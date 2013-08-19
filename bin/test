@@ -4,7 +4,8 @@ result=0
 
 packages=(
 	cf
-	cf/terminalcolor
+	cf/configuration
+	cf/terminal
 );
 
 for package in "${packages[@]}"

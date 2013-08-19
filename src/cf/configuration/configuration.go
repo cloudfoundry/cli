@@ -1,9 +1,8 @@
 package configuration
 
 type Configuration struct {
-	Target string
+	Target     string
 	ApiVersion string
-
 }
 
 func Default() (c Configuration) {

@@ -2,10 +2,9 @@ package main
 
 import (
 	"cf/configuration"
-	termcolor "cf/terminalcolor"
+	term "cf/terminal"
 	"github.com/codegangsta/cli"
 	"os"
-	"fmt"
 )
 
 func main() {
@@ -19,14 +18,22 @@ func main() {
 			ShortName: "t",
 			Usage:     "Set or view the target",
 			Action: func(c *cli.Context) {
-				config := configuration.Default()
+					config := configuration.Default()
 
-				fmt.Println("Target Information (where will apps be pushed):")
-				fmt.Printf("CF instance: %s (API version: %s)\n",
-					termcolor.Colorize(config.Target, termcolor.Yellow, true),
-					termcolor.Colorize(config.ApiVersion, termcolor.Cyan, true))
-				fmt.Println("user: N/A")
-				fmt.Println("target app space: N/A (org: N/A)")
+					term.Say("Target Information (where will apps be pushed):")
+
+					term.Say("CF instance: %s (API version: %s)",
+						term.Yellow(config.Target),
+						term.Yellow(config.ApiVersion))
+
+					term.Say("user: %s",
+						term.Red("N/A"))
+
+					term.Say("target app space: %s (org: %s)",
+						term.Red("N/A"),
+						term.Red("N/A"))
+
+					return
 			},
 		},
 	}
