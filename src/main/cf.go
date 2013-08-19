@@ -18,22 +18,16 @@ func main() {
 			ShortName: "t",
 			Usage:     "Set or view the target",
 			Action: func(c *cli.Context) {
-					config := configuration.Default()
+				config := configuration.Default()
 
-					term.Say("Target Information (where will apps be pushed):")
+				term.Say("CF instance: %s (API version: %s)",
+					term.Yellow(config.Target),
+					term.Yellow(config.ApiVersion))
 
-					term.Say("CF instance: %s (API version: %s)",
-						term.Yellow(config.Target),
-						term.Yellow(config.ApiVersion))
+				term.Say("Logged out. Use '%s' to login.",
+					term.Green("cf login USERNAME"))
 
-					term.Say("user: %s",
-						term.Red("N/A"))
-
-					term.Say("target app space: %s (org: %s)",
-						term.Red("N/A"),
-						term.Red("N/A"))
-
-					return
+				return
 			},
 		},
 	}

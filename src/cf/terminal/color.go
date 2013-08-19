@@ -29,3 +29,7 @@ func Yellow(message string) string {
 func Red(message string) string {
 	return Colorize(message, red, true)
 }
+
+func Green(message string) string {
+	return Colorize(message, green, true)
+}
