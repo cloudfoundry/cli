@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+echo "Creating release dir..."
+mkdir -p release
+
+PLATFORMS="darwin/386 darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64"
+
+function build-architecture {
+  GOOS=${1%/*}
+  GOARCH=${1#*/}
+  echo "Creating $GOOS $GOARCH binary..."
+
+  GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build"
+  cd out
+  tar cvzf ../release/go-cf-$GOOS-$GOARCH.tgz go-cf
+  cd ..
+}
+
+for PLATFORM in $PLATFORMS; do
+  build-architecture $PLATFORM
+done
