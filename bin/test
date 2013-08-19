@@ -1,0 +1,33 @@
+#!/bin/bash
+
+result=0
+
+packages=(
+	cf
+	cf/terminalcolor
+);
+
+for package in "${packages[@]}"
+do
+    echo -e "\n Testing package $package"
+    $(dirname $0)/go fmt $package
+# Don't need race testing yet but may need it
+# in the future. 
+#   $(dirname $0)/go test -i --race $package
+#   $(dirname $0)/go test -v --race $package
+	$(dirname $0)/go test -i $package
+    $(dirname $0)/go test -v $package
+    let "result+=$?" 
+done
+
+echo -e "\n Running build script to confirm main compiles"
+$(dirname $0)/build
+let "result+=$?"
+
+if [ $result -eq 0 ]; then
+	echo -e "\nSUITE SUCCESS"
+else
+	echo -e "\nSUITE FAILURE"
+fi
+
+exit $result
