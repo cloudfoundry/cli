@@ -1,8 +1,7 @@
 package main
 
 import (
-	"cf/configuration"
-	term "cf/terminal"
+	"cf/commands"
 	"github.com/codegangsta/cli"
 	"os"
 )
@@ -18,16 +17,7 @@ func main() {
 			ShortName: "t",
 			Usage:     "Set or view the target",
 			Action: func(c *cli.Context) {
-				config := configuration.Default()
-
-				term.Say("CF instance: %s (API version: %s)",
-					term.Yellow(config.Target),
-					term.Yellow(config.ApiVersion))
-
-				term.Say("Logged out. Use '%s' to login.",
-					term.Green("cf login USERNAME"))
-
-				return
+				commands.Target(c)
 			},
 		},
 	}
