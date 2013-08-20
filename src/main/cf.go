@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	terminalUI := new(terminal.TerminalUI)
+
 	app := cli.NewApp()
 	app.Name = "cf"
 	app.Usage = "A command line tool to interact with Cloud Foundry"
@@ -18,7 +20,7 @@ func main() {
 			ShortName: "t",
 			Usage:     "Set or view the target",
 			Action: func(c *cli.Context) {
-				commands.Target(c, new(terminal.TerminalUI))
+				commands.Target(c, terminalUI)
 			},
 		},
 		{
@@ -26,7 +28,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Log user in",
 			Action: func(c *cli.Context) {
-				commands.Login(c, new(terminal.TerminalUI))
+				commands.Login(c, terminalUI)
 			},
 		},
 	}
