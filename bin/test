@@ -4,6 +4,7 @@ result=0
 
 packages=(
 	cf
+	cf/commands
 	cf/configuration
 	cf/terminal
 );

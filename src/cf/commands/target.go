@@ -1,57 +1,108 @@
 package commands
 
 import (
-	"github.com/codegangsta/cli"
 	"cf/configuration"
 	term "cf/terminal"
-	"net/http"
 	"crypto/tls"
+	"encoding/json"
+	"github.com/codegangsta/cli"
+	"io/ioutil"
+	"net/http"
 )
+
+type InfoResponse struct {
+	ApiVersion string `json:"api_version"`
+}
 
 func Target(c *cli.Context) {
 	if len(c.Args()) == 0 {
-		config := configuration.Default()
-
-		term.Say("CF instance: %s (API version: %s)",
-			term.Yellow(config.Target),
-			term.Yellow(config.ApiVersion))
-
-		term.Say("Logged out. Use '%s' to login.",
-			term.Yellow("cf login USERNAME"))
-
+		showCurrentTarget()
 	} else {
-		target := c.Args()[0]
-		term.Say("Setting target to %s...", term.Yellow(target))
-
-		req, err := http.NewRequest("GET", target + "/v2/info", nil)
-
-		if err != nil {
-			term.Say(term.Red("FAILED"))
-			term.Say("URL invalid.")
-			return
-		}
-
-		tr := &http.Transport{
-			TLSClientConfig:    &tls.Config{InsecureSkipVerify: true},
-		}
-		client := &http.Client{Transport: tr}
-		response, err := client.Do(req)
-
-		if err != nil || response.StatusCode > 299 {
-			term.Say(term.Red("FAILED"))
-			term.Say("Target refused connection.")
-		} else {
-			term.Say(term.Green("OK"))
-
-			term.Say("API Endpoint: %s (API version: %s)",
-				term.Yellow(target),
-				"2")
-
-			term.Say("Logged out. Use '%s' to login.",
-				term.Green("cf login USERNAME"))
-		}
+		setNewTarget(c.Args()[0])
 	}
 
 	return
 }
 
+func showCurrentTarget() {
+	config, err := configuration.Load()
+
+	if err != nil {
+		config = configuration.Default()
+	}
+
+	showConfiguration(config)
+}
+
+func setNewTarget(target string) {
+	url := "https://" + target
+	term.Say("Setting target to %s...", term.Yellow(url))
+
+	req, err := http.NewRequest("GET", url+"/v2/info", nil)
+
+	if err != nil {
+		failedSettingTarget("URL invalid.", err)
+		return
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+	response, err := client.Do(req)
+
+	if err != nil || response.StatusCode > 299 {
+		failedSettingTarget("Target refused connection.", err)
+		return
+	}
+
+	jsonBytes, err := ioutil.ReadAll(response.Body)
+	response.Body.Close()
+	if err != nil {
+		failedSettingTarget("Could not read response body.", err)
+		return
+	}
+
+	serverResponse := new(InfoResponse)
+	err = json.Unmarshal(jsonBytes, &serverResponse)
+
+	if err != nil {
+		failedSettingTarget("Invalid JSON response from server.", err)
+		return
+	}
+
+	newConfiguration, err := saveTarget(url, serverResponse.ApiVersion)
+
+	if err != nil {
+		failedSettingTarget("Error saving configuration", err)
+		return
+	}
+
+	term.Say(term.Green("OK"))
+	showConfiguration(newConfiguration)
+}
+
+func showConfiguration(config configuration.Configuration) {
+	term.Say("CF instance: %s (API version: %s)",
+		term.Yellow(config.Target),
+		term.Yellow(config.ApiVersion))
+
+	term.Say("Logged out. Use '%s' to login.",
+		term.Yellow("cf login USERNAME"))
+}
+
+func failedSettingTarget(message string, err error) {
+	term.Say(term.Red("FAILED"))
+	term.Say(message)
+
+	if err != nil {
+		term.Say(err.Error())
+	}
+}
+
+func saveTarget(target string, apiVersion string) (config configuration.Configuration, err error) {
+	config.Target = target
+	config.ApiVersion = apiVersion
+	err = config.Save()
+	return
+}
