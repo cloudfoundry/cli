@@ -52,6 +52,13 @@ func (c *FakeUI) Ok() {
 
 func (c *FakeUI) Failed(message string, err error) {
 	c.Say("FAILED")
-	c.Say(message)
+
+	if message != "" {
+		c.Say(message)
+	}
+
+	if err != nil {
+		c.Say(err.Error())
+	}
 	return
 }

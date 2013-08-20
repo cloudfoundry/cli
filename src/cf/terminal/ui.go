@@ -30,7 +30,10 @@ func (c TerminalUI) Ok() {
 
 func (c TerminalUI) Failed(message string, err error) {
 	c.Say(Red("FAILED"))
-	c.Say(message)
+
+	if message != "" {
+		c.Say(message)
+	}
 
 	if err != nil {
 		c.Say(err.Error())

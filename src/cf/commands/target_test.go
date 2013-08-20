@@ -39,7 +39,7 @@ var notFoundEndpoint = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var invalidJsonResponseEndpoint = func(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, `I am not valid`)
+	fmt.Fprintln(w, `Foo`)
 }
 
 func newContext(args []string) *cli.Context {
@@ -100,7 +100,7 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
-	assert.Contains(t, fakeUI.Outputs[2], "Target refused connection.")
+	assert.Contains(t, fakeUI.Outputs[2], "Server error, status code: 404")
 }
 
 func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
@@ -115,5 +115,5 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 	Target(context, fakeUI)
 
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
-	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server.")
+	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server")
 }

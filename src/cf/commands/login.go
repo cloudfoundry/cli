@@ -5,11 +5,8 @@ import (
 	"cf/configuration"
 	term "cf/terminal"
 	"encoding/base64"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -64,37 +61,15 @@ func authenticate(endpoint string, email string, password string) (response Auth
 		"scope":      {""},
 	}
 
-	client := api.NewClient()
-
-	req, err := http.NewRequest("POST", endpoint+"/oauth/token", strings.NewReader(data.Encode()))
+	request, err := http.NewRequest("POST", endpoint+"/oauth/token", strings.NewReader(data.Encode()))
 	if err != nil {
 		return
 	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("Accept", "application/json")
+	request.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
-	rawResponse, err := client.Do(req)
-
-	if err != nil {
-		return
-	}
-
-	if rawResponse.StatusCode > 299 {
-		err = errors.New("Login error")
-	}
-
-	jsonBytes, err := ioutil.ReadAll(rawResponse.Body)
-	rawResponse.Body.Close()
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(jsonBytes, &response)
-
-	if err != nil {
-		return
-	}
+	err = api.PerformRequest(request, &response)
 
 	return
 }

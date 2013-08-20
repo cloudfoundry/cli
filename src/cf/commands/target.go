@@ -4,9 +4,7 @@ import (
 	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
-	"encoding/json"
 	"github.com/codegangsta/cli"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -43,34 +41,18 @@ func setNewTarget(target string) {
 	url := "https://" + target
 	termUI.Say("Setting target to %s...", term.Yellow(url))
 
-	req, err := http.NewRequest("GET", url+"/v2/info", nil)
+	request, err := http.NewRequest("GET", url+"/v2/info", nil)
 
 	if err != nil {
 		termUI.Failed("URL invalid.", err)
 		return
 	}
 
-	client := api.NewClient()
-	response, err := client.Do(req)
-
-	if err != nil || response.StatusCode > 299 {
-		termUI.Failed("Target refused connection.", err)
-		return
-	}
-
-	jsonBytes, err := ioutil.ReadAll(response.Body)
-	response.Body.Close()
-	if err != nil {
-		termUI.Failed("Could not read response body.", err)
-		return
-	}
-
 	serverResponse := new(InfoResponse)
-	err = json.Unmarshal(jsonBytes, &serverResponse)
+	err = api.PerformRequest(request, &serverResponse)
 
 	if err != nil {
-		termUI.Failed("Invalid JSON response from server.", err)
-		return
+		termUI.Failed("", err)
 	}
 
 	newConfiguration, err := saveTarget(url, serverResponse)
