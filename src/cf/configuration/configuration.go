@@ -1,10 +1,12 @@
 package configuration
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"os/user"
+	"strings"
 )
 
 const (
@@ -68,6 +70,42 @@ func (c Configuration) Save() (err error) {
 	err = ioutil.WriteFile(file, bytes, filePermissions)
 
 	return
+}
+
+func (c Configuration) UserEmail() (email string) {
+	tokenParts := strings.Split(c.AccessToken, " ")
+
+	if len(tokenParts) < 2 {
+		return
+	}
+
+	token := tokenParts[1]
+	encodedInfoParts := strings.Split(token, ".")
+
+	if len(encodedInfoParts) < 3 {
+		return
+	}
+
+	encodedInfo := encodedInfoParts[1]
+	clearInfoPart, err := base64.StdEncoding.DecodeString(encodedInfo)
+
+	if err != nil {
+		return
+	}
+
+	type TokenInfo struct {
+		UserName string `json:"user_name"`
+		Email    string `json:"email"`
+	}
+
+	tokenInfo := new(TokenInfo)
+	err = json.Unmarshal(clearInfoPart, &tokenInfo)
+
+	if err != nil {
+		return
+	}
+
+	return tokenInfo.Email
 }
 
 func configFile() (file string, err error) {

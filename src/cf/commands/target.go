@@ -71,8 +71,14 @@ func showConfiguration(config configuration.Configuration) {
 		term.Yellow(config.Target),
 		term.Yellow(config.ApiVersion))
 
-	termUI.Say("Logged out. Use '%s' to login.",
-		term.Yellow("cf login USERNAME"))
+	email := config.UserEmail()
+
+	if email != "" {
+		termUI.Say("user: %s", term.Yellow(email))
+		termUI.Say("No org targeted. Use 'cf target -o' to target an org.")
+	} else {
+		termUI.Say("Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
+	}
 }
 
 func saveTarget(target string, info *InfoResponse) (config configuration.Configuration, err error) {
