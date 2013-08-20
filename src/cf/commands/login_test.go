@@ -57,6 +57,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
+	config.AccessToken = ""
 	err = config.Save()
 	assert.NoError(t, err)
 
@@ -69,6 +70,10 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Prompts[0], "Email")
 	assert.Contains(t, ui.Prompts[1], "Password")
+
+	config, err = configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, config.AccessToken, "BEARER my_access_token")
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
@@ -78,6 +83,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
+	config.AccessToken = ""
 	err = config.Save()
 	assert.NoError(t, err)
 
@@ -99,4 +105,8 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[5], "FAILED")
 	assert.Equal(t, ui.Outputs[7], "Authenticating...")
 	assert.Equal(t, ui.Outputs[8], "FAILED")
+
+	config, err = configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, config.AccessToken, "")
 }

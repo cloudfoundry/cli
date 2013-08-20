@@ -5,8 +5,11 @@ import (
 	"cf/configuration"
 	term "cf/terminal"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -14,6 +17,7 @@ import (
 
 type AuthenticationResponse struct {
 	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
 }
 
 const maxLoginTries = 3
@@ -32,14 +36,23 @@ func Login(c *cli.Context, ui term.UI) {
 		password := ui.Ask("Password%s", term.Cyan(">"))
 		ui.Say("Authenticating...")
 
-		_, err = authenticate(config.AuthorizationEndpoint, email, password)
+		response, err := authenticate(config.AuthorizationEndpoint, email, password)
 
 		if err != nil {
 			ui.Failed("Error Authenticating", err)
-		} else {
-			ui.Ok()
+			continue
+		}
+
+		config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
+		err = config.Save()
+
+		if err != nil {
+			ui.Failed("Error Persisting Session", err)
 			return
 		}
+
+		ui.Ok()
+		return
 	}
 }
 
@@ -61,14 +74,26 @@ func authenticate(endpoint string, email string, password string) (response Auth
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
-	resp, err := client.Do(req)
+	rawResponse, err := client.Do(req)
 
 	if err != nil {
 		return
 	}
 
-	if resp.StatusCode > 299 {
+	if rawResponse.StatusCode > 299 {
 		err = errors.New("Login error")
+	}
+
+	jsonBytes, err := ioutil.ReadAll(rawResponse.Body)
+	rawResponse.Body.Close()
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(jsonBytes, &response)
+
+	if err != nil {
+		return
 	}
 
 	return
