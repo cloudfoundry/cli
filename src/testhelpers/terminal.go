@@ -39,8 +39,8 @@ func (c *FakeUI) Say(message string, args ...interface{}) {
 	return
 }
 
-func (c *FakeUI) Ask(prompt string) (answer string) {
-	c.Prompts = append(c.Prompts, prompt)
+func (c *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
+	c.Prompts = append(c.Prompts, fmt.Sprintf(prompt, args...))
 	answer = c.Inputs[0]
 	c.Inputs = c.Inputs[1:]
 	return

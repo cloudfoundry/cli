@@ -23,9 +23,9 @@ func Login(c *cli.Context, ui term.UI) {
 		return
 	}
 
-	ui.Say("target: %s", config.Target)
-	email := ui.Ask("Email>")
-	password := ui.Ask("Password>")
+	ui.Say("target: %s", term.Cyan(config.Target))
+	email := ui.Ask("Email%s", term.Cyan(">"))
+	password := ui.Ask("Password%s", term.Cyan(">"))
 	ui.Say("Authenticating...")
 
 	_, err = authenticate(config.AuthorizationEndpoint, email, password)

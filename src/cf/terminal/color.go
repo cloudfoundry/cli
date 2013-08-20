@@ -16,7 +16,7 @@ const (
 	cyan          = 36
 )
 
-func Colorize(message string, color Color, bold bool) string {
+func colorize(message string, color Color, bold bool) string {
 	if runtime.GOOS == "windows" {
 		return message
 	}
@@ -30,13 +30,21 @@ func Colorize(message string, color Color, bold bool) string {
 }
 
 func Yellow(message string) string {
-	return Colorize(message, yellow, true)
+	return colorize(message, yellow, true)
 }
 
 func Red(message string) string {
-	return Colorize(message, red, true)
+	return colorize(message, red, true)
 }
 
 func Green(message string) string {
-	return Colorize(message, green, true)
+	return colorize(message, green, true)
+}
+
+func Blue(message string) string {
+	return colorize(message, blue, true)
+}
+
+func Cyan(message string) string {
+	return colorize(message, cyan, true)
 }

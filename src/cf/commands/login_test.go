@@ -67,8 +67,8 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
-	assert.Equal(t, ui.Prompts[0], "Email>")
-	assert.Equal(t, ui.Prompts[1], "Password>")
+	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[1], "Password")
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
@@ -88,6 +88,4 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "FAILED")
-	assert.Equal(t, ui.Prompts[0], "Email>")
-	assert.Equal(t, ui.Prompts[1], "Password>")
 }
