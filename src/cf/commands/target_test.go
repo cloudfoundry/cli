@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/configuration"
-	term "cf/terminal"
 	"flag"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -54,12 +53,11 @@ func newContext(args []string) *cli.Context {
 func TestTargetDefaults(t *testing.T) {
 	configuration.Delete()
 	context := newContext([]string{})
+	fakeUI := new(testhelpers.FakeUI)
 
-	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.TerminalUI))
-	})
+	Target(context, fakeUI)
 
-	assert.Contains(t, out, "https://api.run.pivotal.io")
+	assert.Contains(t, fakeUI.Outputs[0], "https://api.run.pivotal.io")
 }
 
 func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
@@ -70,20 +68,18 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	assert.NoError(t, err)
 
 	context := newContext([]string{URL.Host})
-	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.TerminalUI))
-	})
+	fakeUI := new(testhelpers.FakeUI)
+	Target(context, fakeUI)
 
-	assert.Contains(t, out, "https://"+URL.Host)
-	assert.Contains(t, out, "42.0.0")
+	assert.Contains(t, fakeUI.Outputs[2], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[2], "42.0.0")
 
 	context = newContext([]string{})
-	out = testhelpers.CaptureOutput(func() {
-		Target(context, new(term.TerminalUI))
-	})
+	fakeUI = new(testhelpers.FakeUI)
+	Target(context, fakeUI)
 
-	assert.Contains(t, out, "https://"+URL.Host)
-	assert.Contains(t, out, "42.0.0")
+	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[0], "42.0.0")
 
 	savedConfig, err := configuration.Load()
 
@@ -99,13 +95,12 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 	assert.NoError(t, err)
 
 	context := newContext([]string{URL.Host})
-	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.TerminalUI))
-	})
+	fakeUI := new(testhelpers.FakeUI)
+	Target(context, fakeUI)
 
-	assert.Contains(t, out, "https://"+URL.Host)
-	assert.Contains(t, out, "FAILED")
-	assert.Contains(t, out, "Target refused connection.")
+	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[2], "Target refused connection.")
 }
 
 func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
@@ -116,10 +111,9 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 	assert.NoError(t, err)
 
 	context := newContext([]string{URL.Host})
-	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.TerminalUI))
-	})
+	fakeUI := new(testhelpers.FakeUI)
+	Target(context, fakeUI)
 
-	assert.Contains(t, out, "FAILED")
-	assert.Contains(t, out, "Invalid JSON response from server.")
+	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server.")
 }
