@@ -46,6 +46,10 @@ func (c *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	return
 }
 
+func (c *FakeUI) Ok() {
+	c.Say("OK")
+}
+
 func (c *FakeUI) Failed(message string, err error) {
 	c.Say("FAILED")
 	c.Say(message)

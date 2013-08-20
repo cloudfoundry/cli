@@ -5,6 +5,7 @@ import "fmt"
 type UI interface {
 	Say(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
+	Ok()
 	Failed(message string, err error)
 }
 
@@ -17,9 +18,14 @@ func (c TerminalUI) Say(message string, args ...interface{}) {
 }
 
 func (c TerminalUI) Ask(prompt string, args ...interface{}) (answer string) {
+	fmt.Println("")
 	fmt.Printf(prompt+" ", args...)
 	fmt.Scanln(&answer)
 	return
+}
+
+func (c TerminalUI) Ok() {
+	c.Say(Green("OK"))
 }
 
 func (c TerminalUI) Failed(message string, err error) {

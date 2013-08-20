@@ -80,7 +80,7 @@ func setNewTarget(target string) {
 		return
 	}
 
-	termUI.Say(term.Green("OK"))
+	termUI.Ok()
 	showConfiguration(newConfiguration)
 }
 

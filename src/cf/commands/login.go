@@ -35,7 +35,7 @@ func Login(c *cli.Context, ui term.UI) {
 		return
 	}
 
-	ui.Say("OK")
+	ui.Ok()
 }
 
 func authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
