@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/configuration"
+	"encoding/base64"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -15,6 +16,8 @@ var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Req
 	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
 	methodMatches := request.Method == "POST"
 	pathMatches := request.URL.Path == "/oauth/token"
+	encodedAuth := base64.StdEncoding.EncodeToString([]byte("cf:"))
+	basicAuthMatches := request.Header.Get("authorization") == "Basic "+encodedAuth
 
 	err := request.ParseForm()
 
@@ -24,9 +27,11 @@ var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Req
 	}
 	usernameMatches := request.Form.Get("username") == "foo@example.com"
 	passwordMatches := request.Form.Get("password") == "bar"
-	credentialsMatch := usernameMatches && passwordMatches
+	grantTypeMatches := request.Form.Get("grant_type") == "password"
+	scopeMatches := request.Form.Get("scope") == ""
+	bodyMatches := usernameMatches && passwordMatches && grantTypeMatches && scopeMatches
 
-	if !(contentTypeMatches && acceptHeaderMatches && methodMatches && pathMatches && credentialsMatch) {
+	if !(contentTypeMatches && acceptHeaderMatches && methodMatches && pathMatches && bodyMatches && basicAuthMatches) {
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}

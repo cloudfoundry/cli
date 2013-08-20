@@ -4,6 +4,7 @@ import (
 	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
+	"encoding/base64"
 	"errors"
 	"github.com/codegangsta/cli"
 	"net/http"
@@ -38,7 +39,12 @@ func Login(c *cli.Context, ui term.UI) {
 }
 
 func authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
-	data := url.Values{"username": {email}, "password": {password}}
+	data := url.Values{
+		"username":   {email},
+		"password":   {password},
+		"grant_type": {"password"},
+		"scope":      {""},
+	}
 
 	client := api.NewClient()
 
@@ -48,6 +54,7 @@ func authenticate(endpoint string, email string, password string) (response Auth
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
 	resp, err := client.Do(req)
 
