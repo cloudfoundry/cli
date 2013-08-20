@@ -13,13 +13,15 @@ const (
 )
 
 type Configuration struct {
-	Target     string
-	ApiVersion string
+	Target                string
+	ApiVersion            string
+	AuthorizationEndpoint string
 }
 
 func Default() (c Configuration) {
 	c.Target = "https://api.run.pivotal.io"
 	c.ApiVersion = "2"
+	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
 	return
 }
 

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/configuration"
+	term "cf/terminal"
 	"flag"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -27,7 +28,7 @@ var validInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
   "support": "http://support.cloudfoundry.com",
   "version": 2,
   "description": "Cloud Foundry sponsored by Pivotal",
-  "authorization_endpoint": "https://login.run.pivotal.io",
+  "authorization_endpoint": "https://login.example.com",
   "api_version": "42.0.0"
 } `
 	fmt.Fprintln(w, infoResponse)
@@ -55,7 +56,7 @@ func TestTargetDefaults(t *testing.T) {
 	context := newContext([]string{})
 
 	out := testhelpers.CaptureOutput(func() {
-		Target(context)
+		Target(context, new(term.ConsoleUI))
 	})
 
 	assert.Contains(t, out, "https://api.run.pivotal.io")
@@ -70,7 +71,7 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	context := newContext([]string{URL.Host})
 	out := testhelpers.CaptureOutput(func() {
-		Target(context)
+		Target(context, new(term.ConsoleUI))
 	})
 
 	assert.Contains(t, out, "https://"+URL.Host)
@@ -78,11 +79,16 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	context = newContext([]string{})
 	out = testhelpers.CaptureOutput(func() {
-		Target(context)
+		Target(context, new(term.ConsoleUI))
 	})
 
 	assert.Contains(t, out, "https://"+URL.Host)
 	assert.Contains(t, out, "42.0.0")
+
+	savedConfig, err := configuration.Load()
+
+	assert.NoError(t, err)
+	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
 }
 
 func TestTargetWhenEndpointReturns404(t *testing.T) {
@@ -94,7 +100,7 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 
 	context := newContext([]string{URL.Host})
 	out := testhelpers.CaptureOutput(func() {
-		Target(context)
+		Target(context, new(term.ConsoleUI))
 	})
 
 	assert.Contains(t, out, "https://"+URL.Host)
@@ -111,7 +117,7 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 
 	context := newContext([]string{URL.Host})
 	out := testhelpers.CaptureOutput(func() {
-		Target(context)
+		Target(context, new(term.ConsoleUI))
 	})
 
 	assert.Contains(t, out, "FAILED")

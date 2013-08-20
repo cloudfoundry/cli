@@ -10,12 +10,14 @@ func TestDefaults(t *testing.T) {
 
 	assert.Equal(t, config.Target, "https://api.run.pivotal.io")
 	assert.Equal(t, config.ApiVersion, "2")
+	assert.Equal(t, config.AuthorizationEndpoint, "https://login.run.pivotal.io")
 }
 
 func TestSavingAndLoading(t *testing.T) {
 	configToSave := Default()
 	configToSave.ApiVersion = "3.1.0"
-	configToSave.Target = "https://target.example.com"
+	configToSave.Target = "https://api.target.example.com"
+	configToSave.AuthorizationEndpoint = "https://login.target.example.com"
 
 	configToSave.Save()
 

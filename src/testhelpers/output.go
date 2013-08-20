@@ -3,7 +3,9 @@ package testhelpers
 import (
 	"bytes"
 	"io"
-	"os")
+	"os"
+	"fmt"
+)
 
 func CaptureOutput(f func()) string {
 	old := os.Stdout // keep backup of the real stdout
@@ -24,4 +26,22 @@ func CaptureOutput(f func()) string {
 	w.Close()
 	os.Stdout = old // restoring the real stdout
 	return <-outC
+}
+
+type FakeUI struct {
+	Outputs []string
+	Prompts []string
+	Inputs []string
+}
+
+func (c *FakeUI) Say(message string, args ...interface{}) {
+	c.Outputs = append(c.Outputs, fmt.Sprintf(message, args...))
+	return
+}
+
+func (c *FakeUI) Ask(prompt string) (answer string) {
+	c.Prompts = append(c.Prompts, prompt)
+	answer = c.Inputs[0]
+	c.Inputs = c.Inputs[1:]
+	return
 }
