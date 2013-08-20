@@ -45,3 +45,9 @@ func (c *FakeUI) Ask(prompt string) (answer string) {
 	c.Inputs = c.Inputs[1:]
 	return
 }
+
+func (c *FakeUI) Failed(message string, err error) {
+	c.Say("FAILED")
+	c.Say(message)
+	return
+}

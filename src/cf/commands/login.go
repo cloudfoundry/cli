@@ -18,7 +18,7 @@ type AuthenticationResponse struct {
 func Login(c *cli.Context, ui term.UI) {
 	config, err := configuration.Load()
 	if err != nil {
-		ui.Say("FAILED")
+		ui.Failed("Error loading configuration", err)
 		return
 	}
 
@@ -30,7 +30,7 @@ func Login(c *cli.Context, ui term.UI) {
 	_, err = authenticate(config.AuthorizationEndpoint, email, password)
 
 	if err != nil {
-		ui.Say("FAILED")
+		ui.Failed("Error Authenticating", err)
 		return
 	}
 

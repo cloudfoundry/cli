@@ -42,7 +42,7 @@ func setNewTarget(target string, ui term.UI) {
 	req, err := http.NewRequest("GET", url+"/v2/info", nil)
 
 	if err != nil {
-		failedSettingTarget("URL invalid.", err, ui)
+		ui.Failed("URL invalid.", err)
 		return
 	}
 
@@ -50,14 +50,14 @@ func setNewTarget(target string, ui term.UI) {
 	response, err := client.Do(req)
 
 	if err != nil || response.StatusCode > 299 {
-		failedSettingTarget("Target refused connection.", err, ui)
+		ui.Failed("Target refused connection.", err)
 		return
 	}
 
 	jsonBytes, err := ioutil.ReadAll(response.Body)
 	response.Body.Close()
 	if err != nil {
-		failedSettingTarget("Could not read response body.", err, ui)
+		ui.Failed("Could not read response body.", err)
 		return
 	}
 
@@ -65,14 +65,14 @@ func setNewTarget(target string, ui term.UI) {
 	err = json.Unmarshal(jsonBytes, &serverResponse)
 
 	if err != nil {
-		failedSettingTarget("Invalid JSON response from server.", err, ui)
+		ui.Failed("Invalid JSON response from server.", err)
 		return
 	}
 
 	newConfiguration, err := saveTarget(url, serverResponse)
 
 	if err != nil {
-		failedSettingTarget("Error saving configuration", err, ui)
+		ui.Failed("Error saving configuration", err)
 		return
 	}
 
@@ -87,15 +87,6 @@ func showConfiguration(config configuration.Configuration, ui term.UI) {
 
 	ui.Say("Logged out. Use '%s' to login.",
 		term.Yellow("cf login USERNAME"))
-}
-
-func failedSettingTarget(message string, err error, ui term.UI) {
-	ui.Say(term.Red("FAILED"))
-	ui.Say(message)
-
-	if err != nil {
-		ui.Say(err.Error())
-	}
 }
 
 func saveTarget(target string, info *InfoResponse) (config configuration.Configuration, err error) {
