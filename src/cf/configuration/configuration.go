@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"os/user"
+	"runtime"
 	"strings"
 )
 
@@ -109,13 +109,7 @@ func (c Configuration) UserEmail() (email string) {
 }
 
 func configFile() (file string, err error) {
-	currentUser, err := user.Current()
-
-	if err != nil {
-		return
-	}
-
-	configDir := currentUser.HomeDir + "/.cf"
+	configDir := userHomeDir() + "/.cf"
 
 	err = os.MkdirAll(configDir, dirPermissions)
 
@@ -125,4 +119,18 @@ func configFile() (file string, err error) {
 
 	file = configDir + "/config.json"
 	return
+}
+
+// See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
+// we can't compile using cgo and use user.Current()
+func userHomeDir() string {
+	if runtime.GOOS == "windows" {
+		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
+		if home == "" {
+			home = os.Getenv("USERPROFILE")
+		}
+		return home
+	}
+
+	return os.Getenv("HOME")
 }
