@@ -56,7 +56,7 @@ func TestTargetDefaults(t *testing.T) {
 	context := newContext([]string{})
 
 	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.ConsoleUI))
+		Target(context, new(term.TerminalUI))
 	})
 
 	assert.Contains(t, out, "https://api.run.pivotal.io")
@@ -71,7 +71,7 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	context := newContext([]string{URL.Host})
 	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.ConsoleUI))
+		Target(context, new(term.TerminalUI))
 	})
 
 	assert.Contains(t, out, "https://"+URL.Host)
@@ -79,7 +79,7 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	context = newContext([]string{})
 	out = testhelpers.CaptureOutput(func() {
-		Target(context, new(term.ConsoleUI))
+		Target(context, new(term.TerminalUI))
 	})
 
 	assert.Contains(t, out, "https://"+URL.Host)
@@ -100,7 +100,7 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 
 	context := newContext([]string{URL.Host})
 	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.ConsoleUI))
+		Target(context, new(term.TerminalUI))
 	})
 
 	assert.Contains(t, out, "https://"+URL.Host)
@@ -117,7 +117,7 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 
 	context := newContext([]string{URL.Host})
 	out := testhelpers.CaptureOutput(func() {
-		Target(context, new(term.ConsoleUI))
+		Target(context, new(term.TerminalUI))
 	})
 
 	assert.Contains(t, out, "FAILED")

@@ -7,7 +7,7 @@ import (
 )
 
 func TestSayWithStringOnly(t *testing.T) {
-	ui := new(ConsoleUI)
+	ui := new(TerminalUI)
 	out := testhelpers.CaptureOutput(func() {
 		ui.Say("Hello")
 	})
@@ -16,7 +16,7 @@ func TestSayWithStringOnly(t *testing.T) {
 }
 
 func TestSayWithStringWithFormat(t *testing.T) {
-	ui := new(ConsoleUI)
+	ui := new(TerminalUI)
 	out := testhelpers.CaptureOutput(func() {
 		ui.Say("Hello %s", "World!")
 	})

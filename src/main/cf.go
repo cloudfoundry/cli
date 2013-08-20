@@ -18,7 +18,7 @@ func main() {
 			ShortName: "t",
 			Usage:     "Set or view the target",
 			Action: func(c *cli.Context) {
-				commands.Target(c, new(terminal.ConsoleUI))
+				commands.Target(c, new(terminal.TerminalUI))
 			},
 		},
 		{
@@ -26,7 +26,7 @@ func main() {
 			ShortName: "l",
 			Usage:     "Log user in",
 			Action: func(c *cli.Context) {
-				commands.Login(c, new(terminal.ConsoleUI))
+				commands.Login(c, new(terminal.TerminalUI))
 			},
 		},
 	}
