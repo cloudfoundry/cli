@@ -1,6 +1,9 @@
 package terminal
 
-import "fmt"
+import (
+	"fmt"
+	"runtime"
+)
 
 type Color uint
 
@@ -14,6 +17,10 @@ const (
 )
 
 func Colorize(message string, color Color, bold bool) string {
+	if runtime.GOOS == "windows" {
+		return message
+	}
+
 	attr := 0
 	if bold {
 		attr = 1
