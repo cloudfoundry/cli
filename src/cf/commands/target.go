@@ -1,9 +1,9 @@
 package commands
 
 import (
+	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
-	"crypto/tls"
 	"encoding/json"
 	"github.com/codegangsta/cli"
 	"io/ioutil"
@@ -46,10 +46,7 @@ func setNewTarget(target string, ui term.UI) {
 		return
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
+	client := api.NewClient()
 	response, err := client.Do(req)
 
 	if err != nil || response.StatusCode > 299 {

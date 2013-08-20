@@ -1,9 +1,9 @@
 package commands
 
 import (
+	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
-	"crypto/tls"
 	"errors"
 	"github.com/codegangsta/cli"
 	"net/http"
@@ -40,10 +40,7 @@ func Login(c *cli.Context, ui term.UI) {
 func authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
 	data := url.Values{"username": {email}, "password": {password}}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := &http.Client{Transport: tr}
+	client := api.NewClient()
 
 	req, err := http.NewRequest("POST", endpoint+"/oauth/token", strings.NewReader(data.Encode()))
 	if err != nil {
