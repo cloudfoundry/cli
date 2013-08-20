@@ -15,34 +15,38 @@ type InfoResponse struct {
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
 }
 
+var termUI term.UI
+
 func Target(c *cli.Context, ui term.UI) {
+	termUI = ui
+
 	if len(c.Args()) == 0 {
-		showCurrentTarget(ui)
+		showCurrentTarget()
 	} else {
-		setNewTarget(c.Args()[0], ui)
+		setNewTarget(c.Args()[0])
 	}
 
 	return
 }
 
-func showCurrentTarget(ui term.UI) {
+func showCurrentTarget() {
 	config, err := configuration.Load()
 
 	if err != nil {
 		config = configuration.Default()
 	}
 
-	showConfiguration(config, ui)
+	showConfiguration(config)
 }
 
-func setNewTarget(target string, ui term.UI) {
+func setNewTarget(target string) {
 	url := "https://" + target
-	ui.Say("Setting target to %s...", term.Yellow(url))
+	termUI.Say("Setting target to %s...", term.Yellow(url))
 
 	req, err := http.NewRequest("GET", url+"/v2/info", nil)
 
 	if err != nil {
-		ui.Failed("URL invalid.", err)
+		termUI.Failed("URL invalid.", err)
 		return
 	}
 
@@ -50,14 +54,14 @@ func setNewTarget(target string, ui term.UI) {
 	response, err := client.Do(req)
 
 	if err != nil || response.StatusCode > 299 {
-		ui.Failed("Target refused connection.", err)
+		termUI.Failed("Target refused connection.", err)
 		return
 	}
 
 	jsonBytes, err := ioutil.ReadAll(response.Body)
 	response.Body.Close()
 	if err != nil {
-		ui.Failed("Could not read response body.", err)
+		termUI.Failed("Could not read response body.", err)
 		return
 	}
 
@@ -65,27 +69,27 @@ func setNewTarget(target string, ui term.UI) {
 	err = json.Unmarshal(jsonBytes, &serverResponse)
 
 	if err != nil {
-		ui.Failed("Invalid JSON response from server.", err)
+		termUI.Failed("Invalid JSON response from server.", err)
 		return
 	}
 
 	newConfiguration, err := saveTarget(url, serverResponse)
 
 	if err != nil {
-		ui.Failed("Error saving configuration", err)
+		termUI.Failed("Error saving configuration", err)
 		return
 	}
 
-	ui.Say(term.Green("OK"))
-	showConfiguration(newConfiguration, ui)
+	termUI.Say(term.Green("OK"))
+	showConfiguration(newConfiguration)
 }
 
-func showConfiguration(config configuration.Configuration, ui term.UI) {
-	ui.Say("CF instance: %s (API version: %s)",
+func showConfiguration(config configuration.Configuration) {
+	termUI.Say("CF instance: %s (API version: %s)",
 		term.Yellow(config.Target),
 		term.Yellow(config.ApiVersion))
 
-	ui.Say("Logged out. Use '%s' to login.",
+	termUI.Say("Logged out. Use '%s' to login.",
 		term.Yellow("cf login USERNAME"))
 }
 
