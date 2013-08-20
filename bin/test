@@ -4,10 +4,14 @@ result=0
 
 packages=(
 	cf
-	cf/commands
-	cf/configuration
-	cf/terminal
 );
+
+sub_packages=`find src/cf -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;`
+
+for sub_package in $sub_packages
+do
+    packages+=("cf/$sub_package")
+done
 
 for package in "${packages[@]}"
 do
