@@ -53,13 +53,13 @@ func authenticate(endpoint string, email string, password string) (response Auth
 
 	client := api.NewClient()
 
-	req, err := http.NewRequest("POST", endpoint + "/oauth/token", strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", endpoint+"/oauth/token", strings.NewReader(data.Encode()))
 	if err != nil {
 		return
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Basic " + base64.StdEncoding.EncodeToString([]byte("cf:")))
+	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
 	resp, err := client.Do(req)
 
