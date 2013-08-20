@@ -16,6 +16,8 @@ type AuthenticationResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
+const maxLoginTries = 3
+
 func Login(c *cli.Context, ui term.UI) {
 	config, err := configuration.Load()
 	if err != nil {
@@ -25,17 +27,20 @@ func Login(c *cli.Context, ui term.UI) {
 
 	ui.Say("target: %s", term.Cyan(config.Target))
 	email := ui.Ask("Email%s", term.Cyan(">"))
-	password := ui.Ask("Password%s", term.Cyan(">"))
-	ui.Say("Authenticating...")
 
-	_, err = authenticate(config.AuthorizationEndpoint, email, password)
+	for i := 0; i < maxLoginTries; i++ {
+		password := ui.Ask("Password%s", term.Cyan(">"))
+		ui.Say("Authenticating...")
 
-	if err != nil {
-		ui.Failed("Error Authenticating", err)
-		return
+		_, err = authenticate(config.AuthorizationEndpoint, email, password)
+
+		if err != nil {
+			ui.Failed("Error Authenticating", err)
+		} else {
+			ui.Ok()
+			return
+		}
 	}
-
-	ui.Ok()
 }
 
 func authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
@@ -48,13 +53,13 @@ func authenticate(endpoint string, email string, password string) (response Auth
 
 	client := api.NewClient()
 
-	req, err := http.NewRequest("POST", endpoint+"/oauth/token", strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", endpoint + "/oauth/token", strings.NewReader(data.Encode()))
 	if err != nil {
 		return
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
+	req.Header.Set("Authorization", "Basic " + base64.StdEncoding.EncodeToString([]byte("cf:")))
 
 	resp, err := client.Do(req)
 

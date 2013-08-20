@@ -82,10 +82,21 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 
 	ui := new(testhelpers.FakeUI)
-	ui.Inputs = []string{"foo@example.com", "bar"}
+	ui.Inputs = []string{
+		"foo@example.com",
+		"bar",
+		"bar",
+		"bar",
+		"bar",
+	}
 
 	Login(nil, ui)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
-	assert.Contains(t, ui.Outputs[2], "FAILED")
+	assert.Equal(t, ui.Outputs[1], "Authenticating...")
+	assert.Equal(t, ui.Outputs[2], "FAILED")
+	assert.Equal(t, ui.Outputs[4], "Authenticating...")
+	assert.Equal(t, ui.Outputs[5], "FAILED")
+	assert.Equal(t, ui.Outputs[7], "Authenticating...")
+	assert.Equal(t, ui.Outputs[8], "FAILED")
 }
