@@ -118,6 +118,18 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server")
 }
 
+func TestTargetWithUnreachableEndpoint(t *testing.T) {
+	URL, err := url.Parse("https://foo")
+	assert.NoError(t, err)
+
+	context := newContext([]string{URL.Host})
+	fakeUI := new(testhelpers.FakeUI)
+	Target(context, fakeUI)
+
+	assert.Equal(t, 3, len(fakeUI.Outputs))
+	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
+}
+
 var orgInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, `Foo`)
 }

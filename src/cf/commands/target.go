@@ -53,6 +53,7 @@ func setNewTarget(target string) {
 
 	if err != nil {
 		termUI.Failed("", err)
+		return
 	}
 
 	newConfiguration, err := saveTarget(url, serverResponse)
