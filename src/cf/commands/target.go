@@ -59,10 +59,8 @@ func showConfiguration(config *configuration.Configuration) {
 		term.Yellow(config.Target),
 		term.Yellow(config.ApiVersion))
 
-	email := config.UserEmail()
-
-	if email != "" {
-		termUI.Say("  user:            %s", term.Yellow(email))
+	if config.IsLoggedIn() {
+		termUI.Say("  user:            %s", term.Yellow(config.UserEmail()))
 
 		if config.Organization != "" {
 			termUI.Say("  org:             %s", term.Yellow(config.Organization))
