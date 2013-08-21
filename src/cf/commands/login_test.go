@@ -13,14 +13,6 @@ import (
 	"testing"
 )
 
-type FakeOrgRepository struct {
-	organizations []api.Organization
-}
-
-func (repo *FakeOrgRepository) FindOrganizations(config *configuration.Configuration) (orgs []api.Organization, err error) {
-	return repo.organizations, nil
-}
-
 var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 	contentTypeMatches := request.Header.Get("content-type") == "application/x-www-form-urlencoded"
 	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
@@ -65,7 +57,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
 
-	Login(nil, ui, &FakeOrgRepository{})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -90,7 +82,7 @@ func TestLoggingInWithTwoOrgsAskUserToChooseOrg(t *testing.T) {
 		api.Organization{"FirstOrg", "org-1-guid"},
 		api.Organization{"SecondOrg", "org-2-guid"},
 	}
-	Login(nil, ui, &FakeOrgRepository{orgs})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{orgs})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
@@ -123,7 +115,7 @@ func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar", "3", "2"}
 
-	Login(nil, ui, &FakeOrgRepository{orgs})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{orgs})
 
 	assert.Contains(t, ui.Prompts[2], "Organization")
 	assert.Contains(t, ui.Outputs[5], "FAILED")
@@ -154,7 +146,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		"bar",
 	}
 
-	Login(nil, ui, &FakeOrgRepository{})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Equal(t, ui.Outputs[1], "Authenticating...")
