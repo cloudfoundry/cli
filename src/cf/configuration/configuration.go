@@ -19,6 +19,7 @@ type Configuration struct {
 	AuthorizationEndpoint string
 	AccessToken           string
 	Organization          string
+	Space                 string
 }
 
 func setDefaultConfig() (c Configuration) {

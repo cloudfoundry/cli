@@ -17,12 +17,14 @@ var termUI term.UI
 var authorizer api.Authorizer
 
 func Target(c *cli.Context, ui term.UI, a api.Authorizer) {
-	argsCount := len(c.Args())
-	org := c.String("o")
 	termUI = ui
 	authorizer = a
 
-	if argsCount == 0 && org == "" {
+	argsCount := len(c.Args())
+	org := c.String("o")
+	space := c.String("s")
+
+	if argsCount == 0 && org == "" && space == "" {
 		showCurrentTarget()
 		return
 	}
@@ -34,6 +36,11 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer) {
 
 	if org != "" {
 		setOrganization(org)
+		return
+	}
+
+	if space != "" {
+		setSpace(space)
 		return
 	}
 
@@ -96,6 +103,12 @@ func showConfiguration(config configuration.Configuration) {
 		} else {
 			termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
 		}
+
+		if config.Space != "" {
+			termUI.Say("  space:           %s", term.Yellow(config.Space))
+		} else {
+			termUI.Say("  No space targeted. Use 'cf target -s' to target a space.")
+		}
 	} else {
 		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
 	}
@@ -128,6 +141,39 @@ func setOrganization(org string) {
 	}
 
 	config.Organization = org
+
+	err = config.Save()
+	if err != nil {
+		termUI.Failed("Error saving configuration", err)
+		return
+	}
+	showConfiguration(config)
+}
+
+func setSpace(space string) {
+	config, err := configuration.Load()
+
+	if err != nil {
+		termUI.Failed("Error loading configuration", err)
+		return
+	}
+
+	if config.Organization == "" {
+		termUI.Failed("Organization must be set before targeting space.", nil)
+		return
+	}
+
+	if !authorizer.CanAccessSpace("", space) {
+		termUI.Failed("You do not have access to that space.", nil)
+		return
+	}
+
+	if !config.IsLoggedIn() {
+		termUI.Failed("You must be logged in to set a space.", nil)
+		return
+	}
+
+	config.Space = space
 
 	err = config.Save()
 	if err != nil {

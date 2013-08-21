@@ -23,12 +23,19 @@ func (a FakeAuthorizer) CanAccessOrg(userGuid string, orgName string) bool {
 	return a.hasAccess
 }
 
+func (a FakeAuthorizer) CanAccessSpace(userGuid string, spaceName string) bool {
+	return a.hasAccess
+}
+
 func newContext(args []string) *cli.Context {
 	app := app.New()
 	targetCommand := app.Commands[0]
 
 	flagSet := new(flag.FlagSet)
-	targetCommand.Flags[0].Apply(flagSet)
+	for i, _ := range targetCommand.Flags {
+		targetCommand.Flags[i].Apply(flagSet)
+	}
+
 	flagSet.Parse(args)
 
 	globalSet := new(flag.FlagSet)
@@ -228,6 +235,75 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "No org targeted.")
 }
 
+// End test with organization option
+
+// Start test with space option
+
+func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
+	login(t)
+
+	ui := new(testhelpers.FakeUI)
+	context := newContext([]string{"-s", "my-space"})
+	authorizer := FakeAuthorizer{true}
+
+	Target(context, ui, authorizer)
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "Organization must be set before targeting space.")
+
+	ui = new(testhelpers.FakeUI)
+	context = newContext([]string{})
+
+	Target(context, ui, authorizer)
+	assert.Contains(t, ui.Outputs[4], "No space targeted.")
+}
+
+func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
+	login(t)
+	setOrganization(t)
+
+	ui := new(testhelpers.FakeUI)
+	context := newContext([]string{"-s", "my-space"})
+	authorizer := FakeAuthorizer{true}
+
+	Target(context, ui, authorizer)
+	assert.Contains(t, ui.Outputs[4], "space:")
+	assert.Contains(t, ui.Outputs[4], "my-space")
+
+	ui = new(testhelpers.FakeUI)
+	context = newContext([]string{})
+
+	Target(context, ui, authorizer)
+	assert.Contains(t, ui.Outputs[4], "my-space")
+}
+
+func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
+	login(t)
+	setOrganization(t)
+
+	authorizer := FakeAuthorizer{false}
+
+	ui := new(testhelpers.FakeUI)
+	context := newContext([]string{})
+	Target(context, ui, authorizer)
+
+	assert.Contains(t, ui.Outputs[4], "No space targeted.")
+
+	ui = new(testhelpers.FakeUI)
+	context = newContext([]string{"-s", "my-space"})
+	Target(context, ui, authorizer)
+
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "You do not have access to that space.")
+
+	ui = new(testhelpers.FakeUI)
+	context = newContext([]string{})
+	Target(context, ui, authorizer)
+
+	assert.Contains(t, ui.Outputs[4], "No space targeted.")
+}
+
+// End test with space option
+
 func login(t *testing.T) {
 	configuration.Delete()
 	config, err := configuration.Load()
@@ -240,4 +316,10 @@ func login(t *testing.T) {
 	return
 }
 
-// End test with organization option
+func setOrganization(t *testing.T) {
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	config.Organization = "my-org"
+	err = config.Save()
+	assert.NoError(t, err)
+}

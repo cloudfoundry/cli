@@ -22,6 +22,7 @@ func New() (app *cli.App) {
 			Usage:     "Set or view the target",
 			Flags: []cli.Flag{
 				cli.StringFlag{"o", "", "organization"},
+				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
 				commands.Target(c, termUI, authorizer)
