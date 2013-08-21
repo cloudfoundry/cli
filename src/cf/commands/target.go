@@ -59,22 +59,23 @@ func showConfiguration(config *configuration.Configuration) {
 		term.Yellow(config.Target),
 		term.Yellow(config.ApiVersion))
 
-	if config.IsLoggedIn() {
-		termUI.Say("  user:            %s", term.Yellow(config.UserEmail()))
-
-		if config.Organization != "" {
-			termUI.Say("  org:             %s", term.Yellow(config.Organization))
-		} else {
-			termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
-		}
-
-		if config.Space != "" {
-			termUI.Say("  space:           %s", term.Yellow(config.Space))
-		} else {
-			termUI.Say("  No space targeted. Use 'cf target -s' to target a space.")
-		}
-	} else {
+	if !config.IsLoggedIn() {
 		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
+		return
+	}
+
+	termUI.Say("  user:            %s", term.Yellow(config.UserEmail()))
+
+	if config.Organization != "" {
+		termUI.Say("  org:             %s", term.Yellow(config.Organization))
+	} else {
+		termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
+	}
+
+	if config.Space != "" {
+		termUI.Say("  space:           %s", term.Yellow(config.Space))
+	} else {
+		termUI.Say("  No space targeted. Use 'cf target -s' to target a space.")
 	}
 }
 
