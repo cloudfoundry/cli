@@ -97,7 +97,7 @@ func (c Configuration) UserEmail() (email string) {
 	return tokenInfo.Email
 }
 
-func (c Configuration) IsLoggedIn() (bool) {
+func (c Configuration) IsLoggedIn() bool {
 	return c.AccessToken != ""
 }
 
