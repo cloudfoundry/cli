@@ -12,6 +12,7 @@ type Organization struct {
 
 type OrganizationRepository interface {
 	FindOrganizations(config *configuration.Configuration) (orgs []Organization, err error)
+	OrganizationExists(config *configuration.Configuration, organization Organization) bool
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -54,4 +55,19 @@ func (repo CloudControllerOrganizationRepository) FindOrganizations(config *conf
 	}
 
 	return
+}
+
+func (repo CloudControllerOrganizationRepository) OrganizationExists(config *configuration.Configuration, organization Organization) bool {
+	orgs, err := repo.FindOrganizations(config)
+
+	if err != nil {
+		return false
+	}
+
+	for _, o := range orgs {
+		if o.Name == organization.Name {
+			return true
+		}
+	}
+	return false
 }

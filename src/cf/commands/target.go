@@ -15,10 +15,12 @@ type InfoResponse struct {
 
 var termUI term.UI
 var authorizer api.Authorizer
+var organizationRepo api.OrganizationRepository
 
-func Target(c *cli.Context, ui term.UI, a api.Authorizer) {
+func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepository) {
 	termUI = ui
 	authorizer = a
+	organizationRepo = o
 
 	argsCount := len(c.Args())
 	org := c.String("o")
@@ -118,9 +120,10 @@ func saveTarget(target string, info *InfoResponse) (config *configuration.Config
 	return
 }
 
-func setOrganization(config *configuration.Configuration, org string) {
-	if !authorizer.CanAccessOrg("", org) {
-		termUI.Failed("You do not have access to that org.", nil)
+func setOrganization(config *configuration.Configuration, orgName string) {
+	o := api.Organization{Name: orgName}
+	if !organizationRepo.OrganizationExists(config, o) {
+		termUI.Failed("Could not set organization.", nil)
 		return
 	}
 
@@ -129,7 +132,7 @@ func setOrganization(config *configuration.Configuration, org string) {
 		return
 	}
 
-	config.Organization = org
+	config.Organization = orgName
 	saveAndShowConfig(config)
 }
 

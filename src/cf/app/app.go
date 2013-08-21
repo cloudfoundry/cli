@@ -10,6 +10,7 @@ import (
 func New() (app *cli.App) {
 	termUI := new(terminal.TerminalUI)
 	authorizer := new(api.CloudControllerAuthorizer)
+	organizationRepo := new(api.CloudControllerOrganizationRepository)
 
 	app = cli.NewApp()
 	app.Name = "cf"
@@ -25,7 +26,7 @@ func New() (app *cli.App) {
 				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
-				commands.Target(c, termUI, authorizer)
+				commands.Target(c, termUI, authorizer, organizationRepo)
 			},
 		},
 		{
@@ -33,7 +34,7 @@ func New() (app *cli.App) {
 			ShortName: "l",
 			Usage:     "Log user in",
 			Action: func(c *cli.Context) {
-				commands.Login(c, termUI, new(api.CloudControllerOrganizationRepository))
+				commands.Login(c, termUI, organizationRepo)
 			},
 		},
 	}

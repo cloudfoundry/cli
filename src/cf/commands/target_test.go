@@ -28,28 +28,10 @@ func (a FakeAuthorizer) CanAccessSpace(userGuid string, spaceName string) bool {
 	return a.hasAccess
 }
 
-func newContext(args []string) *cli.Context {
-	app := app.New()
-	targetCommand := app.Commands[0]
-
-	flagSet := new(flag.FlagSet)
-	for i, _ := range targetCommand.Flags {
-		targetCommand.Flags[i].Apply(flagSet)
-	}
-
-	flagSet.Parse(args)
-
-	globalSet := new(flag.FlagSet)
-
-	return cli.NewContext(cli.NewApp(), flagSet, globalSet)
-}
-
 func TestTargetWithoutArgument(t *testing.T) {
 	configuration.Delete()
-	context := newContext([]string{})
-	fakeUI := new(testhelpers.FakeUI)
 
-	Target(context, fakeUI, FakeAuthorizer{true})
+	fakeUI := callTarget([]string{}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Contains(t, fakeUI.Outputs[1], "https://api.run.pivotal.io")
 }
@@ -75,12 +57,6 @@ var validInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, infoResponse)
 }
 
-func callTarget(params []string, a api.Authorizer) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = new(testhelpers.FakeUI)
-	Target(newContext(params), fakeUI, a)
-	return
-}
-
 func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	configuration.Delete()
 	ts := httptest.NewTLSServer(http.HandlerFunc(validInfoEndpoint))
@@ -89,12 +65,12 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	URL, err := url.Parse(ts.URL)
 	assert.NoError(t, err)
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true})
+	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Contains(t, fakeUI.Outputs[3], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[3], "42.0.0")
 
-	fakeUI = callTarget([]string{}, FakeAuthorizer{true})
+	fakeUI = callTarget([]string{}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Contains(t, fakeUI.Outputs[1], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[1], "42.0.0")
@@ -117,7 +93,7 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 	URL, err := url.Parse(ts.URL)
 	assert.NoError(t, err)
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true})
+	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
@@ -136,7 +112,7 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 	URL, err := url.Parse(ts.URL)
 	assert.NoError(t, err)
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true})
+	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
 	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server")
@@ -147,7 +123,7 @@ func TestTargetWithUnreachableEndpoint(t *testing.T) {
 	URL, err := url.Parse("https://foo")
 	assert.NoError(t, err)
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true})
+	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Equal(t, 3, len(fakeUI.Outputs))
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
@@ -173,7 +149,7 @@ func TestTargetWithLoggedInUserShowsOrgInfo(t *testing.T) {
 	err = config.Save()
 	assert.NoError(t, err)
 
-	ui := callTarget([]string{}, FakeAuthorizer{true})
+	ui := callTarget([]string{}, FakeAuthorizer{true}, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[1], cloudController.URL)
 	assert.Contains(t, ui.Outputs[2], "user:")
@@ -188,13 +164,15 @@ func TestTargetWithLoggedInUserShowsOrgInfo(t *testing.T) {
 func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	login(t)
 
-	authorizer := FakeAuthorizer{true}
-	ui := callTarget([]string{"-o", "my-organization"}, authorizer)
+	orgs := []api.Organization{
+		api.Organization{Name: "my-organization"},
+	}
+	ui := callTarget([]string{"-o", "my-organization"}, nil, orgs)
 
 	assert.Contains(t, ui.Outputs[3], "org:")
 	assert.Contains(t, ui.Outputs[3], "my-organization")
 
-	ui = callTarget([]string{}, authorizer)
+	ui = callTarget([]string{}, nil, orgs)
 
 	assert.Contains(t, ui.Outputs[3], "my-organization")
 }
@@ -202,18 +180,17 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 	login(t)
 
-	authorizer := FakeAuthorizer{false}
+	orgs := []api.Organization{}
 
-	ui := callTarget([]string{}, authorizer)
+	ui := callTarget([]string{}, nil, orgs)
 
 	assert.Contains(t, ui.Outputs[3], "No org targeted.")
 
-	ui = callTarget([]string{"-o", "my-organization"}, authorizer)
+	ui = callTarget([]string{"-o", "my-organization"}, nil, orgs)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "You do not have access to that org.")
 
-	ui = callTarget([]string{}, authorizer)
+	ui = callTarget([]string{}, nil, orgs)
 
 	assert.Contains(t, ui.Outputs[3], "No org targeted.")
 }
@@ -226,12 +203,12 @@ func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 	login(t)
 
 	authorizer := FakeAuthorizer{true}
-	ui := callTarget([]string{"-s", "my-space"}, authorizer)
+	ui := callTarget([]string{"-s", "my-space"}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "Organization must be set before targeting space.")
 
-	ui = callTarget([]string{}, authorizer)
+	ui = callTarget([]string{}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[4], "No space targeted.")
 }
@@ -241,12 +218,12 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 	setOrganization(t)
 
 	authorizer := FakeAuthorizer{true}
-	ui := callTarget([]string{"-s", "my-space"}, authorizer)
+	ui := callTarget([]string{"-s", "my-space"}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[4], "space:")
 	assert.Contains(t, ui.Outputs[4], "my-space")
 
-	ui = callTarget([]string{}, authorizer)
+	ui = callTarget([]string{}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[4], "my-space")
 }
@@ -256,21 +233,48 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	setOrganization(t)
 
 	authorizer := FakeAuthorizer{false}
-	ui := callTarget([]string{}, authorizer)
+	ui := callTarget([]string{}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[4], "No space targeted.")
 
-	ui = callTarget([]string{"-s", "my-space"}, authorizer)
+	ui = callTarget([]string{"-s", "my-space"}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "You do not have access to that space.")
 
-	ui = callTarget([]string{}, authorizer)
+	ui = callTarget([]string{}, authorizer, []api.Organization{})
 
 	assert.Contains(t, ui.Outputs[4], "No space targeted.")
 }
 
 // End test with space option
+
+func newContext(args []string) *cli.Context {
+	app := app.New()
+	targetCommand := app.Commands[0]
+
+	flagSet := new(flag.FlagSet)
+	for i, _ := range targetCommand.Flags {
+		targetCommand.Flags[i].Apply(flagSet)
+	}
+
+	flagSet.Parse(args)
+
+	globalSet := new(flag.FlagSet)
+
+	return cli.NewContext(cli.NewApp(), flagSet, globalSet)
+}
+
+func callTarget(params []string, a api.Authorizer, orgs []api.Organization) (fakeUI *testhelpers.FakeUI) {
+	if a == nil {
+		a = FakeAuthorizer{true}
+	}
+
+	orgRepo := &testhelpers.FakeOrgRepository{orgs}
+	fakeUI = new(testhelpers.FakeUI)
+	Target(newContext(params), fakeUI, a, orgRepo)
+	return
+}
 
 func login(t *testing.T) {
 	configuration.Delete()
