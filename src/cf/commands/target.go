@@ -14,14 +14,27 @@ type InfoResponse struct {
 }
 
 var termUI term.UI
+var authorizer api.Authorizer
 
-func Target(c *cli.Context, ui term.UI) {
+func Target(c *cli.Context, ui term.UI, a api.Authorizer) {
+	argsCount := len(c.Args())
+	org := c.String("o")
 	termUI = ui
+	authorizer = a
 
-	if len(c.Args()) == 0 {
+	if argsCount == 0 && org == "" {
 		showCurrentTarget()
-	} else {
+		return
+	}
+
+	if argsCount > 0 {
 		setNewTarget(c.Args()[0])
+		return
+	}
+
+	if org != "" {
+		setOrganization(org)
+		return
 	}
 
 	return
@@ -77,7 +90,12 @@ func showConfiguration(config configuration.Configuration) {
 
 	if email != "" {
 		termUI.Say("  user:            %s", term.Yellow(email))
-		termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
+
+		if config.Organization != "" {
+			termUI.Say("  org:             %s", term.Yellow(config.Organization))
+		} else {
+			termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
+		}
 	} else {
 		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
 	}
@@ -89,4 +107,27 @@ func saveTarget(target string, info *InfoResponse) (config configuration.Configu
 	config.AuthorizationEndpoint = info.AuthorizationEndpoint
 	err = config.Save()
 	return
+}
+
+func setOrganization(org string) {
+	if !authorizer.CanAccessOrg("", org) {
+		termUI.Failed("You do not have access to that org.", nil)
+		return
+	}
+
+	config, err := configuration.Load()
+
+	if err != nil {
+		termUI.Failed("Error loading configuration", err)
+		return
+	}
+
+	config.Organization = org
+
+	err = config.Save()
+	if err != nil {
+		termUI.Failed("Error saving configuration", err)
+		return
+	}
+	showConfiguration(config)
 }

@@ -18,6 +18,7 @@ type Configuration struct {
 	ApiVersion            string
 	AuthorizationEndpoint string
 	AccessToken           string
+	Organization          string
 }
 
 func setDefaultConfig() (c Configuration) {

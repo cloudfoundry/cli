@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"fmt"
+	"strings"
 )
 
 func CaptureOutput(f func()) string {
@@ -61,4 +62,8 @@ func (c *FakeUI) Failed(message string, err error) {
 		c.Say(err.Error())
 	}
 	return
+}
+
+func (c *FakeUI)DumpOutputs()string{
+	return "****************************\n" + strings.Join(c.Outputs, "\n")
 }

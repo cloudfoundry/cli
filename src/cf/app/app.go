@@ -1,6 +1,7 @@
 package app
 
 import (
+	"cf/api"
 	"cf/commands"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -8,6 +9,7 @@ import (
 
 func New() (app *cli.App) {
 	termUI := new(terminal.TerminalUI)
+	authorizer := new(api.CloudControllerAuthorizer)
 
 	app = cli.NewApp()
 	app.Name = "cf"
@@ -22,7 +24,7 @@ func New() (app *cli.App) {
 				cli.StringFlag{"o", "", "organization"},
 			},
 			Action: func(c *cli.Context) {
-				commands.Target(c, termUI)
+				commands.Target(c, termUI, authorizer)
 			},
 		},
 		{
