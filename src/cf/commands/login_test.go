@@ -1,6 +1,7 @@
 package commands_test
 
 import (
+	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
 	"encoding/base64"
@@ -11,6 +12,14 @@ import (
 	"testhelpers"
 	"testing"
 )
+
+type FakeOrgRepository struct {
+	organizations []api.Organization
+}
+
+func (repo *FakeOrgRepository) FindOrganizations(config *configuration.Configuration) (orgs []api.Organization, err error) {
+	return repo.organizations, nil
+}
 
 var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 	contentTypeMatches := request.Header.Get("content-type") == "application/x-www-form-urlencoded"
@@ -51,12 +60,12 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer ts.Close()
 
-	config := setAuthEndpoint(t, ts.URL)
+	config := logout(t, ts.URL)
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
 
-	Login(nil, ui)
+	Login(nil, ui, &FakeOrgRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -68,6 +77,64 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, config.AccessToken, "BEARER my_access_token")
 }
 
+func TestLoggingInWithTwoOrgsAskUserToChooseOrg(t *testing.T) {
+	loginServer := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
+	defer loginServer.Close()
+
+	config := logout(t, loginServer.URL)
+
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"foo@example.com", "bar", "2"}
+
+	orgs := []api.Organization{
+		api.Organization{"FirstOrg", "org-1-guid"},
+		api.Organization{"SecondOrg", "org-2-guid"},
+	}
+	Login(nil, ui, &FakeOrgRepository{orgs})
+
+	assert.Contains(t, ui.Outputs[0], config.Target)
+
+	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.Outputs[2], "OK")
+
+	assert.Contains(t, ui.Outputs[3], "FirstOrg")
+	assert.Contains(t, ui.Outputs[4], "SecondOrg")
+
+	assert.Contains(t, ui.Prompts[2], "Organization")
+	assert.Contains(t, ui.Outputs[5], "SecondOrg")
+
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, "SecondOrg", config.Organization)
+}
+
+func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
+	loginServer := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
+	defer loginServer.Close()
+
+	config := logout(t, loginServer.URL)
+
+	orgs := []api.Organization{
+		api.Organization{"Org1", "org-1-guid"},
+		api.Organization{"Org2", "org-2-guid"},
+	}
+
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"foo@example.com", "bar", "3", "2"}
+
+	Login(nil, ui, &FakeOrgRepository{orgs})
+
+	assert.Contains(t, ui.Prompts[2], "Organization")
+	assert.Contains(t, ui.Outputs[5], "FAILED")
+	assert.Contains(t, ui.Prompts[3], "Organization")
+	assert.Contains(t, ui.Outputs[9], "Targeting org")
+
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, "Org2", config.Organization)
+}
+
 var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusBadRequest)
 }
@@ -76,7 +143,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(unsuccessfulLoginEndpoint))
 	defer ts.Close()
 
-	config := setAuthEndpoint(t, ts.URL)
+	config := logout(t, ts.URL)
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{
@@ -87,7 +154,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		"bar",
 	}
 
-	Login(nil, ui)
+	Login(nil, ui, &FakeOrgRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Equal(t, ui.Outputs[1], "Authenticating...")
@@ -102,7 +169,8 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, config.AccessToken, "")
 }
 
-func setAuthEndpoint(t *testing.T, url string) (config *configuration.Configuration) {
+func logout(t *testing.T, url string) (config *configuration.Configuration) {
+	configuration.Delete()
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = url

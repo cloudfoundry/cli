@@ -18,6 +18,7 @@ func newClient() *http.Client {
 
 func PerformRequest(request *http.Request, response interface{}) (err error) {
 	client := newClient()
+	request.Header.Set("accept", "application/json")
 	rawResponse, err := client.Do(request)
 
 	if err != nil {

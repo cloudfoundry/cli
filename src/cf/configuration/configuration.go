@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"cf/api"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -79,7 +78,7 @@ func (c Configuration) Save() (err error) {
 }
 
 func (c Configuration) UserEmail() (email string) {
-	clearInfo, err := api.DecodeTokenInfo(c.AccessToken)
+	clearInfo, err := DecodeTokenInfo(c.AccessToken)
 
 	if err != nil {
 		return

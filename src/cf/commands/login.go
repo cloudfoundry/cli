@@ -9,6 +9,7 @@ import (
 	"github.com/codegangsta/cli"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -19,7 +20,13 @@ type AuthenticationResponse struct {
 
 const maxLoginTries = 3
 
-func Login(c *cli.Context, ui term.UI) {
+var orgRepo api.OrganizationRepository
+var ui term.UI
+
+func Login(c *cli.Context, termUI term.UI, o api.OrganizationRepository) {
+	orgRepo = o
+	ui = termUI
+
 	config, err := configuration.Load()
 	if err != nil {
 		ui.Failed("Error loading configuration", err)
@@ -47,8 +54,10 @@ func Login(c *cli.Context, ui term.UI) {
 			ui.Failed("Error Persisting Session", err)
 			return
 		}
-
 		ui.Ok()
+
+		targetOrganization(config)
+
 		return
 	}
 }
@@ -72,4 +81,41 @@ func authenticate(endpoint string, email string, password string) (response Auth
 	err = api.PerformRequest(request, &response)
 
 	return
+}
+
+func targetOrganization(config *configuration.Configuration) {
+	organizations, err := orgRepo.FindOrganizations(config)
+
+	if err != nil {
+		ui.Failed("Error fetching organizations.", err)
+		return
+	}
+
+	if len(organizations) < 2 {
+		return
+	}
+
+	for i, org := range organizations {
+		ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), org.Name)
+	}
+
+	index, err := strconv.Atoi(ui.Ask("Organization%s", term.Cyan(">")))
+
+	if err != nil || index > len(organizations) {
+		ui.Failed("Invalid number", err)
+		targetOrganization(config)
+		return
+	}
+
+	selectedOrg := organizations[index-1]
+	config.Organization = selectedOrg.Name
+	err = config.Save()
+
+	if err != nil {
+		ui.Failed("Error saving organization: %s", err)
+		return
+	}
+
+	ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
+	ui.Ok()
 }
