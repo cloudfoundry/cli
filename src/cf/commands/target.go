@@ -67,17 +67,18 @@ func setNewTarget(target string) {
 }
 
 func showConfiguration(config configuration.Configuration) {
-	termUI.Say("CF instance: %s (API version: %s)",
+	termUI.Say("CF Target Info (where apps will be pushed)")
+	termUI.Say("  CF API endpoint: %s (API version: %s)",
 		term.Yellow(config.Target),
 		term.Yellow(config.ApiVersion))
 
 	email := config.UserEmail()
 
 	if email != "" {
-		termUI.Say("user: %s", term.Yellow(email))
-		termUI.Say("No org targeted. Use 'cf target -o' to target an org.")
+		termUI.Say("  user:            %s", term.Yellow(email))
+		termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
 	} else {
-		termUI.Say("Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
+		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
 	}
 }
 

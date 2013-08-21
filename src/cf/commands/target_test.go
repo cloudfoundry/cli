@@ -28,7 +28,7 @@ func TestTargetDefaults(t *testing.T) {
 
 	Target(context, fakeUI)
 
-	assert.Contains(t, fakeUI.Outputs[0], "https://api.run.pivotal.io")
+	assert.Contains(t, fakeUI.Outputs[1], "https://api.run.pivotal.io")
 }
 
 var validInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -62,15 +62,15 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	fakeUI := new(testhelpers.FakeUI)
 	Target(context, fakeUI)
 
-	assert.Contains(t, fakeUI.Outputs[2], "https://"+URL.Host)
-	assert.Contains(t, fakeUI.Outputs[2], "42.0.0")
+	assert.Contains(t, fakeUI.Outputs[3], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[3], "42.0.0")
 
 	context = newContext([]string{})
 	fakeUI = new(testhelpers.FakeUI)
 	Target(context, fakeUI)
 
-	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
-	assert.Contains(t, fakeUI.Outputs[0], "42.0.0")
+	assert.Contains(t, fakeUI.Outputs[1], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[1], "42.0.0")
 
 	savedConfig, err := configuration.Load()
 
@@ -142,8 +142,8 @@ func TestTargetWithLoggedInUserShowsOrgInfo(t *testing.T) {
 	context := newContext([]string{})
 	Target(context, ui)
 
-	assert.Contains(t, ui.Outputs[0], cloudController.URL)
-	assert.Contains(t, ui.Outputs[1], "user:")
-	assert.Contains(t, ui.Outputs[1], "user1@example.com")
-	assert.Contains(t, ui.Outputs[2], "No org targeted. Use 'cf target -o' to target an org.")
+	assert.Contains(t, ui.Outputs[1], cloudController.URL)
+	assert.Contains(t, ui.Outputs[2], "user:")
+	assert.Contains(t, ui.Outputs[2], "user1@example.com")
+	assert.Contains(t, ui.Outputs[3], "No org targeted. Use 'cf target -o' to target an org.")
 }
