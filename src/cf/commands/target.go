@@ -23,9 +23,15 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer) {
 	argsCount := len(c.Args())
 	org := c.String("o")
 	space := c.String("s")
+	config, err := configuration.Load()
+
+	if err != nil {
+		termUI.Failed("Error loading configuration", err)
+		return
+	}
 
 	if argsCount == 0 && org == "" && space == "" {
-		showCurrentTarget()
+		showConfiguration(config)
 		return
 	}
 
@@ -35,26 +41,43 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer) {
 	}
 
 	if org != "" {
-		setOrganization(org)
+		setOrganization(config, org)
 		return
 	}
 
 	if space != "" {
-		setSpace(space)
+		setSpace(config, space)
 		return
 	}
 
 	return
 }
 
-func showCurrentTarget() {
-	config, err := configuration.Load()
+func showConfiguration(config *configuration.Configuration) {
+	termUI.Say("CF Target Info (where apps will be pushed)")
+	termUI.Say("  CF API endpoint: %s (API version: %s)",
+		term.Yellow(config.Target),
+		term.Yellow(config.ApiVersion))
 
-	if err != nil {
-		termUI.Failed("Error parsing configuration", err)
+	email := config.UserEmail()
+
+	if email != "" {
+		termUI.Say("  user:            %s", term.Yellow(email))
+
+		if config.Organization != "" {
+			termUI.Say("  org:             %s", term.Yellow(config.Organization))
+		} else {
+			termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
+		}
+
+		if config.Space != "" {
+			termUI.Say("  space:           %s", term.Yellow(config.Space))
+		} else {
+			termUI.Say("  No space targeted. Use 'cf target -s' to target a space.")
+		}
+	} else {
+		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
 	}
-
-	showConfiguration(config)
 }
 
 func setNewTarget(target string) {
@@ -87,34 +110,8 @@ func setNewTarget(target string) {
 	showConfiguration(newConfiguration)
 }
 
-func showConfiguration(config configuration.Configuration) {
-	termUI.Say("CF Target Info (where apps will be pushed)")
-	termUI.Say("  CF API endpoint: %s (API version: %s)",
-		term.Yellow(config.Target),
-		term.Yellow(config.ApiVersion))
-
-	email := config.UserEmail()
-
-	if email != "" {
-		termUI.Say("  user:            %s", term.Yellow(email))
-
-		if config.Organization != "" {
-			termUI.Say("  org:             %s", term.Yellow(config.Organization))
-		} else {
-			termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
-		}
-
-		if config.Space != "" {
-			termUI.Say("  space:           %s", term.Yellow(config.Space))
-		} else {
-			termUI.Say("  No space targeted. Use 'cf target -s' to target a space.")
-		}
-	} else {
-		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
-	}
-}
-
-func saveTarget(target string, info *InfoResponse) (config configuration.Configuration, err error) {
+func saveTarget(target string, info *InfoResponse) (config *configuration.Configuration, err error) {
+	config = new(configuration.Configuration)
 	config.Target = target
 	config.ApiVersion = info.ApiVersion
 	config.AuthorizationEndpoint = info.AuthorizationEndpoint
@@ -122,16 +119,9 @@ func saveTarget(target string, info *InfoResponse) (config configuration.Configu
 	return
 }
 
-func setOrganization(org string) {
+func setOrganization(config *configuration.Configuration, org string) {
 	if !authorizer.CanAccessOrg("", org) {
 		termUI.Failed("You do not have access to that org.", nil)
-		return
-	}
-
-	config, err := configuration.Load()
-
-	if err != nil {
-		termUI.Failed("Error loading configuration", err)
 		return
 	}
 
@@ -142,7 +132,7 @@ func setOrganization(org string) {
 
 	config.Organization = org
 
-	err = config.Save()
+	err := config.Save()
 	if err != nil {
 		termUI.Failed("Error saving configuration", err)
 		return
@@ -150,14 +140,7 @@ func setOrganization(org string) {
 	showConfiguration(config)
 }
 
-func setSpace(space string) {
-	config, err := configuration.Load()
-
-	if err != nil {
-		termUI.Failed("Error loading configuration", err)
-		return
-	}
-
+func setSpace(config *configuration.Configuration, space string) {
 	if config.Organization == "" {
 		termUI.Failed("Organization must be set before targeting space.", nil)
 		return
@@ -175,7 +158,7 @@ func setSpace(space string) {
 
 	config.Space = space
 
-	err = config.Save()
+	err := config.Save()
 	if err != nil {
 		termUI.Failed("Error saving configuration", err)
 		return

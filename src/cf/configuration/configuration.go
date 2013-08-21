@@ -22,7 +22,8 @@ type Configuration struct {
 	Space                 string
 }
 
-func setDefaultConfig() (c Configuration) {
+func setDefaultConfig() (c *Configuration) {
+	c = new(Configuration)
 	c.Target = "https://api.run.pivotal.io"
 	c.ApiVersion = "2"
 	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
@@ -40,8 +41,9 @@ func Delete() {
 	os.Remove(file)
 }
 
-func Load() (c Configuration, parseError error) {
+func Load() (c *Configuration, parseError error) {
 	file, readError := configFile()
+	c = new(Configuration)
 
 	if readError != nil {
 		c = setDefaultConfig()
@@ -55,7 +57,7 @@ func Load() (c Configuration, parseError error) {
 		return
 	}
 
-	parseError = json.Unmarshal(data, &c)
+	parseError = json.Unmarshal(data, c)
 
 	return
 }

@@ -47,7 +47,7 @@ func TestUserEmailWithInvalidAccessToken(t *testing.T) {
 	assert.Empty(t, config.UserEmail())
 }
 
-func loadDefaultConfig(t *testing.T) (config Configuration) {
+func loadDefaultConfig(t *testing.T) (config *Configuration) {
 	Delete()
 	config, err := Load()
 	assert.NoError(t, err)
