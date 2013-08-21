@@ -131,13 +131,7 @@ func setOrganization(config *configuration.Configuration, org string) {
 	}
 
 	config.Organization = org
-
-	err := config.Save()
-	if err != nil {
-		termUI.Failed("Error saving configuration", err)
-		return
-	}
-	showConfiguration(config)
+	saveAndShowConfig(config)
 }
 
 func setSpace(config *configuration.Configuration, space string) {
@@ -157,7 +151,10 @@ func setSpace(config *configuration.Configuration, space string) {
 	}
 
 	config.Space = space
+	saveAndShowConfig(config)
+}
 
+func saveAndShowConfig(config *configuration.Configuration) {
 	err := config.Save()
 	if err != nil {
 		termUI.Failed("Error saving configuration", err)
