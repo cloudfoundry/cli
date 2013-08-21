@@ -1,6 +1,8 @@
-package commands
+package commands_test
 
 import (
+	"cf/app"
+	. "cf/commands"
 	"cf/configuration"
 	"flag"
 	"fmt"
@@ -14,8 +16,13 @@ import (
 )
 
 func newContext(args []string) *cli.Context {
+	app := app.New()
+	targetCommand := app.Commands[0]
+
 	flagSet := new(flag.FlagSet)
+	targetCommand.Flags[0].Apply(flagSet)
 	flagSet.Parse(args)
+
 	globalSet := new(flag.FlagSet)
 
 	return cli.NewContext(cli.NewApp(), flagSet, globalSet)

@@ -1,6 +1,7 @@
-package commands
+package commands_test
 
 import (
+	. "cf/commands"
 	"cf/configuration"
 	"encoding/base64"
 	"fmt"
