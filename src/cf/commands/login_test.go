@@ -47,20 +47,11 @@ var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Req
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusBadRequest)
-}
-
 func TestSuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer ts.Close()
 
-	config, err := configuration.Load()
-	assert.NoError(t, err)
-	config.AuthorizationEndpoint = ts.URL
-	config.AccessToken = ""
-	err = config.Save()
-	assert.NoError(t, err)
+	config := setAuthEndpoint(t, ts.URL)
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
@@ -72,21 +63,20 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Contains(t, ui.Prompts[0], "Email")
 	assert.Contains(t, ui.Prompts[1], "Password")
 
-	config, err = configuration.Load()
+	config, err := configuration.Load()
 	assert.NoError(t, err)
 	assert.Equal(t, config.AccessToken, "BEARER my_access_token")
+}
+
+var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusBadRequest)
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(unsuccessfulLoginEndpoint))
 	defer ts.Close()
 
-	config, err := configuration.Load()
-	assert.NoError(t, err)
-	config.AuthorizationEndpoint = ts.URL
-	config.AccessToken = ""
-	err = config.Save()
-	assert.NoError(t, err)
+	config := setAuthEndpoint(t, ts.URL)
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{
@@ -107,7 +97,17 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[9], "Authenticating...")
 	assert.Equal(t, ui.Outputs[10], "FAILED")
 
-	config, err = configuration.Load()
+	config, err := configuration.Load()
 	assert.NoError(t, err)
 	assert.Equal(t, config.AccessToken, "")
+}
+
+func setAuthEndpoint(t *testing.T, url string) (config *configuration.Configuration) {
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	config.AuthorizationEndpoint = url
+	config.AccessToken = ""
+	err = config.Save()
+	assert.NoError(t, err)
+	return
 }
