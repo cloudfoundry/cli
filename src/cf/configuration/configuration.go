@@ -97,6 +97,10 @@ func (c Configuration) UserEmail() (email string) {
 	return tokenInfo.Email
 }
 
+func (c Configuration) IsLoggedIn() (bool) {
+	return c.AccessToken != ""
+}
+
 func configFile() (file string, err error) {
 	configDir := userHomeDir() + "/.cf"
 

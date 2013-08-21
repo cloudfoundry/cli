@@ -122,6 +122,11 @@ func setOrganization(org string) {
 		return
 	}
 
+	if !config.IsLoggedIn() {
+		termUI.Failed("You must be logged in to set an organization.", nil)
+		return
+	}
+
 	config.Organization = org
 
 	err = config.Save()
