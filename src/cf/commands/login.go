@@ -75,7 +75,6 @@ func authenticate(endpoint string, email string, password string) (response Auth
 		return
 	}
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	request.Header.Set("Accept", "application/json")
 	request.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
 	err = api.PerformRequest(request, &response)
