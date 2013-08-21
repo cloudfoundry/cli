@@ -1,12 +1,11 @@
 package configuration
 
 import (
-	"encoding/base64"
+	"cf/api"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"runtime"
-	"strings"
 )
 
 const (
@@ -21,10 +20,11 @@ type Configuration struct {
 	AccessToken           string
 }
 
-func Default() (c Configuration) {
+func setDefaultConfig() (c Configuration) {
 	c.Target = "https://api.run.pivotal.io"
 	c.ApiVersion = "2"
 	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
+	c.Save()
 	return
 }
 
@@ -38,20 +38,22 @@ func Delete() {
 	os.Remove(file)
 }
 
-func Load() (c Configuration, err error) {
-	file, err := configFile()
+func Load() (c Configuration, parseError error) {
+	file, readError := configFile()
 
-	if err != nil {
+	if readError != nil {
+		c = setDefaultConfig()
 		return
 	}
 
-	data, err := ioutil.ReadFile(file)
+	data, readError := ioutil.ReadFile(file)
 
-	if err != nil {
+	if readError != nil {
+		c = setDefaultConfig()
 		return
 	}
 
-	err = json.Unmarshal(data, &c)
+	parseError = json.Unmarshal(data, &c)
 
 	return
 }
@@ -73,21 +75,7 @@ func (c Configuration) Save() (err error) {
 }
 
 func (c Configuration) UserEmail() (email string) {
-	tokenParts := strings.Split(c.AccessToken, " ")
-
-	if len(tokenParts) < 2 {
-		return
-	}
-
-	token := tokenParts[1]
-	encodedInfoParts := strings.Split(token, ".")
-
-	if len(encodedInfoParts) < 3 {
-		return
-	}
-
-	encodedInfo := encodedInfoParts[1]
-	clearInfoPart, err := base64.StdEncoding.DecodeString(encodedInfo)
+	clearInfo, err := api.DecodeTokenInfo(c.AccessToken)
 
 	if err != nil {
 		return
@@ -99,7 +87,7 @@ func (c Configuration) UserEmail() (email string) {
 	}
 
 	tokenInfo := new(TokenInfo)
-	err = json.Unmarshal(clearInfoPart, &tokenInfo)
+	err = json.Unmarshal(clearInfo, &tokenInfo)
 
 	if err != nil {
 		return
@@ -122,7 +110,7 @@ func configFile() (file string, err error) {
 }
 
 // See: http://stackoverflow.com/questions/7922270/obtain-users-home-directory
-// we can't compile using cgo and use user.Current()
+// we can't cross compile using cgo and use user.Current()
 func userHomeDir() string {
 	if runtime.GOOS == "windows" {
 		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")

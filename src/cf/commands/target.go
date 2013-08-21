@@ -31,7 +31,7 @@ func showCurrentTarget() {
 	config, err := configuration.Load()
 
 	if err != nil {
-		config = configuration.Default()
+		termUI.Failed("Error parsing configuration", err)
 	}
 
 	showConfiguration(config)
