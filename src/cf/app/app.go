@@ -18,9 +18,9 @@ func New() (app *cli.App) {
 	app.Version = "1.0.0.alpha"
 	app.Commands = []cli.Command{
 		{
-			Name:      "target",
-			ShortName: "t",
-			Usage:     "Set or view the target",
+			Name:        "target",
+			ShortName:   "t",
+			Description: "Set or view the target",
 			Flags: []cli.Flag{
 				cli.StringFlag{"o", "", "organization"},
 				cli.StringFlag{"s", "", "space"},
@@ -31,9 +31,9 @@ func New() (app *cli.App) {
 			},
 		},
 		{
-			Name:      "login",
-			ShortName: "l",
-			Usage:     "Log user in",
+			Name:        "login",
+			ShortName:   "l",
+			Description: "Log user in",
 			Action: func(c *cli.Context) {
 				cmd := commands.NewLogin(termUI, organizationRepo, spaceRepo)
 				cmd.Run(c)
