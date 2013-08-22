@@ -35,7 +35,8 @@ func New() (app *cli.App) {
 			ShortName: "l",
 			Usage:     "Log user in",
 			Action: func(c *cli.Context) {
-				commands.Login(c, termUI, organizationRepo, spaceRepo)
+				cmd := commands.NewLogin(termUI, organizationRepo, spaceRepo)
+				cmd.Run(c)
 			},
 		},
 	}

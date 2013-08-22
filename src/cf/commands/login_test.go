@@ -2,10 +2,13 @@ package commands_test
 
 import (
 	"cf"
+	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	term "cf/terminal"
 	"encoding/base64"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -57,7 +60,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{}, &testhelpers.FakeSpaceRepository{})
+	callLogin(nil, ui, &testhelpers.FakeOrgRepository{}, &testhelpers.FakeSpaceRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -87,7 +90,7 @@ func TestLoggingInWithTwoOrgsAskUserToChooseOrgAndSpace(t *testing.T) {
 		cf.Space{"SecondSpace", "space-2-guid"},
 	}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs}, &testhelpers.FakeSpaceRepository{Spaces: spaces})
+	callLogin(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs}, &testhelpers.FakeSpaceRepository{Spaces: spaces})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
@@ -131,7 +134,7 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar", "3", "2", "3", "1"}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs}, &testhelpers.FakeSpaceRepository{Spaces: spaces})
+	callLogin(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs}, &testhelpers.FakeSpaceRepository{Spaces: spaces})
 
 	assert.Contains(t, ui.Prompts[2], "Organization")
 	assert.Contains(t, ui.Outputs[5], "FAILED")
@@ -170,7 +173,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		"bar",
 	}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{}, &testhelpers.FakeSpaceRepository{})
+	callLogin(nil, ui, &testhelpers.FakeOrgRepository{}, &testhelpers.FakeSpaceRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Equal(t, ui.Outputs[1], "Authenticating...")
@@ -183,6 +186,11 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 	assert.Equal(t, config.AccessToken, "")
+}
+
+func callLogin(c *cli.Context, ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) {
+	l := NewLogin(ui, orgRepo, spaceRepo)
+	l.Run(c)
 }
 
 func logout(t *testing.T, url string) (config *configuration.Configuration) {

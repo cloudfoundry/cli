@@ -20,32 +20,37 @@ type AuthenticationResponse struct {
 
 const maxLoginTries = 3
 
-var orgRepo api.OrganizationRepository
-var spaceRepo api.SpaceRepository
-var ui term.UI
+type Login struct {
+	ui        term.UI
+	orgRepo   api.OrganizationRepository
+	spaceRepo api.SpaceRepository
+}
 
-func Login(c *cli.Context, termUI term.UI, or api.OrganizationRepository, sr api.SpaceRepository) {
-	orgRepo = or
-	spaceRepo = sr
-	ui = termUI
+func NewLogin(ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (l Login) {
+	l.ui = ui
+	l.orgRepo = orgRepo
+	l.spaceRepo = spaceRepo
+	return
+}
 
+func (l Login) Run(c *cli.Context) {
 	config, err := configuration.Load()
 	if err != nil {
-		ui.Failed("Error loading configuration", err)
+		l.ui.Failed("Error loading configuration", err)
 		return
 	}
 
-	ui.Say("target: %s", term.Cyan(config.Target))
-	email := ui.Ask("Email%s", term.Cyan(">"))
+	l.ui.Say("target: %s", term.Cyan(config.Target))
+	email := l.ui.Ask("Email%s", term.Cyan(">"))
 
 	for i := 0; i < maxLoginTries; i++ {
-		password := ui.Ask("Password%s", term.Cyan(">"))
-		ui.Say("Authenticating...")
+		password := l.ui.Ask("Password%s", term.Cyan(">"))
+		l.ui.Say("Authenticating...")
 
-		response, err := authenticate(config.AuthorizationEndpoint, email, password)
+		response, err := l.authenticate(config.AuthorizationEndpoint, email, password)
 
 		if err != nil {
-			ui.Failed("Error Authenticating", err)
+			l.ui.Failed("Error Authenticating", err)
 			continue
 		}
 
@@ -53,19 +58,19 @@ func Login(c *cli.Context, termUI term.UI, or api.OrganizationRepository, sr api
 		err = config.Save()
 
 		if err != nil {
-			ui.Failed("Error Persisting Session", err)
+			l.ui.Failed("Error Persisting Session", err)
 			return
 		}
-		ui.Ok()
+		l.ui.Ok()
 
-		targetOrganization(config)
-		targetSpace(config)
+		l.targetOrganization(config)
+		l.targetSpace(config)
 
 		return
 	}
 }
 
-func authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
+func (l Login) authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
 	data := url.Values{
 		"username":   {email},
 		"password":   {password},
@@ -85,11 +90,11 @@ func authenticate(endpoint string, email string, password string) (response Auth
 	return
 }
 
-func targetOrganization(config *configuration.Configuration) {
-	organizations, err := orgRepo.FindOrganizations(config)
+func (l Login) targetOrganization(config *configuration.Configuration) {
+	organizations, err := l.orgRepo.FindOrganizations(config)
 
 	if err != nil {
-		ui.Failed("Error fetching organizations.", err)
+		l.ui.Failed("Error fetching organizations.", err)
 		return
 	}
 
@@ -98,14 +103,14 @@ func targetOrganization(config *configuration.Configuration) {
 	}
 
 	for i, org := range organizations {
-		ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), org.Name)
+		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), org.Name)
 	}
 
-	index, err := strconv.Atoi(ui.Ask("Organization%s", term.Cyan(">")))
+	index, err := strconv.Atoi(l.ui.Ask("Organization%s", term.Cyan(">")))
 
 	if err != nil || index > len(organizations) {
-		ui.Failed("Invalid number", err)
-		targetOrganization(config)
+		l.ui.Failed("Invalid number", err)
+		l.targetOrganization(config)
 		return
 	}
 
@@ -114,21 +119,19 @@ func targetOrganization(config *configuration.Configuration) {
 	err = config.Save()
 
 	if err != nil {
-		ui.Failed("Error saving organization: %s", err)
+		l.ui.Failed("Error saving organization: %s", err)
 		return
 	}
 
-	ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
-	ui.Ok()
+	l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
+	l.ui.Ok()
 }
 
-func targetSpace(config *configuration.Configuration) {
-	// TODO return if no organization
-
-	spaces, err := spaceRepo.FindSpaces(config)
+func (l Login) targetSpace(config *configuration.Configuration) {
+	spaces, err := l.spaceRepo.FindSpaces(config)
 
 	if err != nil {
-		ui.Failed("Error fetching spaces.", err)
+		l.ui.Failed("Error fetching spaces.", err)
 		return
 	}
 
@@ -137,14 +140,14 @@ func targetSpace(config *configuration.Configuration) {
 	}
 
 	for i, space := range spaces {
-		ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), space.Name)
+		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), space.Name)
 	}
 
-	index, err := strconv.Atoi(ui.Ask("Space%s", term.Cyan(">")))
+	index, err := strconv.Atoi(l.ui.Ask("Space%s", term.Cyan(">")))
 
 	if err != nil || index > len(spaces) {
-		ui.Failed("Invalid number", err)
-		targetSpace(config)
+		l.ui.Failed("Invalid number", err)
+		l.targetSpace(config)
 		return
 	}
 
@@ -153,10 +156,10 @@ func targetSpace(config *configuration.Configuration) {
 	err = config.Save()
 
 	if err != nil {
-		ui.Failed("Error saving organization: %s", err)
+		l.ui.Failed("Error saving organization: %s", err)
 		return
 	}
 
-	ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
-	ui.Ok()
+	l.ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
+	l.ui.Ok()
 }
