@@ -81,7 +81,7 @@ func (t Target) showConfiguration(config *configuration.Configuration) {
 	}
 
 	if config.HasSpace() {
-		t.ui.Say("  space:           %s", term.Yellow(config.Space.Name))
+		t.ui.Say("  app space:       %s", term.Yellow(config.Space.Name))
 	} else {
 		t.ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
 	}
