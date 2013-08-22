@@ -6,6 +6,25 @@ import (
 	"errors"
 )
 
+type FakeAuthenticator struct {
+	Config *configuration.Configuration
+	Email string
+	Password string
+	AuthError bool
+}
+
+func (auth *FakeAuthenticator) Authenticate(config *configuration.Configuration, email string, password string) (err error) {
+	auth.Config = config
+	auth.Email = email
+	auth.Password = password
+
+	if auth.AuthError {
+		err = errors.New("Error authenticating.")
+	}
+
+	return
+}
+
 type FakeOrgRepository struct {
 	Organizations []cf.Organization
 

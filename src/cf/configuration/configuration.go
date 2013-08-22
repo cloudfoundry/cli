@@ -112,7 +112,7 @@ func (c Configuration) HasSpace() bool {
 	return c.Space.Guid != "" && c.Space.Name != ""
 }
 
-func (c Configuration) ClearSession() (err error) {
+func (c *Configuration) ClearSession() (err error) {
 	c.AccessToken = ""
 	c.Organization = cf.Organization{}
 	c.Space = cf.Space{}

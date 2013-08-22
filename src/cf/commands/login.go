@@ -4,32 +4,24 @@ import (
 	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
-	"encoding/base64"
-	"fmt"
 	"github.com/codegangsta/cli"
-	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
 )
-
-type AuthenticationResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-}
 
 const maxLoginTries = 3
 
 type Login struct {
-	ui        term.UI
-	orgRepo   api.OrganizationRepository
-	spaceRepo api.SpaceRepository
+	ui            term.UI
+	orgRepo       api.OrganizationRepository
+	spaceRepo     api.SpaceRepository
+	authenticator api.Authenticator
 }
 
-func NewLogin(ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (l Login) {
+func NewLogin(ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, autenticator api.Authenticator) (l Login) {
 	l.ui = ui
 	l.orgRepo = orgRepo
 	l.spaceRepo = spaceRepo
+	l.authenticator = autenticator
 	return
 }
 
@@ -47,49 +39,20 @@ func (l Login) Run(c *cli.Context) {
 		password := l.ui.Ask("Password%s", term.Cyan(">"))
 		l.ui.Say("Authenticating...")
 
-		response, err := l.authenticate(config.AuthorizationEndpoint, email, password)
+		err := l.authenticator.Authenticate(config, email, password)
 
 		if err != nil {
 			l.ui.Failed("Error Authenticating", err)
 			continue
 		}
 
-		config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
-		err = config.Save()
-
-		if err != nil {
-			l.ui.Failed("Error Persisting Session", err)
-			return
-		}
 		l.ui.Ok()
-
 		l.targetOrganization(config)
 		l.targetSpace(config)
-
 		l.ui.ShowConfiguration(config)
 
 		return
 	}
-}
-
-func (l Login) authenticate(endpoint string, email string, password string) (response AuthenticationResponse, err error) {
-	data := url.Values{
-		"username":   {email},
-		"password":   {password},
-		"grant_type": {"password"},
-		"scope":      {""},
-	}
-
-	request, err := http.NewRequest("POST", endpoint+"/oauth/token", strings.NewReader(data.Encode()))
-	if err != nil {
-		return
-	}
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	request.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
-
-	err = api.PerformRequestForBody(request, &response)
-
-	return
 }
 
 func (l Login) targetOrganization(config *configuration.Configuration) {
