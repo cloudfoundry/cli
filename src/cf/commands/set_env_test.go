@@ -51,6 +51,31 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "Failed setting env")
 }
 
+func TestRunReportsWhenArgumentsAreMissing(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	appRepo := &testhelpers.FakeApplicationRepository{
+		AppByName: app,
+	}
+
+	args := []string{"my-app", "DATABASE_URL"}
+	ui := callSetEnv(args, appRepo)
+
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
+
+	args = []string{"my-app"}
+	ui = callSetEnv(args, appRepo)
+
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
+
+	args = []string{}
+	ui = callSetEnv(args, appRepo)
+
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
+}
+
 func callSetEnv(args []string, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	context := testhelpers.NewContext(2, args)
 	ui = new(testhelpers.FakeUI)

@@ -19,6 +19,11 @@ func NewSetEnv(ui term.UI, appRepo api.ApplicationRepository) (se SetEnv) {
 }
 
 func (se SetEnv) Run(c *cli.Context) {
+	if len(c.Args()) < 3 {
+		se.ui.Failed("Please enter app name, variable name and value.", nil)
+		return
+	}
+
 	appName := c.Args()[0]
 	varName := c.Args()[1]
 	varValue := c.Args()[2]
