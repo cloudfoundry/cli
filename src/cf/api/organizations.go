@@ -23,24 +23,7 @@ func (repo CloudControllerOrganizationRepository) FindOrganizations(config *conf
 	}
 	request.Header.Set("Authorization", config.AccessToken)
 
-	type Metadata struct {
-		Guid string
-	}
-
-	type Entity struct {
-		Name string
-	}
-
-	type Resource struct {
-		Metadata Metadata
-		Entity   Entity
-	}
-
-	type OrganizationsResponse struct {
-		Resources []Resource
-	}
-
-	response := new(OrganizationsResponse)
+	response := new(ApiResponse)
 
 	err = PerformRequest(request, response)
 

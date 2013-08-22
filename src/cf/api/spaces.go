@@ -25,24 +25,7 @@ func (repo CloudControllerSpaceRepository) FindSpaces(config *configuration.Conf
 	}
 	request.Header.Set("Authorization", config.AccessToken)
 
-	type Metadata struct {
-		Guid string
-	}
-
-	type Entity struct {
-		Name string
-	}
-
-	type Resource struct {
-		Metadata Metadata
-		Entity   Entity
-	}
-
-	type SpacesResponse struct {
-		Resources []Resource
-	}
-
-	response := new(SpacesResponse)
+	response := new(ApiResponse)
 
 	err = PerformRequest(request, response)
 
