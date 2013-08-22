@@ -279,7 +279,8 @@ func newContext(args []string) *cli.Context {
 
 func callTarget(params []string, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
-	Target(newContext(params), fakeUI, orgRepo, spaceRepo)
+	target := NewTarget(fakeUI, orgRepo, spaceRepo)
+	target.Run(newContext(params))
 	return
 }
 

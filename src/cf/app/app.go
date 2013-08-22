@@ -26,7 +26,8 @@ func New() (app *cli.App) {
 				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
-				commands.Target(c, termUI, organizationRepo, spaceRepo)
+				cmd := commands.NewTarget(termUI, organizationRepo, spaceRepo)
+				cmd.Run(c)
 			},
 		},
 		{
