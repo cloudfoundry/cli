@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -14,6 +15,15 @@ func newClient() *http.Client {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 	return &http.Client{Transport: tr}
+}
+
+func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (request *http.Request, err error) {
+	request, err = http.NewRequest(method, path, body)
+	if err != nil {
+		return
+	}
+	request.Header.Set("Authorization", accessToken)
+	return
 }
 
 func PerformRequest(request *http.Request) (err error) {

@@ -4,7 +4,6 @@ import (
 	"cf"
 	"cf/configuration"
 	"errors"
-	"net/http"
 	"strings"
 )
 
@@ -17,12 +16,11 @@ type CloudControllerOrganizationRepository struct {
 }
 
 func (repo CloudControllerOrganizationRepository) FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error) {
-	request, err := http.NewRequest("GET", config.Target+"/v2/organizations", nil)
+	path := config.Target + "/v2/organizations"
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
-	request.Header.Set("Authorization", config.AccessToken)
-
 	response := new(ApiResponse)
 
 	err = PerformRequestForBody(request, response)

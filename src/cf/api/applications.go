@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 )
 
@@ -38,23 +37,17 @@ func (repo CloudControllerApplicationRepository) FindByName(config *configuratio
 func (repo CloudControllerApplicationRepository) SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s", config.Target, app.Guid)
 	data := fmt.Sprintf(`{"environment_json":{"%s":"%s"}}`, name, value)
-	request, err := http.NewRequest("PUT", path, strings.NewReader(data))
+	request, err := NewAuthorizedRequest("PUT", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}
-	request.Header.Set("Authorization", config.AccessToken)
-
-	if err != nil {
-		return
-	}
-
 	err = PerformRequest(request)
 	return
 }
 
 func findApplications(config *configuration.Configuration) (apps []cf.Application, err error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps", config.Target, config.Space.Guid)
-	request, err := http.NewRequest("GET", path, nil)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

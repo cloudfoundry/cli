@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 )
 
@@ -19,11 +18,10 @@ type CloudControllerSpaceRepository struct {
 
 func (repo CloudControllerSpaceRepository) FindSpaces(config *configuration.Configuration) (spaces []cf.Space, err error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", config.Target, config.Organization.Guid)
-	request, err := http.NewRequest("GET", path, nil)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
-	request.Header.Set("Authorization", config.AccessToken)
 
 	response := new(ApiResponse)
 
