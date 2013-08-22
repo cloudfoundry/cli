@@ -16,6 +16,24 @@ func newClient() *http.Client {
 	return &http.Client{Transport: tr}
 }
 
+func PerformRequestWithoutResponseBody(request *http.Request) (err error) {
+	client := newClient()
+	request.Header.Set("accept", "application/json")
+
+	rawResponse, err := client.Do(request)
+
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
+		return
+	}
+
+	if rawResponse.StatusCode > 299 {
+		err = errors.New(fmt.Sprintf("Server error, status code: %d", rawResponse.StatusCode))
+
+	}
+	return
+}
+
 func PerformRequest(request *http.Request, response interface{}) (err error) {
 	client := newClient()
 	request.Header.Set("accept", "application/json")

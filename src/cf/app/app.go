@@ -39,6 +39,17 @@ func New() (app *cli.App) {
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:        "set-env",
+			ShortName:   "se",
+			Description: "Set an environment variable for an application",
+			Action: func(c *cli.Context) {
+				appRepo := new(api.CloudControllerApplicationRepository)
+
+				cmd := commands.NewSetEnv(termUI, appRepo)
+				cmd.Run(c)
+			},
+		},
 	}
 	return
 }

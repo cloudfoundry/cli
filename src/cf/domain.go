@@ -9,3 +9,8 @@ type Space struct {
 	Name string
 	Guid string
 }
+
+type Application struct {
+	Name string
+	Guid string
+}
