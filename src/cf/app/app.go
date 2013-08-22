@@ -9,7 +9,6 @@ import (
 
 func New() (app *cli.App) {
 	termUI := new(terminal.TerminalUI)
-	authorizer := new(api.CloudControllerAuthorizer)
 	organizationRepo := new(api.CloudControllerOrganizationRepository)
 	spaceRepo := new(api.CloudControllerSpaceRepository)
 
@@ -27,7 +26,7 @@ func New() (app *cli.App) {
 				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
-				commands.Target(c, termUI, authorizer, organizationRepo, spaceRepo)
+				commands.Target(c, termUI, organizationRepo, spaceRepo)
 			},
 		},
 		{

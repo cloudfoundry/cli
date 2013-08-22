@@ -13,11 +13,8 @@ type InfoResponse struct {
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
 }
 
-var authorizer api.Authorizer
-
-func Target(c *cli.Context, termUI term.UI, a api.Authorizer, or api.OrganizationRepository, sr api.SpaceRepository) {
+func Target(c *cli.Context, termUI term.UI, or api.OrganizationRepository, sr api.SpaceRepository) {
 	ui = termUI
-	authorizer = a
 	orgRepo = or
 	spaceRepo = sr
 

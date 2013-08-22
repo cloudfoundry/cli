@@ -17,25 +17,13 @@ import (
 	"testing"
 )
 
-type FakeAuthorizer struct {
-	hasAccess bool
-}
-
-func (a FakeAuthorizer) CanAccessOrg(userGuid string, orgName string) bool {
-	return a.hasAccess
-}
-
-func (a FakeAuthorizer) CanAccessSpace(userGuid string, spaceName string) bool {
-	return a.hasAccess
-}
-
 func TestTargetWithoutArgument(t *testing.T) {
 	configuration.Delete()
 
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	fakeUI := callTarget([]string{}, FakeAuthorizer{true}, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[1], "https://api.run.pivotal.io")
 }
@@ -72,12 +60,12 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{URL.Host}, orgRepo, spaceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[3], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[3], "42.0.0")
 
-	fakeUI = callTarget([]string{}, FakeAuthorizer{true}, orgRepo, spaceRepo)
+	fakeUI = callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[1], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[1], "42.0.0")
@@ -103,7 +91,7 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{URL.Host}, orgRepo, spaceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
@@ -125,7 +113,7 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	fakeUI := callTarget([]string{URL.Host}, FakeAuthorizer{true}, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{URL.Host}, orgRepo, spaceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
 	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server")
@@ -154,7 +142,7 @@ func TestTargetWithLoggedInUserShowsOrgInfo(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	ui := callTarget([]string{}, FakeAuthorizer{true}, orgRepo, spaceRepo)
+	ui := callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[1], cloudController.URL)
 	assert.Contains(t, ui.Outputs[2], "user:")
@@ -178,13 +166,13 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	ui := callTarget([]string{"-o", "my-organization"}, nil, orgRepo, spaceRepo)
+	ui := callTarget([]string{"-o", "my-organization"}, orgRepo, spaceRepo)
 
 	assert.Equal(t, orgRepo.OrganizationName, "my-organization")
 	assert.Contains(t, ui.Outputs[3], "org:")
 	assert.Contains(t, ui.Outputs[3], "my-organization")
 
-	ui = callTarget([]string{}, nil, orgRepo, spaceRepo)
+	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[3], "my-organization")
 }
@@ -197,15 +185,15 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{Organizations: orgs, OrganizationByNameErr: true}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	ui := callTarget([]string{}, nil, orgRepo, spaceRepo)
+	ui := callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[3], "No org targeted.")
 
-	ui = callTarget([]string{"-o", "my-organization"}, nil, orgRepo, spaceRepo)
+	ui = callTarget([]string{"-o", "my-organization"}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 
-	ui = callTarget([]string{}, nil, orgRepo, spaceRepo)
+	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[3], "No org targeted.")
 }
@@ -217,16 +205,15 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 	login(t)
 
-	authorizer := FakeAuthorizer{true}
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
-	ui := callTarget([]string{"-s", "my-space"}, authorizer, orgRepo, spaceRepo)
+	ui := callTarget([]string{"-s", "my-space"}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "Organization must be set before targeting space.")
 
-	ui = callTarget([]string{}, authorizer, orgRepo, spaceRepo)
+	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[4], "No space targeted.")
 }
@@ -235,20 +222,19 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 	login(t)
 	setOrganization(t)
 
-	authorizer := FakeAuthorizer{true}
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaces := []cf.Space{
 		cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
 	spaceRepo := &testhelpers.FakeSpaceRepository{Spaces: spaces, SpaceByName: spaces[0]}
 
-	ui := callTarget([]string{"-s", "my-space"}, authorizer, orgRepo, spaceRepo)
+	ui := callTarget([]string{"-s", "my-space"}, orgRepo, spaceRepo)
 
 	assert.Equal(t, spaceRepo.SpaceName, "my-space")
 	assert.Contains(t, ui.Outputs[4], "space:")
 	assert.Contains(t, ui.Outputs[4], "my-space")
 
-	ui = callTarget([]string{}, authorizer, orgRepo, spaceRepo)
+	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[4], "my-space")
 }
@@ -257,20 +243,18 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	login(t)
 	setOrganization(t)
 
-	authorizer := FakeAuthorizer{false}
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{SpaceByNameErr: true}
-
-	ui := callTarget([]string{}, authorizer, orgRepo, spaceRepo)
+	ui := callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[4], "No space targeted.")
 
-	ui = callTarget([]string{"-s", "my-space"}, authorizer, orgRepo, spaceRepo)
+	ui = callTarget([]string{"-s", "my-space"}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "You do not have access to that space.")
 
-	ui = callTarget([]string{}, authorizer, orgRepo, spaceRepo)
+	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[4], "No space targeted.")
 }
@@ -293,13 +277,9 @@ func newContext(args []string) *cli.Context {
 	return cli.NewContext(cli.NewApp(), flagSet, globalSet)
 }
 
-func callTarget(params []string, a api.Authorizer, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (fakeUI *testhelpers.FakeUI) {
-	if a == nil {
-		a = FakeAuthorizer{true}
-	}
-
+func callTarget(params []string, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
-	Target(newContext(params), fakeUI, a, orgRepo, spaceRepo)
+	Target(newContext(params), fakeUI, orgRepo, spaceRepo)
 	return
 }
 
