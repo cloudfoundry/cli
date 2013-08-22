@@ -1,6 +1,7 @@
-package terminal
+package terminal_test
 
 import (
+	. "cf/terminal"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"

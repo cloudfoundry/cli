@@ -3,12 +3,9 @@ package commands_test
 import (
 	"cf"
 	"cf/api"
-	"cf/app"
 	. "cf/commands"
 	"cf/configuration"
-	"flag"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -261,26 +258,10 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 
 // End test with space option
 
-func newContext(args []string) *cli.Context {
-	app := app.New()
-	targetCommand := app.Commands[0]
-
-	flagSet := new(flag.FlagSet)
-	for i, _ := range targetCommand.Flags {
-		targetCommand.Flags[i].Apply(flagSet)
-	}
-
-	flagSet.Parse(args)
-
-	globalSet := new(flag.FlagSet)
-
-	return cli.NewContext(cli.NewApp(), flagSet, globalSet)
-}
-
-func callTarget(params []string, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (fakeUI *testhelpers.FakeUI) {
+func callTarget(args []string, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	target := NewTarget(fakeUI, orgRepo, spaceRepo)
-	target.Run(newContext(params))
+	target.Run(testhelpers.NewContext(0, args))
 	return
 }
 
