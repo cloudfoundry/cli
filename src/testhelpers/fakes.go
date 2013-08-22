@@ -18,7 +18,6 @@ func (repo FakeOrgRepository) FindOrganizations(config *configuration.Configurat
 	return repo.Organizations, nil
 }
 
-
 func (repo *FakeOrgRepository) FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
 	repo.OrganizationName = name
 	if repo.OrganizationByNameErr {
@@ -27,11 +26,22 @@ func (repo *FakeOrgRepository) FindOrganizationByName(config *configuration.Conf
 	return repo.OrganizationByName, err
 }
 
-func (repo FakeOrgRepository) OrganizationExists(config *configuration.Configuration, organization cf.Organization) (bool) {
-	for _, o := range repo.Organizations{
-		if o.Name == organization.Name || o.Guid == organization.Guid {
-			return true
-		}
+type FakeSpaceRepository struct {
+	Spaces []cf.Space
+
+	SpaceName string
+	SpaceByName cf.Space
+	SpaceByNameErr bool
+}
+
+func (repo FakeSpaceRepository) FindSpaces(config *configuration.Configuration) (spaces []cf.Space, err error) {
+	return repo.Spaces, nil
+}
+
+func (repo *FakeSpaceRepository) FindSpaceByName(config *configuration.Configuration, name string) (space cf.Space, err error) {
+	repo.SpaceName = name
+	if repo.SpaceByNameErr {
+		err = errors.New("Error finding space by name.")
 	}
-	return false
+	return repo.SpaceByName, err
 }

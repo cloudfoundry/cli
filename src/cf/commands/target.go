@@ -13,26 +13,25 @@ type InfoResponse struct {
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
 }
 
-var termUI term.UI
 var authorizer api.Authorizer
-var organizationRepo api.OrganizationRepository
 
-func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepository) {
-	termUI = ui
+func Target(c *cli.Context, termUI term.UI, a api.Authorizer, or api.OrganizationRepository, sr api.SpaceRepository) {
+	ui = termUI
 	authorizer = a
-	organizationRepo = o
+	orgRepo = or
+	spaceRepo = sr
 
 	argsCount := len(c.Args())
 	orgName := c.String("o")
-	space := c.String("s")
+	spaceName := c.String("s")
 	config, err := configuration.Load()
 
 	if err != nil {
-		termUI.Failed("Error loading configuration", err)
+		ui.Failed("Error loading configuration", err)
 		return
 	}
 
-	if argsCount == 0 && orgName == "" && space == "" {
+	if argsCount == 0 && orgName == "" && spaceName == "" {
 		showConfiguration(config)
 		return
 	}
@@ -47,8 +46,8 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepo
 		return
 	}
 
-	if space != "" {
-		setSpace(config, space)
+	if spaceName != "" {
+		setSpace(config, spaceName)
 		return
 	}
 
@@ -56,39 +55,39 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepo
 }
 
 func showConfiguration(config *configuration.Configuration) {
-	termUI.Say("CF Target Info (where apps will be pushed)")
-	termUI.Say("  CF API endpoint: %s (API version: %s)",
+	ui.Say("CF Target Info (where apps will be pushed)")
+	ui.Say("  CF API endpoint: %s (API version: %s)",
 		term.Yellow(config.Target),
 		term.Yellow(config.ApiVersion))
 
 	if !config.IsLoggedIn() {
-		termUI.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
+		ui.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
 		return
 	}
 
-	termUI.Say("  user:            %s", term.Yellow(config.UserEmail()))
+	ui.Say("  user:            %s", term.Yellow(config.UserEmail()))
 
 	if config.HasOrganization() {
-		termUI.Say("  org:             %s", term.Yellow(config.Organization.Name))
+		ui.Say("  org:             %s", term.Yellow(config.Organization.Name))
 	} else {
-		termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
+		ui.Say("  No org targeted. Use 'cf target -o' to target an org.")
 	}
 
-	if config.Space != "" {
-		termUI.Say("  space:           %s", term.Yellow(config.Space))
+	if config.HasSpace() {
+		ui.Say("  space:           %s", term.Yellow(config.Space.Name))
 	} else {
-		termUI.Say("  No space targeted. Use 'cf target -s' to target a space.")
+		ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
 	}
 }
 
 func setNewTarget(target string) {
 	url := "https://" + target
-	termUI.Say("Setting target to %s...", term.Yellow(url))
+	ui.Say("Setting target to %s...", term.Yellow(url))
 
 	request, err := http.NewRequest("GET", url+"/v2/info", nil)
 
 	if err != nil {
-		termUI.Failed("URL invalid.", err)
+		ui.Failed("URL invalid.", err)
 		return
 	}
 
@@ -96,18 +95,18 @@ func setNewTarget(target string) {
 	err = api.PerformRequest(request, &serverResponse)
 
 	if err != nil {
-		termUI.Failed("", err)
+		ui.Failed("", err)
 		return
 	}
 
 	newConfiguration, err := saveTarget(url, serverResponse)
 
 	if err != nil {
-		termUI.Failed("Error saving configuration", err)
+		ui.Failed("Error saving configuration", err)
 		return
 	}
 
-	termUI.Ok()
+	ui.Ok()
 	showConfiguration(newConfiguration)
 }
 
@@ -121,14 +120,14 @@ func saveTarget(target string, info *InfoResponse) (config *configuration.Config
 }
 
 func setOrganization(config *configuration.Configuration, orgName string) {
-	org, err := organizationRepo.FindOrganizationByName(config, orgName)
-	if err != nil {
-		termUI.Failed("Could not set organization.", nil)
+	if !config.IsLoggedIn() {
+		ui.Failed("You must be logged in to set an organization.", nil)
 		return
 	}
 
-	if !config.IsLoggedIn() {
-		termUI.Failed("You must be logged in to set an organization.", nil)
+	org, err := orgRepo.FindOrganizationByName(config, orgName)
+	if err != nil {
+		ui.Failed("Could not set organization.", nil)
 		return
 	}
 
@@ -136,19 +135,20 @@ func setOrganization(config *configuration.Configuration, orgName string) {
 	saveAndShowConfig(config)
 }
 
-func setSpace(config *configuration.Configuration, space string) {
-	if !config.HasOrganization() {
-		termUI.Failed("Organization must be set before targeting space.", nil)
-		return
-	}
-
-	if !authorizer.CanAccessSpace("", space) {
-		termUI.Failed("You do not have access to that space.", nil)
-		return
-	}
-
+func setSpace(config *configuration.Configuration, spaceName string) {
 	if !config.IsLoggedIn() {
-		termUI.Failed("You must be logged in to set a space.", nil)
+		ui.Failed("You must be logged in to set a space.", nil)
+		return
+	}
+
+	if !config.HasOrganization() {
+		ui.Failed("Organization must be set before targeting space.", nil)
+		return
+	}
+
+	space, err := spaceRepo.FindSpaceByName(config, spaceName)
+	if err != nil {
+		ui.Failed("You do not have access to that space.", nil)
 		return
 	}
 
@@ -159,7 +159,7 @@ func setSpace(config *configuration.Configuration, space string) {
 func saveAndShowConfig(config *configuration.Configuration) {
 	err := config.Save()
 	if err != nil {
-		termUI.Failed("Error saving configuration", err)
+		ui.Failed("Error saving configuration", err)
 		return
 	}
 	showConfiguration(config)

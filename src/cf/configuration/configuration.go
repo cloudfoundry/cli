@@ -19,7 +19,7 @@ type Configuration struct {
 	AuthorizationEndpoint string
 	AccessToken           string
 	Organization          cf.Organization
-	Space                 string
+	Space                 cf.Space
 }
 
 func setDefaultConfig() (c *Configuration) {
@@ -106,6 +106,10 @@ func (c Configuration) IsLoggedIn() bool {
 
 func (c Configuration) HasOrganization() bool {
 	return c.Organization.Guid != "" && c.Organization.Name != ""
+}
+
+func (c Configuration) HasSpace() bool {
+	return c.Space.Guid != "" && c.Space.Name != ""
 }
 
 func configFile() (file string, err error) {

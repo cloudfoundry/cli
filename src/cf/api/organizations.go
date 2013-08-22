@@ -11,7 +11,6 @@ import (
 type OrganizationRepository interface {
 	FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error)
 	FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error)
-	OrganizationExists(config *configuration.Configuration, organization cf.Organization) bool
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -72,10 +71,4 @@ func (repo CloudControllerOrganizationRepository) FindOrganizationByName(config 
 
 	err = errors.New("Organization not found")
 	return
-}
-
-func (repo CloudControllerOrganizationRepository) OrganizationExists(config *configuration.Configuration, organization cf.Organization) bool {
-	_, err := repo.FindOrganizationByName(config, organization.Name)
-
-	return err == nil
 }

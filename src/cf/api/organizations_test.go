@@ -81,20 +81,6 @@ func TestFindOrganizationsWithIncorrectToken(t *testing.T) {
 	assert.Equal(t, 0, len(organizations))
 }
 
-func TestOrganizationExists(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
-	defer ts.Close()
-
-	repo := CloudControllerOrganizationRepository{}
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	existingOrg := cf.Organization{Guid: "org1-guid", Name: "org1"}
-	nonexistingOrg := cf.Organization{Guid: "org3-guid", Name: "org3"}
-
-	assert.True(t, repo.OrganizationExists(config, existingOrg))
-	assert.False(t, repo.OrganizationExists(config, nonexistingOrg))
-}
-
 func TestFindOrganizationByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()

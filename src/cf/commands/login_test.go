@@ -57,7 +57,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{}, &testhelpers.FakeSpaceRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -69,20 +69,25 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, config.AccessToken, "BEARER my_access_token")
 }
 
-func TestLoggingInWithTwoOrgsAskUserToChooseOrg(t *testing.T) {
+func TestLoggingInWithTwoOrgsAskUserToChooseOrgAndSpace(t *testing.T) {
 	loginServer := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer loginServer.Close()
 
 	config := logout(t, loginServer.URL)
 
 	ui := new(testhelpers.FakeUI)
-	ui.Inputs = []string{"foo@example.com", "bar", "2"}
+	ui.Inputs = []string{"foo@example.com", "bar", "2", "1"}
 
 	orgs := []cf.Organization{
 		cf.Organization{"FirstOrg", "org-1-guid"},
 		cf.Organization{"SecondOrg", "org-2-guid"},
 	}
-	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs})
+	spaces := []cf.Space{
+		cf.Space{"FirstSpace", "space-1-guid"},
+		cf.Space{"SecondSpace", "space-2-guid"},
+	}
+
+	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs}, &testhelpers.FakeSpaceRepository{Spaces: spaces})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
@@ -95,13 +100,19 @@ func TestLoggingInWithTwoOrgsAskUserToChooseOrg(t *testing.T) {
 
 	assert.Contains(t, ui.Prompts[2], "Organization")
 	assert.Contains(t, ui.Outputs[5], "SecondOrg")
+	assert.Contains(t, ui.Outputs[7], "FirstSpace")
+	assert.Contains(t, ui.Outputs[8], "SecondSpace")
+
+	assert.Contains(t, ui.Prompts[3], "Space")
+	assert.Contains(t, ui.Outputs[9], "FirstSpace")
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 	assert.Equal(t, orgs[1], config.Organization)
+	assert.Equal(t, spaces[0], config.Space)
 }
 
-func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
+func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	loginServer := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer loginServer.Close()
 
@@ -112,19 +123,32 @@ func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
 		cf.Organization{"Org2", "org-2-guid"},
 	}
 
-	ui := new(testhelpers.FakeUI)
-	ui.Inputs = []string{"foo@example.com", "bar", "3", "2"}
+	spaces := []cf.Space{
+		cf.Space{"FirstSpace", "space-1-guid"},
+		cf.Space{"SecondSpace", "space-2-guid"},
+	}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs})
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"foo@example.com", "bar", "3", "2", "3", "1"}
+
+	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs}, &testhelpers.FakeSpaceRepository{Spaces: spaces})
 
 	assert.Contains(t, ui.Prompts[2], "Organization")
 	assert.Contains(t, ui.Outputs[5], "FAILED")
+
 	assert.Contains(t, ui.Prompts[3], "Organization")
 	assert.Contains(t, ui.Outputs[9], "Targeting org")
+
+	assert.Contains(t, ui.Prompts[4], "Space")
+	assert.Contains(t, ui.Outputs[13], "FAILED")
+
+	assert.Contains(t, ui.Prompts[5], "Space")
+	assert.Contains(t, ui.Outputs[17], "Targeting space")
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 	assert.Equal(t, orgs[1], config.Organization)
+	assert.Equal(t, spaces[0], config.Space)
 }
 
 var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
@@ -146,7 +170,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		"bar",
 	}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{}, &testhelpers.FakeSpaceRepository{})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Equal(t, ui.Outputs[1], "Authenticating...")

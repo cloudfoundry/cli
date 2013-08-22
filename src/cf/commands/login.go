@@ -21,10 +21,12 @@ type AuthenticationResponse struct {
 const maxLoginTries = 3
 
 var orgRepo api.OrganizationRepository
+var spaceRepo api.SpaceRepository
 var ui term.UI
 
-func Login(c *cli.Context, termUI term.UI, o api.OrganizationRepository) {
-	orgRepo = o
+func Login(c *cli.Context, termUI term.UI, or api.OrganizationRepository, sr api.SpaceRepository) {
+	orgRepo = or
+	spaceRepo = sr
 	ui = termUI
 
 	config, err := configuration.Load()
@@ -57,6 +59,7 @@ func Login(c *cli.Context, termUI term.UI, o api.OrganizationRepository) {
 		ui.Ok()
 
 		targetOrganization(config)
+		targetSpace(config)
 
 		return
 	}
@@ -116,5 +119,44 @@ func targetOrganization(config *configuration.Configuration) {
 	}
 
 	ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
+	ui.Ok()
+}
+
+func targetSpace(config *configuration.Configuration) {
+	// TODO return if no organization
+
+	spaces, err := spaceRepo.FindSpaces(config)
+
+	if err != nil {
+		ui.Failed("Error fetching spaces.", err)
+		return
+	}
+
+	if len(spaces) < 2 {
+		return
+	}
+
+	for i, space := range spaces {
+		ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), space.Name)
+	}
+
+	index, err := strconv.Atoi(ui.Ask("Space%s", term.Cyan(">")))
+
+	if err != nil || index > len(spaces) {
+		ui.Failed("Invalid number", err)
+		targetSpace(config)
+		return
+	}
+
+	selectedSpace := spaces[index-1]
+	config.Space = selectedSpace
+	err = config.Save()
+
+	if err != nil {
+		ui.Failed("Error saving organization: %s", err)
+		return
+	}
+
+	ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
 	ui.Ok()
 }
