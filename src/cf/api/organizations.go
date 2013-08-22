@@ -1,24 +1,23 @@
 package api
 
 import (
+	"cf"
 	"cf/configuration"
+	"errors"
 	"net/http"
+	"strings"
 )
 
-type Organization struct {
-	Name string
-	Guid string
-}
-
 type OrganizationRepository interface {
-	FindOrganizations(config *configuration.Configuration) (orgs []Organization, err error)
-	OrganizationExists(config *configuration.Configuration, organization Organization) bool
+	FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error)
+	FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error)
+	OrganizationExists(config *configuration.Configuration, organization cf.Organization) bool
 }
 
 type CloudControllerOrganizationRepository struct {
 }
 
-func (repo CloudControllerOrganizationRepository) FindOrganizations(config *configuration.Configuration) (orgs []Organization, err error) {
+func (repo CloudControllerOrganizationRepository) FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error) {
 	request, err := http.NewRequest("GET", config.Target+"/v2/organizations", nil)
 	if err != nil {
 		return
@@ -51,23 +50,32 @@ func (repo CloudControllerOrganizationRepository) FindOrganizations(config *conf
 	}
 
 	for _, r := range response.Resources {
-		orgs = append(orgs, Organization{r.Entity.Name, r.Metadata.Guid})
+		orgs = append(orgs, cf.Organization{r.Entity.Name, r.Metadata.Guid})
 	}
 
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) OrganizationExists(config *configuration.Configuration, organization Organization) bool {
+func (repo CloudControllerOrganizationRepository) FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
 	orgs, err := repo.FindOrganizations(config)
+	lowerName := strings.ToLower(name)
 
 	if err != nil {
-		return false
+		return
 	}
 
 	for _, o := range orgs {
-		if o.Name == organization.Name {
-			return true
+		if strings.ToLower(o.Name) == lowerName {
+			return o, nil
 		}
 	}
-	return false
+
+	err = errors.New("Organization not found")
+	return
+}
+
+func (repo CloudControllerOrganizationRepository) OrganizationExists(config *configuration.Configuration, organization cf.Organization) bool {
+	_, err := repo.FindOrganizationByName(config, organization.Name)
+
+	return err == nil
 }

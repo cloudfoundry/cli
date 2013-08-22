@@ -23,7 +23,7 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepo
 	organizationRepo = o
 
 	argsCount := len(c.Args())
-	org := c.String("o")
+	orgName := c.String("o")
 	space := c.String("s")
 	config, err := configuration.Load()
 
@@ -32,7 +32,7 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepo
 		return
 	}
 
-	if argsCount == 0 && org == "" && space == "" {
+	if argsCount == 0 && orgName == "" && space == "" {
 		showConfiguration(config)
 		return
 	}
@@ -42,8 +42,8 @@ func Target(c *cli.Context, ui term.UI, a api.Authorizer, o api.OrganizationRepo
 		return
 	}
 
-	if org != "" {
-		setOrganization(config, org)
+	if orgName != "" {
+		setOrganization(config, orgName)
 		return
 	}
 
@@ -68,8 +68,8 @@ func showConfiguration(config *configuration.Configuration) {
 
 	termUI.Say("  user:            %s", term.Yellow(config.UserEmail()))
 
-	if config.Organization != "" {
-		termUI.Say("  org:             %s", term.Yellow(config.Organization))
+	if config.HasOrganization() {
+		termUI.Say("  org:             %s", term.Yellow(config.Organization.Name))
 	} else {
 		termUI.Say("  No org targeted. Use 'cf target -o' to target an org.")
 	}
@@ -121,8 +121,8 @@ func saveTarget(target string, info *InfoResponse) (config *configuration.Config
 }
 
 func setOrganization(config *configuration.Configuration, orgName string) {
-	o := api.Organization{Name: orgName}
-	if !organizationRepo.OrganizationExists(config, o) {
+	org, err := organizationRepo.FindOrganizationByName(config, orgName)
+	if err != nil {
 		termUI.Failed("Could not set organization.", nil)
 		return
 	}
@@ -132,12 +132,12 @@ func setOrganization(config *configuration.Configuration, orgName string) {
 		return
 	}
 
-	config.Organization = orgName
+	config.Organization = org
 	saveAndShowConfig(config)
 }
 
 func setSpace(config *configuration.Configuration, space string) {
-	if config.Organization == "" {
+	if !config.HasOrganization() {
 		termUI.Failed("Organization must be set before targeting space.", nil)
 		return
 	}

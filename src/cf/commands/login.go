@@ -107,7 +107,7 @@ func targetOrganization(config *configuration.Configuration) {
 	}
 
 	selectedOrg := organizations[index-1]
-	config.Organization = selectedOrg.Name
+	config.Organization = selectedOrg
 	err = config.Save()
 
 	if err != nil {

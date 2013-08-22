@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf"
 	"cf/configuration"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,6 @@ var multipleOrgEndpoint = func(writer http.ResponseWriter, request *http.Request
 	}
 
 	jsonResponse := `
-
 {
   "total_results": 2,
   "total_pages": 1,
@@ -30,7 +30,7 @@ var multipleOrgEndpoint = func(writer http.ResponseWriter, request *http.Request
   "resources": [
     {
       "metadata": {
-        "guid": "c4acbb8c-956c-49c8-abe4-b81881ad4138"
+        "guid": "org1-guid"
       },
       "entity": {
         "name": "Org1"
@@ -38,7 +38,7 @@ var multipleOrgEndpoint = func(writer http.ResponseWriter, request *http.Request
     },
     {
       "metadata": {
-        "guid": "ac411d31-5e3b-4bea-ba5e-a0540627d1e7"
+        "guid": "org2-guid"
       },
       "entity": {
         "name": "Org2"
@@ -59,6 +59,13 @@ func TestFindOrganizations(t *testing.T) {
 	organizations, err := repo.FindOrganizations(config)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(organizations))
+
+	firstOrg := organizations[0]
+	assert.Equal(t, firstOrg.Name, "Org1")
+	assert.Equal(t, firstOrg.Guid, "org1-guid")
+	secondOrg := organizations[1]
+	assert.Equal(t, secondOrg.Name, "Org2")
+	assert.Equal(t, secondOrg.Guid, "org2-guid")
 }
 
 func TestFindOrganizationsWithIncorrectToken(t *testing.T) {
@@ -81,9 +88,29 @@ func TestOrganizationExists(t *testing.T) {
 	repo := CloudControllerOrganizationRepository{}
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	existingOrg := Organization{Name: "Org1"}
-	nonexistingOrg := Organization{Name: "Org3"}
+	existingOrg := cf.Organization{Guid: "org1-guid", Name: "org1"}
+	nonexistingOrg := cf.Organization{Guid: "org3-guid", Name: "org3"}
 
 	assert.True(t, repo.OrganizationExists(config, existingOrg))
 	assert.False(t, repo.OrganizationExists(config, nonexistingOrg))
+}
+
+func TestFindOrganizationByName(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerOrganizationRepository{}
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
+
+	org, err := repo.FindOrganizationByName(config, "Org1")
+	assert.NoError(t, err)
+	assert.Equal(t, org, existingOrg)
+
+	org, err = repo.FindOrganizationByName(config, "org1")
+	assert.NoError(t, err)
+	assert.Equal(t, org, existingOrg)
+
+	org, err = repo.FindOrganizationByName(config, "org that does not exist")
+	assert.Error(t, err)
 }

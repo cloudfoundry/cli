@@ -1,7 +1,7 @@
 package commands_test
 
 import (
-	"cf/api"
+	"cf"
 	. "cf/commands"
 	"cf/configuration"
 	"encoding/base64"
@@ -78,11 +78,11 @@ func TestLoggingInWithTwoOrgsAskUserToChooseOrg(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar", "2"}
 
-	orgs := []api.Organization{
-		api.Organization{"FirstOrg", "org-1-guid"},
-		api.Organization{"SecondOrg", "org-2-guid"},
+	orgs := []cf.Organization{
+		cf.Organization{"FirstOrg", "org-1-guid"},
+		cf.Organization{"SecondOrg", "org-2-guid"},
 	}
-	Login(nil, ui, &testhelpers.FakeOrgRepository{orgs})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs})
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
@@ -98,7 +98,7 @@ func TestLoggingInWithTwoOrgsAskUserToChooseOrg(t *testing.T) {
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)
-	assert.Equal(t, "SecondOrg", config.Organization)
+	assert.Equal(t, orgs[1], config.Organization)
 }
 
 func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
@@ -107,15 +107,15 @@ func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
 
 	config := logout(t, loginServer.URL)
 
-	orgs := []api.Organization{
-		api.Organization{"Org1", "org-1-guid"},
-		api.Organization{"Org2", "org-2-guid"},
+	orgs := []cf.Organization{
+		cf.Organization{"Org1", "org-1-guid"},
+		cf.Organization{"Org2", "org-2-guid"},
 	}
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar", "3", "2"}
 
-	Login(nil, ui, &testhelpers.FakeOrgRepository{orgs})
+	Login(nil, ui, &testhelpers.FakeOrgRepository{Organizations: orgs})
 
 	assert.Contains(t, ui.Prompts[2], "Organization")
 	assert.Contains(t, ui.Outputs[5], "FAILED")
@@ -124,7 +124,7 @@ func TestWhenUserPicksInvalidOrgNumber(t *testing.T) {
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)
-	assert.Equal(t, "Org2", config.Organization)
+	assert.Equal(t, orgs[1], config.Organization)
 }
 
 var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {

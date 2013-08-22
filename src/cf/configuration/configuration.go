@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"cf"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -17,7 +18,7 @@ type Configuration struct {
 	ApiVersion            string
 	AuthorizationEndpoint string
 	AccessToken           string
-	Organization          string
+	Organization          cf.Organization
 	Space                 string
 }
 
@@ -101,6 +102,10 @@ func (c Configuration) UserEmail() (email string) {
 
 func (c Configuration) IsLoggedIn() bool {
 	return c.AccessToken != ""
+}
+
+func (c Configuration) HasOrganization() bool {
+	return c.Organization.Guid != "" && c.Organization.Name != ""
 }
 
 func configFile() (file string, err error) {

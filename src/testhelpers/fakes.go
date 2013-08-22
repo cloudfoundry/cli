@@ -1,21 +1,35 @@
 package testhelpers
 
 import (
-	"cf/api"
 	"cf/configuration"
+	"cf"
+	"errors"
 )
 
 type FakeOrgRepository struct {
-	Organizations []api.Organization
+	Organizations []cf.Organization
+
+	OrganizationName string
+	OrganizationByName cf.Organization
+	OrganizationByNameErr bool
 }
 
-func (repo FakeOrgRepository) FindOrganizations(config *configuration.Configuration) (orgs []api.Organization, err error) {
+func (repo FakeOrgRepository) FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error) {
 	return repo.Organizations, nil
 }
 
-func (repo FakeOrgRepository) OrganizationExists(config *configuration.Configuration, organization api.Organization) (bool) {
+
+func (repo *FakeOrgRepository) FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
+	repo.OrganizationName = name
+	if repo.OrganizationByNameErr {
+		err = errors.New("Error finding organization by name.")
+	}
+	return repo.OrganizationByName, err
+}
+
+func (repo FakeOrgRepository) OrganizationExists(config *configuration.Configuration, organization cf.Organization) (bool) {
 	for _, o := range repo.Organizations{
-		if o.Name == organization.Name || o.Guid == organization.Guid{
+		if o.Name == organization.Name || o.Guid == organization.Guid {
 			return true
 		}
 	}
