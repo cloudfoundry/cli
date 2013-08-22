@@ -130,12 +130,12 @@ func (l Login) targetOrganization(config *configuration.Configuration) {
 func (l Login) targetSpace(config *configuration.Configuration) {
 	spaces, err := l.spaceRepo.FindSpaces(config)
 
-	if err != nil {
-		l.ui.Failed("Error fetching spaces.", err)
+	if len(spaces) < 2 {
 		return
 	}
 
-	if len(spaces) < 2 {
+	if err != nil {
+		l.ui.Failed("Error fetching spaces.", err)
 		return
 	}
 
