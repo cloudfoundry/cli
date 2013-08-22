@@ -1,15 +1,15 @@
 package commands_test
 
 import (
-	"testing"
-	"cf/configuration"
-	. "cf/commands"
 	"cf"
+	. "cf/commands"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
+	"testing"
 )
 
-func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T){
+func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
 	config, err := configuration.Load()
 	assert.NoError(t, err)
 
