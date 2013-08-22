@@ -45,7 +45,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(config *configuration.Co
 		return
 	}
 
-	err = PerformRequestWithoutResponseBody(request)
+	err = PerformRequest(request)
 	return
 }
 
@@ -59,7 +59,7 @@ func findApplications(config *configuration.Configuration) (apps []cf.Applicatio
 
 	response := new(ApiResponse)
 
-	err = PerformRequest(request, response)
+	err = PerformRequestForBody(request, response)
 
 	if err != nil {
 		return

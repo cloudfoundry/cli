@@ -85,7 +85,7 @@ func (l Login) authenticate(endpoint string, email string, password string) (res
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
-	err = api.PerformRequest(request, &response)
+	err = api.PerformRequestForBody(request, &response)
 
 	return
 }

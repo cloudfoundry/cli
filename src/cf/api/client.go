@@ -16,7 +16,7 @@ func newClient() *http.Client {
 	return &http.Client{Transport: tr}
 }
 
-func PerformRequestWithoutResponseBody(request *http.Request) (err error) {
+func PerformRequest(request *http.Request) (err error) {
 	client := newClient()
 	request.Header.Set("accept", "application/json")
 
@@ -34,7 +34,7 @@ func PerformRequestWithoutResponseBody(request *http.Request) (err error) {
 	return
 }
 
-func PerformRequest(request *http.Request, response interface{}) (err error) {
+func PerformRequestForBody(request *http.Request, response interface{}) (err error) {
 	client := newClient()
 	request.Header.Set("accept", "application/json")
 

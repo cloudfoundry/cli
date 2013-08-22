@@ -99,7 +99,7 @@ func (t Target) setNewTarget(target string) {
 	}
 
 	serverResponse := new(InfoResponse)
-	err = api.PerformRequest(request, &serverResponse)
+	err = api.PerformRequestForBody(request, &serverResponse)
 
 	if err != nil {
 		t.ui.Failed("", err)
