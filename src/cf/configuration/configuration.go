@@ -112,6 +112,14 @@ func (c Configuration) HasSpace() bool {
 	return c.Space.Guid != "" && c.Space.Name != ""
 }
 
+func (c Configuration) ClearSession() (err error) {
+	c.AccessToken = ""
+	c.Organization = cf.Organization{}
+	c.Space = cf.Space{}
+
+	return c.Save()
+}
+
 func configFile() (file string, err error) {
 	configDir := userHomeDir() + "/.cf"
 

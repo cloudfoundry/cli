@@ -50,6 +50,15 @@ func New() (app *cli.App) {
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:        "logout",
+			ShortName:   "bye",
+			Description: "Log user out",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewLogout(termUI)
+				cmd.Run(c)
+			},
+		},
 	}
 	return
 }
