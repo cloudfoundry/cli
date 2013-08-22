@@ -66,6 +66,8 @@ func (l Login) Run(c *cli.Context) {
 		l.targetOrganization(config)
 		l.targetSpace(config)
 
+		l.ui.ShowConfiguration(config)
+
 		return
 	}
 }

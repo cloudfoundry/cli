@@ -6,6 +6,7 @@ import (
 	"os"
 	"fmt"
 	"strings"
+	"cf/configuration"
 )
 
 func CaptureOutput(f func()) string {
@@ -35,35 +36,59 @@ type FakeUI struct {
 	Inputs []string
 }
 
-func (c *FakeUI) Say(message string, args ...interface{}) {
-	c.Outputs = append(c.Outputs, fmt.Sprintf(message, args...))
+func (ui *FakeUI) Say(message string, args ...interface{}) {
+	ui.Outputs = append(ui.Outputs, fmt.Sprintf(message, args...))
 	return
 }
 
-func (c *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
-	c.Prompts = append(c.Prompts, fmt.Sprintf(prompt, args...))
-	answer = c.Inputs[0]
-	c.Inputs = c.Inputs[1:]
+func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
+	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
+	answer = ui.Inputs[0]
+	ui.Inputs = ui.Inputs[1:]
 	return
 }
 
-func (c *FakeUI) Ok() {
-	c.Say("OK")
+func (ui *FakeUI) Ok() {
+	ui.Say("OK")
 }
 
-func (c *FakeUI) Failed(message string, err error) {
-	c.Say("FAILED")
+func (ui *FakeUI) Failed(message string, err error) {
+	ui.Say("FAILED")
 
 	if message != "" {
-		c.Say(message)
+		ui.Say(message)
 	}
 
 	if err != nil {
-		c.Say(err.Error())
+		ui.Say(err.Error())
 	}
 	return
 }
 
-func (c *FakeUI)DumpOutputs()string{
-	return "****************************\n" + strings.Join(c.Outputs, "\n")
+func (ui *FakeUI)DumpOutputs()string{
+	return "****************************\n" + strings.Join(ui.Outputs, "\n")
+}
+
+func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
+	ui.Say("CF Target Info (where apps will be pushed)")
+	ui.Say("  CF API endpoint: %s (API version: %s)", config.Target, config.ApiVersion)
+
+	if !config.IsLoggedIn() {
+		ui.Say("  Logged out. Use '%s' to login.", "cf login USERNAME")
+		return
+	}
+
+	ui.Say("  user:            %s", config.UserEmail())
+
+	if config.HasOrganization() {
+		ui.Say("  org:             %s", config.Organization.Name)
+	} else {
+		ui.Say("  No org targeted. Use 'cf target -o' to target an org.")
+	}
+
+	if config.HasSpace() {
+		ui.Say("  app space:       %s", config.Space.Name)
+	} else {
+		ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
+	}
 }

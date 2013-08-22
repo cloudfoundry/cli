@@ -39,7 +39,7 @@ func (t Target) Run(c *cli.Context) {
 	}
 
 	if argsCount == 0 && orgName == "" && spaceName == "" {
-		t.showConfiguration(config)
+		t.ui.ShowConfiguration(config)
 		return
 	}
 
@@ -59,32 +59,6 @@ func (t Target) Run(c *cli.Context) {
 	}
 
 	return
-}
-
-func (t Target) showConfiguration(config *configuration.Configuration) {
-	t.ui.Say("CF Target Info (where apps will be pushed)")
-	t.ui.Say("  CF API endpoint: %s (API version: %s)",
-		term.Yellow(config.Target),
-		term.Yellow(config.ApiVersion))
-
-	if !config.IsLoggedIn() {
-		t.ui.Say("  Logged out. Use '%s' to login.", term.Yellow("cf login USERNAME"))
-		return
-	}
-
-	t.ui.Say("  user:            %s", term.Yellow(config.UserEmail()))
-
-	if config.HasOrganization() {
-		t.ui.Say("  org:             %s", term.Yellow(config.Organization.Name))
-	} else {
-		t.ui.Say("  No org targeted. Use 'cf target -o' to target an org.")
-	}
-
-	if config.HasSpace() {
-		t.ui.Say("  app space:       %s", term.Yellow(config.Space.Name))
-	} else {
-		t.ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
-	}
 }
 
 func (t Target) setNewTarget(target string) {
@@ -114,7 +88,7 @@ func (t Target) setNewTarget(target string) {
 	}
 
 	t.ui.Ok()
-	t.showConfiguration(newConfiguration)
+	t.ui.ShowConfiguration(newConfiguration)
 }
 
 func (t Target) saveTarget(target string, info *InfoResponse) (config *configuration.Configuration, err error) {
@@ -169,5 +143,5 @@ func (t Target) saveAndShowConfig(config *configuration.Configuration) {
 		t.ui.Failed("Error saving configuration", err)
 		return
 	}
-	t.showConfiguration(config)
+	t.ui.ShowConfiguration(config)
 }

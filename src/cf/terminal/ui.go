@@ -1,12 +1,16 @@
 package terminal
 
-import "fmt"
+import (
+	"cf/configuration"
+	"fmt"
+)
 
 type UI interface {
 	Say(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
 	Ok()
 	Failed(message string, err error)
+	ShowConfiguration(*configuration.Configuration)
 }
 
 type TerminalUI struct {
@@ -39,4 +43,30 @@ func (c TerminalUI) Failed(message string, err error) {
 		c.Say(err.Error())
 	}
 	return
+}
+
+func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
+	ui.Say("CF Target Info (where apps will be pushed)")
+	ui.Say("  CF API endpoint: %s (API version: %s)",
+		Yellow(config.Target),
+		Yellow(config.ApiVersion))
+
+	if !config.IsLoggedIn() {
+		ui.Say("  Logged out. Use '%s' to login.", Yellow("cf login USERNAME"))
+		return
+	}
+
+	ui.Say("  user:            %s", Yellow(config.UserEmail()))
+
+	if config.HasOrganization() {
+		ui.Say("  org:             %s", Yellow(config.Organization.Name))
+	} else {
+		ui.Say("  No org targeted. Use 'cf target -o' to target an org.")
+	}
+
+	if config.HasSpace() {
+		ui.Say("  app space:       %s", Yellow(config.Space.Name))
+	} else {
+		ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
+	}
 }
