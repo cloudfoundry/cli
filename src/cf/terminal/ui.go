@@ -46,8 +46,7 @@ func (c TerminalUI) Failed(message string, err error) {
 }
 
 func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
-	ui.Say("CF Target Info (where apps will be pushed)")
-	ui.Say("  CF API endpoint: %s (API version: %s)",
+	ui.Say("  API endpoint: %s (API version: %s)",
 		Yellow(config.Target),
 		Yellow(config.ApiVersion))
 

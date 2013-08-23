@@ -70,8 +70,7 @@ func (ui *FakeUI)DumpOutputs()string{
 }
 
 func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
-	ui.Say("CF Target Info (where apps will be pushed)")
-	ui.Say("  CF API endpoint: %s (API version: %s)", config.Target, config.ApiVersion)
+	ui.Say("  API endpoint: %s (API version: %s)", config.Target, config.ApiVersion)
 
 	if !config.IsLoggedIn() {
 		ui.Say("  Logged out. Use '%s' to login.", "cf login USERNAME")

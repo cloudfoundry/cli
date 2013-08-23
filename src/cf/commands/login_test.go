@@ -75,7 +75,6 @@ func TestLoggingInWithTwoOrgsAskUserToChooseOrgAndSpace(t *testing.T) {
 
 	assert.Contains(t, ui.Prompts[3], "Space")
 	assert.Contains(t, ui.Outputs[9], "FirstSpace")
-	assert.Contains(t, ui.Outputs[11], "CF Target Info (where apps will be pushed)")
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)

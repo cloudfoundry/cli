@@ -22,7 +22,7 @@ func TestTargetWithoutArgument(t *testing.T) {
 
 	fakeUI := callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, fakeUI.Outputs[1], "https://api.run.pivotal.io")
+	assert.Contains(t, fakeUI.Outputs[0], "https://api.run.pivotal.io")
 }
 
 // With target argument
@@ -59,13 +59,13 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	fakeUI := callTarget([]string{URL.Host}, orgRepo, spaceRepo)
 
-	assert.Contains(t, fakeUI.Outputs[3], "https://"+URL.Host)
-	assert.Contains(t, fakeUI.Outputs[3], "42.0.0")
+	assert.Contains(t, fakeUI.Outputs[2], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[2], "42.0.0")
 
 	fakeUI = callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, fakeUI.Outputs[1], "https://"+URL.Host)
-	assert.Contains(t, fakeUI.Outputs[1], "42.0.0")
+	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[0], "42.0.0")
 
 	savedConfig, err := configuration.Load()
 
@@ -141,10 +141,10 @@ func TestTargetWithLoggedInUserShowsOrgInfo(t *testing.T) {
 
 	ui := callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[1], cloudController.URL)
-	assert.Contains(t, ui.Outputs[2], "user:")
-	assert.Contains(t, ui.Outputs[2], "user1@example.com")
-	assert.Contains(t, ui.Outputs[3], "No org targeted. Use 'cf target -o' to target an org.")
+	assert.Contains(t, ui.Outputs[0], cloudController.URL)
+	assert.Contains(t, ui.Outputs[1], "user:")
+	assert.Contains(t, ui.Outputs[1], "user1@example.com")
+	assert.Contains(t, ui.Outputs[2], "No org targeted. Use 'cf target -o' to target an org.")
 }
 
 // End with target argument
@@ -166,12 +166,12 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	ui := callTarget([]string{"-o", "my-organization"}, orgRepo, spaceRepo)
 
 	assert.Equal(t, orgRepo.OrganizationName, "my-organization")
-	assert.Contains(t, ui.Outputs[3], "org:")
-	assert.Contains(t, ui.Outputs[3], "my-organization")
+	assert.Contains(t, ui.Outputs[2], "org:")
+	assert.Contains(t, ui.Outputs[2], "my-organization")
 
 	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[3], "my-organization")
+	assert.Contains(t, ui.Outputs[2], "my-organization")
 }
 
 func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
@@ -184,7 +184,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui := callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[3], "No org targeted.")
+	assert.Contains(t, ui.Outputs[2], "No org targeted.")
 
 	ui = callTarget([]string{"-o", "my-organization"}, orgRepo, spaceRepo)
 
@@ -192,7 +192,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[3], "No org targeted.")
+	assert.Contains(t, ui.Outputs[2], "No org targeted.")
 }
 
 // End test with organization option
@@ -212,7 +212,7 @@ func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 
 	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[4], "No space targeted.")
+	assert.Contains(t, ui.Outputs[3], "No space targeted.")
 }
 
 func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
@@ -228,12 +228,12 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 	ui := callTarget([]string{"-s", "my-space"}, orgRepo, spaceRepo)
 
 	assert.Equal(t, spaceRepo.SpaceName, "my-space")
-	assert.Contains(t, ui.Outputs[4], "space:")
-	assert.Contains(t, ui.Outputs[4], "my-space")
+	assert.Contains(t, ui.Outputs[3], "space:")
+	assert.Contains(t, ui.Outputs[3], "my-space")
 
 	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[4], "my-space")
+	assert.Contains(t, ui.Outputs[3], "my-space")
 }
 
 func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
@@ -244,7 +244,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	spaceRepo := &testhelpers.FakeSpaceRepository{SpaceByNameErr: true}
 	ui := callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[4], "No space targeted.")
+	assert.Contains(t, ui.Outputs[3], "No space targeted.")
 
 	ui = callTarget([]string{"-s", "my-space"}, orgRepo, spaceRepo)
 
@@ -253,7 +253,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui = callTarget([]string{}, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[4], "No space targeted.")
+	assert.Contains(t, ui.Outputs[3], "No space targeted.")
 }
 
 // End test with space option
