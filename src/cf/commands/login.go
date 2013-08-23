@@ -83,26 +83,16 @@ func (l Login) Run(c *cli.Context) {
 }
 
 func (l Login) targetOrganization(config *configuration.Configuration, organizations []cf.Organization) {
-	var selectedOrg cf.Organization
-	var displayOk bool
 	if len(organizations) == 1 {
-		selectedOrg = organizations[0]
+		l.saveOrg(config, organizations[0])
 	} else {
-		displayOk = true
-		selectedOrg = l.chooseOrg(organizations)
+		selectedOrg := l.chooseOrg(organizations)
 		l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
-	}
+		err := l.saveOrg(config, selectedOrg)
 
-	config.Organization = selectedOrg
-	err := config.Save()
-
-	if err != nil {
-		l.ui.Failed("Error saving organization: %s", err)
-		return
-	}
-
-	if displayOk {
-		l.ui.Ok()
+		if err == nil {
+			l.ui.Ok()
+		}
 	}
 }
 
@@ -121,28 +111,29 @@ func (l Login) chooseOrg(orgs []cf.Organization) (org cf.Organization) {
 	return orgs[index-1]
 }
 
-func (l Login) targetSpace(config *configuration.Configuration, spaces []cf.Space) {
-	var selectedSpace cf.Space
-	var displayOk bool
-
-	if len(spaces) == 1 {
-		selectedSpace = spaces[0]
-	} else {
-		displayOk = true
-		selectedSpace = l.chooseSpace(spaces)
-		l.ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
-	}
-
-	config.Space = selectedSpace
-	err := config.Save()
+func (l Login) saveOrg(config *configuration.Configuration, org cf.Organization) (err error) {
+	config.Organization = org
+	err = config.Save()
 
 	if err != nil {
 		l.ui.Failed("Error saving organization: %s", err)
 		return
 	}
 
-	if displayOk {
-		l.ui.Ok()
+	return
+}
+
+func (l Login) targetSpace(config *configuration.Configuration, spaces []cf.Space) {
+	if len(spaces) == 1 {
+		l.saveSpace(config, spaces[0])
+	} else {
+		selectedSpace := l.chooseSpace(spaces)
+		l.ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
+		err := l.saveSpace(config, selectedSpace)
+
+		if err == nil {
+			l.ui.Ok()
+		}
 	}
 }
 
@@ -159,4 +150,16 @@ func (l Login) chooseSpace(spaces []cf.Space) (space cf.Space) {
 	}
 
 	return spaces[index-1]
+}
+
+func (l Login) saveSpace(config *configuration.Configuration, space cf.Space) (err error) {
+	config.Space = space
+	err = config.Save()
+
+	if err != nil {
+		l.ui.Failed("Error saving organization: %s", err)
+		return
+	}
+
+	return
 }
