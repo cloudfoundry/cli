@@ -17,7 +17,9 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
-	auth := &testhelpers.FakeAuthenticator{}
+	auth := &testhelpers.FakeAuthenticator{
+		AccessToken: "my_access_token",
+	}
 	callLogin(
 		nil,
 		ui,
@@ -26,17 +28,20 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 		auth,
 	)
 
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Prompts[0], "Email")
 	assert.Contains(t, ui.Prompts[1], "Password")
 
-	assert.Equal(t, *auth.Config, *config)
+	assert.Equal(t, config.AccessToken, "my_access_token")
 	assert.Equal(t, auth.Email, "foo@example.com")
 	assert.Equal(t, auth.Password, "bar")
 }
 
-func TestLoggingInWithTwoOrgsAskUserToChooseOrgAndSpace(t *testing.T) {
+func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	config := logout(t)
 
 	ui := new(testhelpers.FakeUI)
@@ -122,6 +127,106 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, orgs[1], config.Organization)
 	assert.Equal(t, spaces[0], config.Space)
+}
+
+func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
+	config := logout(t)
+
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"foo@example.com", "bar"}
+
+	orgs := []cf.Organization{
+		cf.Organization{"FirstOrg", "org-1-guid"},
+	}
+	spaces := []cf.Space{
+		cf.Space{"FirstSpace", "space-1-guid"},
+	}
+
+	callLogin(
+		nil,
+		ui,
+		&testhelpers.FakeOrgRepository{Organizations: orgs},
+		&testhelpers.FakeSpaceRepository{Spaces: spaces},
+		&testhelpers.FakeAuthenticator{},
+	)
+
+	assert.Contains(t, ui.Outputs[0], config.Target)
+
+	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.Outputs[2], "OK")
+
+	assert.Contains(t, ui.Outputs[3], "API endpoint:")
+	assert.Contains(t, ui.Outputs[5], "FirstOrg")
+	assert.Contains(t, ui.Outputs[6], "FirstSpace")
+
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, orgs[0], config.Organization)
+	assert.Equal(t, spaces[0], config.Space)
+}
+
+func TestLoggingInWithoutOrg(t *testing.T) {
+	config := logout(t)
+
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"foo@example.com", "bar"}
+	orgs := []cf.Organization{}
+	spaces := []cf.Space{}
+
+	callLogin(
+		nil,
+		ui,
+		&testhelpers.FakeOrgRepository{Organizations: orgs},
+		&testhelpers.FakeSpaceRepository{Spaces: spaces},
+		&testhelpers.FakeAuthenticator{},
+	)
+
+	assert.Contains(t, ui.Outputs[0], config.Target)
+
+	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.Outputs[2], "OK")
+	assert.Contains(t, ui.Outputs[3], "No orgs found.")
+
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, cf.Organization{}, config.Organization)
+	assert.Equal(t, cf.Space{}, config.Space)
+}
+
+func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
+	config := logout(t)
+
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"foo@example.com", "bar"}
+	orgs := []cf.Organization{
+		cf.Organization{"FirstOrg", "org-1-guid"},
+	}
+	spaces := []cf.Space{}
+
+	callLogin(
+		nil,
+		ui,
+		&testhelpers.FakeOrgRepository{Organizations: orgs},
+		&testhelpers.FakeSpaceRepository{Spaces: spaces},
+		&testhelpers.FakeAuthenticator{},
+	)
+
+	assert.Contains(t, ui.Outputs[0], config.Target)
+
+	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.Outputs[2], "OK")
+
+	assert.Contains(t, ui.Outputs[3], "API endpoint:")
+	assert.Contains(t, ui.Outputs[5], "FirstOrg")
+	assert.Contains(t, ui.Outputs[6], "No spaces found")
+
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	assert.Equal(t, orgs[0], config.Organization)
+	assert.Equal(t, cf.Space{}, config.Space)
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {

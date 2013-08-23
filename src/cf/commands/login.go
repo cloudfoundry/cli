@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
@@ -47,63 +48,105 @@ func (l Login) Run(c *cli.Context) {
 		}
 
 		l.ui.Ok()
-		l.targetOrganization(config)
-		l.targetSpace(config)
+
+		organizations, err := l.orgRepo.FindOrganizations(config)
+
+		if err != nil {
+			l.ui.Failed("Error fetching organizations.", err)
+			return
+		}
+
+		if len(organizations) == 0 {
+			l.ui.Say("No orgs found. Use 'cf create-organization' as an Administrator.")
+			return
+		}
+
+		l.targetOrganization(config, organizations)
+
+		spaces, err := l.spaceRepo.FindSpaces(config)
+
+		if err != nil {
+			l.ui.Failed("Error fetching spaces.", err)
+			return
+		}
+
+		if len(spaces) == 0 {
+			l.ui.ShowConfigurationNoSpacesAvailable(config)
+			return
+		}
+
+		l.targetSpace(config, spaces)
 		l.ui.ShowConfiguration(config)
 
 		return
 	}
 }
 
-func (l Login) targetOrganization(config *configuration.Configuration) {
-	organizations, err := l.orgRepo.FindOrganizations(config)
-
-	if err != nil {
-		l.ui.Failed("Error fetching organizations.", err)
-		return
+func (l Login) targetOrganization(config *configuration.Configuration, organizations []cf.Organization) {
+	var selectedOrg cf.Organization
+	var displayOk bool
+	if len(organizations) == 1 {
+		selectedOrg = organizations[0]
+	} else {
+		displayOk = true
+		selectedOrg = l.chooseOrg(organizations)
+		l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
 	}
 
-	if len(organizations) < 2 {
-		return
-	}
-
-	for i, org := range organizations {
-		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), org.Name)
-	}
-
-	index, err := strconv.Atoi(l.ui.Ask("Organization%s", term.Cyan(">")))
-
-	if err != nil || index > len(organizations) {
-		l.ui.Failed("Invalid number", err)
-		l.targetOrganization(config)
-		return
-	}
-
-	selectedOrg := organizations[index-1]
 	config.Organization = selectedOrg
-	err = config.Save()
+	err := config.Save()
 
 	if err != nil {
 		l.ui.Failed("Error saving organization: %s", err)
 		return
 	}
 
-	l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
-	l.ui.Ok()
+	if displayOk {
+		l.ui.Ok()
+	}
 }
 
-func (l Login) targetSpace(config *configuration.Configuration) {
-	spaces, err := l.spaceRepo.FindSpaces(config)
-
-	if len(spaces) < 2 {
-		return
+func (l Login) chooseOrg(orgs []cf.Organization) (org cf.Organization) {
+	for i, org := range orgs {
+		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), org.Name)
 	}
+
+	index, err := strconv.Atoi(l.ui.Ask("Organization%s", term.Cyan(">")))
+
+	if err != nil || index > len(orgs) {
+		l.ui.Failed("Invalid number", err)
+		return l.chooseOrg(orgs)
+	}
+
+	return orgs[index-1]
+}
+
+func (l Login) targetSpace(config *configuration.Configuration, spaces []cf.Space) {
+	var selectedSpace cf.Space
+	var displayOk bool
+
+	if len(spaces) == 1 {
+		selectedSpace = spaces[0]
+	} else {
+		displayOk = true
+		selectedSpace = l.chooseSpace(spaces)
+		l.ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
+	}
+
+	config.Space = selectedSpace
+	err := config.Save()
 
 	if err != nil {
-		l.ui.Failed("Error fetching spaces.", err)
+		l.ui.Failed("Error saving organization: %s", err)
 		return
 	}
 
+	if displayOk {
+		l.ui.Ok()
+	}
+}
+
+func (l Login) chooseSpace(spaces []cf.Space) (space cf.Space) {
 	for i, space := range spaces {
 		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), space.Name)
 	}
@@ -112,19 +155,8 @@ func (l Login) targetSpace(config *configuration.Configuration) {
 
 	if err != nil || index > len(spaces) {
 		l.ui.Failed("Invalid number", err)
-		l.targetSpace(config)
-		return
+		return l.chooseSpace(spaces)
 	}
 
-	selectedSpace := spaces[index-1]
-	config.Space = selectedSpace
-	err = config.Save()
-
-	if err != nil {
-		l.ui.Failed("Error saving organization: %s", err)
-		return
-	}
-
-	l.ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
-	l.ui.Ok()
+	return spaces[index-1]
 }

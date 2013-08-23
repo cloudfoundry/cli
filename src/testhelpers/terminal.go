@@ -70,7 +70,25 @@ func (ui *FakeUI)DumpOutputs()string{
 }
 
 func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
-	ui.Say("  API endpoint: %s (API version: %s)", config.Target, config.ApiVersion)
+	ui.showBaseConfig(config)
+
+	if config.HasSpace() {
+		ui.Say("  app space:       %s", config.Space.Name)
+	} else {
+		ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
+	}
+}
+
+func (ui *FakeUI) ShowConfigurationNoSpacesAvailable(config *configuration.Configuration) {
+	ui.showBaseConfig(config)
+
+	ui.Say("  No spaces found. Use 'cf create-space' as an Org Manager.")
+}
+
+func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
+	ui.Say("  API endpoint: %s (API version: %s)",
+		config.Target,
+		config.ApiVersion)
 
 	if !config.IsLoggedIn() {
 		ui.Say("  Logged out. Use '%s' to login.", "cf login USERNAME")
@@ -83,11 +101,5 @@ func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
 		ui.Say("  org:             %s", config.Organization.Name)
 	} else {
 		ui.Say("  No org targeted. Use 'cf target -o' to target an org.")
-	}
-
-	if config.HasSpace() {
-		ui.Say("  app space:       %s", config.Space.Name)
-	} else {
-		ui.Say("  No space targeted. Use 'cf target -s' to target a space.")
 	}
 }
