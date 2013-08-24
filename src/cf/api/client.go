@@ -14,6 +14,11 @@ type AuthorizedRequest struct {
 	*http.Request
 }
 
+type errorResponse struct {
+	Code        int
+	Description string
+}
+
 func newClient() *http.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -43,8 +48,9 @@ func PerformRequest(request *AuthorizedRequest) (err error) {
 	}
 
 	if rawResponse.StatusCode > 299 {
-		err = errors.New(fmt.Sprintf("Server error, status code: %d", rawResponse.StatusCode))
-
+		errorResponse := getErrorResponse(rawResponse)
+		message := fmt.Sprintf("Server error, status code: %d, message: %s", rawResponse.StatusCode, errorResponse.Description)
+		err = errors.New(message)
 	}
 	return
 }
@@ -60,7 +66,9 @@ func PerformRequestForBody(request *AuthorizedRequest, response interface{}) (er
 	}
 
 	if rawResponse.StatusCode > 299 {
-		err = errors.New(fmt.Sprintf("Server error, status code: %d", rawResponse.StatusCode))
+		errorResponse := getErrorResponse(rawResponse)
+		message := fmt.Sprintf("Server error, status code: %d, message: %s", rawResponse.StatusCode, errorResponse.Description)
+		err = errors.New(message)
 		return
 	}
 
@@ -77,5 +85,14 @@ func PerformRequestForBody(request *AuthorizedRequest, response interface{}) (er
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Invalid JSON response from server: %s", err.Error()))
 	}
+	return
+}
+
+func getErrorResponse(response *http.Response) (eR errorResponse) {
+	jsonBytes, _ := ioutil.ReadAll(response.Body)
+	response.Body.Close()
+
+	eR = errorResponse{}
+	_ = json.Unmarshal(jsonBytes, &eR)
 	return
 }
