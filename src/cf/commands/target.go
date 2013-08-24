@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
-	"net/http"
 )
 
 type InfoResponse struct {
@@ -65,7 +64,7 @@ func (t Target) setNewTarget(target string) {
 	url := "https://" + target
 	t.ui.Say("Setting target to %s...", term.Yellow(url))
 
-	request, err := http.NewRequest("GET", url+"/v2/info", nil)
+	request, err := api.NewAuthorizedRequest("GET", url+"/v2/info", "", nil)
 
 	if err != nil {
 		t.ui.Failed("URL invalid.", err)
