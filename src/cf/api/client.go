@@ -27,12 +27,13 @@ func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (*Au
 		return nil, err
 	}
 	request.Header.Set("Authorization", accessToken)
+	request.Header.Set("accept", "application/json")
+
 	return &AuthorizedRequest{request}, err
 }
 
 func PerformRequest(request *AuthorizedRequest) (err error) {
 	client := newClient()
-	request.Header.Set("accept", "application/json")
 
 	rawResponse, err := client.Do(request.Request)
 
@@ -50,7 +51,6 @@ func PerformRequest(request *AuthorizedRequest) (err error) {
 
 func PerformRequestForBody(request *AuthorizedRequest, response interface{}) (err error) {
 	client := newClient()
-	request.Header.Set("accept", "application/json")
 
 	rawResponse, err := client.Do(request.Request)
 
