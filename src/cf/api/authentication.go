@@ -4,7 +4,6 @@ import (
 	"cf/configuration"
 	"encoding/base64"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 )
@@ -30,12 +29,11 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", config.AuthorizationEndpoint)
-	request, err := http.NewRequest("POST", path, strings.NewReader(data.Encode()))
+	request, err := NewAuthorizedRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
 		return
 	}
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	request.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")))
 
 	response := new(AuthenticationResponse)
 	err = PerformRequestForBody(request, &response)
