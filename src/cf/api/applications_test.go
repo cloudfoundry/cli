@@ -21,9 +21,10 @@ var multipleAppsEndpoint = func(writer http.ResponseWriter, request *http.Reques
 	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
 	methodMatches := request.Method == "GET"
 	pathMatches := request.URL.Path == "/v2/spaces/my-space-guid/apps"
+	queryStringMatches := strings.Contains(request.RequestURI, "?inline-relations-depth=2")
 	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
 
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches) {
+	if !(acceptHeaderMatches && methodMatches && pathMatches && queryStringMatches && authMatches) {
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -36,7 +37,28 @@ var multipleAppsEndpoint = func(writer http.ResponseWriter, request *http.Reques
         "guid": "app1-guid"
       },
       "entity": {
-        "name": "App1"
+        "name": "App1",
+        "memory": 256,
+        "instances": 1,
+        "state": "STOPPED",
+        "routes": [
+      	  {
+      	    "metadata": {
+      	      "guid": "app1-route-guid"
+      	    },
+      	    "entity": {
+      	      "host": "app1",
+      	      "domain": {
+      	      	"metadata": {
+      	      	  "guid": "domain1-guid"
+      	      	},
+      	      	"entity": {
+      	      	  "name": "cfapps.io"
+      	      	}
+      	      }
+      	    }
+      	  }
+        ]
       }
     },
     {
@@ -44,12 +66,62 @@ var multipleAppsEndpoint = func(writer http.ResponseWriter, request *http.Reques
         "guid": "app2-guid"
       },
       "entity": {
-        "name": "App2"
+        "name": "App2",
+        "memory": 512,
+        "instances": 2,
+        "state": "STARTED",
+        "routes": [
+      	  {
+      	    "metadata": {
+      	      "guid": "app2-route-guid"
+      	    },
+      	    "entity": {
+      	      "host": "app2",
+      	      "domain": {
+      	      	"metadata": {
+      	      	  "guid": "domain1-guid"
+      	      	},
+      	      	"entity": {
+      	      	  "name": "cfapps.io"
+      	      	}
+      	      }
+      	    }
+      	  }
+        ]
       }
     }
   ]
 }`
 	fmt.Fprintln(writer, jsonResponse)
+}
+
+func TestApplicationsFindAll(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(multipleAppsEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
+	}
+
+	apps, err := repo.FindAll(config)
+	assert.NoError(t, err)
+	assert.Equal(t, len(apps), 2)
+
+	app := apps[0]
+	assert.Equal(t, app.Name, "App1")
+	assert.Equal(t, app.Guid, "app1-guid")
+	assert.Equal(t, app.State, "stopped")
+	assert.Equal(t, app.Instances, 1)
+	assert.Equal(t, app.Memory, 256)
+	assert.Equal(t, len(app.Urls), 1)
+	assert.Equal(t, app.Urls[0], "app1.cfapps.io")
+
+	app = apps[1]
+	assert.Equal(t, app.Guid, "app2-guid")
+
 }
 
 func TestFindByName(t *testing.T) {
@@ -63,15 +135,14 @@ func TestFindByName(t *testing.T) {
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
 
-	existingApp := cf.Application{Guid: "app1-guid", Name: "App1"}
-
 	app, err := repo.FindByName(config, "App1")
 	assert.NoError(t, err)
-	assert.Equal(t, app, existingApp)
+	assert.Equal(t, app.Name, "App1")
+	assert.Equal(t, app.Guid, "app1-guid")
 
 	app, err = repo.FindByName(config, "app1")
 	assert.NoError(t, err)
-	assert.Equal(t, app, existingApp)
+	assert.Equal(t, app.Guid, "app1-guid")
 
 	app, err = repo.FindByName(config, "app that does not exist")
 	assert.Error(t, err)

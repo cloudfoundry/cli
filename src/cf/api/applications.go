@@ -18,6 +18,7 @@ import (
 )
 
 type ApplicationRepository interface {
+	FindAll(config *configuration.Configuration) (apps []cf.Application, err error)
 	FindByName(config *configuration.Configuration, name string) (app cf.Application, err error)
 	SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error)
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
@@ -27,8 +28,42 @@ type ApplicationRepository interface {
 type CloudControllerApplicationRepository struct {
 }
 
+func (repo CloudControllerApplicationRepository) FindAll(config *configuration.Configuration) (apps []cf.Application, err error) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?inline-relations-depth=2", config.Target, config.Space.Guid)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	response := new(ApplicationsApiResponse)
+	err = PerformRequestForBody(request, response)
+	if err != nil {
+		return
+	}
+
+	for _, res := range response.Resources {
+		urls := []string{}
+		for _, routeRes := range res.Entity.Routes {
+			routeEntity := routeRes.Entity
+			domainEntity := routeEntity.Domain.Entity
+			urls = append(urls, fmt.Sprintf("%s.%s", routeEntity.Host, domainEntity.Name))
+		}
+
+		apps = append(apps, cf.Application{
+			Name:      res.Entity.Name,
+			Guid:      res.Metadata.Guid,
+			State:     strings.ToLower(res.Entity.State),
+			Instances: res.Entity.Instances,
+			Memory:    res.Entity.Memory,
+			Urls:      urls,
+		})
+	}
+
+	return
+}
+
 func (repo CloudControllerApplicationRepository) FindByName(config *configuration.Configuration, name string) (app cf.Application, err error) {
-	apps, err := findApplications(config)
+	apps, err := repo.FindAll(config)
 	lowerName := strings.ToLower(name)
 	if err != nil {
 		return
@@ -201,24 +236,4 @@ func createZipPartWriter(zipBuffer *bytes.Buffer, writer *multipart.Writer) (io.
 	h.Set("Content-Length", fmt.Sprintf("%d", zipBuffer.Len()))
 	h.Set("Content-Transfer-Encoding", "binary")
 	return writer.CreatePart(h)
-}
-
-func findApplications(config *configuration.Configuration) (apps []cf.Application, err error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps", config.Target, config.Space.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
-	if err != nil {
-		return
-	}
-
-	response := new(ApiResponse)
-	err = PerformRequestForBody(request, response)
-	if err != nil {
-		return
-	}
-
-	for _, r := range response.Resources {
-		apps = append(apps, cf.Application{r.Entity.Name, r.Metadata.Guid})
-	}
-
-	return
 }

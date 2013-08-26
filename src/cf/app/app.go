@@ -3,12 +3,19 @@ package app
 import (
 	"cf/api"
 	"cf/commands"
+	"cf/configuration"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 func New() (app *cli.App) {
 	termUI := new(terminal.TerminalUI)
+	config, err := configuration.Load()
+
+	if err != nil {
+		termUI.Failed("Error loading configuration", err)
+	}
+
 	organizationRepo := new(api.CloudControllerOrganizationRepository)
 	spaceRepo := new(api.CloudControllerSpaceRepository)
 	appRepo := new(api.CloudControllerApplicationRepository)
@@ -71,6 +78,15 @@ func New() (app *cli.App) {
 			},
 			Action: func(c *cli.Context) {
 				cmd := commands.NewPush(termUI, appRepo, domainRepo, routeRepo)
+				cmd.Run(c)
+			},
+		},
+		{
+			Name:        "apps",
+			ShortName:   "a",
+			Description: "List all applications in the currently selected space",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewApps(termUI, config, appRepo)
 				cmd.Run(c)
 			},
 		},
