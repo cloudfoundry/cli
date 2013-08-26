@@ -47,7 +47,7 @@ func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	err = PerformRequestForBody(request, resource)
+	err = PerformRequestAndParseResponse(request, resource)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")

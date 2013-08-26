@@ -55,7 +55,7 @@ func PerformRequest(request *AuthorizedRequest) (err error) {
 	return
 }
 
-func PerformRequestForBody(request *AuthorizedRequest, response interface{}) (err error) {
+func PerformRequestAndParseResponse(request *AuthorizedRequest, response interface{}) (err error) {
 	client := newClient()
 
 	rawResponse, err := client.Do(request.Request)

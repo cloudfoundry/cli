@@ -23,7 +23,7 @@ func (repo CloudControllerOrganizationRepository) FindOrganizations(config *conf
 	}
 	response := new(ApiResponse)
 
-	err = PerformRequestForBody(request, response)
+	err = PerformRequestAndParseResponse(request, response)
 
 	if err != nil {
 		return

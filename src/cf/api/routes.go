@@ -27,7 +27,7 @@ func (repo CloudControllerRouteRepository) Create(config *configuration.Configur
 	}
 
 	resource := new(Resource)
-	err = PerformRequestForBody(request, resource)
+	err = PerformRequestAndParseResponse(request, resource)
 	if err != nil {
 		return
 	}

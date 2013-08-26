@@ -37,7 +37,7 @@ func (repo CloudControllerApplicationRepository) FindAll(config *configuration.C
 	}
 
 	response := new(ApplicationsApiResponse)
-	err = PerformRequestForBody(request, response)
+	err = PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}
@@ -109,7 +109,7 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 	}
 
 	resource := new(Resource)
-	err = PerformRequestForBody(request, resource)
+	err = PerformRequestAndParseResponse(request, resource)
 
 	if err != nil {
 		return

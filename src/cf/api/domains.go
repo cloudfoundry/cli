@@ -21,7 +21,7 @@ func (repo CloudControllerDomainRepository) FindAll(config *configuration.Config
 	}
 
 	response := new(ApiResponse)
-	err = PerformRequestForBody(request, response)
+	err = PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}
