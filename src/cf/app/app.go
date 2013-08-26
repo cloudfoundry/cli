@@ -9,6 +9,34 @@ import (
 )
 
 func New() (app *cli.App) {
+	cli.AppHelpTemplate = `NAME:
+   {{.Name}} - {{.Usage}}
+
+USAGE:
+   {{.Name}} [global options] command [command options] [arguments...]
+
+VERSION:
+   {{.Version}}
+
+COMMANDS:
+   {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Description}}
+   {{end}}
+GLOBAL OPTIONS:
+   {{range .Flags}}{{.}}
+   {{end}}
+`
+
+	cli.CommandHelpTemplate = `NAME:
+   {{.Name}} - {{.Description}}
+
+USAGE:
+   {{.Usage}}{{with .Flags}}
+
+OPTIONS:
+   {{range .}}{{.}}
+   {{end}}{{else}}
+{{end}}`
+
 	termUI := new(terminal.TerminalUI)
 	config, err := configuration.Load()
 
@@ -31,6 +59,7 @@ func New() (app *cli.App) {
 			Name:        "target",
 			ShortName:   "t",
 			Description: "Set or view the target",
+			Usage:       "cf target <target> --o <organization> --s <space>",
 			Flags: []cli.Flag{
 				cli.StringFlag{"o", "", "organization"},
 				cli.StringFlag{"s", "", "space"},
@@ -44,6 +73,7 @@ func New() (app *cli.App) {
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",
+			Usage:       "cf login",
 			Action: func(c *cli.Context) {
 				authenticator := new(api.UAAAuthenticator)
 
@@ -55,6 +85,7 @@ func New() (app *cli.App) {
 			Name:        "set-env",
 			ShortName:   "se",
 			Description: "Set an environment variable for an application",
+			Usage:       "cf set-env <application> <variable> <value>",
 			Action: func(c *cli.Context) {
 				cmd := commands.NewSetEnv(termUI, appRepo)
 				cmd.Run(c)
@@ -64,6 +95,7 @@ func New() (app *cli.App) {
 			Name:        "logout",
 			ShortName:   "lo",
 			Description: "Log user out",
+			Usage:       "cf logout",
 			Action: func(c *cli.Context) {
 				cmd := commands.NewLogout(termUI)
 				cmd.Run(c)
@@ -73,6 +105,7 @@ func New() (app *cli.App) {
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push an application",
+			Usage:       "cf push --name <application>",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
 			},
@@ -85,6 +118,7 @@ func New() (app *cli.App) {
 			Name:        "apps",
 			ShortName:   "a",
 			Description: "List all applications in the currently selected space",
+			Usage:       "cf apps",
 			Action: func(c *cli.Context) {
 				cmd := commands.NewApps(termUI, config, appRepo)
 				cmd.Run(c)
