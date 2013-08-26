@@ -49,7 +49,7 @@ func PerformRequest(request *AuthorizedRequest) (err error) {
 
 	if rawResponse.StatusCode > 299 {
 		errorResponse := getErrorResponse(rawResponse)
-		message := fmt.Sprintf("Server error, status code: %d, message: %s", rawResponse.StatusCode, errorResponse.Description)
+		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", rawResponse.StatusCode, errorResponse.Code, errorResponse.Description)
 		err = errors.New(message)
 	}
 	return
@@ -67,7 +67,7 @@ func PerformRequestForBody(request *AuthorizedRequest, response interface{}) (er
 
 	if rawResponse.StatusCode > 299 {
 		errorResponse := getErrorResponse(rawResponse)
-		message := fmt.Sprintf("Server error, status code: %d, message: %s", rawResponse.StatusCode, errorResponse.Description)
+		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", rawResponse.StatusCode, errorResponse.Code, errorResponse.Description)
 		err = errors.New(message)
 		return
 	}
