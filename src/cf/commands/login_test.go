@@ -155,10 +155,12 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	assert.Contains(t, ui.Prompts[0], "Email")
 	assert.Contains(t, ui.Prompts[1], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
+	assert.Contains(t, ui.Outputs[3], "FirstOrg")
+	assert.Contains(t, ui.Outputs[4], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "API endpoint:")
-	assert.Contains(t, ui.Outputs[5], "FirstOrg")
-	assert.Contains(t, ui.Outputs[6], "FirstSpace")
+	assert.Contains(t, ui.Outputs[5], "API endpoint:")
+	assert.Contains(t, ui.Outputs[7], "FirstOrg")
+	assert.Contains(t, ui.Outputs[8], "FirstSpace")
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)
@@ -219,9 +221,9 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	assert.Contains(t, ui.Prompts[1], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "API endpoint:")
-	assert.Contains(t, ui.Outputs[5], "FirstOrg")
-	assert.Contains(t, ui.Outputs[6], "No spaces found")
+	assert.Contains(t, ui.Outputs[5], "API endpoint:")
+	assert.Contains(t, ui.Outputs[7], "FirstOrg")
+	assert.Contains(t, ui.Outputs[8], "No spaces found")
 
 	config, err := configuration.Load()
 	assert.NoError(t, err)

@@ -83,16 +83,19 @@ func (l Login) Run(c *cli.Context) {
 }
 
 func (l Login) targetOrganization(config *configuration.Configuration, organizations []cf.Organization) {
-	if len(organizations) == 1 {
-		l.saveOrg(config, organizations[0])
-	} else {
-		selectedOrg := l.chooseOrg(organizations)
-		l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
-		err := l.saveOrg(config, selectedOrg)
+	var selectedOrg cf.Organization
 
-		if err == nil {
-			l.ui.Ok()
-		}
+	if len(organizations) == 1 {
+		selectedOrg = organizations[0]
+	} else {
+		selectedOrg = l.chooseOrg(organizations)
+	}
+
+	l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
+	err := l.saveOrg(config, selectedOrg)
+
+	if err == nil {
+		l.ui.Ok()
 	}
 }
 
