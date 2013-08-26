@@ -22,6 +22,7 @@ type ApplicationRepository interface {
 	FindByName(config *configuration.Configuration, name string) (app cf.Application, err error)
 	SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error)
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
+	Delete(config *configuration.Configuration, app cf.Application) (err error)
 	Upload(config *configuration.Configuration, app cf.Application) (err error)
 }
 
@@ -116,6 +117,17 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 
 	createdApp.Guid = resource.Metadata.Guid
 	createdApp.Name = resource.Entity.Name
+	return
+}
+
+func (repo CloudControllerApplicationRepository) Delete(config *configuration.Configuration, app cf.Application) (err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", config.Target, app.Guid)
+	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	err = PerformRequest(request)
 	return
 }
 

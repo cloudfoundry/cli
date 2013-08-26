@@ -124,6 +124,16 @@ OPTIONS:
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:        "delete",
+			ShortName:   "d",
+			Description: "Delete an application",
+			Usage:       "cf delete <application>",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewDelete(termUI, config, appRepo)
+				cmd.Run(c)
+			},
+		},
 	}
 	return
 }

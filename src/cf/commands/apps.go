@@ -54,6 +54,7 @@ func (a Apps) Run(c *cli.Context) {
 }
 
 func longestName(apps []cf.Application) (name string) {
+	name = "name"
 	for _, app := range apps {
 		if len(app.Name) > len(name) {
 			name = app.Name

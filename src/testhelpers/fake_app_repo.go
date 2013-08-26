@@ -7,18 +7,20 @@ import (
 )
 
 type FakeApplicationRepository struct {
+	DeletedApp cf.Application
+
 	FindAllApps []cf.Application
 
-	AppName string
-	AppByName cf.Application
+	AppName      string
+	AppByName    cf.Application
 	AppByNameErr bool
 
-	SetEnvApp cf.Application
-	SetEnvName string
+	SetEnvApp   cf.Application
+	SetEnvName  string
 	SetEnvValue string
-	SetEnvErr bool
+	SetEnvErr   bool
 
-	CreatedApp cf.Application
+	CreatedApp  cf.Application
 	UploadedApp cf.Application
 }
 
@@ -49,11 +51,16 @@ func (repo *FakeApplicationRepository) Create(config *configuration.Configuratio
 	repo.CreatedApp = newApp
 
 	createdApp = cf.Application{
-Name: newApp.Name,
-Guid: newApp.Name + "-guid",
+		Name: newApp.Name,
+		Guid: newApp.Name + "-guid",
+	}
+
+	return
 }
 
-return
+func (repo *FakeApplicationRepository) Delete(config *configuration.Configuration, app cf.Application) (err error){
+	repo.DeletedApp = app
+	return
 }
 
 

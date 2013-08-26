@@ -263,6 +263,37 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+var deleteApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
+	methodMatches := request.Method == "DELETE"
+	pathMatches := request.URL.Path == "/v2/apps/my-cool-app-guid"
+	queryParamsMatch := strings.Contains(request.RequestURI, "?recursive=true")
+	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
+
+	if !(acceptHeaderMatches && methodMatches && pathMatches && queryParamsMatch && authMatches) {
+		writer.WriteHeader(http.StatusInternalServerError)
+	} else {
+		writer.WriteHeader(http.StatusOK)
+		fmt.Fprintln(writer, "")
+	}
+}
+
+func TestDeleteApplication(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(deleteApplicationEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+
+	err := repo.Delete(config, app)
+	assert.NoError(t, err)
+}
+
 var uploadApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 	bodyBytes, err := ioutil.ReadAll(request.Body)
 
