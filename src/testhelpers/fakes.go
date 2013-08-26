@@ -83,6 +83,9 @@ type FakeApplicationRepository struct {
 	SetEnvName string
 	SetEnvValue string
 	SetEnvErr bool
+
+	CreatedApp cf.Application
+	UploadedApp cf.Application
 }
 
 func (repo *FakeApplicationRepository) FindByName(config *configuration.Configuration, name string) (app cf.Application, err error) {
@@ -101,5 +104,23 @@ func (repo *FakeApplicationRepository) SetEnv(config *configuration.Configuratio
 	if repo.SetEnvErr {
 		err = errors.New("Error setting env.")
 	}
+	return
+}
+
+func (repo *FakeApplicationRepository) Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error) {
+	repo.CreatedApp = newApp
+
+	createdApp = cf.Application{
+		Name: newApp.Name,
+		Guid: newApp.Name + "-guid",
+	}
+
+	return
+}
+
+
+func (repo *FakeApplicationRepository) Upload(config *configuration.Configuration, app cf.Application) (err error) {
+	repo.UploadedApp = app
+
 	return
 }

@@ -6,6 +6,7 @@ type Metadata struct {
 
 type Entity struct {
 	Name string
+	Host string
 }
 
 type Resource struct {

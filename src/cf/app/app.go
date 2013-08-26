@@ -11,6 +11,9 @@ func New() (app *cli.App) {
 	termUI := new(terminal.TerminalUI)
 	organizationRepo := new(api.CloudControllerOrganizationRepository)
 	spaceRepo := new(api.CloudControllerSpaceRepository)
+	appRepo := new(api.CloudControllerApplicationRepository)
+	domainRepo := new(api.CloudControllerDomainRepository)
+	routeRepo := new(api.CloudControllerRouteRepository)
 
 	app = cli.NewApp()
 	app.Name = "cf"
@@ -46,8 +49,6 @@ func New() (app *cli.App) {
 			ShortName:   "se",
 			Description: "Set an environment variable for an application",
 			Action: func(c *cli.Context) {
-				appRepo := new(api.CloudControllerApplicationRepository)
-
 				cmd := commands.NewSetEnv(termUI, appRepo)
 				cmd.Run(c)
 			},
@@ -58,6 +59,18 @@ func New() (app *cli.App) {
 			Description: "Log user out",
 			Action: func(c *cli.Context) {
 				cmd := commands.NewLogout(termUI)
+				cmd.Run(c)
+			},
+		},
+		{
+			Name:        "push",
+			ShortName:   "p",
+			Description: "Push an application",
+			Flags: []cli.Flag{
+				cli.StringFlag{"name", "", "name of the application"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := commands.NewPush(termUI, appRepo, domainRepo, routeRepo)
 				cmd.Run(c)
 			},
 		},

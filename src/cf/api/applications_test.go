@@ -1,13 +1,19 @@
 package api
 
 import (
+	"archive/zip"
+	"bytes"
 	"cf"
 	"cf/configuration"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -107,4 +113,137 @@ func TestSetEnv(t *testing.T) {
 	err := repo.SetEnv(config, app, "DATABASE_URL", "mysql://example.com/my-db")
 
 	assert.NoError(t, err)
+}
+
+var createApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	bodyBytes, err := ioutil.ReadAll(request.Body)
+
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
+	methodMatches := request.Method == "POST"
+	pathMatches := request.URL.Path == "/v2/apps"
+	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
+	expectedBody := `{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":256,"stack_guid":null}`
+	bodyMatches := string(bodyBytes) == expectedBody
+
+	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches && bodyMatches) {
+		writer.WriteHeader(http.StatusInternalServerError)
+	} else {
+		writer.WriteHeader(http.StatusCreated)
+		jsonResponse := `
+{
+    "metadata": {
+        "guid": "my-cool-app-guid"
+    },
+    "entity": {
+        "name": "my-cool-app"
+    }
+}`
+		fmt.Fprintln(writer, jsonResponse)
+
+	}
+}
+
+func TestCreateApplication(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	newApp := cf.Application{Name: "my-cool-app"}
+
+	createdApp, err := repo.Create(config, newApp)
+	assert.NoError(t, err)
+
+	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
+}
+
+var uploadApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	bodyBytes, err := ioutil.ReadAll(request.Body)
+
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
+	methodMatches := request.Method == "PUT"
+	pathMatches := request.URL.Path == "/v2/apps/my-cool-app-guid/bits"
+	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
+
+	bodyString := string(bodyBytes)
+	zipAttachmentContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="application"; filename="application.zip"`)
+	zipAttachmentContentTypeMatches := strings.Contains(bodyString, `Content-Type: application/zip`)
+	zipAttachmentContentTransferEncodingMatches := strings.Contains(bodyString, `Content-Transfer-Encoding: binary`)
+	zipAttachmentContentLengthPresent := strings.Contains(bodyString, `Content-Length:`)
+
+	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
+
+	bodyMatches := zipAttachmentContentDispositionMatches &&
+		zipAttachmentContentTypeMatches &&
+		zipAttachmentContentTransferEncodingMatches &&
+		zipAttachmentContentLengthPresent &&
+		resourcesContentDispositionMatches
+
+	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches && bodyMatches) {
+		writer.WriteHeader(http.StatusInternalServerError)
+	} else {
+		writer.WriteHeader(http.StatusCreated)
+	}
+}
+
+func TestUploadApplication(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(uploadApplicationEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+
+	err := repo.Upload(config, app)
+	assert.NoError(t, err)
+}
+
+func TestZipApplication(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	zipFile, err := zipApplication(filepath.Clean(dir + "/../../fixtures/zip/"))
+	assert.NoError(t, err)
+
+	byteReader := bytes.NewReader(zipFile.Bytes())
+	reader, err := zip.NewReader(byteReader, int64(byteReader.Len()))
+	assert.NoError(t, err)
+
+	readFile := func(index int) (string, string) {
+		buf := &bytes.Buffer{}
+		file := reader.File[index]
+		fReader, err := file.Open()
+		_, err = io.Copy(buf, fReader)
+
+		assert.NoError(t, err)
+
+		return file.Name, string(buf.Bytes())
+	}
+
+	name, contents := readFile(0)
+	assert.Equal(t, name, "foo.txt")
+	assert.Equal(t, contents, "This is a simple text file.")
+
+	name, contents = readFile(1)
+	assert.Equal(t, name, "subDir/bar.txt")
+	assert.Equal(t, contents, "I am in a subdirectory.")
 }
