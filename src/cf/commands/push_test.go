@@ -11,22 +11,14 @@ import (
 )
 
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
-	testhelpers.Login(t)
-	config, err := configuration.Load()
-	assert.NoError(t, err)
-	config.Organization = cf.Organization{Name: "MyOrg"}
-
-	config.Space = cf.Space{Name: "MySpace"}
-
-	err = config.Save()
-	assert.NoError(t, err)
+	setupBasePushConfig(t)
 
 	domains := []cf.Domain{
 		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
 	}
 	domainRepo := &testhelpers.FakeDomainRepository{Domains: domains}
 	routeRepo := &testhelpers.FakeRouteRepository{}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 
 	fakeUI := callPush([]string{"--name", "my-new-app"}, appRepo, domainRepo, routeRepo)
 
@@ -49,6 +41,21 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[7], "OK")
 }
 
+func TestPushingAppWhenItAlreadyExists(t *testing.T) {
+	setupBasePushConfig(t)
+
+	domainRepo := &testhelpers.FakeDomainRepository{}
+	routeRepo := &testhelpers.FakeRouteRepository{}
+	existingApp := cf.Application{Name: "existing-app", Guid: "existing-app-guid"}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByName: existingApp}
+
+	fakeUI := callPush([]string{"--name", "existing-app"}, appRepo, domainRepo, routeRepo)
+
+	assert.Contains(t, fakeUI.Outputs[0], "Uploading existing-app...")
+	assert.Equal(t, appRepo.UploadedApp.Guid, "existing-app-guid")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+}
+
 func callPush(args []string,
 	appRepo api.ApplicationRepository,
 	domainRepo api.DomainRepository,
@@ -58,4 +65,14 @@ func callPush(args []string,
 	target := NewPush(fakeUI, appRepo, domainRepo, routeRepo)
 	target.Run(testhelpers.NewContext(4, args))
 	return
+}
+
+func setupBasePushConfig(t *testing.T) {
+	testhelpers.Login(t)
+	config, err := configuration.Load()
+	assert.NoError(t, err)
+	config.Organization = cf.Organization{Name: "MyOrg"}
+	config.Space = cf.Space{Name: "MySpace"}
+	err = config.Save()
+	assert.NoError(t, err)
 }

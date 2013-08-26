@@ -32,10 +32,30 @@ func (p Push) Run(c *cli.Context) {
 	}
 
 	appName := c.String("name")
+	app, err := p.appRepo.FindByName(config, appName)
+
+	if err != nil {
+		app, err = p.createApp(config, appName)
+
+		if err != nil {
+			return
+		}
+	}
+
+	p.ui.Say("Uploading %s...", app.Name)
+	err = p.appRepo.Upload(config, app)
+	if err != nil {
+		p.ui.Failed("Error uploading app", err)
+		return
+	}
+	p.ui.Ok()
+}
+
+func (p Push) createApp(config *configuration.Configuration, appName string) (app cf.Application, err error) {
 	newApp := cf.Application{Name: appName}
 
 	p.ui.Say("Creating %s...", appName)
-	createdApp, err := p.appRepo.Create(config, newApp)
+	app, err = p.appRepo.Create(config, newApp)
 	if err != nil {
 		p.ui.Failed("Error creating application", err)
 		return
@@ -50,9 +70,9 @@ func (p Push) Run(c *cli.Context) {
 	}
 
 	domain := domains[0]
-	newRoute := cf.Route{Host: createdApp.Name}
+	newRoute := cf.Route{Host: app.Name}
 
-	p.ui.Say("Creating route %s.%s...", createdApp.Name, domain.Name)
+	p.ui.Say("Creating route %s.%s...", app.Name, domain.Name)
 	createdRoute, err := p.routeRepo.Create(config, newRoute, domain)
 	if err != nil {
 		p.ui.Failed("Error creating route", err)
@@ -60,20 +80,13 @@ func (p Push) Run(c *cli.Context) {
 	}
 	p.ui.Ok()
 
-	p.ui.Say("Binding %s.%s to %s...", createdApp.Name, domain.Name, createdApp.Name)
-	err = p.routeRepo.Bind(config, createdRoute, createdApp)
+	p.ui.Say("Binding %s.%s to %s...", app.Name, domain.Name, app.Name)
+	err = p.routeRepo.Bind(config, createdRoute, app)
 	if err != nil {
 		p.ui.Failed("Error binding route", err)
 		return
 	}
 	p.ui.Ok()
 
-	p.ui.Say("Uploading %s...", createdApp.Name)
-	err = p.appRepo.Upload(config, createdApp)
-	if err != nil {
-		p.ui.Failed("Error uploading app", err)
-		return
-	}
-	p.ui.Ok()
-
+	return
 }
