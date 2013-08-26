@@ -13,6 +13,7 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -56,6 +57,11 @@ func (repo CloudControllerApplicationRepository) SetEnv(config *configuration.Co
 }
 
 func (repo CloudControllerApplicationRepository) Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error) {
+	err = validateApplication(newApp)
+	if err != nil {
+		return
+	}
+
 	path := fmt.Sprintf("%s/v2/apps", config.Target)
 	data := fmt.Sprintf(
 		`{"space_guid":"%s","name":"%s","instances":1,"buildpack":null,"command":null,"memory":256,"stack_guid":null}`,
@@ -103,6 +109,15 @@ func (repo CloudControllerApplicationRepository) Upload(config *configuration.Co
 	}
 
 	err = PerformRequest(request)
+	return
+}
+
+func validateApplication(app cf.Application) (err error) {
+	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
+	if !reg.MatchString(app.Name) {
+		err = errors.New("Application name is invalid. Name can only contain letters, numbers, underscores and hyphens.")
+	}
+
 	return
 }
 

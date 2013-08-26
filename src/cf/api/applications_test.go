@@ -148,6 +148,10 @@ var createApplicationEndpoint = func(writer http.ResponseWriter, request *http.R
 	}
 }
 
+var alwaysSuccessfulEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	fmt.Fprintln(writer, "{}")
+}
+
 func TestCreateApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationEndpoint))
 	defer ts.Close()
@@ -165,6 +169,27 @@ func TestCreateApplication(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
+}
+
+func TestCreateRejectsInproperNames(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(alwaysSuccessfulEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{Target: ts.URL}
+	repo := CloudControllerApplicationRepository{}
+
+	createdApp, err := repo.Create(config, cf.Application{Name: "name with space"})
+	assert.Equal(t, createdApp, cf.Application{})
+	assert.Contains(t, err.Error(), "Application name is invalid")
+
+	_, err = repo.Create(config, cf.Application{Name: "name-with-inv@lid-chars!"})
+	assert.Error(t, err)
+
+	_, err = repo.Create(config, cf.Application{Name: "Valid-Name"})
+	assert.NoError(t, err)
+
+	_, err = repo.Create(config, cf.Application{Name: "name_with_numbers_2"})
+	assert.NoError(t, err)
 }
 
 var uploadApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
