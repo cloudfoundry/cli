@@ -14,11 +14,11 @@ type FakeOrgRepository struct {
 	OrganizationByNameErr bool
 }
 
-func (repo FakeOrgRepository) FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error) {
+func (repo FakeOrgRepository) FindAll(config *configuration.Configuration) (orgs []cf.Organization, err error) {
 	return repo.Organizations, nil
 }
 
-func (repo *FakeOrgRepository) FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
+func (repo *FakeOrgRepository) FindByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
 	repo.OrganizationName = name
 	if repo.OrganizationByNameErr {
 		err = errors.New("Error finding organization by name.")

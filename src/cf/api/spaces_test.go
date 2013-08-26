@@ -45,7 +45,7 @@ var multipleSpacesEndpoint = func(writer http.ResponseWriter, request *http.Requ
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-func TestFindSpaces(t *testing.T) {
+func TestSpacesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
@@ -55,7 +55,7 @@ func TestFindSpaces(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	spaces, err := repo.FindSpaces(config)
+	spaces, err := repo.FindAll(config)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(spaces))
@@ -69,7 +69,7 @@ func TestFindSpaces(t *testing.T) {
 	assert.Equal(t, secondSpace.Guid, "staging-space-guid")
 }
 
-func TestFindSpacesWithIncorrectToken(t *testing.T) {
+func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
@@ -80,13 +80,13 @@ func TestFindSpacesWithIncorrectToken(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	spaces, err := repo.FindSpaces(config)
+	spaces, err := repo.FindAll(config)
 
 	assert.Error(t, err)
 	assert.Equal(t, 0, len(spaces))
 }
 
-func TestFindSpaceByName(t *testing.T) {
+func TestSpacesFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
@@ -98,14 +98,14 @@ func TestFindSpaceByName(t *testing.T) {
 	}
 	existingOrg := cf.Space{Guid: "staging-space-guid", Name: "staging"}
 
-	org, err := repo.FindSpaceByName(config, "staging")
+	org, err := repo.FindByName(config, "staging")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindSpaceByName(config, "Staging")
+	org, err = repo.FindByName(config, "Staging")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindSpaceByName(config, "space that does not exist")
+	org, err = repo.FindByName(config, "space that does not exist")
 	assert.Error(t, err)
 }

@@ -49,14 +49,14 @@ var multipleOrgEndpoint = func(writer http.ResponseWriter, request *http.Request
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-func TestFindOrganizations(t *testing.T) {
+func TestOrganizationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
 	repo := CloudControllerOrganizationRepository{}
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	organizations, err := repo.FindOrganizations(config)
+	organizations, err := repo.FindAll(config)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(organizations))
 
@@ -68,20 +68,20 @@ func TestFindOrganizations(t *testing.T) {
 	assert.Equal(t, secondOrg.Guid, "org2-guid")
 }
 
-func TestFindOrganizationsWithIncorrectToken(t *testing.T) {
+func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
 	repo := CloudControllerOrganizationRepository{}
 
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
-	organizations, err := repo.FindOrganizations(config)
+	organizations, err := repo.FindAll(config)
 
 	assert.Error(t, err)
 	assert.Equal(t, 0, len(organizations))
 }
 
-func TestFindOrganizationByName(t *testing.T) {
+func TestOrganizationsFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
@@ -89,14 +89,14 @@ func TestFindOrganizationByName(t *testing.T) {
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
-	org, err := repo.FindOrganizationByName(config, "Org1")
+	org, err := repo.FindByName(config, "Org1")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindOrganizationByName(config, "org1")
+	org, err = repo.FindByName(config, "org1")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindOrganizationByName(config, "org that does not exist")
+	org, err = repo.FindByName(config, "org that does not exist")
 	assert.Error(t, err)
 }

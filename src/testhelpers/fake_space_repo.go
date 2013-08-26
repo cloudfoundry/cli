@@ -14,11 +14,11 @@ type FakeSpaceRepository struct {
 	SpaceByNameErr bool
 }
 
-func (repo FakeSpaceRepository) FindSpaces(config *configuration.Configuration) (spaces []cf.Space, err error) {
+func (repo FakeSpaceRepository) FindAll(config *configuration.Configuration) (spaces []cf.Space, err error) {
 	return repo.Spaces, nil
 }
 
-func (repo *FakeSpaceRepository) FindSpaceByName(config *configuration.Configuration, name string) (space cf.Space, err error) {
+func (repo *FakeSpaceRepository) FindByName(config *configuration.Configuration, name string) (space cf.Space, err error) {
 	repo.SpaceName = name
 	if repo.SpaceByNameErr {
 		err = errors.New("Error finding space by name.")

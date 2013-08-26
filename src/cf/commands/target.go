@@ -105,7 +105,7 @@ func (t Target) setOrganization(config *configuration.Configuration, orgName str
 		return
 	}
 
-	org, err := t.orgRepo.FindOrganizationByName(config, orgName)
+	org, err := t.orgRepo.FindByName(config, orgName)
 	if err != nil {
 		t.ui.Failed("Could not set organization.", nil)
 		return
@@ -126,7 +126,7 @@ func (t Target) setSpace(config *configuration.Configuration, spaceName string) 
 		return
 	}
 
-	space, err := t.spaceRepo.FindSpaceByName(config, spaceName)
+	space, err := t.spaceRepo.FindByName(config, spaceName)
 	if err != nil {
 		t.ui.Failed("You do not have access to that space.", nil)
 		return

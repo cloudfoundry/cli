@@ -9,14 +9,14 @@ import (
 )
 
 type SpaceRepository interface {
-	FindSpaces(config *configuration.Configuration) (spaces []cf.Space, err error)
-	FindSpaceByName(config *configuration.Configuration, name string) (space cf.Space, err error)
+	FindAll(config *configuration.Configuration) (spaces []cf.Space, err error)
+	FindByName(config *configuration.Configuration, name string) (space cf.Space, err error)
 }
 
 type CloudControllerSpaceRepository struct {
 }
 
-func (repo CloudControllerSpaceRepository) FindSpaces(config *configuration.Configuration) (spaces []cf.Space, err error) {
+func (repo CloudControllerSpaceRepository) FindAll(config *configuration.Configuration) (spaces []cf.Space, err error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", config.Target, config.Organization.Guid)
 	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
@@ -38,8 +38,8 @@ func (repo CloudControllerSpaceRepository) FindSpaces(config *configuration.Conf
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindSpaceByName(config *configuration.Configuration, name string) (space cf.Space, err error) {
-	spaces, err := repo.FindSpaces(config)
+func (repo CloudControllerSpaceRepository) FindByName(config *configuration.Configuration, name string) (space cf.Space, err error) {
+	spaces, err := repo.FindAll(config)
 	lowerName := strings.ToLower(name)
 
 	if err != nil {

@@ -49,7 +49,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.ui.Ok()
 
-		organizations, err := l.orgRepo.FindOrganizations(config)
+		organizations, err := l.orgRepo.FindAll(config)
 
 		if err != nil {
 			l.ui.Failed("Error fetching organizations.", err)
@@ -63,7 +63,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.targetOrganization(config, organizations)
 
-		spaces, err := l.spaceRepo.FindSpaces(config)
+		spaces, err := l.spaceRepo.FindAll(config)
 
 		if err != nil {
 			l.ui.Failed("Error fetching spaces.", err)

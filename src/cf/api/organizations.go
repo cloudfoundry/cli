@@ -8,14 +8,14 @@ import (
 )
 
 type OrganizationRepository interface {
-	FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error)
-	FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error)
+	FindAll(config *configuration.Configuration) (orgs []cf.Organization, err error)
+	FindByName(config *configuration.Configuration, name string) (org cf.Organization, err error)
 }
 
 type CloudControllerOrganizationRepository struct {
 }
 
-func (repo CloudControllerOrganizationRepository) FindOrganizations(config *configuration.Configuration) (orgs []cf.Organization, err error) {
+func (repo CloudControllerOrganizationRepository) FindAll(config *configuration.Configuration) (orgs []cf.Organization, err error) {
 	path := config.Target + "/v2/organizations"
 	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
@@ -36,8 +36,8 @@ func (repo CloudControllerOrganizationRepository) FindOrganizations(config *conf
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindOrganizationByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
-	orgs, err := repo.FindOrganizations(config)
+func (repo CloudControllerOrganizationRepository) FindByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
+	orgs, err := repo.FindAll(config)
 	lowerName := strings.ToLower(name)
 
 	if err != nil {
