@@ -19,7 +19,7 @@ func TestDelete(t *testing.T) {
 
 	ui.Inputs = []string{"y"}
 
-	cmd.Run(testhelpers.NewContext(6, []string{"app-to-delete"}))
+	cmd.Run(testhelpers.NewContext("delete", []string{"app-to-delete"}))
 
 	assert.Equal(t, appRepo.AppName, "app-to-delete")
 	assert.Contains(t, ui.Prompts[0], "Really delete app-to-delete?>")

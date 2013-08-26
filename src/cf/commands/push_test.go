@@ -63,7 +63,7 @@ func callPush(args []string,
 
 	fakeUI = new(testhelpers.FakeUI)
 	target := NewPush(fakeUI, appRepo, domainRepo, routeRepo)
-	target.Run(testhelpers.NewContext(4, args))
+	target.Run(testhelpers.NewContext("push", args))
 	return
 }
 

@@ -261,7 +261,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 func callTarget(args []string, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	target := NewTarget(fakeUI, orgRepo, spaceRepo)
-	target.Run(testhelpers.NewContext(0, args))
+	target.Run(testhelpers.NewContext("target", args))
 	return
 }
 

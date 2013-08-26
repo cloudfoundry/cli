@@ -24,7 +24,7 @@ func TestApps(t *testing.T) {
 	}
 
 	cmd := NewApps(ui, config, appRepo)
-	cmd.Run(testhelpers.NewContext(5, []string{}))
+	cmd.Run(testhelpers.NewContext("apps", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting applications in development")
 	assert.Contains(t, ui.Outputs[1], "OK")

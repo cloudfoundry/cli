@@ -77,7 +77,7 @@ func TestRunReportsWhenArgumentsAreMissing(t *testing.T) {
 }
 
 func callSetEnv(args []string, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
-	context := testhelpers.NewContext(2, args)
+	context := testhelpers.NewContext("set-env", args)
 	ui = new(testhelpers.FakeUI)
 	se := NewSetEnv(ui, appRepo)
 	se.Run(context)
