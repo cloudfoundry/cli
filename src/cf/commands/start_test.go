@@ -47,6 +47,18 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
 }
 
+func TestStartApplicationIsAlreadyStarted(t *testing.T) {
+	config := &configuration.Configuration{}
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	args := []string{"my-app"}
+	ui := callStart(args, config, appRepo)
+
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "is already started")
+	assert.Equal(t, appRepo.StartedApp.Guid, "")
+}
+
 func callStart(args []string, config *configuration.Configuration, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	context := testhelpers.NewContext("start", args)
 	ui = new(testhelpers.FakeUI)

@@ -48,3 +48,7 @@ func Blue(message string) string {
 func Cyan(message string) string {
 	return colorize(message, cyan, true)
 }
+
+func Magenta(message string) string {
+	return colorize(message, magenta, true)
+}

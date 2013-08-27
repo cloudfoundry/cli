@@ -30,7 +30,13 @@ func (s Start) Run(c *cli.Context) {
 		return
 	}
 
+	if app.State == "started" {
+		s.ui.Say(term.Magenta("Application " + appName + " is already started."))
+		return
+	}
+
 	s.ui.Say("Starting %s...", term.Cyan(appName))
+
 	err = s.appRepo.Start(s.config, app)
 	if err != nil {
 		s.ui.Failed("Error starting application.", err)
