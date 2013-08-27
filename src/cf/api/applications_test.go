@@ -1,9 +1,10 @@
-package api
+package api_test
 
 import (
 	"archive/zip"
 	"bytes"
 	"cf"
+	. "cf/api"
 	"cf/configuration"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -14,22 +15,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testhelpers"
 	"testing"
 )
 
-var multipleAppsEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "GET"
-	pathMatches := request.URL.Path == "/v2/spaces/my-space-guid/apps"
-	queryStringMatches := strings.Contains(request.RequestURI, "?inline-relations-depth=2")
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && queryStringMatches && authMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	jsonResponse := `
+var multipleAppsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -91,9 +81,14 @@ var multipleAppsEndpoint = func(writer http.ResponseWriter, request *http.Reques
       }
     }
   ]
-}`
-	fmt.Fprintln(writer, jsonResponse)
-}
+}`}
+
+var multipleAppsEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/apps?inline-relations-depth=2",
+	nil,
+	multipleAppsResponse,
+)
 
 func TestApplicationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleAppsEndpoint))
@@ -148,26 +143,12 @@ func TestFindByName(t *testing.T) {
 	assert.Error(t, err)
 }
 
-var setEnvEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	bodyBytes, err := ioutil.ReadAll(request.Body)
-
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "PUT"
-	pathMatches := request.URL.Path == "/v2/apps/app1-guid"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-	bodyMatches := string(bodyBytes) == `{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches && bodyMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writer.WriteHeader(http.StatusCreated)
-	}
-}
+var setEnvEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/apps/app1-guid",
+	testhelpers.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
 
 func TestSetEnv(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(setEnvEndpoint))
@@ -186,26 +167,7 @@ func TestSetEnv(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-var createApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	bodyBytes, err := ioutil.ReadAll(request.Body)
-
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "POST"
-	pathMatches := request.URL.Path == "/v2/apps"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-	expectedBody := `{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":256,"stack_guid":null}`
-	bodyMatches := string(bodyBytes) == expectedBody
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches && bodyMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writer.WriteHeader(http.StatusCreated)
-		jsonResponse := `
+var createApplicationResponse = `
 {
     "metadata": {
         "guid": "my-cool-app-guid"
@@ -214,10 +176,13 @@ var createApplicationEndpoint = func(writer http.ResponseWriter, request *http.R
         "name": "my-cool-app"
     }
 }`
-		fmt.Fprintln(writer, jsonResponse)
 
-	}
-}
+var createApplicationEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/apps",
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":256,"stack_guid":null}`),
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+)
 
 var alwaysSuccessfulEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintln(writer, "{}")
@@ -263,20 +228,12 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-var deleteApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "DELETE"
-	pathMatches := request.URL.Path == "/v2/apps/my-cool-app-guid"
-	queryParamsMatch := strings.Contains(request.RequestURI, "?recursive=true")
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && queryParamsMatch && authMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writer.WriteHeader(http.StatusOK)
-		fmt.Fprintln(writer, "")
-	}
-}
+var deleteApplicationEndpoint = testhelpers.CreateEndpoint(
+	"DELETE",
+	"/v2/apps/my-cool-app-guid?recursive=true",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusOK, Body: ""},
+)
 
 func TestDeleteApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(deleteApplicationEndpoint))
@@ -294,18 +251,12 @@ func TestDeleteApplication(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-var uploadApplicationEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+var uploadBodyMatcher = func(request *http.Request) bool {
 	bodyBytes, err := ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+		return false
 	}
-
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "PUT"
-	pathMatches := request.URL.Path == "/v2/apps/my-cool-app-guid/bits"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
 
 	bodyString := string(bodyBytes)
 	zipAttachmentContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="application"; filename="application.zip"`)
@@ -315,18 +266,19 @@ var uploadApplicationEndpoint = func(writer http.ResponseWriter, request *http.R
 
 	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
 
-	bodyMatches := zipAttachmentContentDispositionMatches &&
+	return zipAttachmentContentDispositionMatches &&
 		zipAttachmentContentTypeMatches &&
 		zipAttachmentContentTransferEncodingMatches &&
 		zipAttachmentContentLengthPresent &&
 		resourcesContentDispositionMatches
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches && bodyMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writer.WriteHeader(http.StatusCreated)
-	}
 }
+
+var uploadApplicationEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/apps/my-cool-app-guid/bits",
+	uploadBodyMatcher,
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
 
 func TestUploadApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(uploadApplicationEndpoint))
@@ -348,7 +300,7 @@ func TestZipApplication(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 
-	zipFile, err := zipApplication(filepath.Clean(dir + "/../../fixtures/zip/"))
+	zipFile, err := ZipApplication(filepath.Clean(dir + "/../../fixtures/zip/"))
 	assert.NoError(t, err)
 
 	byteReader := bytes.NewReader(zipFile.Bytes())

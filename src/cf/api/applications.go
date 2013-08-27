@@ -138,7 +138,7 @@ func (repo CloudControllerApplicationRepository) Upload(config *configuration.Co
 		return
 	}
 
-	zipBuffer, err := zipApplication(dir)
+	zipBuffer, err := ZipApplication(dir)
 	if err != nil {
 		return
 	}
@@ -168,7 +168,7 @@ func validateApplication(app cf.Application) (err error) {
 	return
 }
 
-func zipApplication(dirToZip string) (zipBuffer *bytes.Buffer, err error) {
+func ZipApplication(dirToZip string) (zipBuffer *bytes.Buffer, err error) {
 	zipBuffer = new(bytes.Buffer)
 	writer := zip.NewWriter(zipBuffer)
 
