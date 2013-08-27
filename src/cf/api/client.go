@@ -1,6 +1,7 @@
 package api
 
 import (
+	term "cf/terminal"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -8,6 +9,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
+	"os"
 )
 
 type AuthorizedRequest struct {
@@ -38,43 +41,17 @@ func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (*Au
 }
 
 func PerformRequest(request *AuthorizedRequest) (err error) {
-	client := newClient()
-
-	rawResponse, err := client.Do(request.Request)
-
-	if err != nil {
-		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
-		return
-	}
-
-	if rawResponse.StatusCode > 299 {
-		errorResponse := getErrorResponse(rawResponse)
-		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", rawResponse.StatusCode, errorResponse.Code, errorResponse.Description)
-		err = errors.New(message)
-	}
+	_, err = doRequest(request.Request)
 	return
 }
 
 func PerformRequestAndParseResponse(request *AuthorizedRequest, response interface{}) (err error) {
-	client := newClient()
-
-	rawResponse, err := client.Do(request.Request)
-
+	rawResponse, err := doRequest(request.Request)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
-		return
-	}
-
-	if rawResponse.StatusCode > 299 {
-		errorResponse := getErrorResponse(rawResponse)
-		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", rawResponse.StatusCode, errorResponse.Code, errorResponse.Description)
-		err = errors.New(message)
 		return
 	}
 
 	jsonBytes, err := ioutil.ReadAll(rawResponse.Body)
-	rawResponse.Body.Close()
-
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Could not read response body: %s", err.Error()))
 		return
@@ -85,6 +62,43 @@ func PerformRequestAndParseResponse(request *AuthorizedRequest, response interfa
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Invalid JSON response from server: %s", err.Error()))
 	}
+	return
+}
+
+func doRequest(request *http.Request) (response *http.Response, err error) {
+	client := newClient()
+
+	if os.Getenv("TRACE") != "" {
+		dumpedRequest, err := httputil.DumpRequest(request, true)
+		if err != nil {
+			fmt.Println("Error dumping request")
+		} else {
+			fmt.Printf("\n%s\n%s\n", term.Cyan("REQUEST:"), string(dumpedRequest))
+		}
+	}
+
+	response, err = client.Do(request)
+
+	if os.Getenv("TRACE") != "" {
+		dumpedResponse, err := httputil.DumpResponse(response, true)
+		if err != nil {
+			fmt.Println("Error dumping response")
+		} else {
+			fmt.Printf("\n%s\n%s\n", term.Cyan("RESPONSE:"), string(dumpedResponse))
+		}
+	}
+
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
+		return
+	}
+
+	if response.StatusCode > 299 {
+		errorResponse := getErrorResponse(response)
+		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", response.StatusCode, errorResponse.Code, errorResponse.Description)
+		err = errors.New(message)
+	}
+
 	return
 }
 

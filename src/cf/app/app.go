@@ -13,7 +13,7 @@ func New() (app *cli.App) {
    {{.Name}} - {{.Usage}}
 
 USAGE:
-   {{.Name}} [global options] command [command options] [arguments...]
+   [environment variables] {{.Name}} [global options] command [command options] [arguments...]
 
 VERSION:
    {{.Version}}
@@ -24,6 +24,8 @@ COMMANDS:
 GLOBAL OPTIONS:
    {{range .Flags}}{{.}}
    {{end}}
+ENVIRONMENT VARIABLES:
+   TRACE=true - will output HTTP requests and responses during command
 `
 
 	cli.CommandHelpTemplate = `NAME:
