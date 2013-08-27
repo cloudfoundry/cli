@@ -7,6 +7,9 @@ import (
 )
 
 type FakeApplicationRepository struct {
+	StartedApp cf.Application
+	StartAppErr bool
+
 	DeletedApp cf.Application
 
 	FindAllApps []cf.Application
@@ -67,5 +70,13 @@ func (repo *FakeApplicationRepository) Delete(config *configuration.Configuratio
 func (repo *FakeApplicationRepository) Upload(config *configuration.Configuration, app cf.Application) (err error) {
 	repo.UploadedApp = app
 
+	return
+}
+
+func (repo *FakeApplicationRepository) Start(config *configuration.Configuration, app cf.Application) (err error){
+	repo.StartedApp = app
+	if repo.StartAppErr {
+		err = errors.New("Error starting app.")
+	}
 	return
 }

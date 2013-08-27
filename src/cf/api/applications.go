@@ -24,6 +24,7 @@ type ApplicationRepository interface {
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(config *configuration.Configuration, app cf.Application) (err error)
 	Upload(config *configuration.Configuration, app cf.Application) (err error)
+	Start(config *configuration.Configuration, app cf.Application) (err error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -157,6 +158,18 @@ func (repo CloudControllerApplicationRepository) Upload(config *configuration.Co
 
 	err = PerformRequest(request)
 	return
+}
+
+func (repo CloudControllerApplicationRepository) Start(config *configuration.Configuration, app cf.Application) (err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s", config.Target, app.Guid)
+	body := `{"console":true,"state":"STARTED"}`
+	request, err := NewAuthorizedRequest("PUT", path, config.AccessToken, strings.NewReader(body))
+
+	if err != nil {
+		return
+	}
+
+	return PerformRequest(request)
 }
 
 func validateApplication(app cf.Application) (err error) {

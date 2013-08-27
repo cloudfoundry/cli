@@ -296,6 +296,38 @@ func TestUploadApplication(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+var startApplicationEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/apps/my-cool-app-guid",
+	testhelpers.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+{
+  "metadata": {
+    "guid": "my-cool-app-guid",
+  },
+  "entity": {
+    "name": "cli1",
+    "state": "STARTED"
+  }
+}`},
+)
+
+func TestStartApplication(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(startApplicationEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+
+	err := repo.Start(config, app)
+	assert.NoError(t, err)
+}
+
 func TestZipApplication(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)

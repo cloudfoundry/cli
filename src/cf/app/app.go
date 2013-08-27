@@ -134,6 +134,16 @@ OPTIONS:
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:        "start",
+			ShortName:   "s",
+			Description: "Start applications",
+			Usage:       "cf start <application>",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewStart(termUI, config, appRepo)
+				cmd.Run(c)
+			},
+		},
 	}
 	return
 }
