@@ -1,27 +1,17 @@
-package api
+package api_test
 
 import (
 	"cf"
+	. "cf/api"
 	"cf/configuration"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"testhelpers"
 	"testing"
 )
 
-var multipleOrgEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "GET"
-	pathMatches := request.URL.Path == "/v2/organizations"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	jsonResponse := `
+var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
   "total_results": 2,
   "total_pages": 1,
@@ -45,9 +35,14 @@ var multipleOrgEndpoint = func(writer http.ResponseWriter, request *http.Request
       }
     }
   ]
-}`
-	fmt.Fprintln(writer, jsonResponse)
-}
+}`}
+
+var multipleOrgEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/organizations",
+	nil,
+	multipleOrgResponse,
+)
 
 func TestOrganizationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
