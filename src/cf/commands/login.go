@@ -39,7 +39,7 @@ func (l Login) Run(c *cli.Context) {
 	email := l.ui.Ask("Email%s", term.Cyan(">"))
 
 	for i := 0; i < maxLoginTries; i++ {
-		password := l.ui.Ask("Password%s", term.Cyan(">"))
+		password := l.ui.AskForPassword("Password%s", term.Cyan(">"))
 		l.ui.Say("Authenticating...")
 
 		err := l.authenticator.Authenticate(config, email, password)

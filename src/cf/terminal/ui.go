@@ -8,6 +8,7 @@ import (
 type UI interface {
 	Say(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
+	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Ok()
 	Failed(message string, err error)
 	ShowConfiguration(*configuration.Configuration)

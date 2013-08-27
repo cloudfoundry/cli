@@ -48,6 +48,10 @@ func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	return
 }
 
+func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {
+	return ui.Ask(prompt, args)
+}
+
 func (ui *FakeUI) Ok() {
 	ui.Say("OK")
 }
