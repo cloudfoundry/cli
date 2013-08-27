@@ -10,25 +10,20 @@ import (
 )
 
 func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
-	config, err := configuration.Load()
-	assert.NoError(t, err)
-
+	config := &configuration.Configuration{}
 	config.AccessToken = "MyAccessToken"
 	config.Organization = cf.Organization{Name: "MyOrg"}
 	config.Space = cf.Space{Name: "MyOrg"}
 
-	err = config.Save()
-	assert.NoError(t, err)
-
 	ui := new(testhelpers.FakeUI)
 
-	l := NewLogout(ui)
+	l := NewLogout(ui, config)
 	l.Run(nil)
 
-	config, err = configuration.Load()
-	assert.NoError(t, err)
+	updatedConfig, err := configuration.Load()
 
-	assert.Empty(t, config.AccessToken)
-	assert.Equal(t, config.Organization, cf.Organization{})
-	assert.Equal(t, config.Space, cf.Space{})
+	assert.NoError(t, err)
+	assert.Empty(t, updatedConfig.AccessToken)
+	assert.Equal(t, updatedConfig.Organization, cf.Organization{})
+	assert.Equal(t, updatedConfig.Space, cf.Space{})
 }

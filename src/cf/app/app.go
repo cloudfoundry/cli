@@ -65,7 +65,7 @@ OPTIONS:
 				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewTarget(termUI, organizationRepo, spaceRepo)
+				cmd := commands.NewTarget(termUI, config, organizationRepo, spaceRepo)
 				cmd.Run(c)
 			},
 		},
@@ -77,7 +77,7 @@ OPTIONS:
 			Action: func(c *cli.Context) {
 				authenticator := new(api.UAAAuthenticator)
 
-				cmd := commands.NewLogin(termUI, organizationRepo, spaceRepo, authenticator)
+				cmd := commands.NewLogin(termUI, config, organizationRepo, spaceRepo, authenticator)
 				cmd.Run(c)
 			},
 		},
@@ -87,7 +87,7 @@ OPTIONS:
 			Description: "Set an environment variable for an application",
 			Usage:       "cf set-env <application> <variable> <value>",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewSetEnv(termUI, appRepo)
+				cmd := commands.NewSetEnv(termUI, config, appRepo)
 				cmd.Run(c)
 			},
 		},
@@ -97,7 +97,7 @@ OPTIONS:
 			Description: "Log user out",
 			Usage:       "cf logout",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewLogout(termUI)
+				cmd := commands.NewLogout(termUI, config)
 				cmd.Run(c)
 			},
 		},
@@ -110,7 +110,7 @@ OPTIONS:
 				cli.StringFlag{"name", "", "name of the application"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewPush(termUI, appRepo, domainRepo, routeRepo)
+				cmd := commands.NewPush(termUI, config, appRepo, domainRepo, routeRepo)
 				cmd.Run(c)
 			},
 		},

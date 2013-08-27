@@ -23,6 +23,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
 		auth,
@@ -59,6 +60,7 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
 		&testhelpers.FakeAuthenticator{},
@@ -106,6 +108,7 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
 		&testhelpers.FakeAuthenticator{},
@@ -145,6 +148,7 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
 		&testhelpers.FakeAuthenticator{},
@@ -179,6 +183,7 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
 		&testhelpers.FakeAuthenticator{},
@@ -210,6 +215,7 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
 		&testhelpers.FakeAuthenticator{},
@@ -246,6 +252,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	callLogin(
 		nil,
 		ui,
+		config,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
 		&testhelpers.FakeAuthenticator{AuthError: true},
@@ -260,8 +267,8 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[10], "FAILED")
 }
 
-func callLogin(c *cli.Context, ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
-	l := NewLogin(ui, orgRepo, spaceRepo, auth)
+func callLogin(c *cli.Context, ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
+	l := NewLogin(ui, config, orgRepo, spaceRepo, auth)
 	l.Run(c)
 }
 

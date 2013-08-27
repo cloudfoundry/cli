@@ -9,14 +9,14 @@ import (
 
 type Delete struct {
 	ui      term.UI
-	appRepo api.ApplicationRepository
 	config  *configuration.Configuration
+	appRepo api.ApplicationRepository
 }
 
 func NewDelete(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (d Delete) {
 	d.ui = ui
-	d.appRepo = appRepo
 	d.config = config
+	d.appRepo = appRepo
 	return
 }
 

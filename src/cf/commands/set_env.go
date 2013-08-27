@@ -9,11 +9,13 @@ import (
 
 type SetEnv struct {
 	ui      term.UI
+	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 }
 
-func NewSetEnv(ui term.UI, appRepo api.ApplicationRepository) (se SetEnv) {
+func NewSetEnv(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (se SetEnv) {
 	se.ui = ui
+	se.config = config
 	se.appRepo = appRepo
 	return
 }

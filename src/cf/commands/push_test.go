@@ -11,8 +11,6 @@ import (
 )
 
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
-	setupBasePushConfig(t)
-
 	domains := []cf.Domain{
 		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
 	}
@@ -20,7 +18,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, appRepo, domainRepo, routeRepo)
+	fakeUI := callPush([]string{"--name", "my-new-app"}, basePushConfig(), appRepo, domainRepo, routeRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
@@ -42,14 +40,12 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 }
 
 func TestPushingAppWhenItAlreadyExists(t *testing.T) {
-	setupBasePushConfig(t)
-
 	domainRepo := &testhelpers.FakeDomainRepository{}
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	existingApp := cf.Application{Name: "existing-app", Guid: "existing-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: existingApp}
 
-	fakeUI := callPush([]string{"--name", "existing-app"}, appRepo, domainRepo, routeRepo)
+	fakeUI := callPush([]string{"--name", "existing-app"}, basePushConfig(), appRepo, domainRepo, routeRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Uploading existing-app...")
 	assert.Equal(t, appRepo.UploadedApp.Guid, "existing-app-guid")
@@ -57,22 +53,21 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 }
 
 func callPush(args []string,
+	config *configuration.Configuration,
 	appRepo api.ApplicationRepository,
 	domainRepo api.DomainRepository,
 	routeRepo api.RouteRepository) (fakeUI *testhelpers.FakeUI) {
 
 	fakeUI = new(testhelpers.FakeUI)
-	target := NewPush(fakeUI, appRepo, domainRepo, routeRepo)
+	target := NewPush(fakeUI, config, appRepo, domainRepo, routeRepo)
 	target.Run(testhelpers.NewContext("push", args))
 	return
 }
 
-func setupBasePushConfig(t *testing.T) {
-	testhelpers.Login(t)
-	config, err := configuration.Load()
-	assert.NoError(t, err)
+func basePushConfig() (config *configuration.Configuration) {
+	config = testhelpers.Login()
 	config.Organization = cf.Organization{Name: "MyOrg"}
 	config.Space = cf.Space{Name: "MySpace"}
-	err = config.Save()
-	assert.NoError(t, err)
+
+	return
 }

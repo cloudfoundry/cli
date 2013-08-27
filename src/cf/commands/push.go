@@ -10,32 +10,27 @@ import (
 
 type Push struct {
 	ui         term.UI
+	config     *configuration.Configuration
 	appRepo    api.ApplicationRepository
 	domainRepo api.DomainRepository
 	routeRepo  api.RouteRepository
 }
 
-func NewPush(ui term.UI, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
+func NewPush(ui term.UI, config *configuration.Configuration, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
+	p.ui = ui
+	p.config = config
 	p.appRepo = aR
 	p.domainRepo = dR
 	p.routeRepo = rR
-	p.ui = ui
 	return
 }
 
 func (p Push) Run(c *cli.Context) {
-	config, err := configuration.Load()
-
-	if err != nil {
-		p.ui.Failed("Error loading configuration", err)
-		return
-	}
-
 	appName := c.String("name")
-	app, err := p.appRepo.FindByName(config, appName)
+	app, err := p.appRepo.FindByName(p.config, appName)
 
 	if err != nil {
-		app, err = p.createApp(config, appName)
+		app, err = p.createApp(p.config, appName)
 
 		if err != nil {
 			return
@@ -43,7 +38,7 @@ func (p Push) Run(c *cli.Context) {
 	}
 
 	p.ui.Say("Uploading %s...", app.Name)
-	err = p.appRepo.Upload(config, app)
+	err = p.appRepo.Upload(p.config, app)
 	if err != nil {
 		p.ui.Failed("Error uploading app", err)
 		return

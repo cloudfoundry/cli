@@ -13,13 +13,15 @@ const maxLoginTries = 3
 
 type Login struct {
 	ui            term.UI
+	config        *configuration.Configuration
 	orgRepo       api.OrganizationRepository
 	spaceRepo     api.SpaceRepository
 	authenticator api.Authenticator
 }
 
-func NewLogin(ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, autenticator api.Authenticator) (l Login) {
+func NewLogin(ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, autenticator api.Authenticator) (l Login) {
 	l.ui = ui
+	l.config = config
 	l.orgRepo = orgRepo
 	l.spaceRepo = spaceRepo
 	l.authenticator = autenticator

@@ -14,12 +14,14 @@ type InfoResponse struct {
 
 type Target struct {
 	ui        term.UI
+	config    *configuration.Configuration
 	orgRepo   api.OrganizationRepository
 	spaceRepo api.SpaceRepository
 }
 
-func NewTarget(ui term.UI, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
+func NewTarget(ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
 	t.ui = ui
+	t.config = config
 	t.orgRepo = orgRepo
 	t.spaceRepo = spaceRepo
 
@@ -30,15 +32,9 @@ func (t Target) Run(c *cli.Context) {
 	argsCount := len(c.Args())
 	orgName := c.String("o")
 	spaceName := c.String("s")
-	config, err := configuration.Load()
-
-	if err != nil {
-		t.ui.Failed("Error loading configuration", err)
-		return
-	}
 
 	if argsCount == 0 && orgName == "" && spaceName == "" {
-		t.ui.ShowConfiguration(config)
+		t.ui.ShowConfiguration(t.config)
 		return
 	}
 
@@ -48,12 +44,12 @@ func (t Target) Run(c *cli.Context) {
 	}
 
 	if orgName != "" {
-		t.setOrganization(config, orgName)
+		t.setOrganization(orgName)
 		return
 	}
 
 	if spaceName != "" {
-		t.setSpace(config, spaceName)
+		t.setSpace(spaceName)
 		return
 	}
 
@@ -79,7 +75,7 @@ func (t Target) setNewTarget(target string) {
 		return
 	}
 
-	newConfiguration, err := t.saveTarget(url, serverResponse)
+	err = t.saveTarget(url, serverResponse)
 
 	if err != nil {
 		t.ui.Failed("Error saving configuration", err)
@@ -87,60 +83,60 @@ func (t Target) setNewTarget(target string) {
 	}
 
 	t.ui.Ok()
-	t.ui.ShowConfiguration(newConfiguration)
+	t.ui.ShowConfiguration(t.config)
 }
 
-func (t Target) saveTarget(target string, info *InfoResponse) (config *configuration.Configuration, err error) {
-	config = new(configuration.Configuration)
-	config.Target = target
-	config.ApiVersion = info.ApiVersion
-	config.AuthorizationEndpoint = info.AuthorizationEndpoint
-	err = config.Save()
+func (t *Target) saveTarget(target string, info *InfoResponse) (err error) {
+	t.config = new(configuration.Configuration)
+	t.config.Target = target
+	t.config.ApiVersion = info.ApiVersion
+	t.config.AuthorizationEndpoint = info.AuthorizationEndpoint
+	err = t.config.Save()
 	return
 }
 
-func (t Target) setOrganization(config *configuration.Configuration, orgName string) {
-	if !config.IsLoggedIn() {
+func (t Target) setOrganization(orgName string) {
+	if !t.config.IsLoggedIn() {
 		t.ui.Failed("You must be logged in to set an organization.", nil)
 		return
 	}
 
-	org, err := t.orgRepo.FindByName(config, orgName)
+	org, err := t.orgRepo.FindByName(t.config, orgName)
 	if err != nil {
 		t.ui.Failed("Could not set organization.", nil)
 		return
 	}
 
-	config.Organization = org
-	t.saveAndShowConfig(config)
+	t.config.Organization = org
+	t.saveAndShowConfig()
 }
 
-func (t Target) setSpace(config *configuration.Configuration, spaceName string) {
-	if !config.IsLoggedIn() {
+func (t Target) setSpace(spaceName string) {
+	if !t.config.IsLoggedIn() {
 		t.ui.Failed("You must be logged in to set a space.", nil)
 		return
 	}
 
-	if !config.HasOrganization() {
+	if !t.config.HasOrganization() {
 		t.ui.Failed("Organization must be set before targeting space.", nil)
 		return
 	}
 
-	space, err := t.spaceRepo.FindByName(config, spaceName)
+	space, err := t.spaceRepo.FindByName(t.config, spaceName)
 	if err != nil {
 		t.ui.Failed("You do not have access to that space.", nil)
 		return
 	}
 
-	config.Space = space
-	t.saveAndShowConfig(config)
+	t.config.Space = space
+	t.saveAndShowConfig()
 }
 
-func (t Target) saveAndShowConfig(config *configuration.Configuration) {
-	err := config.Save()
+func (t Target) saveAndShowConfig() {
+	err := t.config.Save()
 	if err != nil {
 		t.ui.Failed("Error saving configuration", err)
 		return
 	}
-	t.ui.ShowConfiguration(config)
+	t.ui.ShowConfiguration(t.config)
 }

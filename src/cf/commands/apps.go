@@ -11,14 +11,14 @@ import (
 
 type Apps struct {
 	ui      term.UI
-	appRepo api.ApplicationRepository
 	config  *configuration.Configuration
+	appRepo api.ApplicationRepository
 }
 
 func NewApps(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (a Apps) {
 	a.ui = ui
-	a.appRepo = appRepo
 	a.config = config
+	a.appRepo = appRepo
 	return
 }
 
