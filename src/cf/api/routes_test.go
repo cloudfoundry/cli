@@ -1,36 +1,17 @@
-package api
+package api_test
 
 import (
 	"cf"
+	. "cf/api"
 	"cf/configuration"
-	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"testhelpers"
 	"testing"
 )
 
-var createRouteEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	bodyBytes, err := ioutil.ReadAll(request.Body)
-
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "POST"
-	pathMatches := request.URL.Path == "/v2/routes"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-	expectedBody := `{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`
-	bodyMatches := string(bodyBytes) == expectedBody
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches && bodyMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writer.WriteHeader(http.StatusCreated)
-		jsonResponse := `
+var createRouteResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
     "metadata": {
         "guid": "my-route-guid"
@@ -38,11 +19,14 @@ var createRouteEndpoint = func(writer http.ResponseWriter, request *http.Request
     "entity": {
         "host": "my-cool-app"
     }
-}`
-		fmt.Fprintln(writer, jsonResponse)
+}`}
 
-	}
-}
+var createRouteEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/routes",
+	testhelpers.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+	createRouteResponse,
+)
 
 func TestCreate(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createRouteEndpoint))
@@ -64,20 +48,12 @@ func TestCreate(t *testing.T) {
 	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
 
-var bindRouteEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "PUT"
-	pathMatches := request.URL.Path == "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writer.WriteHeader(http.StatusCreated)
-		jsonResponse := ``
-		fmt.Fprintln(writer, jsonResponse)
-	}
-}
+var bindRouteEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: ""},
+)
 
 func TestBind(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(bindRouteEndpoint))
