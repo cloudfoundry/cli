@@ -75,7 +75,17 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	spaces, err := repo.FindAll(config)
+
+	var (
+		spaces []cf.Space
+		err    error
+	)
+
+	// Capture output so debugging info does not show up in test
+	// output
+	testhelpers.CaptureOutput(func() {
+		spaces, err = repo.FindAll(config)
+	})
 
 	assert.Error(t, err)
 	assert.Equal(t, 0, len(spaces))

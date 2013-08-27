@@ -18,28 +18,35 @@ type TestResponse struct {
 	Status int
 }
 
-var RequestBodyMatcher = func(body string) RequestMatcher {
+var RequestBodyMatcher = func(expectedBody string) RequestMatcher {
 	return func(request *http.Request) bool {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 
 		if err != nil {
+			fmt.Printf("Error reading request body: %s", err.Error())
 			return false
 		}
 
-		return string(bodyBytes) == body
+		actualBody := string(bodyBytes)
+		bodyMatches := actualBody == expectedBody
+
+		if !bodyMatches {
+			fmt.Printf("Body did not match. Expected [%s], Actual [%s]", expectedBody, actualBody)
+		}
+		return bodyMatches
 	}
 }
 
-var CreateEndpoint = func(method string, path string, matcher RequestMatcher, response TestResponse) http.HandlerFunc {
+var CreateEndpoint = func(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		if matcher == nil {
-			matcher = successMatcher
+		if customMatcher == nil {
+			customMatcher = successMatcher
 		}
 
 		acceptHeaderMatches := request.Header.Get("accept") == "application/json"
 		authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
 		methodMatches := request.Method == method
-		matcherMatches := matcher(request)
+		customMatcherMatches := customMatcher(request)
 
 		paths := strings.Split(path, "?")
 		pathMatches := request.URL.Path == paths[0]
@@ -48,7 +55,10 @@ var CreateEndpoint = func(method string, path string, matcher RequestMatcher, re
 			pathMatches = pathMatches && queryStringMatches
 		}
 
-		if !(acceptHeaderMatches && authMatches && methodMatches && pathMatches && matcherMatches) {
+		if !(acceptHeaderMatches && authMatches && methodMatches && pathMatches && customMatcherMatches) {
+			fmt.Printf("One of the matchers did not match. AcceptHeader [%t] Auth [%t] Method [%t] Path [%t] Custom Matcher [%t]",
+			acceptHeaderMatches, authMatches, methodMatches, pathMatches, customMatcherMatches)
+
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}

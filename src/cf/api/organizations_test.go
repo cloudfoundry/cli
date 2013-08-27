@@ -70,7 +70,17 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	repo := CloudControllerOrganizationRepository{}
 
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
-	organizations, err := repo.FindAll(config)
+
+	var (
+		organizations []cf.Organization
+		err           error
+	)
+
+	// Capture output so debugging info does not show up in test
+	// output
+	testhelpers.CaptureOutput(func() {
+		organizations, err = repo.FindAll(config)
+	})
 
 	assert.Error(t, err)
 	assert.Equal(t, 0, len(organizations))
