@@ -1,27 +1,17 @@
-package api
+package api_test
 
 import (
 	"cf"
+	. "cf/api"
 	"cf/configuration"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"testhelpers"
 	"testing"
 )
 
-var multipleSpacesEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "GET"
-	pathMatches := request.URL.Path == "/v2/organizations/some-org-guid/spaces"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	jsonResponse := `
+var multipleSpacesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -41,9 +31,14 @@ var multipleSpacesEndpoint = func(writer http.ResponseWriter, request *http.Requ
       }
     }
   ]
-}`
-	fmt.Fprintln(writer, jsonResponse)
-}
+}`}
+
+var multipleSpacesEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/organizations/some-org-guid/spaces",
+	nil,
+	multipleSpacesResponse,
+)
 
 func TestSpacesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
