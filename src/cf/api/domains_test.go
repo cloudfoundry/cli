@@ -1,27 +1,17 @@
-package api
+package api_test
 
 import (
 	"cf"
+	. "cf/api"
 	"cf/configuration"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"testhelpers"
 	"testing"
 )
 
-var multipleDomainsEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "GET"
-	pathMatches := request.URL.Path == "/v2/spaces/my-space-guid/domains"
-	authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
-
-	if !(acceptHeaderMatches && methodMatches && pathMatches && authMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	jsonResponse := `
+var multipleDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
   "total_results": 2,
   "total_pages": 1,
@@ -45,9 +35,14 @@ var multipleDomainsEndpoint = func(writer http.ResponseWriter, request *http.Req
       }
     }
   ]
-}`
-	fmt.Fprintln(writer, jsonResponse)
-}
+}`}
+
+var multipleDomainsEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/domains",
+	nil,
+	multipleDomainsResponse,
+)
 
 func TestFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
