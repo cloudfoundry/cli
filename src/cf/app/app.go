@@ -146,6 +146,16 @@ OPTIONS:
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:        "stop",
+			ShortName:   "st",
+			Description: "Stop applications",
+			Usage:       "cf stop <application>",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewStop(termUI, config, appRepo)
+				cmd.Run(c)
+			},
+		},
 	}
 	return
 }

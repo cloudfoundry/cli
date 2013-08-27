@@ -10,6 +10,9 @@ type FakeApplicationRepository struct {
 	StartedApp cf.Application
 	StartAppErr bool
 
+	StoppedApp cf.Application
+	StopAppErr bool
+
 	DeletedApp cf.Application
 
 	FindAllApps []cf.Application
@@ -77,6 +80,14 @@ func (repo *FakeApplicationRepository) Start(config *configuration.Configuration
 	repo.StartedApp = app
 	if repo.StartAppErr {
 		err = errors.New("Error starting app.")
+	}
+	return
+}
+
+func (repo *FakeApplicationRepository) Stop(config *configuration.Configuration, app cf.Application) (err error){
+	repo.StoppedApp = app
+	if repo.StopAppErr {
+		err = errors.New("Error stopping app.")
 	}
 	return
 }
