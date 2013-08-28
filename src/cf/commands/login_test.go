@@ -7,7 +7,6 @@ import (
 	"cf/configuration"
 	"cf/configuration/configtest"
 	term "cf/terminal"
-	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -22,7 +21,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 		AccessToken: "my_access_token",
 	}
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{},
@@ -37,6 +36,35 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Prompts[0], "Email")
 	assert.Contains(t, ui.Prompts[1], "Password")
+
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, auth.Email, "foo@example.com")
+	assert.Equal(t, auth.Password, "bar")
+}
+
+func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
+	config := logout(t)
+
+	ui := new(testhelpers.FakeUI)
+	ui.Inputs = []string{"bar"}
+	auth := &testhelpers.FakeAuthenticator{
+		AccessToken: "my_access_token",
+	}
+	callLogin(
+		[]string{"foo@example.com"},
+		ui,
+		config,
+		&testhelpers.FakeOrgRepository{},
+		&testhelpers.FakeSpaceRepository{},
+		auth,
+	)
+
+	savedConfig, err := configtest.GetSavedConfig()
+	assert.NoError(t, err)
+
+	assert.Contains(t, ui.Outputs[0], config.Target)
+	assert.Contains(t, ui.Outputs[2], "OK")
+	assert.Contains(t, ui.Prompts[0], "Password")
 
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, auth.Email, "foo@example.com")
@@ -59,7 +87,7 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	}
 
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
@@ -107,7 +135,7 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	ui.Inputs = []string{"foo@example.com", "bar", "3", "2", "3", "1"}
 
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
@@ -147,7 +175,7 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	}
 
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
@@ -182,7 +210,7 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 	spaces := []cf.Space{}
 
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
@@ -214,7 +242,7 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	spaces := []cf.Space{}
 
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
@@ -251,7 +279,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	}
 
 	callLogin(
-		nil,
+		[]string{},
 		ui,
 		config,
 		&testhelpers.FakeOrgRepository{},
@@ -268,9 +296,9 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[10], "FAILED")
 }
 
-func callLogin(c *cli.Context, ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
+func callLogin(args []string, ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
 	l := NewLogin(ui, config, orgRepo, spaceRepo, auth)
-	l.Run(c)
+	l.Run(testhelpers.NewContext("login", args))
 }
 
 func logout(t *testing.T) (config *configuration.Configuration) {

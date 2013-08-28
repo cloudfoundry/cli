@@ -30,7 +30,13 @@ func NewLogin(ui term.UI, config *configuration.Configuration, orgRepo api.Organ
 
 func (l Login) Run(c *cli.Context) {
 	l.ui.Say("target: %s", term.Cyan(l.config.Target))
-	email := l.ui.Ask("Email%s", term.Cyan(">"))
+
+	var email string
+	if len(c.Args()) > 0 {
+		email = c.Args()[0]
+	} else {
+		email = l.ui.Ask("Email%s", term.Cyan(">"))
+	}
 
 	for i := 0; i < maxLoginTries; i++ {
 		password := l.ui.AskForPassword("Password%s", term.Cyan(">"))

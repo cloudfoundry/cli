@@ -71,7 +71,7 @@ OPTIONS:
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",
-			Usage:       "cf login",
+			Usage:       "cf login [username]",
 			Action: func(c *cli.Context) {
 				authenticator := new(api.UAAAuthenticator)
 
