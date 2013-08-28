@@ -29,6 +29,15 @@ type Route struct {
 	Guid string
 }
 
+type InstanceState string
+
+const (
+	InstanceStarting InstanceState = "starting"
+	InstanceRunning = "running"
+	InstanceFlapping = "flapping"
+	InstanceDown = "down"
+)
+
 type ApplicationInstance struct {
-	State string
+	State InstanceState
 }

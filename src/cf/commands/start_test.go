@@ -32,12 +32,12 @@ func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors
 func TestStartApplication(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "running"},
-			cf.ApplicationInstance{State: "starting"},
+			cf.ApplicationInstance{State: cf.InstanceRunning},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
 		},
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "running"},
-			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: cf.InstanceRunning},
+			cf.ApplicationInstance{State: cf.InstanceRunning},
 		},
 	}
 
@@ -58,16 +58,16 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		[]cf.ApplicationInstance{},
 		[]cf.ApplicationInstance{},
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "down"},
-			cf.ApplicationInstance{State: "starting"},
+			cf.ApplicationInstance{State: cf.InstanceDown},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
 		},
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "starting"},
-			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
+			cf.ApplicationInstance{State: cf.InstanceRunning},
 		},
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "running"},
-			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: cf.InstanceRunning},
+			cf.ApplicationInstance{State: cf.InstanceRunning},
 		},
 	}
 
@@ -82,19 +82,19 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 	assert.Contains(t, ui.Outputs[5], "2 of 2 instances running")
 }
 
-func TestStartApplicationWhenOneInstanceFlaps ( t *testing.T) {
+func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "starting"},
-			cf.ApplicationInstance{State: "starting"},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
 		},
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "starting"},
-			cf.ApplicationInstance{State: "flapping"},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
+			cf.ApplicationInstance{State: cf.InstanceFlapping},
 		},
 	}
 
-	errors := []bool{ false, false}
+	errors := []bool{false, false}
 
 	ui, _ := startAppWithInstancesAndErrors(instances, errors)
 

@@ -68,13 +68,13 @@ func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFi
 
 	for _, inst := range instances {
 		switch inst.State {
-		case "running":
+		case cf.InstanceRunning:
 			runningCount++
-		case "starting":
+		case cf.InstanceStarting:
 			startingCount++
-		case "flapping":
+		case cf.InstanceFlapping:
 			flappingCount++
-		case "down":
+		case cf.InstanceDown:
 			downCount++
 		}
 	}
