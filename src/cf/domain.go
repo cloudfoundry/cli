@@ -33,9 +33,9 @@ type InstanceState string
 
 const (
 	InstanceStarting InstanceState = "starting"
-	InstanceRunning = "running"
-	InstanceFlapping = "flapping"
-	InstanceDown = "down"
+	InstanceRunning                = "running"
+	InstanceFlapping               = "flapping"
+	InstanceDown                   = "down"
 )
 
 type ApplicationInstance struct {

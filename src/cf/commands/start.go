@@ -57,12 +57,12 @@ func (s Start) Run(c *cli.Context) {
 
 	s.ui.Say("")
 
-	for s.displayInstancesStatus(instances) {
+	for s.displayInstancesStatus(app, instances) {
 		instances, _ = s.appRepo.GetInstances(s.config, app)
 	}
 }
 
-func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFinished bool) {
+func (s Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {
 	totalCount := len(instances)
 	runningCount, startingCount, flappingCount, downCount := 0, 0, 0, 0
 
@@ -84,10 +84,11 @@ func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFi
 		return false
 	}
 
-	allInstancesAreRunning := runningCount == totalCount
+	anyInstanceRunning := runningCount > 0
 
-	if allInstancesAreRunning {
-		s.ui.Say("%d of %d instances running", runningCount, totalCount)
+	if anyInstanceRunning {
+		s.ui.Say("Start successful! App %s available at %s", app.Name, app.Urls[0])
+		return false
 	} else {
 		details := instancesDetails(runningCount, startingCount, downCount)
 		s.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
@@ -98,10 +99,6 @@ func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFi
 
 func instancesDetails(runningCount int, startingCount int, downCount int) string {
 	details := []string{}
-
-	if runningCount > 0 {
-		details = append(details, fmt.Sprintf("%d running", runningCount))
-	}
 
 	if startingCount > 0 {
 		details = append(details, fmt.Sprintf("%d starting", startingCount))

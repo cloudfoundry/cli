@@ -16,6 +16,7 @@ func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors
 		Name:      "my-app",
 		Guid:      "my-app-guid",
 		Instances: 2,
+		Urls:      []string{"http://my-app.example.com"},
 	}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
@@ -32,12 +33,12 @@ func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors
 func TestStartApplication(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: cf.InstanceRunning},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
 			cf.ApplicationInstance{State: cf.InstanceStarting},
 		},
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: cf.InstanceRunning},
-			cf.ApplicationInstance{State: cf.InstanceRunning},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
 		},
 	}
 
@@ -46,8 +47,8 @@ func TestStartApplication(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "1 of 2 instances running (1 running, 1 starting)")
-	assert.Contains(t, ui.Outputs[4], "2 of 2 instances running")
+	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[4], "Start successful! App my-app available at http://my-app.example.com")
 
 	assert.Equal(t, appRepo.AppName, "my-app")
 	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
@@ -63,7 +64,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		},
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: cf.InstanceStarting},
-			cf.ApplicationInstance{State: cf.InstanceRunning},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
 		},
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: cf.InstanceRunning},
@@ -78,8 +79,8 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (1 starting, 1 down)")
-	assert.Contains(t, ui.Outputs[4], "1 of 2 instances running (1 running, 1 starting)")
-	assert.Contains(t, ui.Outputs[5], "2 of 2 instances running")
+	assert.Contains(t, ui.Outputs[4], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[5], "Start successful! App my-app available at http://my-app.example.com")
 }
 
 func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
