@@ -1,6 +1,7 @@
-package api
+package api_test
 
 import (
+	. "cf/api"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
