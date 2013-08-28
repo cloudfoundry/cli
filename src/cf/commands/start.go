@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	term "cf/terminal"
@@ -42,5 +43,43 @@ func (s Start) Run(c *cli.Context) {
 		s.ui.Failed("Error starting application.", err)
 		return
 	}
+
 	s.ui.Ok()
+
+	instances, err := s.appRepo.GetInstances(s.config, app)
+
+	for err != nil {
+		s.ui.Wait(1)
+		instances, err = s.appRepo.GetInstances(s.config, app)
+		s.ui.LoadingIndication()
+	}
+
+	s.ui.Say("")
+
+	for s.displayInstancesStatus(instances) {
+		instances, _ = s.appRepo.GetInstances(s.config, app)
+	}
+}
+
+func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFinished bool) {
+	totalCount := len(instances)
+	runningCount := 0
+	startingCount := 0
+
+	for _, inst := range instances {
+		switch inst.State {
+		case "running":
+			runningCount++
+		case "starting":
+			startingCount++
+		}
+	}
+
+	if runningCount < totalCount {
+		s.ui.Say("%d of %d instances running (%d running, %d starting)", runningCount, totalCount, runningCount, startingCount)
+	} else {
+		s.ui.Say("%d of %d instances running", runningCount, totalCount)
+	}
+
+	return totalCount > runningCount
 }

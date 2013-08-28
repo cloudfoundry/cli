@@ -28,3 +28,7 @@ type Route struct {
 	Host string
 	Guid string
 }
+
+type ApplicationInstance struct {
+	State string
+}

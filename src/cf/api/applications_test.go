@@ -360,6 +360,40 @@ func TestStopApplication(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+var successfulGetInstancesEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/apps/my-cool-app-guid/instances",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+{
+  "1": {
+    "state": "STARTING"
+  },
+  "0": {
+    "state": "RUNNING"
+  }
+}`},
+)
+
+func TestGetInstances(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(successfulGetInstancesEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+
+	instances, err := repo.GetInstances(config, app)
+	assert.NoError(t, err)
+	assert.Equal(t, len(instances), 2)
+	assert.Equal(t, instances[0].State, "running")
+	assert.Equal(t, instances[1].State, "starting")
+}
+
 func TestZipApplication(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)

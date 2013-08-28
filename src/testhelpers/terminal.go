@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"strings"
 	"cf/configuration"
+	"time"
 )
 
-func CaptureOutput(f func()) string {
+func CaptureOutput(f func ()) string {
 	old := os.Stdout // keep backup of the real stdout
 	r, w, _ := os.Pipe()
 	os.Stdout = w
@@ -33,7 +34,7 @@ func CaptureOutput(f func()) string {
 type FakeUI struct {
 	Outputs []string
 	Prompts []string
-	Inputs []string
+	Inputs  []string
 }
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
@@ -69,7 +70,7 @@ func (ui *FakeUI) Failed(message string, err error) {
 	return
 }
 
-func (ui *FakeUI)DumpOutputs()string{
+func (ui *FakeUI) DumpOutputs() string {
 	return "****************************\n" + strings.Join(ui.Outputs, "\n")
 }
 
@@ -87,6 +88,12 @@ func (ui *FakeUI) ShowConfigurationNoSpacesAvailable(config *configuration.Confi
 	ui.showBaseConfig(config)
 
 	ui.Say("No spaces found. Use 'cf create-space' as an Org Manager.")
+}
+
+func (ui FakeUI) LoadingIndication() {
+}
+
+func (c FakeUI) Wait(seconds time.Duration) {
 }
 
 func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {

@@ -10,15 +10,71 @@ import (
 	"testing"
 )
 
-func TestStartApplication(t *testing.T) {
+func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors []bool) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
 	config := &configuration.Configuration{}
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	app := cf.Application{
+		Name:      "my-app",
+		Guid:      "my-app-guid",
+		Instances: 2,
+	}
+
+	appRepo = &testhelpers.FakeApplicationRepository{
+		AppByName:             app,
+		GetInstancesResponses: instances,
+		GetInstancesErrors:    errors,
+	}
 	args := []string{"my-app"}
-	ui := callStart(args, config, appRepo)
+
+	ui = callStart(args, config, appRepo)
+	return
+}
+
+func TestStartApplication(t *testing.T) {
+	instances := [][]cf.ApplicationInstance{
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: "starting"},
+		},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: "running"},
+		},
+	}
+
+	errors := []bool{false, false}
+	ui, appRepo := startAppWithInstancesAndErrors(instances, errors)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[3], "1 of 2 instances running (1 running, 1 starting)")
+	assert.Contains(t, ui.Outputs[4], "2 of 2 instances running")
+
+	assert.Equal(t, appRepo.AppName, "my-app")
+	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
+}
+
+func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
+	instances := [][]cf.ApplicationInstance{
+		[]cf.ApplicationInstance{},
+		[]cf.ApplicationInstance{},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: "starting"},
+		},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: "running"},
+		},
+	}
+
+	errors := []bool{true, true, false, false}
+
+	ui, appRepo := startAppWithInstancesAndErrors(instances, errors)
+
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[3], "1 of 2 instances running (1 running, 1 starting)")
+	assert.Contains(t, ui.Outputs[4], "2 of 2 instances running")
 
 	assert.Equal(t, appRepo.AppName, "my-app")
 	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")

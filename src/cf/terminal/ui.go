@@ -3,6 +3,7 @@ package terminal
 import (
 	"cf/configuration"
 	"fmt"
+	"time"
 )
 
 type UI interface {
@@ -13,6 +14,8 @@ type UI interface {
 	Failed(message string, err error)
 	ShowConfiguration(*configuration.Configuration)
 	ShowConfigurationNoSpacesAvailable(config *configuration.Configuration)
+	LoadingIndication()
+	Wait(seconds time.Duration)
 }
 
 type TerminalUI struct {
@@ -61,6 +64,14 @@ func (ui TerminalUI) ShowConfigurationNoSpacesAvailable(config *configuration.Co
 	ui.showBaseConfig(config)
 
 	ui.Say("No spaces found. Use 'cf create-space' as an Org Manager.")
+}
+
+func (c TerminalUI) LoadingIndication() {
+	fmt.Print(".")
+}
+
+func (c TerminalUI) Wait(seconds time.Duration) {
+	time.Sleep(1000 * 1000 * 1000 * seconds)
 }
 
 func (ui TerminalUI) showBaseConfig(config *configuration.Configuration) {

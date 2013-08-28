@@ -28,6 +28,9 @@ type FakeApplicationRepository struct {
 
 	CreatedApp  cf.Application
 	UploadedApp cf.Application
+
+	GetInstancesResponses [][]cf.ApplicationInstance
+	GetInstancesErrors []bool
 }
 
 func (repo *FakeApplicationRepository) FindAll(config *configuration.Configuration) (apps []cf.Application, err error) {
@@ -89,5 +92,19 @@ func (repo *FakeApplicationRepository) Stop(config *configuration.Configuration,
 	if repo.StopAppErr {
 		err = errors.New("Error stopping app.")
 	}
+	return
+}
+
+func (repo *FakeApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances[]cf.ApplicationInstance, err error) {
+	shouldReturnError := repo.GetInstancesErrors[0]
+	repo.GetInstancesErrors = repo.GetInstancesErrors[1:]
+
+	instances = repo.GetInstancesResponses[0]
+	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]
+
+	if shouldReturnError {
+		err = errors.New("Still staging.")
+	}
+
 	return
 }

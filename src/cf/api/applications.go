@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -26,6 +27,7 @@ type ApplicationRepository interface {
 	Upload(config *configuration.Configuration, app cf.Application) (err error)
 	Start(config *configuration.Configuration, app cf.Application) (err error)
 	Stop(config *configuration.Configuration, app cf.Application) (err error)
+	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, err error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -167,6 +169,37 @@ func (repo CloudControllerApplicationRepository) Start(config *configuration.Con
 
 func (repo CloudControllerApplicationRepository) Stop(config *configuration.Configuration, app cf.Application) (err error) {
 	return changeApplicationState(config, app, "STOPPED")
+}
+
+type InstancesApiResponse map[string]InstanceApiResponse
+
+type InstanceApiResponse struct {
+	State string
+}
+
+func (repo CloudControllerApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s/instances", config.Target, app.Guid)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	apiResponse := InstancesApiResponse{}
+
+	err = PerformRequestAndParseResponse(request, &apiResponse)
+	if err != nil {
+		return
+	}
+
+	instances = make([]cf.ApplicationInstance, len(apiResponse), len(apiResponse))
+	for k, v := range apiResponse {
+		index, err := strconv.Atoi(k)
+		if err != nil {
+			continue
+		}
+		instances[index] = cf.ApplicationInstance{State: strings.ToLower(v.State)}
+	}
+	return
 }
 
 func changeApplicationState(config *configuration.Configuration, app cf.Application, state string) (err error) {
