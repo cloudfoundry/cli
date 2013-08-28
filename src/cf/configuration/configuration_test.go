@@ -22,11 +22,10 @@ func TestSavingAndLoading(t *testing.T) {
 	configToSave.AuthorizationEndpoint = "https://login.target.example.com"
 	configToSave.AccessToken = "bearer my_access_token"
 
-	configToSave.Save()
+	Save()
 
-	savedConfig, err := Load()
-	assert.NoError(t, err)
-
+	singleton = nil
+	savedConfig := Get()
 	assert.Equal(t, savedConfig, configToSave)
 }
 
@@ -49,7 +48,6 @@ func TestUserEmailWithInvalidAccessToken(t *testing.T) {
 
 func loadDefaultConfig(t *testing.T) (config *Configuration) {
 	Delete()
-	config, err := Load()
-	assert.NoError(t, err)
+	config = Get()
 	return
 }

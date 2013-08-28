@@ -40,11 +40,7 @@ OPTIONS:
 {{end}}`
 
 	termUI := new(terminal.TerminalUI)
-	config, err := configuration.Load()
-
-	if err != nil {
-		termUI.Failed("Error loading configuration", err)
-	}
+	config := configuration.Get()
 
 	organizationRepo := new(api.CloudControllerOrganizationRepository)
 	spaceRepo := new(api.CloudControllerSpaceRepository)

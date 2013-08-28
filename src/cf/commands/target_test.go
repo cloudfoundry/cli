@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/configuration/configtest"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -60,9 +61,10 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "https://"+URL.Host)
 	assert.Contains(t, fakeUI.Outputs[2], "42.0.0")
 
-	savedConfig, err := configuration.Load()
-
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
+
+	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
 	assert.Equal(t, savedConfig.Target, "https://"+URL.Host)
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
@@ -163,6 +165,7 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 }
 
 func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
+	configuration.ClearSession()
 	config := testhelpers.Login()
 	orgs := []cf.Organization{}
 	orgRepo := &testhelpers.FakeOrgRepository{Organizations: orgs, OrganizationByNameErr: true}
@@ -186,7 +189,9 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 // Start test with space option
 
 func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
+	configuration.ClearSession()
 	config := testhelpers.Login()
+
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
@@ -249,6 +254,7 @@ func callTarget(args []string, config *configuration.Configuration, orgRepo api.
 }
 
 func setOrganization() (config *configuration.Configuration) {
+	configuration.ClearSession()
 	config = testhelpers.Login()
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
 	return

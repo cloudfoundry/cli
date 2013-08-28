@@ -1,7 +1,9 @@
-package api
+package api_test
 
 import (
+	. "cf/api"
 	"cf/configuration"
+	"cf/configuration/configtest"
 	"encoding/base64"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -50,18 +52,16 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
-		AuthorizationEndpoint: ts.URL,
-		AccessToken:           "",
-	}
+	config := configuration.Get()
+	config.AuthorizationEndpoint = ts.URL
+	config.AccessToken = ""
 
 	auth := UAAAuthenticator{}
 	err := auth.Authenticate(config, "foo@example.com", "bar")
-	assert.NoError(t, err)
 
-	config, err = configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, config.AccessToken, "BEARER my_access_token")
+	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
 }
 
 var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
@@ -73,17 +73,15 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(unsuccessfulLoginEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
-		AuthorizationEndpoint: ts.URL,
-		AccessToken:           "",
-	}
+	config := configuration.Get()
+	config.AuthorizationEndpoint = ts.URL
+	config.AccessToken = ""
 
 	auth := UAAAuthenticator{}
 	err := auth.Authenticate(config, "foo@example.com", "oops wrong pass")
-
 	assert.Error(t, err)
 
-	config, err = configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Empty(t, config.AccessToken)
+	assert.Empty(t, savedConfig.AccessToken)
 }

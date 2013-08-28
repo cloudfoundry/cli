@@ -13,6 +13,8 @@ const (
 	dirPermissions  = 0700
 )
 
+var singleton *Configuration
+
 type Configuration struct {
 	Target                string
 	ApiVersion            string
@@ -22,39 +24,54 @@ type Configuration struct {
 	Space                 cf.Space
 }
 
-func setDefaultConfig() (c *Configuration) {
+func Get() *Configuration {
+	if singleton == nil {
+		var err error
+		singleton, err = load()
+
+		if err != nil {
+			println("Error loading configuration")
+			os.Exit(-1)
+		}
+	}
+
+	return singleton
+}
+
+func defaultConfig() (c *Configuration) {
 	c = new(Configuration)
 	c.Target = "https://api.run.pivotal.io"
 	c.ApiVersion = "2"
 	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
-	c.Save()
+
 	return
 }
 
 func Delete() {
-	file, err := configFile()
+	file, err := ConfigFile()
 
 	if err != nil {
 		return
 	}
 
 	os.Remove(file)
+	singleton = nil
 }
 
-func Load() (c *Configuration, parseError error) {
-	file, readError := configFile()
+func load() (c *Configuration, parseError error) {
+	file, readError := ConfigFile()
 	c = new(Configuration)
 
 	if readError != nil {
-		c = setDefaultConfig()
-		return
+		c := defaultConfig()
+		return c, saveConfiguration(c)
 	}
 
 	data, readError := ioutil.ReadFile(file)
 
 	if readError != nil {
-		c = setDefaultConfig()
-		return
+		c := defaultConfig()
+		return c, saveConfiguration(c)
 	}
 
 	parseError = json.Unmarshal(data, c)
@@ -62,13 +79,17 @@ func Load() (c *Configuration, parseError error) {
 	return
 }
 
-func (c Configuration) Save() (err error) {
-	bytes, err := json.Marshal(c)
+func Save() (err error) {
+	return saveConfiguration(Get())
+}
+
+func saveConfiguration(config *Configuration) (err error) {
+	bytes, err := json.Marshal(config)
 	if err != nil {
 		return
 	}
 
-	file, err := configFile()
+	file, err := ConfigFile()
 
 	if err != nil {
 		return
@@ -76,6 +97,15 @@ func (c Configuration) Save() (err error) {
 	err = ioutil.WriteFile(file, bytes, filePermissions)
 
 	return
+}
+
+func ClearSession() (err error) {
+	c := Get()
+	c.AccessToken = ""
+	c.Organization = cf.Organization{}
+	c.Space = cf.Space{}
+
+	return saveConfiguration(c)
 }
 
 func (c Configuration) UserEmail() (email string) {
@@ -112,15 +142,8 @@ func (c Configuration) HasSpace() bool {
 	return c.Space.Guid != "" && c.Space.Name != ""
 }
 
-func (c *Configuration) ClearSession() (err error) {
-	c.AccessToken = ""
-	c.Organization = cf.Organization{}
-	c.Space = cf.Space{}
-
-	return c.Save()
-}
-
-func configFile() (file string, err error) {
+// Keep this one public for configtest/configuration.go
+func ConfigFile() (file string, err error) {
 	configDir := userHomeDir() + "/.cf"
 
 	err = os.MkdirAll(configDir, dirPermissions)

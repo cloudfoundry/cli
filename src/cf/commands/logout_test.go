@@ -20,9 +20,8 @@ func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
 	l := NewLogout(ui, config)
 	l.Run(nil)
 
-	updatedConfig, err := configuration.Load()
+	updatedConfig := configuration.Get()
 
-	assert.NoError(t, err)
 	assert.Empty(t, updatedConfig.AccessToken)
 	assert.Equal(t, updatedConfig.Organization, cf.Organization{})
 	assert.Equal(t, updatedConfig.Space, cf.Space{})

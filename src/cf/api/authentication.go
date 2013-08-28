@@ -43,5 +43,5 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 	}
 
 	config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
-	return config.Save()
+	return configuration.Save()
 }

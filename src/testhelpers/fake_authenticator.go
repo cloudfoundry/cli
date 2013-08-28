@@ -24,7 +24,7 @@ func (auth *FakeAuthenticator) Authenticate(config *configuration.Configuration,
 	}
 
 	config.AccessToken = auth.AccessToken
-	config.Save()
+	configuration.Save()
 
 	if auth.AuthError {
 		err = errors.New("Error authenticating.")

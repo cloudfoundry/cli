@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/configuration/configtest"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 		auth,
 	)
 
-	config, err := configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -37,7 +38,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Contains(t, ui.Prompts[0], "Email")
 	assert.Contains(t, ui.Prompts[1], "Password")
 
-	assert.Equal(t, config.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, auth.Email, "foo@example.com")
 	assert.Equal(t, auth.Password, "bar")
 }
@@ -83,10 +84,10 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	assert.Contains(t, ui.Prompts[3], "Space")
 	assert.Contains(t, ui.Outputs[9], "FirstSpace")
 
-	config, err := configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, orgs[1], config.Organization)
-	assert.Equal(t, spaces[0], config.Space)
+	assert.Equal(t, orgs[1], savedConfig.Organization)
+	assert.Equal(t, spaces[0], savedConfig.Space)
 }
 
 func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
@@ -126,10 +127,10 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	assert.Contains(t, ui.Prompts[5], "Space")
 	assert.Contains(t, ui.Outputs[17], "Targeting space")
 
-	config, err := configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, orgs[1], config.Organization)
-	assert.Equal(t, spaces[0], config.Space)
+	assert.Equal(t, orgs[1], savedConfig.Organization)
+	assert.Equal(t, spaces[0], savedConfig.Space)
 }
 
 func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
@@ -166,10 +167,10 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "FirstOrg")
 	assert.Contains(t, ui.Outputs[8], "FirstSpace")
 
-	config, err := configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, orgs[0], config.Organization)
-	assert.Equal(t, spaces[0], config.Space)
+	assert.Equal(t, orgs[0], savedConfig.Organization)
+	assert.Equal(t, spaces[0], savedConfig.Space)
 }
 
 func TestLoggingInWithoutOrg(t *testing.T) {
@@ -196,10 +197,10 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Outputs[3], "No orgs found.")
 
-	config, err := configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, cf.Organization{}, config.Organization)
-	assert.Equal(t, cf.Space{}, config.Space)
+	assert.Equal(t, cf.Organization{}, savedConfig.Organization)
+	assert.Equal(t, cf.Space{}, savedConfig.Space)
 }
 
 func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
@@ -231,10 +232,10 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "FirstOrg")
 	assert.Contains(t, ui.Outputs[8], "No spaces found")
 
-	config, err := configuration.Load()
+	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
-	assert.Equal(t, orgs[0], config.Organization)
-	assert.Equal(t, cf.Space{}, config.Space)
+	assert.Equal(t, orgs[0], savedConfig.Organization)
+	assert.Equal(t, cf.Space{}, savedConfig.Space)
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
@@ -273,9 +274,8 @@ func callLogin(c *cli.Context, ui term.UI, config *configuration.Configuration, 
 }
 
 func logout(t *testing.T) (config *configuration.Configuration) {
-	config, err := configuration.Load()
-	assert.NoError(t, err)
-	err = config.ClearSession()
+	config = configuration.Get()
+	err := configuration.ClearSession()
 	assert.NoError(t, err)
 	return
 }

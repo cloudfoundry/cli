@@ -87,12 +87,11 @@ func (t Target) setNewTarget(target string) {
 }
 
 func (t *Target) saveTarget(target string, info *InfoResponse) (err error) {
-	t.config = new(configuration.Configuration)
+	configuration.ClearSession()
 	t.config.Target = target
 	t.config.ApiVersion = info.ApiVersion
 	t.config.AuthorizationEndpoint = info.AuthorizationEndpoint
-	err = t.config.Save()
-	return
+	return configuration.Save()
 }
 
 func (t Target) setOrganization(orgName string) {
@@ -133,7 +132,7 @@ func (t Target) setSpace(spaceName string) {
 }
 
 func (t Target) saveAndShowConfig() {
-	err := t.config.Save()
+	err := configuration.Save()
 	if err != nil {
 		t.ui.Failed("Error saving configuration", err)
 		return

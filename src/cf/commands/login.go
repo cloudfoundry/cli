@@ -29,20 +29,14 @@ func NewLogin(ui term.UI, config *configuration.Configuration, orgRepo api.Organ
 }
 
 func (l Login) Run(c *cli.Context) {
-	config, err := configuration.Load()
-	if err != nil {
-		l.ui.Failed("Error loading configuration", err)
-		return
-	}
-
-	l.ui.Say("target: %s", term.Cyan(config.Target))
+	l.ui.Say("target: %s", term.Cyan(l.config.Target))
 	email := l.ui.Ask("Email%s", term.Cyan(">"))
 
 	for i := 0; i < maxLoginTries; i++ {
 		password := l.ui.AskForPassword("Password%s", term.Cyan(">"))
 		l.ui.Say("Authenticating...")
 
-		err := l.authenticator.Authenticate(config, email, password)
+		err := l.authenticator.Authenticate(l.config, email, password)
 
 		if err != nil {
 			l.ui.Failed("Error Authenticating", err)
@@ -51,7 +45,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.ui.Ok()
 
-		organizations, err := l.orgRepo.FindAll(config)
+		organizations, err := l.orgRepo.FindAll(l.config)
 
 		if err != nil {
 			l.ui.Failed("Error fetching organizations.", err)
@@ -63,9 +57,9 @@ func (l Login) Run(c *cli.Context) {
 			return
 		}
 
-		l.targetOrganization(config, organizations)
+		l.targetOrganization(l.config, organizations)
 
-		spaces, err := l.spaceRepo.FindAll(config)
+		spaces, err := l.spaceRepo.FindAll(l.config)
 
 		if err != nil {
 			l.ui.Failed("Error fetching spaces.", err)
@@ -73,12 +67,12 @@ func (l Login) Run(c *cli.Context) {
 		}
 
 		if len(spaces) == 0 {
-			l.ui.ShowConfigurationNoSpacesAvailable(config)
+			l.ui.ShowConfigurationNoSpacesAvailable(l.config)
 			return
 		}
 
-		l.targetSpace(config, spaces)
-		l.ui.ShowConfiguration(config)
+		l.targetSpace(l.config, spaces)
+		l.ui.ShowConfiguration(l.config)
 
 		return
 	}
@@ -118,7 +112,7 @@ func (l Login) chooseOrg(orgs []cf.Organization) (org cf.Organization) {
 
 func (l Login) saveOrg(config *configuration.Configuration, org cf.Organization) (err error) {
 	config.Organization = org
-	err = config.Save()
+	err = configuration.Save()
 
 	if err != nil {
 		l.ui.Failed("Error saving organization: %s", err)
@@ -159,7 +153,7 @@ func (l Login) chooseSpace(spaces []cf.Space) (space cf.Space) {
 
 func (l Login) saveSpace(config *configuration.Configuration, space cf.Space) (err error) {
 	config.Space = space
-	err = config.Save()
+	err = configuration.Save()
 
 	if err != nil {
 		l.ui.Failed("Error saving organization: %s", err)

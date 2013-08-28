@@ -29,14 +29,8 @@ func (se SetEnv) Run(c *cli.Context) {
 	appName := c.Args()[0]
 	varName := c.Args()[1]
 	varValue := c.Args()[2]
-	config, err := configuration.Load()
 
-	if err != nil {
-		se.ui.Failed("Error loading configuration", err)
-		return
-	}
-
-	app, err := se.appRepo.FindByName(config, appName)
+	app, err := se.appRepo.FindByName(se.config, appName)
 
 	if err != nil {
 		se.ui.Failed("App does not exist.", err)
@@ -45,7 +39,7 @@ func (se SetEnv) Run(c *cli.Context) {
 
 	se.ui.Say("Updating env variable %s for app %s...", varName, appName)
 
-	err = se.appRepo.SetEnv(config, app, varName, varValue)
+	err = se.appRepo.SetEnv(se.config, app, varName, varValue)
 
 	if err != nil {
 		se.ui.Failed("Failed setting env", err)
