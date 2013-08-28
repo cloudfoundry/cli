@@ -7,6 +7,7 @@ import (
 	term "cf/terminal"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"strings"
 )
 
 type Start struct {
@@ -63,8 +64,7 @@ func (s Start) Run(c *cli.Context) {
 
 func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFinished bool) {
 	totalCount := len(instances)
-	runningCount := 0
-	startingCount := 0
+	runningCount, startingCount, flappingCount, downCount := 0, 0, 0, 0
 
 	for _, inst := range instances {
 		switch inst.State {
@@ -72,14 +72,44 @@ func (s Start) displayInstancesStatus(instances []cf.ApplicationInstance) (notFi
 			runningCount++
 		case "starting":
 			startingCount++
+		case "flapping":
+			flappingCount++
+		case "down":
+			downCount++
 		}
 	}
 
-	if runningCount < totalCount {
-		s.ui.Say("%d of %d instances running (%d running, %d starting)", runningCount, totalCount, runningCount, startingCount)
-	} else {
+	if flappingCount > 0 {
+		s.ui.Failed("Start unsuccessful", nil)
+		return false
+	}
+
+	allInstancesAreRunning := runningCount == totalCount
+
+	if allInstancesAreRunning {
 		s.ui.Say("%d of %d instances running", runningCount, totalCount)
+	} else {
+		details := instancesDetails(runningCount, startingCount, downCount)
+		s.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
 	}
 
 	return totalCount > runningCount
+}
+
+func instancesDetails(runningCount int, startingCount int, downCount int) string {
+	details := []string{}
+
+	if runningCount > 0 {
+		details = append(details, fmt.Sprintf("%d running", runningCount))
+	}
+
+	if startingCount > 0 {
+		details = append(details, fmt.Sprintf("%d starting", startingCount))
+	}
+
+	if downCount > 0 {
+		details = append(details, fmt.Sprintf("%d down", downCount))
+	}
+
+	return strings.Join(details, ", ")
 }

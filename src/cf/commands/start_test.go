@@ -58,8 +58,12 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		[]cf.ApplicationInstance{},
 		[]cf.ApplicationInstance{},
 		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: "running"},
+			cf.ApplicationInstance{State: "down"},
 			cf.ApplicationInstance{State: "starting"},
+		},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "starting"},
+			cf.ApplicationInstance{State: "running"},
 		},
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: "running"},
@@ -67,17 +71,38 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		},
 	}
 
-	errors := []bool{true, true, false, false}
+	errors := []bool{true, true, false, false, false}
 
-	ui, appRepo := startAppWithInstancesAndErrors(instances, errors)
+	ui, _ := startAppWithInstancesAndErrors(instances, errors)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "1 of 2 instances running (1 running, 1 starting)")
-	assert.Contains(t, ui.Outputs[4], "2 of 2 instances running")
+	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (1 starting, 1 down)")
+	assert.Contains(t, ui.Outputs[4], "1 of 2 instances running (1 running, 1 starting)")
+	assert.Contains(t, ui.Outputs[5], "2 of 2 instances running")
+}
 
-	assert.Equal(t, appRepo.AppName, "my-app")
-	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
+func TestStartApplicationWhenOneInstanceFlaps ( t *testing.T) {
+	instances := [][]cf.ApplicationInstance{
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "starting"},
+			cf.ApplicationInstance{State: "starting"},
+		},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: "starting"},
+			cf.ApplicationInstance{State: "flapping"},
+		},
+	}
+
+	errors := []bool{ false, false}
+
+	ui, _ := startAppWithInstancesAndErrors(instances, errors)
+
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[4], "FAILED")
+	assert.Contains(t, ui.Outputs[5], "Start unsuccessful")
 }
 
 func TestStartApplicationWhenAppDoesNotExist(t *testing.T) {
