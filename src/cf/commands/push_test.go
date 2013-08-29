@@ -22,6 +22,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-new-app.foo.cf-app.com...")
@@ -49,10 +50,12 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"--name", "my-new-app",
 		"--domain", "bar.cf-app.com",
 		"--host", "my-hostname",
+		"--instances", "3",
 	}, basePushConfig(), appRepo, domainRepo, routeRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Equal(t, appRepo.CreatedApp.Instances, 3)
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-hostname.bar.cf-app.com...")

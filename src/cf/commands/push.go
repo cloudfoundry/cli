@@ -47,7 +47,8 @@ func (p Push) Run(c *cli.Context) {
 }
 
 func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {
-	newApp := cf.Application{Name: appName}
+	numInstances := c.Int("instances")
+	newApp := cf.Application{Name: appName, Instances: numInstances}
 
 	p.ui.Say("Creating %s...", appName)
 	app, err = p.appRepo.Create(config, newApp)

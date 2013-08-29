@@ -106,8 +106,9 @@ OPTIONS:
 			Usage:       "cf push --name <application> [--domain <domain>] [--host <hostname>]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
-				cli.StringFlag{"domain", "", "domain of the application"},
-				cli.StringFlag{"host", "", "hostname of the application"},
+				cli.StringFlag{"domain", "", "domain (for example: cfapps.io)"},
+				cli.StringFlag{"host", "", "hostname (for example: my-subdomain)"},
+				cli.IntFlag{"instances", 1, "number of instances"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := commands.NewPush(termUI, config, appRepo, domainRepo, routeRepo)
