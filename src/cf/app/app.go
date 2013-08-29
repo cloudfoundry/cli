@@ -103,7 +103,7 @@ OPTIONS:
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push an application",
-			Usage:       "cf push --name <application> [--domain <domain>] [--host <hostname>] [--instances <num>] [--memory <memory>] [--buildpack <url>]",
+			Usage:       "cf push --name <application> [--domain <domain>] [--host <hostname>] [--instances <num>] [--memory <memory>] [--buildpack <url>] [--no-start]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
 				cli.StringFlag{"domain", "", "domain (for example: cfapps.io)"},
@@ -111,9 +111,11 @@ OPTIONS:
 				cli.IntFlag{"instances", 1, "number of instances"},
 				cli.StringFlag{"memory", "128", "memory limit (for example: 256, 1G, 1024M)"},
 				cli.StringFlag{"buildpack", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.BoolFlag{"no-start", "do not start an application after pushing"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewPush(termUI, config, appRepo, domainRepo, routeRepo)
+				startCmd := commands.NewStart(termUI, config, appRepo)
+				cmd := commands.NewPush(termUI, config, &startCmd, appRepo, domainRepo, routeRepo)
 				cmd.Run(c)
 			},
 		},

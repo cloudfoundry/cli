@@ -18,6 +18,10 @@ type Start struct {
 	startTime time.Time
 }
 
+type ApplicationStarter interface {
+	ApplicationStart(string)
+}
+
 func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s Start) {
 	s.ui = ui
 	s.config = config
@@ -28,6 +32,10 @@ func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.Appli
 
 func (s *Start) Run(c *cli.Context) {
 	appName := c.Args()[0]
+	s.ApplicationStart(appName)
+}
+
+func (s *Start) ApplicationStart(appName string) {
 	app, err := s.appRepo.FindByName(s.config, appName)
 	if err != nil {
 		s.ui.Failed(fmt.Sprintf("Error finding application %s", term.Cyan(appName)), err)

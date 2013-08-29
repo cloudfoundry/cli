@@ -13,14 +13,16 @@ import (
 type Push struct {
 	ui         term.UI
 	config     *configuration.Configuration
+	starter    ApplicationStarter
 	appRepo    api.ApplicationRepository
 	domainRepo api.DomainRepository
 	routeRepo  api.RouteRepository
 }
 
-func NewPush(ui term.UI, config *configuration.Configuration, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
+func NewPush(ui term.UI, config *configuration.Configuration, starter ApplicationStarter, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
 	p.ui = ui
 	p.config = config
+	p.starter = starter
 	p.appRepo = aR
 	p.domainRepo = dR
 	p.routeRepo = rR
@@ -46,6 +48,10 @@ func (p Push) Run(c *cli.Context) {
 		return
 	}
 	p.ui.Ok()
+	if !c.Bool("no-start") {
+		p.starter.ApplicationStart(appName)
+	}
+
 }
 
 func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {
