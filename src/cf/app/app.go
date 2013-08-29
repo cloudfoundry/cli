@@ -103,10 +103,11 @@ OPTIONS:
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push an application",
-			Usage:       "cf push --name <application> [--domain <domain>]",
+			Usage:       "cf push --name <application> [--domain <domain>] [--host <hostname>]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
 				cli.StringFlag{"domain", "", "domain of the application"},
+				cli.StringFlag{"host", "", "hostname of the application"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := commands.NewPush(termUI, config, appRepo, domainRepo, routeRepo)
