@@ -94,6 +94,7 @@ func (ui FakeUI) LoadingIndication() {
 }
 
 func (c FakeUI) Wait(seconds time.Duration) {
+	time.Sleep(seconds * time.Second)
 }
 
 func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {

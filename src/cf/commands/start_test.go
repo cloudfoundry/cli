@@ -11,7 +11,7 @@ import (
 )
 
 func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors []bool) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
-	config := &configuration.Configuration{}
+	config := &configuration.Configuration{ ApplicationStartTimeout: 2 }
 	app := cf.Application{
 		Name:      "my-app",
 		Guid:      "my-app-guid",
@@ -104,6 +104,35 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
 	assert.Contains(t, ui.Outputs[4], "FAILED")
 	assert.Contains(t, ui.Outputs[5], "Start unsuccessful")
+}
+
+func TestStartApplicationWhenStartTimesOut(t *testing.T) {
+	instances := [][]cf.ApplicationInstance{
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: cf.InstanceStarting},
+			cf.ApplicationInstance{State: cf.InstanceStarting},
+		},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: cf.InstanceStarting},
+			cf.ApplicationInstance{State: cf.InstanceDown},
+		},
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: cf.InstanceDown},
+			cf.ApplicationInstance{State: cf.InstanceDown},
+		},
+	}
+
+	errors := []bool{false, false, false}
+
+	ui, _ := startAppWithInstancesAndErrors(instances, errors)
+
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[4], "0 of 2 instances running (1 starting, 1 down)")
+	assert.Contains(t, ui.Outputs[5], "0 of 2 instances running (2 down)")
+	assert.Contains(t, ui.Outputs[6], "FAILED")
+	assert.Contains(t, ui.Outputs[7], "Start app timeout")
 }
 
 func TestStartApplicationWhenAppDoesNotExist(t *testing.T) {

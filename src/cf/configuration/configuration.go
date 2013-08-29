@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"runtime"
+	"time"
 )
 
 const (
@@ -22,6 +23,7 @@ type Configuration struct {
 	AccessToken           string
 	Organization          cf.Organization
 	Space                 cf.Space
+	ApplicationStartTimeout time.Duration // will be used as seconds
 }
 
 func Get() *Configuration {
@@ -43,6 +45,7 @@ func defaultConfig() (c *Configuration) {
 	c.Target = "https://api.run.pivotal.io"
 	c.ApiVersion = "2"
 	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
+	c.ApplicationStartTimeout = 30 // seconds
 
 	return
 }

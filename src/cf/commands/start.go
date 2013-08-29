@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
+	"time"
 )
 
 type Start struct {
 	ui      term.UI
 	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
+	startTime time.Time
 }
 
 func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s Start) {
@@ -24,7 +26,7 @@ func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.Appli
 	return
 }
 
-func (s Start) Run(c *cli.Context) {
+func (s *Start) Run(c *cli.Context) {
 	appName := c.Args()[0]
 	app, err := s.appRepo.FindByName(s.config, appName)
 	if err != nil {
@@ -57,7 +59,10 @@ func (s Start) Run(c *cli.Context) {
 
 	s.ui.Say("")
 
+	s.startTime = time.Now()
+
 	for s.displayInstancesStatus(app, instances) {
+		s.ui.Wait(1)
 		instances, _ = s.appRepo.GetInstances(s.config, app)
 	}
 }
@@ -92,6 +97,11 @@ func (s Start) displayInstancesStatus(app cf.Application, instances []cf.Applica
 	} else {
 		details := instancesDetails(runningCount, startingCount, downCount)
 		s.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
+	}
+
+	if time.Since(s.startTime) > s.config.ApplicationStartTimeout*time.Second {
+		s.ui.Failed("Start app timeout", nil)
+		return false
 	}
 
 	return totalCount > runningCount
