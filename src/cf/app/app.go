@@ -110,7 +110,7 @@ OPTIONS:
 				cli.StringFlag{"host", "", "hostname (for example: my-subdomain)"},
 				cli.IntFlag{"instances", 1, "number of instances"},
 				cli.StringFlag{"memory", "128", "memory limit (for example: 256, 1G, 1024M)"},
-				cli.StringFlag{"buildpack", "", "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.StringFlag{"buildpack", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := commands.NewPush(termUI, config, appRepo, domainRepo, routeRepo)
