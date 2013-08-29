@@ -23,6 +23,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
+	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-new-app.foo.cf-app.com...")
@@ -51,11 +52,13 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"--domain", "bar.cf-app.com",
 		"--host", "my-hostname",
 		"--instances", "3",
+		"--memory", "2G",
 	}, basePushConfig(), appRepo, domainRepo, routeRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 3)
+	assert.Equal(t, appRepo.CreatedApp.Memory, 2048)
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-hostname.bar.cf-app.com...")
@@ -72,6 +75,48 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[6], "Uploading my-new-app...")
 	assert.Equal(t, appRepo.UploadedApp.Guid, "my-new-app-guid")
 	assert.Contains(t, fakeUI.Outputs[7], "OK")
+}
+
+func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
+	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
+	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domain}
+	routeRepo := &testhelpers.FakeRouteRepository{}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
+
+	callPush([]string{
+		"--name", "my-new-app",
+		"--memory", "256M",
+	}, basePushConfig(), appRepo, domainRepo, routeRepo)
+
+	assert.Equal(t, appRepo.CreatedApp.Memory, 256)
+}
+
+func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
+	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
+	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domain}
+	routeRepo := &testhelpers.FakeRouteRepository{}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
+
+	callPush([]string{
+		"--name", "my-new-app",
+		"--memory", "512",
+	}, basePushConfig(), appRepo, domainRepo, routeRepo)
+
+	assert.Equal(t, appRepo.CreatedApp.Memory, 512)
+}
+
+func TestPushingAppWithInvalidMemory(t *testing.T) {
+	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
+	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domain}
+	routeRepo := &testhelpers.FakeRouteRepository{}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
+
+	callPush([]string{
+		"--name", "my-new-app",
+		"--memory", "abcM",
+	}, basePushConfig(), appRepo, domainRepo, routeRepo)
+
+	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
 }
 
 func TestPushingAppWhenItAlreadyExists(t *testing.T) {

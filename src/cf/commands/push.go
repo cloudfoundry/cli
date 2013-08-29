@@ -6,6 +6,8 @@ import (
 	"cf/configuration"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
+	"strconv"
+	"strings"
 )
 
 type Push struct {
@@ -48,7 +50,8 @@ func (p Push) Run(c *cli.Context) {
 
 func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {
 	numInstances := c.Int("instances")
-	newApp := cf.Application{Name: appName, Instances: numInstances}
+	memory := getMemoryLimit(c.String("memory"))
+	newApp := cf.Application{Name: appName, Instances: numInstances, Memory: memory}
 
 	p.ui.Say("Creating %s...", appName)
 	app, err = p.appRepo.Create(config, newApp)
@@ -86,6 +89,28 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 		return
 	}
 	p.ui.Ok()
+
+	return
+}
+
+func getMemoryLimit(arg string) (memory int) {
+	var err error
+
+	switch {
+	case strings.HasSuffix(arg, "M"):
+		trimmedArg := arg[:len(arg)-1]
+		memory, err = strconv.Atoi(trimmedArg)
+	case strings.HasSuffix(arg, "G"):
+		trimmedArg := arg[:len(arg)-1]
+		memory, err = strconv.Atoi(trimmedArg)
+		memory = memory * 1024
+	default:
+		memory, err = strconv.Atoi(arg)
+	}
+
+	if err != nil {
+		memory = 128
+	}
 
 	return
 }

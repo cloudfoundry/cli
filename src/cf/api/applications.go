@@ -104,8 +104,8 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 
 	path := fmt.Sprintf("%s/v2/apps", config.Target)
 	data := fmt.Sprintf(
-		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":null,"command":null,"memory":256,"stack_guid":null}`,
-		config.Space.Guid, newApp.Name, newApp.Instances,
+		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":null,"command":null,"memory":%d,"stack_guid":null}`,
+		config.Space.Guid, newApp.Name, newApp.Instances, newApp.Memory,
 	)
 	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {

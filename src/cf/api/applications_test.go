@@ -180,7 +180,7 @@ var createApplicationResponse = `
 var createApplicationEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":null,"command":null,"memory":256,"stack_guid":null}`),
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":null,"command":null,"memory":2048,"stack_guid":null}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 )
 
@@ -199,7 +199,7 @@ func TestCreateApplication(t *testing.T) {
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
 
-	newApp := cf.Application{Name: "my-cool-app", Instances: 3}
+	newApp := cf.Application{Name: "my-cool-app", Instances: 3, Memory: 2048}
 
 	createdApp, err := repo.Create(config, newApp)
 	assert.NoError(t, err)
