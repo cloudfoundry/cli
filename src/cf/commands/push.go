@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -14,15 +15,17 @@ type Push struct {
 	ui         term.UI
 	config     *configuration.Configuration
 	starter    ApplicationStarter
+	zipper     cf.Zipper
 	appRepo    api.ApplicationRepository
 	domainRepo api.DomainRepository
 	routeRepo  api.RouteRepository
 }
 
-func NewPush(ui term.UI, config *configuration.Configuration, starter ApplicationStarter, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
+func NewPush(ui term.UI, config *configuration.Configuration, starter ApplicationStarter, zipper cf.Zipper, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
 	p.ui = ui
 	p.config = config
 	p.starter = starter
+	p.zipper = zipper
 	p.appRepo = aR
 	p.domainRepo = dR
 	p.routeRepo = rR
@@ -42,16 +45,32 @@ func (p Push) Run(c *cli.Context) {
 	}
 
 	p.ui.Say("Uploading %s...", app.Name)
-	err = p.appRepo.Upload(p.config, app)
+
+	dir := c.String("path")
+	if dir == "" {
+		dir, err = os.Getwd()
+		if err != nil {
+			p.ui.Failed("Error getting working directory", err)
+			return
+		}
+	}
+
+	zipBuffer, err := p.zipper.Zip(dir)
+	if err != nil {
+		p.ui.Failed("Error zipping app", err)
+		return
+	}
+
+	err = p.appRepo.Upload(p.config, app, zipBuffer)
 	if err != nil {
 		p.ui.Failed("Error uploading app", err)
 		return
 	}
+
 	p.ui.Ok()
 	if !c.Bool("no-start") {
 		p.starter.ApplicationStart(appName)
 	}
-
 }
 
 func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {

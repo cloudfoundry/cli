@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"errors"
+	"bytes"
 )
 
 type FakeApplicationRepository struct {
@@ -28,6 +29,7 @@ type FakeApplicationRepository struct {
 
 	CreatedApp  cf.Application
 	UploadedApp cf.Application
+	UploadedZipBuffer *bytes.Buffer
 
 	GetInstancesResponses [][]cf.ApplicationInstance
 	GetInstancesErrors []bool
@@ -73,7 +75,8 @@ func (repo *FakeApplicationRepository) Delete(config *configuration.Configuratio
 }
 
 
-func (repo *FakeApplicationRepository) Upload(config *configuration.Configuration, app cf.Application) (err error) {
+func (repo *FakeApplicationRepository) Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error) {
+	repo.UploadedZipBuffer = zipBuffer
 	repo.UploadedApp = app
 
 	return

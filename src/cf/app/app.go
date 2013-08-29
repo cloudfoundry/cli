@@ -1,6 +1,7 @@
 package app
 
 import (
+	"cf"
 	"cf/api"
 	"cf/commands"
 	"cf/configuration"
@@ -112,10 +113,12 @@ OPTIONS:
 				cli.StringFlag{"memory", "128", "memory limit (for example: 256, 1G, 1024M)"},
 				cli.StringFlag{"buildpack", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
 				cli.BoolFlag{"no-start", "do not start an application after pushing"},
+				cli.StringFlag{"path", "", "path of application directory or zip file"},
 			},
 			Action: func(c *cli.Context) {
 				startCmd := commands.NewStart(termUI, config, appRepo)
-				cmd := commands.NewPush(termUI, config, &startCmd, appRepo, domainRepo, routeRepo)
+				zipper := cf.ApplicationZipper{}
+				cmd := commands.NewPush(termUI, config, &startCmd, zipper, appRepo, domainRepo, routeRepo)
 				cmd.Run(c)
 			},
 		},

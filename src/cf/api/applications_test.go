@@ -1,19 +1,15 @@
 package api_test
 
 import (
-	"archive/zip"
 	"bytes"
 	"cf"
 	. "cf/api"
 	"cf/configuration"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"path/filepath"
 	"strings"
 	"testhelpers"
 	"testing"
@@ -297,6 +293,7 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 	zipAttachmentContentTypeMatches := strings.Contains(bodyString, `Content-Type: application/zip`)
 	zipAttachmentContentTransferEncodingMatches := strings.Contains(bodyString, `Content-Transfer-Encoding: binary`)
 	zipAttachmentContentLengthPresent := strings.Contains(bodyString, `Content-Length:`)
+	zipAttachmentContentPresent := strings.Contains(bodyString, `hello world!`)
 
 	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
 
@@ -304,6 +301,7 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 		zipAttachmentContentTypeMatches &&
 		zipAttachmentContentTransferEncodingMatches &&
 		zipAttachmentContentLengthPresent &&
+		zipAttachmentContentPresent &&
 		resourcesContentDispositionMatches
 }
 
@@ -325,8 +323,9 @@ func TestUploadApplication(t *testing.T) {
 	}
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+	zipBuffer := bytes.NewBufferString("hello world!")
 
-	err := repo.Upload(config, app)
+	err := repo.Upload(config, app, zipBuffer)
 	assert.NoError(t, err)
 }
 
@@ -426,35 +425,4 @@ func TestGetInstances(t *testing.T) {
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")
-}
-
-func TestZipApplication(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-
-	zipFile, err := ZipApplication(filepath.Clean(dir + "/../../fixtures/zip/"))
-	assert.NoError(t, err)
-
-	byteReader := bytes.NewReader(zipFile.Bytes())
-	reader, err := zip.NewReader(byteReader, int64(byteReader.Len()))
-	assert.NoError(t, err)
-
-	readFile := func(index int) (string, string) {
-		buf := &bytes.Buffer{}
-		file := reader.File[index]
-		fReader, err := file.Open()
-		_, err = io.Copy(buf, fReader)
-
-		assert.NoError(t, err)
-
-		return file.Name, string(buf.Bytes())
-	}
-
-	name, contents := readFile(0)
-	assert.Equal(t, name, "foo.txt")
-	assert.Equal(t, contents, "This is a simple text file.")
-
-	name, contents = readFile(1)
-	assert.Equal(t, name, "subDir/bar.txt")
-	assert.Equal(t, contents, "I am in a subdirectory.")
 }

@@ -1,18 +1,14 @@
 package api
 
 import (
-	"archive/zip"
 	"bytes"
 	"cf"
 	"cf/configuration"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/textproto"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -24,7 +20,7 @@ type ApplicationRepository interface {
 	SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error)
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(config *configuration.Configuration, app cf.Application) (err error)
-	Upload(config *configuration.Configuration, app cf.Application) (err error)
+	Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error)
 	Start(config *configuration.Configuration, app cf.Application) (err error)
 	Stop(config *configuration.Configuration, app cf.Application) (err error)
 	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, err error)
@@ -142,17 +138,8 @@ func (repo CloudControllerApplicationRepository) Delete(config *configuration.Co
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Upload(config *configuration.Configuration, app cf.Application) (err error) {
+func (repo CloudControllerApplicationRepository) Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits", config.Target, app.Guid)
-	dir, err := os.Getwd()
-	if err != nil {
-		return
-	}
-
-	zipBuffer, err := ZipApplication(dir)
-	if err != nil {
-		return
-	}
 
 	body, boundary, err := createApplicationUploadBody(zipBuffer)
 	if err != nil {
@@ -227,49 +214,6 @@ func validateApplication(app cf.Application) (err error) {
 		err = errors.New("Application name is invalid. Name can only contain letters, numbers, underscores and hyphens.")
 	}
 
-	return
-}
-
-func ZipApplication(dirToZip string) (zipBuffer *bytes.Buffer, err error) {
-	zipBuffer = new(bytes.Buffer)
-	writer := zip.NewWriter(zipBuffer)
-
-	addFileToZip := func(path string, f os.FileInfo, inErr error) (err error) {
-		err = inErr
-		if err != nil {
-			return
-		}
-
-		if f.IsDir() {
-			return
-		}
-
-		fileName := strings.TrimPrefix(path, dirToZip+"/")
-		zipFile, err := writer.Create(fileName)
-		if err != nil {
-			return
-		}
-
-		content, err := ioutil.ReadFile(path)
-		if err != nil {
-			return
-		}
-
-		_, err = zipFile.Write(content)
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
-	err = filepath.Walk(dirToZip, addFileToZip)
-
-	if err != nil {
-		return
-	}
-
-	err = writer.Close()
 	return
 }
 
