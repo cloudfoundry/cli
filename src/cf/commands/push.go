@@ -30,7 +30,7 @@ func (p Push) Run(c *cli.Context) {
 	app, err := p.appRepo.FindByName(p.config, appName)
 
 	if err != nil {
-		app, err = p.createApp(p.config, appName)
+		app, err = p.createApp(p.config, appName, c)
 
 		if err != nil {
 			return
@@ -46,7 +46,7 @@ func (p Push) Run(c *cli.Context) {
 	p.ui.Ok()
 }
 
-func (p Push) createApp(config *configuration.Configuration, appName string) (app cf.Application, err error) {
+func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {
 	newApp := cf.Application{Name: appName}
 
 	p.ui.Say("Creating %s...", appName)
@@ -57,14 +57,13 @@ func (p Push) createApp(config *configuration.Configuration, appName string) (ap
 	}
 	p.ui.Ok()
 
-	domains, err := p.domainRepo.FindAll(config)
+	domain, err := p.domainRepo.FindByName(config, c.String("domain"))
 
 	if err != nil {
-		p.ui.Failed("Error loading domains", err)
+		p.ui.Failed("Error loading domain", err)
 		return
 	}
 
-	domain := domains[0]
 	newRoute := cf.Route{Host: app.Name}
 
 	p.ui.Say("Creating route %s.%s...", app.Name, domain.Name)

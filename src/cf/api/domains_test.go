@@ -67,3 +67,41 @@ func TestFindAll(t *testing.T) {
 	assert.Equal(t, second.Name, "domain2.cf-app.com")
 	assert.Equal(t, second.Guid, "domain2-guid")
 }
+
+func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerDomainRepository{}
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	domain, err := repo.FindByName(config, "domain2.cf-app.com")
+	assert.NoError(t, err)
+
+	assert.Equal(t, domain.Name, "domain2.cf-app.com")
+	assert.Equal(t, domain.Guid, "domain2-guid")
+}
+
+func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerDomainRepository{}
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	domain, err := repo.FindByName(config, "")
+	assert.NoError(t, err)
+
+	assert.Equal(t, domain.Name, "domain1.cf-app.com")
+	assert.Equal(t, domain.Guid, "domain1-guid")
+}

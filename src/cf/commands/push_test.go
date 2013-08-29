@@ -14,7 +14,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	domains := []cf.Domain{
 		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
 	}
-	domainRepo := &testhelpers.FakeDomainRepository{Domains: domains}
+	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domains[0]}
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 
@@ -30,6 +30,34 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[3], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[4], "Binding my-new-app.foo.cf-app.com to my-new-app...")
+	assert.Equal(t, routeRepo.BoundApp.Name, "my-new-app")
+	assert.Equal(t, routeRepo.BoundRoute.Host, "my-new-app")
+	assert.Contains(t, fakeUI.Outputs[5], "OK")
+
+	assert.Contains(t, fakeUI.Outputs[6], "Uploading my-new-app...")
+	assert.Equal(t, appRepo.UploadedApp.Guid, "my-new-app-guid")
+	assert.Contains(t, fakeUI.Outputs[7], "OK")
+}
+
+func TestPushingAppSelectingDomain(t *testing.T) {
+	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
+	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domain}
+	routeRepo := &testhelpers.FakeRouteRepository{}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
+
+	fakeUI := callPush([]string{"--name", "my-new-app", "--domain", "bar.cf-app.com"}, basePushConfig(), appRepo, domainRepo, routeRepo)
+
+	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
+	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+
+	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-new-app.bar.cf-app.com...")
+	assert.Equal(t, domainRepo.FindByNameName, "bar.cf-app.com")
+	assert.Equal(t, routeRepo.CreatedRoute.Host, "my-new-app")
+	assert.Equal(t, routeRepo.CreatedRouteDomain.Guid, "bar-domain-guid")
+	assert.Contains(t, fakeUI.Outputs[3], "OK")
+
+	assert.Contains(t, fakeUI.Outputs[4], "Binding my-new-app.bar.cf-app.com to my-new-app...")
 	assert.Equal(t, routeRepo.BoundApp.Name, "my-new-app")
 	assert.Equal(t, routeRepo.BoundRoute.Host, "my-new-app")
 	assert.Contains(t, fakeUI.Outputs[5], "OK")
