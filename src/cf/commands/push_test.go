@@ -24,6 +24,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
 	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
+	assert.Equal(t, appRepo.CreatedApp.BuildpackUrl, "")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-new-app.foo.cf-app.com...")
@@ -53,12 +54,14 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"--host", "my-hostname",
 		"--instances", "3",
 		"--memory", "2G",
+		"--buildpack", "https://github.com/heroku/heroku-buildpack-play.git",
 	}, basePushConfig(), appRepo, domainRepo, routeRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 3)
 	assert.Equal(t, appRepo.CreatedApp.Memory, 2048)
+	assert.Equal(t, appRepo.CreatedApp.BuildpackUrl, "https://github.com/heroku/heroku-buildpack-play.git")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-hostname.bar.cf-app.com...")

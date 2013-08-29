@@ -11,12 +11,13 @@ type Space struct {
 }
 
 type Application struct {
-	Name      string
-	Guid      string
-	State     string
-	Instances int
-	Memory    int
-	Urls      []string
+	Name         string
+	Guid         string
+	State        string
+	Instances    int
+	Memory       int
+	Urls         []string
+	BuildpackUrl string
 }
 
 type Domain struct {

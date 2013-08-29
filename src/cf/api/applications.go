@@ -102,10 +102,17 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 		return
 	}
 
+	var buildpackUrl string
+	if newApp.BuildpackUrl == "" {
+		buildpackUrl = "null"
+	} else {
+		buildpackUrl = fmt.Sprintf(`"%s"`, newApp.BuildpackUrl)
+	}
+
 	path := fmt.Sprintf("%s/v2/apps", config.Target)
 	data := fmt.Sprintf(
-		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":null,"command":null,"memory":%d,"stack_guid":null}`,
-		config.Space.Guid, newApp.Name, newApp.Instances, newApp.Memory,
+		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":null}`,
+		config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory,
 	)
 	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {

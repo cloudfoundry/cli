@@ -180,7 +180,7 @@ var createApplicationResponse = `
 var createApplicationEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":null,"command":null,"memory":2048,"stack_guid":null}`),
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":null}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 )
 
@@ -199,12 +199,46 @@ func TestCreateApplication(t *testing.T) {
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
 
-	newApp := cf.Application{Name: "my-cool-app", Instances: 3, Memory: 2048}
+	newApp := cf.Application{
+		Name:         "my-cool-app",
+		Instances:    3,
+		Memory:       2048,
+		BuildpackUrl: "buildpack-url",
+	}
 
 	createdApp, err := repo.Create(config, newApp)
 	assert.NoError(t, err)
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
+}
+
+var createApplicationWithoutBuildpackEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/apps",
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null}`),
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+)
+
+func TestCreateApplicationWithoutBuildpack(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationWithoutBuildpackEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	newApp := cf.Application{
+		Name:         "my-cool-app",
+		Memory:       128,
+		Instances:    1,
+		BuildpackUrl: "",
+	}
+
+	_, err := repo.Create(config, newApp)
+	assert.NoError(t, err)
 }
 
 func TestCreateRejectsInproperNames(t *testing.T) {

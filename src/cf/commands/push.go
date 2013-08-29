@@ -49,9 +49,12 @@ func (p Push) Run(c *cli.Context) {
 }
 
 func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {
-	numInstances := c.Int("instances")
-	memory := getMemoryLimit(c.String("memory"))
-	newApp := cf.Application{Name: appName, Instances: numInstances, Memory: memory}
+	newApp := cf.Application{
+		Name:         appName,
+		Instances:    c.Int("instances"),
+		Memory:       getMemoryLimit(c.String("memory")),
+		BuildpackUrl: c.String("buildpack"),
+	}
 
 	p.ui.Say("Creating %s...", appName)
 	app, err = p.appRepo.Create(config, newApp)
