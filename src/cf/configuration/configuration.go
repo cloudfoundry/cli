@@ -17,12 +17,12 @@ const (
 var singleton *Configuration
 
 type Configuration struct {
-	Target                string
-	ApiVersion            string
-	AuthorizationEndpoint string
-	AccessToken           string
-	Organization          cf.Organization
-	Space                 cf.Space
+	Target                  string
+	ApiVersion              string
+	AuthorizationEndpoint   string
+	AccessToken             string
+	Organization            cf.Organization
+	Space                   cf.Space
 	ApplicationStartTimeout time.Duration // will be used as seconds
 }
 

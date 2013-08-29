@@ -11,7 +11,7 @@ import (
 )
 
 func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors []bool) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
-	config := &configuration.Configuration{ ApplicationStartTimeout: 2 }
+	config := &configuration.Configuration{ApplicationStartTimeout: 2}
 	app := cf.Application{
 		Name:      "my-app",
 		Guid:      "my-app-guid",

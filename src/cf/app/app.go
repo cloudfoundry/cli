@@ -25,7 +25,7 @@ GLOBAL OPTIONS:
    {{range .Flags}}{{.}}
    {{end}}
 ENVIRONMENT VARIABLES:
-   TRACE=true - will output HTTP requests and responses during command
+   CF_TRACE=true - will output HTTP requests and responses during command
 `
 
 	cli.CommandHelpTemplate = `NAME:

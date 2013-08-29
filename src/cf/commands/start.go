@@ -12,9 +12,9 @@ import (
 )
 
 type Start struct {
-	ui      term.UI
-	config  *configuration.Configuration
-	appRepo api.ApplicationRepository
+	ui        term.UI
+	config    *configuration.Configuration
+	appRepo   api.ApplicationRepository
 	startTime time.Time
 }
 
