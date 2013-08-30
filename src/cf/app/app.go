@@ -48,6 +48,7 @@ OPTIONS:
 	appRepo := new(api.CloudControllerApplicationRepository)
 	domainRepo := new(api.CloudControllerDomainRepository)
 	routeRepo := new(api.CloudControllerRouteRepository)
+	stackRepo := new(api.CloudControllerStackRepository)
 
 	app = cli.NewApp()
 	app.Name = "cf"
@@ -104,7 +105,9 @@ OPTIONS:
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push an application",
-			Usage:       "cf push --name <application> [--domain <domain>] [--host <hostname>] [--instances <num>] [--memory <memory>] [--buildpack <url>] [--no-start]",
+			Usage: "cf push --name <application> [--domain <domain>] [--host <hostname>] [--instances <num>]\n" +
+				"                                [--memory <memory>] [--buildpack <url>] [--no-start] [--path <path to app>]\n" +
+				"                                [--stack <stack>]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
 				cli.StringFlag{"domain", "", "domain (for example: cfapps.io)"},
@@ -114,11 +117,12 @@ OPTIONS:
 				cli.StringFlag{"buildpack", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
 				cli.BoolFlag{"no-start", "do not start an application after pushing"},
 				cli.StringFlag{"path", "", "path of application directory or zip file"},
+				cli.StringFlag{"stack", "", "stack to use"},
 			},
 			Action: func(c *cli.Context) {
 				startCmd := commands.NewStart(termUI, config, appRepo)
 				zipper := cf.ApplicationZipper{}
-				cmd := commands.NewPush(termUI, config, &startCmd, zipper, appRepo, domainRepo, routeRepo)
+				cmd := commands.NewPush(termUI, config, &startCmd, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 				cmd.Run(c)
 			},
 		},

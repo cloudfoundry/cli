@@ -22,6 +22,7 @@ type Application struct {
 	Memory           int
 	Urls             []string
 	BuildpackUrl     string
+	Stack            Stack
 }
 
 type Domain struct {
@@ -31,6 +32,11 @@ type Domain struct {
 
 type Route struct {
 	Host string
+	Guid string
+}
+
+type Stack struct {
+	Name string
 	Guid string
 }
 

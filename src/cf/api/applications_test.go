@@ -282,7 +282,7 @@ var createApplicationResponse = `
 var createApplicationEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":null}`),
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid"}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 )
 
@@ -306,6 +306,7 @@ func TestCreateApplication(t *testing.T) {
 		Instances:    3,
 		Memory:       2048,
 		BuildpackUrl: "buildpack-url",
+		Stack:        cf.Stack{Guid: "some-stack-guid"},
 	}
 
 	createdApp, err := repo.Create(config, newApp)
@@ -314,15 +315,15 @@ func TestCreateApplication(t *testing.T) {
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
 }
 
-var createApplicationWithoutBuildpackEndpoint = testhelpers.CreateEndpoint(
+var createApplicationWithoutBuildpackOrStackEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/apps",
 	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 )
 
-func TestCreateApplicationWithoutBuildpack(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationWithoutBuildpackEndpoint))
+func TestCreateApplicationWithoutBuildpackOrStack(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationWithoutBuildpackOrStackEndpoint))
 	defer ts.Close()
 
 	repo := CloudControllerApplicationRepository{}
@@ -337,6 +338,7 @@ func TestCreateApplicationWithoutBuildpack(t *testing.T) {
 		Memory:       128,
 		Instances:    1,
 		BuildpackUrl: "",
+		Stack:        cf.Stack{},
 	}
 
 	_, err := repo.Create(config, newApp)

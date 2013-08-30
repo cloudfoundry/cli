@@ -19,9 +19,11 @@ type Push struct {
 	appRepo    api.ApplicationRepository
 	domainRepo api.DomainRepository
 	routeRepo  api.RouteRepository
+	stackRepo  api.StackRepository
 }
 
-func NewPush(ui term.UI, config *configuration.Configuration, starter ApplicationStarter, zipper cf.Zipper, aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository) (p Push) {
+func NewPush(ui term.UI, config *configuration.Configuration, starter ApplicationStarter, zipper cf.Zipper,
+	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository) (p Push) {
 	p.ui = ui
 	p.config = config
 	p.starter = starter
@@ -29,6 +31,7 @@ func NewPush(ui term.UI, config *configuration.Configuration, starter Applicatio
 	p.appRepo = aR
 	p.domainRepo = dR
 	p.routeRepo = rR
+	p.stackRepo = sR
 	return
 }
 
@@ -79,6 +82,19 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 		Instances:    c.Int("instances"),
 		Memory:       getMemoryLimit(c.String("memory")),
 		BuildpackUrl: c.String("buildpack"),
+	}
+
+	stackName := c.String("stack")
+	if stackName != "" {
+		var stack cf.Stack
+		stack, err = p.stackRepo.FindByName(p.config, stackName)
+
+		if err != nil {
+			p.ui.Failed("Error finding stack", err)
+			return
+		}
+		newApp.Stack = stack
+		p.ui.Say("Using stack %s.", stack.Name)
 	}
 
 	p.ui.Say("Creating %s...", appName)

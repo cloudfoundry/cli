@@ -129,17 +129,13 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 		return
 	}
 
-	var buildpackUrl string
-	if newApp.BuildpackUrl == "" {
-		buildpackUrl = "null"
-	} else {
-		buildpackUrl = fmt.Sprintf(`"%s"`, newApp.BuildpackUrl)
-	}
+	buildpackUrl := stringOrNull(newApp.BuildpackUrl)
+	stackGuid := stringOrNull(newApp.Stack.Guid)
 
 	path := fmt.Sprintf("%s/v2/apps", config.Target)
 	data := fmt.Sprintf(
-		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":null}`,
-		config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory,
+		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s}`,
+		config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid,
 	)
 	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {
@@ -156,6 +152,14 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 	createdApp.Guid = resource.Metadata.Guid
 	createdApp.Name = resource.Entity.Name
 	return
+}
+
+func stringOrNull(s string) string {
+	if s == "" {
+		return "null"
+	}
+
+	return fmt.Sprintf(`"%s"`, s)
 }
 
 func (repo CloudControllerApplicationRepository) Delete(config *configuration.Configuration, app cf.Application) (err error) {
