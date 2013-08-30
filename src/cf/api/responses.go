@@ -44,3 +44,23 @@ type RouteEntity struct {
 	Host   string
 	Domain Resource
 }
+
+type ApplicationSummary struct {
+	Guid             string
+	Name             string
+	Routes           []RouteSummary
+	RunningInstances int
+	Memory           int
+	Instances        int
+}
+
+type RouteSummary struct {
+	Guid   string
+	Host   string
+	Domain DomainSummary
+}
+
+type DomainSummary struct {
+	Guid string
+	Name string
+}

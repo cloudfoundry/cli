@@ -86,7 +86,6 @@ var multipleAppsEndpoint = testhelpers.CreateEndpoint(
 	multipleAppsResponse,
 )
 
-
 func TestApplicationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleAppsEndpoint))
 	defer ts.Close()
@@ -151,12 +150,48 @@ var singleAppResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-var singleAppEndpoint = testhelpers.CreateEndpoint(
+var findAppEndpoint = testhelpers.CreateEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
 	nil,
 	singleAppResponse,
 )
+
+var appSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "guid": "app1-guid",
+  "name": "App1",
+  "routes": [
+    {
+      "guid": "route-1-guid",
+      "host": "app1",
+      "domain": {
+        "guid": "domain-1-guid",
+        "name": "cfapps.io"
+      }
+    }
+  ],
+  "running_instances": 1,
+  "memory": 128,
+  "instances": 1
+}`}
+
+var appSummaryEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/apps/app1-guid/summary",
+	nil,
+	appSummaryResponse,
+)
+
+var singleAppEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	if strings.Contains(request.URL.Path, "summary") {
+		appSummaryEndpoint(writer, request)
+		return
+	}
+
+	findAppEndpoint(writer, request)
+	return
+}
 
 func TestFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(singleAppEndpoint))
@@ -173,6 +208,11 @@ func TestFindByName(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
+	assert.Equal(t, app.Memory, 128)
+	assert.Equal(t, app.Instances, 1)
+
+	assert.Equal(t, len(app.Urls), 1)
+	assert.Equal(t, app.Urls[0], "app1.cfapps.io")
 
 	app, err = repo.FindByName(config, "app that does not exist")
 	assert.Error(t, err)
@@ -204,7 +244,6 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	_, err := repo.FindByName(config, "App1")
 	assert.Error(t, err)
 }
-
 
 var setEnvEndpoint = testhelpers.CreateEndpoint(
 	"PUT",
