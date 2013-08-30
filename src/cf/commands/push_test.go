@@ -25,7 +25,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
 	}
 	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domains[0]}
-	routeRepo := &testhelpers.FakeRouteRepository{}
+	routeRepo := &testhelpers.FakeRouteRepository{FindByHostErr: true}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	fakeStarter := &FakeAppStarter{}
 	zipper := &testhelpers.FakeZipper{}
@@ -40,6 +40,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[2], "Creating route my-new-app.foo.cf-app.com...")
+	assert.Equal(t, routeRepo.FindByHostHost, "my-new-app")
 	assert.Equal(t, routeRepo.CreatedRoute.Host, "my-new-app")
 	assert.Equal(t, routeRepo.CreatedRouteDomain.Guid, "foo-domain-guid")
 	assert.Contains(t, fakeUI.Outputs[3], "OK")
@@ -60,10 +61,49 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Equal(t, fakeStarter.Started, "my-new-app")
 }
 
+func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
+	domains := []cf.Domain{
+		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
+	}
+	route := cf.Route{Host: "my-new-app"}
+	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domains[0]}
+	routeRepo := &testhelpers.FakeRouteRepository{FindByHostRoute: route}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
+	fakeStarter := &FakeAppStarter{}
+	zipper := &testhelpers.FakeZipper{}
+
+	fakeUI := callPush([]string{"--name", "my-new-app"}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo)
+
+	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
+	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
+	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
+	assert.Equal(t, appRepo.CreatedApp.BuildpackUrl, "")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+
+	assert.Contains(t, fakeUI.Outputs[2], "Using route my-new-app.foo.cf-app.com")
+	assert.Equal(t, routeRepo.FindByHostHost, "my-new-app")
+
+	assert.Contains(t, fakeUI.Outputs[3], "Binding my-new-app.foo.cf-app.com to my-new-app...")
+	assert.Equal(t, routeRepo.BoundApp.Name, "my-new-app")
+	assert.Equal(t, routeRepo.BoundRoute.Host, "my-new-app")
+	assert.Contains(t, fakeUI.Outputs[4], "OK")
+
+	expectedAppDir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	assert.Contains(t, fakeUI.Outputs[5], "Uploading my-new-app...")
+	assert.Equal(t, appRepo.UploadedApp.Guid, "my-new-app-guid")
+	assert.Equal(t, zipper.ZippedDir, expectedAppDir)
+	assert.Contains(t, fakeUI.Outputs[6], "OK")
+
+	assert.Equal(t, fakeStarter.Started, "my-new-app")
+}
+
 func TestPushingAppWithCustomFlags(t *testing.T) {
 	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
 	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domain}
-	routeRepo := &testhelpers.FakeRouteRepository{}
+	routeRepo := &testhelpers.FakeRouteRepository{FindByHostErr: true}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	fakeStarter := &FakeAppStarter{}
 	zipper := &testhelpers.FakeZipper{ZippedBuffer: bytes.NewBufferString("Zip File!")}

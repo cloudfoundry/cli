@@ -3,16 +3,44 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"errors"
 	"fmt"
 	"strings"
 )
 
 type RouteRepository interface {
+	FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error)
 	Create(config *configuration.Configuration, newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error)
 	Bind(config *configuration.Configuration, route cf.Route, app cf.Application) (err error)
 }
 
 type CloudControllerRouteRepository struct {
+}
+
+func (repo CloudControllerRouteRepository) FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error) {
+	path := fmt.Sprintf("%s/v2/routes?q=host%s", config.Target, "%3A"+host)
+
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	response := new(ApiResponse)
+	_, err = PerformRequestAndParseResponse(request, response)
+	if err != nil {
+		return
+	}
+
+	if len(response.Resources) == 0 {
+		err = errors.New("Route not found")
+		return
+	}
+
+	resource := response.Resources[0]
+	route.Guid = resource.Metadata.Guid
+	route.Host = resource.Entity.Host
+
+	return
 }
 
 func (repo CloudControllerRouteRepository) Create(config *configuration.Configuration, newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error) {

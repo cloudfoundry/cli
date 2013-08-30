@@ -100,18 +100,24 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 	if hostName == "" {
 		hostName = app.Name
 	}
-	newRoute := cf.Route{Host: hostName}
 
-	p.ui.Say("Creating route %s.%s...", newRoute.Host, domain.Name)
-	createdRoute, err := p.routeRepo.Create(config, newRoute, domain)
+	route, err := p.routeRepo.FindByHost(config, hostName)
 	if err != nil {
-		p.ui.Failed("Error creating route", err)
-		return
-	}
-	p.ui.Ok()
+		newRoute := cf.Route{Host: hostName}
 
-	p.ui.Say("Binding %s.%s to %s...", createdRoute.Host, domain.Name, app.Name)
-	err = p.routeRepo.Bind(config, createdRoute, app)
+		p.ui.Say("Creating route %s.%s...", newRoute.Host, domain.Name)
+		route, err = p.routeRepo.Create(config, newRoute, domain)
+		if err != nil {
+			p.ui.Failed("Error creating route", err)
+			return
+		}
+		p.ui.Ok()
+	} else {
+		p.ui.Say("Using route %s.%s", route.Host, domain.Name)
+	}
+
+	p.ui.Say("Binding %s.%s to %s...", route.Host, domain.Name, app.Name)
+	err = p.routeRepo.Bind(config, route, app)
 	if err != nil {
 		p.ui.Failed("Error binding route", err)
 		return

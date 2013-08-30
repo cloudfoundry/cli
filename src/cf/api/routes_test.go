@@ -11,6 +11,65 @@ import (
 	"testing"
 )
 
+var findRouteByHostResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+{ "resources": [
+    {
+    	"metadata": {
+        	"guid": "my-route-guid"
+    	},
+    	"entity": {
+       	     "host": "my-cool-app"
+    	}
+    }
+]}`}
+
+var findRouteByHostEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/routes?q=host%3Amy-cool-app",
+	nil,
+	findRouteByHostResponse,
+)
+
+func TestFindByHost(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerRouteRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	route, err := repo.FindByHost(config, "my-cool-app")
+	assert.NoError(t, err)
+	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
+}
+
+var findRouteByHostNotFoundResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+{ "resources": [
+]}`}
+
+var findRouteByHostNotFoundEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/routes?q=host%3Amy-cool-app",
+	nil,
+	findRouteByHostNotFoundResponse,
+)
+
+func TestFindByHostWhenHostIsNotFound(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostNotFoundEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerRouteRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	_, err := repo.FindByHost(config, "my-cool-app")
+	assert.Error(t, err)
+}
+
 var createRouteResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
     "metadata": {
