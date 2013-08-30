@@ -86,6 +86,7 @@ var multipleAppsEndpoint = testhelpers.CreateEndpoint(
 	multipleAppsResponse,
 )
 
+
 func TestApplicationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleAppsEndpoint))
 	defer ts.Close()
@@ -115,8 +116,50 @@ func TestApplicationsFindAll(t *testing.T) {
 
 }
 
+var singleAppResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": [
+    {
+      "metadata": {
+        "guid": "app1-guid"
+      },
+      "entity": {
+        "name": "App1",
+        "memory": 256,
+        "instances": 1,
+        "state": "STOPPED",
+        "routes": [
+      	  {
+      	    "metadata": {
+      	      "guid": "app1-route-guid"
+      	    },
+      	    "entity": {
+      	      "host": "app1",
+      	      "domain": {
+      	      	"metadata": {
+      	      	  "guid": "domain1-guid"
+      	      	},
+      	      	"entity": {
+      	      	  "name": "cfapps.io"
+      	      	}
+      	      }
+      	    }
+      	  }
+        ]
+      }
+    }
+  ]
+}`}
+
+var singleAppEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
+	nil,
+	singleAppResponse,
+)
+
 func TestFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleAppsEndpoint))
+	ts := httptest.NewTLSServer(http.HandlerFunc(singleAppEndpoint))
 	defer ts.Close()
 
 	repo := CloudControllerApplicationRepository{}
@@ -131,13 +174,37 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
 
-	app, err = repo.FindByName(config, "app1")
-	assert.NoError(t, err)
-	assert.Equal(t, app.Guid, "app1-guid")
-
 	app, err = repo.FindByName(config, "app that does not exist")
 	assert.Error(t, err)
 }
+
+var appNotFoundResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": []
+}`}
+
+var appNotFoundEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
+	nil,
+	appNotFoundResponse,
+)
+
+func TestFindByNameWhenAppIsNotFound(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(appNotFoundEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerApplicationRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
+	}
+
+	_, err := repo.FindByName(config, "App1")
+	assert.Error(t, err)
+}
+
 
 var setEnvEndpoint = testhelpers.CreateEndpoint(
 	"PUT",

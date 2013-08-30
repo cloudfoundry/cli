@@ -51,32 +51,53 @@ func (repo CloudControllerApplicationRepository) FindAll(config *configuration.C
 		}
 
 		apps = append(apps, cf.Application{
-			Name:      res.Entity.Name,
-			Guid:      res.Metadata.Guid,
-			State:     strings.ToLower(res.Entity.State),
-			Instances: res.Entity.Instances,
-			Memory:    res.Entity.Memory,
-			Urls:      urls,
-		})
+				Name:      res.Entity.Name,
+				Guid:      res.Metadata.Guid,
+				State:     strings.ToLower(res.Entity.State),
+				Instances: res.Entity.Instances,
+				Memory:    res.Entity.Memory,
+				Urls:      urls,
+			})
 	}
 
 	return
 }
 
 func (repo CloudControllerApplicationRepository) FindByName(config *configuration.Configuration, name string) (app cf.Application, err error) {
-	apps, err := repo.FindAll(config)
-	lowerName := strings.ToLower(name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A" + name)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
 
-	for _, a := range apps {
-		if strings.ToLower(a.Name) == lowerName {
-			return a, nil
-		}
+	response := new(ApplicationsApiResponse)
+	_, err = PerformRequestAndParseResponse(request, response)
+	if err != nil {
+		return
 	}
 
-	err = errors.New("Application not found")
+	if len(response.Resources) == 0 {
+		err = errors.New(fmt.Sprintf("Application %s not found", name))
+		return
+	}
+
+	res := response.Resources[0]
+	urls := []string{}
+	for _, routeRes := range res.Entity.Routes {
+		routeEntity := routeRes.Entity
+		domainEntity := routeEntity.Domain.Entity
+		urls = append(urls, fmt.Sprintf("%s.%s", routeEntity.Host, domainEntity.Name))
+	}
+
+	app = cf.Application{
+		Name:      res.Entity.Name,
+		Guid:      res.Metadata.Guid,
+		State:     strings.ToLower(res.Entity.State),
+		Instances: res.Entity.Instances,
+		Memory:    res.Entity.Memory,
+		Urls:      urls,
+	}
+
 	return
 }
 
@@ -185,7 +206,7 @@ func (repo CloudControllerApplicationRepository) GetInstances(config *configurat
 		return
 	}
 
-	instances = make([]cf.ApplicationInstance, len(apiResponse), len(apiResponse))
+	instances = make([]cf.ApplicationInstance,len(apiResponse), len(apiResponse))
 	for k, v := range apiResponse {
 		index, err := strconv.Atoi(k)
 		if err != nil {
