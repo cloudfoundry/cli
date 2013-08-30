@@ -49,9 +49,11 @@ type ApplicationSummary struct {
 	Guid             string
 	Name             string
 	Routes           []RouteSummary
-	RunningInstances int
+	RunningInstances int `json:"running_instances"`
 	Memory           int
 	Instances        int
+	Urls             []string
+	State            string
 }
 
 type RouteSummary struct {
@@ -63,4 +65,10 @@ type RouteSummary struct {
 type DomainSummary struct {
 	Guid string
 	Name string
+}
+
+type SpaceSummary struct {
+	Guid string
+	Name string
+	Apps []ApplicationSummary
 }

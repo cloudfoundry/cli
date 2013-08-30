@@ -10,27 +10,29 @@ import (
 )
 
 type Apps struct {
-	ui      term.UI
-	config  *configuration.Configuration
-	appRepo api.ApplicationRepository
+	ui        term.UI
+	config    *configuration.Configuration
+	spaceRepo api.SpaceRepository
 }
 
-func NewApps(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (a Apps) {
+func NewApps(ui term.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (a Apps) {
 	a.ui = ui
 	a.config = config
-	a.appRepo = appRepo
+	a.spaceRepo = spaceRepo
 	return
 }
 
 func (a Apps) Run(c *cli.Context) {
 	a.ui.Say("Getting applications in %s", a.config.Space.Name)
 
-	apps, err := a.appRepo.FindAll(a.config)
+	space, err := a.spaceRepo.GetSummary(a.config)
 
 	if err != nil {
 		a.ui.Failed("Error loading applications", err)
 		return
 	}
+
+	apps := space.Applications
 
 	a.ui.Ok()
 

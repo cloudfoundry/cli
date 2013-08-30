@@ -17,13 +17,13 @@ func TestApps(t *testing.T) {
 		cf.Application{Name: "Application-1", State: "started", Instances: 1, Memory: 512, Urls: app1Urls},
 		cf.Application{Name: "Application-2", State: "started", Instances: 2, Memory: 256, Urls: app2Urls},
 	}
-	appRepo := &testhelpers.FakeApplicationRepository{FindAllApps: apps}
+	spaceRepo := &testhelpers.FakeSpaceRepository{SummarySpace: cf.Space{Applications: apps}}
 	ui := &testhelpers.FakeUI{}
 	config := &configuration.Configuration{
 		Space: cf.Space{Name: "development", Guid: "development-guid"},
 	}
 
-	cmd := NewApps(ui, config, appRepo)
+	cmd := NewApps(ui, config, spaceRepo)
 	cmd.Run(testhelpers.NewContext("apps", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting applications in development")

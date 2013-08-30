@@ -82,8 +82,8 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 		cf.Organization{"SecondOrg", "org-2-guid"},
 	}
 	spaces := []cf.Space{
-		cf.Space{"FirstSpace", "space-1-guid"},
-		cf.Space{"SecondSpace", "space-2-guid"},
+		cf.Space{Name: "FirstSpace", Guid: "space-1-guid"},
+		cf.Space{Name: "SecondSpace", Guid: "space-2-guid"},
 	}
 
 	callLogin(
@@ -127,8 +127,8 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	}
 
 	spaces := []cf.Space{
-		cf.Space{"FirstSpace", "space-1-guid"},
-		cf.Space{"SecondSpace", "space-2-guid"},
+		cf.Space{Name: "FirstSpace", Guid: "space-1-guid"},
+		cf.Space{Name: "SecondSpace", Guid: "space-2-guid"},
 	}
 
 	ui := new(testhelpers.FakeUI)
@@ -171,7 +171,7 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 		cf.Organization{"FirstOrg", "org-1-guid"},
 	}
 	spaces := []cf.Space{
-		cf.Space{"FirstSpace", "space-1-guid"},
+		cf.Space{Name: "FirstSpace", Guid: "space-1-guid"},
 	}
 
 	callLogin(

@@ -128,7 +128,7 @@ OPTIONS:
 			Description: "List all applications in the currently selected space",
 			Usage:       "cf apps",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewApps(termUI, config, appRepo)
+				cmd := commands.NewApps(termUI, config, spaceRepo)
 				cmd.Run(c)
 			},
 		},
