@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
+	"strings"
 )
 
 type Delete struct {
@@ -29,8 +30,8 @@ func (d Delete) Run(c *cli.Context) {
 		return
 	}
 
-	response := d.ui.Ask("Really delete %s?>", app.Name)
-	if response != "y" {
+	response := strings.ToLower(d.ui.Ask("Really delete %s?>", app.Name))
+	if response != "y" && response != "yes" {
 		return
 	}
 
