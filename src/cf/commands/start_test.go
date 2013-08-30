@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors []bool) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
+func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errorCodes []int) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
 	config := &configuration.Configuration{ApplicationStartTimeout: 2}
 	app := cf.Application{
 		Name:      "my-app",
@@ -20,9 +20,9 @@ func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errors
 	}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
-		AppByName:             app,
-		GetInstancesResponses: instances,
-		GetInstancesErrors:    errors,
+		AppByName:              app,
+		GetInstancesResponses:  instances,
+		GetInstancesErrorCodes: errorCodes,
 	}
 	args := []string{"my-app"}
 
@@ -42,8 +42,8 @@ func TestStartApplication(t *testing.T) {
 		},
 	}
 
-	errors := []bool{false, false}
-	ui, appRepo := startAppWithInstancesAndErrors(instances, errors)
+	errorCodes := []int{0, 0}
+	ui, appRepo := startAppWithInstancesAndErrors(instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -72,15 +72,27 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		},
 	}
 
-	errors := []bool{true, true, false, false, false}
+	errorCodes := []int{170002, 170002, 0, 0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errors)
+	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (1 starting, 1 down)")
 	assert.Contains(t, ui.Outputs[4], "0 of 2 instances running (2 starting)")
 	assert.Contains(t, ui.Outputs[5], "Start successful! App my-app available at http://my-app.example.com")
+}
+
+func TestStartApplicationWhenStagingFails(t *testing.T) {
+	instances := [][]cf.ApplicationInstance{[]cf.ApplicationInstance{}}
+	errorCodes := []int{170001}
+
+	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
+
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[3], "FAILED")
+	assert.Contains(t, ui.Outputs[4], "Error staging app")
 }
 
 func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
@@ -95,9 +107,9 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 		},
 	}
 
-	errors := []bool{false, false}
+	errorCodes := []int{0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errors)
+	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -122,9 +134,9 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 		},
 	}
 
-	errors := []bool{false, false, false}
+	errorCodes := []int{0, 0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errors)
+	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")

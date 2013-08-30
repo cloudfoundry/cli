@@ -34,7 +34,7 @@ func TestPerformRequestOutputsErrorFromServer(t *testing.T) {
 	request, err := NewAuthorizedRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
-	err = PerformRequest(request)
+	_, err = PerformRequest(request)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
@@ -48,8 +48,22 @@ func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	err = PerformRequestAndParseResponse(request, resource)
+	_, err = PerformRequestAndParseResponse(request, resource)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
+}
+
+func TestPerformRequestReturnsErrorCode(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
+	defer ts.Close()
+
+	request, err := NewAuthorizedRequest("GET", ts.URL, "TOKEN", nil)
+	assert.NoError(t, err)
+
+	resource := new(Resource)
+	errorCode, err := PerformRequestAndParseResponse(request, resource)
+
+	assert.Equal(t, errorCode, 210003)
+	assert.Error(t, err)
 }

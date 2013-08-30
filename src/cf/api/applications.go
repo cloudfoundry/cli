@@ -23,7 +23,7 @@ type ApplicationRepository interface {
 	Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error)
 	Start(config *configuration.Configuration, app cf.Application) (err error)
 	Stop(config *configuration.Configuration, app cf.Application) (err error)
-	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, err error)
+	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -37,7 +37,7 @@ func (repo CloudControllerApplicationRepository) FindAll(config *configuration.C
 	}
 
 	response := new(ApplicationsApiResponse)
-	err = PerformRequestAndParseResponse(request, response)
+	_, err = PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}
@@ -88,7 +88,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(config *configuration.Co
 		return
 	}
 
-	err = PerformRequest(request)
+	_, err = PerformRequest(request)
 	return
 }
 
@@ -116,7 +116,7 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 	}
 
 	resource := new(Resource)
-	err = PerformRequestAndParseResponse(request, resource)
+	_, err = PerformRequestAndParseResponse(request, resource)
 
 	if err != nil {
 		return
@@ -134,7 +134,7 @@ func (repo CloudControllerApplicationRepository) Delete(config *configuration.Co
 		return
 	}
 
-	err = PerformRequest(request)
+	_, err = PerformRequest(request)
 	return
 }
 
@@ -153,7 +153,7 @@ func (repo CloudControllerApplicationRepository) Upload(config *configuration.Co
 		return
 	}
 
-	err = PerformRequest(request)
+	_, err = PerformRequest(request)
 	return
 }
 
@@ -171,7 +171,7 @@ type InstanceApiResponse struct {
 	State string
 }
 
-func (repo CloudControllerApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, err error) {
+func (repo CloudControllerApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", config.Target, app.Guid)
 	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
@@ -180,7 +180,7 @@ func (repo CloudControllerApplicationRepository) GetInstances(config *configurat
 
 	apiResponse := InstancesApiResponse{}
 
-	err = PerformRequestAndParseResponse(request, &apiResponse)
+	errorCode, err = PerformRequestAndParseResponse(request, &apiResponse)
 	if err != nil {
 		return
 	}
@@ -205,7 +205,8 @@ func changeApplicationState(config *configuration.Configuration, app cf.Applicat
 		return
 	}
 
-	return PerformRequest(request)
+	_, err = PerformRequest(request)
+	return
 }
 
 func validateApplication(app cf.Application) (err error) {

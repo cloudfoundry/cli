@@ -25,7 +25,7 @@ func (repo CloudControllerSpaceRepository) FindAll(config *configuration.Configu
 
 	response := new(ApiResponse)
 
-	err = PerformRequestAndParseResponse(request, response)
+	_, err = PerformRequestAndParseResponse(request, response)
 
 	if err != nil {
 		return

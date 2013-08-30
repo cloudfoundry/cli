@@ -57,11 +57,17 @@ func (s *Start) ApplicationStart(appName string) {
 
 	s.ui.Ok()
 
-	instances, err := s.appRepo.GetInstances(s.config, app)
+	instances, errorCode, err := s.appRepo.GetInstances(s.config, app)
 
 	for err != nil {
+		if errorCode != 170002 {
+			s.ui.Say("")
+			s.ui.Failed("Error staging application", err)
+			return
+		}
+
 		s.ui.Wait(1)
-		instances, err = s.appRepo.GetInstances(s.config, app)
+		instances, errorCode, err = s.appRepo.GetInstances(s.config, app)
 		s.ui.LoadingIndication()
 	}
 
@@ -71,7 +77,7 @@ func (s *Start) ApplicationStart(appName string) {
 
 	for s.displayInstancesStatus(app, instances) {
 		s.ui.Wait(1)
-		instances, _ = s.appRepo.GetInstances(s.config, app)
+		instances, _, _ = s.appRepo.GetInstances(s.config, app)
 	}
 }
 

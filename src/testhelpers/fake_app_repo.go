@@ -32,7 +32,7 @@ type FakeApplicationRepository struct {
 	UploadedZipBuffer *bytes.Buffer
 
 	GetInstancesResponses [][]cf.ApplicationInstance
-	GetInstancesErrors []bool
+	GetInstancesErrorCodes []int
 }
 
 func (repo *FakeApplicationRepository) FindAll(config *configuration.Configuration) (apps []cf.Application, err error) {
@@ -98,15 +98,17 @@ func (repo *FakeApplicationRepository) Stop(config *configuration.Configuration,
 	return
 }
 
-func (repo *FakeApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances[]cf.ApplicationInstance, err error) {
-	shouldReturnError := repo.GetInstancesErrors[0]
-	repo.GetInstancesErrors = repo.GetInstancesErrors[1:]
+func (repo *FakeApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances[]cf.ApplicationInstance, errorCode int, err error) {
+	errorCode = repo.GetInstancesErrorCodes[0]
+	repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
+
 
 	instances = repo.GetInstancesResponses[0]
 	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]
 
-	if shouldReturnError {
-		err = errors.New("Still staging.")
+	if errorCode != 0 {
+		err = errors.New("Error while starting app")
+		return
 	}
 
 	return

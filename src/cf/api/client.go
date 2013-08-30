@@ -30,24 +30,25 @@ func newClient() *http.Client {
 	return &http.Client{Transport: tr}
 }
 
-func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (*AuthorizedRequest, error) {
+func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (authReq *AuthorizedRequest, err error) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
-		return nil, err
+		return
 	}
 	request.Header.Set("Authorization", accessToken)
 	request.Header.Set("accept", "application/json")
 
-	return &AuthorizedRequest{request}, err
-}
-
-func PerformRequest(request *AuthorizedRequest) (err error) {
-	_, err = doRequest(request.Request)
+	authReq = &AuthorizedRequest{request}
 	return
 }
 
-func PerformRequestAndParseResponse(request *AuthorizedRequest, response interface{}) (err error) {
-	rawResponse, err := doRequest(request.Request)
+func PerformRequest(request *AuthorizedRequest) (errorCode int, err error) {
+	_, errorCode, err = doRequest(request.Request)
+	return
+}
+
+func PerformRequestAndParseResponse(request *AuthorizedRequest, response interface{}) (errorCode int, err error) {
+	rawResponse, errorCode, err := doRequest(request.Request)
 	if err != nil {
 		return
 	}
@@ -66,7 +67,7 @@ func PerformRequestAndParseResponse(request *AuthorizedRequest, response interfa
 	return
 }
 
-func doRequest(request *http.Request) (response *http.Response, err error) {
+func doRequest(request *http.Request) (response *http.Response, errorCode int, err error) {
 	client := newClient()
 
 	if traceEnabled() {
@@ -96,7 +97,8 @@ func doRequest(request *http.Request) (response *http.Response, err error) {
 
 	if response.StatusCode > 299 {
 		errorResponse := getErrorResponse(response)
-		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", response.StatusCode, errorResponse.Code, errorResponse.Description)
+		errorCode = errorResponse.Code
+		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", response.StatusCode, errorCode, errorResponse.Description)
 		err = errors.New(message)
 	}
 

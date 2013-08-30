@@ -36,7 +36,7 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
-	err = PerformRequestAndParseResponse(request, &response)
+	_, err = PerformRequestAndParseResponse(request, &response)
 
 	if err != nil {
 		return
