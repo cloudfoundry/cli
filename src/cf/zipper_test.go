@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestZip(t *testing.T) {
+func TestZipWithDirectory(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 
@@ -40,4 +40,15 @@ func TestZip(t *testing.T) {
 	name, contents = readFile(1)
 	assert.Equal(t, name, "subDir/bar.txt")
 	assert.Equal(t, contents, "I am in a subdirectory.")
+}
+
+func TestZipWithZipFile(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	zipper := ApplicationZipper{}
+	zipFile, err := zipper.Zip(filepath.Clean(dir + "/../fixtures/application.zip"))
+	assert.NoError(t, err)
+
+	assert.Equal(t, string(zipFile.Bytes()), "This is an application zip file\n")
 }
