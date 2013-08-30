@@ -10,14 +10,15 @@ import (
 	"testing"
 )
 
-func startAppWithInstancesAndErrors(instances [][]cf.ApplicationInstance, errorCodes []int) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
+var defaultAppForStart = cf.Application{
+	Name:      "my-app",
+	Guid:      "my-app-guid",
+	Instances: 2,
+	Urls:      []string{"http://my-app.example.com"},
+}
+
+func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []int) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
 	config := &configuration.Configuration{ApplicationStartTimeout: 2}
-	app := cf.Application{
-		Name:      "my-app",
-		Guid:      "my-app-guid",
-		Instances: 2,
-		Urls:      []string{"http://my-app.example.com"},
-	}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
 		AppByName:              app,
@@ -43,12 +44,33 @@ func TestStartApplication(t *testing.T) {
 	}
 
 	errorCodes := []int{0, 0}
-	ui, appRepo := startAppWithInstancesAndErrors(instances, errorCodes)
+	ui, appRepo := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
 	assert.Contains(t, ui.Outputs[4], "Start successful! App my-app available at http://my-app.example.com")
+
+	assert.Equal(t, appRepo.AppName, "my-app")
+	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
+}
+
+func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
+	app := defaultAppForStart
+	app.Urls = []string{}
+
+	instances := [][]cf.ApplicationInstance{
+		[]cf.ApplicationInstance{
+			cf.ApplicationInstance{State: cf.InstanceRunning},
+		},
+	}
+
+	errorCodes := []int{0}
+	ui, appRepo := startAppWithInstancesAndErrors(app, instances, errorCodes)
+
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[3], "Start successful!")
 
 	assert.Equal(t, appRepo.AppName, "my-app")
 	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
@@ -74,7 +96,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 
 	errorCodes := []int{170002, 170002, 0, 0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
+	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -87,7 +109,7 @@ func TestStartApplicationWhenStagingFails(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{[]cf.ApplicationInstance{}}
 	errorCodes := []int{170001}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
+	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -109,7 +131,7 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 
 	errorCodes := []int{0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
+	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -136,7 +158,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 
 	errorCodes := []int{0, 0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(instances, errorCodes)
+	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")

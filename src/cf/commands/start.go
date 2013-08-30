@@ -106,7 +106,11 @@ func (s Start) displayInstancesStatus(app cf.Application, instances []cf.Applica
 	anyInstanceRunning := runningCount > 0
 
 	if anyInstanceRunning {
-		s.ui.Say("Start successful! App %s available at %s", app.Name, app.Urls[0])
+		if len(app.Urls) == 0 {
+			s.ui.Say("Start successful!")
+		} else {
+			s.ui.Say("Start successful! App %s available at %s", app.Name, app.Urls[0])
+		}
 		return false
 	} else {
 		details := instancesDetails(runningCount, startingCount, downCount)
