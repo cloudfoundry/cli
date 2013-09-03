@@ -57,10 +57,9 @@ func (t Target) Run(c *cli.Context) {
 }
 
 func (t Target) setNewTarget(target string) {
-	url := "https://" + target
-	t.ui.Say("Setting target to %s...", term.Yellow(url))
+	t.ui.Say("Setting target to %s...", term.Yellow(target))
 
-	request, err := api.NewAuthorizedRequest("GET", url+"/v2/info", "", nil)
+	request, err := api.NewAuthorizedRequest("GET", target+"/v2/info", "", nil)
 
 	if err != nil {
 		t.ui.Failed("URL invalid.", err)
@@ -75,7 +74,7 @@ func (t Target) setNewTarget(target string) {
 		return
 	}
 
-	err = t.saveTarget(url, serverResponse)
+	err = t.saveTarget(target, serverResponse)
 
 	if err != nil {
 		t.ui.Failed("Error saving configuration", err)

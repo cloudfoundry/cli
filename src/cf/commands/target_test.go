@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testhelpers"
 	"testing"
 )
@@ -50,15 +49,12 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(validInfoEndpoint))
 	defer ts.Close()
 
-	URL, err := url.Parse(ts.URL)
-	assert.NoError(t, err)
-
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 	config := testhelpers.Login()
-	fakeUI := callTarget([]string{URL.Host}, config, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{ts.URL}, config, orgRepo, spaceRepo)
 
-	assert.Contains(t, fakeUI.Outputs[2], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[2], ts.URL)
 	assert.Contains(t, fakeUI.Outputs[2], "42.0.0")
 
 	savedConfig, err := configtest.GetSavedConfig()
@@ -66,7 +62,7 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
-	assert.Equal(t, savedConfig.Target, "https://"+URL.Host)
+	assert.Equal(t, savedConfig.Target, ts.URL)
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
@@ -78,15 +74,12 @@ func TestTargetWhenEndpointReturns404(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(notFoundEndpoint))
 	defer ts.Close()
 
-	URL, err := url.Parse(ts.URL)
-	assert.NoError(t, err)
-
 	config := testhelpers.Login()
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	fakeUI := callTarget([]string{URL.Host}, config, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{ts.URL}, config, orgRepo, spaceRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "https://"+URL.Host)
+	assert.Contains(t, fakeUI.Outputs[0], ts.URL)
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
 	assert.Contains(t, fakeUI.Outputs[2], "Server error, status code: 404")
 }
@@ -99,13 +92,10 @@ func TestTargetWhenEndpointReturnsInvalidJson(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(invalidJsonResponseEndpoint))
 	defer ts.Close()
 
-	URL, err := url.Parse(ts.URL)
-	assert.NoError(t, err)
-
 	config := testhelpers.Login()
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	fakeUI := callTarget([]string{URL.Host}, config, orgRepo, spaceRepo)
+	fakeUI := callTarget([]string{ts.URL}, config, orgRepo, spaceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
 	assert.Contains(t, fakeUI.Outputs[2], "Invalid JSON response from server")
