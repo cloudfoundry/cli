@@ -2,6 +2,15 @@ package cf
 
 import "fmt"
 
+type InstanceState string
+
+const (
+	InstanceStarting InstanceState = "starting"
+	InstanceRunning                = "running"
+	InstanceFlapping               = "flapping"
+	InstanceDown                   = "down"
+)
+
 type Organization struct {
 	Name string
 	Guid string
@@ -25,6 +34,22 @@ type Application struct {
 	Stack            Stack
 }
 
+func (app Application) Health() string {
+	if app.State != "started" {
+		return app.State
+	}
+
+	if app.Instances > 0 {
+		ratio := float32(app.RunningInstances) / float32(app.Instances)
+		if ratio == 1 {
+			return "running"
+		}
+		return fmt.Sprintf("%.0f%%", ratio*100)
+	}
+
+	return "N/A"
+}
+
 type Domain struct {
 	Name string
 	Guid string
@@ -40,31 +65,17 @@ type Stack struct {
 	Guid string
 }
 
-type InstanceState string
-
-const (
-	InstanceStarting InstanceState = "starting"
-	InstanceRunning                = "running"
-	InstanceFlapping               = "flapping"
-	InstanceDown                   = "down"
-)
-
 type ApplicationInstance struct {
 	State InstanceState
 }
 
-func (app Application) Health() string {
-	if app.State != "started" {
-		return app.State
-	}
+type ServicePlan struct {
+	Name string
+	Guid string
+}
 
-	if app.Instances > 0 {
-		ratio := float32(app.RunningInstances) / float32(app.Instances)
-		if ratio == 1 {
-			return "running"
-		}
-		return fmt.Sprintf("%.0f%%", ratio*100)
-	}
-
-	return "N/A"
+type ServiceOffering struct {
+	Label string
+	Guid  string
+	Plans []ServicePlan
 }

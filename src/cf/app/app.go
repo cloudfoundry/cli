@@ -49,6 +49,7 @@ OPTIONS:
 	domainRepo := new(api.CloudControllerDomainRepository)
 	routeRepo := new(api.CloudControllerRouteRepository)
 	stackRepo := new(api.CloudControllerStackRepository)
+	serviceRepo := new(api.CloudControllerServiceRepository)
 
 	app = cli.NewApp()
 	app.Name = "cf"
@@ -163,6 +164,21 @@ OPTIONS:
 			Usage:       "cf stop <application>",
 			Action: func(c *cli.Context) {
 				cmd := commands.NewStop(termUI, config, appRepo)
+				cmd.Run(c)
+			},
+		},
+		{
+			Name:        "create-service",
+			ShortName:   "cs",
+			Description: "Create service instance",
+			Usage:       "cf create-service --offering <offering> --plan <plan> --name <service instance name>",
+			Flags: []cli.Flag{
+				cli.StringFlag{"name", "", "name of the service instance"},
+				cli.StringFlag{"offering", "", "name of the service offering to use"},
+				cli.StringFlag{"plan", "", "name of the service plan to use"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := commands.NewCreateService(termUI, config, serviceRepo)
 				cmd.Run(c)
 			},
 		},
