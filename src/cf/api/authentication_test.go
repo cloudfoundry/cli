@@ -52,12 +52,13 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer ts.Close()
 
-	config := configuration.Get()
+	config, err := configuration.Get()
+	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
 
 	auth := UAAAuthenticator{}
-	err := auth.Authenticate(config, "foo@example.com", "bar")
+	err = auth.Authenticate(config, "foo@example.com", "bar")
 
 	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
@@ -73,12 +74,13 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(unsuccessfulLoginEndpoint))
 	defer ts.Close()
 
-	config := configuration.Get()
+	config, err := configuration.Get()
+	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
 
 	auth := UAAAuthenticator{}
-	err := auth.Authenticate(config, "foo@example.com", "oops wrong pass")
+	err = auth.Authenticate(config, "foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
 
 	savedConfig, err := configtest.GetSavedConfig()

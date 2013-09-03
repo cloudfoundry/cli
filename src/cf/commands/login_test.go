@@ -302,8 +302,9 @@ func callLogin(args []string, ui term.UI, config *configuration.Configuration, o
 }
 
 func logout(t *testing.T) (config *configuration.Configuration) {
-	config = configuration.Get()
-	err := configuration.ClearSession()
+	config, err := configuration.Get()
+	assert.NoError(t, err)
+	err = configuration.ClearSession()
 	assert.NoError(t, err)
 	return
 }

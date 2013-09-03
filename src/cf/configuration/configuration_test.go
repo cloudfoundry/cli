@@ -25,7 +25,8 @@ func TestSavingAndLoading(t *testing.T) {
 	Save()
 
 	singleton = nil
-	savedConfig := Get()
+	savedConfig, err := Get()
+	assert.NoError(t, err)
 	assert.Equal(t, savedConfig, configToSave)
 }
 
@@ -48,6 +49,7 @@ func TestUserEmailWithInvalidAccessToken(t *testing.T) {
 
 func loadDefaultConfig(t *testing.T) (config *Configuration) {
 	Delete()
-	config = Get()
+	config, err := Get()
+	assert.NoError(t, err)
 	return
 }

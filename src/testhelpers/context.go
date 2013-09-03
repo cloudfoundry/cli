@@ -22,7 +22,7 @@ func NewContext(cmdName string, args []string) (*cli.Context) {
 }
 
 func findCommand(cmdName string) (cmd cli.Command) {
-	myApp := app.New()
+	myApp, _ := app.New()
 
 	for _, cmd := range myApp.Commands {
 		if cmd.Name == cmdName {
