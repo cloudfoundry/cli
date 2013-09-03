@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -14,6 +15,10 @@ type Logout struct {
 func NewLogout(ui term.UI, config *configuration.Configuration) (l Logout) {
 	l.ui = ui
 	l.config = config
+	return
+}
+
+func (cmd Logout) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

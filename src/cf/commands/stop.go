@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -19,6 +20,10 @@ func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.Applic
 	s.config = config
 	s.appRepo = appRepo
 
+	return
+}
+
+func (s Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -25,6 +26,10 @@ func NewTarget(ui term.UI, config *configuration.Configuration, orgRepo api.Orga
 	t.orgRepo = orgRepo
 	t.spaceRepo = spaceRepo
 
+	return
+}
+
+func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

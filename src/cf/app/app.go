@@ -1,10 +1,10 @@
 package app
 
 import (
-	"cf"
 	"cf/api"
 	"cf/commands"
 	"cf/configuration"
+	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -42,14 +42,10 @@ OPTIONS:
 
 	termUI := new(terminal.TerminalUI)
 	config := configuration.Get()
-
-	organizationRepo := new(api.CloudControllerOrganizationRepository)
-	spaceRepo := new(api.CloudControllerSpaceRepository)
-	appRepo := new(api.CloudControllerApplicationRepository)
-	domainRepo := new(api.CloudControllerDomainRepository)
-	routeRepo := new(api.CloudControllerRouteRepository)
-	stackRepo := new(api.CloudControllerStackRepository)
-	serviceRepo := new(api.CloudControllerServiceRepository)
+	repoLocator := api.NewRepositoryLocator(config)
+	cmdFactory := commands.NewFactory(termUI, repoLocator)
+	reqFactory := requirements.NewFactory(termUI, repoLocator)
+	cmdRunner := commands.NewRunner(reqFactory)
 
 	app = cli.NewApp()
 	app.Name = "cf"
@@ -66,8 +62,8 @@ OPTIONS:
 				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewTarget(termUI, config, organizationRepo, spaceRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewTarget()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -76,10 +72,8 @@ OPTIONS:
 			Description: "Log user in",
 			Usage:       "cf login [username]",
 			Action: func(c *cli.Context) {
-				authenticator := new(api.UAAAuthenticator)
-
-				cmd := commands.NewLogin(termUI, config, organizationRepo, spaceRepo, authenticator)
-				cmd.Run(c)
+				cmd := cmdFactory.NewLogin()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -88,8 +82,8 @@ OPTIONS:
 			Description: "Set an environment variable for an application",
 			Usage:       "cf set-env <application> <variable> <value>",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewSetEnv(termUI, config, appRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewSetEnv()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -98,8 +92,8 @@ OPTIONS:
 			Description: "Log user out",
 			Usage:       "cf logout",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewLogout(termUI, config)
-				cmd.Run(c)
+				cmd := cmdFactory.NewLogout()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -121,10 +115,8 @@ OPTIONS:
 				cli.StringFlag{"stack", "", "stack to use"},
 			},
 			Action: func(c *cli.Context) {
-				startCmd := commands.NewStart(termUI, config, appRepo)
-				zipper := cf.ApplicationZipper{}
-				cmd := commands.NewPush(termUI, config, &startCmd, zipper, appRepo, domainRepo, routeRepo, stackRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewPush()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -133,8 +125,8 @@ OPTIONS:
 			Description: "List all applications in the currently selected space",
 			Usage:       "cf apps",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewApps(termUI, config, spaceRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewApps()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -143,8 +135,8 @@ OPTIONS:
 			Description: "Delete an application",
 			Usage:       "cf delete <application>",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewDelete(termUI, config, appRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewDelete()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -153,8 +145,8 @@ OPTIONS:
 			Description: "Start applications",
 			Usage:       "cf start <application>",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewStart(termUI, config, appRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewStart()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -163,8 +155,8 @@ OPTIONS:
 			Description: "Stop applications",
 			Usage:       "cf stop <application>",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewStop(termUI, config, appRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewStop()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -178,8 +170,8 @@ OPTIONS:
 				cli.StringFlag{"plan", "", "name of the service plan to use"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewCreateService(termUI, config, serviceRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewCreateService()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -192,8 +184,8 @@ OPTIONS:
 				cli.StringFlag{"service", "", "name of the service instance to bind to the application"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewBindService(termUI, config, serviceRepo, appRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewBindService()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -206,8 +198,8 @@ OPTIONS:
 				cli.StringFlag{"service", "", "name of the service instance to unbind from the application"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := commands.NewUnbindService(termUI, config, serviceRepo, appRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewUnbindService()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 		{
@@ -216,8 +208,8 @@ OPTIONS:
 			Description: "Delete a service instance",
 			Usage:       "cf delete-service <service instance name>",
 			Action: func(c *cli.Context) {
-				cmd := commands.NewDeleteService(termUI, config, serviceRepo)
-				cmd.Run(c)
+				cmd := cmdFactory.NewDeleteService()
+				cmdRunner.Run(cmd, c)
 			},
 		},
 	}

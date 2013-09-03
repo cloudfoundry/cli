@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -17,6 +18,10 @@ func NewSetEnv(ui term.UI, config *configuration.Configuration, appRepo api.Appl
 	se.ui = ui
 	se.config = config
 	se.appRepo = appRepo
+	return
+}
+
+func (cmd SetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

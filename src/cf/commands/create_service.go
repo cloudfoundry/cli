@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"errors"
 	"fmt"
@@ -20,6 +21,10 @@ func NewCreateService(ui term.UI, config *configuration.Configuration, sR api.Se
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = sR
+	return
+}
+
+func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

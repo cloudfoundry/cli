@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -19,6 +20,10 @@ func NewApps(ui term.UI, config *configuration.Configuration, spaceRepo api.Spac
 	a.ui = ui
 	a.config = config
 	a.spaceRepo = spaceRepo
+	return
+}
+
+func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

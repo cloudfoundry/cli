@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -22,11 +23,16 @@ type ApplicationStarter interface {
 	ApplicationStart(string)
 }
 
-func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s Start) {
+func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Start) {
+	s = new(Start)
 	s.ui = ui
 	s.config = config
 	s.appRepo = appRepo
 
+	return
+}
+
+func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

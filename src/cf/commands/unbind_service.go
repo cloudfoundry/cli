@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 )
@@ -19,6 +20,10 @@ func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.Se
 	cmd.config = config
 	cmd.serviceRepo = sR
 	cmd.appRepo = aR
+	return
+}
+
+func (cmd UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

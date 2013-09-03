@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -18,6 +19,10 @@ func NewDelete(ui term.UI, config *configuration.Configuration, appRepo api.Appl
 	d.ui = ui
 	d.config = config
 	d.appRepo = appRepo
+	return
+}
+
+func (cmd Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

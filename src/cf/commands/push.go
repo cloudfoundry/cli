@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 	"os"
@@ -32,6 +33,10 @@ func NewPush(ui term.UI, config *configuration.Configuration, starter Applicatio
 	p.domainRepo = dR
 	p.routeRepo = rR
 	p.stackRepo = sR
+	return
+}
+
+func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 

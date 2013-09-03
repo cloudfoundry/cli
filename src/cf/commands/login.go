@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 	"strconv"
@@ -25,6 +26,10 @@ func NewLogin(ui term.UI, config *configuration.Configuration, orgRepo api.Organ
 	l.orgRepo = orgRepo
 	l.spaceRepo = spaceRepo
 	l.authenticator = autenticator
+	return
+}
+
+func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
 	return
 }
 
