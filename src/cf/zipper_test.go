@@ -33,6 +33,8 @@ func TestZipWithDirectory(t *testing.T) {
 		return file.Name, string(buf.Bytes())
 	}
 
+	assert.Equal(t, len(reader.File), 2)
+
 	name, contents := readFile(0)
 	assert.Equal(t, name, "foo.txt")
 	assert.Equal(t, contents, "This is a simple text file.")
