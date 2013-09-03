@@ -1,13 +1,13 @@
 package commands_test
 
 import (
-	"testhelpers"
-	"cf/api"
-	"cf/configuration"
-	. "cf/commands"
-	"testing"
 	"cf"
+	"cf/api"
+	. "cf/commands"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	"testhelpers"
+	"testing"
 )
 
 func TestUnbindCommand(t *testing.T) {

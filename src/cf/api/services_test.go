@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testhelpers"
 	"testing"
-	"strings"
 )
 
 var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -201,7 +201,6 @@ var getServiceInstanceEndpoint = testhelpers.CreateEndpoint(
   }
 }`},
 )
-
 
 var deleteBindingEndPointWasCalled bool = false
 

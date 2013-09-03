@@ -2,7 +2,7 @@ package api
 
 type Metadata struct {
 	Guid string
-	Url string
+	Url  string
 }
 
 type Entity struct {
@@ -99,13 +99,13 @@ type ServiceInstanceApiResponse struct {
 }
 
 type ServiceInstanceEntity struct {
-	Name string
+	Name            string
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
 }
 
 type ServiceBindingResource struct {
 	Metadata Metadata
-	Entity ServiceBindingEntity
+	Entity   ServiceBindingEntity
 }
 
 type ServiceBindingEntity struct {
