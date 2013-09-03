@@ -112,23 +112,11 @@ func (repo CloudControllerServiceRepository) BindService(config *configuration.C
 }
 
 func (repo CloudControllerServiceRepository) UnbindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
-	path := fmt.Sprintf("%s/v2/service_instances/%s?inline-relations-depth=1", config.Target, instance.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
-	if err != nil {
-		return
-	}
+	var path string
 
-	response := new(ServiceInstanceResource)
-
-	_, err = PerformRequestAndParseResponse(request, response)
-	if err != nil {
-		return
-	}
-
-	path = ""
-	for _, bindingResource := range response.Entity.ServiceBindings {
-		if bindingResource.Entity.AppGuid == app.Guid {
-			path = config.Target + bindingResource.Metadata.Url
+	for _, binding := range instance.ServiceBindings {
+		if binding.AppGuid == app.Guid {
+			path = config.Target + binding.Url
 			break
 		}
 	}
@@ -138,7 +126,7 @@ func (repo CloudControllerServiceRepository) UnbindService(config *configuration
 		return
 	}
 
-	request, err = NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
+	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
