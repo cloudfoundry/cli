@@ -26,18 +26,16 @@ type Configuration struct {
 	ApplicationStartTimeout time.Duration // will be used as seconds
 }
 
-func Get() *Configuration {
+func Get() (c *Configuration, err error) {
 	if singleton == nil {
-		var err error
 		singleton, err = load()
 
 		if err != nil {
-			println("Error loading configuration")
-			os.Exit(-1)
+			return
 		}
 	}
 
-	return singleton
+	return singleton, nil
 }
 
 func defaultConfig() (c *Configuration) {
@@ -83,7 +81,11 @@ func load() (c *Configuration, parseError error) {
 }
 
 func Save() (err error) {
-	return saveConfiguration(Get())
+	c, err := Get()
+	if err != nil {
+		return
+	}
+	return saveConfiguration(c)
 }
 
 func saveConfiguration(config *Configuration) (err error) {
@@ -103,7 +105,10 @@ func saveConfiguration(config *Configuration) (err error) {
 }
 
 func ClearSession() (err error) {
-	c := Get()
+	c, err := Get()
+	if err != nil {
+		return
+	}
 	c.AccessToken = ""
 	c.Organization = cf.Organization{}
 	c.Space = cf.Space{}

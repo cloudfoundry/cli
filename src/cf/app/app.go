@@ -6,10 +6,11 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
-func New() (app *cli.App) {
+func New() (app *cli.App, err error) {
 	cli.AppHelpTemplate = `NAME:
    {{.Name}} - {{.Usage}}
 
@@ -41,7 +42,13 @@ OPTIONS:
 {{end}}`
 
 	termUI := new(terminal.TerminalUI)
-	config := configuration.Get()
+	config, err := configuration.Get()
+	if err != nil {
+		termUI.Failed(fmt.Sprintf("Error loading config. Please reset target (%s) and log in (%s).", terminal.Yellow("cf target"), terminal.Yellow("cf login")), nil)
+		configuration.Delete()
+		return
+	}
+
 	repoLocator := api.NewRepositoryLocator(config)
 	cmdFactory := commands.NewFactory(termUI, repoLocator)
 	reqFactory := requirements.NewFactory(termUI, repoLocator)
