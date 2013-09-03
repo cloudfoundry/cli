@@ -1,5 +1,5 @@
 *.log
 /someDir/baz.txt
 ignoredDir
-/lastDIr/*
+/lastDir/*
 /fooDir/**/baz.txt
