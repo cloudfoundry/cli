@@ -93,7 +93,11 @@ type ServicePlanResource struct {
 	Entity   Entity
 }
 
-type ServiceInstanceApiResponse struct {
+type ServiceInstancesApiResponse struct {
+	Resources []ServiceInstanceResource
+}
+
+type ServiceInstanceResource struct {
 	Metadata Metadata
 	Entity   ServiceInstanceEntity
 }

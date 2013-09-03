@@ -108,15 +108,34 @@ func TestCreateServiceInstance(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
-{
+var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {
       "metadata": {
-        "guid": "my-service-guid"
+        "guid": "my-service-instance-guid"
       },
       "entity": {
-        "name": "my-service"
+        "name": "my-service",
+        "service_bindings": [
+          {
+            "metadata": {
+              "guid": "service-binding-1-guid",
+              "url": "/v2/service_bindings/service-binding-1-guid"
+            },
+            "entity": {
+              "app_guid": "app-1-guid"
+            }
+          },
+          {
+            "metadata": {
+              "guid": "service-binding-2-guid",
+              "url": "/v2/service_bindings/service-binding-2-guid"
+            },
+            "entity": {
+              "app_guid": "app-2-guid"
+            }
+          }
+        ]
       }
     }
   ]
@@ -142,7 +161,14 @@ func TestFindInstanceByName(t *testing.T) {
 
 	instance, err := repo.FindInstanceByName(config, "my-service")
 	assert.NoError(t, err)
-	assert.Equal(t, instance, cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"})
+	assert.Equal(t, instance.Name, "my-service")
+	assert.Equal(t, instance.Guid, "my-service-instance-guid")
+	assert.Equal(t, len(instance.ServiceBindings), 2)
+
+	binding := instance.ServiceBindings[0]
+	assert.Equal(t, binding.Url, "/v2/service_bindings/service-binding-1-guid")
+	assert.Equal(t, binding.Guid, "service-binding-1-guid")
+	assert.Equal(t, binding.AppGuid, "app-1-guid")
 }
 
 var bindServiceEndpoint = testhelpers.CreateEndpoint(

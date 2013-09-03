@@ -68,7 +68,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(config *configur
 		return
 	}
 
-	response := new(ApiResponse)
+	response := new(ServiceInstancesApiResponse)
 	_, err = PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
@@ -82,6 +82,17 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(config *configur
 	resource := response.Resources[0]
 	instance.Guid = resource.Metadata.Guid
 	instance.Name = resource.Entity.Name
+	instance.ServiceBindings = []cf.ServiceBinding{}
+
+	for _, bindingResource := range resource.Entity.ServiceBindings {
+		newBinding := cf.ServiceBinding{
+			Url:     bindingResource.Metadata.Url,
+			Guid:    bindingResource.Metadata.Guid,
+			AppGuid: bindingResource.Entity.AppGuid,
+		}
+		instance.ServiceBindings = append(instance.ServiceBindings, newBinding)
+	}
+
 	return
 }
 
@@ -107,7 +118,7 @@ func (repo CloudControllerServiceRepository) UnbindService(config *configuration
 		return
 	}
 
-	response := new(ServiceInstanceApiResponse)
+	response := new(ServiceInstanceResource)
 
 	_, err = PerformRequestAndParseResponse(request, response)
 	if err != nil {
