@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -10,6 +11,8 @@ import (
 type ServiceRepository interface {
 	GetServiceOfferings(config *configuration.Configuration) (offerings []cf.ServiceOffering, err error)
 	CreateServiceInstance(config *configuration.Configuration, name string, plan cf.ServicePlan) (err error)
+	FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error)
+	BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
 }
 
 type CloudControllerServiceRepository struct {
@@ -49,6 +52,45 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(config *confi
 		name, plan.Guid, config.Space.Guid,
 	)
 	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
+	if err != nil {
+		return
+	}
+
+	_, err = PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerServiceRepository) FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A"+name)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	response := new(ApiResponse)
+	_, err = PerformRequestAndParseResponse(request, response)
+	if err != nil {
+		return
+	}
+
+	if len(response.Resources) == 0 {
+		err = errors.New(fmt.Sprintf("Service %s not found", name))
+		return
+	}
+
+	resource := response.Resources[0]
+	instance.Guid = resource.Metadata.Guid
+	instance.Name = resource.Entity.Name
+	return
+}
+
+func (repo CloudControllerServiceRepository) BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
+	path := fmt.Sprintf("%s/v2/service_bindings", config.Target)
+	body := fmt.Sprintf(
+		`{"app_guid":"%s","service_instance_guid":"%s"}`,
+		app.Guid, instance.Guid,
+	)
+	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(body))
 	if err != nil {
 		return
 	}

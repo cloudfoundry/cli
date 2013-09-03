@@ -106,3 +106,63 @@ func TestCreateServiceInstance(t *testing.T) {
 	err := repo.CreateServiceInstance(config, "instance-name", cf.ServicePlan{Guid: "plan-guid"})
 	assert.NoError(t, err)
 }
+
+var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": [
+    {
+      "metadata": {
+        "guid": "my-service-guid"
+      },
+      "entity": {
+        "name": "my-service"
+      }
+    }
+  ]
+}`}
+
+var findServiceInstanceEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/service_instances?q=name%3Amy-service",
+	nil,
+	singleServiceInstanceResponse,
+)
+
+func TestFindInstanceByName(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findServiceInstanceEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerServiceRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	instance, err := repo.FindInstanceByName(config, "my-service")
+	assert.NoError(t, err)
+	assert.Equal(t, instance, cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"})
+}
+
+var bindServiceEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/service_bindings",
+	testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestBindService(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(bindServiceEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerServiceRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
+	app := cf.Application{Guid: "my-app-guid"}
+	err := repo.BindService(config, serviceInstance, app)
+	assert.NoError(t, err)
+}

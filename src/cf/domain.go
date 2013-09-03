@@ -79,3 +79,8 @@ type ServiceOffering struct {
 	Guid  string
 	Plans []ServicePlan
 }
+
+type ServiceInstance struct {
+	Name string
+	Guid string
+}
