@@ -1,13 +1,13 @@
 package commands_test
 
 import (
-	"cf/configuration"
+	"cf"
 	"cf/api"
+	. "cf/commands"
+	"cf/configuration"
+	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
-	. "cf/commands"
-	"cf"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDeleteServiceCommand(t *testing.T) {

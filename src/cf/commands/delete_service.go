@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"cf/configuration"
 	"cf/api"
+	"cf/configuration"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
 )

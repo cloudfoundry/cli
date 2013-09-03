@@ -226,7 +226,7 @@ func TestUnbindService(t *testing.T) {
 
 var deleteServiceInstanceEndpoint = testhelpers.CreateEndpoint(
 	"DELETE",
-	"/v2/spaces/my-space-guid/service_instances/my-service-instance-guid",
+	"/v2/service_instances/my-service-instance-guid",
 	nil,
 	testhelpers.TestResponse{Status: http.StatusOK},
 )
@@ -241,7 +241,7 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 		Target:      ts.URL,
 	}
 
-	serviceInstance := cf.ServiceInstance{ Guid:"my-service-instance-guid"}
+	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	err := repo.DeleteService(config, serviceInstance)
 	assert.NoError(t, err)
 }
