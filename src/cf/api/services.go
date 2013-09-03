@@ -14,6 +14,7 @@ type ServiceRepository interface {
 	FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error)
 	BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
 	UnbindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
+	DeleteService(config *configuration.Configuration, instance cf.ServiceInstance) (err error)
 }
 
 type CloudControllerServiceRepository struct {
@@ -126,6 +127,21 @@ func (repo CloudControllerServiceRepository) UnbindService(config *configuration
 		return
 	}
 
+	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	_, err = PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerServiceRepository) DeleteService(config *configuration.Configuration, instance cf.ServiceInstance) (err error) {
+	if len(instance.ServiceBindings) > 0 {
+		return errors.New("Cannot delete service instance, apps are still bound to it")
+	}
+
+	path := fmt.Sprintf("%s/v2/service_instances/%s", config.Target, instance.Guid)
 	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
 	if err != nil {
 		return

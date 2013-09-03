@@ -223,3 +223,45 @@ func TestUnbindService(t *testing.T) {
 	err := repo.UnbindService(config, serviceInstance, app)
 	assert.NoError(t, err)
 }
+
+var deleteServiceInstanceEndpoint = testhelpers.CreateEndpoint(
+	"DELETE",
+	"/v2/spaces/my-space-guid/service_instances/my-service-instance-guid",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusOK},
+)
+
+func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(deleteServiceInstanceEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerServiceRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	serviceInstance := cf.ServiceInstance{ Guid:"my-service-instance-guid"}
+	err := repo.DeleteService(config, serviceInstance)
+	assert.NoError(t, err)
+}
+
+func TestDeleteServiceWithServiceBindings(t *testing.T) {
+	repo := CloudControllerServiceRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+	}
+
+	serviceBindings := []cf.ServiceBinding{
+		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
+		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-2-guid", AppGuid: "app-2-guid"},
+	}
+
+	serviceInstance := cf.ServiceInstance{
+		Guid:            "my-service-instance-guid",
+		ServiceBindings: serviceBindings,
+	}
+
+	err := repo.DeleteService(config, serviceInstance)
+	assert.Equal(t, err.Error(), "Cannot delete service instance, apps are still bound to it")
+}

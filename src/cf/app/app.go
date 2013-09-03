@@ -210,6 +210,16 @@ OPTIONS:
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:        "delete-service",
+			ShortName:   "ds",
+			Description: "Delete a service instance",
+			Usage:       "cf delete-service <service instance name>",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewDeleteService(termUI, config, serviceRepo)
+				cmd.Run(c)
+			},
+		},
 	}
 	return
 }
