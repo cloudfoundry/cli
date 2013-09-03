@@ -13,6 +13,7 @@ type ServiceRepository interface {
 	CreateServiceInstance(config *configuration.Configuration, name string, plan cf.ServicePlan) (err error)
 	FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error)
 	BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
+	UnbindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
 }
 
 type CloudControllerServiceRepository struct {
@@ -91,6 +92,42 @@ func (repo CloudControllerServiceRepository) BindService(config *configuration.C
 		app.Guid, instance.Guid,
 	)
 	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(body))
+	if err != nil {
+		return
+	}
+
+	_, err = PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerServiceRepository) UnbindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
+	path := fmt.Sprintf("%s/v2/service_instances/%s?inline-relations-depth=1", config.Target, instance.Guid)
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	response := new(ServiceInstanceApiResponse)
+
+	_, err = PerformRequestAndParseResponse(request, response)
+	if err != nil {
+		return
+	}
+
+	path = ""
+	for _, bindingResource := range response.Entity.ServiceBindings {
+		if bindingResource.Entity.AppGuid == app.Guid {
+			path = config.Target + bindingResource.Metadata.Url
+			break
+		}
+	}
+
+	if path == "" {
+		err = errors.New("Error finding service binding")
+		return
+	}
+
+	request, err = NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

@@ -16,6 +16,9 @@ type FakeServiceRepo struct {
 
 	BindServiceServiceInstance cf.ServiceInstance
 	BindServiceApplication cf.Application
+
+	UnbindServiceServiceInstance cf.ServiceInstance
+	UnbindServiceApplication cf.Application
 }
 
 func (repo *FakeServiceRepo) GetServiceOfferings(config *configuration.Configuration) (offerings []cf.ServiceOffering, err error) {
@@ -38,5 +41,11 @@ func (repo *FakeServiceRepo) FindInstanceByName(config *configuration.Configurat
 func (repo *FakeServiceRepo) BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
 	repo.BindServiceServiceInstance = instance
 	repo.BindServiceApplication = app
+	return
+}
+
+func (repo *FakeServiceRepo) UnbindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
+	repo.UnbindServiceServiceInstance = instance
+	repo.UnbindServiceApplication = app
 	return
 }
