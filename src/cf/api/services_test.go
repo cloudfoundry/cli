@@ -142,7 +142,7 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
 
 var findServiceInstanceEndpoint = testhelpers.CreateEndpoint(
 	"GET",
-	"/v2/spaces/my-space-guid/service_instances?q=name%3Amy-service",
+	"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 	nil,
 	singleServiceInstanceResponse,
 )

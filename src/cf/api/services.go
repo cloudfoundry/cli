@@ -63,7 +63,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(config *confi
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A"+name)
 	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
