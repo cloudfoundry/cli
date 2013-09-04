@@ -17,10 +17,11 @@ type Start struct {
 	config    *configuration.Configuration
 	appRepo   api.ApplicationRepository
 	startTime time.Time
+	appReq    requirements.ApplicationRequirement
 }
 
 type ApplicationStarter interface {
-	ApplicationStart(string)
+	ApplicationStart(cf.Application)
 }
 
 func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Start) {
@@ -33,29 +34,25 @@ func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.Appli
 }
 
 func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+
+	reqs = []Requirement{&s.appReq}
 	return
 }
 
 func (s *Start) Run(c *cli.Context) {
-	appName := c.Args()[0]
-	s.ApplicationStart(appName)
+	s.ApplicationStart(s.appReq.Application)
 }
 
-func (s *Start) ApplicationStart(appName string) {
-	app, err := s.appRepo.FindByName(s.config, appName)
-	if err != nil {
-		s.ui.Failed(fmt.Sprintf("Error finding application %s", term.Cyan(appName)), err)
-		return
-	}
-
+func (s *Start) ApplicationStart(app cf.Application) {
 	if app.State == "started" {
-		s.ui.Say(term.Magenta("Application " + appName + " is already started."))
+		s.ui.Say(term.Magenta("Application " + app.Name + " is already started."))
 		return
 	}
 
-	s.ui.Say("Starting %s...", term.Cyan(appName))
+	s.ui.Say("Starting %s...", term.Cyan(app.Name))
 
-	err = s.appRepo.Start(s.config, app)
+	err := s.appRepo.Start(s.config, app)
 	if err != nil {
 		s.ui.Failed("Error starting application.", err)
 		return
