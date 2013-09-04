@@ -84,7 +84,7 @@ func (f Factory) NewApps() Apps {
 	)
 }
 
-func (f Factory) NewDelete() Delete {
+func (f Factory) NewDelete() *Delete {
 	return NewDelete(
 		f.ui,
 		f.repoLocator.GetConfig(),
