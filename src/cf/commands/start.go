@@ -32,7 +32,7 @@ func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.Appli
 	return
 }
 
-func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	return
 }
 
