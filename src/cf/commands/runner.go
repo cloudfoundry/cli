@@ -20,12 +20,12 @@ type Command interface {
 }
 
 type Requirement interface {
-	Execute(c *cli.Context) (err error)
+	Execute() (err error)
 }
 
 func (runner Runner) Run(cmd Command, c *cli.Context) (err error) {
 	for _, requirement := range cmd.GetRequirements(runner.reqFactory, c) {
-		err = requirement.Execute(c)
+		err = requirement.Execute()
 		if err != nil {
 			return
 		}

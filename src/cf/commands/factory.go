@@ -108,12 +108,11 @@ func (f Factory) NewCreateService() CreateService {
 	)
 }
 
-func (f Factory) NewBindService() BindService {
+func (f Factory) NewBindService() *BindService {
 	return NewBindService(
 		f.ui,
 		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
-		f.repoLocator.GetApplicationRepository(),
 	)
 }
 

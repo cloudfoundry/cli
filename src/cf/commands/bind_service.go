@@ -9,43 +9,35 @@ import (
 )
 
 type BindService struct {
-	ui          term.UI
-	config      *configuration.Configuration
-	serviceRepo api.ServiceRepository
-	appRepo     api.ApplicationRepository
+	ui                 term.UI
+	config             *configuration.Configuration
+	serviceRepo        api.ServiceRepository
+	appReq             requirements.ApplicationRequirement
+	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewBindService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository, aR api.ApplicationRepository) (cmd BindService) {
+func NewBindService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd *BindService) {
+	cmd = new(BindService)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = sR
-	cmd.appRepo = aR
 	return
 }
 
-func (cmd BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
-	return
+func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
+	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.String("service"))
+
+	return []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
 }
 
-func (cmd BindService) Run(c *cli.Context) {
-	appName := c.String("app")
-	instanceName := c.String("service")
-
-	app, err := cmd.appRepo.FindByName(cmd.config, appName)
-	if err != nil {
-		cmd.ui.Failed("Application not found", err)
-		return
-	}
-
-	instance, err := cmd.serviceRepo.FindInstanceByName(cmd.config, instanceName)
-	if err != nil {
-		cmd.ui.Failed("Service instance not found", err)
-		return
-	}
+func (cmd *BindService) Run(c *cli.Context) {
+	app := cmd.appReq.Application
+	instance := cmd.serviceInstanceReq.ServiceInstance
 
 	cmd.ui.Say("Binding service %s to %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
 
-	err = cmd.serviceRepo.BindService(cmd.config, instance, app)
+	err := cmd.serviceRepo.BindService(cmd.config, instance, app)
 	if err != nil {
 		cmd.ui.Failed("Failed binding service", err)
 		return
