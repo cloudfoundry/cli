@@ -6,6 +6,7 @@ import (
 	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
+	"errors"
 )
 
 type UnbindService struct {
@@ -25,8 +26,17 @@ func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.Se
 }
 
 func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
-	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.String("service"))
+	appName := c.String("app")
+	serviceName := c.String("service")
+
+	if appName == "" || serviceName == "" {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "unbind-service")
+		return
+	}
+
+	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
+	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
 
 	reqs = []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
 	return
