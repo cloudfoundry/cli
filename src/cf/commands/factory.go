@@ -92,7 +92,7 @@ func (f Factory) NewDelete() *Delete {
 	)
 }
 
-func (f Factory) NewStop() Stop {
+func (f Factory) NewStop() *Stop {
 	return NewStop(
 		f.ui,
 		f.repoLocator.GetConfig(),
