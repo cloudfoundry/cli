@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
-	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -13,9 +12,11 @@ type Stop struct {
 	ui      term.UI
 	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
+	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s Stop) {
+func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Stop) {
+	s = new(Stop)
 	s.ui = ui
 	s.config = config
 	s.appRepo = appRepo
@@ -23,26 +24,24 @@ func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.Applic
 	return
 }
 
-func (s Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+
+	reqs = []Requirement{&s.appReq}
 	return
 }
 
-func (s Stop) Run(c *cli.Context) {
-	appName := c.Args()[0]
-	app, err := s.appRepo.FindByName(s.config, appName)
-	if err != nil {
-		s.ui.Failed(fmt.Sprintf("Error finding application %s", term.Cyan(appName)), err)
-		return
-	}
+func (s *Stop) Run(c *cli.Context) {
+	app := s.appReq.Application
 
 	if app.State == "stopped" {
-		s.ui.Say(term.Magenta("Application " + appName + " is already stopped."))
+		s.ui.Say(term.Magenta("Application " + app.Name + " is already stopped."))
 		return
 	}
 
-	s.ui.Say("Stopping %s...", term.Cyan(appName))
+	s.ui.Say("Stopping %s...", term.Cyan(app.Name))
 
-	err = s.appRepo.Stop(s.config, app)
+	err := s.appRepo.Stop(s.config, app)
 	if err != nil {
 		s.ui.Failed("Error stopping application.", err)
 		return
