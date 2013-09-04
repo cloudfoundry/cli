@@ -77,7 +77,7 @@ func (p Push) Run(c *cli.Context) {
 
 	p.ui.Ok()
 	if !c.Bool("no-start") {
-		p.starter.ApplicationStart(appName)
+		p.starter.ApplicationStart(app)
 	}
 }
 
