@@ -9,43 +9,35 @@ import (
 )
 
 type UnbindService struct {
-	ui          term.UI
-	config      *configuration.Configuration
-	serviceRepo api.ServiceRepository
-	appRepo     api.ApplicationRepository
+	ui                 term.UI
+	config             *configuration.Configuration
+	serviceRepo        api.ServiceRepository
+	appReq             requirements.ApplicationRequirement
+	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository, aR api.ApplicationRepository) (cmd UnbindService) {
+func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd *UnbindService) {
+	cmd = new(UnbindService)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = sR
-	cmd.appRepo = aR
 	return
 }
 
-func (cmd UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
-	return
+func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
+	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.String("service"))
+
+	return []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
 }
 
-func (cmd UnbindService) Run(c *cli.Context) {
-	appName := c.String("app")
-	instanceName := c.String("service")
-
-	app, err := cmd.appRepo.FindByName(cmd.config, appName)
-	if err != nil {
-		cmd.ui.Failed("", err)
-		return
-	}
-
-	instance, err := cmd.serviceRepo.FindInstanceByName(cmd.config, instanceName)
-	if err != nil {
-		cmd.ui.Failed("", err)
-		return
-	}
+func (cmd *UnbindService) Run(c *cli.Context) {
+	app := cmd.appReq.Application
+	instance := cmd.serviceInstanceReq.ServiceInstance
 
 	cmd.ui.Say("Unbinding service %s from %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
 
-	err = cmd.serviceRepo.UnbindService(cmd.config, instance, app)
+	err := cmd.serviceRepo.UnbindService(cmd.config, instance, app)
 	if err != nil {
 		cmd.ui.Failed("Failed unbinding service", err)
 		return

@@ -116,12 +116,11 @@ func (f Factory) NewBindService() *BindService {
 	)
 }
 
-func (f Factory) NewUnbindService() UnbindService {
+func (f Factory) NewUnbindService() *UnbindService {
 	return NewUnbindService(
 		f.ui,
 		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
-		f.repoLocator.GetApplicationRepository(),
 	)
 }
 
