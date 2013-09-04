@@ -68,9 +68,12 @@ func PerformRequestAndParseResponse(request *AuthorizedRequest, response interfa
 	return
 }
 
-func SanitizeRequest(request string) string {
+func SanitizeRequest(request string) (sanitized string) {
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)
-	return re.ReplaceAllString(request, "Authorization: [PRIVATE DATA HIDDEN]")
+	sanitized = re.ReplaceAllString(request, "Authorization: [PRIVATE DATA HIDDEN]")
+	re = regexp.MustCompile(`password=[^&]*&`)
+	sanitized = re.ReplaceAllString(sanitized, "password=REDACTED&")
+	return
 }
 
 func doRequest(request *http.Request) (response *http.Response, errorCode int, err error) {

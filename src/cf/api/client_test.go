@@ -68,7 +68,7 @@ func TestPerformRequestReturnsErrorCode(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestSanitizingRequest(t *testing.T) {
+func TestSanitizingRequestRemovesAuthorizationToken(t *testing.T) {
 	request := `
 REQUEST:
 GET /v2/organizations HTTP/1.1
@@ -87,5 +87,28 @@ Authorization: [PRIVATE DATA HIDDEN]
 This is the body. Please don't get rid of me even though I contain Authorization: and some other text
 	`
 
+	assert.Equal(t, SanitizeRequest(request), expected)
+}
+
+func TestSanitizeRequestRemovesPassword(t *testing.T) {
+	request := `
+POST /oauth/token HTTP/1.1
+Host: login.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&password=password&scope=&username=mgehard%2Bcli%40pivotallabs.com
+`
+
+	expected := `
+POST /oauth/token HTTP/1.1
+Host: login.run.pivotal.io
+Accept: application/json
+Authorization: [PRIVATE DATA HIDDEN]
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&password=REDACTED&scope=&username=mgehard%2Bcli%40pivotallabs.com
+`
 	assert.Equal(t, SanitizeRequest(request), expected)
 }
