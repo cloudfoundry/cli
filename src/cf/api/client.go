@@ -27,6 +27,7 @@ type errorResponse struct {
 func newClient() *http.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		Proxy:           http.ProxyFromEnvironment,
 	}
 	return &http.Client{Transport: tr}
 }
