@@ -24,11 +24,12 @@ func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.Se
 	return
 }
 
-func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.String("service"))
 
-	return []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
+	reqs = []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
+	return
 }
 
 func (cmd *UnbindService) Run(c *cli.Context) {

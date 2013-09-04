@@ -24,10 +24,11 @@ func NewDelete(ui term.UI, config *configuration.Configuration, appRepo api.Appl
 	return
 }
 
-func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	return []Requirement{&cmd.appReq}
+	reqs = []Requirement{&cmd.appReq}
+	return
 }
 
 func (d *Delete) Run(c *cli.Context) {

@@ -23,7 +23,7 @@ func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.Applic
 	return
 }
 
-func (s Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (s Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	return
 }
 

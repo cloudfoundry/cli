@@ -15,8 +15,9 @@ type TestCommand struct {
 	WasRunWith *cli.Context
 }
 
-func (cmd *TestCommand) GetRequirements(factory requirements.Factory, c *cli.Context) (reqs []Requirement) {
-	return cmd.Reqs
+func (cmd *TestCommand) GetRequirements(factory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+	reqs = cmd.Reqs
+	return
 }
 
 func (cmd *TestCommand) Run(c *cli.Context) {
