@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"cf/configuration"
+	term "cf/terminal"
 	"time"
 	"github.com/codegangsta/cli"
 )
@@ -120,5 +121,19 @@ func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
 		ui.Say("org:             %s", config.Organization.Name)
 	} else {
 		ui.Say("No org targeted. Use 'cf target -o' to target an org.")
+	}
+}
+
+func (ui *FakeUI) DisplayTable(table [][]string, coloringFunc term.ColoringFunction) {
+	if coloringFunc == nil {
+		coloringFunc = term.DefaultColoringFunc
+	}
+
+	for row, line := range table {
+		output := ""
+		for col, value := range line {
+			output = output + coloringFunc(value, row, col) + "  "
+		}
+		ui.Say(output)
 	}
 }
