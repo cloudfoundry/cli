@@ -56,8 +56,13 @@ type Domain struct {
 }
 
 type Route struct {
-	Host string
-	Guid string
+	Host   string
+	Guid   string
+	Domain Domain
+}
+
+func (r Route) URL() string {
+	return fmt.Sprintf("%s.%s", r.Host, r.Domain.Name)
 }
 
 type Stack struct {

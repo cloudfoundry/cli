@@ -16,6 +16,18 @@ type FakeRouteRepository struct {
 
 	BoundRoute cf.Route
 	BoundApp cf.Application
+
+	FindAllErr bool
+	FindAllRoutes []cf.Route
+}
+
+func (repo *FakeRouteRepository) FindAll(config *configuration.Configuration) (routes []cf.Route, err error){
+	if repo.FindAllErr {
+		err = errors.New("Error finding all routes")
+	}
+
+	routes = repo.FindAllRoutes
+	return
 }
 
 func (repo *FakeRouteRepository) FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error) {
