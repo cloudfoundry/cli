@@ -14,6 +14,8 @@ const (
 	blue          = 34
 	magenta       = 35
 	cyan          = 36
+	grey          = 37
+	white         = 38
 )
 
 func colorize(message string, color Color, bold bool) string {
@@ -27,6 +29,14 @@ func colorize(message string, color Color, bold bool) string {
 	}
 
 	return fmt.Sprintf("\033[%d;%dm%s\033[0m", attr, color, message)
+}
+
+func White(message string) string {
+	return colorize(message, white, true)
+}
+
+func Grey(message string) string {
+	return colorize(message, grey, false)
 }
 
 func Yellow(message string) string {

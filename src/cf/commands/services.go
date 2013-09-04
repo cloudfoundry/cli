@@ -38,17 +38,20 @@ func (cmd Services) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	cmd.ui.Say("name \t service \t provider \t version \t plan \t bound apps")
+	table := [][]string{
+		[]string{"name", "service", "provider", "version", "plan", "bound apps"},
+	}
 
 	for _, instance := range space.ServiceInstances {
-		cmd.ui.Say(
-			"%s \t %s \t %s \t %s \t %s \t %s",
-			term.Cyan(instance.Name),
+		table = append(table, []string{
+			instance.Name,
 			instance.ServicePlan.ServiceOffering.Label,
 			instance.ServicePlan.ServiceOffering.Provider,
 			instance.ServicePlan.ServiceOffering.Version,
 			instance.ServicePlan.Name,
 			strings.Join(instance.ApplicationNames, ", "),
-		)
+		})
 	}
+
+	cmd.ui.DisplayTable(table, nil)
 }
