@@ -24,12 +24,12 @@ func (cmd *TestCommand) Run(c *cli.Context) {
 }
 
 type TestRequirement struct {
-	Passes          bool
-	WasExecutedWith *cli.Context
+	Passes      bool
+	WasExecuted bool
 }
 
-func (r *TestRequirement) Execute(c *cli.Context) (err error) {
-	r.WasExecutedWith = c
+func (r *TestRequirement) Execute() (err error) {
+	r.WasExecuted = true
 
 	if !r.Passes {
 		return errors.New("Error in requirement")
@@ -51,10 +51,10 @@ func TestRun(t *testing.T) {
 	ctxt := testhelpers.NewContext("login", []string{})
 	err := runner.Run(&cmd, ctxt)
 
-	assert.Equal(t, passingReq.WasExecutedWith, ctxt)
-	assert.Equal(t, failingReq.WasExecutedWith, ctxt)
+	assert.True(t, passingReq.WasExecuted, ctxt)
+	assert.True(t, failingReq.WasExecuted, ctxt)
 
-	assert.Nil(t, lastReq.WasExecutedWith)
+	assert.False(t, lastReq.WasExecuted)
 	assert.Nil(t, cmd.WasRunWith)
 
 	assert.Error(t, err)
