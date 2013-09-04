@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
+	"strings"
 	"time"
 )
+
+type ColoringFunction func(value string, row int, col int) string
 
 type UI interface {
 	Say(message string, args ...interface{})
@@ -19,6 +22,7 @@ type UI interface {
 	ShowConfigurationNoSpacesAvailable(config *configuration.Configuration)
 	LoadingIndication()
 	Wait(seconds time.Duration)
+	DisplayTable(table [][]string, coloringFunc ColoringFunction)
 }
 
 type TerminalUI struct {
@@ -101,4 +105,41 @@ func (ui TerminalUI) showBaseConfig(config *configuration.Configuration) {
 	} else {
 		ui.Say("No org targeted. Use 'cf target -o' to target an org.")
 	}
+}
+
+func (ui TerminalUI) DisplayTable(table [][]string, coloringFunc ColoringFunction) {
+	if coloringFunc == nil {
+		coloringFunc = DefaultColoringFunc
+	}
+
+	columnCount := len(table[0])
+	maxSizes := make([]int, columnCount)
+
+	for _, line := range table {
+		for index, value := range line {
+			if maxSizes[index] < len(value) {
+				maxSizes[index] = len(value)
+			}
+		}
+	}
+
+	for row, line := range table {
+		for col, value := range line {
+			padding := strings.Repeat(" ", maxSizes[col]-len(value))
+			value = coloringFunc(value, row, col)
+			fmt.Printf("%s%s   ", value, padding)
+		}
+		fmt.Print("\n")
+	}
+}
+
+func DefaultColoringFunc(value string, row int, col int) string {
+	switch {
+	case row == 0:
+		return White(value)
+	case col == 0 && row > 0:
+		return Cyan(value)
+	}
+
+	return Grey(value)
 }

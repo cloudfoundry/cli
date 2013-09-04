@@ -1,11 +1,11 @@
 package commands
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -41,34 +41,28 @@ func (a Apps) Run(c *cli.Context) {
 
 	a.ui.Ok()
 
-	longestNameLength := len(longestName(apps))
-	appNamePadding := strings.Repeat(" ", longestNameLength-len("name"))
-	a.ui.Say("name%s \tstatus  \tusage   \turl", appNamePadding)
+	table := [][]string{
+		[]string{"name", "status", "usage", "url"},
+	}
 
 	for _, app := range apps {
-		appNamePadding := strings.Repeat(" ", longestNameLength-len(app.Name))
-
-		a.ui.Say(
-			"%s%s \t%s \t%d x %dM \t%s",
-			term.Cyan(app.Name),
-			appNamePadding,
-			coloredState(app.State),
-			app.Instances,
-			app.Memory,
+		table = append(table, []string{
+			app.Name,
+			app.State,
+			fmt.Sprintf("%d x %dM", app.Instances, app.Memory),
 			strings.Join(app.Urls, ", "),
-		)
+		})
 	}
+
+	a.ui.DisplayTable(table, a.coloringFunc)
 }
 
-func longestName(apps []cf.Application) (name string) {
-	name = "name"
-	for _, app := range apps {
-		if len(app.Name) > len(name) {
-			name = app.Name
-		}
+func (a Apps) coloringFunc(value string, row int, col int) string {
+	if row > 0 && col == 1 {
+		return coloredState(value)
 	}
 
-	return
+	return term.DefaultColoringFunc(value, row, col)
 }
 
 func coloredState(state string) (colored string) {
