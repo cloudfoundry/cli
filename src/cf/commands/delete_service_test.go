@@ -27,6 +27,18 @@ func TestDeleteServiceCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
+func TestDeleteServiceCommandFailsWithUsage(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{}
+	serviceRepo := &testhelpers.FakeServiceRepo{}
+	config := &configuration.Configuration{}
+
+	fakeUI := callDeleteService([]string{}, config, reqFactory, serviceRepo)
+	assert.True(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callDeleteService([]string{"my-service"}, config, reqFactory, serviceRepo)
+	assert.False(t, fakeUI.FailedWithUsage)
+}
+
 func callDeleteService(args []string, config *configuration.Configuration, reqFactory requirements.Factory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("delete-service", args)

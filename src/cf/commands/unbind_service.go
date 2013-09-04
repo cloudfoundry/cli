@@ -5,8 +5,8 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
-	"github.com/codegangsta/cli"
 	"errors"
+	"github.com/codegangsta/cli"
 )
 
 type UnbindService struct {
