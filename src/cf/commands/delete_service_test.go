@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -12,12 +13,12 @@ import (
 
 func TestDeleteServiceCommand(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
-
+	reqFactory := &testhelpers.FakeReqFactory{ServiceInstance: serviceInstance}
 	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
 	config := &configuration.Configuration{}
-	fakeUI := callDeleteService([]string{"my-service"}, config, serviceRepo)
+	fakeUI := callDeleteService([]string{"my-service"}, config, reqFactory, serviceRepo)
 
-	assert.Equal(t, serviceRepo.FindInstanceByNameName, "my-service")
+	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
 
 	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
 	assert.Contains(t, fakeUI.Outputs[0], "my-service")
@@ -26,9 +27,12 @@ func TestDeleteServiceCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func callDeleteService(args []string, config *configuration.Configuration, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
+func callDeleteService(args []string, config *configuration.Configuration, reqFactory requirements.Factory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
-	target := NewDeleteService(fakeUI, config, serviceRepo)
-	target.Run(testhelpers.NewContext("unbind-service", args))
+	ctxt := testhelpers.NewContext("delete-service", args)
+	cmd := NewDeleteService(fakeUI, config, serviceRepo)
+	cmd.GetRequirements(reqFactory, ctxt)
+	cmd.Run(ctxt)
+
 	return
 }
