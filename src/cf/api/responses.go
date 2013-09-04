@@ -36,6 +36,10 @@ type ApplicationEntity struct {
 	Routes    []RouteResource
 }
 
+type RoutesResponse struct {
+	Routes []RouteResource `json:"resources"`
+}
+
 type RouteResource struct {
 	Metadata Metadata
 	Entity   RouteEntity

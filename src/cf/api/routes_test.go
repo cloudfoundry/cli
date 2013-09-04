@@ -11,6 +11,80 @@ import (
 	"testing"
 )
 
+var findAllRoutesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "route-1-guid"
+      },
+      "entity": {
+        "host": "route-1-host",
+        "domain": {
+          "metadata": {
+            "guid": "domain-1-guid"
+          },
+          "entity": {
+            "name": "cfapps.io"
+          }
+        }
+      }
+    },
+    {
+      "metadata": {
+        "guid": "route-2-guid"
+      },
+      "entity": {
+        "host": "route-2-host",
+        "domain": {
+          "metadata": {
+            "guid": "domain-2-guid"
+          },
+          "entity": {
+            "name": "example.com"
+          }
+        }
+      }
+    }
+  ]
+}`}
+
+var findAllEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/routes?inline-relations-depth=1",
+	nil,
+	findAllRoutesResponse,
+)
+
+func TestRoutesFindAll(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findAllEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerRouteRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	routes, err := repo.FindAll(config)
+	assert.NoError(t, err)
+
+	assert.Equal(t, len(routes), 2)
+
+	route := routes[0]
+	assert.Equal(t, route.Host, "route-1-host")
+	assert.Equal(t, route.Guid, "route-1-guid")
+	assert.Equal(t, route.Domain.Name, "cfapps.io")
+	assert.Equal(t, route.Domain.Guid, "domain-1-guid")
+
+	route = routes[1]
+	assert.Equal(t, route.Guid, "route-2-guid")
+}
+
 var findRouteByHostResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 { "resources": [
     {

@@ -95,9 +95,14 @@ func (repo CloudControllerApplicationRepository) FindByName(config *configuratio
 	}
 
 	urls := []string{}
+	// This is a little wonky but we made a concious effort
+	// to keep the domain very separate from the API repsonses
+	// to maintain flexibility.
+	domainRoute := cf.Route{}
 	for _, route := range summaryResponse.Routes {
-		url := fmt.Sprintf("%s.%s", route.Host, route.Domain.Name)
-		urls = append(urls, url)
+		domainRoute.Domain = cf.Domain{Name: route.Domain.Name}
+		domainRoute.Host = route.Host
+		urls = append(urls, domainRoute.URL())
 	}
 
 	app = cf.Application{

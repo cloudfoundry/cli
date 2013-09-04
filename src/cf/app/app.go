@@ -219,6 +219,16 @@ OPTIONS:
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		{
+			Name:        "routes",
+			ShortName:   "r",
+			Description: "List all routes",
+			Usage:       "cf routes",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewRoutes()
+				cmdRunner.Run(cmd, c)
+			},
+		},
 	}
 	return
 }
