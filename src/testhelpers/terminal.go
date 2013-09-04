@@ -8,6 +8,7 @@ import (
 	"strings"
 	"cf/configuration"
 	"time"
+	"github.com/codegangsta/cli"
 )
 
 func CaptureOutput(f func ()) string {
@@ -35,6 +36,7 @@ type FakeUI struct {
 	Outputs []string
 	Prompts []string
 	Inputs  []string
+	FailedWithUsage bool
 }
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
@@ -68,6 +70,11 @@ func (ui *FakeUI) Failed(message string, err error) {
 		ui.Say(err.Error())
 	}
 	return
+}
+
+func (ui *FakeUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
+	ui.FailedWithUsage = true
+	ui.Failed("Incorrect Usage.", nil)
 }
 
 func (ui *FakeUI) DumpOutputs() string {

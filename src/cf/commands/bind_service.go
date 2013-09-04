@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -25,8 +26,17 @@ func NewBindService(ui term.UI, config *configuration.Configuration, sR api.Serv
 }
 
 func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
-	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.String("service"))
+	appName := c.String("app")
+	serviceName := c.String("service")
+
+	if appName == "" || serviceName == "" {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "bind-service")
+		return
+	}
+
+	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
+	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
 
 	reqs = []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
 	return
