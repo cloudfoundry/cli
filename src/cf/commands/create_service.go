@@ -24,7 +24,7 @@ func NewCreateService(ui term.UI, config *configuration.Configuration, sR api.Se
 	return
 }
 
-func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	return
 }
 

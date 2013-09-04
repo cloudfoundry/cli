@@ -18,7 +18,7 @@ func NewLogout(ui term.UI, config *configuration.Configuration) (l Logout) {
 	return
 }
 
-func (cmd Logout) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (cmd Logout) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	return
 }
 

@@ -38,7 +38,7 @@ func (f Factory) NewLogin() Login {
 	)
 }
 
-func (f Factory) NewSetEnv() SetEnv {
+func (f Factory) NewSetEnv() *SetEnv {
 	return NewSetEnv(
 		f.ui,
 		f.repoLocator.GetConfig(),

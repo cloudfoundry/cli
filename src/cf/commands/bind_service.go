@@ -24,11 +24,12 @@ func NewBindService(ui term.UI, config *configuration.Configuration, sR api.Serv
 	return
 }
 
-func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.String("service"))
 
-	return []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
+	reqs = []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
+	return
 }
 
 func (cmd *BindService) Run(c *cli.Context) {

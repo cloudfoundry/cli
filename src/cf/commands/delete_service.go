@@ -23,10 +23,11 @@ func NewDeleteService(ui term.UI, config *configuration.Configuration, sR api.Se
 	return
 }
 
-func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.Args()[0])
 
-	return []Requirement{&cmd.serviceInstanceReq}
+	reqs = []Requirement{&cmd.serviceInstanceReq}
+	return
 }
 
 func (cmd *DeleteService) Run(c *cli.Context) {
