@@ -131,3 +131,11 @@ func (f Factory) NewDeleteService() *DeleteService {
 		f.repoLocator.GetServiceRepository(),
 	)
 }
+
+func (f Factory) NewRoutes() *Routes {
+	return NewRoutes(
+		f.ui,
+		f.repoLocator.GetConfig(),
+		f.repoLocator.GetRouteRepository(),
+	)
+}

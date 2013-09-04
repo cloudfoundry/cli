@@ -9,12 +9,42 @@ import (
 )
 
 type RouteRepository interface {
+	FindAll(config *configuration.Configuration) (routes []cf.Route, err error)
 	FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error)
 	Create(config *configuration.Configuration, newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error)
 	Bind(config *configuration.Configuration, route cf.Route, app cf.Application) (err error)
 }
 
 type CloudControllerRouteRepository struct {
+}
+
+func (repo CloudControllerRouteRepository) FindAll(config *configuration.Configuration) (routes []cf.Route, err error) {
+	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", config.Target)
+
+	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	response := new(RoutesResponse)
+	_, err = PerformRequestAndParseResponse(request, response)
+	if err != nil {
+		return
+	}
+
+	for _, routeResponse := range response.Routes {
+		routes = append(routes,
+			cf.Route{
+				Host: routeResponse.Entity.Host,
+				Guid: routeResponse.Metadata.Guid,
+				Domain: cf.Domain{
+					Name: routeResponse.Entity.Domain.Entity.Name,
+					Guid: routeResponse.Entity.Domain.Metadata.Guid,
+				},
+			},
+		)
+	}
+	return
 }
 
 func (repo CloudControllerRouteRepository) FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error) {

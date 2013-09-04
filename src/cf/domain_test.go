@@ -20,3 +20,12 @@ func TestApplicationHealth(t *testing.T) {
 	app.RunningInstances = 3
 	assert.Equal(t, app.Health(), "running")
 }
+
+func TestRouteURL(t *testing.T) {
+	route := Route{
+		Host:   "foo",
+		Domain: Domain{Name: "example.com"},
+	}
+
+	assert.Equal(t, route.URL(), "foo.example.com")
+}
