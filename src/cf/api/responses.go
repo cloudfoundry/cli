@@ -59,6 +59,7 @@ type ApplicationSummary struct {
 	Instances        int
 	Urls             []string
 	State            string
+	ServiceNames     []string `json:"service_names"`
 }
 
 type RouteSummary struct {
@@ -73,9 +74,26 @@ type DomainSummary struct {
 }
 
 type SpaceSummary struct {
-	Guid string
-	Name string
-	Apps []ApplicationSummary
+	Guid             string
+	Name             string
+	Apps             []ApplicationSummary
+	ServiceInstances []ServiceInstanceSummary `json:"services"`
+}
+
+type ServiceInstanceSummary struct {
+	Name        string
+	ServicePlan ServicePlanSummary `json:"service_plan"`
+}
+
+type ServicePlanSummary struct {
+	Name            string
+	ServiceOffering ServiceOfferingSummary `json:"service"`
+}
+
+type ServiceOfferingSummary struct {
+	Label    string
+	Provider string
+	Version  string
 }
 
 type ServiceOfferingsApiResponse struct {

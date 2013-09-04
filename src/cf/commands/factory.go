@@ -139,3 +139,11 @@ func (f Factory) NewRoutes() *Routes {
 		f.repoLocator.GetRouteRepository(),
 	)
 }
+
+func (f Factory) NewServices() Services {
+	return NewServices(
+		f.ui,
+		f.repoLocator.GetConfig(),
+		f.repoLocator.GetSpaceRepository(),
+	)
+}

@@ -17,9 +17,10 @@ type Organization struct {
 }
 
 type Space struct {
-	Name         string
-	Guid         string
-	Applications []Application
+	Name             string
+	Guid             string
+	Applications     []Application
+	ServiceInstances []ServiceInstance
 }
 
 type Application struct {
@@ -75,20 +76,25 @@ type ApplicationInstance struct {
 }
 
 type ServicePlan struct {
-	Name string
-	Guid string
+	Name            string
+	Guid            string
+	ServiceOffering ServiceOffering
 }
 
 type ServiceOffering struct {
-	Label string
-	Guid  string
-	Plans []ServicePlan
+	Guid     string
+	Label    string
+	Provider string
+	Version  string
+	Plans    []ServicePlan
 }
 
 type ServiceInstance struct {
-	Name            string
-	Guid            string
-	ServiceBindings []ServiceBinding
+	Name             string
+	Guid             string
+	ServiceBindings  []ServiceBinding
+	ServicePlan      ServicePlan
+	ApplicationNames []string
 }
 
 type ServiceBinding struct {

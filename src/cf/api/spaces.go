@@ -71,9 +71,16 @@ func (repo CloudControllerSpaceRepository) GetSummary(config *configuration.Conf
 		return
 	}
 
-	applications := []cf.Application{}
+	applications := extractApplicationsFromSummary(response.Apps)
+	serviceInstances := extractServiceInstancesFromSummary(response.ServiceInstances, response.Apps)
 
-	for _, appSummary := range response.Apps {
+	space = cf.Space{Name: response.Name, Guid: response.Guid, Applications: applications, ServiceInstances: serviceInstances}
+
+	return
+}
+
+func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applications []cf.Application) {
+	for _, appSummary := range appSummaries {
 		app := cf.Application{
 			Name:             appSummary.Name,
 			Guid:             appSummary.Guid,
@@ -86,7 +93,47 @@ func (repo CloudControllerSpaceRepository) GetSummary(config *configuration.Conf
 		applications = append(applications, app)
 	}
 
-	space = cf.Space{Name: response.Name, Guid: response.Guid, Applications: applications}
+	return
+}
+
+func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSummary, appSummaries []ApplicationSummary) (instances []cf.ServiceInstance) {
+	for _, instanceSummary := range instanceSummaries {
+		applicationNames := findApplicationNamesForInstance(instanceSummary.Name, appSummaries)
+
+		planSummary := instanceSummary.ServicePlan
+		offeringSummary := planSummary.ServiceOffering
+
+		serviceOffering := cf.ServiceOffering{
+			Label:    offeringSummary.Label,
+			Provider: offeringSummary.Provider,
+			Version:  offeringSummary.Version,
+		}
+
+		servicePlan := cf.ServicePlan{
+			Name:            planSummary.Name,
+			ServiceOffering: serviceOffering,
+		}
+
+		instance := cf.ServiceInstance{
+			Name:             instanceSummary.Name,
+			ServicePlan:      servicePlan,
+			ApplicationNames: applicationNames,
+		}
+
+		instances = append(instances, instance)
+	}
+
+	return
+}
+
+func findApplicationNamesForInstance(instanceName string, appSummaries []ApplicationSummary) (applicationNames []string) {
+	for _, appSummary := range appSummaries {
+		for _, name := range appSummary.ServiceNames {
+			if name == instanceName {
+				applicationNames = append(applicationNames, appSummary.Name)
+			}
+		}
+	}
 
 	return
 }
