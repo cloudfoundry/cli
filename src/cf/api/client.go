@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -67,6 +68,11 @@ func PerformRequestAndParseResponse(request *AuthorizedRequest, response interfa
 	return
 }
 
+func SanitizeRequest(request string) string {
+	re := regexp.MustCompile(`(?m)^Authorization: .*`)
+	return re.ReplaceAllString(request, "Authorization: [PRIVATE DATA HIDDEN]")
+}
+
 func doRequest(request *http.Request) (response *http.Response, errorCode int, err error) {
 	client := newClient()
 
@@ -75,7 +81,7 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 		if err != nil {
 			fmt.Println("Error dumping request")
 		} else {
-			fmt.Printf("\n%s\n%s\n", term.Cyan("REQUEST:"), string(dumpedRequest))
+			fmt.Printf("\n%s\n%s\n", term.Cyan("REQUEST:"), SanitizeRequest(string(dumpedRequest)))
 		}
 	}
 
