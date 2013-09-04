@@ -229,6 +229,16 @@ OPTIONS:
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		{
+			Name:        "services",
+			ShortName:   "se",
+			Description: "List all services in the currently selected space",
+			Usage:       "cf services",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewServices()
+				cmdRunner.Run(cmd, c)
+			},
+		},
 	}
 	return
 }
