@@ -35,6 +35,21 @@ func TestUnbindCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
+func TestUnbindCommandFailsWithUsage(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{}
+	serviceRepo := &testhelpers.FakeServiceRepo{}
+	config := &configuration.Configuration{}
+
+	fakeUI := callUnbindService([]string{"--service", "my-service"}, config, reqFactory, serviceRepo)
+	assert.True(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callUnbindService([]string{"--app", "my-app"}, config, reqFactory, serviceRepo)
+	assert.True(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callUnbindService([]string{"--app", "my-app", "--service", "my-service"}, config, reqFactory, serviceRepo)
+	assert.False(t, fakeUI.FailedWithUsage)
+}
+
 func callUnbindService(args []string, config *configuration.Configuration, reqFactory requirements.Factory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("unbind-service", args)
