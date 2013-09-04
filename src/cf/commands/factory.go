@@ -124,7 +124,7 @@ func (f Factory) NewUnbindService() *UnbindService {
 	)
 }
 
-func (f Factory) NewDeleteService() DeleteService {
+func (f Factory) NewDeleteService() *DeleteService {
 	return NewDeleteService(
 		f.ui,
 		f.repoLocator.GetConfig(),

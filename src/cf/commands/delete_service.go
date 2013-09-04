@@ -9,34 +9,31 @@ import (
 )
 
 type DeleteService struct {
-	ui          term.UI
-	config      *configuration.Configuration
-	serviceRepo api.ServiceRepository
+	ui                 term.UI
+	config             *configuration.Configuration
+	serviceRepo        api.ServiceRepository
+	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewDeleteService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd DeleteService) {
+func NewDeleteService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd *DeleteService) {
+	cmd = new(DeleteService)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = sR
 	return
 }
 
-func (cmd DeleteService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
-	return
+func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement) {
+	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.Args()[0])
+
+	return []Requirement{&cmd.serviceInstanceReq}
 }
 
-func (cmd DeleteService) Run(c *cli.Context) {
-	instanceName := c.Args()[0]
-
-	instance, err := cmd.serviceRepo.FindInstanceByName(cmd.config, instanceName)
-	if err != nil {
-		cmd.ui.Failed("", err)
-		return
-	}
-
+func (cmd *DeleteService) Run(c *cli.Context) {
+	instance := cmd.serviceInstanceReq.ServiceInstance
 	cmd.ui.Say("Deleting service %s...", term.Cyan(instance.Name))
 
-	err = cmd.serviceRepo.DeleteService(cmd.config, instance)
+	err := cmd.serviceRepo.DeleteService(cmd.config, instance)
 	if err != nil {
 		cmd.ui.Failed("Failed deleting service", err)
 		return
