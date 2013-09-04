@@ -3,6 +3,8 @@ package terminal
 import (
 	"cf/configuration"
 	"fmt"
+	"github.com/codegangsta/cli"
+	"os"
 	"time"
 )
 
@@ -12,6 +14,7 @@ type UI interface {
 	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Ok()
 	Failed(message string, err error)
+	FailWithUsage(ctxt *cli.Context, cmdName string)
 	ShowConfiguration(*configuration.Configuration)
 	ShowConfigurationNoSpacesAvailable(config *configuration.Configuration)
 	LoadingIndication()
@@ -48,6 +51,13 @@ func (c TerminalUI) Failed(message string, err error) {
 		c.Say(err.Error())
 	}
 	return
+}
+
+func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
+	c.Failed("Incorrect Usage.\n", nil)
+	cli.ShowCommandHelp(ctxt, cmdName)
+	c.Say("")
+	os.Exit(1)
 }
 
 func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
