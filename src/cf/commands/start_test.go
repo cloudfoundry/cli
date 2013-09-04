@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -17,7 +18,7 @@ var defaultAppForStart = cf.Application{
 	Urls:      []string{"http://my-app.example.com"},
 }
 
-func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []int) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository) {
+func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []int) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository, reqFactory *testhelpers.FakeReqFactory) {
 	config := &configuration.Configuration{ApplicationStartTimeout: 2}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
@@ -26,8 +27,8 @@ func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.Applica
 		GetInstancesErrorCodes: errorCodes,
 	}
 	args := []string{"my-app"}
-
-	ui = callStart(args, config, appRepo)
+	reqFactory = &testhelpers.FakeReqFactory{Application: app}
+	ui = callStart(args, config, reqFactory, appRepo)
 	return
 }
 
@@ -44,14 +45,14 @@ func TestStartApplication(t *testing.T) {
 	}
 
 	errorCodes := []int{0, 0}
-	ui, appRepo := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
 	assert.Contains(t, ui.Outputs[4], "Start successful! App my-app available at http://my-app.example.com")
 
-	assert.Equal(t, appRepo.AppName, "my-app")
+	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
 }
 
@@ -66,13 +67,13 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	}
 
 	errorCodes := []int{0}
-	ui, appRepo := startAppWithInstancesAndErrors(app, instances, errorCodes)
+	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(app, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "Start successful!")
 
-	assert.Equal(t, appRepo.AppName, "my-app")
+	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
 }
 
@@ -96,7 +97,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 
 	errorCodes := []int{170002, 170002, 0, 0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -109,7 +110,7 @@ func TestStartApplicationWhenStagingFails(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{[]cf.ApplicationInstance{}}
 	errorCodes := []int{170001}
 
-	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -131,7 +132,7 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 
 	errorCodes := []int{0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -158,7 +159,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 
 	errorCodes := []int{0, 0, 0}
 
-	ui, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -169,22 +170,13 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "Start app timeout")
 }
 
-func TestStartApplicationWhenAppDoesNotExist(t *testing.T) {
-	config := &configuration.Configuration{}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
-	args := []string{"i-do-not-exist"}
-	ui := callStart(args, config, appRepo)
-
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "i-do-not-exist")
-}
-
 func TestStartApplicationWhenStartFails(t *testing.T) {
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app, StartAppErr: true}
 	args := []string{"my-app"}
-	ui := callStart(args, config, appRepo)
+	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	ui := callStart(args, config, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
@@ -196,19 +188,23 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+
+	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+
 	args := []string{"my-app"}
-	ui := callStart(args, config, appRepo)
+	ui := callStart(args, config, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "is already started")
 	assert.Equal(t, appRepo.StartedApp.Guid, "")
 }
 
-func callStart(args []string, config *configuration.Configuration, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
-	context := testhelpers.NewContext("start", args)
+func callStart(args []string, config *configuration.Configuration, reqFactory requirements.Factory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
-	s := NewStart(ui, config, appRepo)
-	s.Run(context)
+	ctxt := testhelpers.NewContext("start", args)
 
+	cmd := NewStart(ui, config, appRepo)
+	cmd.GetRequirements(reqFactory, ctxt)
+	cmd.Run(ctxt)
 	return
 }

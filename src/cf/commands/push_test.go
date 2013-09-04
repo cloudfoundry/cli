@@ -13,11 +13,11 @@ import (
 )
 
 type FakeAppStarter struct {
-	Started string
+	StartedApp cf.Application
 }
 
-func (starter *FakeAppStarter) ApplicationStart(name string) {
-	starter.Started = name
+func (starter *FakeAppStarter) ApplicationStart(app cf.Application) {
+	starter.StartedApp = app
 }
 
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
@@ -59,7 +59,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Equal(t, zipper.ZippedDir, expectedAppDir)
 	assert.Contains(t, fakeUI.Outputs[7], "OK")
 
-	assert.Equal(t, fakeStarter.Started, "my-new-app")
+	assert.Equal(t, fakeStarter.StartedApp.Name, "my-new-app")
 }
 
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
@@ -99,7 +99,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	assert.Equal(t, zipper.ZippedDir, expectedAppDir)
 	assert.Contains(t, fakeUI.Outputs[6], "OK")
 
-	assert.Equal(t, fakeStarter.Started, "my-new-app")
+	assert.Equal(t, fakeStarter.StartedApp.Name, "my-new-app")
 }
 
 func TestPushingAppWithCustomFlags(t *testing.T) {
@@ -151,7 +151,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, appRepo.UploadedZipBuffer, zipper.ZippedBuffer)
 	assert.Contains(t, fakeUI.Outputs[8], "OK")
 
-	assert.Equal(t, fakeStarter.Started, "")
+	assert.Equal(t, fakeStarter.StartedApp.Name, "")
 }
 
 func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
