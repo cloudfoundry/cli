@@ -1,0 +1,3 @@
+#- Go CLI	
+build: jenkins_build.check http://ci:clone7adhere@174.129.252.37:8080 cli-tests
+
