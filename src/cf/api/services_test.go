@@ -116,6 +116,33 @@ func TestCreateServiceInstance(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+var createUserProvidedServiceInstanceEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/user_provided_service_instances",
+	testhelpers.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"some-space-guid"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestCreateUserProvidedServiceInstance(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(createUserProvidedServiceInstanceEndpoint))
+	defer ts.Close()
+
+	repo := CloudControllerServiceRepository{}
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "some-space-guid"},
+	}
+
+	params := map[string]string{
+		"host":     "example.com",
+		"user":     "me",
+		"password": "secret",
+	}
+	err := repo.CreateUserProvidedServiceInstance(config, "my-custom-service", params)
+	assert.NoError(t, err)
+}
+
 var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {

@@ -11,6 +11,9 @@ type FakeServiceRepo struct {
 	CreateServiceInstanceName string
 	CreateServiceInstancePlan cf.ServicePlan
 
+	CreateUserProvidedServiceInstanceName string
+	CreateUserProvidedServiceInstanceParameters map[string]string
+
 	FindInstanceByNameName string
 	FindInstanceByNameServiceInstance cf.ServiceInstance
 
@@ -31,6 +34,12 @@ func (repo *FakeServiceRepo) GetServiceOfferings(config *configuration.Configura
 func (repo *FakeServiceRepo) CreateServiceInstance(config *configuration.Configuration, name string, plan cf.ServicePlan) (err error) {
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlan = plan
+	return
+}
+
+func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(config *configuration.Configuration, name string, params map[string]string) (err error) {
+	repo.CreateUserProvidedServiceInstanceName = name
+	repo.CreateUserProvidedServiceInstanceParameters = params
 	return
 }
 
