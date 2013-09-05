@@ -11,11 +11,11 @@ import (
 )
 
 type TestCommand struct {
-	Reqs       []Requirement
+	Reqs       []requirements.Requirement
 	WasRunWith *cli.Context
 }
 
-func (cmd *TestCommand) GetRequirements(factory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd *TestCommand) GetRequirements(factory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = cmd.Reqs
 	return
 }
@@ -46,7 +46,7 @@ func TestRun(t *testing.T) {
 	lastReq := TestRequirement{Passes: true}
 
 	cmd := TestCommand{
-		Reqs: []Requirement{&passingReq, &failingReq, &lastReq},
+		Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
 	}
 
 	ctxt := testhelpers.NewContext("login", []string{})

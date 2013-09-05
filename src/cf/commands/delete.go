@@ -25,7 +25,7 @@ func NewDelete(ui term.UI, config *configuration.Configuration, appRepo api.Appl
 	return
 }
 
-func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete")
@@ -33,12 +33,12 @@ func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 	}
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []Requirement{&cmd.appReq}
+	reqs = []requirements.Requirement{cmd.appReq}
 	return
 }
 
 func (d *Delete) Run(c *cli.Context) {
-	app := d.appReq.Application
+	app := d.appReq.GetApplication()
 	force := c.Bool("f")
 
 	if !force {

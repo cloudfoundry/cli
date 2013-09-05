@@ -29,7 +29,7 @@ func NewLogin(ui term.UI, config *configuration.Configuration, orgRepo api.Organ
 	return
 }
 
-func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

@@ -25,7 +25,7 @@ func NewCreateService(ui term.UI, config *configuration.Configuration, sR api.Se
 	return
 }
 
-func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	offeringName := c.String("offering")
 	parameterList := c.String("parameters")
 

@@ -7,16 +7,21 @@ import (
 	"cf/terminal"
 )
 
-type ApplicationRequirement struct {
-	name    string
-	ui      terminal.UI
-	config  *configuration.Configuration
-	appRepo api.ApplicationRepository
-
-	Application cf.Application
+type ApplicationRequirement interface {
+	Requirement
+	GetApplication() cf.Application
 }
 
-func NewApplicationRequirement(name string, ui terminal.UI, config *configuration.Configuration, aR api.ApplicationRepository) (req ApplicationRequirement) {
+type ApplicationApiRequirement struct {
+	name        string
+	ui          terminal.UI
+	config      *configuration.Configuration
+	appRepo     api.ApplicationRepository
+	application cf.Application
+}
+
+func NewApplicationRequirement(name string, ui terminal.UI, config *configuration.Configuration, aR api.ApplicationRepository) (req *ApplicationApiRequirement) {
+	req = new(ApplicationApiRequirement)
 	req.name = name
 	req.ui = ui
 	req.config = config
@@ -24,10 +29,14 @@ func NewApplicationRequirement(name string, ui terminal.UI, config *configuratio
 	return
 }
 
-func (req *ApplicationRequirement) Execute() (err error) {
-	req.Application, err = req.appRepo.FindByName(req.config, req.name)
+func (req *ApplicationApiRequirement) Execute() (err error) {
+	req.application, err = req.appRepo.FindByName(req.config, req.name)
 	if err != nil {
 		req.ui.Failed("", err)
 	}
 	return
+}
+
+func (req *ApplicationApiRequirement) GetApplication() cf.Application {
+	return req.application
 }
