@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -34,6 +35,12 @@ func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.Appli
 }
 
 func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+	if len(c.Args()) == 0 {
+		err = errors.New("Incorrect Usage")
+		s.ui.FailWithUsage(c, "start")
+		return
+	}
+
 	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []Requirement{&s.appReq}
