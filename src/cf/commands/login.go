@@ -40,7 +40,7 @@ func (l Login) Run(c *cli.Context) {
 	if len(c.Args()) > 0 {
 		email = c.Args()[0]
 	} else {
-		email = l.ui.Ask("Email%s", term.Cyan(">"))
+		email = l.ui.Ask("Username%s", term.Cyan(">"))
 	}
 
 	for i := 0; i < maxLoginTries; i++ {

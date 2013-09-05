@@ -34,7 +34,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
-	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[0], "Username")
 	assert.Contains(t, ui.Prompts[1], "Password")
 
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
@@ -97,7 +97,7 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
-	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[0], "Username")
 	assert.Contains(t, ui.Prompts[1], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 
@@ -185,7 +185,7 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
-	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[0], "Username")
 	assert.Contains(t, ui.Prompts[1], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Outputs[3], "FirstOrg")
@@ -220,7 +220,7 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
-	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[0], "Username")
 	assert.Contains(t, ui.Prompts[1], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Outputs[3], "No orgs found.")
@@ -252,7 +252,7 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
-	assert.Contains(t, ui.Prompts[0], "Email")
+	assert.Contains(t, ui.Prompts[0], "Username")
 	assert.Contains(t, ui.Prompts[1], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 
