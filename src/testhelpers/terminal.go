@@ -82,6 +82,10 @@ func (ui *FakeUI) DumpOutputs() string {
 	return "****************************\n" + strings.Join(ui.Outputs, "\n")
 }
 
+func (ui *FakeUI) ClearOutputs() {
+	ui.Outputs = []string{}
+}
+
 func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
 	ui.Say("API endpoint: %s (API version: %s)",
 		config.Target,

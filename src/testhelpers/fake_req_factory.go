@@ -14,6 +14,7 @@ type FakeReqFactory struct {
 	ServiceInstance     cf.ServiceInstance
 
 	LoginSuccess bool
+	SpaceSuccess bool
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -28,6 +29,10 @@ func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
 	return FakeRequirement{ f, f.LoginSuccess }
+}
+
+func (f *FakeReqFactory) NewSpaceRequirement() requirements.Requirement {
+	return FakeRequirement{ f, f.SpaceSuccess }
 }
 
 type FakeRequirement struct {

@@ -18,15 +18,15 @@ func TestApps(t *testing.T) {
 		cf.Application{Name: "Application-2", State: "started", Instances: 2, Memory: 256, Urls: app2Urls},
 	}
 	spaceRepo := &testhelpers.FakeSpaceRepository{SummarySpace: cf.Space{Applications: apps}}
-	ui := &testhelpers.FakeUI{}
+
 	config := &configuration.Configuration{
 		Space: cf.Space{Name: "development", Guid: "development-guid"},
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	ctxt := testhelpers.NewContext("apps", []string{})
-	cmd := NewApps(ui, config, spaceRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+
+	ui := callApps(config, spaceRepo, reqFactory)
+
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
 	assert.Contains(t, ui.Outputs[0], "Getting applications in development")
@@ -43,15 +43,31 @@ func TestApps(t *testing.T) {
 }
 
 func TestAppsRequiresLogin(t *testing.T) {
-	ui := &testhelpers.FakeUI{}
 	config := &configuration.Configuration{}
-
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, SpaceSuccess: true}
+
+	callApps(config, spaceRepo, reqFactory)
+
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+}
+
+func TestAppsRequiresASelectedSpaceAndOrg(t *testing.T) {
+	config := &configuration.Configuration{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: false}
+
+	callApps(config, spaceRepo, reqFactory)
+
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+}
+
+func callApps(config *configuration.Configuration, spaceRepo *testhelpers.FakeSpaceRepository, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
+	ui = &testhelpers.FakeUI{}
 
 	ctxt := testhelpers.NewContext("apps", []string{})
 	cmd := NewApps(ui, config, spaceRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	return
 }
