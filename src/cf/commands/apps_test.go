@@ -23,8 +23,11 @@ func TestApps(t *testing.T) {
 		Space: cf.Space{Name: "development", Guid: "development-guid"},
 	}
 
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	ctxt := testhelpers.NewContext("apps", []string{})
 	cmd := NewApps(ui, config, spaceRepo)
-	cmd.Run(testhelpers.NewContext("apps", []string{}))
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	assert.True(t, testhelpers.CommandDidPassRequirements)
 
 	assert.Contains(t, ui.Outputs[0], "Getting applications in development")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -37,4 +40,18 @@ func TestApps(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "running")
 	assert.Contains(t, ui.Outputs[4], "2 x 256M")
 	assert.Contains(t, ui.Outputs[4], "app2.cfapps.io")
+}
+
+func TestAppsRequiresLogin(t *testing.T) {
+	ui := &testhelpers.FakeUI{}
+	config := &configuration.Configuration{}
+
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false}
+
+	ctxt := testhelpers.NewContext("apps", []string{})
+	cmd := NewApps(ui, config, spaceRepo)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+
+	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
