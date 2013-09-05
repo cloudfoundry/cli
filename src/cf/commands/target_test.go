@@ -66,6 +66,17 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
+func TestTargetWhenUrlIsMissingScheme(t *testing.T) {
+	orgRepo := &testhelpers.FakeOrgRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	config := testhelpers.Login()
+	fakeUI := callTarget([]string{"example.com"}, config, orgRepo, spaceRepo)
+
+	assert.Contains(t, fakeUI.Outputs[0], "Setting target")
+	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[2], "API Endpoints should start with https:// or http://")
+}
+
 var notFoundEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
