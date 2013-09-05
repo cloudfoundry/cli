@@ -3,6 +3,7 @@ package testhelpers
 import (
 	"cf"
 	"cf/configuration"
+	"errors"
 )
 
 type FakeServiceRepo struct {
@@ -19,6 +20,7 @@ type FakeServiceRepo struct {
 
 	BindServiceServiceInstance cf.ServiceInstance
 	BindServiceApplication cf.Application
+	BindServiceErrorCode int
 
 	UnbindServiceServiceInstance cf.ServiceInstance
 	UnbindServiceApplication cf.Application
@@ -49,9 +51,15 @@ func (repo *FakeServiceRepo) FindInstanceByName(config *configuration.Configurat
 	return
 }
 
-func (repo *FakeServiceRepo) BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
+func (repo *FakeServiceRepo) BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (errorCode int, err error) {
 	repo.BindServiceServiceInstance = instance
 	repo.BindServiceApplication = app
+
+	if repo.BindServiceErrorCode != 0 {
+		err = errors.New("Error binding service")
+		errorCode = repo.BindServiceErrorCode
+	}
+
 	return
 }
 
