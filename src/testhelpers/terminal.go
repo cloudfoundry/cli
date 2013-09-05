@@ -110,8 +110,8 @@ func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
 func (ui FakeUI) LoadingIndication() {
 }
 
-func (c FakeUI) Wait(seconds time.Duration) {
-	time.Sleep(seconds * time.Second)
+func (c FakeUI) Wait(duration time.Duration) {
+	time.Sleep(duration)
 }
 
 func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
