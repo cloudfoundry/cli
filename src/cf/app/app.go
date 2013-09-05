@@ -141,7 +141,10 @@ OPTIONS:
 			Name:        "delete",
 			ShortName:   "d",
 			Description: "Delete an application",
-			Usage:       "cf delete <application>",
+			Usage:       "cf delete -f <application>",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"f", "force deletion without confirmation"},
+			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewDelete()
 				cmdRunner.Run(cmd, c)
