@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -72,15 +71,11 @@ func TestRunReportsWhenArgumentsAreMissing(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
 }
 
-func callSetEnv(args []string, config *configuration.Configuration, reqFactory requirements.Factory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
+func callSetEnv(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("set-env", args)
 
 	cmd := NewSetEnv(ui, config, appRepo)
-	_, err := cmd.GetRequirements(reqFactory, ctxt)
-	if err != nil {
-		return
-	}
-	cmd.Run(ctxt)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
