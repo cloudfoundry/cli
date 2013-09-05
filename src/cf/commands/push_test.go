@@ -20,6 +20,33 @@ func (starter *FakeAppStarter) ApplicationStart(app cf.Application) {
 	starter.StartedApp = app
 }
 
+func TestPushingRequirements(t *testing.T) {
+	fakeUI := new(testhelpers.FakeUI)
+	starter := &FakeAppStarter{}
+	zipper := &testhelpers.FakeZipper{}
+	appRepo := &testhelpers.FakeApplicationRepository{}
+	domainRepo := &testhelpers.FakeDomainRepository{}
+	routeRepo := &testhelpers.FakeRouteRepository{}
+	stackRepo := &testhelpers.FakeStackRepository{}
+
+	cmd := NewPush(fakeUI, basePushConfig(), starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	ctxt := testhelpers.NewContext("push", []string{})
+
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	assert.True(t, testhelpers.CommandDidPassRequirements)
+
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, SpaceSuccess: true}
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+
+	testhelpers.CommandDidPassRequirements = true
+
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: false}
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+}
+
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	domains := []cf.Domain{
 		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
@@ -231,8 +258,11 @@ func callPush(args []string,
 	stackRepo api.StackRepository) (fakeUI *testhelpers.FakeUI) {
 
 	fakeUI = new(testhelpers.FakeUI)
-	target := NewPush(fakeUI, config, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
-	target.Run(testhelpers.NewContext("push", args))
+	ctxt := testhelpers.NewContext("push", args)
+	cmd := NewPush(fakeUI, config, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+
 	return
 }
 
