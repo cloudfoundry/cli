@@ -71,6 +71,12 @@ func (t Target) setNewTarget(target string) {
 		return
 	}
 
+	scheme := request.URL.Scheme
+	if scheme != "http" && scheme != "https" {
+		t.ui.Failed("API Endpoints should start with https:// or http://", nil)
+		return
+	}
+
 	serverResponse := new(InfoResponse)
 	_, err = api.PerformRequestAndParseResponse(request, &serverResponse)
 
