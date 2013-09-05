@@ -93,6 +93,10 @@ func (t Target) setNewTarget(target string) {
 	}
 
 	t.ui.Ok()
+
+	if scheme == "http" {
+		t.ui.Say(term.Magenta("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
+	}
 	t.ui.ShowConfiguration(t.config)
 }
 
