@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -53,13 +52,11 @@ func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 	assert.Equal(t, appRepo.StoppedApp.Guid, "")
 }
 
-func callStop(args []string, config *configuration.Configuration, reqFactory requirements.Factory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
+func callStop(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("stop", args)
 
 	cmd := NewStop(ui, config, appRepo)
-	cmd.GetRequirements(reqFactory, ctxt)
-	cmd.Run(ctxt)
-
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -199,12 +198,11 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 	assert.Equal(t, appRepo.StartedApp.Guid, "")
 }
 
-func callStart(args []string, config *configuration.Configuration, reqFactory requirements.Factory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
+func callStart(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("start", args)
 
 	cmd := NewStart(ui, config, appRepo)
-	cmd.GetRequirements(reqFactory, ctxt)
-	cmd.Run(ctxt)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
