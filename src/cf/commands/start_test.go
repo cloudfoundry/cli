@@ -31,6 +31,23 @@ func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.Applica
 	return
 }
 
+func TestStartCommandFailsWithUsage(t *testing.T) {
+	config := &configuration.Configuration{}
+	appRepo := &testhelpers.FakeApplicationRepository{
+		GetInstancesResponses: [][]cf.ApplicationInstance{
+			[]cf.ApplicationInstance{},
+		},
+		GetInstancesErrorCodes: []int{0},
+	}
+	reqFactory := &testhelpers.FakeReqFactory{}
+
+	ui := callStart([]string{}, config, reqFactory, appRepo)
+	assert.True(t, ui.FailedWithUsage)
+
+	ui = callStart([]string{"my-app"}, config, reqFactory, appRepo)
+	assert.False(t, ui.FailedWithUsage)
+}
+
 func TestStartApplication(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{

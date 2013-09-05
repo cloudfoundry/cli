@@ -26,8 +26,8 @@ func NewSetEnv(ui term.UI, config *configuration.Configuration, appRepo api.Appl
 
 func (cmd *SetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
 	if len(c.Args()) < 3 {
-		cmd.ui.Failed("Please enter app name, variable name and value.", nil)
-		err = errors.New("Invalid params")
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "set-env")
 		return
 	}
 

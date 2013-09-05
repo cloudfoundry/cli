@@ -46,29 +46,27 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "Failed setting env")
 }
 
-func TestRunReportsWhenArgumentsAreMissing(t *testing.T) {
+func TestSetEnvFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
 	config := &configuration.Configuration{}
 
-	args := []string{"my-app", "DATABASE_URL"}
+	args := []string{"my-app", "DATABASE_URL", "..."}
 	ui := callSetEnv(args, config, reqFactory, appRepo)
+	assert.False(t, ui.FailedWithUsage)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
+	args = []string{"my-app", "DATABASE_URL"}
+	ui = callSetEnv(args, config, reqFactory, appRepo)
+	assert.True(t, ui.FailedWithUsage)
 
 	args = []string{"my-app"}
 	ui = callSetEnv(args, config, reqFactory, appRepo)
-
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
+	assert.True(t, ui.FailedWithUsage)
 
 	args = []string{}
 	ui = callSetEnv(args, config, reqFactory, appRepo)
-
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "Please enter app name, variable name and value.")
+	assert.True(t, ui.FailedWithUsage)
 }
 
 func callSetEnv(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
