@@ -107,6 +107,9 @@ type ServiceOfferingResource struct {
 
 type ServiceOfferingEntity struct {
 	Label        string
+	Version      string
+	Description  string
+	Provider     string
 	ServicePlans []ServicePlanResource `json:"service_plans"`
 }
 
