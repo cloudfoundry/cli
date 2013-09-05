@@ -42,8 +42,7 @@ func TestMarketplaceServices(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
 
 	cmd := NewMarketplaceServices(ui, config, serviceRepo)
-	cmd.GetRequirements(reqFactory, ctxt)
-	cmd.Run(ctxt)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "Getting services from marketplace...")
 	assert.Contains(t, ui.Outputs[1], "OK")

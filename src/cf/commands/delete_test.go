@@ -21,9 +21,7 @@ func deleteApp(confirmation string) (ui *testhelpers.FakeUI, reqFactory *testhel
 	ctxt := testhelpers.NewContext("delete", []string{"app-to-delete"})
 
 	cmd := NewDelete(ui, config, appRepo)
-	cmd.GetRequirements(reqFactory, ctxt)
-	cmd.Run(ctxt)
-
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
 

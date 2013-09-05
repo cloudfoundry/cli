@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -50,12 +49,10 @@ func TestBindCommandFailsWithUsage(t *testing.T) {
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func callBindService(args []string, config *configuration.Configuration, reqFactory requirements.Factory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
+func callBindService(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("bind-service", args)
-
 	cmd := NewBindService(fakeUI, config, serviceRepo)
-	cmd.GetRequirements(reqFactory, ctxt)
-	cmd.Run(ctxt)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
