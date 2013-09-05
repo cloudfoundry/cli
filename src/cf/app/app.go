@@ -170,11 +170,13 @@ OPTIONS:
 			Name:        "create-service",
 			ShortName:   "cs",
 			Description: "Create service instance",
-			Usage:       "cf create-service --offering <offering> --plan <plan> --name <service instance name>",
+			Usage: "cf create-service --offering <offering> --plan <plan> --name <service instance name>\n" +
+				"   cf create-service --offering user-provided --name <service name> --parameters \"<comma separated parameter list>\"",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the service instance"},
 				cli.StringFlag{"offering", "", "name of the service offering to use"},
 				cli.StringFlag{"plan", "", "name of the service plan to use"},
+				cli.StringFlag{"parameters", "", "parameters to use for user-provided services"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewCreateService()
