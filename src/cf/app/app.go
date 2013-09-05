@@ -231,7 +231,7 @@ OPTIONS:
 		},
 		{
 			Name:        "services",
-			ShortName:   "se",
+			ShortName:   "sv",
 			Description: "List all services in the currently selected space",
 			Usage:       "cf services [--marketplace]",
 			Flags: []cli.Flag{
