@@ -22,7 +22,7 @@ func NewRoutes(ui term.UI, config *configuration.Configuration, routeRepo api.Ro
 	return
 }
 
-func (r Routes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (r Routes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

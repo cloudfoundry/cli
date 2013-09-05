@@ -15,12 +15,8 @@ func NewRunner(reqFactory requirements.Factory) (runner Runner) {
 }
 
 type Command interface {
-	GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error)
+	GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
 	Run(c *cli.Context)
-}
-
-type Requirement interface {
-	Execute() (err error)
 }
 
 func (runner Runner) Run(cmd Command, c *cli.Context) (err error) {

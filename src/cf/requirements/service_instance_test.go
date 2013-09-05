@@ -20,5 +20,5 @@ func TestServiceInstanceReqExecute(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, repo.FindInstanceByNameName, "foo")
-	assert.Equal(t, req.ServiceInstance, instance)
+	assert.Equal(t, req.GetServiceInstance(), instance)
 }

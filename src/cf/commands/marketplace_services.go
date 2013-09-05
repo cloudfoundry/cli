@@ -22,7 +22,7 @@ func NewMarketplaceServices(ui term.UI, config *configuration.Configuration, ser
 	return
 }
 
-func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

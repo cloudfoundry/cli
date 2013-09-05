@@ -25,7 +25,7 @@ func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.Se
 	return
 }
 
-func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	appName := c.String("app")
 	serviceName := c.String("service")
 
@@ -38,13 +38,13 @@ func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cl
 	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
+	reqs = []requirements.Requirement{cmd.appReq, cmd.serviceInstanceReq}
 	return
 }
 
 func (cmd *UnbindService) Run(c *cli.Context) {
-	app := cmd.appReq.Application
-	instance := cmd.serviceInstanceReq.ServiceInstance
+	app := cmd.appReq.GetApplication()
+	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
 	cmd.ui.Say("Unbinding service %s from %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
 

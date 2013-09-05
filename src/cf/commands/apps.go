@@ -23,7 +23,7 @@ func NewApps(ui term.UI, config *configuration.Configuration, spaceRepo api.Spac
 	return
 }
 
-func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

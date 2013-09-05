@@ -3,22 +3,49 @@ package testhelpers
 import (
 	"cf/requirements"
 	"cf"
+	"errors"
 )
 
 type FakeReqFactory struct {
 	ApplicationName string
-	Application cf.Application
+	Application     cf.Application
 
 	ServiceInstanceName string
-	ServiceInstance cf.ServiceInstance
+	ServiceInstance     cf.ServiceInstance
+
+	LoginSuccess bool
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
 	f.ApplicationName = name
-	return requirements.ApplicationRequirement{Application: f.Application}
+	return FakeRequirement{f, true}
 }
 
 func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements.ServiceInstanceRequirement {
 	f.ServiceInstanceName = name
-	return requirements.ServiceInstanceRequirement{ServiceInstance: f.ServiceInstance}
+	return FakeRequirement{f, true}
+}
+
+func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
+	return FakeRequirement{ f, f.LoginSuccess }
+}
+
+type FakeRequirement struct {
+	factory *FakeReqFactory
+	success bool
+}
+
+func (r FakeRequirement) Execute() (err error) {
+	if !r.success {
+		err = errors.New("Requirement error")
+	}
+	return
+}
+
+func (r FakeRequirement) GetApplication() cf.Application {
+	return r.factory.Application
+}
+
+func (r FakeRequirement) GetServiceInstance() cf.ServiceInstance {
+	return r.factory.ServiceInstance
 }
