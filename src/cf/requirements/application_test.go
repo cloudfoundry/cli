@@ -20,5 +20,5 @@ func TestApplicationReqExecute(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, appRepo.AppName, "foo")
-	assert.Equal(t, appReq.Application, app)
+	assert.Equal(t, appReq.GetApplication(), app)
 }

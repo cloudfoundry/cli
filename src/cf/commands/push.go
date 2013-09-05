@@ -36,7 +36,7 @@ func NewPush(ui term.UI, config *configuration.Configuration, starter Applicatio
 	return
 }
 
-func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

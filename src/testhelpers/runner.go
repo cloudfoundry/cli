@@ -5,13 +5,25 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *FakeReqFactory) {
-	_, err := cmd.GetRequirements(reqFactory, ctxt)
+var CommandDidPassRequirements bool
 
+func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *FakeReqFactory) {
+	CommandDidPassRequirements = false
+
+	reqs, err := cmd.GetRequirements(reqFactory, ctxt)
 	if err != nil {
 		return
 	}
 
+	for _, req := range reqs {
+		err = req.Execute()
+		if err != nil {
+			return
+		}
+	}
+
 	cmd.Run(ctxt)
+	CommandDidPassRequirements = true
+
 	return
 }

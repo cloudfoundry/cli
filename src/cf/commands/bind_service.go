@@ -25,7 +25,7 @@ func NewBindService(ui term.UI, config *configuration.Configuration, sR api.Serv
 	return
 }
 
-func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	appName := c.String("app")
 	serviceName := c.String("service")
 
@@ -38,13 +38,13 @@ func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.
 	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []Requirement{&cmd.appReq, &cmd.serviceInstanceReq}
+	reqs = []requirements.Requirement{cmd.appReq, cmd.serviceInstanceReq}
 	return
 }
 
 func (cmd *BindService) Run(c *cli.Context) {
-	app := cmd.appReq.Application
-	instance := cmd.serviceInstanceReq.ServiceInstance
+	app := cmd.appReq.GetApplication()
+	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
 	cmd.ui.Say("Binding service %s to %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
 

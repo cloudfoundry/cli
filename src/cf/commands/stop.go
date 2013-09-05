@@ -25,7 +25,7 @@ func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.Applic
 	return
 }
 
-func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		s.ui.FailWithUsage(c, "stop")
@@ -34,12 +34,12 @@ func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 
 	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []Requirement{&s.appReq}
+	reqs = []requirements.Requirement{s.appReq}
 	return
 }
 
 func (s *Stop) Run(c *cli.Context) {
-	app := s.appReq.Application
+	app := s.appReq.GetApplication()
 
 	if app.State == "stopped" {
 		s.ui.Say(term.Magenta("Application " + app.Name + " is already stopped."))

@@ -29,7 +29,7 @@ func NewTarget(ui term.UI, config *configuration.Configuration, orgRepo api.Orga
 	return
 }
 
-func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

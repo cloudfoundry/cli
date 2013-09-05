@@ -22,7 +22,7 @@ func NewServices(ui term.UI, config *configuration.Configuration, spaceRepo api.
 	return
 }
 
-func (cmd Services) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (cmd Services) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 

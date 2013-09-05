@@ -5,6 +5,10 @@ import (
 	"cf/terminal"
 )
 
+type Requirement interface {
+	Execute() (err error)
+}
+
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement

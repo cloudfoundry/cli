@@ -34,7 +34,7 @@ func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.Appli
 	return
 }
 
-func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		s.ui.FailWithUsage(c, "start")
@@ -43,12 +43,12 @@ func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 
 	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []Requirement{&s.appReq}
+	reqs = []requirements.Requirement{s.appReq}
 	return
 }
 
 func (s *Start) Run(c *cli.Context) {
-	s.ApplicationStart(s.appReq.Application)
+	s.ApplicationStart(s.appReq.GetApplication())
 }
 
 func (s *Start) ApplicationStart(app cf.Application) {
