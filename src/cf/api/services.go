@@ -15,7 +15,7 @@ type ServiceRepository interface {
 	CreateServiceInstance(config *configuration.Configuration, name string, plan cf.ServicePlan) (err error)
 	CreateUserProvidedServiceInstance(config *configuration.Configuration, name string, params map[string]string) (err error)
 	FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error)
-	BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
+	BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (errorCode int, err error)
 	UnbindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error)
 	DeleteService(config *configuration.Configuration, instance cf.ServiceInstance) (err error)
 }
@@ -131,7 +131,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(config *configur
 	return
 }
 
-func (repo CloudControllerServiceRepository) BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (err error) {
+func (repo CloudControllerServiceRepository) BindService(config *configuration.Configuration, instance cf.ServiceInstance, app cf.Application) (errorCode int, err error) {
 	path := fmt.Sprintf("%s/v2/service_bindings", config.Target)
 	body := fmt.Sprintf(
 		`{"app_guid":"%s","service_instance_guid":"%s"}`,
@@ -142,7 +142,7 @@ func (repo CloudControllerServiceRepository) BindService(config *configuration.C
 		return
 	}
 
-	_, err = PerformRequest(request)
+	errorCode, err = PerformRequest(request)
 	return
 }
 
