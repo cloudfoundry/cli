@@ -31,7 +31,7 @@ type CloudControllerApplicationRepository struct {
 
 func (repo CloudControllerApplicationRepository) FindAll(config *configuration.Configuration) (apps []cf.Application, err error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?inline-relations-depth=2", config.Target, config.Space.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -65,7 +65,7 @@ func (repo CloudControllerApplicationRepository) FindAll(config *configuration.C
 
 func (repo CloudControllerApplicationRepository) FindByName(config *configuration.Configuration, name string) (app cf.Application, err error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A"+name)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -83,7 +83,7 @@ func (repo CloudControllerApplicationRepository) FindByName(config *configuratio
 
 	res := findResponse.Resources[0]
 	path = fmt.Sprintf("%s/v2/apps/%s/summary", config.Target, res.Metadata.Guid)
-	request, err = NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err = NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -119,7 +119,7 @@ func (repo CloudControllerApplicationRepository) FindByName(config *configuratio
 func (repo CloudControllerApplicationRepository) SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s", config.Target, app.Guid)
 	data := fmt.Sprintf(`{"environment_json":{"%s":"%s"}}`, name, value)
-	request, err := NewAuthorizedRequest("PUT", path, config.AccessToken, strings.NewReader(data))
+	request, err := NewRequest("PUT", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -142,7 +142,7 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s}`,
 		config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid,
 	)
-	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
+	request, err := NewRequest("POST", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -169,7 +169,7 @@ func stringOrNull(s string) string {
 
 func (repo CloudControllerApplicationRepository) Delete(config *configuration.Configuration, app cf.Application) (err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", config.Target, app.Guid)
-	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
+	request, err := NewRequest("DELETE", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -186,7 +186,7 @@ func (repo CloudControllerApplicationRepository) Upload(config *configuration.Co
 		return
 	}
 
-	request, err := NewAuthorizedRequest("PUT", url, config.AccessToken, body)
+	request, err := NewRequest("PUT", url, config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 	request.Header.Set("Content-Type", contentType)
 	if err != nil {
@@ -213,7 +213,7 @@ type InstanceApiResponse struct {
 
 func (repo CloudControllerApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", config.Target, app.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -239,7 +239,7 @@ func (repo CloudControllerApplicationRepository) GetInstances(config *configurat
 func changeApplicationState(config *configuration.Configuration, app cf.Application, state string) (err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s", config.Target, app.Guid)
 	body := fmt.Sprintf(`{"console":true,"state":"%s"}`, state)
-	request, err := NewAuthorizedRequest("PUT", path, config.AccessToken, strings.NewReader(body))
+	request, err := NewRequest("PUT", path, config.AccessToken, strings.NewReader(body))
 
 	if err != nil {
 		return

@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewAuthorizedRequest(t *testing.T) {
-	request, err := NewAuthorizedRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+	request, err := NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
 	assert.NoError(t, err)
 	assert.Equal(t, request.Header.Get("Authorization"), "BEARER my-access-token")
@@ -31,7 +31,7 @@ func TestPerformRequestOutputsErrorFromServer(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
 	defer ts.Close()
 
-	request, err := NewAuthorizedRequest("GET", ts.URL, "TOKEN", nil)
+	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
 	_, err = PerformRequest(request)
@@ -44,7 +44,7 @@ func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
 	defer ts.Close()
 
-	request, err := NewAuthorizedRequest("GET", ts.URL, "TOKEN", nil)
+	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
 	resource := new(Resource)
@@ -58,7 +58,7 @@ func TestPerformRequestReturnsErrorCode(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
 	defer ts.Close()
 
-	request, err := NewAuthorizedRequest("GET", ts.URL, "TOKEN", nil)
+	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
 	resource := new(Resource)

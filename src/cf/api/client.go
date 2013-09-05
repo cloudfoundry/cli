@@ -17,7 +17,7 @@ import (
 
 const PRIVATE_DATA_PLACEHOLDER = "[PRIVATE DATA HIDDEN]"
 
-type AuthorizedRequest struct {
+type Request struct {
 	*http.Request
 }
 
@@ -34,7 +34,7 @@ func newClient() *http.Client {
 	return &http.Client{Transport: tr}
 }
 
-func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (authReq *AuthorizedRequest, err error) {
+func NewRequest(method, path, accessToken string, body io.Reader) (authReq *Request, err error) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
 		return
@@ -42,16 +42,16 @@ func NewAuthorizedRequest(method, path, accessToken string, body io.Reader) (aut
 	request.Header.Set("Authorization", accessToken)
 	request.Header.Set("accept", "application/json")
 
-	authReq = &AuthorizedRequest{request}
+	authReq = &Request{request}
 	return
 }
 
-func PerformRequest(request *AuthorizedRequest) (errorCode int, err error) {
+func PerformRequest(request *Request) (errorCode int, err error) {
 	_, errorCode, err = doRequest(request.Request)
 	return
 }
 
-func PerformRequestAndParseResponse(request *AuthorizedRequest, response interface{}) (errorCode int, err error) {
+func PerformRequestAndParseResponse(request *Request, response interface{}) (errorCode int, err error) {
 	rawResponse, errorCode, err := doRequest(request.Request)
 	if err != nil {
 		return

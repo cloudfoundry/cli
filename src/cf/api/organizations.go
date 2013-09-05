@@ -17,7 +17,7 @@ type CloudControllerOrganizationRepository struct {
 
 func (repo CloudControllerOrganizationRepository) FindAll(config *configuration.Configuration) (orgs []cf.Organization, err error) {
 	path := config.Target + "/v2/organizations"
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

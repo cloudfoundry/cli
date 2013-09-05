@@ -18,7 +18,7 @@ type CloudControllerDomainRepository struct {
 
 func (repo CloudControllerDomainRepository) FindAll(config *configuration.Configuration) (domains []cf.Domain, err error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains", config.Target, config.Space.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

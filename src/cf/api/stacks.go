@@ -16,7 +16,7 @@ type CloudControllerStackRepository struct {
 
 func (repo CloudControllerStackRepository) FindByName(config *configuration.Configuration, name string) (stack cf.Stack, err error) {
 	path := fmt.Sprintf("%s/v2/stacks?q=name%s", config.Target, "%3A"+name)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

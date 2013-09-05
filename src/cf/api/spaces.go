@@ -19,7 +19,7 @@ type CloudControllerSpaceRepository struct {
 
 func (repo CloudControllerSpaceRepository) FindAll(config *configuration.Configuration) (spaces []cf.Space, err error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", config.Target, config.Organization.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func (repo CloudControllerSpaceRepository) FindByName(config *configuration.Conf
 
 func (repo CloudControllerSpaceRepository) GetSummary(config *configuration.Configuration) (space cf.Space, err error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", config.Target, config.Space.Guid)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

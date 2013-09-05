@@ -70,7 +70,7 @@ func (t Target) Run(c *cli.Context) {
 func (t Target) setNewTarget(target string) {
 	t.ui.Say("Setting target to %s...", term.Yellow(target))
 
-	request, err := api.NewAuthorizedRequest("GET", target+"/v2/info", "", nil)
+	request, err := api.NewRequest("GET", target+"/v2/info", "", nil)
 
 	if err != nil {
 		t.ui.Failed("URL invalid.", err)

@@ -25,7 +25,7 @@ type CloudControllerServiceRepository struct {
 
 func (repo CloudControllerServiceRepository) GetServiceOfferings(config *configuration.Configuration) (offerings []cf.ServiceOffering, err error) {
 	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", config.Target)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(config *confi
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
 		name, plan.Guid, config.Space.Guid,
 	)
-	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
+	request, err := NewRequest("POST", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -87,7 +87,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(c
 		return
 	}
 
-	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, bytes.NewReader(jsonBytes))
+	request, err := NewRequest("POST", path, config.AccessToken, bytes.NewReader(jsonBytes))
 	if err != nil {
 		return
 	}
@@ -98,7 +98,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(c
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(config *configuration.Configuration, name string) (instance cf.ServiceInstance, err error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A"+name)
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -137,7 +137,7 @@ func (repo CloudControllerServiceRepository) BindService(config *configuration.C
 		`{"app_guid":"%s","service_instance_guid":"%s"}`,
 		app.Guid, instance.Guid,
 	)
-	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(body))
+	request, err := NewRequest("POST", path, config.AccessToken, strings.NewReader(body))
 	if err != nil {
 		return
 	}
@@ -161,7 +161,7 @@ func (repo CloudControllerServiceRepository) UnbindService(config *configuration
 		return
 	}
 
-	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
+	request, err := NewRequest("DELETE", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -176,7 +176,7 @@ func (repo CloudControllerServiceRepository) DeleteService(config *configuration
 	}
 
 	path := fmt.Sprintf("%s/v2/service_instances/%s", config.Target, instance.Guid)
-	request, err := NewAuthorizedRequest("DELETE", path, config.AccessToken, nil)
+	request, err := NewRequest("DELETE", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}

@@ -29,7 +29,7 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", config.AuthorizationEndpoint)
-	request, err := NewAuthorizedRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
+	request, err := NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
 		return
 	}

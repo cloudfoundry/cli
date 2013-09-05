@@ -21,7 +21,7 @@ type CloudControllerRouteRepository struct {
 func (repo CloudControllerRouteRepository) FindAll(config *configuration.Configuration) (routes []cf.Route, err error) {
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", config.Target)
 
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -50,7 +50,7 @@ func (repo CloudControllerRouteRepository) FindAll(config *configuration.Configu
 func (repo CloudControllerRouteRepository) FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error) {
 	path := fmt.Sprintf("%s/v2/routes?q=host%s", config.Target, "%3A"+host)
 
-	request, err := NewAuthorizedRequest("GET", path, config.AccessToken, nil)
+	request, err := NewRequest("GET", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (repo CloudControllerRouteRepository) Create(config *configuration.Configur
 		`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`,
 		newRoute.Host, domain.Guid, config.Space.Guid,
 	)
-	request, err := NewAuthorizedRequest("POST", path, config.AccessToken, strings.NewReader(data))
+	request, err := NewRequest("POST", path, config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -97,7 +97,7 @@ func (repo CloudControllerRouteRepository) Create(config *configuration.Configur
 
 func (repo CloudControllerRouteRepository) Bind(config *configuration.Configuration, route cf.Route, app cf.Application) (err error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", config.Target, app.Guid, route.Guid)
-	request, err := NewAuthorizedRequest("PUT", path, config.AccessToken, nil)
+	request, err := NewRequest("PUT", path, config.AccessToken, nil)
 	if err != nil {
 		return
 	}
