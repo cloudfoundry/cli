@@ -10,6 +10,19 @@ import (
 	"testing"
 )
 
+func TestStopCommandFailsWithUsage(t *testing.T) {
+	config := &configuration.Configuration{}
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+
+	ui := callStop([]string{}, config, reqFactory, appRepo)
+	assert.True(t, ui.FailedWithUsage)
+
+	ui = callStop([]string{"my-app"}, config, reqFactory, appRepo)
+	assert.False(t, ui.FailedWithUsage)
+}
+
 func TestStopApplication(t *testing.T) {
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}

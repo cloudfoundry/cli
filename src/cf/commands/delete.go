@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -25,6 +26,11 @@ func NewDelete(ui term.UI, config *configuration.Configuration, appRepo api.Appl
 }
 
 func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []Requirement, err error) {
+	if len(c.Args()) == 0 {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "delete")
+		return
+	}
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []Requirement{&cmd.appReq}

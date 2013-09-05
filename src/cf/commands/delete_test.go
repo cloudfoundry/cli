@@ -9,24 +9,8 @@ import (
 	"testing"
 )
 
-func deleteApp(confirmation string) (ui *testhelpers.FakeUI, reqFactory *testhelpers.FakeReqFactory, appRepo *testhelpers.FakeApplicationRepository) {
-	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
-	reqFactory = &testhelpers.FakeReqFactory{Application: app}
-	appRepo = &testhelpers.FakeApplicationRepository{}
-	config := &configuration.Configuration{}
-
-	ui = &testhelpers.FakeUI{
-		Inputs: []string{confirmation},
-	}
-	ctxt := testhelpers.NewContext("delete", []string{"app-to-delete"})
-
-	cmd := NewDelete(ui, config, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
 func TestDeleteConfirmingWithY(t *testing.T) {
-	ui, reqFactory, appRepo := deleteApp("y")
+	ui, reqFactory, appRepo := deleteApp("y", []string{"app-to-delete"})
 
 	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
 	assert.Contains(t, ui.Prompts[0], "Really delete app-to-delete?>")
@@ -37,7 +21,7 @@ func TestDeleteConfirmingWithY(t *testing.T) {
 }
 
 func TestDeleteConfirmingWithYes(t *testing.T) {
-	ui, reqFactory, appRepo := deleteApp("Yes")
+	ui, reqFactory, appRepo := deleteApp("Yes", []string{"app-to-delete"})
 
 	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
 	assert.Contains(t, ui.Prompts[0], "Really delete app-to-delete?>")
@@ -64,4 +48,26 @@ func TestDeleteWithForceOption(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Deleting app-to-delete")
 	assert.Equal(t, appRepo.DeletedApp, reqFactory.Application)
 	assert.Contains(t, ui.Outputs[1], "OK")
+}
+
+func TestDeleteCommandFailsWithUsage(t *testing.T) {
+	ui, _, _ := deleteApp("Yes", []string{})
+	assert.True(t, ui.FailedWithUsage)
+
+	ui, _, _ = deleteApp("Yes", []string{"app-to-delete"})
+	assert.False(t, ui.FailedWithUsage)
+}
+
+func deleteApp(confirmation string, args []string) (ui *testhelpers.FakeUI, reqFactory *testhelpers.FakeReqFactory, appRepo *testhelpers.FakeApplicationRepository) {
+	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
+	reqFactory = &testhelpers.FakeReqFactory{Application: app}
+	appRepo = &testhelpers.FakeApplicationRepository{}
+	config := &configuration.Configuration{}
+	ui = &testhelpers.FakeUI{
+		Inputs: []string{confirmation},
+	}
+	ctxt := testhelpers.NewContext("delete", args)
+	cmd := NewDelete(ui, config, appRepo)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	return
 }
