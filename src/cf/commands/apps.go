@@ -26,6 +26,7 @@ func NewApps(ui term.UI, config *configuration.Configuration, spaceRepo api.Spac
 func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
+		reqFactory.NewSpaceRequirement(),
 	}
 	return
 }
