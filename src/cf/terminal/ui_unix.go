@@ -96,5 +96,6 @@ func catchSignal(fd []uintptr, sig chan os.Signal, brk chan bool) {
 		echoOn(fd)
 		os.Exit(-1)
 	case <-brk:
+		signal.Stop(sig)
 	}
 }
