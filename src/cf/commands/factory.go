@@ -147,3 +147,11 @@ func (f Factory) NewServices() Services {
 		f.repoLocator.GetSpaceRepository(),
 	)
 }
+
+func (f Factory) NewMarketplaceServices() MarketplaceServices {
+	return NewMarketplaceServices(
+		f.ui,
+		f.repoLocator.GetConfig(),
+		f.repoLocator.GetServiceRepository(),
+	)
+}

@@ -20,6 +20,9 @@ var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, 
       },
       "entity": {
         "label": "Offering 1",
+        "provider": "Offering 1 provider",
+        "description": "Offering 1 description",
+        "version" : "1.0",
         "service_plans": [
         	{
         		"metadata": {"guid": "offering-1-plan-1-guid"},
@@ -38,6 +41,9 @@ var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, 
       },
       "entity": {
         "label": "Offering 2",
+        "provider": "Offering 2 provider",
+        "description": "Offering 2 description",
+        "version" : "1.5",
         "service_plans": [
         	{
         		"metadata": {"guid": "offering-2-plan-1-guid"},
@@ -72,6 +78,9 @@ func TestGetServiceOfferings(t *testing.T) {
 
 	firstOffering := offerings[0]
 	assert.Equal(t, firstOffering.Label, "Offering 1")
+	assert.Equal(t, firstOffering.Version, "1.0")
+	assert.Equal(t, firstOffering.Description, "Offering 1 description")
+	assert.Equal(t, firstOffering.Provider, "Offering 1 provider")
 	assert.Equal(t, firstOffering.Guid, "offering-1-guid")
 	assert.Equal(t, len(firstOffering.Plans), 2)
 

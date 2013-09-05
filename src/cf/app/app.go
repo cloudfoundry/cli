@@ -233,9 +233,18 @@ OPTIONS:
 			Name:        "services",
 			ShortName:   "se",
 			Description: "List all services in the currently selected space",
-			Usage:       "cf services",
+			Usage:       "cf services [--marketplace]",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"marketplace", "use to list available offerings on the marketplace"},
+			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewServices()
+				var cmd commands.Command
+				cmd = cmdFactory.NewServices()
+
+				if c.Bool("marketplace") {
+					cmd = cmdFactory.NewMarketplaceServices()
+				}
+
 				cmdRunner.Run(cmd, c)
 			},
 		},

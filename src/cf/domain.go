@@ -82,11 +82,12 @@ type ServicePlan struct {
 }
 
 type ServiceOffering struct {
-	Guid     string
-	Label    string
-	Provider string
-	Version  string
-	Plans    []ServicePlan
+	Guid        string
+	Label       string
+	Provider    string
+	Version     string
+	Description string
+	Plans       []ServicePlan
 }
 
 type ServiceInstance struct {
