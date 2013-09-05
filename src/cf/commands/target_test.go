@@ -225,7 +225,7 @@ func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 
 	ui = callTarget([]string{}, config, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[3], "No space targeted.")
+	assert.Contains(t, ui.Outputs[2], "No org targeted.")
 }
 
 func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
@@ -249,15 +249,12 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 }
 
 func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
+	configuration.Delete()
 	config := setOrganization()
 
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{SpaceByNameErr: true}
-	ui := callTarget([]string{}, config, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[3], "No space targeted.")
-
-	ui = callTarget([]string{"-s", "my-space"}, config, orgRepo, spaceRepo)
+	ui := callTarget([]string{"-s", "my-space"}, config, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "You do not have access to that space.")
