@@ -1,13 +1,13 @@
 package requirements
 
 import (
-	"cf/terminal"
 	"cf/configuration"
+	"cf/terminal"
 	"errors"
 )
 
 type LoginRequirement struct {
-	ui terminal.UI
+	ui     terminal.UI
 	config *configuration.Configuration
 }
 
