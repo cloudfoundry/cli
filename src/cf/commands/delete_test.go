@@ -46,3 +46,22 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 	assert.Equal(t, appRepo.DeletedApp, reqFactory.Application)
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
+
+func TestDeleteWithForceOption(t *testing.T) {
+	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	appRepo := &testhelpers.FakeApplicationRepository{}
+	config := &configuration.Configuration{}
+
+	ui := &testhelpers.FakeUI{}
+	ctxt := testhelpers.NewContext("delete", []string{"-f", "app-to-delete"})
+
+	cmd := NewDelete(ui, config, appRepo)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+
+	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
+	assert.Equal(t, len(ui.Prompts), 0)
+	assert.Contains(t, ui.Outputs[0], "Deleting app-to-delete")
+	assert.Equal(t, appRepo.DeletedApp, reqFactory.Application)
+	assert.Contains(t, ui.Outputs[1], "OK")
+}

@@ -33,10 +33,13 @@ func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 
 func (d *Delete) Run(c *cli.Context) {
 	app := d.appReq.Application
+	force := c.Bool("f")
 
-	response := strings.ToLower(d.ui.Ask("Really delete %s?>", app.Name))
-	if response != "y" && response != "yes" {
-		return
+	if !force {
+		response := strings.ToLower(d.ui.Ask("Really delete %s?>", app.Name))
+		if response != "y" && response != "yes" {
+			return
+		}
 	}
 
 	d.ui.Say("Deleting %s", app.Name)
