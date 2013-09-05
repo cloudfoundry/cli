@@ -20,7 +20,7 @@ type UI interface {
 	FailWithUsage(ctxt *cli.Context, cmdName string)
 	ShowConfiguration(*configuration.Configuration)
 	LoadingIndication()
-	Wait(seconds time.Duration)
+	Wait(duration time.Duration)
 	DisplayTable(table [][]string, coloringFunc ColoringFunction)
 }
 
@@ -88,8 +88,8 @@ func (c TerminalUI) LoadingIndication() {
 	fmt.Print(".")
 }
 
-func (c TerminalUI) Wait(seconds time.Duration) {
-	time.Sleep(1000 * 1000 * 1000 * seconds)
+func (c TerminalUI) Wait(duration time.Duration) {
+	time.Sleep(duration)
 }
 
 func (ui TerminalUI) DisplayTable(table [][]string, coloringFunc ColoringFunction) {
