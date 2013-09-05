@@ -47,13 +47,14 @@ func (c TerminalUI) Ok() {
 func (c TerminalUI) Failed(message string, err error) {
 	c.Say(Red("FAILED"))
 
-	if message != "" {
+	if message != "" && err == nil {
 		c.Say(message)
 	}
 
 	if err != nil {
 		c.Say(err.Error())
 	}
+
 	return
 }
 
