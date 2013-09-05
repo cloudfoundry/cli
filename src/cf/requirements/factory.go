@@ -12,6 +12,7 @@ type Requirement interface {
 type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement
+	NewLoginRequirement() Requirement
 }
 
 type ApiRequirementFactory struct {
@@ -38,5 +39,12 @@ func (f ApiRequirementFactory) NewServiceInstanceRequirement(name string) Servic
 		f.ui,
 		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
+	)
+}
+
+func (f ApiRequirementFactory) NewLoginRequirement() Requirement {
+	return NewLoginRequirement(
+		f.ui,
+		f.repoLocator.GetConfig(),
 	)
 }
