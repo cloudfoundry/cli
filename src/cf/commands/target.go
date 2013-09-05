@@ -40,6 +40,12 @@ func (t Target) Run(c *cli.Context) {
 
 	if argsCount == 0 && orgName == "" && spaceName == "" {
 		t.ui.ShowConfiguration(t.config)
+		if !t.config.HasOrganization() {
+			t.ui.Say("No org targeted. Use 'cf target -o' to target an org.")
+		}
+		if !t.config.HasSpace() {
+			t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
+		}
 		return
 	}
 

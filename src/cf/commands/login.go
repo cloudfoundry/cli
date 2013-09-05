@@ -78,7 +78,8 @@ func (l Login) Run(c *cli.Context) {
 		}
 
 		if len(spaces) == 0 {
-			l.ui.ShowConfigurationNoSpacesAvailable(l.config)
+			l.ui.ShowConfiguration(l.config)
+			l.ui.Say("No spaces found. Use 'cf create-space' as an Org Manager.")
 			return
 		}
 

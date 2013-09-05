@@ -83,19 +83,24 @@ func (ui *FakeUI) DumpOutputs() string {
 }
 
 func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
-	ui.showBaseConfig(config)
+	ui.Say("API endpoint: %s (API version: %s)",
+		config.Target,
+		config.ApiVersion)
+
+	if !config.IsLoggedIn() {
+		ui.Say("Logged out. Use '%s' to login.", "cf login USERNAME")
+		return
+	} else {
+		ui.Say("user:            %s", config.UserEmail())
+	}
+
+	if config.HasOrganization() {
+		ui.Say("org:             %s", config.Organization.Name)
+	}
 
 	if config.HasSpace() {
 		ui.Say("app space:       %s", config.Space.Name)
-	} else {
-		ui.Say("No space targeted. Use 'cf target -s' to target a space.")
 	}
-}
-
-func (ui *FakeUI) ShowConfigurationNoSpacesAvailable(config *configuration.Configuration) {
-	ui.showBaseConfig(config)
-
-	ui.Say("No spaces found. Use 'cf create-space' as an Org Manager.")
 }
 
 func (ui FakeUI) LoadingIndication() {
@@ -106,22 +111,7 @@ func (c FakeUI) Wait(seconds time.Duration) {
 }
 
 func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
-	ui.Say("API endpoint: %s (API version: %s)",
-		config.Target,
-		config.ApiVersion)
 
-	if !config.IsLoggedIn() {
-		ui.Say("Logged out. Use '%s' to login.", "cf login USERNAME")
-		return
-	}
-
-	ui.Say("user:            %s", config.UserEmail())
-
-	if config.HasOrganization() {
-		ui.Say("org:             %s", config.Organization.Name)
-	} else {
-		ui.Say("No org targeted. Use 'cf target -o' to target an org.")
-	}
 }
 
 func (ui *FakeUI) DisplayTable(table [][]string, coloringFunc term.ColoringFunction) {
