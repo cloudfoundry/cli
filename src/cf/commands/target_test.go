@@ -45,7 +45,7 @@ var validInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, infoResponse)
 }
 
-func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
+func TestTargetWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(validInfoEndpoint))
 	defer ts.Close()
 
@@ -56,6 +56,28 @@ func TestTargetWhenUrlIsValidInfoEndpoint(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[2], ts.URL)
 	assert.Contains(t, fakeUI.Outputs[2], "42.0.0")
+
+	savedConfig, err := configtest.GetSavedConfig()
+	assert.NoError(t, err)
+
+	assert.Equal(t, savedConfig.AccessToken, "")
+	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
+	assert.Equal(t, savedConfig.Target, ts.URL)
+	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
+}
+
+func TestTargetWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(validInfoEndpoint))
+	defer ts.Close()
+
+	orgRepo := &testhelpers.FakeOrgRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	config := testhelpers.Login()
+	fakeUI := callTarget([]string{ts.URL}, config, orgRepo, spaceRepo)
+
+	assert.Contains(t, fakeUI.Outputs[2], "Warning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.")
+	assert.Contains(t, fakeUI.Outputs[3], ts.URL)
+	assert.Contains(t, fakeUI.Outputs[3], "42.0.0")
 
 	savedConfig, err := configtest.GetSavedConfig()
 	assert.NoError(t, err)
