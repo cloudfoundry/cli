@@ -10,10 +10,30 @@ import (
 	"testing"
 )
 
+func TestSetEnvRequirements(t *testing.T) {
+	config := &configuration.Configuration{}
+	appRepo := &testhelpers.FakeApplicationRepository{}
+	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
+
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+	callSetEnv(args, config, reqFactory, appRepo)
+	assert.True(t, testhelpers.CommandDidPassRequirements)
+
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, SpaceSuccess: true}
+	callSetEnv(args, config, reqFactory, appRepo)
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+
+	testhelpers.CommandDidPassRequirements = true
+
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: false}
+	callSetEnv(args, config, reqFactory, appRepo)
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+}
+
 func TestRunWhenApplicationExists(t *testing.T) {
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, SpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
@@ -32,7 +52,7 @@ func TestRunWhenApplicationExists(t *testing.T) {
 func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, SpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{
 		AppByName: app,
 		SetEnvErr: true,
@@ -48,7 +68,7 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 
 func TestSetEnvFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, SpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
 	config := &configuration.Configuration{}
 

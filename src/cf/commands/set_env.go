@@ -32,7 +32,11 @@ func (cmd *SetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 	}
 
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
-	reqs = []requirements.Requirement{cmd.appReq}
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+		reqFactory.NewSpaceRequirement(),
+		cmd.appReq,
+	}
 	return
 }
 
