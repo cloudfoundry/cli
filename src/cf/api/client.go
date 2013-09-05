@@ -15,6 +15,8 @@ import (
 	"strings"
 )
 
+const PRIVATE_DATA_PLACEHOLDER = "[PRIVATE DATA HIDDEN]"
+
 type AuthorizedRequest struct {
 	*http.Request
 }
@@ -69,11 +71,15 @@ func PerformRequestAndParseResponse(request *AuthorizedRequest, response interfa
 	return
 }
 
-func SanitizeRequest(request string) (sanitized string) {
+func Sanitize(input string) (sanitized string) {
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)
-	sanitized = re.ReplaceAllString(request, "Authorization: [PRIVATE DATA HIDDEN]")
+	sanitized = re.ReplaceAllString(input, "Authorization: "+PRIVATE_DATA_PLACEHOLDER)
 	re = regexp.MustCompile(`password=[^&]*&`)
-	sanitized = re.ReplaceAllString(sanitized, "password=REDACTED&")
+	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER+"&")
+	re = regexp.MustCompile(`"access_token":"[^"]*"`)
+	sanitized = re.ReplaceAllString(sanitized, `"access_token":"`+PRIVATE_DATA_PLACEHOLDER+`"`)
+	re = regexp.MustCompile(`"refresh_token":"[^"]*"`)
+	sanitized = re.ReplaceAllString(sanitized, `"refresh_token":"`+PRIVATE_DATA_PLACEHOLDER+`"`)
 	return
 }
 
@@ -85,7 +91,7 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 		if err != nil {
 			fmt.Println("Error dumping request")
 		} else {
-			fmt.Printf("\n%s\n%s\n", term.Cyan("REQUEST:"), SanitizeRequest(string(dumpedRequest)))
+			fmt.Printf("\n%s\n%s\n", term.Cyan("REQUEST:"), Sanitize(string(dumpedRequest)))
 		}
 	}
 
@@ -96,7 +102,7 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 		if err != nil {
 			fmt.Println("Error dumping response")
 		} else {
-			fmt.Printf("\n%s\n%s\n", term.Cyan("RESPONSE:"), string(dumpedResponse))
+			fmt.Printf("\n%s\n%s\n", term.Cyan("RESPONSE:"), Sanitize(string(dumpedResponse)))
 		}
 	}
 
