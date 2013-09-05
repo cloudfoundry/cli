@@ -28,6 +28,7 @@ GLOBAL OPTIONS:
    {{end}}
 ENVIRONMENT VARIABLES:
    CF_TRACE=true - will output HTTP requests and responses during command
+   HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
 `
 
 	cli.CommandHelpTemplate = `NAME:
