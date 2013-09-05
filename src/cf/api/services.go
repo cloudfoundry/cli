@@ -40,7 +40,14 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings(config *configu
 		for _, p := range r.Entity.ServicePlans {
 			plans = append(plans, cf.ServicePlan{Name: p.Entity.Name, Guid: p.Metadata.Guid})
 		}
-		offerings = append(offerings, cf.ServiceOffering{Label: r.Entity.Label, Guid: r.Metadata.Guid, Plans: plans})
+		offerings = append(offerings, cf.ServiceOffering{
+			Label:       r.Entity.Label,
+			Version:     r.Entity.Version,
+			Provider:    r.Entity.Provider,
+			Description: r.Entity.Description,
+			Guid:        r.Metadata.Guid,
+			Plans:       plans,
+		})
 	}
 
 	return
