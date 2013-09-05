@@ -3,9 +3,9 @@ package requirements_test
 import (
 	"cf/configuration"
 	. "cf/requirements"
-	"testing"
-	"testhelpers"
 	"github.com/stretchr/testify/assert"
+	"testhelpers"
+	"testing"
 )
 
 func TestLoginRequirement(t *testing.T) {
