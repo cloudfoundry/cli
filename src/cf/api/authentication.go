@@ -9,19 +9,21 @@ import (
 )
 
 type Authenticator interface {
-	Authenticate(config *configuration.Configuration, email string, password string) (err error)
+	Authenticate(email string, password string) (err error)
 }
 
 type UAAAuthenticator struct {
 	configRepo configuration.ConfigurationRepository
+	config     *configuration.Configuration
 }
 
 func NewUAAAuthenticator(configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticator) {
 	uaa.configRepo = configRepo
+	uaa.config, _ = configRepo.Get()
 	return
 }
 
-func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, email string, password string) (err error) {
+func (uaa UAAAuthenticator) Authenticate(email string, password string) (err error) {
 	type AuthenticationResponse struct {
 		AccessToken string `json:"access_token"`
 		TokenType   string `json:"token_type"`
@@ -34,7 +36,7 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 		"scope":      {""},
 	}
 
-	path := fmt.Sprintf("%s/oauth/token", config.AuthorizationEndpoint)
+	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)
 	request, err := NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
 		return
@@ -48,6 +50,6 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 		return
 	}
 
-	config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
+	uaa.config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
 	return uaa.configRepo.Save()
 }

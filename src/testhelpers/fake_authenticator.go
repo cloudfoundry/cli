@@ -16,8 +16,8 @@ type FakeAuthenticator struct {
 	AccessToken string
 }
 
-func (auth *FakeAuthenticator) Authenticate(config *configuration.Configuration, email string, password string) (err error) {
-	auth.Config = config
+func (auth *FakeAuthenticator) Authenticate(email string, password string) (err error) {
+	auth.Config, _ = auth.ConfigRepo.Get()
 	auth.Email = email
 	auth.Password = password
 
@@ -25,7 +25,7 @@ func (auth *FakeAuthenticator) Authenticate(config *configuration.Configuration,
 		auth.AccessToken = "BEARER some_access_token"
 	}
 
-	config.AccessToken = auth.AccessToken
+	auth.Config.AccessToken = auth.AccessToken
 	auth.ConfigRepo.Save()
 
 	if auth.AuthError {

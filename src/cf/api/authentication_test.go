@@ -58,7 +58,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	config.AccessToken = ""
 
 	auth := NewUAAAuthenticator(configRepo)
-	err = auth.Authenticate(config, "foo@example.com", "bar")
+	err = auth.Authenticate("foo@example.com", "bar")
 
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
@@ -80,7 +80,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	config.AccessToken = ""
 
 	auth := NewUAAAuthenticator(configRepo)
-	err = auth.Authenticate(config, "foo@example.com", "oops wrong pass")
+	err = auth.Authenticate("foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
 
 	savedConfig := testhelpers.SavedConfiguration

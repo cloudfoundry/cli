@@ -49,7 +49,7 @@ func (l Login) Run(c *cli.Context) {
 		password := l.ui.AskForPassword("Password%s", term.Cyan(">"))
 		l.ui.Say("Authenticating...")
 
-		err := l.authenticator.Authenticate(l.config, email, password)
+		err := l.authenticator.Authenticate(email, password)
 
 		if err != nil {
 			l.ui.Failed("Error Authenticating", err)
