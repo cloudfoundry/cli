@@ -333,7 +333,7 @@ func TestUploadApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 	zipBuffer := bytes.NewBufferString("hello world!")
 
-	err := repo.Upload(config, app, zipBuffer)
+	err := repo.Upload(app, zipBuffer)
 	assert.NoError(t, err)
 }
 

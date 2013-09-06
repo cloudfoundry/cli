@@ -73,7 +73,7 @@ func (p Push) Run(c *cli.Context) {
 		return
 	}
 
-	err = p.appRepo.Upload(p.config, app, zipBuffer)
+	err = p.appRepo.Upload(app, zipBuffer)
 	if err != nil {
 		p.ui.Failed("Error uploading app", err)
 		return

@@ -19,7 +19,7 @@ type ApplicationRepository interface {
 	SetEnv(app cf.Application, name string, value string) (err error)
 	Create(newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(app cf.Application) (err error)
-	Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error)
+	Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error)
 	Start(config *configuration.Configuration, app cf.Application) (err error)
 	Stop(config *configuration.Configuration, app cf.Application) (err error)
 	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error)
@@ -149,15 +149,15 @@ func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (err
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error) {
-	url := fmt.Sprintf("%s/v2/apps/%s/bits", config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error) {
+	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, app.Guid)
 
 	body, boundary, err := createApplicationUploadBody(zipBuffer)
 	if err != nil {
 		return
 	}
 
-	request, err := NewRequest("PUT", url, config.AccessToken, body)
+	request, err := NewRequest("PUT", url, repo.config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 	request.Header.Set("Content-Type", contentType)
 	if err != nil {

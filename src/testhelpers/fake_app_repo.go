@@ -71,7 +71,7 @@ func (repo *FakeApplicationRepository) Delete(app cf.Application) (err error){
 }
 
 
-func (repo *FakeApplicationRepository) Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error) {
+func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error) {
 	repo.UploadedZipBuffer = zipBuffer
 	repo.UploadedApp = app
 
