@@ -16,7 +16,7 @@ import (
 
 type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, err error)
-	SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error)
+	SetEnv(app cf.Application, name string, value string) (err error)
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(config *configuration.Configuration, app cf.Application) (err error)
 	Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error)
@@ -87,10 +87,10 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	return
 }
 
-func (repo CloudControllerApplicationRepository) SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error) {
-	path := fmt.Sprintf("%s/v2/apps/%s", config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, name string, value string) (err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	data := fmt.Sprintf(`{"environment_json":{"%s":"%s"}}`, name, value)
-	request, err := NewRequest("PUT", path, config.AccessToken, strings.NewReader(data))
+	request, err := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}

@@ -47,7 +47,7 @@ func (se *SetEnv) Run(c *cli.Context) {
 
 	se.ui.Say("Updating env variable %s for app %s...", varName, app.Name)
 
-	err := se.appRepo.SetEnv(se.config, app, varName, varValue)
+	err := se.appRepo.SetEnv(app, varName, varValue)
 
 	if err != nil {
 		se.ui.Failed("Failed setting env", err)

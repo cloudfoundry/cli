@@ -43,7 +43,7 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 	return repo.AppByName, err
 }
 
-func (repo *FakeApplicationRepository) SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error) {
+func (repo *FakeApplicationRepository) SetEnv(app cf.Application, name string, value string) (err error) {
 	repo.SetEnvApp = app
 	repo.SetEnvName = name
 	repo.SetEnvValue = value
