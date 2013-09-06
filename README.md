@@ -1,10 +1,12 @@
 Cloud Foundry CLI written in Go
 ===========
 
-Goals
+Background
 ===========
 
-Spike on converting the Cloud Foundry CLI tool to Go.
+Project to rewrite the Cloud Foundry CLI tool using Go. This project should currently be considered alpha quality
+software and should not be used in production environments. If you need something more stable, please check
+out the [RubyGem](https://github.com/cloudfoundry/cf).
 
 Building
 ========
