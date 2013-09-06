@@ -25,8 +25,9 @@ func NewUAAAuthenticator(configRepo configuration.ConfigurationRepository) (uaa 
 
 func (uaa UAAAuthenticator) Authenticate(email string, password string) (err error) {
 	type AuthenticationResponse struct {
-		AccessToken string `json:"access_token"`
-		TokenType   string `json:"token_type"`
+		AccessToken  string `json:"access_token"`
+		TokenType    string `json:"token_type"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	data := url.Values{
@@ -51,5 +52,6 @@ func (uaa UAAAuthenticator) Authenticate(email string, password string) (err err
 	}
 
 	uaa.config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
+	uaa.config.RefreshToken = response.RefreshToken
 	return uaa.configRepo.Save()
 }

@@ -11,6 +11,7 @@ type Configuration struct {
 	ApiVersion              string
 	AuthorizationEndpoint   string
 	AccessToken             string
+	RefreshToken            string
 	Organization            cf.Organization
 	Space                   cf.Space
 	ApplicationStartTimeout time.Duration // will be used as seconds

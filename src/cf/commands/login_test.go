@@ -19,8 +19,9 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
 	auth := &testhelpers.FakeAuthenticator{
-		AccessToken: "my_access_token",
-		ConfigRepo:  configRepo,
+		AccessToken:  "my_access_token",
+		RefreshToken: "my_refresh_token",
+		ConfigRepo:   configRepo,
 	}
 	callLogin(
 		[]string{},
@@ -39,6 +40,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.Contains(t, ui.Prompts[1], "Password")
 
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 	assert.Equal(t, auth.Email, "foo@example.com")
 	assert.Equal(t, auth.Password, "bar")
 }
@@ -51,8 +53,9 @@ func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"bar"}
 	auth := &testhelpers.FakeAuthenticator{
-		AccessToken: "my_access_token",
-		ConfigRepo:  configRepo,
+		AccessToken:  "my_access_token",
+		RefreshToken: "my_refresh_token",
+		ConfigRepo:   configRepo,
 	}
 	callLogin(
 		[]string{"foo@example.com"},
@@ -70,6 +73,7 @@ func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
 	assert.Contains(t, ui.Prompts[0], "Password")
 
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 	assert.Equal(t, auth.Email, "foo@example.com")
 	assert.Equal(t, auth.Password, "bar")
 }

@@ -14,6 +14,7 @@ type FakeAuthenticator struct {
 
 	AuthError bool
 	AccessToken string
+	RefreshToken string
 }
 
 func (auth *FakeAuthenticator) Authenticate(email string, password string) (err error) {
@@ -26,6 +27,7 @@ func (auth *FakeAuthenticator) Authenticate(email string, password string) (err 
 	}
 
 	auth.Config.AccessToken = auth.AccessToken
+	auth.Config.RefreshToken = auth.RefreshToken
 	auth.ConfigRepo.Save()
 
 	if auth.AuthError {

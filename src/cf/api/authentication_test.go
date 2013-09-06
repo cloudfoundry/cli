@@ -40,6 +40,7 @@ var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Req
 {
   "access_token": "my_access_token",
   "token_type": "BEARER",
+  "refresh_token": "my_refresh_token",
   "scope": "openid",
   "expires_in": 98765
 } `
@@ -62,6 +63,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 }
 
 var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
