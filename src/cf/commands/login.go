@@ -58,7 +58,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.ui.Ok()
 
-		organizations, err := l.orgRepo.FindAll(l.config)
+		organizations, err := l.orgRepo.FindAll()
 
 		if err != nil {
 			l.ui.Failed("Error fetching organizations.", err)

@@ -8,16 +8,22 @@ import (
 )
 
 type OrganizationRepository interface {
-	FindAll(config *configuration.Configuration) (orgs []cf.Organization, err error)
-	FindByName(config *configuration.Configuration, name string) (org cf.Organization, err error)
+	FindAll() (orgs []cf.Organization, err error)
+	FindByName(name string) (org cf.Organization, err error)
 }
 
 type CloudControllerOrganizationRepository struct {
+	config *configuration.Configuration
 }
 
-func (repo CloudControllerOrganizationRepository) FindAll(config *configuration.Configuration) (orgs []cf.Organization, err error) {
-	path := config.Target + "/v2/organizations"
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
+func NewCloudControllerOrganizationRepository(config *configuration.Configuration) (repo CloudControllerOrganizationRepository) {
+	repo.config = config
+	return
+}
+
+func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, err error) {
+	path := repo.config.Target + "/v2/organizations"
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -36,8 +42,8 @@ func (repo CloudControllerOrganizationRepository) FindAll(config *configuration.
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(config *configuration.Configuration, name string) (org cf.Organization, err error) {
-	orgs, err := repo.FindAll(config)
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, err error) {
+	orgs, err := repo.FindAll()
 	lowerName := strings.ToLower(name)
 
 	if err != nil {

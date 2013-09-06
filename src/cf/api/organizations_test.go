@@ -48,10 +48,10 @@ func TestOrganizationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerOrganizationRepository{}
-
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	organizations, err := repo.FindAll(config)
+	repo := NewCloudControllerOrganizationRepository(config)
+
+	organizations, err := repo.FindAll()
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(organizations))
 
@@ -67,9 +67,8 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerOrganizationRepository{}
-
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
+	repo := NewCloudControllerOrganizationRepository(config)
 
 	var (
 		organizations []cf.Organization
@@ -79,7 +78,7 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	// Capture output so debugging info does not show up in test
 	// output
 	testhelpers.CaptureOutput(func() {
-		organizations, err = repo.FindAll(config)
+		organizations, err = repo.FindAll()
 	})
 
 	assert.Error(t, err)
@@ -90,18 +89,19 @@ func TestOrganizationsFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerOrganizationRepository{}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	repo := NewCloudControllerOrganizationRepository(config)
+
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
-	org, err := repo.FindByName(config, "Org1")
+	org, err := repo.FindByName("Org1")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindByName(config, "org1")
+	org, err = repo.FindByName("org1")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindByName(config, "org that does not exist")
+	org, err = repo.FindByName("org that does not exist")
 	assert.Error(t, err)
 }
