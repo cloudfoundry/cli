@@ -21,10 +21,10 @@ type Target struct {
 	spaceRepo  api.SpaceRepository
 }
 
-func NewTarget(ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
+func NewTarget(ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
 	t.ui = ui
-	t.config = config
 	t.configRepo = configRepo
+	t.config, _ = configRepo.Get()
 	t.orgRepo = orgRepo
 	t.spaceRepo = spaceRepo
 

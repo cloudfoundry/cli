@@ -20,7 +20,6 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Fact
 func (f Factory) NewTarget() Target {
 	return NewTarget(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetConfigurationRepository(),
 		f.repoLocator.GetOrganizationRepository(),
 		f.repoLocator.GetSpaceRepository(),
