@@ -111,8 +111,6 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 		}
 	}
 
-
-
 	if response.StatusCode > 299 {
 		errorResponse := getErrorResponse(response)
 		errorCode = errorResponse.Code
