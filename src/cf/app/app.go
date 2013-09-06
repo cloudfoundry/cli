@@ -1,6 +1,7 @@
 package app
 
 import (
+	"cf"
 	"cf/api"
 	"cf/commands"
 	"cf/configuration"
@@ -61,7 +62,7 @@ OPTIONS:
 	app = cli.NewApp()
 	app.Name = "cf"
 	app.Usage = "A command line tool to interact with Cloud Foundry"
-	app.Version = "1.0.0.alpha"
+	app.Version = cf.Version
 	app.Commands = []cli.Command{
 		{
 			Name:        "target",

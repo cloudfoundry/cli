@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf"
 	term "cf/terminal"
 	"crypto/tls"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 )
 
@@ -41,7 +43,7 @@ func NewRequest(method, path, accessToken string, body io.Reader) (authReq *Requ
 	}
 	request.Header.Set("Authorization", accessToken)
 	request.Header.Set("accept", "application/json")
-
+	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
 	authReq = &Request{request}
 	return
 }

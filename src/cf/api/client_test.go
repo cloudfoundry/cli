@@ -1,20 +1,23 @@
 package api_test
 
 import (
+	"cf"
 	. "cf/api"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
 	"testing"
 )
 
-func TestNewAuthorizedRequest(t *testing.T) {
+func TestNewRequest(t *testing.T) {
 	request, err := NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
 	assert.NoError(t, err)
 	assert.Equal(t, request.Header.Get("Authorization"), "BEARER my-access-token")
 	assert.Equal(t, request.Header.Get("accept"), "application/json")
+	assert.Equal(t, request.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
 }
 
 var failingRequest = func(writer http.ResponseWriter, request *http.Request) {
