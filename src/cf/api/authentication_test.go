@@ -67,7 +67,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 }
 
 var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusBadRequest)
+	writer.WriteHeader(http.StatusUnauthorized)
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
@@ -84,7 +84,30 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	auth := NewUAAAuthenticator(configRepo)
 	err = auth.Authenticate("foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "Password in incorrect, please try again.")
+	savedConfig := testhelpers.SavedConfiguration
+	assert.Empty(t, savedConfig.AccessToken)
+}
 
+var errorLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusInternalServerError)
+}
+
+func TestServerErrorLoggingIn(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(errorLoginEndpoint))
+	defer ts.Close()
+
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+	config.AuthorizationEndpoint = ts.URL
+	config.AccessToken = ""
+
+	auth := NewUAAAuthenticator(configRepo)
+	err = auth.Authenticate("foo@example.com", "bar")
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "Server error, status code: 500, error code: 0, message: ")
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Empty(t, savedConfig.AccessToken)
 }

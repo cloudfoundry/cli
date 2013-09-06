@@ -3,6 +3,7 @@ package api
 import (
 	"cf/configuration"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -48,6 +49,9 @@ func (uaa UAAAuthenticator) Authenticate(email string, password string) (err err
 	_, err = PerformRequestAndParseResponse(request, &response)
 
 	if err != nil {
+		if strings.Contains(err.Error(), "status code: 401") {
+			err = errors.New("Password in incorrect, please try again.")
+		}
 		return
 	}
 
