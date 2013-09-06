@@ -15,7 +15,7 @@ import (
 )
 
 type ApplicationRepository interface {
-	FindByName(config *configuration.Configuration, name string) (app cf.Application, err error)
+	FindByName(name string) (app cf.Application, err error)
 	SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error)
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(config *configuration.Configuration, app cf.Application) (err error)
@@ -34,9 +34,9 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) FindByName(config *configuration.Configuration, name string) (app cf.Application, err error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", config.Target, config.Space.Guid, "%3A"+name)
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
+func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, err error) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -53,8 +53,8 @@ func (repo CloudControllerApplicationRepository) FindByName(config *configuratio
 	}
 
 	res := findResponse.Resources[0]
-	path = fmt.Sprintf("%s/v2/apps/%s/summary", config.Target, res.Metadata.Guid)
-	request, err = NewRequest("GET", path, config.AccessToken, nil)
+	path = fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, res.Metadata.Guid)
+	request, err = NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}

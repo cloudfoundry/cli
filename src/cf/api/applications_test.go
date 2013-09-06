@@ -104,7 +104,7 @@ func TestFindByName(t *testing.T) {
 	}
 	repo := NewCloudControllerApplicationRepository(config)
 
-	app, err := repo.FindByName(config, "App1")
+	app, err := repo.FindByName("App1")
 	assert.NoError(t, err)
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
@@ -114,7 +114,7 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, len(app.Urls), 1)
 	assert.Equal(t, app.Urls[0], "app1.cfapps.io")
 
-	app, err = repo.FindByName(config, "app that does not exist")
+	app, err = repo.FindByName("app that does not exist")
 	assert.Error(t, err)
 }
 
@@ -141,7 +141,7 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	}
 	repo := NewCloudControllerApplicationRepository(config)
 
-	_, err := repo.FindByName(config, "App1")
+	_, err := repo.FindByName("App1")
 	assert.Error(t, err)
 }
 

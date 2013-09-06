@@ -46,7 +46,7 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 
 func (p Push) Run(c *cli.Context) {
 	appName := c.String("name")
-	app, err := p.appRepo.FindByName(p.config, appName)
+	app, err := p.appRepo.FindByName(appName)
 
 	if err != nil {
 		app, err = p.createApp(p.config, appName, c)
