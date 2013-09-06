@@ -48,15 +48,14 @@ func TestFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerDomainRepository{}
-
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
+	repo := NewCloudControllerDomainRepository(config)
 
-	domains, err := repo.FindAll(config)
+	domains, err := repo.FindAll()
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(domains))
 
@@ -72,15 +71,14 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerDomainRepository{}
-
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
+	repo := NewCloudControllerDomainRepository(config)
 
-	domain, err := repo.FindByName(config, "domain2.cf-app.com")
+	domain, err := repo.FindByName("domain2.cf-app.com")
 	assert.NoError(t, err)
 
 	assert.Equal(t, domain.Name, "domain2.cf-app.com")
@@ -91,15 +89,14 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerDomainRepository{}
-
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
+	repo := NewCloudControllerDomainRepository(config)
 
-	domain, err := repo.FindByName(config, "")
+	domain, err := repo.FindByName("")
 	assert.NoError(t, err)
 
 	assert.Equal(t, domain.Name, "domain1.cf-app.com")

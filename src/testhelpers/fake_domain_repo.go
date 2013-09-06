@@ -2,7 +2,6 @@ package testhelpers
 
 import (
 	"cf"
-	"cf/configuration"
 )
 
 type FakeDomainRepository struct {
@@ -12,11 +11,11 @@ type FakeDomainRepository struct {
 	FindByNameDomain cf.Domain
 }
 
-func (repo *FakeDomainRepository) FindAll(config *configuration.Configuration) (domains []cf.Domain, err error){
+func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, err error){
 	return repo.FindAllDomains, nil
 }
 
-func (repo *FakeDomainRepository) FindByName(config *configuration.Configuration, name string) (domain cf.Domain, err error){
+func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, err error){
 	repo.FindByNameName = name
 	return repo.FindByNameDomain, nil
 }

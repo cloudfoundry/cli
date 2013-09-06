@@ -114,7 +114,7 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 	}
 	p.ui.Ok()
 
-	domain, err := p.domainRepo.FindByName(config, c.String("domain"))
+	domain, err := p.domainRepo.FindByName(c.String("domain"))
 
 	if err != nil {
 		p.ui.Failed("Error loading domain", err)
