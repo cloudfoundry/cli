@@ -29,7 +29,7 @@ func (r Routes) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 func (r Routes) Run(c *cli.Context) {
 	r.ui.Say("Getting routes")
 
-	routes, err := r.routeRepo.FindAll(r.config)
+	routes, err := r.routeRepo.FindAll()
 
 	if err != nil {
 		r.ui.Failed("Error getting routes.", err)

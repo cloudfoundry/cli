@@ -64,13 +64,13 @@ func TestRoutesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findAllEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerRouteRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerRouteRepository(config)
 
-	routes, err := repo.FindAll(config)
+	routes, err := repo.FindAll()
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(routes), 2)
@@ -108,13 +108,13 @@ func TestFindByHost(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerRouteRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerRouteRepository(config)
 
-	route, err := repo.FindByHost(config, "my-cool-app")
+	route, err := repo.FindByHost("my-cool-app")
 	assert.NoError(t, err)
 	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
@@ -134,13 +134,13 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostNotFoundEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerRouteRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerRouteRepository(config)
 
-	_, err := repo.FindByHost(config, "my-cool-app")
+	_, err := repo.FindByHost("my-cool-app")
 	assert.Error(t, err)
 }
 
@@ -165,17 +165,17 @@ func TestCreate(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createRouteEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerRouteRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
+	repo := NewCloudControllerRouteRepository(config)
 
 	domain := cf.Domain{Guid: "my-domain-guid"}
 	newRoute := cf.Route{Host: "my-cool-app"}
 
-	createdRoute, err := repo.Create(config, newRoute, domain)
+	createdRoute, err := repo.Create(newRoute, domain)
 	assert.NoError(t, err)
 
 	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
@@ -192,15 +192,15 @@ func TestBind(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(bindRouteEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerRouteRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerRouteRepository(config)
 
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
-	err := repo.Bind(config, route, app)
+	err := repo.Bind(route, app)
 	assert.NoError(t, err)
 }

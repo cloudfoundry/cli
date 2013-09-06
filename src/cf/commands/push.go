@@ -126,12 +126,12 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 		hostName = app.Name
 	}
 
-	route, err := p.routeRepo.FindByHost(config, hostName)
+	route, err := p.routeRepo.FindByHost(hostName)
 	if err != nil {
 		newRoute := cf.Route{Host: hostName}
 
 		p.ui.Say("Creating route %s.%s...", newRoute.Host, domain.Name)
-		route, err = p.routeRepo.Create(config, newRoute, domain)
+		route, err = p.routeRepo.Create(newRoute, domain)
 		if err != nil {
 			p.ui.Failed("Error creating route", err)
 			return
@@ -142,7 +142,7 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 	}
 
 	p.ui.Say("Binding %s.%s to %s...", route.Host, domain.Name, app.Name)
-	err = p.routeRepo.Bind(config, route, app)
+	err = p.routeRepo.Bind(route, app)
 	if err != nil {
 		p.ui.Failed("Error binding route", err)
 		return

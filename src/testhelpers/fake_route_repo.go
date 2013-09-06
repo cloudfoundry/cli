@@ -1,27 +1,26 @@
 package testhelpers
 
 import (
-"cf"
-"cf/configuration"
+	"cf"
 	"errors"
 )
 
 type FakeRouteRepository struct {
-	FindByHostHost      string
-	FindByHostErr      bool
+	FindByHostHost       string
+	FindByHostErr        bool
 	FindByHostRoute      cf.Route
 
-	CreatedRoute cf.Route
+	CreatedRoute       cf.Route
 	CreatedRouteDomain cf.Domain
 
 	BoundRoute cf.Route
-	BoundApp cf.Application
+	BoundApp   cf.Application
 
-	FindAllErr bool
+	FindAllErr    bool
 	FindAllRoutes []cf.Route
 }
 
-func (repo *FakeRouteRepository) FindAll(config *configuration.Configuration) (routes []cf.Route, err error){
+func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, err error) {
 	if repo.FindAllErr {
 		err = errors.New("Error finding all routes")
 	}
@@ -30,7 +29,7 @@ func (repo *FakeRouteRepository) FindAll(config *configuration.Configuration) (r
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHost(config *configuration.Configuration, host string) (route cf.Route, err error) {
+func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, err error) {
 	repo.FindByHostHost = host
 
 	if repo.FindByHostErr {
@@ -41,7 +40,7 @@ func (repo *FakeRouteRepository) FindByHost(config *configuration.Configuration,
 	return
 }
 
-func (repo *FakeRouteRepository) Create(config *configuration.Configuration, newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error){
+func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error) {
 	repo.CreatedRoute = newRoute
 	repo.CreatedRouteDomain = domain
 
@@ -52,7 +51,7 @@ func (repo *FakeRouteRepository) Create(config *configuration.Configuration, new
 	return
 }
 
-func (repo *FakeRouteRepository) Bind(config *configuration.Configuration, route cf.Route, app cf.Application) (err error){
+func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (err error) {
 	repo.BoundRoute = route
 	repo.BoundApp = app
 	return
