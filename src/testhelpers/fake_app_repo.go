@@ -78,7 +78,7 @@ func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *byt
 	return
 }
 
-func (repo *FakeApplicationRepository) Start(config *configuration.Configuration, app cf.Application) (err error){
+func (repo *FakeApplicationRepository) Start(app cf.Application) (err error){
 	repo.StartedApp = app
 	if repo.StartAppErr {
 		err = errors.New("Error starting app.")
@@ -86,7 +86,7 @@ func (repo *FakeApplicationRepository) Start(config *configuration.Configuration
 	return
 }
 
-func (repo *FakeApplicationRepository) Stop(config *configuration.Configuration, app cf.Application) (err error){
+func (repo *FakeApplicationRepository) Stop(app cf.Application) (err error){
 	repo.StoppedApp = app
 	if repo.StopAppErr {
 		err = errors.New("Error stopping app.")

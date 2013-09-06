@@ -59,7 +59,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	s.ui.Say("Starting %s...", term.Cyan(app.Name))
 
-	err := s.appRepo.Start(s.config, app)
+	err := s.appRepo.Start(app)
 	if err != nil {
 		s.ui.Failed("Error starting application.", err)
 		return

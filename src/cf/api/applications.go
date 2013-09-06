@@ -20,8 +20,8 @@ type ApplicationRepository interface {
 	Create(newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(app cf.Application) (err error)
 	Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error)
-	Start(config *configuration.Configuration, app cf.Application) (err error)
-	Stop(config *configuration.Configuration, app cf.Application) (err error)
+	Start(app cf.Application) (err error)
+	Stop(app cf.Application) (err error)
 	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error)
 }
 
@@ -168,12 +168,12 @@ func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipB
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Start(config *configuration.Configuration, app cf.Application) (err error) {
-	return changeApplicationState(config, app, "STARTED")
+func (repo CloudControllerApplicationRepository) Start(app cf.Application) (err error) {
+	return repo.changeApplicationState(app, "STARTED")
 }
 
-func (repo CloudControllerApplicationRepository) Stop(config *configuration.Configuration, app cf.Application) (err error) {
-	return changeApplicationState(config, app, "STOPPED")
+func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (err error) {
+	return repo.changeApplicationState(app, "STOPPED")
 }
 
 type InstancesApiResponse map[string]InstanceApiResponse
@@ -207,10 +207,10 @@ func (repo CloudControllerApplicationRepository) GetInstances(config *configurat
 	return
 }
 
-func changeApplicationState(config *configuration.Configuration, app cf.Application, state string) (err error) {
-	path := fmt.Sprintf("%s/v2/apps/%s", config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.Application, state string) (err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	body := fmt.Sprintf(`{"console":true,"state":"%s"}`, state)
-	request, err := NewRequest("PUT", path, config.AccessToken, strings.NewReader(body))
+	request, err := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 
 	if err != nil {
 		return

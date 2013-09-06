@@ -48,7 +48,7 @@ func (s *Stop) Run(c *cli.Context) {
 
 	s.ui.Say("Stopping %s...", term.Cyan(app.Name))
 
-	err := s.appRepo.Stop(s.config, app)
+	err := s.appRepo.Stop(app)
 	if err != nil {
 		s.ui.Failed("Error stopping application.", err)
 		return

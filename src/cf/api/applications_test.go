@@ -365,7 +365,7 @@ func TestStartApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	err := repo.Start(config, app)
+	err := repo.Start(app)
 	assert.NoError(t, err)
 }
 
@@ -397,7 +397,7 @@ func TestStopApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	err := repo.Stop(config, app)
+	err := repo.Stop(app)
 	assert.NoError(t, err)
 }
 
