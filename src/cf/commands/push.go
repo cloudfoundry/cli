@@ -96,7 +96,7 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 	stackName := c.String("stack")
 	if stackName != "" {
 		var stack cf.Stack
-		stack, err = p.stackRepo.FindByName(p.config, stackName)
+		stack, err = p.stackRepo.FindByName(stackName)
 
 		if err != nil {
 			p.ui.Failed("Error finding stack", err)

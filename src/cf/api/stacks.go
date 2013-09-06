@@ -8,15 +8,21 @@ import (
 )
 
 type StackRepository interface {
-	FindByName(config *configuration.Configuration, name string) (stack cf.Stack, err error)
+	FindByName(name string) (stack cf.Stack, err error)
 }
 
 type CloudControllerStackRepository struct {
+	config *configuration.Configuration
 }
 
-func (repo CloudControllerStackRepository) FindByName(config *configuration.Configuration, name string) (stack cf.Stack, err error) {
-	path := fmt.Sprintf("%s/v2/stacks?q=name%s", config.Target, "%3A"+name)
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
+func NewCloudControllerStackRepository(config *configuration.Configuration) (repo CloudControllerStackRepository) {
+	repo.config = config
+	return
+}
+
+func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, err error) {
+	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}

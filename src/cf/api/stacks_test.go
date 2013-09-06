@@ -35,17 +35,17 @@ func TestStacksFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(singleStackEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerStackRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerStackRepository(config)
 
-	stack, err := repo.FindByName(config, "linux")
+	stack, err := repo.FindByName("linux")
 	assert.NoError(t, err)
 	assert.Equal(t, stack.Name, "custom-linux")
 	assert.Equal(t, stack.Guid, "custom-linux-guid")
 
-	stack, err = repo.FindByName(config, "stack that does not exist")
+	stack, err = repo.FindByName("stack that does not exist")
 	assert.Error(t, err)
 }
