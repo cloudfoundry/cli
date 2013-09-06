@@ -18,7 +18,7 @@ type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, err error)
 	SetEnv(app cf.Application, name string, value string) (err error)
 	Create(newApp cf.Application) (createdApp cf.Application, err error)
-	Delete(config *configuration.Configuration, app cf.Application) (err error)
+	Delete(app cf.Application) (err error)
 	Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error)
 	Start(config *configuration.Configuration, app cf.Application) (err error)
 	Stop(config *configuration.Configuration, app cf.Application) (err error)
@@ -138,9 +138,9 @@ func stringOrNull(s string) string {
 	return fmt.Sprintf(`"%s"`, s)
 }
 
-func (repo CloudControllerApplicationRepository) Delete(config *configuration.Configuration, app cf.Application) (err error) {
-	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", config.Target, app.Guid)
-	request, err := NewRequest("DELETE", path, config.AccessToken, nil)
+func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, app.Guid)
+	request, err := NewRequest("DELETE", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}

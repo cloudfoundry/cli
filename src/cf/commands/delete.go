@@ -49,7 +49,7 @@ func (d *Delete) Run(c *cli.Context) {
 	}
 
 	d.ui.Say("Deleting %s", app.Name)
-	err := d.appRepo.Delete(d.config, app)
+	err := d.appRepo.Delete(app)
 	if err != nil {
 		d.ui.Failed("Error deleting app.", err)
 		return

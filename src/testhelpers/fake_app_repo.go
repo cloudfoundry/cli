@@ -65,7 +65,7 @@ func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp
 	return
 }
 
-func (repo *FakeApplicationRepository) Delete(config *configuration.Configuration, app cf.Application) (err error){
+func (repo *FakeApplicationRepository) Delete(app cf.Application) (err error){
 	repo.DeletedApp = app
 	return
 }

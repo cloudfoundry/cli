@@ -285,7 +285,7 @@ func TestDeleteApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	err := repo.Delete(config, app)
+	err := repo.Delete(app)
 	assert.NoError(t, err)
 }
 
