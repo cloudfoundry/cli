@@ -17,7 +17,7 @@ import (
 type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, err error)
 	SetEnv(app cf.Application, name string, value string) (err error)
-	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
+	Create(newApp cf.Application) (createdApp cf.Application, err error)
 	Delete(config *configuration.Configuration, app cf.Application) (err error)
 	Upload(config *configuration.Configuration, app cf.Application, zipBuffer *bytes.Buffer) (err error)
 	Start(config *configuration.Configuration, app cf.Application) (err error)
@@ -99,7 +99,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, name
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error) {
+func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, err error) {
 	err = validateApplication(newApp)
 	if err != nil {
 		return
@@ -108,12 +108,12 @@ func (repo CloudControllerApplicationRepository) Create(config *configuration.Co
 	buildpackUrl := stringOrNull(newApp.BuildpackUrl)
 	stackGuid := stringOrNull(newApp.Stack.Guid)
 
-	path := fmt.Sprintf("%s/v2/apps", config.Target)
+	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s}`,
-		config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid,
+		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid,
 	)
-	request, err := NewRequest("POST", path, config.AccessToken, strings.NewReader(data))
+	request, err := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
 	if err != nil {
 		return
 	}

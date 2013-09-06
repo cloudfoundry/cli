@@ -54,7 +54,7 @@ func (repo *FakeApplicationRepository) SetEnv(app cf.Application, name string, v
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error) {
+func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, err error) {
 	repo.CreatedApp = newApp
 
 	createdApp = cf.Application{

@@ -107,7 +107,7 @@ func (p Push) createApp(config *configuration.Configuration, appName string, c *
 	}
 
 	p.ui.Say("Creating %s...", appName)
-	app, err = p.appRepo.Create(config, newApp)
+	app, err = p.appRepo.Create(newApp)
 	if err != nil {
 		p.ui.Failed("Error creating application", err)
 		return

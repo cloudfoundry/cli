@@ -209,7 +209,7 @@ func TestCreateApplication(t *testing.T) {
 		Stack:        cf.Stack{Guid: "some-stack-guid"},
 	}
 
-	createdApp, err := repo.Create(config, newApp)
+	createdApp, err := repo.Create(newApp)
 	assert.NoError(t, err)
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
@@ -241,7 +241,7 @@ func TestCreateApplicationWithoutBuildpackOrStack(t *testing.T) {
 		Stack:        cf.Stack{},
 	}
 
-	_, err := repo.Create(config, newApp)
+	_, err := repo.Create(newApp)
 	assert.NoError(t, err)
 }
 
@@ -252,17 +252,17 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	config := &configuration.Configuration{Target: ts.URL}
 	repo := NewCloudControllerApplicationRepository(config)
 
-	createdApp, err := repo.Create(config, cf.Application{Name: "name with space"})
+	createdApp, err := repo.Create(cf.Application{Name: "name with space"})
 	assert.Equal(t, createdApp, cf.Application{})
 	assert.Contains(t, err.Error(), "Application name is invalid")
 
-	_, err = repo.Create(config, cf.Application{Name: "name-with-inv@lid-chars!"})
+	_, err = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
 	assert.Error(t, err)
 
-	_, err = repo.Create(config, cf.Application{Name: "Valid-Name"})
+	_, err = repo.Create(cf.Application{Name: "Valid-Name"})
 	assert.NoError(t, err)
 
-	_, err = repo.Create(config, cf.Application{Name: "name_with_numbers_2"})
+	_, err = repo.Create(cf.Application{Name: "name_with_numbers_2"})
 	assert.NoError(t, err)
 }
 
