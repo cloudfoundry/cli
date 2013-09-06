@@ -17,7 +17,7 @@ func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
 
 	ui := new(testhelpers.FakeUI)
 
-	l := NewLogout(ui, config, configRepo)
+	l := NewLogout(ui, configRepo)
 	l.Run(nil)
 
 	updatedConfig, err := configRepo.Get()

@@ -51,7 +51,6 @@ func (f Factory) NewSetEnv() *SetEnv {
 func (f Factory) NewLogout() Logout {
 	return NewLogout(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetConfigurationRepository(),
 	)
 }

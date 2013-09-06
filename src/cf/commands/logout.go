@@ -13,10 +13,10 @@ type Logout struct {
 	configRepo configuration.ConfigurationRepository
 }
 
-func NewLogout(ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository) (l Logout) {
+func NewLogout(ui term.UI, configRepo configuration.ConfigurationRepository) (l Logout) {
 	l.ui = ui
-	l.config = config
 	l.configRepo = configRepo
+	l.config, _ = configRepo.Get()
 	return
 }
 
