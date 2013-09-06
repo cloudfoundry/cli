@@ -61,7 +61,7 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 	}
 
 	cmd.ui.Say("Creating service...")
-	err := cmd.serviceRepo.CreateUserProvidedServiceInstance(cmd.config, name, paramsMap)
+	err := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
 	if err != nil {
 		cmd.ui.Failed("Error creating user provided service instance", err)
 		return
@@ -72,7 +72,7 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 }
 
 func (cmd CreateService) createService(name string, offeringName string, planName string) {
-	offerings, err := cmd.serviceRepo.GetServiceOfferings(cmd.config)
+	offerings, err := cmd.serviceRepo.GetServiceOfferings()
 	if err != nil {
 		cmd.ui.Failed("Error fetching offerings", err)
 		return
@@ -91,7 +91,7 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 	}
 
 	cmd.ui.Say("Creating service %s", term.Cyan(name))
-	err = cmd.serviceRepo.CreateServiceInstance(cmd.config, name, plan)
+	err = cmd.serviceRepo.CreateServiceInstance(name, plan)
 	if err != nil {
 		cmd.ui.Failed("Error creating plan", err)
 		return

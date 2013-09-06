@@ -66,12 +66,12 @@ func TestGetServiceOfferings(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOfferingsEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	offerings, err := repo.GetServiceOfferings(config)
+	repo := NewCloudControllerServiceRepository(config)
+	offerings, err := repo.GetServiceOfferings()
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(offerings))
@@ -105,14 +105,14 @@ func TestCreateServiceInstance(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createServiceInstanceEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "space-guid"},
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
-	err := repo.CreateServiceInstance(config, "instance-name", cf.ServicePlan{Guid: "plan-guid"})
+	err := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
 	assert.NoError(t, err)
 }
 
@@ -127,19 +127,19 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createUserProvidedServiceInstanceEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "some-space-guid"},
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
 	params := map[string]string{
 		"host":     "example.com",
 		"user":     "me",
 		"password": "secret",
 	}
-	err := repo.CreateUserProvidedServiceInstance(config, "my-custom-service", params)
+	err := repo.CreateUserProvidedServiceInstance("my-custom-service", params)
 	assert.NoError(t, err)
 }
 
@@ -187,14 +187,14 @@ func TestFindInstanceByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findServiceInstanceEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
-	instance, err := repo.FindInstanceByName(config, "my-service")
+	instance, err := repo.FindInstanceByName("my-service")
 	assert.NoError(t, err)
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
@@ -217,15 +217,15 @@ func TestBindService(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(bindServiceEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
-	_, err := repo.BindService(config, serviceInstance, app)
+	_, err := repo.BindService(serviceInstance, app)
 	assert.NoError(t, err)
 }
 
@@ -243,15 +243,15 @@ func TestBindServiceIfError(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(bindServiceErrorEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
-	errorCode, err := repo.BindService(config, serviceInstance, app)
+	errorCode, err := repo.BindService(serviceInstance, app)
 
 	assert.Error(t, err)
 	assert.Equal(t, errorCode, 90003)
@@ -268,11 +268,11 @@ func TestUnbindService(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(deleteBindingEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
@@ -284,7 +284,7 @@ func TestUnbindService(t *testing.T) {
 		ServiceBindings: serviceBindings,
 	}
 	app := cf.Application{Guid: "app-2-guid"}
-	err := repo.UnbindService(config, serviceInstance, app)
+	err := repo.UnbindService(serviceInstance, app)
 	assert.NoError(t, err)
 }
 
@@ -299,22 +299,22 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(deleteServiceInstanceEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
-	err := repo.DeleteService(config, serviceInstance)
+	err := repo.DeleteService(serviceInstance)
 	assert.NoError(t, err)
 }
 
 func TestDeleteServiceWithServiceBindings(t *testing.T) {
-	repo := CloudControllerServiceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
+	repo := NewCloudControllerServiceRepository(config)
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
@@ -326,6 +326,6 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 		ServiceBindings: serviceBindings,
 	}
 
-	err := repo.DeleteService(config, serviceInstance)
+	err := repo.DeleteService(serviceInstance)
 	assert.Equal(t, err.Error(), "Cannot delete service instance, apps are still bound to it")
 }

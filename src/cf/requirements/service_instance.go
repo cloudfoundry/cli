@@ -30,7 +30,7 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, config *configur
 }
 
 func (req *ServiceInstanceApiRequirement) Execute() (err error) {
-	req.serviceInstance, err = req.serviceRepo.FindInstanceByName(req.config, req.name)
+	req.serviceInstance, err = req.serviceRepo.FindInstanceByName(req.name)
 	if err != nil {
 		req.ui.Failed("", err)
 	}

@@ -48,7 +48,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Binding service %s to %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
 
-	errorCode, err := cmd.serviceRepo.BindService(cmd.config, instance, app)
+	errorCode, err := cmd.serviceRepo.BindService(instance, app)
 	if err != nil && errorCode != 90003 {
 		cmd.ui.Failed("Failed binding service", err)
 		return

@@ -47,7 +47,7 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 	cmd.ui.Say("Deleting service %s...", term.Cyan(instance.Name))
 
-	err := cmd.serviceRepo.DeleteService(cmd.config, instance)
+	err := cmd.serviceRepo.DeleteService(instance)
 	if err != nil {
 		cmd.ui.Failed("Failed deleting service", err)
 		return

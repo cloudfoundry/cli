@@ -27,7 +27,7 @@ func NewRepositoryLocator(config *configuration.Configuration) (locator Reposito
 	locator.domainRepo = NewCloudControllerDomainRepository(config)
 	locator.routeRepo = NewCloudControllerRouteRepository(config)
 	locator.stackRepo = CloudControllerStackRepository{}
-	locator.serviceRepo = CloudControllerServiceRepository{}
+	locator.serviceRepo = NewCloudControllerServiceRepository(config)
 
 	return
 }

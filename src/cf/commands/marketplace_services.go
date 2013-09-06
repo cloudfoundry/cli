@@ -29,7 +29,7 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	cmd.ui.Say("Getting services from marketplace...")
 
-	serviceOfferings, err := cmd.serviceRepo.GetServiceOfferings(cmd.config)
+	serviceOfferings, err := cmd.serviceRepo.GetServiceOfferings()
 
 	if err != nil {
 		cmd.ui.Failed("Error loading service offerings", err)
