@@ -21,11 +21,13 @@ type ServiceRepository interface {
 }
 
 type CloudControllerServiceRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerServiceRepository(config *configuration.Configuration) (repo CloudControllerServiceRepository) {
+func NewCloudControllerServiceRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerServiceRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -38,7 +40,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 
 	response := new(ServiceOfferingsApiResponse)
 
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
 	if err != nil {
 		return
@@ -74,7 +76,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -98,7 +100,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -110,7 +112,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	response := new(ServiceInstancesApiResponse)
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}
@@ -148,7 +150,7 @@ func (repo CloudControllerServiceRepository) BindService(instance cf.ServiceInst
 		return
 	}
 
-	errorCode, err = PerformRequest(request)
+	errorCode, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -172,7 +174,7 @@ func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceIn
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -187,6 +189,6 @@ func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceIn
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }

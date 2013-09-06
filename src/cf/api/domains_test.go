@@ -53,7 +53,8 @@ func TestFindAll(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerDomainRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, client)
 
 	domains, err := repo.FindAll()
 	assert.NoError(t, err)
@@ -76,7 +77,8 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerDomainRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, client)
 
 	domain, err := repo.FindByName("domain2.cf-app.com")
 	assert.NoError(t, err)
@@ -94,7 +96,8 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerDomainRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, client)
 
 	domain, err := repo.FindByName("")
 	assert.NoError(t, err)

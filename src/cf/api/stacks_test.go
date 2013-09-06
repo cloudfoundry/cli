@@ -39,7 +39,8 @@ func TestStacksFindByName(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerStackRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerStackRepository(config, client)
 
 	stack, err := repo.FindByName("linux")
 	assert.NoError(t, err)

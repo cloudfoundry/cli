@@ -70,7 +70,8 @@ func TestGetServiceOfferings(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 	offerings, err := repo.GetServiceOfferings()
 
 	assert.NoError(t, err)
@@ -110,7 +111,8 @@ func TestCreateServiceInstance(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "space-guid"},
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	err := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
 	assert.NoError(t, err)
@@ -132,7 +134,8 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "some-space-guid"},
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	params := map[string]string{
 		"host":     "example.com",
@@ -192,7 +195,8 @@ func TestFindInstanceByName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	instance, err := repo.FindInstanceByName("my-service")
 	assert.NoError(t, err)
@@ -221,7 +225,8 @@ func TestBindService(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
@@ -247,7 +252,8 @@ func TestBindServiceIfError(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
@@ -272,7 +278,8 @@ func TestUnbindService(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
@@ -303,7 +310,8 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	err := repo.DeleteService(serviceInstance)
@@ -314,7 +322,8 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
-	repo := NewCloudControllerServiceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, client)
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},

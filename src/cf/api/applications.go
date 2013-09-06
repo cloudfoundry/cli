@@ -26,11 +26,13 @@ type ApplicationRepository interface {
 }
 
 type CloudControllerApplicationRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerApplicationRepository(config *configuration.Configuration) (repo CloudControllerApplicationRepository) {
+func NewCloudControllerApplicationRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerApplicationRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -42,7 +44,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	findResponse := new(ApplicationsApiResponse)
-	_, err = PerformRequestAndParseResponse(request, findResponse)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, findResponse)
 	if err != nil {
 		return
 	}
@@ -60,7 +62,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	summaryResponse := new(ApplicationSummary)
-	_, err = PerformRequestAndParseResponse(request, summaryResponse)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, summaryResponse)
 	if err != nil {
 		return
 	}
@@ -95,7 +97,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, name
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -119,7 +121,7 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 	}
 
 	resource := new(Resource)
-	_, err = PerformRequestAndParseResponse(request, resource)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, resource)
 
 	if err != nil {
 		return
@@ -145,7 +147,7 @@ func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (err
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -164,7 +166,7 @@ func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipB
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 
@@ -191,7 +193,7 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 
 	apiResponse := InstancesApiResponse{}
 
-	errorCode, err = PerformRequestAndParseResponse(request, &apiResponse)
+	errorCode, err = repo.apiClient.PerformRequestAndParseResponse(request, &apiResponse)
 	if err != nil {
 		return
 	}
@@ -216,7 +218,7 @@ func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.A
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 	return
 }
 

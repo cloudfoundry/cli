@@ -11,6 +11,7 @@ import (
 
 type Authenticator interface {
 	Authenticate(email string, password string) (err error)
+	RefreshAuthToken() (updatedToken string, err error)
 }
 
 type UAAAuthenticator struct {
@@ -25,17 +26,34 @@ func NewUAAAuthenticator(configRepo configuration.ConfigurationRepository) (uaa 
 }
 
 func (uaa UAAAuthenticator) Authenticate(email string, password string) (err error) {
-	type AuthenticationResponse struct {
-		AccessToken  string `json:"access_token"`
-		TokenType    string `json:"token_type"`
-		RefreshToken string `json:"refresh_token"`
-	}
-
 	data := url.Values{
 		"username":   {email},
 		"password":   {password},
 		"grant_type": {"password"},
 		"scope":      {""},
+	}
+
+	return uaa.getAuthToken(data)
+}
+
+func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, err error) {
+	data := url.Values{
+		"refresh_token": {uaa.config.RefreshToken},
+		"grant_type":    {"refresh_token"},
+		"scope":         {""},
+	}
+
+	err = uaa.getAuthToken(data)
+	updatedToken = uaa.config.AccessToken
+
+	return
+}
+
+func (uaa UAAAuthenticator) getAuthToken(data url.Values) (err error) {
+	type AuthenticationResponse struct {
+		AccessToken  string `json:"access_token"`
+		TokenType    string `json:"token_type"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)

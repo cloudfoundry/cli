@@ -19,15 +19,18 @@ type RepositoryLocator struct {
 
 func NewRepositoryLocator(config *configuration.Configuration) (locator RepositoryLocator) {
 	locator.config = config
-
 	locator.configurationRepo = configuration.NewConfigurationDiskRepository()
-	locator.organizationRepo = NewCloudControllerOrganizationRepository(config)
-	locator.spaceRepo = NewCloudControllerSpaceRepository(config)
-	locator.appRepo = NewCloudControllerApplicationRepository(config)
-	locator.domainRepo = NewCloudControllerDomainRepository(config)
-	locator.routeRepo = NewCloudControllerRouteRepository(config)
-	locator.stackRepo = NewCloudControllerStackRepository(config)
-	locator.serviceRepo = NewCloudControllerServiceRepository(config)
+
+	authenticator := NewUAAAuthenticator(locator.configurationRepo)
+	apiClient := NewApiClient(authenticator)
+
+	locator.organizationRepo = NewCloudControllerOrganizationRepository(config, apiClient)
+	locator.spaceRepo = NewCloudControllerSpaceRepository(config, apiClient)
+	locator.appRepo = NewCloudControllerApplicationRepository(config, apiClient)
+	locator.domainRepo = NewCloudControllerDomainRepository(config, apiClient)
+	locator.routeRepo = NewCloudControllerRouteRepository(config, apiClient)
+	locator.stackRepo = NewCloudControllerStackRepository(config, apiClient)
+	locator.serviceRepo = NewCloudControllerServiceRepository(config, apiClient)
 
 	return
 }

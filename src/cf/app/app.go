@@ -113,7 +113,7 @@ OPTIONS:
 			ShortName:   "p",
 			Description: "Push an application",
 			Usage: "cf push --name <application> [--domain <domain>] [--host <hostname>] [--instances <num>]\n" +
-				"                                [--memory <memory>] [--buildpack <url>] [--no-start] [--path <path to app>]\n" +
+				"                                [--memory <memory>] [--buildpack <url>] [--no-[re]start] [--path <path to app>]\n" +
 				"                                [--stack <stack>]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
@@ -123,6 +123,7 @@ OPTIONS:
 				cli.StringFlag{"memory", "128", "memory limit (for example: 256, 1G, 1024M)"},
 				cli.StringFlag{"buildpack", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
 				cli.BoolFlag{"no-start", "do not start an application after pushing"},
+				cli.BoolFlag{"no-restart", "do not restart an application after pushing"},
 				cli.StringFlag{"path", "", "path of application directory or zip file"},
 				cli.StringFlag{"stack", "", "stack to use"},
 			},

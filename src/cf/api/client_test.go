@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"runtime"
+	"testhelpers"
 	"testing"
 )
 
@@ -31,19 +32,21 @@ var failingRequest = func(writer http.ResponseWriter, request *http.Request) {
 }
 
 func TestPerformRequestOutputsErrorFromServer(t *testing.T) {
+	client := ApiClient{}
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
 	defer ts.Close()
 
 	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
-	_, err = PerformRequest(request)
+	_, err = client.PerformRequest(request)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
 }
 
 func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
+	client := ApiClient{}
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
 	defer ts.Close()
 
@@ -51,13 +54,14 @@ func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	_, err = PerformRequestAndParseResponse(request, resource)
+	_, err = client.PerformRequestAndParseResponse(request, resource)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
 }
 
 func TestPerformRequestReturnsErrorCode(t *testing.T) {
+	client := ApiClient{}
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
 	defer ts.Close()
 
@@ -65,7 +69,7 @@ func TestPerformRequestReturnsErrorCode(t *testing.T) {
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	errorCode, err := PerformRequestAndParseResponse(request, resource)
+	errorCode, err := client.PerformRequestAndParseResponse(request, resource)
 
 	assert.Equal(t, errorCode, 210003)
 	assert.Error(t, err)
@@ -152,4 +156,60 @@ Server: Apache-Coyote/1.1
 `
 
 	assert.Equal(t, Sanitize(response), expected)
+}
+
+var refreshTokenApiEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	var jsonResponse string
+
+	switch request.Header.Get("Authorization") {
+	case "bearer initial-access-token":
+		writer.WriteHeader(http.StatusUnauthorized)
+		jsonResponse = `{ "code": 1000, "description": "Auth token is invalid" }`
+	case "bearer new-access-token":
+		writer.WriteHeader(http.StatusOK)
+	default:
+		writer.WriteHeader(http.StatusInternalServerError)
+	}
+
+	fmt.Fprintln(writer, jsonResponse)
+}
+
+var refreshTokenAuthEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	jsonResponse := `
+	{
+	  "access_token": "new-access-token",
+	  "token_type": "bearer",
+	  "refresh_token": "new-refresh-token"
+	}`
+	fmt.Fprintln(writer, jsonResponse)
+}
+
+func TestRefreshingTheToken(t *testing.T) {
+	ccServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenApiEndpoint))
+	defer ccServer.Close()
+
+	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
+	defer authServer.Close()
+
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+
+	config.AuthorizationEndpoint = authServer.URL
+	config.Target = ccServer.URL
+	config.AccessToken = "bearer initial-access-token"
+	config.RefreshToken = "initial-refresh-token"
+
+	auth := NewUAAAuthenticator(configRepo)
+	client := NewApiClient(auth)
+
+	request, err := NewRequest("GET", config.Target+"/v2/foo", config.AccessToken, nil)
+	assert.NoError(t, err)
+	_, err = client.PerformRequest(request)
+	assert.NoError(t, err)
+
+	savedConfig := testhelpers.SavedConfiguration
+	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
+	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
 }

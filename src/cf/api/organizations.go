@@ -13,11 +13,13 @@ type OrganizationRepository interface {
 }
 
 type CloudControllerOrganizationRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerOrganizationRepository(config *configuration.Configuration) (repo CloudControllerOrganizationRepository) {
+func NewCloudControllerOrganizationRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerOrganizationRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -29,7 +31,7 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	}
 	response := new(ApiResponse)
 
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
 	if err != nil {
 		return

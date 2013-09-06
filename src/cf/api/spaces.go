@@ -16,11 +16,13 @@ type SpaceRepository interface {
 }
 
 type CloudControllerSpaceRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerSpaceRepository(config *configuration.Configuration) (repo CloudControllerSpaceRepository) {
+func NewCloudControllerSpaceRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerSpaceRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -37,7 +39,7 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, err err
 
 	response := new(ApiResponse)
 
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
 	if err != nil {
 		return
@@ -76,7 +78,7 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, err err
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
 	if err != nil {
 		return

@@ -16,11 +16,13 @@ type RouteRepository interface {
 }
 
 type CloudControllerRouteRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerRouteRepository(config *configuration.Configuration) (repo CloudControllerRouteRepository) {
+func NewCloudControllerRouteRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerRouteRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -33,7 +35,7 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, err err
 	}
 
 	response := new(RoutesResponse)
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}
@@ -62,7 +64,7 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	}
 
 	response := new(ApiResponse)
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}
@@ -91,7 +93,7 @@ func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.D
 	}
 
 	resource := new(Resource)
-	_, err = PerformRequestAndParseResponse(request, resource)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, resource)
 	if err != nil {
 		return
 	}
@@ -108,7 +110,7 @@ func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Applicati
 		return
 	}
 
-	_, err = PerformRequest(request)
+	_, err = repo.apiClient.PerformRequest(request)
 
 	return
 }

@@ -102,7 +102,8 @@ func TestFindByName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app, err := repo.FindByName("App1")
 	assert.NoError(t, err)
@@ -139,7 +140,8 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	_, err := repo.FindByName("App1")
 	assert.Error(t, err)
@@ -160,7 +162,8 @@ func TestSetEnv(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
 
@@ -199,7 +202,8 @@ func TestCreateApplication(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	newApp := cf.Application{
 		Name:         "my-cool-app",
@@ -231,7 +235,8 @@ func TestCreateApplicationWithoutBuildpackOrStack(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	newApp := cf.Application{
 		Name:         "my-cool-app",
@@ -250,7 +255,8 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{Target: ts.URL}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	createdApp, err := repo.Create(cf.Application{Name: "name with space"})
 	assert.Equal(t, createdApp, cf.Application{})
@@ -281,7 +287,8 @@ func TestDeleteApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -328,7 +335,8 @@ func TestUploadApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 	zipBuffer := bytes.NewBufferString("hello world!")
@@ -361,7 +369,8 @@ func TestStartApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -393,7 +402,8 @@ func TestStopApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -424,7 +434,8 @@ func TestGetInstances(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerApplicationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, client)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 

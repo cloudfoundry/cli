@@ -49,7 +49,8 @@ func TestOrganizationsFindAll(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	repo := NewCloudControllerOrganizationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, client)
 
 	organizations, err := repo.FindAll()
 	assert.NoError(t, err)
@@ -68,7 +69,8 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
-	repo := NewCloudControllerOrganizationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, client)
 
 	var (
 		organizations []cf.Organization
@@ -90,7 +92,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	repo := NewCloudControllerOrganizationRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, client)
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 

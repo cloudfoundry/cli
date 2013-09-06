@@ -12,11 +12,13 @@ type StackRepository interface {
 }
 
 type CloudControllerStackRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerStackRepository(config *configuration.Configuration) (repo CloudControllerStackRepository) {
+func NewCloudControllerStackRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerStackRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -28,7 +30,7 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	}
 
 	findResponse := new(ApiResponse)
-	_, err = PerformRequestAndParseResponse(request, findResponse)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, findResponse)
 	if err != nil {
 		return
 	}

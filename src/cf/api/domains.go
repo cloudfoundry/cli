@@ -14,11 +14,13 @@ type DomainRepository interface {
 }
 
 type CloudControllerDomainRepository struct {
-	config *configuration.Configuration
+	config    *configuration.Configuration
+	apiClient ApiClient
 }
 
-func NewCloudControllerDomainRepository(config *configuration.Configuration) (repo CloudControllerDomainRepository) {
+func NewCloudControllerDomainRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerDomainRepository) {
 	repo.config = config
+	repo.apiClient = apiClient
 	return
 }
 
@@ -30,7 +32,7 @@ func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, err 
 	}
 
 	response := new(ApiResponse)
-	_, err = PerformRequestAndParseResponse(request, response)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
 	if err != nil {
 		return
 	}

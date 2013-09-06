@@ -49,7 +49,8 @@ func TestSpacesFindAll(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	repo := NewCloudControllerSpaceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
 	spaces, err := repo.FindAll()
 
 	assert.NoError(t, err)
@@ -73,7 +74,8 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	repo := NewCloudControllerSpaceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
 
 	var (
 		spaces []cf.Space
@@ -99,7 +101,8 @@ func TestSpacesFindByName(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	repo := NewCloudControllerSpaceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
 	existingOrg := cf.Space{Guid: "staging-space-guid", Name: "staging"}
 
 	org, err := repo.FindByName("staging")
@@ -198,7 +201,8 @@ func TestGetSummary(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerSpaceRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
 
 	space, err := repo.GetSummary()
 	assert.NoError(t, err)

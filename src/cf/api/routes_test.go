@@ -68,7 +68,8 @@ func TestRoutesFindAll(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerRouteRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, client)
 
 	routes, err := repo.FindAll()
 	assert.NoError(t, err)
@@ -112,7 +113,8 @@ func TestFindByHost(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerRouteRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, client)
 
 	route, err := repo.FindByHost("my-cool-app")
 	assert.NoError(t, err)
@@ -138,7 +140,8 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerRouteRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, client)
 
 	_, err := repo.FindByHost("my-cool-app")
 	assert.Error(t, err)
@@ -170,7 +173,8 @@ func TestCreate(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	repo := NewCloudControllerRouteRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, client)
 
 	domain := cf.Domain{Guid: "my-domain-guid"}
 	newRoute := cf.Route{Host: "my-cool-app"}
@@ -196,7 +200,8 @@ func TestBind(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	repo := NewCloudControllerRouteRepository(config)
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, client)
 
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}

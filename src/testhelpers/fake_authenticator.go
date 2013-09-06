@@ -36,3 +36,7 @@ func (auth *FakeAuthenticator) Authenticate(email string, password string) (err 
 
 	return
 }
+
+func (auth *FakeAuthenticator) RefreshAuthToken() (updatedToken string, err error) {
+	return
+}
