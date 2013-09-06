@@ -67,7 +67,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	s.ui.Ok()
 
-	instances, errorCode, err := s.appRepo.GetInstances(s.config, app)
+	instances, errorCode, err := s.appRepo.GetInstances(app)
 
 	for err != nil {
 		if errorCode != 170002 {
@@ -77,7 +77,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 		}
 
 		s.ui.Wait(1 * time.Second)
-		instances, errorCode, err = s.appRepo.GetInstances(s.config, app)
+		instances, errorCode, err = s.appRepo.GetInstances(app)
 		s.ui.LoadingIndication()
 	}
 
@@ -87,7 +87,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	for s.displayInstancesStatus(app, instances) {
 		s.ui.Wait(1 * time.Second)
-		instances, _, _ = s.appRepo.GetInstances(s.config, app)
+		instances, _, _ = s.appRepo.GetInstances(app)
 	}
 }
 

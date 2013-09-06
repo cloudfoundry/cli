@@ -22,7 +22,7 @@ type ApplicationRepository interface {
 	Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error)
 	Start(app cf.Application) (err error)
 	Stop(app cf.Application) (err error)
-	GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error)
+	GetInstances(app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -182,9 +182,9 @@ type InstanceApiResponse struct {
 	State string
 }
 
-func (repo CloudControllerApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error) {
-	path := fmt.Sprintf("%s/v2/apps/%s/instances", config.Target, app.Guid)
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
+func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error) {
+	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.Target, app.Guid)
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}

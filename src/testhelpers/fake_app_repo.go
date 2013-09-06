@@ -2,7 +2,6 @@ package testhelpers
 
 import (
 	"cf"
-	"cf/configuration"
 	"errors"
 	"bytes"
 )
@@ -94,10 +93,9 @@ func (repo *FakeApplicationRepository) Stop(app cf.Application) (err error){
 	return
 }
 
-func (repo *FakeApplicationRepository) GetInstances(config *configuration.Configuration, app cf.Application) (instances[]cf.ApplicationInstance, errorCode int, err error) {
+func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instances[]cf.ApplicationInstance, errorCode int, err error) {
 	errorCode = repo.GetInstancesErrorCodes[0]
 	repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
-
 
 	instances = repo.GetInstancesResponses[0]
 	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]

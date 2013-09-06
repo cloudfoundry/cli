@@ -428,7 +428,7 @@ func TestGetInstances(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	instances, code, err := repo.GetInstances(config, app)
+	instances, code, err := repo.GetInstances(app)
 	assert.NoError(t, err)
 	assert.Equal(t, code, 0)
 	assert.Equal(t, len(instances), 2)
