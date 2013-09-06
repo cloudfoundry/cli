@@ -13,6 +13,12 @@ type Authenticator interface {
 }
 
 type UAAAuthenticator struct {
+	configRepo configuration.ConfigurationRepository
+}
+
+func NewUAAAuthenticator(configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticator) {
+	uaa.configRepo = configRepo
+	return
 }
 
 func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, email string, password string) (err error) {
@@ -43,5 +49,5 @@ func (uaa UAAAuthenticator) Authenticate(config *configuration.Configuration, em
 	}
 
 	config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
-	return configuration.Save()
+	return uaa.configRepo.Save()
 }

@@ -14,15 +14,17 @@ type InfoResponse struct {
 }
 
 type Target struct {
-	ui        term.UI
-	config    *configuration.Configuration
-	orgRepo   api.OrganizationRepository
-	spaceRepo api.SpaceRepository
+	ui         term.UI
+	config     *configuration.Configuration
+	configRepo configuration.ConfigurationRepository
+	orgRepo    api.OrganizationRepository
+	spaceRepo  api.SpaceRepository
 }
 
-func NewTarget(ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
+func NewTarget(ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
 	t.ui = ui
 	t.config = config
+	t.configRepo = configRepo
 	t.orgRepo = orgRepo
 	t.spaceRepo = spaceRepo
 
@@ -107,11 +109,11 @@ func (t Target) setNewTarget(target string) {
 }
 
 func (t *Target) saveTarget(target string, info *InfoResponse) (err error) {
-	configuration.ClearSession()
+	t.configRepo.ClearSession()
 	t.config.Target = target
 	t.config.ApiVersion = info.ApiVersion
 	t.config.AuthorizationEndpoint = info.AuthorizationEndpoint
-	return configuration.Save()
+	return t.configRepo.Save()
 }
 
 func (t Target) setOrganization(orgName string) {
@@ -152,7 +154,7 @@ func (t Target) setSpace(spaceName string) {
 }
 
 func (t Target) saveAndShowConfig() {
-	err := configuration.Save()
+	err := t.configRepo.Save()
 	if err != nil {
 		t.ui.Failed("Error saving configuration", err)
 		return

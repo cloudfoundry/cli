@@ -21,17 +21,19 @@ func (f Factory) NewTarget() Target {
 	return NewTarget(
 		f.ui,
 		f.repoLocator.GetConfig(),
+		f.repoLocator.GetConfigurationRepository(),
 		f.repoLocator.GetOrganizationRepository(),
 		f.repoLocator.GetSpaceRepository(),
 	)
 }
 
 func (f Factory) NewLogin() Login {
-	authenticator := new(api.UAAAuthenticator)
+	authenticator := api.NewUAAAuthenticator(f.repoLocator.GetConfigurationRepository())
 
 	return NewLogin(
 		f.ui,
 		f.repoLocator.GetConfig(),
+		f.repoLocator.GetConfigurationRepository(),
 		f.repoLocator.GetOrganizationRepository(),
 		f.repoLocator.GetSpaceRepository(),
 		authenticator,
@@ -50,6 +52,7 @@ func (f Factory) NewLogout() Logout {
 	return NewLogout(
 		f.ui,
 		f.repoLocator.GetConfig(),
+		f.repoLocator.GetConfigurationRepository(),
 	)
 }
 

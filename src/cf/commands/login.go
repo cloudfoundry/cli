@@ -15,17 +15,19 @@ const maxLoginTries = 3
 type Login struct {
 	ui            term.UI
 	config        *configuration.Configuration
+	configRepo    configuration.ConfigurationRepository
 	orgRepo       api.OrganizationRepository
 	spaceRepo     api.SpaceRepository
 	authenticator api.Authenticator
 }
 
-func NewLogin(ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, autenticator api.Authenticator) (l Login) {
+func NewLogin(ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (l Login) {
 	l.ui = ui
 	l.config = config
+	l.configRepo = configRepo
 	l.orgRepo = orgRepo
 	l.spaceRepo = spaceRepo
-	l.authenticator = autenticator
+	l.authenticator = authenticator
 	return
 }
 
@@ -124,7 +126,7 @@ func (l Login) chooseOrg(orgs []cf.Organization) (org cf.Organization) {
 
 func (l Login) saveOrg(config *configuration.Configuration, org cf.Organization) (err error) {
 	config.Organization = org
-	err = configuration.Save()
+	err = l.configRepo.Save()
 
 	if err != nil {
 		l.ui.Failed("Error saving organization: %s", err)
@@ -165,7 +167,7 @@ func (l Login) chooseSpace(spaces []cf.Space) (space cf.Space) {
 
 func (l Login) saveSpace(config *configuration.Configuration, space cf.Space) (err error) {
 	config.Space = space
-	err = configuration.Save()
+	err = l.configRepo.Save()
 
 	if err != nil {
 		l.ui.Failed("Error saving organization: %s", err)

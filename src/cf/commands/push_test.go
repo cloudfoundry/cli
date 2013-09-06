@@ -267,7 +267,8 @@ func callPush(args []string,
 }
 
 func basePushConfig() (config *configuration.Configuration) {
-	config = testhelpers.Login()
+	configRepo := &testhelpers.FakeConfigRepository{}
+	config = configRepo.Login()
 	config.Organization = cf.Organization{Name: "MyOrg"}
 	config.Space = cf.Space{Name: "MySpace"}
 

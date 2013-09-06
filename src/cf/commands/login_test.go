@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/configuration/configtest"
 	term "cf/terminal"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
@@ -13,24 +12,27 @@ import (
 )
 
 func TestSuccessfullyLoggingIn(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
 	auth := &testhelpers.FakeAuthenticator{
 		AccessToken: "my_access_token",
+		ConfigRepo:  configRepo,
 	}
 	callLogin(
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
 		auth,
 	)
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -43,24 +45,27 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 }
 
 func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"bar"}
 	auth := &testhelpers.FakeAuthenticator{
 		AccessToken: "my_access_token",
+		ConfigRepo:  configRepo,
 	}
 	callLogin(
 		[]string{"foo@example.com"},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
 		auth,
 	)
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -72,7 +77,9 @@ func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
 }
 
 func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar", "2", "1"}
@@ -90,9 +97,10 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
-		&testhelpers.FakeAuthenticator{},
+		&testhelpers.FakeAuthenticator{ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -112,14 +120,15 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	assert.Contains(t, ui.Prompts[3], "Space")
 	assert.Contains(t, ui.Outputs[9], "FirstSpace")
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, orgs[1], savedConfig.Organization)
 	assert.Equal(t, spaces[0], savedConfig.Space)
 }
 
 func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	orgs := []cf.Organization{
 		cf.Organization{"Org1", "org-1-guid"},
@@ -138,9 +147,10 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
-		&testhelpers.FakeAuthenticator{},
+		&testhelpers.FakeAuthenticator{ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Prompts[2], "Organization")
@@ -155,14 +165,15 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	assert.Contains(t, ui.Prompts[5], "Space")
 	assert.Contains(t, ui.Outputs[17], "Targeting space")
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, orgs[1], savedConfig.Organization)
 	assert.Equal(t, spaces[0], savedConfig.Space)
 }
 
 func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
@@ -178,9 +189,10 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
-		&testhelpers.FakeAuthenticator{},
+		&testhelpers.FakeAuthenticator{ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -195,14 +207,15 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "FirstOrg")
 	assert.Contains(t, ui.Outputs[8], "FirstSpace")
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, orgs[0], savedConfig.Organization)
 	assert.Equal(t, spaces[0], savedConfig.Space)
 }
 
 func TestLoggingInWithoutOrg(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
@@ -213,9 +226,10 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
-		&testhelpers.FakeAuthenticator{},
+		&testhelpers.FakeAuthenticator{ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -225,14 +239,15 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Outputs[3], "No orgs found.")
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, cf.Organization{}, savedConfig.Organization)
 	assert.Equal(t, cf.Space{}, savedConfig.Space)
 }
 
 func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{"foo@example.com", "bar"}
@@ -245,9 +260,10 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
-		&testhelpers.FakeAuthenticator{},
+		&testhelpers.FakeAuthenticator{ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -260,14 +276,15 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "FirstOrg")
 	assert.Contains(t, ui.Outputs[8], "No spaces found")
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, orgs[0], savedConfig.Organization)
 	assert.Equal(t, cf.Space{}, savedConfig.Space)
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
-	config := logout(t)
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
 	ui.Inputs = []string{
@@ -282,9 +299,10 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		[]string{},
 		ui,
 		config,
+		configRepo,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
-		&testhelpers.FakeAuthenticator{AuthError: true},
+		&testhelpers.FakeAuthenticator{AuthError: true, ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -296,15 +314,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[10], "FAILED")
 }
 
-func callLogin(args []string, ui term.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
-	l := NewLogin(ui, config, orgRepo, spaceRepo, auth)
+func callLogin(args []string, ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
+	l := NewLogin(ui, config, configRepo, orgRepo, spaceRepo, auth)
 	l.Run(testhelpers.NewContext("login", args))
-}
-
-func logout(t *testing.T) (config *configuration.Configuration) {
-	config, err := configuration.Get()
-	assert.NoError(t, err)
-	err = configuration.ClearSession()
-	assert.NoError(t, err)
-	return
 }

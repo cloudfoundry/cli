@@ -2,13 +2,12 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
-	"cf/configuration/configtest"
 	"encoding/base64"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"testhelpers"
 	"testing"
 )
 
@@ -48,20 +47,20 @@ var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Req
 }
 
 func TestSuccessfullyLoggingIn(t *testing.T) {
-	configuration.Delete()
 	ts := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
 	defer ts.Close()
 
-	config, err := configuration.Get()
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, err := configRepo.Get()
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
 
-	auth := UAAAuthenticator{}
+	auth := NewUAAAuthenticator(configRepo)
 	err = auth.Authenticate(config, "foo@example.com", "bar")
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
 }
 
@@ -70,20 +69,20 @@ var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.R
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
-	configuration.Delete()
 	ts := httptest.NewTLSServer(http.HandlerFunc(unsuccessfulLoginEndpoint))
 	defer ts.Close()
 
-	config, err := configuration.Get()
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, err := configRepo.Get()
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
 
-	auth := UAAAuthenticator{}
+	auth := NewUAAAuthenticator(configRepo)
 	err = auth.Authenticate(config, "foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
 
-	savedConfig, err := configtest.GetSavedConfig()
-	assert.NoError(t, err)
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Empty(t, savedConfig.AccessToken)
 }
