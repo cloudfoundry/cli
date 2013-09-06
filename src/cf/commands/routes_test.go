@@ -3,7 +3,6 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -23,9 +22,8 @@ func TestListingRoutes(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindAllRoutes: routes}
 
 	ui := &testhelpers.FakeUI{}
-	config := &configuration.Configuration{}
 
-	cmd := NewRoutes(ui, config, routeRepo)
+	cmd := NewRoutes(ui, routeRepo)
 	cmd.Run(testhelpers.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
@@ -39,9 +37,8 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindAllRoutes: routes}
 
 	ui := &testhelpers.FakeUI{}
-	config := &configuration.Configuration{}
 
-	cmd := NewRoutes(ui, config, routeRepo)
+	cmd := NewRoutes(ui, routeRepo)
 	cmd.Run(testhelpers.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
@@ -53,9 +50,8 @@ func TestListingRoutesWhenFindFails(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindAllErr: true}
 
 	ui := &testhelpers.FakeUI{}
-	config := &configuration.Configuration{}
 
-	cmd := NewRoutes(ui, config, routeRepo)
+	cmd := NewRoutes(ui, routeRepo)
 	cmd.Run(testhelpers.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")

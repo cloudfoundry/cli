@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
@@ -11,13 +10,11 @@ import (
 
 type Services struct {
 	ui        term.UI
-	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 }
 
-func NewServices(ui term.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd Services) {
+func NewServices(ui term.UI, spaceRepo api.SpaceRepository) (cmd Services) {
 	cmd.ui = ui
-	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	return
 }
@@ -27,7 +24,7 @@ func (cmd Services) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 }
 
 func (cmd Services) Run(c *cli.Context) {
-	cmd.ui.Say("Getting services in %s", cmd.config.Space.Name)
+	cmd.ui.Say("Getting services in %s", cmd.spaceRepo.GetCurrentSpace().Name)
 
 	space, err := cmd.spaceRepo.GetSummary()
 

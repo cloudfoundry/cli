@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -11,15 +10,13 @@ import (
 
 type Stop struct {
 	ui      term.UI
-	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Stop) {
+func NewStop(ui term.UI, appRepo api.ApplicationRepository) (s *Stop) {
 	s = new(Stop)
 	s.ui = ui
-	s.config = config
 	s.appRepo = appRepo
 
 	return

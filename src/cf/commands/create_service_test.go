@@ -4,7 +4,6 @@ import (
 	"cf"
 	"cf/api"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -18,11 +17,9 @@ func TestCreateService(t *testing.T) {
 		cf.ServiceOffering{Label: "postgres"},
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings}
-	config := &configuration.Configuration{}
 	fakeUI := callCreateService(
 		[]string{"--offering", "cleardb", "--plan", "spark", "--name", "my-cleardb-service"},
 		[]string{},
-		config,
 		serviceRepo,
 	)
 
@@ -35,11 +32,9 @@ func TestCreateService(t *testing.T) {
 
 func TestCreateUserProvidedService(t *testing.T) {
 	serviceRepo := &testhelpers.FakeServiceRepo{}
-	config := &configuration.Configuration{}
 	fakeUI := callCreateService(
 		[]string{"--offering", "user-provided", "--name", "my-custom-service", "--parameters", `"foo, bar, baz"`},
 		[]string{"foo value", "bar value", "baz value"},
-		config,
 		serviceRepo,
 	)
 
@@ -60,21 +55,19 @@ func TestCreateUserProvidedService(t *testing.T) {
 
 func TestCreateUserProvidedServiceWithNoParameterList(t *testing.T) {
 	serviceRepo := &testhelpers.FakeServiceRepo{}
-	config := &configuration.Configuration{}
 	fakeUI := callCreateService(
 		[]string{"--offering", "user-provided", "--name", "my-custom-service"},
 		[]string{},
-		config,
 		serviceRepo,
 	)
 
 	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
 }
 
-func callCreateService(args []string, inputs []string, config *configuration.Configuration, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
+func callCreateService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = &testhelpers.FakeUI{Inputs: inputs}
 	ctxt := testhelpers.NewContext("create-service", args)
-	cmd := NewCreateService(fakeUI, config, serviceRepo)
+	cmd := NewCreateService(fakeUI, serviceRepo)
 	reqFactory := &testhelpers.FakeReqFactory{}
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)

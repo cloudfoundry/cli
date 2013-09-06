@@ -9,14 +9,12 @@ import (
 
 type Logout struct {
 	ui         term.UI
-	config     *configuration.Configuration
 	configRepo configuration.ConfigurationRepository
 }
 
 func NewLogout(ui term.UI, configRepo configuration.ConfigurationRepository) (l Logout) {
 	l.ui = ui
 	l.configRepo = configRepo
-	l.config, _ = configRepo.Get()
 	return
 }
 

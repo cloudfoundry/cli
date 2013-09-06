@@ -9,6 +9,7 @@ import (
 )
 
 type SpaceRepository interface {
+	GetCurrentSpace() (space cf.Space)
 	FindAll() (spaces []cf.Space, err error)
 	FindByName(name string) (space cf.Space, err error)
 	GetSummary() (space cf.Space, err error)
@@ -21,6 +22,10 @@ type CloudControllerSpaceRepository struct {
 func NewCloudControllerSpaceRepository(config *configuration.Configuration) (repo CloudControllerSpaceRepository) {
 	repo.config = config
 	return
+}
+
+func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
+	return repo.config.Space
 }
 
 func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, err error) {

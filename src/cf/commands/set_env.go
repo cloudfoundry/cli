@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -11,15 +10,13 @@ import (
 
 type SetEnv struct {
 	ui      term.UI
-	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (se *SetEnv) {
+func NewSetEnv(ui term.UI, appRepo api.ApplicationRepository) (se *SetEnv) {
 	se = new(SetEnv)
 	se.ui = ui
-	se.config = config
 	se.appRepo = appRepo
 	return
 }

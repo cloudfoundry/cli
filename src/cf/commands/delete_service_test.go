@@ -4,7 +4,6 @@ import (
 	"cf"
 	"cf/api"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -14,8 +13,7 @@ func TestDeleteServiceCommand(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{ServiceInstance: serviceInstance}
 	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-	config := &configuration.Configuration{}
-	fakeUI := callDeleteService([]string{"my-service"}, config, reqFactory, serviceRepo)
+	fakeUI := callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
 
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
 
@@ -29,19 +27,18 @@ func TestDeleteServiceCommand(t *testing.T) {
 func TestDeleteServiceCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
 	serviceRepo := &testhelpers.FakeServiceRepo{}
-	config := &configuration.Configuration{}
 
-	fakeUI := callDeleteService([]string{}, config, reqFactory, serviceRepo)
+	fakeUI := callDeleteService([]string{}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callDeleteService([]string{"my-service"}, config, reqFactory, serviceRepo)
+	fakeUI = callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func callDeleteService(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
+func callDeleteService(args []string, reqFactory *testhelpers.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("delete-service", args)
-	cmd := NewDeleteService(fakeUI, config, serviceRepo)
+	cmd := NewDeleteService(fakeUI, serviceRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

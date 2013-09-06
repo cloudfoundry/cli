@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"fmt"
@@ -12,13 +11,11 @@ import (
 
 type Apps struct {
 	ui        term.UI
-	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 }
 
-func NewApps(ui term.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (a Apps) {
+func NewApps(ui term.UI, spaceRepo api.SpaceRepository) (a Apps) {
 	a.ui = ui
-	a.config = config
 	a.spaceRepo = spaceRepo
 	return
 }
@@ -32,7 +29,7 @@ func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (
 }
 
 func (a Apps) Run(c *cli.Context) {
-	a.ui.Say("Getting applications in %s", a.config.Space.Name)
+	a.ui.Say("Getting applications in %s", a.spaceRepo.GetCurrentSpace().Name)
 
 	space, err := a.spaceRepo.GetSummary()
 

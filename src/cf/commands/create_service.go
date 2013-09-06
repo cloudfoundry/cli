@@ -3,7 +3,6 @@ package commands
 import (
 	"cf"
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -14,13 +13,11 @@ import (
 
 type CreateService struct {
 	ui          term.UI
-	config      *configuration.Configuration
 	serviceRepo api.ServiceRepository
 }
 
-func NewCreateService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd CreateService) {
+func NewCreateService(ui term.UI, sR api.ServiceRepository) (cmd CreateService) {
 	cmd.ui = ui
-	cmd.config = config
 	cmd.serviceRepo = sR
 	return
 }

@@ -3,7 +3,6 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -36,13 +35,13 @@ func TestServices(t *testing.T) {
 			ApplicationNames: []string{"cli1"},
 		},
 	}
-	spaceRepo := &testhelpers.FakeSpaceRepository{SummarySpace: cf.Space{ServiceInstances: serviceInstances}}
-	ui := &testhelpers.FakeUI{}
-	config := &configuration.Configuration{
-		Space: cf.Space{Name: "development", Guid: "development-guid"},
+	spaceRepo := &testhelpers.FakeSpaceRepository{
+		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
+		SummarySpace: cf.Space{ServiceInstances: serviceInstances},
 	}
+	ui := &testhelpers.FakeUI{}
 
-	cmd := NewServices(ui, config, spaceRepo)
+	cmd := NewServices(ui, spaceRepo)
 	cmd.Run(testhelpers.NewContext("services", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting services in development")

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -11,16 +10,14 @@ import (
 
 type UnbindService struct {
 	ui                 term.UI
-	config             *configuration.Configuration
 	serviceRepo        api.ServiceRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd *UnbindService) {
+func NewUnbindService(ui term.UI, sR api.ServiceRepository) (cmd *UnbindService) {
 	cmd = new(UnbindService)
 	cmd.ui = ui
-	cmd.config = config
 	cmd.serviceRepo = sR
 	return
 }

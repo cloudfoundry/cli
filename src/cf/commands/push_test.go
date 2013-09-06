@@ -5,7 +5,6 @@ import (
 	"cf"
 	"cf/api"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testhelpers"
@@ -29,7 +28,7 @@ func TestPushingRequirements(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	stackRepo := &testhelpers.FakeStackRepository{}
 
-	cmd := NewPush(fakeUI, basePushConfig(), starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	cmd := NewPush(fakeUI, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 	ctxt := testhelpers.NewContext("push", []string{})
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
@@ -58,7 +57,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	fakeStarter := &FakeAppStarter{}
 	zipper := &testhelpers.FakeZipper{}
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
@@ -101,7 +100,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	fakeStarter := &FakeAppStarter{}
 	zipper := &testhelpers.FakeZipper{}
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating my-new-app...")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
@@ -148,7 +147,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"--path", "/Users/pivotal/workspace/my-new-app",
 		"--stack", "customLinux",
 		"--no-start", "",
-	}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Using stack customLinux.")
 	assert.Equal(t, stackRepo.FindByNameName, "customLinux")
@@ -193,7 +192,7 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	callPush([]string{
 		"--name", "my-new-app",
 		"--memory", "256M",
-	}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, 256)
 }
@@ -210,7 +209,7 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 	callPush([]string{
 		"--name", "my-new-app",
 		"--memory", "512",
-	}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, 512)
 }
@@ -227,7 +226,7 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 	callPush([]string{
 		"--name", "my-new-app",
 		"--memory", "abcM",
-	}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
 }
@@ -241,7 +240,7 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	fakeStarter := &FakeAppStarter{}
 	zipper := &testhelpers.FakeZipper{}
 
-	fakeUI := callPush([]string{"--name", "existing-app"}, basePushConfig(), fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	fakeUI := callPush([]string{"--name", "existing-app"}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Uploading existing-app...")
 	assert.Equal(t, appRepo.UploadedApp.Guid, "existing-app-guid")
@@ -249,7 +248,6 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 }
 
 func callPush(args []string,
-	config *configuration.Configuration,
 	starter ApplicationStarter,
 	zipper cf.Zipper,
 	appRepo api.ApplicationRepository,
@@ -259,18 +257,9 @@ func callPush(args []string,
 
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("push", args)
-	cmd := NewPush(fakeUI, config, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	cmd := NewPush(fakeUI, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
-
-	return
-}
-
-func basePushConfig() (config *configuration.Configuration) {
-	configRepo := &testhelpers.FakeConfigRepository{}
-	config = configRepo.Login()
-	config.Organization = cf.Organization{Name: "MyOrg"}
-	config.Space = cf.Space{Name: "MySpace"}
 
 	return
 }

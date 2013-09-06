@@ -3,7 +3,6 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -35,12 +34,11 @@ func TestDeleteWithForceOption(t *testing.T) {
 	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 	appRepo := &testhelpers.FakeApplicationRepository{}
-	config := &configuration.Configuration{}
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "app-to-delete"})
 
-	cmd := NewDelete(ui, config, appRepo)
+	cmd := NewDelete(ui, appRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
@@ -62,12 +60,11 @@ func deleteApp(confirmation string, args []string) (ui *testhelpers.FakeUI, reqF
 	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
 	reqFactory = &testhelpers.FakeReqFactory{Application: app}
 	appRepo = &testhelpers.FakeApplicationRepository{}
-	config := &configuration.Configuration{}
 	ui = &testhelpers.FakeUI{
 		Inputs: []string{confirmation},
 	}
 	ctxt := testhelpers.NewContext("delete", args)
-	cmd := NewDelete(ui, config, appRepo)
+	cmd := NewDelete(ui, appRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

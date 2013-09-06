@@ -3,7 +3,6 @@ package commands
 import (
 	"cf"
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
@@ -14,7 +13,6 @@ import (
 
 type Push struct {
 	ui         term.UI
-	config     *configuration.Configuration
 	starter    ApplicationStarter
 	zipper     cf.Zipper
 	appRepo    api.ApplicationRepository
@@ -23,10 +21,9 @@ type Push struct {
 	stackRepo  api.StackRepository
 }
 
-func NewPush(ui term.UI, config *configuration.Configuration, starter ApplicationStarter, zipper cf.Zipper,
+func NewPush(ui term.UI, starter ApplicationStarter, zipper cf.Zipper,
 	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository) (p Push) {
 	p.ui = ui
-	p.config = config
 	p.starter = starter
 	p.zipper = zipper
 	p.appRepo = aR
@@ -49,7 +46,7 @@ func (p Push) Run(c *cli.Context) {
 	app, err := p.appRepo.FindByName(appName)
 
 	if err != nil {
-		app, err = p.createApp(p.config, appName, c)
+		app, err = p.createApp(appName, c)
 
 		if err != nil {
 			return
@@ -85,7 +82,7 @@ func (p Push) Run(c *cli.Context) {
 	}
 }
 
-func (p Push) createApp(config *configuration.Configuration, appName string, c *cli.Context) (app cf.Application, err error) {
+func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, err error) {
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("instances"),

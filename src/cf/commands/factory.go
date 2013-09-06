@@ -41,7 +41,6 @@ func (f Factory) NewLogin() Login {
 func (f Factory) NewSetEnv() *SetEnv {
 	return NewSetEnv(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetApplicationRepository(),
 	)
 }
@@ -66,7 +65,6 @@ func (f Factory) NewPush() Push {
 
 	return NewPush(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.NewStart(),
 		zipper,
 		f.repoLocator.GetApplicationRepository(),
@@ -79,7 +77,6 @@ func (f Factory) NewPush() Push {
 func (f Factory) NewApps() Apps {
 	return NewApps(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetSpaceRepository(),
 	)
 }
@@ -87,7 +84,6 @@ func (f Factory) NewApps() Apps {
 func (f Factory) NewDelete() *Delete {
 	return NewDelete(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetApplicationRepository(),
 	)
 }
@@ -95,7 +91,6 @@ func (f Factory) NewDelete() *Delete {
 func (f Factory) NewStop() *Stop {
 	return NewStop(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetApplicationRepository(),
 	)
 }
@@ -103,7 +98,6 @@ func (f Factory) NewStop() *Stop {
 func (f Factory) NewCreateService() CreateService {
 	return NewCreateService(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
 	)
 }
@@ -111,7 +105,6 @@ func (f Factory) NewCreateService() CreateService {
 func (f Factory) NewBindService() *BindService {
 	return NewBindService(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
 	)
 }
@@ -119,7 +112,6 @@ func (f Factory) NewBindService() *BindService {
 func (f Factory) NewUnbindService() *UnbindService {
 	return NewUnbindService(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
 	)
 }
@@ -127,7 +119,6 @@ func (f Factory) NewUnbindService() *UnbindService {
 func (f Factory) NewDeleteService() *DeleteService {
 	return NewDeleteService(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
 	)
 }
@@ -135,7 +126,6 @@ func (f Factory) NewDeleteService() *DeleteService {
 func (f Factory) NewRoutes() *Routes {
 	return NewRoutes(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetRouteRepository(),
 	)
 }
@@ -143,7 +133,6 @@ func (f Factory) NewRoutes() *Routes {
 func (f Factory) NewServices() Services {
 	return NewServices(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetSpaceRepository(),
 	)
 }
@@ -151,7 +140,6 @@ func (f Factory) NewServices() Services {
 func (f Factory) NewMarketplaceServices() MarketplaceServices {
 	return NewMarketplaceServices(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
 	)
 }

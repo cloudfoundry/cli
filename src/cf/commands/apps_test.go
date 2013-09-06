@@ -3,7 +3,6 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -17,15 +16,14 @@ func TestApps(t *testing.T) {
 		cf.Application{Name: "Application-1", State: "started", Instances: 1, Memory: 512, Urls: app1Urls},
 		cf.Application{Name: "Application-2", State: "started", Instances: 2, Memory: 256, Urls: app2Urls},
 	}
-	spaceRepo := &testhelpers.FakeSpaceRepository{SummarySpace: cf.Space{Applications: apps}}
-
-	config := &configuration.Configuration{
-		Space: cf.Space{Name: "development", Guid: "development-guid"},
+	spaceRepo := &testhelpers.FakeSpaceRepository{
+		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
+		SummarySpace: cf.Space{Applications: apps},
 	}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
 
-	ui := callApps(config, spaceRepo, reqFactory)
+	ui := callApps(spaceRepo, reqFactory)
 
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
@@ -43,30 +41,28 @@ func TestApps(t *testing.T) {
 }
 
 func TestAppsRequiresLogin(t *testing.T) {
-	config := &configuration.Configuration{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, SpaceSuccess: true}
 
-	callApps(config, spaceRepo, reqFactory)
+	callApps(spaceRepo, reqFactory)
 
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
 func TestAppsRequiresASelectedSpaceAndOrg(t *testing.T) {
-	config := &configuration.Configuration{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: false}
 
-	callApps(config, spaceRepo, reqFactory)
+	callApps(spaceRepo, reqFactory)
 
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
-func callApps(config *configuration.Configuration, spaceRepo *testhelpers.FakeSpaceRepository, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
+func callApps(spaceRepo *testhelpers.FakeSpaceRepository, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
 	ui = &testhelpers.FakeUI{}
 
 	ctxt := testhelpers.NewContext("apps", []string{})
-	cmd := NewApps(ui, config, spaceRepo)
+	cmd := NewApps(ui, spaceRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	return

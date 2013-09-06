@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -11,15 +10,13 @@ import (
 
 type DeleteService struct {
 	ui                 term.UI
-	config             *configuration.Configuration
 	serviceRepo        api.ServiceRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewDeleteService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd *DeleteService) {
+func NewDeleteService(ui term.UI, sR api.ServiceRepository) (cmd *DeleteService) {
 	cmd = new(DeleteService)
 	cmd.ui = ui
-	cmd.config = config
 	cmd.serviceRepo = sR
 	return
 }

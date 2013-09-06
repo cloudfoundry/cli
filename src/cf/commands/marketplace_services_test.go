@@ -3,7 +3,6 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
-	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -34,14 +33,11 @@ func TestMarketplaceServices(t *testing.T) {
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 	ui := &testhelpers.FakeUI{}
-	config := &configuration.Configuration{
-		Space: cf.Space{Name: "development", Guid: "development-guid"},
-	}
 
 	ctxt := testhelpers.NewContext("services", []string{"--marketplace"})
 	reqFactory := &testhelpers.FakeReqFactory{}
 
-	cmd := NewMarketplaceServices(ui, config, serviceRepo)
+	cmd := NewMarketplaceServices(ui, serviceRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "Getting services from marketplace...")

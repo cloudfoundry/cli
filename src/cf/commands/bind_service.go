@@ -2,7 +2,6 @@ package commands
 
 import (
 	"cf/api"
-	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -11,16 +10,14 @@ import (
 
 type BindService struct {
 	ui                 term.UI
-	config             *configuration.Configuration
 	serviceRepo        api.ServiceRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewBindService(ui term.UI, config *configuration.Configuration, sR api.ServiceRepository) (cmd *BindService) {
+func NewBindService(ui term.UI, sR api.ServiceRepository) (cmd *BindService) {
 	cmd = new(BindService)
 	cmd.ui = ui
-	cmd.config = config
 	cmd.serviceRepo = sR
 	return
 }

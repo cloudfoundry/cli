@@ -6,6 +6,8 @@ import (
 )
 
 type FakeSpaceRepository struct {
+	CurrentSpace cf.Space
+
 	Spaces []cf.Space
 
 	SpaceName string
@@ -13,6 +15,10 @@ type FakeSpaceRepository struct {
 	SpaceByNameErr bool
 
 	SummarySpace cf.Space
+}
+
+func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
+	return repo.CurrentSpace
 }
 
 func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, err error) {
