@@ -178,12 +178,12 @@ OPTIONS:
 			ShortName:   "cs",
 			Description: "Create service instance",
 			Usage: "cf create-service --offering <offering> --plan <plan> --name <service instance name>\n" +
-				"   cf create-service --offering user-provided --name <service name> --parameters \"<comma separated parameter list>\"",
+				"   cf create-service --offering user-provided --name <service name> --parameters \"<comma separated parameter names>\"",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the service instance"},
 				cli.StringFlag{"offering", "", "name of the service offering to use"},
 				cli.StringFlag{"plan", "", "name of the service plan to use"},
-				cli.StringFlag{"parameters", "", "parameters to use for user-provided services"},
+				cli.StringFlag{"parameters", "", "list of comma parameter names to use for user-provided services (eg. \"n1,n2\")"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewCreateService()
