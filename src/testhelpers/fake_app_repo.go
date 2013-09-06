@@ -35,10 +35,6 @@ type FakeApplicationRepository struct {
 	GetInstancesErrorCodes []int
 }
 
-func (repo *FakeApplicationRepository) FindAll(config *configuration.Configuration) (apps []cf.Application, err error) {
-	return repo.FindAllApps, err
-}
-
 func (repo *FakeApplicationRepository) FindByName(config *configuration.Configuration, name string) (app cf.Application, err error) {
 	repo.AppName = name
 	if repo.AppByNameErr {

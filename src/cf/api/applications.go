@@ -15,7 +15,6 @@ import (
 )
 
 type ApplicationRepository interface {
-	FindAll(config *configuration.Configuration) (apps []cf.Application, err error)
 	FindByName(config *configuration.Configuration, name string) (app cf.Application, err error)
 	SetEnv(config *configuration.Configuration, app cf.Application, name string, value string) (err error)
 	Create(config *configuration.Configuration, newApp cf.Application) (createdApp cf.Application, err error)
@@ -27,39 +26,11 @@ type ApplicationRepository interface {
 }
 
 type CloudControllerApplicationRepository struct {
+	config *configuration.Configuration
 }
 
-func (repo CloudControllerApplicationRepository) FindAll(config *configuration.Configuration) (apps []cf.Application, err error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?inline-relations-depth=2", config.Target, config.Space.Guid)
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
-	if err != nil {
-		return
-	}
-
-	response := new(ApplicationsApiResponse)
-	_, err = PerformRequestAndParseResponse(request, response)
-	if err != nil {
-		return
-	}
-
-	for _, res := range response.Resources {
-		urls := []string{}
-		for _, routeRes := range res.Entity.Routes {
-			routeEntity := routeRes.Entity
-			domainEntity := routeEntity.Domain.Entity
-			urls = append(urls, fmt.Sprintf("%s.%s", routeEntity.Host, domainEntity.Name))
-		}
-
-		apps = append(apps, cf.Application{
-			Name:      res.Entity.Name,
-			Guid:      res.Metadata.Guid,
-			State:     strings.ToLower(res.Entity.State),
-			Instances: res.Entity.Instances,
-			Memory:    res.Entity.Memory,
-			Urls:      urls,
-		})
-	}
-
+func NewCloudControllerApplicationRepository(config *configuration.Configuration) (repo CloudControllerApplicationRepository) {
+	repo.config = config
 	return
 }
 
