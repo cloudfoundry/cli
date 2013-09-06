@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -58,6 +59,7 @@ func (t Target) Run(c *cli.Context) {
 
 	if orgName != "" {
 		t.setOrganization(orgName)
+		t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
 		return
 	}
 
@@ -129,6 +131,7 @@ func (t Target) setOrganization(orgName string) {
 	}
 
 	t.config.Organization = org
+	t.config.Space = cf.Space{}
 	t.saveAndShowConfig()
 }
 

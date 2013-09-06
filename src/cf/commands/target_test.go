@@ -173,6 +173,10 @@ func TestTargetWithLoggedInUserShowsOrgInfo(t *testing.T) {
 func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	configRepo := &testhelpers.FakeConfigRepository{}
 	configRepo.Login()
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+	config.Space = cf.Space{Name: "my-space", Guid: "my-space-guid"}
+
 	orgs := []cf.Organization{
 		cf.Organization{Name: "my-organization", Guid: "my-organization-guid"},
 	}
@@ -187,10 +191,12 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	assert.Equal(t, orgRepo.OrganizationName, "my-organization")
 	assert.Contains(t, ui.Outputs[2], "org:")
 	assert.Contains(t, ui.Outputs[2], "my-organization")
+	assert.Contains(t, ui.Outputs[3], "No space targeted.")
 
 	ui = callTarget([]string{}, configRepo, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[2], "my-organization")
+	assert.NotContains(t, ui.Outputs[3], "my-space")
 }
 
 func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
