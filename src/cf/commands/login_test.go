@@ -25,7 +25,6 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
@@ -58,7 +57,6 @@ func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
 	callLogin(
 		[]string{"foo@example.com"},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
@@ -96,7 +94,6 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
@@ -128,7 +125,6 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
-	config, _ := configRepo.Get()
 
 	orgs := []cf.Organization{
 		cf.Organization{"Org1", "org-1-guid"},
@@ -146,7 +142,6 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
@@ -188,7 +183,6 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
@@ -225,7 +219,6 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
@@ -259,7 +252,6 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{Organizations: orgs},
 		&testhelpers.FakeSpaceRepository{Spaces: spaces},
@@ -298,7 +290,6 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	callLogin(
 		[]string{},
 		ui,
-		config,
 		configRepo,
 		&testhelpers.FakeOrgRepository{},
 		&testhelpers.FakeSpaceRepository{},
@@ -314,7 +305,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[10], "FAILED")
 }
 
-func callLogin(args []string, ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
-	l := NewLogin(ui, config, configRepo, orgRepo, spaceRepo, auth)
+func callLogin(args []string, ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
+	l := NewLogin(ui, configRepo, orgRepo, spaceRepo, auth)
 	l.Run(testhelpers.NewContext("login", args))
 }

@@ -32,7 +32,6 @@ func (f Factory) NewLogin() Login {
 
 	return NewLogin(
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetConfigurationRepository(),
 		f.repoLocator.GetOrganizationRepository(),
 		f.repoLocator.GetSpaceRepository(),

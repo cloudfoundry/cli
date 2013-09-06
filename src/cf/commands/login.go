@@ -21,10 +21,10 @@ type Login struct {
 	authenticator api.Authenticator
 }
 
-func NewLogin(ui term.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (l Login) {
+func NewLogin(ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (l Login) {
 	l.ui = ui
-	l.config = config
 	l.configRepo = configRepo
+	l.config, _ = configRepo.Get()
 	l.orgRepo = orgRepo
 	l.spaceRepo = spaceRepo
 	l.authenticator = authenticator
