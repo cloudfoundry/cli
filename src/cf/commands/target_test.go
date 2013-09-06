@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestTargetWithoutArgument(t *testing.T) {
+func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 	configRepo := &testhelpers.FakeConfigRepository{}
@@ -21,7 +21,59 @@ func TestTargetWithoutArgument(t *testing.T) {
 	config.Target = "https://api.run.pivotal.io"
 	fakeUI := callTarget([]string{}, configRepo, orgRepo, spaceRepo)
 
+	assert.Equal(t, len(fakeUI.Outputs), 4)
 	assert.Contains(t, fakeUI.Outputs[0], "https://api.run.pivotal.io")
+	assert.Contains(t, fakeUI.Outputs[1], "user: ")
+	assert.Contains(t, fakeUI.Outputs[2], "No org targeted")
+	assert.Contains(t, fakeUI.Outputs[3], "No space targeted")
+}
+
+func TestTargetWithoutArgumentsAndNotLoggedIn(t *testing.T) {
+	orgRepo := &testhelpers.FakeOrgRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	configRepo := &testhelpers.FakeConfigRepository{}
+	err := configRepo.ClearSession()
+	assert.NoError(t, err)
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+	config.Target = "https://api.run.pivotal.io"
+
+	fakeUI := callTarget([]string{}, configRepo, orgRepo, spaceRepo)
+	assert.Equal(t, len(fakeUI.Outputs), 2)
+	assert.Contains(t, fakeUI.Outputs[0], "https://api.run.pivotal.io")
+	assert.Contains(t, fakeUI.Outputs[1], "Logged out.")
+}
+
+func TestTargetWithOrganizationFlagAndNotLoggedIn(t *testing.T) {
+	orgRepo := &testhelpers.FakeOrgRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	configRepo := &testhelpers.FakeConfigRepository{}
+	err := configRepo.ClearSession()
+	assert.NoError(t, err)
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+	config.Target = "https://api.run.pivotal.io"
+
+	fakeUI := callTarget([]string{"-o", "my-organization"}, configRepo, orgRepo, spaceRepo)
+	assert.Equal(t, len(fakeUI.Outputs), 2)
+	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[1], "You must be logged in to set an organization. Use 'cf login'.")
+}
+
+func TestTargetWithSpaceFlagAndNotLoggedIn(t *testing.T) {
+	orgRepo := &testhelpers.FakeOrgRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	configRepo := &testhelpers.FakeConfigRepository{}
+	err := configRepo.ClearSession()
+	assert.NoError(t, err)
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+	config.Target = "https://api.run.pivotal.io"
+
+	fakeUI := callTarget([]string{"-s", "my-space"}, configRepo, orgRepo, spaceRepo)
+	assert.Equal(t, len(fakeUI.Outputs), 2)
+	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[1], "You must be logged in to set a space. Use 'cf login'.")
 }
 
 // With target argument

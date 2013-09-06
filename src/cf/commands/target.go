@@ -43,6 +43,10 @@ func (t Target) Run(c *cli.Context) {
 
 	if argsCount == 0 && orgName == "" && spaceName == "" {
 		t.ui.ShowConfiguration(t.config)
+
+		if !t.config.IsLoggedIn() {
+			return
+		}
 		if !t.config.HasOrganization() {
 			t.ui.Say("No org targeted. Use 'cf target -o' to target an org.")
 		}
@@ -59,7 +63,9 @@ func (t Target) Run(c *cli.Context) {
 
 	if orgName != "" {
 		t.setOrganization(orgName)
-		t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
+		if t.config.IsLoggedIn() {
+			t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
+		}
 		return
 	}
 
@@ -120,7 +126,7 @@ func (t *Target) saveTarget(target string, info *InfoResponse) (err error) {
 
 func (t Target) setOrganization(orgName string) {
 	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set an organization.", nil)
+		t.ui.Failed("You must be logged in to set an organization. Use 'cf login'.", nil)
 		return
 	}
 
@@ -137,7 +143,7 @@ func (t Target) setOrganization(orgName string) {
 
 func (t Target) setSpace(spaceName string) {
 	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set a space.", nil)
+		t.ui.Failed("You must be logged in to set a space. Use 'cf login'.", nil)
 		return
 	}
 
