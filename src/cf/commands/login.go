@@ -72,7 +72,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.targetOrganization(l.config, organizations)
 
-		spaces, err := l.spaceRepo.FindAll(l.config)
+		spaces, err := l.spaceRepo.FindAll()
 
 		if err != nil {
 			l.ui.Failed("Error fetching spaces.", err)

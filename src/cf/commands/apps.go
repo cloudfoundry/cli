@@ -34,7 +34,7 @@ func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (
 func (a Apps) Run(c *cli.Context) {
 	a.ui.Say("Getting applications in %s", a.config.Space.Name)
 
-	space, err := a.spaceRepo.GetSummary(a.config)
+	space, err := a.spaceRepo.GetSummary()
 
 	if err != nil {
 		a.ui.Failed("Error loading applications", err)

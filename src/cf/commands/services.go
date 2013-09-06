@@ -29,7 +29,7 @@ func (cmd Services) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 func (cmd Services) Run(c *cli.Context) {
 	cmd.ui.Say("Getting services in %s", cmd.config.Space.Name)
 
-	space, err := cmd.spaceRepo.GetSummary(cmd.config)
+	space, err := cmd.spaceRepo.GetSummary()
 
 	if err != nil {
 		cmd.ui.Failed("Error loading applications", err)

@@ -44,13 +44,13 @@ func TestSpacesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerSpaceRepository{}
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	spaces, err := repo.FindAll(config)
+	repo := NewCloudControllerSpaceRepository(config)
+	spaces, err := repo.FindAll()
 
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(spaces))
@@ -68,13 +68,12 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerSpaceRepository{}
-
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER incorrect_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
+	repo := NewCloudControllerSpaceRepository(config)
 
 	var (
 		spaces []cf.Space
@@ -84,7 +83,7 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 	// Capture output so debugging info does not show up in test
 	// output
 	testhelpers.CaptureOutput(func() {
-		spaces, err = repo.FindAll(config)
+		spaces, err = repo.FindAll()
 	})
 
 	assert.Error(t, err)
@@ -95,23 +94,23 @@ func TestSpacesFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerSpaceRepository{}
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
+	repo := NewCloudControllerSpaceRepository(config)
 	existingOrg := cf.Space{Guid: "staging-space-guid", Name: "staging"}
 
-	org, err := repo.FindByName(config, "staging")
+	org, err := repo.FindByName("staging")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindByName(config, "Staging")
+	org, err = repo.FindByName("Staging")
 	assert.NoError(t, err)
 	assert.Equal(t, org, existingOrg)
 
-	org, err = repo.FindByName(config, "space that does not exist")
+	org, err = repo.FindByName("space that does not exist")
 	assert.Error(t, err)
 }
 
@@ -194,14 +193,14 @@ func TestGetSummary(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(spaceSummaryEndpoint))
 	defer ts.Close()
 
-	repo := CloudControllerSpaceRepository{}
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
+	repo := NewCloudControllerSpaceRepository(config)
 
-	space, err := repo.GetSummary(config)
+	space, err := repo.GetSummary()
 	assert.NoError(t, err)
 	assert.Equal(t, "my-space-guid", space.Guid)
 	assert.Equal(t, "development", space.Name)

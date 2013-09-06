@@ -9,17 +9,23 @@ import (
 )
 
 type SpaceRepository interface {
-	FindAll(config *configuration.Configuration) (spaces []cf.Space, err error)
-	FindByName(config *configuration.Configuration, name string) (space cf.Space, err error)
-	GetSummary(config *configuration.Configuration) (space cf.Space, err error)
+	FindAll() (spaces []cf.Space, err error)
+	FindByName(name string) (space cf.Space, err error)
+	GetSummary() (space cf.Space, err error)
 }
 
 type CloudControllerSpaceRepository struct {
+	config *configuration.Configuration
 }
 
-func (repo CloudControllerSpaceRepository) FindAll(config *configuration.Configuration) (spaces []cf.Space, err error) {
-	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", config.Target, config.Organization.Guid)
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
+func NewCloudControllerSpaceRepository(config *configuration.Configuration) (repo CloudControllerSpaceRepository) {
+	repo.config = config
+	return
+}
+
+func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, err error) {
+	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", repo.config.Target, repo.config.Organization.Guid)
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}
@@ -39,8 +45,8 @@ func (repo CloudControllerSpaceRepository) FindAll(config *configuration.Configu
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(config *configuration.Configuration, name string) (space cf.Space, err error) {
-	spaces, err := repo.FindAll(config)
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, err error) {
+	spaces, err := repo.FindAll()
 	lowerName := strings.ToLower(name)
 
 	if err != nil {
@@ -57,9 +63,9 @@ func (repo CloudControllerSpaceRepository) FindByName(config *configuration.Conf
 	return
 }
 
-func (repo CloudControllerSpaceRepository) GetSummary(config *configuration.Configuration) (space cf.Space, err error) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", config.Target, config.Space.Guid)
-	request, err := NewRequest("GET", path, config.AccessToken, nil)
+func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, err error) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
 	if err != nil {
 		return
 	}

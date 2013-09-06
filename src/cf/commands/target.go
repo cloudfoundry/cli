@@ -143,7 +143,7 @@ func (t Target) setSpace(spaceName string) {
 		return
 	}
 
-	space, err := t.spaceRepo.FindByName(t.config, spaceName)
+	space, err := t.spaceRepo.FindByName(spaceName)
 	if err != nil {
 		t.ui.Failed("You do not have access to that space.", nil)
 		return
