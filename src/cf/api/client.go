@@ -97,6 +97,11 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 
 	response, err = client.Do(request)
 
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
+		return
+	}
+
 	if traceEnabled() {
 		dumpedResponse, err := httputil.DumpResponse(response, true)
 		if err != nil {
@@ -106,10 +111,7 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 		}
 	}
 
-	if err != nil {
-		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
-		return
-	}
+
 
 	if response.StatusCode > 299 {
 		errorResponse := getErrorResponse(response)
