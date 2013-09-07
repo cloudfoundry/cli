@@ -67,8 +67,9 @@ func (r Route) URL() string {
 }
 
 type Stack struct {
-	Name string
-	Guid string
+	Name        string
+	Guid        string
+	Description string
 }
 
 type ApplicationInstance struct {

@@ -95,6 +95,13 @@ func (f Factory) NewStop() *Stop {
 	)
 }
 
+func (f Factory) NewStacks() *Stacks {
+	return NewStacks(
+		f.ui,
+		f.repoLocator.GetStackRepository(),
+	)
+}
+
 func (f Factory) NewCreateService() CreateService {
 	return NewCreateService(
 		f.ui,

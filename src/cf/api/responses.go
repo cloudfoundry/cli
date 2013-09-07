@@ -140,3 +140,17 @@ type ServiceBindingResource struct {
 type ServiceBindingEntity struct {
 	AppGuid string `json:"app_guid"`
 }
+
+type StackApiResponse struct {
+	Resources []StackResource
+}
+
+type StackEntity struct {
+	Name        string
+	Description string
+}
+
+type StackResource struct {
+	Metadata Metadata
+	Entity   StackEntity
+}

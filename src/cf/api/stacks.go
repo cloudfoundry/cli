@@ -9,6 +9,7 @@ import (
 
 type StackRepository interface {
 	FindByName(name string) (stack cf.Stack, err error)
+	FindAll() (stacks []cf.Stack, err error)
 }
 
 type CloudControllerStackRepository struct {
@@ -43,6 +44,26 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	res := findResponse.Resources[0]
 	stack.Guid = res.Metadata.Guid
 	stack.Name = res.Entity.Name
+
+	return
+}
+
+func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, err error) {
+	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
+	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if err != nil {
+		return
+	}
+
+	listResponse := new(StackApiResponse)
+	_, err = repo.apiClient.PerformRequestAndParseResponse(request, listResponse)
+	if err != nil {
+		return
+	}
+
+	for _, r := range listResponse.Resources {
+		stacks = append(stacks, cf.Stack{Guid: r.Metadata.Guid, Name: r.Entity.Name, Description: r.Entity.Description})
+	}
 
 	return
 }

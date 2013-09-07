@@ -259,6 +259,15 @@ OPTIONS:
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		{
+			Name:        "stacks",
+			Description: "List all stacks",
+			Usage:       "cf stacks",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewStacks()
+				cmdRunner.Run(cmd, c)
+			},
+		},
 	}
 	return
 }
