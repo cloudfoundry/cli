@@ -35,6 +35,21 @@ func TestPasswordCanBeChanged(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "OK")
 }
 
+func TestPasswordVerification(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	pwdRepo := &testhelpers.FakePasswordRepo{Score: "meh"}
+	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, reqFactory, pwdRepo)
+
+	assert.Contains(t, ui.Prompts[0], "Current Password")
+	assert.Contains(t, ui.Prompts[1], "New Password")
+	assert.Contains(t, ui.Prompts[2], "Verify Password")
+
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "Password verification does not match")
+
+	assert.Equal(t, pwdRepo.UpdateNewPassword, "")
+}
+
 func callPassword(inputs []string, reqFactory *testhelpers.FakeReqFactory, pwdRepo *testhelpers.FakePasswordRepo) (ui *testhelpers.FakeUI) {
 	ui = &testhelpers.FakeUI{Inputs: inputs}
 
