@@ -65,16 +65,66 @@ OPTIONS:
 	app.Version = cf.Version
 	app.Commands = []cli.Command{
 		{
-			Name:        "target",
-			ShortName:   "t",
-			Description: "Set or view the target",
-			Usage:       "cf target <target> --o <organization> --s <space>",
+			Name:        "apps",
+			ShortName:   "a",
+			Description: "List all applications in the currently selected space",
+			Usage:       "cf apps",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewApps()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "bind-service",
+			ShortName:   "bs",
+			Description: "Bind a service instance to an application",
+			Usage:       "cf bind-service --app <application name> --service <service instance name>",
 			Flags: []cli.Flag{
-				cli.StringFlag{"o", "", "organization"},
-				cli.StringFlag{"s", "", "space"},
+				cli.StringFlag{"app", "", "name of the application"},
+				cli.StringFlag{"service", "", "name of the service instance to bind to the application"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewTarget()
+				cmd := cmdFactory.NewBindService()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "create-service",
+			ShortName:   "cs",
+			Description: "Create service instance",
+			Usage: "cf create-service --offering <offering> --plan <plan> --name <service instance name>\n" +
+				"   cf create-service --offering user-provided --name <service name> --parameters \"<comma separated parameter names>\"",
+			Flags: []cli.Flag{
+				cli.StringFlag{"name", "", "name of the service instance"},
+				cli.StringFlag{"offering", "", "name of the service offering to use"},
+				cli.StringFlag{"plan", "", "name of the service plan to use"},
+				cli.StringFlag{"parameters", "", "list of comma separated parameter names to use for user-provided services (eg. \"n1,n2\")"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewCreateService()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "delete",
+			ShortName:   "d",
+			Description: "Delete an application",
+			Usage:       "cf delete -f <application>",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"f", "force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewDelete()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "delete-service",
+			ShortName:   "ds",
+			Description: "Delete a service instance",
+			Usage:       "cf delete-service <service instance name>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewDeleteService()
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -89,22 +139,22 @@ OPTIONS:
 			},
 		},
 		{
-			Name:        "set-env",
-			ShortName:   "se",
-			Description: "Set an environment variable for an application",
-			Usage:       "cf set-env <application> <variable> <value>",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewSetEnv()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
 			Name:        "logout",
 			ShortName:   "lo",
 			Description: "Log user out",
 			Usage:       "cf logout",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewLogout()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "passwd",
+			ShortName:   "pw",
+			Description: "Change user password",
+			Usage:       "cf passwd",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewPassword()
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -133,104 +183,6 @@ OPTIONS:
 			},
 		},
 		{
-			Name:        "apps",
-			ShortName:   "a",
-			Description: "List all applications in the currently selected space",
-			Usage:       "cf apps",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewApps()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "delete",
-			ShortName:   "d",
-			Description: "Delete an application",
-			Usage:       "cf delete -f <application>",
-			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "force deletion without confirmation"},
-			},
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewDelete()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "start",
-			ShortName:   "s",
-			Description: "Start applications",
-			Usage:       "cf start <application>",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewStart()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "stop",
-			ShortName:   "st",
-			Description: "Stop applications",
-			Usage:       "cf stop <application>",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewStop()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "create-service",
-			ShortName:   "cs",
-			Description: "Create service instance",
-			Usage: "cf create-service --offering <offering> --plan <plan> --name <service instance name>\n" +
-				"   cf create-service --offering user-provided --name <service name> --parameters \"<comma separated parameter names>\"",
-			Flags: []cli.Flag{
-				cli.StringFlag{"name", "", "name of the service instance"},
-				cli.StringFlag{"offering", "", "name of the service offering to use"},
-				cli.StringFlag{"plan", "", "name of the service plan to use"},
-				cli.StringFlag{"parameters", "", "list of comma separated parameter names to use for user-provided services (eg. \"n1,n2\")"},
-			},
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateService()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "bind-service",
-			ShortName:   "bs",
-			Description: "Bind a service instance to an application",
-			Usage:       "cf bind-service --app <application name> --service <service instance name>",
-			Flags: []cli.Flag{
-				cli.StringFlag{"app", "", "name of the application"},
-				cli.StringFlag{"service", "", "name of the service instance to bind to the application"},
-			},
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewBindService()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "unbind-service",
-			ShortName:   "us",
-			Description: "Unbind a service instance from an application",
-			Usage:       "cf unbind-service --app <application name> --service <service instance name>",
-			Flags: []cli.Flag{
-				cli.StringFlag{"app", "", "name of the application"},
-				cli.StringFlag{"service", "", "name of the service instance to unbind from the application"},
-			},
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewUnbindService()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "delete-service",
-			ShortName:   "ds",
-			Description: "Delete a service instance",
-			Usage:       "cf delete-service <service instance name>",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewDeleteService()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
 			Name:        "routes",
 			ShortName:   "r",
 			Description: "List all routes",
@@ -242,7 +194,7 @@ OPTIONS:
 		},
 		{
 			Name:        "services",
-			ShortName:   "sv",
+			ShortName:   "s",
 			Description: "List all services in the currently selected space",
 			Usage:       "cf services [--marketplace]",
 			Flags: []cli.Flag{
@@ -260,6 +212,16 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "set-env",
+			ShortName:   "se",
+			Description: "Set an environment variable for an application",
+			Usage:       "cf set-env <application> <variable> <value>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewSetEnv()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "stacks",
 			Description: "List all stacks",
 			Usage:       "cf stacks",
@@ -269,12 +231,50 @@ OPTIONS:
 			},
 		},
 		{
-			Name:        "passwd",
-			ShortName:   "pw",
-			Description: "Change user password",
-			Usage:       "cf passwd",
+			Name:        "start",
+			ShortName:   "st",
+			Description: "Start applications",
+			Usage:       "cf start <application>",
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewPassword()
+				cmd := cmdFactory.NewStart()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "stop",
+			ShortName:   "sp",
+			Description: "Stop applications",
+			Usage:       "cf stop <application>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewStop()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "target",
+			ShortName:   "t",
+			Description: "Set or view the target",
+			Usage:       "cf target <target> --o <organization> --s <space>",
+			Flags: []cli.Flag{
+				cli.StringFlag{"o", "", "organization"},
+				cli.StringFlag{"s", "", "space"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewTarget()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "unbind-service",
+			ShortName:   "us",
+			Description: "Unbind a service instance from an application",
+			Usage:       "cf unbind-service --app <application name> --service <service instance name>",
+			Flags: []cli.Flag{
+				cli.StringFlag{"app", "", "name of the application"},
+				cli.StringFlag{"service", "", "name of the service instance to unbind from the application"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewUnbindService()
 				cmdRunner.Run(cmd, c)
 			},
 		},
