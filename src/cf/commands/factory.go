@@ -17,12 +17,38 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Fact
 	return
 }
 
-func (f Factory) NewTarget() Target {
-	return NewTarget(
+func (f Factory) NewApps() Apps {
+	return NewApps(
 		f.ui,
-		f.repoLocator.GetConfigurationRepository(),
-		f.repoLocator.GetOrganizationRepository(),
 		f.repoLocator.GetSpaceRepository(),
+	)
+}
+
+func (f Factory) NewBindService() *BindService {
+	return NewBindService(
+		f.ui,
+		f.repoLocator.GetServiceRepository(),
+	)
+}
+
+func (f Factory) NewCreateService() CreateService {
+	return NewCreateService(
+		f.ui,
+		f.repoLocator.GetServiceRepository(),
+	)
+}
+
+func (f Factory) NewDelete() *Delete {
+	return NewDelete(
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
+func (f Factory) NewDeleteService() *DeleteService {
+	return NewDeleteService(
+		f.ui,
+		f.repoLocator.GetServiceRepository(),
 	)
 }
 
@@ -38,13 +64,6 @@ func (f Factory) NewLogin() Login {
 	)
 }
 
-func (f Factory) NewSetEnv() *SetEnv {
-	return NewSetEnv(
-		f.ui,
-		f.repoLocator.GetApplicationRepository(),
-	)
-}
-
 func (f Factory) NewLogout() Logout {
 	return NewLogout(
 		f.ui,
@@ -52,11 +71,17 @@ func (f Factory) NewLogout() Logout {
 	)
 }
 
-func (f Factory) NewStart() *Start {
-	return NewStart(
+func (f Factory) NewMarketplaceServices() MarketplaceServices {
+	return NewMarketplaceServices(
 		f.ui,
-		f.repoLocator.GetConfig(),
-		f.repoLocator.GetApplicationRepository(),
+		f.repoLocator.GetServiceRepository(),
+	)
+}
+
+func (f Factory) NewPassword() Password {
+	return NewPassword(
+		f.ui,
+		f.repoLocator.GetPasswordRepository(),
 	)
 }
 
@@ -74,62 +99,6 @@ func (f Factory) NewPush() Push {
 	)
 }
 
-func (f Factory) NewApps() Apps {
-	return NewApps(
-		f.ui,
-		f.repoLocator.GetSpaceRepository(),
-	)
-}
-
-func (f Factory) NewDelete() *Delete {
-	return NewDelete(
-		f.ui,
-		f.repoLocator.GetApplicationRepository(),
-	)
-}
-
-func (f Factory) NewStop() *Stop {
-	return NewStop(
-		f.ui,
-		f.repoLocator.GetApplicationRepository(),
-	)
-}
-
-func (f Factory) NewStacks() *Stacks {
-	return NewStacks(
-		f.ui,
-		f.repoLocator.GetStackRepository(),
-	)
-}
-
-func (f Factory) NewCreateService() CreateService {
-	return NewCreateService(
-		f.ui,
-		f.repoLocator.GetServiceRepository(),
-	)
-}
-
-func (f Factory) NewBindService() *BindService {
-	return NewBindService(
-		f.ui,
-		f.repoLocator.GetServiceRepository(),
-	)
-}
-
-func (f Factory) NewUnbindService() *UnbindService {
-	return NewUnbindService(
-		f.ui,
-		f.repoLocator.GetServiceRepository(),
-	)
-}
-
-func (f Factory) NewDeleteService() *DeleteService {
-	return NewDeleteService(
-		f.ui,
-		f.repoLocator.GetServiceRepository(),
-	)
-}
-
 func (f Factory) NewRoutes() *Routes {
 	return NewRoutes(
 		f.ui,
@@ -144,16 +113,47 @@ func (f Factory) NewServices() Services {
 	)
 }
 
-func (f Factory) NewMarketplaceServices() MarketplaceServices {
-	return NewMarketplaceServices(
+func (f Factory) NewSetEnv() *SetEnv {
+	return NewSetEnv(
 		f.ui,
-		f.repoLocator.GetServiceRepository(),
+		f.repoLocator.GetApplicationRepository(),
 	)
 }
 
-func (f Factory) NewPassword() Password {
-	return NewPassword(
+func (f Factory) NewStacks() *Stacks {
+	return NewStacks(
 		f.ui,
-		f.repoLocator.GetPasswordRepository(),
+		f.repoLocator.GetStackRepository(),
+	)
+}
+
+func (f Factory) NewStart() *Start {
+	return NewStart(
+		f.ui,
+		f.repoLocator.GetConfig(),
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
+func (f Factory) NewStop() *Stop {
+	return NewStop(
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
+func (f Factory) NewTarget() Target {
+	return NewTarget(
+		f.ui,
+		f.repoLocator.GetConfigurationRepository(),
+		f.repoLocator.GetOrganizationRepository(),
+		f.repoLocator.GetSpaceRepository(),
+	)
+}
+
+func (f Factory) NewUnbindService() *UnbindService {
+	return NewUnbindService(
+		f.ui,
+		f.repoLocator.GetServiceRepository(),
 	)
 }
