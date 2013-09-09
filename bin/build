@@ -2,4 +2,10 @@
 
 set -e
 
-$(dirname $0)/go build -o out/go-cf -v main
+if [[ -d $GOPATH ]]; then
+  echo "installing to $GOPATH/bin/go-cf..."
+  $(dirname $0)/go build -o $GOPATH/bin/go-cf -v main
+else
+  echo "installing to ./out/go-cf..."
+  $(dirname $0)/go build -o out/go-cf -v main
+fi
