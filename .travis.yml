@@ -1,0 +1,10 @@
+language: go
+go:
+- 1.1.2
+before_install:
+- git submodule update --init --recursive
+install: ./bin/build
+script: ./bin/test
+branches:
+  only:
+  - master
