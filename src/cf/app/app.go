@@ -268,6 +268,16 @@ OPTIONS:
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		{
+			Name:        "passwd",
+			ShortName:   "pw",
+			Description: "Change user password",
+			Usage:       "cf passwd",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewPassword()
+				cmdRunner.Run(cmd, c)
+			},
+		},
 	}
 	return
 }
