@@ -11,7 +11,7 @@ out the [RubyGem](https://github.com/cloudfoundry/cf).
 Building
 ========
 1. Run ```./bin/build```
-1. The binary will be built into the out directory.
+1. The binary will be built into the `$GOPATH/bin` directory if `$GOPATH` is set; otherwise built into the `./out` directory.
 
 Development
 ===========
