@@ -17,7 +17,7 @@ var defaultAppForStart = cf.Application{
 	Urls:      []string{"http://my-app.example.com"},
 }
 
-func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []int) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository, reqFactory *testhelpers.FakeReqFactory) {
+func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []string) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository, reqFactory *testhelpers.FakeReqFactory) {
 	config := &configuration.Configuration{ApplicationStartTimeout: 2}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
@@ -37,7 +37,7 @@ func TestStartCommandFailsWithUsage(t *testing.T) {
 		GetInstancesResponses: [][]cf.ApplicationInstance{
 			[]cf.ApplicationInstance{},
 		},
-		GetInstancesErrorCodes: []int{0},
+		GetInstancesErrorCodes: []string{""},
 	}
 	reqFactory := &testhelpers.FakeReqFactory{}
 
@@ -60,7 +60,7 @@ func TestStartApplication(t *testing.T) {
 		},
 	}
 
-	errorCodes := []int{0, 0}
+	errorCodes := []string{"", ""}
 	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -82,7 +82,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 		},
 	}
 
-	errorCodes := []int{0}
+	errorCodes := []string{""}
 	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(app, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -111,7 +111,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		},
 	}
 
-	errorCodes := []int{170002, 170002, 0, 0, 0}
+	errorCodes := []string{"170002", "170002", "", "", ""}
 
 	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
@@ -124,7 +124,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 
 func TestStartApplicationWhenStagingFails(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{[]cf.ApplicationInstance{}}
-	errorCodes := []int{170001}
+	errorCodes := []string{"170001"}
 
 	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
@@ -146,7 +146,7 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 		},
 	}
 
-	errorCodes := []int{0, 0}
+	errorCodes := []string{"", ""}
 
 	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
@@ -173,7 +173,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 		},
 	}
 
-	errorCodes := []int{0, 0, 0}
+	errorCodes := []string{"", "", ""}
 
 	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 

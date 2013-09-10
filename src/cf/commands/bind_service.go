@@ -46,14 +46,14 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Say("Binding service %s to %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
 
 	apiErr := cmd.serviceRepo.BindService(instance, app)
-	if apiErr != nil && apiErr.ErrorCode != 90003 {
+	if apiErr != nil && apiErr.ErrorCode != "90003" {
 		cmd.ui.Failed("Failed binding service", apiErr)
 		return
 	}
 
 	cmd.ui.Ok()
 
-	if apiErr != nil && apiErr.ErrorCode == 90003 {
+	if apiErr != nil && apiErr.ErrorCode == "90003" {
 		cmd.ui.Say("App %s is already bound to %s.", term.Cyan(app.Name), term.Cyan(instance.Name))
 	}
 }

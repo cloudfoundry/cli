@@ -39,7 +39,7 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testhelpers.FakeServiceRepo{BindServiceErrorCode: 90003}
+	serviceRepo := &testhelpers.FakeServiceRepo{BindServiceErrorCode: "90003"}
 	fakeUI := callBindService([]string{"--service", "my-service", "--app", "my-app"}, reqFactory, serviceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Binding service")

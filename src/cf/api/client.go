@@ -13,6 +13,7 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -24,11 +25,11 @@ type Request struct {
 
 type ApiError struct {
 	Message    string
-	ErrorCode  int
+	ErrorCode  string
 	StatusCode int
 }
 
-func NewApiError(message string, errorCode int, statusCode int) (apiErr *ApiError) {
+func NewApiError(message string, errorCode string, statusCode int) (apiErr *ApiError) {
 	return &ApiError{
 		Message:    message,
 		ErrorCode:  errorCode,
@@ -77,11 +78,6 @@ func PerformRequestAndParseResponse(request *Request, response interface{}) (api
 
 	apiErr = parseResponse(rawResponse, response)
 	return
-}
-
-type errorResponse struct {
-	Code        int
-	Description string
 }
 
 func shouldRedirect(request *Request, response *http.Response) bool {
@@ -142,7 +138,7 @@ func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Respo
 		return
 	}
 
-	if response.StatusCode == http.StatusUnauthorized && apiErr.ErrorCode == 1000 {
+	if response.StatusCode == http.StatusUnauthorized && apiErr.ErrorCode == "1000" {
 		newToken, apiErr := c.authenticator.RefreshAuthToken()
 		if apiErr == nil {
 			request.Header.Set("Authorization", newToken)
@@ -192,9 +188,13 @@ func doRequest(request *http.Request) (response *http.Response, apiError *ApiErr
 
 	if response.StatusCode > 299 {
 		errorResponse := getErrorResponse(response)
-		errorCode := errorResponse.Code
-		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", response.StatusCode, errorCode, errorResponse.Description)
-		apiError = NewApiError(message, errorCode, response.StatusCode)
+		message := fmt.Sprintf(
+			"Server error, status code: %d, error code: %s, message: %s",
+			response.StatusCode,
+			errorResponse.Code,
+			errorResponse.Description,
+		)
+		apiError = NewApiError(message, errorResponse.Code, response.StatusCode)
 	}
 
 	return
@@ -233,11 +233,34 @@ func traceEnabled() bool {
 	return traceEnv == "true" || traceEnv == "yes"
 }
 
-func getErrorResponse(response *http.Response) (eR errorResponse) {
+type errorResponse struct {
+	Code        string
+	Description string
+}
+
+type uaaErrorResponse struct {
+	Code        string `json:"error"`
+	Description string `json:"error_description"`
+}
+
+type ccErrorResponse struct {
+	Code        int
+	Description string
+}
+
+func getErrorResponse(response *http.Response) errorResponse {
 	jsonBytes, _ := ioutil.ReadAll(response.Body)
 	response.Body.Close()
 
-	eR = errorResponse{}
-	_ = json.Unmarshal(jsonBytes, &eR)
-	return
+	ccResp := ccErrorResponse{}
+	err := json.Unmarshal(jsonBytes, &ccResp)
+
+	if err != nil || (ccResp == ccErrorResponse{}) {
+		uaaResp := uaaErrorResponse{}
+		json.Unmarshal(jsonBytes, &uaaResp)
+
+		return errorResponse{Code: uaaResp.Code, Description: uaaResp.Description}
+	}
+
+	return errorResponse{Code: strconv.Itoa(ccResp.Code), Description: ccResp.Description}
 }

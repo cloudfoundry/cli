@@ -21,19 +21,15 @@ func TestNewRequest(t *testing.T) {
 	assert.Equal(t, request.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
 }
 
-var failingRequest = func(writer http.ResponseWriter, request *http.Request) {
+var failingCloudControllerRequest = func(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusBadRequest)
-	jsonResponse := `
-	{
-	  "code": 210003,
-	  "description": "The host is taken: test1"
-	}`
+	jsonResponse := `{ "code": 210003, "description": "The host is taken: test1" }`
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-func TestPerformRequestOutputsErrorFromServer(t *testing.T) {
+func TestPerformRequestOutputsErrorFromCloudController(t *testing.T) {
 	client := ApiClient{}
-	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
+	ts := httptest.NewTLSServer(http.HandlerFunc(failingCloudControllerRequest))
 	defer ts.Close()
 
 	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
@@ -43,11 +39,12 @@ func TestPerformRequestOutputsErrorFromServer(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
+	assert.Contains(t, err.ErrorCode, "210003")
 }
 
-func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
+func TestPerformRequestAndParseResponseOutputsErrorFromCloudController(t *testing.T) {
 	client := ApiClient{}
-	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
+	ts := httptest.NewTLSServer(http.HandlerFunc(failingCloudControllerRequest))
 	defer ts.Close()
 
 	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
@@ -58,21 +55,44 @@ func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
+	assert.Equal(t, err.ErrorCode, "210003")
 }
 
-func TestPerformRequestReturnsErrorCode(t *testing.T) {
+var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) {
+	writer.WriteHeader(http.StatusBadRequest)
+	jsonResponse := `{ "error": "invalid_token", "error_description": "The token is invalid..." }`
+	fmt.Fprintln(writer, jsonResponse)
+}
+
+func TestPerformRequestOutputsErrorFromUAA(t *testing.T) {
 	client := ApiClient{}
-	ts := httptest.NewTLSServer(http.HandlerFunc(failingRequest))
+	ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
+	defer ts.Close()
+
+	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
+	assert.NoError(t, err)
+
+	err = client.PerformRequest(request)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "The token is invalid")
+	assert.Contains(t, err.ErrorCode, "invalid_token")
+}
+
+func TestPerformRequestAndParseResponseOutputsErrorFromUAA(t *testing.T) {
+	client := ApiClient{}
+	ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
 	defer ts.Close()
 
 	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	apiErr := client.PerformRequestAndParseResponse(request, resource)
+	err = client.PerformRequestAndParseResponse(request, resource)
 
-	assert.Error(t, apiErr)
-	assert.Equal(t, apiErr.ErrorCode, 210003)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "The token is invalid")
+	assert.Contains(t, err.ErrorCode, "invalid_token")
 }
 
 func TestSanitizingRemovesAuthorizationToken(t *testing.T) {

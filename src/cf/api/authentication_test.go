@@ -107,7 +107,7 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	auth := NewUAAAuthenticator(configRepo)
 	err = auth.Authenticate("foo@example.com", "bar")
 	assert.Error(t, err)
-	assert.Equal(t, err.Error(), "Server error, status code: 500, error code: 0, message: ")
+	assert.Equal(t, err.Error(), "Server error, status code: 500, error code: , message: ")
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Empty(t, savedConfig.AccessToken)
 }

@@ -32,7 +32,7 @@ type FakeApplicationRepository struct {
 	UploadedZipBuffer *bytes.Buffer
 
 	GetInstancesResponses [][]cf.ApplicationInstance
-	GetInstancesErrorCodes []int
+	GetInstancesErrorCodes []string
 }
 
 func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Application, apiErr *api.ApiError) {
@@ -101,7 +101,7 @@ func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instanc
 	instances = repo.GetInstancesResponses[0]
 	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]
 
-	if errorCode != 0 {
+	if errorCode != "" {
 		apiErr = api.NewApiError("Error while starting app", errorCode, http.StatusBadRequest)
 		return
 	}

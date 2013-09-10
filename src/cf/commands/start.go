@@ -70,7 +70,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 	instances, apiErr := s.appRepo.GetInstances(app)
 
 	for apiErr != nil {
-		if apiErr.ErrorCode != 170002 {
+		if apiErr.ErrorCode != "170002" {
 			s.ui.Say("")
 			s.ui.Failed("Error staging application", apiErr)
 			return

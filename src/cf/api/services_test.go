@@ -260,7 +260,7 @@ func TestBindServiceIfError(t *testing.T) {
 	apiErr := repo.BindService(serviceInstance, app)
 
 	assert.Error(t, apiErr)
-	assert.Equal(t, apiErr.ErrorCode, 90003)
+	assert.Equal(t, apiErr.ErrorCode, "90003")
 }
 
 var deleteBindingEndpoint = testhelpers.CreateEndpoint(

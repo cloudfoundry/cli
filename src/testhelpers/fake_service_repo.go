@@ -20,7 +20,7 @@ type FakeServiceRepo struct {
 
 	BindServiceServiceInstance cf.ServiceInstance
 	BindServiceApplication cf.Application
-	BindServiceErrorCode int
+	BindServiceErrorCode string
 
 	UnbindServiceServiceInstance cf.ServiceInstance
 	UnbindServiceApplication cf.Application
@@ -55,7 +55,7 @@ func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.App
 	repo.BindServiceServiceInstance = instance
 	repo.BindServiceApplication = app
 
-	if repo.BindServiceErrorCode != 0 {
+	if repo.BindServiceErrorCode != "" {
 		apiErr = api.NewApiError("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
 	}
 
