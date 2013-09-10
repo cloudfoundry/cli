@@ -3,15 +3,14 @@ package api
 import (
 	"cf/configuration"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
 )
 
 type Authenticator interface {
-	Authenticate(email string, password string) (err error)
-	RefreshAuthToken() (updatedToken string, err error)
+	Authenticate(email string, password string) (apiErr *ApiError)
+	RefreshAuthToken() (updatedToken string, apiErr *ApiError)
 }
 
 type UAAAuthenticator struct {
@@ -25,7 +24,7 @@ func NewUAAAuthenticator(configRepo configuration.ConfigurationRepository) (uaa 
 	return
 }
 
-func (uaa UAAAuthenticator) Authenticate(email string, password string) (err error) {
+func (uaa UAAAuthenticator) Authenticate(email string, password string) (apiErr *ApiError) {
 	data := url.Values{
 		"username":   {email},
 		"password":   {password},
@@ -33,23 +32,31 @@ func (uaa UAAAuthenticator) Authenticate(email string, password string) (err err
 		"scope":      {""},
 	}
 
-	return uaa.getAuthToken(data)
+	apiErr = uaa.getAuthToken(data)
+	if apiErr != nil && apiErr.StatusCode == 401 {
+		apiErr.Message = "Password is incorrect, please try again."
+	}
+	return
 }
 
-func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, err error) {
+func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *ApiError) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken},
 		"grant_type":    {"refresh_token"},
 		"scope":         {""},
 	}
 
-	err = uaa.getAuthToken(data)
+	apiErr = uaa.getAuthToken(data)
 	updatedToken = uaa.config.AccessToken
+
+	if apiErr != nil && apiErr.StatusCode == 401 {
+		apiErr.Message = "Session expired, please login."
+	}
 
 	return
 }
 
-func (uaa UAAAuthenticator) getAuthToken(data url.Values) (err error) {
+func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiErr *ApiError) {
 	type AuthenticationResponse struct {
 		AccessToken  string `json:"access_token"`
 		TokenType    string `json:"token_type"`
@@ -57,23 +64,25 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (err error) {
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)
-	request, err := NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
-	if err != nil {
+	request, apiErr := NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
+	if apiErr != nil {
 		return
 	}
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
-	_, err = PerformRequestAndParseResponse(request, &response)
+	apiErr = PerformRequestAndParseResponse(request, &response)
 
-	if err != nil {
-		if strings.Contains(err.Error(), "status code: 401") {
-			err = errors.New("Password in incorrect, please try again.")
-		}
+	if apiErr != nil {
 		return
 	}
 
 	uaa.config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
 	uaa.config.RefreshToken = response.RefreshToken
-	return uaa.configRepo.Save()
+	err := uaa.configRepo.Save()
+	if err != nil {
+		apiErr = NewApiErrorWithError("Error setting configuration", err)
+	}
+
+	return
 }

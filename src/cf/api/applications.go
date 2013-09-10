@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"cf"
 	"cf/configuration"
-	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -15,14 +14,14 @@ import (
 )
 
 type ApplicationRepository interface {
-	FindByName(name string) (app cf.Application, err error)
-	SetEnv(app cf.Application, name string, value string) (err error)
-	Create(newApp cf.Application) (createdApp cf.Application, err error)
-	Delete(app cf.Application) (err error)
-	Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error)
-	Start(app cf.Application) (err error)
-	Stop(app cf.Application) (err error)
-	GetInstances(app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error)
+	FindByName(name string) (app cf.Application, apiErr *ApiError)
+	SetEnv(app cf.Application, name string, value string) (apiErr *ApiError)
+	Create(newApp cf.Application) (createdApp cf.Application, apiErr *ApiError)
+	Delete(app cf.Application) (apiErr *ApiError)
+	Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *ApiError)
+	Start(app cf.Application) (apiErr *ApiError)
+	Stop(app cf.Application) (apiErr *ApiError)
+	GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiErr *ApiError)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -36,34 +35,34 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, err error) {
+func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	findResponse := new(ApplicationsApiResponse)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, findResponse)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, findResponse)
+	if apiErr != nil {
 		return
 	}
 
 	if len(findResponse.Resources) == 0 {
-		err = errors.New(fmt.Sprintf("Application %s not found", name))
+		apiErr = NewApiErrorWithMessage(fmt.Sprintf("Application %s not found", name))
 		return
 	}
 
 	res := findResponse.Resources[0]
 	path = fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, res.Metadata.Guid)
-	request, err = NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr = NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	summaryResponse := new(ApplicationSummary)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, summaryResponse)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, summaryResponse)
+	if apiErr != nil {
 		return
 	}
 
@@ -89,21 +88,21 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	return
 }
 
-func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, name string, value string) (err error) {
+func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, name string, value string) (apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	data := fmt.Sprintf(`{"environment_json":{"%s":"%s"}}`, name, value)
-	request, err := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if err != nil {
+	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiErr != nil {
 		return
 	}
 
-	_, err = repo.apiClient.PerformRequest(request)
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, err error) {
-	err = validateApplication(newApp)
-	if err != nil {
+func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, apiErr *ApiError) {
+	apiErr = validateApplication(newApp)
+	if apiErr != nil {
 		return
 	}
 
@@ -115,15 +114,14 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s}`,
 		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid,
 	)
-	request, err := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if err != nil {
+	request, apiErr := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiErr != nil {
 		return
 	}
 
 	resource := new(Resource)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, resource)
-
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, resource)
+	if apiErr != nil {
 		return
 	}
 
@@ -140,41 +138,42 @@ func stringOrNull(s string) string {
 	return fmt.Sprintf(`"%s"`, s)
 }
 
-func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (err error) {
+func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, app.Guid)
-	request, err := NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
-	_, err = repo.apiClient.PerformRequest(request)
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (err error) {
+func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *ApiError) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, app.Guid)
 
 	body, boundary, err := createApplicationUploadBody(zipBuffer)
 	if err != nil {
+		apiErr = NewApiErrorWithError("Error creating upload", err)
 		return
 	}
 
-	request, err := NewRequest("PUT", url, repo.config.AccessToken, body)
+	request, apiErr := NewRequest("PUT", url, repo.config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 	request.Header.Set("Content-Type", contentType)
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
-	_, err = repo.apiClient.PerformRequest(request)
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Start(app cf.Application) (err error) {
+func (repo CloudControllerApplicationRepository) Start(app cf.Application) (apiErr *ApiError) {
 	return repo.changeApplicationState(app, "STARTED")
 }
 
-func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (err error) {
+func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (apiErr *ApiError) {
 	return repo.changeApplicationState(app, "STOPPED")
 }
 
@@ -184,17 +183,17 @@ type InstanceApiResponse struct {
 	State string
 }
 
-func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application) (instances []cf.ApplicationInstance, errorCode int, err error) {
+func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.Target, app.Guid)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	apiResponse := InstancesApiResponse{}
 
-	errorCode, err = repo.apiClient.PerformRequestAndParseResponse(request, &apiResponse)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, &apiResponse)
+	if apiErr != nil {
 		return
 	}
 
@@ -209,23 +208,23 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 	return
 }
 
-func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.Application, state string) (err error) {
+func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.Application, state string) (apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	body := fmt.Sprintf(`{"console":true,"state":"%s"}`, state)
-	request, err := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
-	_, err = repo.apiClient.PerformRequest(request)
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }
 
-func validateApplication(app cf.Application) (err error) {
+func validateApplication(app cf.Application) (apiErr *ApiError) {
 	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
 	if !reg.MatchString(app.Name) {
-		err = errors.New("Application name is invalid. Name can only contain letters, numbers, underscores and hyphens.")
+		apiErr = NewApiErrorWithMessage("Application name is invalid. Name can only contain letters, numbers, underscores and hyphens.")
 	}
 
 	return

@@ -439,9 +439,8 @@ func TestGetInstances(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	instances, code, err := repo.GetInstances(app)
+	instances, err := repo.GetInstances(app)
 	assert.NoError(t, err)
-	assert.Equal(t, code, 0)
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")

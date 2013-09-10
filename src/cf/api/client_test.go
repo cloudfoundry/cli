@@ -39,7 +39,7 @@ func TestPerformRequestOutputsErrorFromServer(t *testing.T) {
 	request, err := NewRequest("GET", ts.URL, "TOKEN", nil)
 	assert.NoError(t, err)
 
-	_, err = client.PerformRequest(request)
+	err = client.PerformRequest(request)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
@@ -54,7 +54,7 @@ func TestPerformRequestForBodyOutputsErrorFromServer(t *testing.T) {
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	_, err = client.PerformRequestAndParseResponse(request, resource)
+	err = client.PerformRequestAndParseResponse(request, resource)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The host is taken: test1")
@@ -69,10 +69,10 @@ func TestPerformRequestReturnsErrorCode(t *testing.T) {
 	assert.NoError(t, err)
 
 	resource := new(Resource)
-	errorCode, err := client.PerformRequestAndParseResponse(request, resource)
+	apiErr := client.PerformRequestAndParseResponse(request, resource)
 
-	assert.Equal(t, errorCode, 210003)
-	assert.Error(t, err)
+	assert.Error(t, apiErr)
+	assert.Equal(t, apiErr.ErrorCode, 210003)
 }
 
 func TestSanitizingRemovesAuthorizationToken(t *testing.T) {
@@ -206,7 +206,7 @@ func TestRefreshingTheToken(t *testing.T) {
 
 	request, err := NewRequest("GET", config.Target+"/v2/foo", config.AccessToken, nil)
 	assert.NoError(t, err)
-	_, err = client.PerformRequest(request)
+	err = client.PerformRequest(request)
 	assert.NoError(t, err)
 
 	savedConfig := testhelpers.SavedConfiguration

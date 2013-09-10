@@ -1,8 +1,8 @@
 package testhelpers
 
 import (
-	"errors"
 	"cf"
+	"cf/api"
 )
 
 type FakeSpaceRepository struct {
@@ -21,19 +21,19 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, err error) {
+func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiErr *api.ApiError) {
 	return repo.Spaces, nil
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, err error) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiErr *api.ApiError) {
 	repo.SpaceName = name
 	if repo.SpaceByNameErr {
-		err = errors.New("Error finding space by name.")
+		apiErr = api.NewApiErrorWithMessage("Error finding space by name.")
 	}
-	return repo.SpaceByName, err
+	return repo.SpaceByName, apiErr
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, err error) {
+func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiErr *api.ApiError) {
 	space = repo.SummarySpace
 	return
 }

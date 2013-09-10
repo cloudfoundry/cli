@@ -2,7 +2,7 @@ package testhelpers
 
 import (
 	"cf"
-	"errors"
+	"cf/api"
 )
 
 type FakeRouteRepository struct {
@@ -20,27 +20,27 @@ type FakeRouteRepository struct {
 	FindAllRoutes []cf.Route
 }
 
-func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, err error) {
+func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, apiErr *api.ApiError) {
 	if repo.FindAllErr {
-		err = errors.New("Error finding all routes")
+		apiErr = api.NewApiErrorWithMessage("Error finding all routes")
 	}
 
 	routes = repo.FindAllRoutes
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, err error) {
+func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiErr *api.ApiError) {
 	repo.FindByHostHost = host
 
 	if repo.FindByHostErr {
-		err = errors.New("Route not found")
+		apiErr = api.NewApiErrorWithMessage("Route not found")
 	}
 
 	route = repo.FindByHostRoute
 	return
 }
 
-func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error) {
+func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiErr *api.ApiError) {
 	repo.CreatedRoute = newRoute
 	repo.CreatedRouteDomain = domain
 
@@ -51,7 +51,7 @@ func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (cr
 	return
 }
 
-func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (err error) {
+func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (apiErr *api.ApiError) {
 	repo.BoundRoute = route
 	repo.BoundApp = app
 	return

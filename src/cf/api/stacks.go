@@ -3,13 +3,12 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"errors"
 	"fmt"
 )
 
 type StackRepository interface {
-	FindByName(name string) (stack cf.Stack, err error)
-	FindAll() (stacks []cf.Stack, err error)
+	FindByName(name string) (stack cf.Stack, apiErr *ApiError)
+	FindAll() (stacks []cf.Stack, apiErr *ApiError)
 }
 
 type CloudControllerStackRepository struct {
@@ -23,21 +22,21 @@ func NewCloudControllerStackRepository(config *configuration.Configuration, apiC
 	return
 }
 
-func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, err error) {
+func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	findResponse := new(ApiResponse)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, findResponse)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, findResponse)
+	if apiErr != nil {
 		return
 	}
 
 	if len(findResponse.Resources) == 0 {
-		err = errors.New(fmt.Sprintf("Stack %s not found", name))
+		apiErr = NewApiErrorWithMessage("Stack %s not found", name)
 		return
 	}
 
@@ -48,16 +47,16 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	return
 }
 
-func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, err error) {
+func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	listResponse := new(StackApiResponse)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, listResponse)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, listResponse)
+	if apiErr != nil {
 		return
 	}
 

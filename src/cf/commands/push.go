@@ -42,13 +42,15 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 }
 
 func (p Push) Run(c *cli.Context) {
+	var err error
+
 	appName := c.String("name")
-	app, err := p.appRepo.FindByName(appName)
+	app, apiErr := p.appRepo.FindByName(appName)
 
-	if err != nil {
-		app, err = p.createApp(appName, c)
+	if apiErr != nil {
+		app, apiErr = p.createApp(appName, c)
 
-		if err != nil {
+		if apiErr != nil {
 			return
 		}
 	}
@@ -70,9 +72,9 @@ func (p Push) Run(c *cli.Context) {
 		return
 	}
 
-	err = p.appRepo.Upload(app, zipBuffer)
-	if err != nil {
-		p.ui.Failed("Error uploading app", err)
+	apiErr = p.appRepo.Upload(app, zipBuffer)
+	if apiErr != nil {
+		p.ui.Failed("Error uploading app", apiErr)
 		return
 	}
 
@@ -82,7 +84,7 @@ func (p Push) Run(c *cli.Context) {
 	}
 }
 
-func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, err error) {
+func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, apiErr *api.ApiError) {
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("instances"),
@@ -93,10 +95,10 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, err
 	stackName := c.String("stack")
 	if stackName != "" {
 		var stack cf.Stack
-		stack, err = p.stackRepo.FindByName(stackName)
+		stack, apiErr = p.stackRepo.FindByName(stackName)
 
-		if err != nil {
-			p.ui.Failed("Error finding stack", err)
+		if apiErr != nil {
+			p.ui.Failed("Error finding stack", apiErr)
 			return
 		}
 		newApp.Stack = stack
@@ -104,17 +106,17 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, err
 	}
 
 	p.ui.Say("Creating %s...", appName)
-	app, err = p.appRepo.Create(newApp)
-	if err != nil {
-		p.ui.Failed("Error creating application", err)
+	app, apiErr = p.appRepo.Create(newApp)
+	if apiErr != nil {
+		p.ui.Failed("Error creating application", apiErr)
 		return
 	}
 	p.ui.Ok()
 
-	domain, err := p.domainRepo.FindByName(c.String("domain"))
+	domain, apiErr := p.domainRepo.FindByName(c.String("domain"))
 
-	if err != nil {
-		p.ui.Failed("Error loading domain", err)
+	if apiErr != nil {
+		p.ui.Failed("Error loading domain", apiErr)
 		return
 	}
 
@@ -123,14 +125,14 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, err
 		hostName = app.Name
 	}
 
-	route, err := p.routeRepo.FindByHost(hostName)
-	if err != nil {
+	route, apiErr := p.routeRepo.FindByHost(hostName)
+	if apiErr != nil {
 		newRoute := cf.Route{Host: hostName}
 
 		p.ui.Say("Creating route %s.%s...", newRoute.Host, domain.Name)
-		route, err = p.routeRepo.Create(newRoute, domain)
-		if err != nil {
-			p.ui.Failed("Error creating route", err)
+		route, apiErr = p.routeRepo.Create(newRoute, domain)
+		if apiErr != nil {
+			p.ui.Failed("Error creating route", apiErr)
 			return
 		}
 		p.ui.Ok()
@@ -139,9 +141,9 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, err
 	}
 
 	p.ui.Say("Binding %s.%s to %s...", route.Host, domain.Name, app.Name)
-	err = p.routeRepo.Bind(route, app)
-	if err != nil {
-		p.ui.Failed("Error binding route", err)
+	apiErr = p.routeRepo.Bind(route, app)
+	if apiErr != nil {
+		p.ui.Failed("Error binding route", apiErr)
 		return
 	}
 	p.ui.Ok()

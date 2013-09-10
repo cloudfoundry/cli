@@ -3,14 +3,13 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"errors"
 	"fmt"
 	"strings"
 )
 
 type DomainRepository interface {
-	FindAll() (domains []cf.Domain, err error)
-	FindByName(name string) (domain cf.Domain, err error)
+	FindAll() (domains []cf.Domain, apiErr *ApiError)
+	FindByName(name string) (domain cf.Domain, apiErr *ApiError)
 }
 
 type CloudControllerDomainRepository struct {
@@ -24,16 +23,16 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, api
 	return
 }
 
-func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, err error) {
+func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains", repo.config.Target, repo.config.Space.Guid)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	response := new(ApiResponse)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	if apiErr != nil {
 		return
 	}
 
@@ -44,22 +43,22 @@ func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, err 
 	return
 }
 
-func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.Domain, err error) {
-	domains, err := repo.FindAll()
+func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.Domain, apiErr *ApiError) {
+	domains, apiErr := repo.FindAll()
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
 	if name == "" {
 		domain = domains[0]
 	} else {
-		err = errors.New(fmt.Sprintf("Could not find domain with name %s", name))
+		apiErr = NewApiErrorWithMessage("Could not find domain with name %s", name)
 
 		for _, d := range domains {
 			if d.Name == strings.ToLower(name) {
 				domain = d
-				err = nil
+				apiErr = nil
 			}
 		}
 	}

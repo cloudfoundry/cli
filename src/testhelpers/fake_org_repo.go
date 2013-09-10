@@ -1,8 +1,8 @@
 package testhelpers
 
 import (
-	"errors"
 	"cf"
+	"cf/api"
 )
 
 type FakeOrgRepository struct {
@@ -13,15 +13,15 @@ type FakeOrgRepository struct {
 	OrganizationByNameErr bool
 }
 
-func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, err error) {
+func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *api.ApiError) {
 	return repo.Organizations, nil
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, err error) {
+func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiErr *api.ApiError) {
 	repo.OrganizationName = name
 	if repo.OrganizationByNameErr {
-		err = errors.New("Error finding organization by name.")
+		apiErr = api.NewApiErrorWithMessage("Error finding organization by name.")
 	}
-	return repo.OrganizationByName, err
+	return repo.OrganizationByName, apiErr
 }
 

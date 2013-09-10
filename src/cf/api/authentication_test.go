@@ -84,7 +84,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	auth := NewUAAAuthenticator(configRepo)
 	err = auth.Authenticate("foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
-	assert.Equal(t, err.Error(), "Password in incorrect, please try again.")
+	assert.Equal(t, err.Error(), "Password is incorrect, please try again.")
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Empty(t, savedConfig.AccessToken)
 }

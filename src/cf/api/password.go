@@ -8,8 +8,8 @@ import (
 )
 
 type PasswordRepository interface {
-	GetScore(password string) (string, error)
-	UpdatePassword(old string, new string) error
+	GetScore(password string) (string, *ApiError)
+	UpdatePassword(old string, new string) *ApiError
 }
 
 type CloudControllerPasswordRepository struct {
@@ -35,10 +35,9 @@ type InfoResponse struct {
 	UserGuid      string `json:"user"`
 }
 
-func (repo CloudControllerPasswordRepository) GetScore(password string) (score string, err error) {
-
-	infoResponse, err := repo.getTargetInfo()
-	if err != nil {
+func (repo CloudControllerPasswordRepository) GetScore(password string) (score string, apiErr *ApiError) {
+	infoResponse, apiErr := repo.getTargetInfo()
+	if apiErr != nil {
 		return
 	}
 
@@ -47,15 +46,15 @@ func (repo CloudControllerPasswordRepository) GetScore(password string) (score s
 		"password": []string{password},
 	}
 
-	scoreRequest, err := NewRequest("POST", scorePath, repo.config.AccessToken, strings.NewReader(scoreBody.Encode()))
-	if err != nil {
+	scoreRequest, apiErr := NewRequest("POST", scorePath, repo.config.AccessToken, strings.NewReader(scoreBody.Encode()))
+	if apiErr != nil {
 		return
 	}
 	scoreRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	scoreResponse := ScoreResponse{}
 
-	_, err = repo.apiClient.PerformRequestAndParseResponse(scoreRequest, &scoreResponse)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(scoreRequest, &scoreResponse)
+	if apiErr != nil {
 		return
 	}
 
@@ -63,37 +62,37 @@ func (repo CloudControllerPasswordRepository) GetScore(password string) (score s
 	return
 }
 
-func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (err error) {
-	infoResponse, err := repo.getTargetInfo()
-	if err != nil {
+func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiErr *ApiError) {
+	infoResponse, apiErr := repo.getTargetInfo()
+	if apiErr != nil {
 		return
 	}
 
 	path := fmt.Sprintf("%s/Users/%s/password", infoResponse.TokenEndpoint, infoResponse.UserGuid)
 	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
-	request, err := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if err != nil {
+	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiErr != nil {
 		return
 	}
 
 	request.Header.Set("Content-Type", "application/json")
 
-	_, err = repo.apiClient.PerformRequest(request)
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }
 
-func (repo *CloudControllerPasswordRepository) getTargetInfo() (response InfoResponse, err error) {
+func (repo *CloudControllerPasswordRepository) getTargetInfo() (response InfoResponse, apiErr *ApiError) {
 	if repo.infoResponse.UserGuid == "" {
 		path := fmt.Sprintf("%s/info", repo.config.Target)
 		var request *Request
-		request, err = NewRequest("GET", path, repo.config.AccessToken, nil)
-		if err != nil {
+		request, apiErr = NewRequest("GET", path, repo.config.AccessToken, nil)
+		if apiErr != nil {
 			return
 		}
 
 		response = InfoResponse{}
 
-		_, err = repo.apiClient.PerformRequestAndParseResponse(request, &response)
+		apiErr = repo.apiClient.PerformRequestAndParseResponse(request, &response)
 
 		repo.infoResponse = response
 	}

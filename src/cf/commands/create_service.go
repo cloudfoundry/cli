@@ -69,9 +69,9 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 }
 
 func (cmd CreateService) createService(name string, offeringName string, planName string) {
-	offerings, err := cmd.serviceRepo.GetServiceOfferings()
-	if err != nil {
-		cmd.ui.Failed("Error fetching offerings", err)
+	offerings, apiErr := cmd.serviceRepo.GetServiceOfferings()
+	if apiErr != nil {
+		cmd.ui.Failed("Error fetching offerings", apiErr)
 		return
 	}
 
@@ -88,9 +88,9 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 	}
 
 	cmd.ui.Say("Creating service %s", term.Cyan(name))
-	err = cmd.serviceRepo.CreateServiceInstance(name, plan)
-	if err != nil {
-		cmd.ui.Failed("Error creating plan", err)
+	apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan)
+	if apiErr != nil {
+		cmd.ui.Failed("Error creating plan", apiErr)
 		return
 	}
 

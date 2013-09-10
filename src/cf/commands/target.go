@@ -80,10 +80,10 @@ func (t Target) Run(c *cli.Context) {
 func (t Target) setNewTarget(target string) {
 	t.ui.Say("Setting target to %s...", term.Yellow(target))
 
-	request, err := api.NewRequest("GET", target+"/v2/info", "", nil)
+	request, apiErr := api.NewRequest("GET", target+"/v2/info", "", nil)
 
-	if err != nil {
-		t.ui.Failed("URL invalid.", err)
+	if apiErr != nil {
+		t.ui.Failed("URL invalid.", apiErr)
 		return
 	}
 
@@ -94,14 +94,14 @@ func (t Target) setNewTarget(target string) {
 	}
 
 	serverResponse := new(InfoResponse)
-	_, err = api.PerformRequestAndParseResponse(request, &serverResponse)
+	apiErr = api.PerformRequestAndParseResponse(request, &serverResponse)
 
-	if err != nil {
-		t.ui.Failed("", err)
+	if apiErr != nil {
+		t.ui.Failed("", apiErr)
 		return
 	}
 
-	err = t.saveTarget(target, serverResponse)
+	err := t.saveTarget(target, serverResponse)
 
 	if err != nil {
 		t.ui.Failed("Error saving configuration", err)

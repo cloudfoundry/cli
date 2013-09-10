@@ -3,16 +3,15 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"errors"
 	"fmt"
 	"strings"
 )
 
 type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
-	FindAll() (spaces []cf.Space, err error)
-	FindByName(name string) (space cf.Space, err error)
-	GetSummary() (space cf.Space, err error)
+	FindAll() (spaces []cf.Space, apiErr *ApiError)
+	FindByName(name string) (space cf.Space, apiErr *ApiError)
+	GetSummary() (space cf.Space, apiErr *ApiError)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -30,18 +29,18 @@ func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.config.Space
 }
 
-func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, err error) {
+func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", repo.config.Target, repo.config.Organization.Guid)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	response := new(ApiResponse)
 
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
@@ -52,11 +51,11 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, err err
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, err error) {
-	spaces, err := repo.FindAll()
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiErr *ApiError) {
+	spaces, apiErr := repo.FindAll()
 	lowerName := strings.ToLower(name)
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
@@ -66,21 +65,21 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		}
 	}
 
-	err = errors.New("Space not found")
+	apiErr = NewApiErrorWithMessage("Space not found")
 	return
 }
 
-func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, err error) {
+func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 

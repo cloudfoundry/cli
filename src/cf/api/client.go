@@ -5,7 +5,6 @@ import (
 	term "cf/terminal"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,9 +22,40 @@ type Request struct {
 	*http.Request
 }
 
-func NewRequest(method, path, accessToken string, body io.Reader) (authReq *Request, err error) {
+type ApiError struct {
+	Message    string
+	ErrorCode  int
+	StatusCode int
+}
+
+func NewApiError(message string, errorCode int, statusCode int) (apiErr *ApiError) {
+	return &ApiError{
+		Message:    message,
+		ErrorCode:  errorCode,
+		StatusCode: statusCode,
+	}
+}
+
+func NewApiErrorWithMessage(message string, a ...interface{}) (apiErr *ApiError) {
+	return &ApiError{
+		Message: fmt.Sprintf(message, a...),
+	}
+}
+
+func NewApiErrorWithError(message string, err error) (apiErr *ApiError) {
+	return &ApiError{
+		Message: fmt.Sprintf("%s: %s", message, err.Error()),
+	}
+}
+
+func (apiErr *ApiError) Error() string {
+	return apiErr.Message
+}
+
+func NewRequest(method, path, accessToken string, body io.Reader) (authReq *Request, apiErr *ApiError) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
+		apiErr = NewApiErrorWithError("Error building request", err)
 		return
 	}
 
@@ -39,76 +69,13 @@ func NewRequest(method, path, accessToken string, body io.Reader) (authReq *Requ
 	return
 }
 
-func PerformRequestAndParseResponse(request *Request, response interface{}) (errorCode int, err error) {
-	rawResponse, errorCode, err := doRequest(request.Request)
-	if err != nil {
-		return
-	}
-	errorCode, err = parseResponse(rawResponse, response)
-	return
-}
-
-type ApiClient struct {
-	authenticator Authenticator
-}
-
-func NewApiClient(auth Authenticator) (client ApiClient) {
-	client.authenticator = auth
-	return
-}
-
-func (c ApiClient) PerformRequest(request *Request) (errorCode int, err error) {
-	_, errorCode, err = c.doRequestHandlingAuth(request)
-	return
-}
-
-func (c ApiClient) PerformRequestAndParseResponse(request *Request, response interface{}) (errorCode int, err error) {
-	rawResponse, errorCode, err := c.doRequestHandlingAuth(request)
-	if err != nil {
-		return
-	}
-	errorCode, err = parseResponse(rawResponse, response)
-	return
-}
-
-func (c ApiClient) PerformRequestForTextResponse(request *Request) (response string, err error) {
-	rawResponse, _, err := c.doRequestHandlingAuth(request)
-	if err != nil {
+func PerformRequestAndParseResponse(request *Request, response interface{}) (apiErr *ApiError) {
+	rawResponse, apiErr := doRequest(request.Request)
+	if apiErr != nil {
 		return
 	}
 
-	textBytes, err := ioutil.ReadAll(rawResponse.Body)
-	if err != nil {
-		return
-	}
-
-	response = string(textBytes)
-	return
-}
-
-func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Response, errorCode int, err error) {
-	response, errorCode, err = doRequest(request.Request)
-
-	if err != nil && response == nil {
-		println("Error", err.Error())
-		return
-	}
-
-	if response.StatusCode == http.StatusUnauthorized && errorCode == 1000 {
-		newToken, err := c.authenticator.RefreshAuthToken()
-		if err == nil {
-			request.Header.Set("Authorization", newToken)
-			return doRequest(request.Request)
-		}
-	}
-
-	if shouldRedirect(request, response) {
-		newRequest, err := NewRequest("GET", response.Header.Get("location"), "", nil)
-		if err == nil {
-			return doRequest(newRequest.Request)
-		}
-	}
-
+	apiErr = parseResponse(rawResponse, response)
 	return
 }
 
@@ -129,7 +96,73 @@ func newHttpClient() *http.Client {
 	return &http.Client{Transport: tr}
 }
 
-func doRequest(request *http.Request) (response *http.Response, errorCode int, err error) {
+type ApiClient struct {
+	authenticator Authenticator
+}
+
+func NewApiClient(auth Authenticator) (client ApiClient) {
+	client.authenticator = auth
+	return
+}
+
+func (c ApiClient) PerformRequest(request *Request) (apiErr *ApiError) {
+	_, apiErr = c.doRequestHandlingAuth(request)
+	return
+}
+
+func (c ApiClient) PerformRequestAndParseResponse(request *Request, response interface{}) (apiErr *ApiError) {
+	rawResponse, apiErr := c.doRequestHandlingAuth(request)
+	if apiErr != nil {
+		return
+	}
+	apiErr = parseResponse(rawResponse, response)
+	return
+}
+
+func (c ApiClient) PerformRequestForTextResponse(request *Request) (response string, apiErr *ApiError) {
+	rawResponse, apiErr := c.doRequestHandlingAuth(request)
+	if apiErr != nil {
+		return
+	}
+
+	textBytes, err := ioutil.ReadAll(rawResponse.Body)
+	if err != nil {
+		apiErr = NewApiErrorWithError("Error reading response body:", err)
+		return
+	}
+
+	response = string(textBytes)
+	return
+}
+
+func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Response, apiErr *ApiError) {
+	response, apiErr = doRequest(request.Request)
+
+	if apiErr != nil && response == nil {
+		return
+	}
+
+	if response.StatusCode == http.StatusUnauthorized && apiErr.ErrorCode == 1000 {
+		newToken, apiErr := c.authenticator.RefreshAuthToken()
+		if apiErr == nil {
+			request.Header.Set("Authorization", newToken)
+			return doRequest(request.Request)
+		}
+	}
+
+	if shouldRedirect(request, response) {
+		newRequest, apiErr := NewRequest("GET", response.Header.Get("location"), "", nil)
+		if apiErr == nil {
+			return doRequest(newRequest.Request)
+		}
+	}
+
+	return
+}
+
+func doRequest(request *http.Request) (response *http.Response, apiError *ApiError) {
+	var err error
+
 	httpClient := newHttpClient()
 
 	if traceEnabled() {
@@ -144,7 +177,7 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 	response, err = httpClient.Do(request)
 
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))
+		apiError = NewApiErrorWithError("Error performing request", err)
 		return
 	}
 
@@ -159,9 +192,9 @@ func doRequest(request *http.Request) (response *http.Response, errorCode int, e
 
 	if response.StatusCode > 299 {
 		errorResponse := getErrorResponse(response)
-		errorCode = errorResponse.Code
+		errorCode := errorResponse.Code
 		message := fmt.Sprintf("Server error, status code: %d, error code: %d, message: %s", response.StatusCode, errorCode, errorResponse.Description)
-		err = errors.New(message)
+		apiError = NewApiError(message, errorCode, response.StatusCode)
 	}
 
 	return
@@ -179,17 +212,17 @@ func Sanitize(input string) (sanitized string) {
 	return
 }
 
-func parseResponse(rawResponse *http.Response, response interface{}) (errorCode int, err error) {
+func parseResponse(rawResponse *http.Response, response interface{}) (apiError *ApiError) {
 	jsonBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Could not read response body: %s", err.Error()))
+		apiError = NewApiErrorWithError("Could not read response body", err)
 		return
 	}
 
 	err = json.Unmarshal(jsonBytes, &response)
 
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Invalid JSON response from server: %s", err.Error()))
+		apiError = NewApiErrorWithError("Invalid JSON response from server", err)
 	}
 
 	return

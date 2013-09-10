@@ -2,7 +2,8 @@ package testhelpers
 
 import (
 	"cf"
-	"errors"
+	"cf/api"
+	"net/http"
 )
 
 type FakeServiceRepo struct {
@@ -27,48 +28,47 @@ type FakeServiceRepo struct {
 	DeleteServiceServiceInstance cf.ServiceInstance
 }
 
-func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOffering, err error) {
+func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *api.ApiError) {
 	offerings = repo.ServiceOfferings
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (err error) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (apiErr *api.ApiError) {
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlan = plan
 	return
 }
 
-func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, params map[string]string) (err error) {
+func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *api.ApiError) {
 	repo.CreateUserProvidedServiceInstanceName = name
 	repo.CreateUserProvidedServiceInstanceParameters = params
 	return
 }
 
-func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, err error) {
+func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *api.ApiError) {
 	repo.FindInstanceByNameName = name
 	instance = repo.FindInstanceByNameServiceInstance
 	return
 }
 
-func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.Application) (errorCode int, err error) {
+func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *api.ApiError) {
 	repo.BindServiceServiceInstance = instance
 	repo.BindServiceApplication = app
 
 	if repo.BindServiceErrorCode != 0 {
-		err = errors.New("Error binding service")
-		errorCode = repo.BindServiceErrorCode
+		apiErr = api.NewApiError("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
 	}
 
 	return
 }
 
-func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (err error) {
+func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (apiErr *api.ApiError) {
 	repo.UnbindServiceServiceInstance = instance
 	repo.UnbindServiceApplication = app
 	return
 }
 
-func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (err error) {
+func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (apiErr *api.ApiError) {
 	repo.DeleteServiceServiceInstance = instance
 	return
 }

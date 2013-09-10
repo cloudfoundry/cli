@@ -2,6 +2,7 @@ package testhelpers
 
 import (
 	"cf"
+	"cf/api"
 )
 
 type FakeDomainRepository struct {
@@ -11,12 +12,11 @@ type FakeDomainRepository struct {
 	FindByNameDomain cf.Domain
 }
 
-func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, err error){
+func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiErr *api.ApiError){
 	return repo.FindAllDomains, nil
 }
 
-func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, err error){
+func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiErr *api.ApiError){
 	repo.FindByNameName = name
 	return repo.FindByNameDomain, nil
 }
-

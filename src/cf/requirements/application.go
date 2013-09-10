@@ -30,11 +30,14 @@ func NewApplicationRequirement(name string, ui terminal.UI, config *configuratio
 }
 
 func (req *ApplicationApiRequirement) Execute() (err error) {
-	req.application, err = req.appRepo.FindByName(req.name)
-	if err != nil {
-		req.ui.Failed("", err)
+	var apiErr *api.ApiError
+	req.application, apiErr = req.appRepo.FindByName(req.name)
+
+	if apiErr != nil {
+		req.ui.Failed("", apiErr)
 	}
-	return
+
+	return apiErr
 }
 
 func (req *ApplicationApiRequirement) GetApplication() cf.Application {

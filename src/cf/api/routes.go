@@ -3,16 +3,15 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"errors"
 	"fmt"
 	"strings"
 )
 
 type RouteRepository interface {
-	FindAll() (routes []cf.Route, err error)
-	FindByHost(host string) (route cf.Route, err error)
-	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error)
-	Bind(route cf.Route, app cf.Application) (err error)
+	FindAll() (routes []cf.Route, apiErr *ApiError)
+	FindByHost(host string) (route cf.Route, apiErr *ApiError)
+	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiErr *ApiError)
+	Bind(route cf.Route, app cf.Application) (apiErr *ApiError)
 }
 
 type CloudControllerRouteRepository struct {
@@ -26,17 +25,17 @@ func NewCloudControllerRouteRepository(config *configuration.Configuration, apiC
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, err error) {
+func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
 
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	response := new(RoutesResponse)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	if apiErr != nil {
 		return
 	}
 
@@ -55,22 +54,22 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, err err
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, err error) {
+func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
 
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
 	response := new(ApiResponse)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	if apiErr != nil {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		err = errors.New("Route not found")
+		apiErr = NewApiErrorWithMessage("Route not found")
 		return
 	}
 
@@ -81,20 +80,20 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	return
 }
 
-func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, err error) {
+func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/routes", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`,
 		newRoute.Host, domain.Guid, repo.config.Space.Guid,
 	)
-	request, err := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if err != nil {
+	request, apiErr := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiErr != nil {
 		return
 	}
 
 	resource := new(Resource)
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, resource)
-	if err != nil {
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, resource)
+	if apiErr != nil {
 		return
 	}
 
@@ -103,14 +102,14 @@ func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.D
 	return
 }
 
-func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (err error) {
+func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiErr *ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
-	request, err := NewRequest("PUT", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 
-	_, err = repo.apiClient.PerformRequest(request)
+	apiErr = repo.apiClient.PerformRequest(request)
 
 	return
 }

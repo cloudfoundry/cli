@@ -3,13 +3,12 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"errors"
 	"strings"
 )
 
 type OrganizationRepository interface {
-	FindAll() (orgs []cf.Organization, err error)
-	FindByName(name string) (org cf.Organization, err error)
+	FindAll() (orgs []cf.Organization, apiErr *ApiError)
+	FindByName(name string) (org cf.Organization, apiErr *ApiError)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -23,17 +22,17 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, err error) {
+func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiErr *ApiError) {
 	path := repo.config.Target + "/v2/organizations"
-	request, err := NewRequest("GET", path, repo.config.AccessToken, nil)
-	if err != nil {
+	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
 		return
 	}
 	response := new(ApiResponse)
 
-	_, err = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
@@ -44,11 +43,11 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, err error) {
-	orgs, err := repo.FindAll()
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiErr *ApiError) {
+	orgs, apiErr := repo.FindAll()
 	lowerName := strings.ToLower(name)
 
-	if err != nil {
+	if apiErr != nil {
 		return
 	}
 
@@ -58,6 +57,6 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 		}
 	}
 
-	err = errors.New("Organization not found")
+	apiErr = NewApiErrorWithMessage("Organization not found")
 	return
 }

@@ -230,7 +230,7 @@ func TestBindService(t *testing.T) {
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
-	_, err := repo.BindService(serviceInstance, app)
+	err := repo.BindService(serviceInstance, app)
 	assert.NoError(t, err)
 }
 
@@ -257,10 +257,10 @@ func TestBindServiceIfError(t *testing.T) {
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
-	errorCode, err := repo.BindService(serviceInstance, app)
+	apiErr := repo.BindService(serviceInstance, app)
 
-	assert.Error(t, err)
-	assert.Equal(t, errorCode, 90003)
+	assert.Error(t, apiErr)
+	assert.Equal(t, apiErr.ErrorCode, 90003)
 }
 
 var deleteBindingEndpoint = testhelpers.CreateEndpoint(

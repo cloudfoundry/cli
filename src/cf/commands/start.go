@@ -59,25 +59,25 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	s.ui.Say("Starting %s...", term.Cyan(app.Name))
 
-	err := s.appRepo.Start(app)
-	if err != nil {
-		s.ui.Failed("Error starting application.", err)
+	apiErr := s.appRepo.Start(app)
+	if apiErr != nil {
+		s.ui.Failed("Error starting application.", apiErr)
 		return
 	}
 
 	s.ui.Ok()
 
-	instances, errorCode, err := s.appRepo.GetInstances(app)
+	instances, apiErr := s.appRepo.GetInstances(app)
 
-	for err != nil {
-		if errorCode != 170002 {
+	for apiErr != nil {
+		if apiErr.ErrorCode != 170002 {
 			s.ui.Say("")
-			s.ui.Failed("Error staging application", err)
+			s.ui.Failed("Error staging application", apiErr)
 			return
 		}
 
 		s.ui.Wait(1 * time.Second)
-		instances, errorCode, err = s.appRepo.GetInstances(app)
+		instances, apiErr = s.appRepo.GetInstances(app)
 		s.ui.LoadingIndication()
 	}
 
@@ -87,7 +87,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	for s.displayInstancesStatus(app, instances) {
 		s.ui.Wait(1 * time.Second)
-		instances, _, _ = s.appRepo.GetInstances(app)
+		instances, _ = s.appRepo.GetInstances(app)
 	}
 }
 
