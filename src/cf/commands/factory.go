@@ -52,6 +52,13 @@ func (f Factory) NewDeleteService() *DeleteService {
 	)
 }
 
+func (f Factory) NewFiles() *Files {
+	return NewFiles(
+		f.ui,
+		f.repoLocator.GetAppFilesRepository(),
+	)
+}
+
 func (f Factory) NewLogin() Login {
 	authenticator := api.NewUAAAuthenticator(f.repoLocator.GetConfigurationRepository())
 

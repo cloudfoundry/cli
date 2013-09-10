@@ -129,6 +129,19 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "files",
+			Description: "Examine an app's files",
+			Usage:       "cf files --app <app name> [--path <file path>]",
+			Flags: []cli.Flag{
+				cli.StringFlag{"app", "", "application name"},
+				cli.StringFlag{"path", "/", "file path"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewFiles()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",

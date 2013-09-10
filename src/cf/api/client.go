@@ -28,7 +28,11 @@ func NewRequest(method, path, accessToken string, body io.Reader) (authReq *Requ
 	if err != nil {
 		return
 	}
-	request.Header.Set("Authorization", accessToken)
+
+	if accessToken != "" {
+		request.Header.Set("Authorization", accessToken)
+	}
+
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
 	authReq = &Request{request}
@@ -67,6 +71,21 @@ func (c ApiClient) PerformRequestAndParseResponse(request *Request, response int
 	return
 }
 
+func (c ApiClient) PerformRequestForTextResponse(request *Request) (response string, err error) {
+	rawResponse, _, err := c.doRequestHandlingAuth(request)
+	if err != nil {
+		return
+	}
+
+	textBytes, err := ioutil.ReadAll(rawResponse.Body)
+	if err != nil {
+		return
+	}
+
+	response = string(textBytes)
+	return
+}
+
 func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Response, errorCode int, err error) {
 	response, errorCode, err = doRequest(request.Request)
 
@@ -75,11 +94,18 @@ func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Respo
 		return
 	}
 
-	if response.StatusCode == 401 && errorCode == 1000 {
+	if response.StatusCode == http.StatusUnauthorized && errorCode == 1000 {
 		newToken, err := c.authenticator.RefreshAuthToken()
 		if err == nil {
 			request.Header.Set("Authorization", newToken)
 			return doRequest(request.Request)
+		}
+	}
+
+	if shouldRedirect(request, response) {
+		newRequest, err := NewRequest("GET", response.Header.Get("location"), "", nil)
+		if err == nil {
+			return doRequest(newRequest.Request)
 		}
 	}
 
@@ -89,6 +115,10 @@ func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Respo
 type errorResponse struct {
 	Code        int
 	Description string
+}
+
+func shouldRedirect(request *Request, response *http.Response) bool {
+	return request.Method == "GET" && response.StatusCode == http.StatusTemporaryRedirect || response.StatusCode == http.StatusMovedPermanently
 }
 
 func newHttpClient() *http.Client {
