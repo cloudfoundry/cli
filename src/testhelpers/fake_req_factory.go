@@ -3,7 +3,6 @@ package testhelpers
 import (
 	"cf/requirements"
 	"cf"
-	"errors"
 )
 
 type FakeReqFactory struct {
@@ -40,11 +39,8 @@ type FakeRequirement struct {
 	success bool
 }
 
-func (r FakeRequirement) Execute() (err error) {
-	if !r.success {
-		err = errors.New("Requirement error")
-	}
-	return
+func (r FakeRequirement) Execute() (success bool) {
+	return r.success
 }
 
 func (r FakeRequirement) GetApplication() cf.Application {

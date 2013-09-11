@@ -15,15 +15,15 @@ func TestLoginRequirement(t *testing.T) {
 	}
 
 	req := NewLoginRequirement(ui, config)
-	err := req.Execute()
-	assert.NoError(t, err)
+	success := req.Execute()
+	assert.True(t, success)
 
 	config = &configuration.Configuration{
 		AccessToken: "",
 	}
 
 	req = NewLoginRequirement(ui, config)
-	err = req.Execute()
-	assert.Error(t, err)
+	success = req.Execute()
+	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "Not logged in.")
 }

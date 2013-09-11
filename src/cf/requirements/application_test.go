@@ -16,9 +16,9 @@ func TestApplicationReqExecute(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 
 	appReq := NewApplicationRequirement("foo", ui, config, appRepo)
-	err := appReq.Execute()
+	success := appReq.Execute()
 
-	assert.NoError(t, err)
+	assert.True(t, success)
 	assert.Equal(t, appRepo.AppName, "foo")
 	assert.Equal(t, appReq.GetApplication(), app)
 }

@@ -3,7 +3,6 @@ package requirements
 import (
 	"cf/configuration"
 	"cf/terminal"
-	"errors"
 	"fmt"
 )
 
@@ -16,21 +15,19 @@ func NewSpaceRequirement(ui terminal.UI, config *configuration.Configuration) Sp
 	return SpaceRequirement{ui, config}
 }
 
-func (req SpaceRequirement) Execute() (err error) {
+func (req SpaceRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org and space targeted. See '%s' to target an org and space.",
 			terminal.Yellow("cf target --o ORGNAME --s SPACENAME"))
 		req.ui.Failed(message, nil)
-		err = errors.New("No org and space targeted")
-		return
+		return false
 	}
 
 	if !req.config.HasSpace() {
 		message := fmt.Sprintf("No space targeted. Use '%s' to target a space.", terminal.Yellow("cf target -s"))
 		req.ui.Failed(message, nil)
-		err = errors.New("No space targeted")
-		return
+		return false
 	}
 
-	return
+	return true
 }

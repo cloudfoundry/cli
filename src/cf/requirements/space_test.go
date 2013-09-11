@@ -23,14 +23,14 @@ func TestSpaceRequirement(t *testing.T) {
 	}
 
 	req := NewSpaceRequirement(ui, config)
-	err := req.Execute()
-	assert.NoError(t, err)
+	success := req.Execute()
+	assert.True(t, success)
 
 	config.Space = cf.Space{}
 
 	req = NewSpaceRequirement(ui, config)
-	err = req.Execute()
-	assert.Error(t, err)
+	success = req.Execute()
+	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "No space targeted")
 
@@ -38,8 +38,8 @@ func TestSpaceRequirement(t *testing.T) {
 	config.Organization = cf.Organization{}
 
 	req = NewSpaceRequirement(ui, config)
-	err = req.Execute()
-	assert.Error(t, err)
+	success = req.Execute()
+	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "No org and space targeted")
 }

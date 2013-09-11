@@ -6,7 +6,7 @@ import (
 )
 
 type Requirement interface {
-	Execute() (err error)
+	Execute() (success bool)
 }
 
 type Factory interface {

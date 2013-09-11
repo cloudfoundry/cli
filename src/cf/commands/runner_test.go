@@ -3,7 +3,6 @@ package commands_test
 import (
 	. "cf/commands"
 	"cf/requirements"
-	"errors"
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
@@ -29,14 +28,14 @@ type TestRequirement struct {
 	WasExecuted bool
 }
 
-func (r *TestRequirement) Execute() (err error) {
+func (r *TestRequirement) Execute() (success bool) {
 	r.WasExecuted = true
 
 	if !r.Passes {
-		return errors.New("Error in requirement")
+		return false
 	}
 
-	return
+	return true
 }
 
 func TestRun(t *testing.T) {

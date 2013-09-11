@@ -16,9 +16,9 @@ func TestServiceInstanceReqExecute(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 
 	req := NewServiceInstanceRequirement("foo", ui, config, repo)
-	err := req.Execute()
+	success := req.Execute()
 
-	assert.NoError(t, err)
+	assert.True(t, success)
 	assert.Equal(t, repo.FindInstanceByNameName, "foo")
 	assert.Equal(t, req.GetServiceInstance(), instance)
 }

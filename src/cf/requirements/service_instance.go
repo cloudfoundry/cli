@@ -29,13 +29,14 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, config *configur
 	return
 }
 
-func (req *ServiceInstanceApiRequirement) Execute() (err error) {
+func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
 	var apiErr *api.ApiError
 	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
 	if apiErr != nil {
 		req.ui.Failed("", apiErr)
+		return false
 	}
-	return apiErr
+	return true
 }
 
 func (req *ServiceInstanceApiRequirement) GetServiceInstance() cf.ServiceInstance {

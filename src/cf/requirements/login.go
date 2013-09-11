@@ -3,7 +3,6 @@ package requirements
 import (
 	"cf/configuration"
 	"cf/terminal"
-	"errors"
 )
 
 type LoginRequirement struct {
@@ -15,11 +14,10 @@ func NewLoginRequirement(ui terminal.UI, config *configuration.Configuration) Lo
 	return LoginRequirement{ui, config}
 }
 
-func (req LoginRequirement) Execute() (err error) {
+func (req LoginRequirement) Execute() (success bool) {
 	if !req.config.IsLoggedIn() {
 		req.ui.Say("Not logged in. Use '%s' to log in.", terminal.Yellow("cf login"))
-		err = errors.New("You need to be logged in")
-		return
+		return false
 	}
-	return
+	return true
 }

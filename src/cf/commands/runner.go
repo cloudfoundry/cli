@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/requirements"
+	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -26,8 +27,9 @@ func (runner Runner) Run(cmd Command, c *cli.Context) (err error) {
 	}
 
 	for _, requirement := range requirements {
-		err = requirement.Execute()
-		if err != nil {
+		success := requirement.Execute()
+		if !success {
+			err = errors.New("Error in requirement")
 			return
 		}
 	}

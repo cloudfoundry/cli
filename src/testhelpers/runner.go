@@ -16,8 +16,8 @@ func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *FakeReqFact
 	}
 
 	for _, req := range reqs {
-		err = req.Execute()
-		if err != nil {
+		success := req.Execute()
+		if !success {
 			return
 		}
 	}
