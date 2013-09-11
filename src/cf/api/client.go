@@ -84,10 +84,6 @@ func PerformRequestAndParseResponse(request *Request, response interface{}) (api
 	return
 }
 
-func shouldRedirect(request *Request, response *http.Response) bool {
-	return request.Method == "GET" && response.StatusCode == http.StatusTemporaryRedirect || response.StatusCode == http.StatusMovedPermanently
-}
-
 func newHttpClient() *http.Client {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -155,13 +151,6 @@ func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Respo
 				request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
 			}
 			return doRequest(request.Request)
-		}
-	}
-
-	if shouldRedirect(request, response) {
-		newRequest, apiErr := NewRequest("GET", response.Header.Get("location"), "", nil)
-		if apiErr == nil {
-			return doRequest(newRequest.Request)
 		}
 	}
 
