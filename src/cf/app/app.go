@@ -130,12 +130,8 @@ OPTIONS:
 		},
 		{
 			Name:        "files",
-			Description: "Examine an app's files",
-			Usage:       "cf files --app <app name> [--path <file path>]",
-			Flags: []cli.Flag{
-				cli.StringFlag{"app", "", "application name"},
-				cli.StringFlag{"path", "/", "file path"},
-			},
+			Description: "Print out a list of files in a directory or the contents of a specific file",
+			Usage:       "cf files <appname> [file or directory]",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewFiles()
 				cmdRunner.Run(cmd, c)

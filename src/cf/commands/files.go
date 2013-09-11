@@ -4,6 +4,7 @@ import (
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -21,7 +22,13 @@ func NewFiles(ui terminal.UI, appFilesRepo api.AppFilesRepository) (cmd *Files) 
 }
 
 func (cmd *Files) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.String("app"))
+	if len(c.Args()) < 1 {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "files")
+		return
+	}
+
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
@@ -35,7 +42,11 @@ func (cmd *Files) Run(c *cli.Context) {
 	cmd.ui.Say("Getting files...")
 
 	app := cmd.appReq.GetApplication()
-	path := c.String("path")
+
+	path := "/"
+	if len(c.Args()) > 1 {
+		path = c.Args()[1]
+	}
 
 	list, err := cmd.appFilesRepo.ListFiles(app, path)
 	if err != nil {
