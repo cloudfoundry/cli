@@ -164,7 +164,7 @@ var createRouteEndpoint = testhelpers.CreateEndpoint(
 	createRouteResponse,
 )
 
-func TestCreate(t *testing.T) {
+func TestCreateRoute(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createRouteEndpoint))
 	defer ts.Close()
 

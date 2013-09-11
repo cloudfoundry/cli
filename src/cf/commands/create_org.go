@@ -2,7 +2,7 @@ package commands
 
 import (
 	/*	"cf"*/
-	/*	"cf/api"*/
+	"cf/api"
 	"cf/requirements"
 	term "cf/terminal"
 	/*	"errors"
@@ -13,10 +13,12 @@ import (
 
 type CreateOrganization struct {
 	ui term.UI
+	orgRepo api.OrganizationRepository
 }
 
-func NewCreateOrganization(ui term.UI) (cmd CreateOrganization) {
+func NewCreateOrganization(ui term.UI, orgRepo api.OrganizationRepository) (cmd CreateOrganization) {
 	cmd.ui = ui
+	cmd.orgRepo = orgRepo
 	return
 }
 
@@ -27,11 +29,16 @@ func (cmd CreateOrganization) GetRequirements(reqFactory requirements.Factory, c
 func (cmd CreateOrganization) Run(c *cli.Context) {
 	name := c.String("name")
 	cmd.createOrganization(name)
-	return
 }
 
 func (cmd CreateOrganization) createOrganization(name string) {
 	cmd.ui.Say("Creating organization %s", term.Cyan(name))
+	_, apiErr := cmd.orgRepo.Create(name)
+	if apiErr != nil {
+		cmd.ui.Failed("Error creating organization", apiErr)
+		return
+	}
+
 	cmd.ui.Ok()
 	return
 }

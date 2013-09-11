@@ -168,5 +168,6 @@ func (f Factory) NewUnbindService() *UnbindService {
 func (f Factory) NewCreateOrganization() CreateOrganization {
 	return NewCreateOrganization(
 		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
 	)
 }
