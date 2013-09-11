@@ -47,7 +47,7 @@ func (se *SetEnv) Run(c *cli.Context) {
 	err := se.appRepo.SetEnv(app, varName, varValue)
 
 	if err != nil {
-		se.ui.Failed("Failed setting env", err)
+		se.ui.Failed(err.Error())
 		return
 	}
 

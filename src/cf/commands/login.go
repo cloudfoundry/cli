@@ -52,7 +52,7 @@ func (l Login) Run(c *cli.Context) {
 		err := l.authenticator.Authenticate(email, password)
 
 		if err != nil {
-			l.ui.Failed("Error Authenticating", err)
+			l.ui.Failed(err.Error())
 			continue
 		}
 
@@ -61,7 +61,7 @@ func (l Login) Run(c *cli.Context) {
 		organizations, err := l.orgRepo.FindAll()
 
 		if err != nil {
-			l.ui.Failed("Error fetching organizations.", err)
+			l.ui.Failed(err.Error())
 			return
 		}
 
@@ -75,7 +75,7 @@ func (l Login) Run(c *cli.Context) {
 		spaces, err := l.spaceRepo.FindAll()
 
 		if err != nil {
-			l.ui.Failed("Error fetching spaces.", err)
+			l.ui.Failed(err.Error())
 			return
 		}
 
@@ -117,7 +117,7 @@ func (l Login) chooseOrg(orgs []cf.Organization) (org cf.Organization) {
 	index, err := strconv.Atoi(l.ui.Ask("Organization%s", term.Cyan(">")))
 
 	if err != nil || index > len(orgs) {
-		l.ui.Failed("Invalid number", err)
+		l.ui.Failed("Invalid number")
 		return l.chooseOrg(orgs)
 	}
 
@@ -129,7 +129,7 @@ func (l Login) saveOrg(config *configuration.Configuration, org cf.Organization)
 	err = l.configRepo.Save()
 
 	if err != nil {
-		l.ui.Failed("Error saving organization: %s", err)
+		l.ui.Failed(err.Error())
 		return
 	}
 
@@ -158,7 +158,7 @@ func (l Login) chooseSpace(spaces []cf.Space) (space cf.Space) {
 	index, err := strconv.Atoi(l.ui.Ask("Space%s", term.Cyan(">")))
 
 	if err != nil || index > len(spaces) {
-		l.ui.Failed("Invalid number", err)
+		l.ui.Failed("Invalid number")
 		return l.chooseSpace(spaces)
 	}
 
@@ -170,7 +170,7 @@ func (l Login) saveSpace(config *configuration.Configuration, space cf.Space) (e
 	err = l.configRepo.Save()
 
 	if err != nil {
-		l.ui.Failed("Error saving organization: %s", err)
+		l.ui.Failed(err.Error())
 		return
 	}
 

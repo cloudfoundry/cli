@@ -33,7 +33,7 @@ func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
 	var apiErr *api.ApiError
 	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
 	if apiErr != nil {
-		req.ui.Failed("", apiErr)
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 	return true

@@ -29,7 +29,7 @@ func (r Routes) Run(c *cli.Context) {
 	routes, err := r.routeRepo.FindAll()
 
 	if err != nil {
-		r.ui.Failed("Error getting routes.", err)
+		r.ui.Failed(err.Error())
 	}
 
 	r.ui.Ok()

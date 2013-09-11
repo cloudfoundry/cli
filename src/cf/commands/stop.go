@@ -47,7 +47,7 @@ func (s *Stop) Run(c *cli.Context) {
 
 	err := s.appRepo.Stop(app)
 	if err != nil {
-		s.ui.Failed("Error stopping application.", err)
+		s.ui.Failed(err.Error())
 		return
 	}
 	s.ui.Ok()

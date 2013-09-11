@@ -53,7 +53,7 @@ func (repo *FakeApplicationRepository) SetEnv(app cf.Application, name string, v
 	repo.SetEnvValue = value
 
 	if repo.SetEnvErr {
-		apiErr = api.NewApiErrorWithMessage("Error setting env.")
+		apiErr = api.NewApiErrorWithMessage("Failed setting env")
 	}
 	return
 }
@@ -85,7 +85,7 @@ func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *byt
 func (repo *FakeApplicationRepository) Start(app cf.Application) (apiErr *api.ApiError){
 	repo.StartedApp = app
 	if repo.StartAppErr {
-		apiErr = api.NewApiErrorWithMessage("Error starting app.")
+		apiErr = api.NewApiErrorWithMessage("Error starting application")
 	}
 	return
 }
@@ -93,7 +93,7 @@ func (repo *FakeApplicationRepository) Start(app cf.Application) (apiErr *api.Ap
 func (repo *FakeApplicationRepository) Stop(app cf.Application) (apiErr *api.ApiError){
 	repo.StoppedApp = app
 	if repo.StopAppErr {
-		apiErr = api.NewApiErrorWithMessage("Error stopping app.")
+		apiErr = api.NewApiErrorWithMessage("Error stopping application")
 	}
 	return
 }
@@ -106,7 +106,7 @@ func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instanc
 	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]
 
 	if errorCode != "" {
-		apiErr = api.NewApiError("Error while starting app", errorCode, http.StatusBadRequest)
+		apiErr = api.NewApiError("Error staging app", errorCode, http.StatusBadRequest)
 		return
 	}
 

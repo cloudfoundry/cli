@@ -28,7 +28,7 @@ func (s *Stacks) Run(c *cli.Context) {
 
 	stacks, err := s.stacksRepo.FindAll()
 	if err != nil {
-		s.ui.Failed("Error getting stacks", err)
+		s.ui.Failed(err.Error())
 		return
 	}
 

@@ -29,7 +29,7 @@ func (cmd Services) Run(c *cli.Context) {
 	space, err := cmd.spaceRepo.GetSummary()
 
 	if err != nil {
-		cmd.ui.Failed("Error loading applications", err)
+		cmd.ui.Failed(err.Error())
 		return
 	}
 

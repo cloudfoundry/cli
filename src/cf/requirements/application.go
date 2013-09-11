@@ -34,7 +34,7 @@ func (req *ApplicationApiRequirement) Execute() (success bool) {
 	req.application, apiErr = req.appRepo.FindByName(req.name)
 
 	if apiErr != nil {
-		req.ui.Failed("", apiErr)
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 

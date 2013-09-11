@@ -47,7 +47,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	apiErr := cmd.serviceRepo.BindService(instance, app)
 	if apiErr != nil && apiErr.ErrorCode != "90003" {
-		cmd.ui.Failed("Failed binding service", apiErr)
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

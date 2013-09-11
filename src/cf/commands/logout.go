@@ -27,7 +27,7 @@ func (l Logout) Run(c *cli.Context) {
 	err := l.configRepo.ClearSession()
 
 	if err != nil {
-		l.ui.Failed("Failed logging out", err)
+		l.ui.Failed(err.Error())
 		return
 	}
 

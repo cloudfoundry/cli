@@ -60,22 +60,15 @@ func (ui *FakeUI) Ok() {
 	ui.Say("OK")
 }
 
-func (ui *FakeUI) Failed(message string, err error) {
+func (ui *FakeUI) Failed(message string) {
 	ui.Say("FAILED")
-
-	if message != "" {
-		ui.Say(message)
-	}
-
-	if err != nil {
-		ui.Say(err.Error())
-	}
+	ui.Say(message)
 	return
 }
 
 func (ui *FakeUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 	ui.FailedWithUsage = true
-	ui.Failed("Incorrect Usage.", nil)
+	ui.Failed("Incorrect Usage.")
 }
 
 func (ui *FakeUI) DumpOutputs() string {

@@ -83,13 +83,13 @@ func (t Target) setNewTarget(target string) {
 	request, apiErr := api.NewRequest("GET", target+"/v2/info", "", nil)
 
 	if apiErr != nil {
-		t.ui.Failed("URL invalid.", apiErr)
+		t.ui.Failed(apiErr.Error())
 		return
 	}
 
 	scheme := request.URL.Scheme
 	if scheme != "http" && scheme != "https" {
-		t.ui.Failed("API Endpoints should start with https:// or http://", nil)
+		t.ui.Failed("API Endpoints should start with https:// or http://")
 		return
 	}
 
@@ -97,14 +97,14 @@ func (t Target) setNewTarget(target string) {
 	apiErr = api.PerformRequestAndParseResponse(request, &serverResponse)
 
 	if apiErr != nil {
-		t.ui.Failed("", apiErr)
+		t.ui.Failed(apiErr.Error())
 		return
 	}
 
 	err := t.saveTarget(target, serverResponse)
 
 	if err != nil {
-		t.ui.Failed("Error saving configuration", err)
+		t.ui.Failed(err.Error())
 		return
 	}
 
@@ -126,13 +126,13 @@ func (t *Target) saveTarget(target string, info *InfoResponse) (err error) {
 
 func (t Target) setOrganization(orgName string) {
 	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set an organization. Use 'cf login'.", nil)
+		t.ui.Failed("You must be logged in to set an organization. Use 'cf login'.")
 		return
 	}
 
 	org, err := t.orgRepo.FindByName(orgName)
 	if err != nil {
-		t.ui.Failed("Could not set organization.", nil)
+		t.ui.Failed("Could not set organization.")
 		return
 	}
 
@@ -143,18 +143,18 @@ func (t Target) setOrganization(orgName string) {
 
 func (t Target) setSpace(spaceName string) {
 	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set a space. Use 'cf login'.", nil)
+		t.ui.Failed("You must be logged in to set a space. Use 'cf login'.")
 		return
 	}
 
 	if !t.config.HasOrganization() {
-		t.ui.Failed("Organization must be set before targeting space.", nil)
+		t.ui.Failed("Organization must be set before targeting space.")
 		return
 	}
 
 	space, err := t.spaceRepo.FindByName(spaceName)
 	if err != nil {
-		t.ui.Failed("You do not have access to that space.", nil)
+		t.ui.Failed("You do not have access to that space.")
 		return
 	}
 
@@ -165,7 +165,7 @@ func (t Target) setSpace(spaceName string) {
 func (t Target) saveAndShowConfig() {
 	err := t.configRepo.Save()
 	if err != nil {
-		t.ui.Failed("Error saving configuration", err)
+		t.ui.Failed(err.Error())
 		return
 	}
 	t.ui.ShowConfiguration(t.config)

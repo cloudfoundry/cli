@@ -50,7 +50,7 @@ func (cmd *Files) Run(c *cli.Context) {
 
 	list, err := cmd.appFilesRepo.ListFiles(app, path)
 	if err != nil {
-		cmd.ui.Failed("", err)
+		cmd.ui.Failed(err.Error())
 		return
 	}
 

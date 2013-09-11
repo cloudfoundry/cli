@@ -29,7 +29,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 	serviceOfferings, err := cmd.serviceRepo.GetServiceOfferings()
 
 	if err != nil {
-		cmd.ui.Failed("Error loading service offerings", err)
+		cmd.ui.Failed(err.Error())
 		return
 	}
 

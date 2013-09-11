@@ -34,7 +34,7 @@ func (a Apps) Run(c *cli.Context) {
 	space, err := a.spaceRepo.GetSummary()
 
 	if err != nil {
-		a.ui.Failed("Error loading applications", err)
+		a.ui.Failed(err.Error())
 		return
 	}
 

@@ -48,7 +48,11 @@ OPTIONS:
 	configRepo := configuration.NewConfigurationDiskRepository()
 	config, err := configRepo.Get()
 	if err != nil {
-		termUI.Failed(fmt.Sprintf("Error loading config. Please reset target (%s) and log in (%s).", terminal.Yellow("cf target"), terminal.Yellow("cf login")), nil)
+		termUI.Failed(fmt.Sprintf(
+			"Error loading config. Please reset target (%s) and log in (%s).",
+			terminal.Yellow("cf target"),
+			terminal.Yellow("cf login"),
+		))
 		configRepo.Delete()
 		os.Exit(1)
 		return

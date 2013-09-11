@@ -16,7 +16,7 @@ type UI interface {
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Ok()
-	Failed(message string, err error)
+	Failed(message string)
 	FailWithUsage(ctxt *cli.Context, cmdName string)
 	ShowConfiguration(*configuration.Configuration)
 	LoadingIndication()
@@ -43,22 +43,15 @@ func (c TerminalUI) Ok() {
 	c.Say(Green("OK"))
 }
 
-func (c TerminalUI) Failed(message string, err error) {
+func (c TerminalUI) Failed(message string) {
 	c.Say(Red("FAILED"))
-
-	if message != "" && err == nil {
-		c.Say(message)
-	}
-
-	if err != nil {
-		c.Say(err.Error())
-	}
+	c.Say(message)
 
 	return
 }
 
 func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
-	c.Failed("Incorrect Usage.\n", nil)
+	c.Failed("Incorrect Usage.\n")
 	cli.ShowCommandHelp(ctxt, cmdName)
 	c.Say("")
 	os.Exit(1)

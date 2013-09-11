@@ -46,7 +46,7 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	err := cmd.serviceRepo.DeleteService(instance)
 	if err != nil {
-		cmd.ui.Failed("Failed deleting service", err)
+		cmd.ui.Failed(err.Error())
 		return
 	}
 

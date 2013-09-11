@@ -303,10 +303,10 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Equal(t, ui.Outputs[1], "Authenticating...")
 	assert.Equal(t, ui.Outputs[2], "FAILED")
-	assert.Equal(t, ui.Outputs[5], "Authenticating...")
-	assert.Equal(t, ui.Outputs[6], "FAILED")
-	assert.Equal(t, ui.Outputs[9], "Authenticating...")
-	assert.Equal(t, ui.Outputs[10], "FAILED")
+	assert.Equal(t, ui.Outputs[4], "Authenticating...")
+	assert.Equal(t, ui.Outputs[5], "FAILED")
+	assert.Equal(t, ui.Outputs[7], "Authenticating...")
+	assert.Equal(t, ui.Outputs[8], "FAILED")
 }
 
 func callLogin(args []string, ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {

@@ -61,20 +61,20 @@ func (p Push) Run(c *cli.Context) {
 	if dir == "" {
 		dir, err = os.Getwd()
 		if err != nil {
-			p.ui.Failed("Error getting working directory", err)
+			p.ui.Failed(err.Error())
 			return
 		}
 	}
 
 	zipBuffer, err := p.zipper.Zip(dir)
 	if err != nil {
-		p.ui.Failed("Error zipping app", err)
+		p.ui.Failed(err.Error())
 		return
 	}
 
 	apiErr = p.appRepo.Upload(app, zipBuffer)
 	if apiErr != nil {
-		p.ui.Failed("Error uploading app", apiErr)
+		p.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -98,7 +98,7 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 		stack, apiErr = p.stackRepo.FindByName(stackName)
 
 		if apiErr != nil {
-			p.ui.Failed("Error finding stack", apiErr)
+			p.ui.Failed(apiErr.Error())
 			return
 		}
 		newApp.Stack = stack
@@ -108,7 +108,7 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	p.ui.Say("Creating %s...", appName)
 	app, apiErr = p.appRepo.Create(newApp)
 	if apiErr != nil {
-		p.ui.Failed("Error creating application", apiErr)
+		p.ui.Failed(apiErr.Error())
 		return
 	}
 	p.ui.Ok()
@@ -116,7 +116,7 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	domain, apiErr := p.domainRepo.FindByName(c.String("domain"))
 
 	if apiErr != nil {
-		p.ui.Failed("Error loading domain", apiErr)
+		p.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -132,7 +132,7 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 		p.ui.Say("Creating route %s.%s...", newRoute.Host, domain.Name)
 		route, apiErr = p.routeRepo.Create(newRoute, domain)
 		if apiErr != nil {
-			p.ui.Failed("Error creating route", apiErr)
+			p.ui.Failed(apiErr.Error())
 			return
 		}
 		p.ui.Ok()
@@ -143,7 +143,7 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	p.ui.Say("Binding %s.%s to %s...", route.Host, domain.Name, app.Name)
 	apiErr = p.routeRepo.Bind(route, app)
 	if apiErr != nil {
-		p.ui.Failed("Error binding route", apiErr)
+		p.ui.Failed(apiErr.Error())
 		return
 	}
 	p.ui.Ok()

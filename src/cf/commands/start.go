@@ -61,7 +61,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	apiErr := s.appRepo.Start(app)
 	if apiErr != nil {
-		s.ui.Failed("Error starting application.", apiErr)
+		s.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -72,7 +72,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 	for apiErr != nil {
 		if apiErr.ErrorCode != "170002" {
 			s.ui.Say("")
-			s.ui.Failed("Error staging application", apiErr)
+			s.ui.Failed(apiErr.Error())
 			return
 		}
 
@@ -109,7 +109,7 @@ func (s Start) displayInstancesStatus(app cf.Application, instances []cf.Applica
 	}
 
 	if flappingCount > 0 {
-		s.ui.Failed("Start unsuccessful", nil)
+		s.ui.Failed("Start unsuccessful")
 		return false
 	}
 
@@ -128,7 +128,7 @@ func (s Start) displayInstancesStatus(app cf.Application, instances []cf.Applica
 	}
 
 	if time.Since(s.startTime) > s.config.ApplicationStartTimeout*time.Second {
-		s.ui.Failed("Start app timeout", nil)
+		s.ui.Failed("Start app timeout")
 		return false
 	}
 

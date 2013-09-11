@@ -34,13 +34,13 @@ func (cmd Password) Run(c *cli.Context) {
 	verifiedPassword := cmd.ui.AskForPassword("Verify Password%s", term.Cyan(">"))
 
 	if verifiedPassword != newPassword {
-		cmd.ui.Failed("Password verification does not match", nil)
+		cmd.ui.Failed("Password verification does not match")
 		return
 	}
 
 	score, err := cmd.pwdRepo.GetScore(newPassword)
 	if err != nil {
-		cmd.ui.Failed("Error scoring password", err)
+		cmd.ui.Failed(err.Error())
 		return
 	}
 	cmd.ui.Say("Your password strength is: %s", score)
@@ -50,9 +50,9 @@ func (cmd Password) Run(c *cli.Context) {
 
 	if err != nil {
 		if err.StatusCode == 401 {
-			cmd.ui.Failed("Current password did not match", nil)
+			cmd.ui.Failed("Current password did not match")
 		} else {
-			cmd.ui.Failed("Error changing password", err)
+			cmd.ui.Failed(err.Error())
 		}
 		return
 	}
