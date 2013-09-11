@@ -11,20 +11,20 @@ import (
 	"testing"
 )
 
-func TestSuccessfullyLoggingIn(t *testing.T) {
+func testSuccessfulLogin(t *testing.T, args []string, inputs []string) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
 	ui := new(testhelpers.FakeUI)
-	ui.Inputs = []string{"foo@example.com", "bar"}
+	ui.Inputs = inputs
 	auth := &testhelpers.FakeAuthenticator{
 		AccessToken:  "my_access_token",
 		RefreshToken: "my_refresh_token",
 		ConfigRepo:   configRepo,
 	}
 	callLogin(
-		[]string{},
+		args,
 		ui,
 		configRepo,
 		&testhelpers.FakeOrgRepository{},
@@ -36,46 +36,23 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
-	assert.Contains(t, ui.Prompts[0], "Username")
-	assert.Contains(t, ui.Prompts[1], "Password")
 
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
-	assert.Equal(t, auth.Email, "foo@example.com")
-	assert.Equal(t, auth.Password, "bar")
+	assert.Equal(t, auth.Email, "user@example.com")
+	assert.Equal(t, auth.Password, "password")
+}
+
+func TestSuccessfullyLoggingIn(t *testing.T) {
+	testSuccessfulLogin(t, []string{}, []string{"user@example.com", "password"})
 }
 
 func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
-	configRepo.Delete()
-	config, _ := configRepo.Get()
+	testSuccessfulLogin(t, []string{"user@example.com"}, []string{"password"})
+}
 
-	ui := new(testhelpers.FakeUI)
-	ui.Inputs = []string{"bar"}
-	auth := &testhelpers.FakeAuthenticator{
-		AccessToken:  "my_access_token",
-		RefreshToken: "my_refresh_token",
-		ConfigRepo:   configRepo,
-	}
-	callLogin(
-		[]string{"foo@example.com"},
-		ui,
-		configRepo,
-		&testhelpers.FakeOrgRepository{},
-		&testhelpers.FakeSpaceRepository{},
-		auth,
-	)
-
-	savedConfig := testhelpers.SavedConfiguration
-
-	assert.Contains(t, ui.Outputs[0], config.Target)
-	assert.Contains(t, ui.Outputs[2], "OK")
-	assert.Contains(t, ui.Prompts[0], "Password")
-
-	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
-	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
-	assert.Equal(t, auth.Email, "foo@example.com")
-	assert.Equal(t, auth.Password, "bar")
+func TestSuccessfullyLoggingInWithUsernameAndPasswordAsArguments(t *testing.T) {
+	testSuccessfulLogin(t, []string{"user@example.com", "password"}, []string{})
 }
 
 func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {

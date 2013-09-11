@@ -38,15 +38,22 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 func (l Login) Run(c *cli.Context) {
 	l.ui.Say("target: %s", term.Cyan(l.config.Target))
 
-	var email string
-	if len(c.Args()) > 0 {
-		email = c.Args()[0]
-	} else {
-		email = l.ui.Ask("Username%s", term.Cyan(">"))
+	var (
+		email    string
+		password string
+	)
+
+	getArgOrPrompt := func(argNum int, prompt string) string {
+		if len(c.Args()) > argNum {
+			return c.Args()[argNum]
+		}
+		return l.ui.Ask("%s%s", prompt, term.Cyan(">"))
 	}
 
+	email = getArgOrPrompt(0, "Username")
+
 	for i := 0; i < maxLoginTries; i++ {
-		password := l.ui.AskForPassword("Password%s", term.Cyan(">"))
+		password = getArgOrPrompt(1, "Password")
 		l.ui.Say("Authenticating...")
 
 		err := l.authenticator.Authenticate(email, password)
