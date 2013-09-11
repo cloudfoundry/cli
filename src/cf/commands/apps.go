@@ -29,7 +29,7 @@ func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (
 }
 
 func (a Apps) Run(c *cli.Context) {
-	a.ui.Say("Getting applications in %s", a.spaceRepo.GetCurrentSpace().Name)
+	a.ui.Say("Getting applications in %s...", a.spaceRepo.GetCurrentSpace().Name)
 
 	space, err := a.spaceRepo.GetSummary()
 

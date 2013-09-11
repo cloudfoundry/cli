@@ -2,9 +2,11 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/terminal"
 	"encoding/base64"
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -50,7 +52,8 @@ func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *Api
 	updatedToken = uaa.config.AccessToken
 
 	if apiErr != nil && apiErr.StatusCode == 401 {
-		apiErr.Message = "Session expired, please login."
+		fmt.Printf("Not logged in. Use '%s' to log in.\n\n", terminal.Yellow("cf login"))
+		os.Exit(1)
 	}
 
 	return
