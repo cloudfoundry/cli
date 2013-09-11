@@ -165,6 +165,13 @@ func (f Factory) NewUnbindService() *UnbindService {
 	)
 }
 
+func (f Factory) NewListOrganizations() ListOrganizations {
+	return NewListOrganizations(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
 func (f Factory) NewCreateOrganization() CreateOrganization {
 	return NewCreateOrganization(
 		f.ui,

@@ -1,14 +1,10 @@
 package commands
 
 import (
-	/*	"cf"*/
 	"cf/api"
 	"cf/requirements"
 	term "cf/terminal"
-	/*	"errors"
-		"fmt"*/
 	"github.com/codegangsta/cli"
-	/*	"strings"*/
 )
 
 type CreateOrganization struct {

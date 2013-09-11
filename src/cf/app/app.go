@@ -292,6 +292,16 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "orgs",
+			ShortName:   "o",
+			Description: "List all organizations",
+			Usage: "cf orgs",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewListOrganizations()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create organization",
