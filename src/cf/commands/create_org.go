@@ -8,7 +8,7 @@ import (
 )
 
 type CreateOrganization struct {
-	ui term.UI
+	ui      term.UI
 	orgRepo api.OrganizationRepository
 }
 

@@ -30,3 +30,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 	return repo.OrganizationByName, apiErr
 }
 
+func (repo FakeOrgRepository) Create(name string) (createdOrg cf.Organization, apiErr *api.ApiError) {
+	repo.OrganizationName = name
+	return
+}

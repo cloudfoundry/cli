@@ -13,24 +13,27 @@ func TestOrgs(t *testing.T) {
 		cf.Organization{Name: "Organization-1"},
 		cf.Organization{Name: "Organization-2"},
 	}
+	orgRepo := &testhelpers.FakeOrgRepository{
+		Organizations: orgs,
+	}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 
-	ui := callOrgs(reqFactory)
+	ui := callOrgs(orgRepo, reqFactory)
 
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
 	assert.Contains(t, ui.Outputs[0], "Getting organizations")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "Name")
+	assert.Contains(t, ui.Outputs[2], "name")
 	assert.Contains(t, ui.Outputs[3], "Organization-1")
 	assert.Contains(t, ui.Outputs[4], "Organization-2")
 }
 
-func callOrgs(reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
+func callOrgs(orgRepo *testhelpers.FakeOrgRepository, reqFactory *testhelpers.FakeReqFactory) (fakeUI *testhelpers.FakeUI) {
+	fakeUI = &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("orgs", []string{})
-	cmd := NewCreateOrganization(fakeUI)
+	cmd := NewListOrganizations(fakeUI, orgRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -23,7 +23,8 @@ func TestCreateOrganization(t *testing.T) {
 func callCreateOrganization(args []string) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("create-org", args)
-	cmd := NewCreateOrganization(fakeUI)
+	orgRepo := &testhelpers.FakeOrgRepository{}
+	cmd := NewCreateOrganization(fakeUI, orgRepo)
 	reqFactory := &testhelpers.FakeReqFactory{}
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
