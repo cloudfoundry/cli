@@ -1,4 +1,4 @@
-Cloud Foundry CLI written in Go
+Cloud Foundry CLI written in Go [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 ===========
 
 Background
