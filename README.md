@@ -19,8 +19,7 @@ Development
 NOTE: Currently only development on OSX 10.8 is supported
 
 1. Install Go ```brew install go --cross-compile-common```
-1. Setup `$GOLANG` env variable and add `$GOLANG/bin` to `$PATH`
-1. Fork and clone: `git clone https://github.com/cloudfoundry/cli.git $GOPATH/src/github.com/cloudfoundry/cli`
+1. Fork and clone.
 1. Run ```git submodule update --init --recursive```
 1. Write a test.
 1. Run ``` bin/test ``` and watch test fail.
