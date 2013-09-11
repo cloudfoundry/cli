@@ -21,6 +21,7 @@ type FakeApplicationRepository struct {
 	AppName      string
 	AppByName    cf.Application
 	AppByNameErr bool
+	AppByNameAuthErr bool
 
 	SetEnvApp   cf.Application
 	SetEnvName  string
@@ -39,6 +40,9 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 	repo.AppName = name
 	if repo.AppByNameErr {
 		apiErr = api.NewApiErrorWithMessage("Error finding app by name.")
+	}
+	if repo.AppByNameAuthErr {
+		apiErr = api.NewApiError("Authentication failed.", "1000", 401)
 	}
 	return repo.AppByName, apiErr
 }

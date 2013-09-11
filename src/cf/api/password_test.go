@@ -3,6 +3,7 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
+	"encoding/base64"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -75,8 +76,11 @@ func TestUpdatePassword(t *testing.T) {
 	targetServer := createInfoServer(passwordUpdateServer.URL)
 	defer targetServer.Close()
 
+	tokenInfo := `{"user_id":"my-user-guid"}`
+	encodedTokenInfo := base64.StdEncoding.EncodeToString([]byte(tokenInfo))
+
 	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
+		AccessToken: fmt.Sprintf("BEARER my_access_token.%s.baz", encodedTokenInfo),
 		Target:      targetServer.URL,
 	}
 	client := NewApiClient(&testhelpers.FakeAuthenticator{})
@@ -90,7 +94,7 @@ func TestUpdatePassword(t *testing.T) {
 func createInfoServer(tokenEndpoint string) *httptest.Server {
 	targetInfoResponse := testhelpers.TestResponse{
 		Status: http.StatusOK,
-		Body:   fmt.Sprintf(`{"token_endpoint": "%s", "user": "my-user-guid"}`, tokenEndpoint),
+		Body:   fmt.Sprintf(`{"token_endpoint": "%s"}`, tokenEndpoint),
 	}
 	targetInfoEndpoint := testhelpers.CreateEndpoint("GET", "/info", nil, targetInfoResponse)
 

@@ -44,7 +44,7 @@ var CreateEndpoint = func(method string, path string, customMatcher RequestMatch
 		}
 
 		acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-		authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
+		authMatches := strings.HasPrefix(request.Header.Get("authorization"), "BEARER my_access_token")
 		methodMatches := request.Method == method
 		customMatcherMatches := customMatcher(request)
 

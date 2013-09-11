@@ -5,9 +5,11 @@ import (
 	. "cf/api"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"runtime"
+	"strings"
 	"testhelpers"
 	"testing"
 )
@@ -60,7 +62,10 @@ func TestPerformRequestAndParseResponseOutputsErrorFromCloudController(t *testin
 
 var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusBadRequest)
-	jsonResponse := `{ "error": "invalid_token", "error_description": "The token is invalid..." }`
+	jsonResponse := fmt.Sprintf(
+		`{ "error": "%s", "error_description": "The token is invalid..." }`,
+		UAA_INVALID_TOKEN_CODE,
+	)
 	fmt.Fprintln(writer, jsonResponse)
 }
 
@@ -76,7 +81,7 @@ func TestPerformRequestOutputsErrorFromUAA(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "The token is invalid")
-	assert.Contains(t, err.ErrorCode, "invalid_token")
+	assert.Contains(t, err.ErrorCode, UAA_INVALID_TOKEN_CODE)
 }
 
 func TestPerformRequestAndParseResponseOutputsErrorFromUAA(t *testing.T) {
@@ -178,21 +183,35 @@ Server: Apache-Coyote/1.1
 	assert.Equal(t, Sanitize(response), expected)
 }
 
-var refreshTokenApiEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	var jsonResponse string
+var refreshTokenApiEndPoint = func(unauthorizedBody string) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		var jsonResponse string
 
-	switch request.Header.Get("Authorization") {
-	case "bearer initial-access-token":
-		writer.WriteHeader(http.StatusUnauthorized)
-		jsonResponse = `{ "code": 1000, "description": "Auth token is invalid" }`
-	case "bearer new-access-token":
-		writer.WriteHeader(http.StatusOK)
-	default:
-		writer.WriteHeader(http.StatusInternalServerError)
+		bodyBytes, err := ioutil.ReadAll(request.Body)
+		if err != nil || string(bodyBytes) != "expected body" {
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		switch request.Header.Get("Authorization") {
+		case "bearer initial-access-token":
+			writer.WriteHeader(http.StatusUnauthorized)
+			jsonResponse = unauthorizedBody
+		case "bearer new-access-token":
+			writer.WriteHeader(http.StatusOK)
+		default:
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
+
+		fmt.Fprintln(writer, jsonResponse)
 	}
-
-	fmt.Fprintln(writer, jsonResponse)
 }
+
+var refreshTokenCloudControllerApiEndpoint = refreshTokenApiEndPoint(`{ "code": 1000, "description": "Auth token is invalid" }`)
+var refreshTokenUAAApiEndpoint = refreshTokenApiEndPoint(fmt.Sprintf(
+	`{ "error": "%s", "error_description": "Auth token is invalid" }`,
+	UAA_INVALID_TOKEN_CODE,
+))
 
 var refreshTokenAuthEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 	jsonResponse := `
@@ -204,27 +223,41 @@ var refreshTokenAuthEndpoint = func(writer http.ResponseWriter, request *http.Re
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-func TestRefreshingTheToken(t *testing.T) {
-	ccServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenApiEndpoint))
+func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
+	ccServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenCloudControllerApiEndpoint))
 	defer ccServer.Close()
 
 	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
 	defer authServer.Close()
 
+	testRefreshToken(t, ccServer, authServer)
+}
+
+func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
+	uaaServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenUAAApiEndpoint))
+	defer uaaServer.Close()
+
+	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
+	defer authServer.Close()
+
+	testRefreshToken(t, uaaServer, authServer)
+}
+
+func testRefreshToken(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
 	config, err := configRepo.Get()
 	assert.NoError(t, err)
 
 	config.AuthorizationEndpoint = authServer.URL
-	config.Target = ccServer.URL
+	config.Target = apiServer.URL
 	config.AccessToken = "bearer initial-access-token"
 	config.RefreshToken = "initial-refresh-token"
 
 	auth := NewUAAAuthenticator(configRepo)
 	client := NewApiClient(auth)
 
-	request, err := NewRequest("GET", config.Target+"/v2/foo", config.AccessToken, nil)
+	request, err := NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
 	assert.NoError(t, err)
 	err = client.PerformRequest(request)
 	assert.NoError(t, err)

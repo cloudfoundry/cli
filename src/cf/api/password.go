@@ -68,7 +68,7 @@ func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new str
 		return
 	}
 
-	path := fmt.Sprintf("%s/Users/%s/password", infoResponse.TokenEndpoint, infoResponse.UserGuid)
+	path := fmt.Sprintf("%s/Users/%s/password", infoResponse.TokenEndpoint, repo.config.UserGuid())
 	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
 	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiErr != nil {

@@ -89,6 +89,7 @@ func (f Factory) NewPassword() Password {
 	return NewPassword(
 		f.ui,
 		f.repoLocator.GetPasswordRepository(),
+		f.repoLocator.GetConfigurationRepository(),
 	)
 }
 

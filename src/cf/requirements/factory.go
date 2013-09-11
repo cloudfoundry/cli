@@ -13,6 +13,7 @@ type Factory interface {
 	NewApplicationRequirement(name string) ApplicationRequirement
 	NewServiceInstanceRequirement(name string) ServiceInstanceRequirement
 	NewLoginRequirement() Requirement
+	NewValidAccessTokenRequirement() Requirement
 	NewSpaceRequirement() Requirement
 }
 
@@ -47,6 +48,12 @@ func (f ApiRequirementFactory) NewLoginRequirement() Requirement {
 	return NewLoginRequirement(
 		f.ui,
 		f.repoLocator.GetConfig(),
+	)
+}
+func (f ApiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
+	return NewValidAccessTokenRequirement(
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
 	)
 }
 

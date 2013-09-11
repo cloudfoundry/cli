@@ -13,6 +13,7 @@ type FakeReqFactory struct {
 	ServiceInstance     cf.ServiceInstance
 
 	LoginSuccess bool
+	ValidAccessTokenSuccess bool
 	SpaceSuccess bool
 }
 
@@ -28,6 +29,10 @@ func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
 	return FakeRequirement{ f, f.LoginSuccess }
+}
+
+func (f *FakeReqFactory) NewValidAccessTokenRequirement() requirements.Requirement {
+	return FakeRequirement{ f, f.ValidAccessTokenSuccess }
 }
 
 func (f *FakeReqFactory) NewSpaceRequirement() requirements.Requirement {

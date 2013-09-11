@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"cf"
 	term "cf/terminal"
 	"crypto/tls"
@@ -17,7 +18,10 @@ import (
 	"strings"
 )
 
-const PRIVATE_DATA_PLACEHOLDER = "[PRIVATE DATA HIDDEN]"
+const (
+	PRIVATE_DATA_PLACEHOLDER = "[PRIVATE DATA HIDDEN]"
+	UAA_INVALID_TOKEN_CODE   = "invalid_token"
+)
 
 type Request struct {
 	*http.Request
@@ -132,16 +136,24 @@ func (c ApiClient) PerformRequestForTextResponse(request *Request) (response str
 }
 
 func (c ApiClient) doRequestHandlingAuth(request *Request) (response *http.Response, apiErr *ApiError) {
+	var bodyBytes []byte
+	if request.Body != nil {
+		bodyBytes, _ = ioutil.ReadAll(request.Body)
+		request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
+	}
 	response, apiErr = doRequest(request.Request)
 
 	if apiErr != nil && response == nil {
 		return
 	}
 
-	if response.StatusCode == http.StatusUnauthorized && apiErr.ErrorCode == "1000" {
+	if response.StatusCode == http.StatusUnauthorized && (apiErr.ErrorCode == "1000" || apiErr.ErrorCode == UAA_INVALID_TOKEN_CODE) {
 		newToken, apiErr := c.authenticator.RefreshAuthToken()
 		if apiErr == nil {
 			request.Header.Set("Authorization", newToken)
+			if len(bodyBytes) > 0 {
+				request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
+			}
 			return doRequest(request.Request)
 		}
 	}
