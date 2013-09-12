@@ -32,7 +32,7 @@ func (cmd *Files) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
-		reqFactory.NewSpaceRequirement(),
+		reqFactory.NewTargetedSpaceRequirement(),
 		cmd.appReq,
 	}
 	return

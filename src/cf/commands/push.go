@@ -36,7 +36,7 @@ func NewPush(ui term.UI, starter ApplicationStarter, zipper cf.Zipper,
 func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
-		reqFactory.NewSpaceRequirement(),
+		reqFactory.NewTargetedSpaceRequirement(),
 	}
 	return
 }

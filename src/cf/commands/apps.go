@@ -23,7 +23,7 @@ func NewApps(ui term.UI, spaceRepo api.SpaceRepository) (a Apps) {
 func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
-		reqFactory.NewSpaceRequirement(),
+		reqFactory.NewTargetedSpaceRequirement(),
 	}
 	return
 }

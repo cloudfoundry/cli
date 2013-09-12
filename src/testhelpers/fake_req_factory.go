@@ -36,7 +36,7 @@ func (f *FakeReqFactory) NewValidAccessTokenRequirement() requirements.Requireme
 	return FakeRequirement{ f, f.ValidAccessTokenSuccess }
 }
 
-func (f *FakeReqFactory) NewSpaceRequirement() requirements.Requirement {
+func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {
 	return FakeRequirement{ f, f.SpaceSuccess }
 }
 

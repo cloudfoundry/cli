@@ -6,16 +6,16 @@ import (
 	"fmt"
 )
 
-type SpaceRequirement struct {
+type TargetedSpaceRequirement struct {
 	ui     terminal.UI
 	config *configuration.Configuration
 }
 
-func NewSpaceRequirement(ui terminal.UI, config *configuration.Configuration) SpaceRequirement {
-	return SpaceRequirement{ui, config}
+func NewTargetedSpaceRequirement(ui terminal.UI, config *configuration.Configuration) TargetedSpaceRequirement {
+	return TargetedSpaceRequirement{ui, config}
 }
 
-func (req SpaceRequirement) Execute() (success bool) {
+func (req TargetedSpaceRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org and space targeted. See '%s' to target an org and space.",
 			terminal.CommandColor("cf target --o ORGNAME --s SPACENAME"))
