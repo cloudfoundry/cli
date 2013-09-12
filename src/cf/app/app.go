@@ -119,6 +119,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "create-space",
+			Description: "Create a space",
+			Usage:       "cf create-space spacename",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewCreateSpace()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "delete",
 			ShortName:   "d",
 			Description: "Delete an application",

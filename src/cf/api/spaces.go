@@ -12,6 +12,7 @@ type SpaceRepository interface {
 	FindAll() (spaces []cf.Space, apiErr *ApiError)
 	FindByName(name string) (space cf.Space, apiErr *ApiError)
 	GetSummary() (space cf.Space, apiErr *ApiError)
+	Create(name string) (apiErr *ApiError)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -88,6 +89,19 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr 
 
 	space = cf.Space{Name: response.Name, Guid: response.Guid, Applications: applications, ServiceInstances: serviceInstances}
 
+	return
+}
+
+func (repo CloudControllerSpaceRepository) Create(name string) (apiErr *ApiError) {
+	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
+	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
+
+	request, apiErr := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiErr != nil {
+		return
+	}
+
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }
 

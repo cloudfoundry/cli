@@ -244,3 +244,26 @@ func TestGetSummary(t *testing.T) {
 	assert.Equal(t, instance1.ApplicationNames[0], "app1")
 	assert.Equal(t, instance1.ApplicationNames[1], "app2")
 }
+
+var createSpaceEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/spaces",
+	testhelpers.RequestBodyMatcher(`{"name":"space-name","organization_guid":"org-guid"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestCreateSpace(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(createSpaceEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken:  "BEARER my_access_token",
+		Target:       ts.URL,
+		Organization: cf.Organization{Guid: "org-guid"},
+	}
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
+
+	err := repo.Create("space-name")
+	assert.NoError(t, err)
+}
