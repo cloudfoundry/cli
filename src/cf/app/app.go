@@ -89,6 +89,16 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "create-org",
+			ShortName:   "co",
+			Description: "Create organization",
+			Usage:       "cf create-org <organization name>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewCreateOrganization()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "create-service",
 			ShortName:   "cs",
 			Description: "Create service instance",
@@ -158,6 +168,16 @@ OPTIONS:
 			Usage:       "cf logout",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewLogout()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "orgs",
+			ShortName:   "o",
+			Description: "List all organizations",
+			Usage:       "cf orgs",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewListOrganizations()
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -288,26 +308,6 @@ OPTIONS:
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewUnbindService()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "orgs",
-			ShortName:   "o",
-			Description: "List all organizations",
-			Usage:       "cf orgs",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewListOrganizations()
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
-			Name:        "create-org",
-			ShortName:   "co",
-			Description: "Create organization",
-			Usage:       "cf create-org <organization name>",
-			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateOrganization()
 				cmdRunner.Run(cmd, c)
 			},
 		},
