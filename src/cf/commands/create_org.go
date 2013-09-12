@@ -24,10 +24,6 @@ func (cmd CreateOrganization) GetRequirements(reqFactory requirements.Factory, c
 
 func (cmd CreateOrganization) Run(c *cli.Context) {
 	name := c.String("name")
-	cmd.createOrganization(name)
-}
-
-func (cmd CreateOrganization) createOrganization(name string) {
 	cmd.ui.Say("Creating organization %s", term.Cyan(name))
 	_, apiErr := cmd.orgRepo.Create(name)
 	if apiErr != nil {
