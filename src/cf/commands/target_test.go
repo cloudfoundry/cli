@@ -163,7 +163,10 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 
 // End test with space option
 
-func callTarget(args []string, reqFactory *testhelpers.FakeReqFactory, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (ui *testhelpers.FakeUI) {
+func callTarget(args []string, reqFactory *testhelpers.FakeReqFactory,
+	configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository,
+	spaceRepo api.SpaceRepository) (ui *testhelpers.FakeUI) {
+
 	ui = new(testhelpers.FakeUI)
 	cmd := NewTarget(ui, configRepo, orgRepo, spaceRepo)
 	ctxt := testhelpers.NewContext("target", args)
