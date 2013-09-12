@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestOrgRequirement(t *testing.T) {
+func TestTargetedOrgRequirement(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
 	config := &configuration.Configuration{
 		Organization: cf.Organization{
@@ -18,13 +18,13 @@ func TestOrgRequirement(t *testing.T) {
 		},
 	}
 
-	req := NewOrgRequirement(ui, config)
+	req := NewTargetedOrgRequirement(ui, config)
 	success := req.Execute()
 	assert.True(t, success)
 
 	config.Organization = cf.Organization{}
 
-	req = NewOrgRequirement(ui, config)
+	req = NewTargetedOrgRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "FAILED")

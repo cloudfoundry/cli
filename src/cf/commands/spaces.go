@@ -24,7 +24,7 @@ func NewSpaces(ui term.UI, config *configuration.Configuration, spaceRepo api.Sp
 func (cmd Spaces) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
-		reqFactory.NewOrgRequirement(),
+		reqFactory.NewTargetedOrgRequirement(),
 	}
 	return
 }

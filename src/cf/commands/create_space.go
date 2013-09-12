@@ -28,7 +28,7 @@ func (cmd CreateSpace) GetRequirements(reqFactory requirements.Factory, c *cli.C
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
-		reqFactory.NewOrgRequirement(),
+		reqFactory.NewTargetedOrgRequirement(),
 	}
 	return
 }

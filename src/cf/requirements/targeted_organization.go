@@ -6,16 +6,16 @@ import (
 	"fmt"
 )
 
-type OrgRequirement struct {
+type TargetedOrgRequirement struct {
 	ui     terminal.UI
 	config *configuration.Configuration
 }
 
-func NewOrgRequirement(ui terminal.UI, config *configuration.Configuration) OrgRequirement {
-	return OrgRequirement{ui, config}
+func NewTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
+	return TargetedOrgRequirement{ui, config}
 }
 
-func (req OrgRequirement) Execute() (success bool) {
+func (req TargetedOrgRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org targeted. See '%s' to target an org.",
 			terminal.CommandColor("cf target --o ORGNAME"))
