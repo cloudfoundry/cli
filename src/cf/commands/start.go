@@ -53,11 +53,11 @@ func (s *Start) Run(c *cli.Context) {
 
 func (s *Start) ApplicationStart(app cf.Application) {
 	if app.State == "started" {
-		s.ui.Say(term.Magenta("Application " + app.Name + " is already started."))
+		s.ui.Say(term.WarningColor("Application " + app.Name + " is already started."))
 		return
 	}
 
-	s.ui.Say("Starting %s...", term.Cyan(app.Name))
+	s.ui.Say("Starting %s...", term.EntityNameColor(app.Name))
 
 	apiErr := s.appRepo.Start(app)
 	if apiErr != nil {

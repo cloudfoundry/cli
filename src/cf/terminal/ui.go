@@ -12,7 +12,7 @@ import (
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf("Not logged in. Use '%s' to log in.\n\n", Yellow("cf login"))
+	return fmt.Sprintf("Not logged in. Use '%s' to log in.\n\n", CommandColor("cf login"))
 }
 
 type UI interface {
@@ -44,11 +44,11 @@ func (c TerminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 }
 
 func (c TerminalUI) Ok() {
-	c.Say(Green("OK"))
+	c.Say(SuccessColor("OK"))
 }
 
 func (c TerminalUI) Failed(message string) {
-	c.Say(Red("FAILED"))
+	c.Say(FailureColor("FAILED"))
 	c.Say(message)
 
 	return
@@ -63,21 +63,21 @@ func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 
 func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
 	ui.Say("API endpoint: %s (API version: %s)",
-		Yellow(config.Target),
-		Yellow(config.ApiVersion))
+		EntityNameColor(config.Target),
+		EntityNameColor(config.ApiVersion))
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out. Use '%s' to login.", Yellow("cf login USERNAME"))
+		ui.Say("Logged out. Use '%s' to login.", CommandColor("cf login USERNAME"))
 	} else {
-		ui.Say("user:            %s", Yellow(config.UserEmail()))
+		ui.Say("user:            %s", EntityNameColor(config.UserEmail()))
 	}
 
 	if config.HasOrganization() {
-		ui.Say("org:             %s", Yellow(config.Organization.Name))
+		ui.Say("org:             %s", EntityNameColor(config.Organization.Name))
 	}
 
 	if config.HasSpace() {
-		ui.Say("app space:       %s", Yellow(config.Space.Name))
+		ui.Say("app space:       %s", EntityNameColor(config.Space.Name))
 	}
 }
 
@@ -118,10 +118,10 @@ func (ui TerminalUI) DisplayTable(table [][]string, coloringFunc ColoringFunctio
 func DefaultColoringFunc(value string, row int, col int) string {
 	switch {
 	case row == 0:
-		return White(value)
+		return HeaderColor(value)
 	case col == 0 && row > 0:
-		return Cyan(value)
+		return TableContentHeaderColor(value)
 	}
 
-	return Grey(value)
+	return TableContentColor(value)
 }

@@ -54,7 +54,7 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 
 	for _, param := range strings.Split(params, ",") {
 		param = strings.Trim(param, " ")
-		paramsMap[param] = cmd.ui.Ask("%s%s", param, term.Cyan(">"))
+		paramsMap[param] = cmd.ui.Ask("%s%s", param, term.PromptColor(">"))
 	}
 
 	cmd.ui.Say("Creating service...")
@@ -87,7 +87,7 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 		return
 	}
 
-	cmd.ui.Say("Creating service %s", term.Cyan(name))
+	cmd.ui.Say("Creating service %s", term.EntityNameColor(name))
 	apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

@@ -35,7 +35,7 @@ func (cmd CreateSpace) GetRequirements(reqFactory requirements.Factory, c *cli.C
 
 func (cmd CreateSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
-	cmd.ui.Say("Creating space %s...", term.Yellow(spaceName))
+	cmd.ui.Say("Creating space %s...", term.EntityNameColor(spaceName))
 
 	err := cmd.spaceRepo.Create(spaceName)
 	if err != nil {

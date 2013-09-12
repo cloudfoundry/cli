@@ -29,9 +29,9 @@ func (cmd Password) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 }
 
 func (cmd Password) Run(c *cli.Context) {
-	oldPassword := cmd.ui.AskForPassword("Current Password%s", term.Cyan(">"))
-	newPassword := cmd.ui.AskForPassword("New Password%s", term.Cyan(">"))
-	verifiedPassword := cmd.ui.AskForPassword("Verify Password%s", term.Cyan(">"))
+	oldPassword := cmd.ui.AskForPassword("Current Password%s", term.PromptColor(">"))
+	newPassword := cmd.ui.AskForPassword("New Password%s", term.PromptColor(">"))
+	verifiedPassword := cmd.ui.AskForPassword("Verify Password%s", term.PromptColor(">"))
 
 	if verifiedPassword != newPassword {
 		cmd.ui.Failed("Password verification does not match")

@@ -43,7 +43,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Binding service %s to %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
+	cmd.ui.Say("Binding service %s to %s...", term.EntityNameColor(instance.Name), term.EntityNameColor(app.Name))
 
 	apiErr := cmd.serviceRepo.BindService(instance, app)
 	if apiErr != nil && apiErr.ErrorCode != "90003" {
@@ -54,6 +54,6 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if apiErr != nil && apiErr.ErrorCode == "90003" {
-		cmd.ui.Say("App %s is already bound to %s.", term.Cyan(app.Name), term.Cyan(instance.Name))
+		cmd.ui.Say("App %s is already bound to %s.", term.EntityNameColor(app.Name), term.EntityNameColor(instance.Name))
 	}
 }

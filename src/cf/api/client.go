@@ -178,7 +178,7 @@ func doRequest(request *http.Request) (response *http.Response, apiError *ApiErr
 		if err != nil {
 			fmt.Println("Error dumping request")
 		} else {
-			fmt.Printf("\n%s\n%s\n", term.Cyan("REQUEST:"), Sanitize(string(dumpedRequest)))
+			fmt.Printf("\n%s\n%s\n", term.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
 		}
 	}
 
@@ -194,7 +194,7 @@ func doRequest(request *http.Request) (response *http.Response, apiError *ApiErr
 		if err != nil {
 			fmt.Println("Error dumping response")
 		} else {
-			fmt.Printf("\n%s\n%s\n", term.Cyan("RESPONSE:"), Sanitize(string(dumpedResponse)))
+			fmt.Printf("\n%s\n%s\n", term.HeaderColor("RESPONSE:"), Sanitize(string(dumpedResponse)))
 		}
 	}
 

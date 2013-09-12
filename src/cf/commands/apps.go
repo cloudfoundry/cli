@@ -69,11 +69,11 @@ func (a Apps) coloringFunc(value string, row int, col int) string {
 func coloredState(state string) (colored string) {
 	switch state {
 	case "started":
-		colored = term.Green("running")
+		colored = term.SuccessColor("running")
 	case "stopped":
-		colored = term.Yellow("stopped")
+		colored = term.StoppedColor("stopped")
 	default:
-		colored = term.Red(state)
+		colored = term.FailureColor(state)
 	}
 
 	return

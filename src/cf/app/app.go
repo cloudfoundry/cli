@@ -50,8 +50,8 @@ OPTIONS:
 	if err != nil {
 		termUI.Failed(fmt.Sprintf(
 			"Error loading config. Please reset target (%s) and log in (%s).",
-			terminal.Yellow("cf target"),
-			terminal.Yellow("cf login"),
+			terminal.CommandColor("cf target"),
+			terminal.CommandColor("cf login"),
 		))
 		configRepo.Delete()
 		os.Exit(1)

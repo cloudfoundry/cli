@@ -18,13 +18,13 @@ func NewSpaceRequirement(ui terminal.UI, config *configuration.Configuration) Sp
 func (req SpaceRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org and space targeted. See '%s' to target an org and space.",
-			terminal.Yellow("cf target --o ORGNAME --s SPACENAME"))
+			terminal.CommandColor("cf target --o ORGNAME --s SPACENAME"))
 		req.ui.Failed(message)
 		return false
 	}
 
 	if !req.config.HasSpace() {
-		message := fmt.Sprintf("No space targeted. Use '%s' to target a space.", terminal.Yellow("cf target -s"))
+		message := fmt.Sprintf("No space targeted. Use '%s' to target a space.", terminal.CommandColor("cf target -s"))
 		req.ui.Failed(message)
 		return false
 	}

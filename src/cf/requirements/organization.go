@@ -18,7 +18,7 @@ func NewOrgRequirement(ui terminal.UI, config *configuration.Configuration) OrgR
 func (req OrgRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org targeted. See '%s' to target an org.",
-			terminal.Yellow("cf target --o ORGNAME"))
+			terminal.CommandColor("cf target --o ORGNAME"))
 		req.ui.Failed(message)
 		return false
 	}

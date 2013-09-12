@@ -43,7 +43,7 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Unbinding service %s from %s...", term.Cyan(instance.Name), term.Cyan(app.Name))
+	cmd.ui.Say("Unbinding service %s from %s...", term.EntityNameColor(instance.Name), term.EntityNameColor(app.Name))
 
 	err := cmd.serviceRepo.UnbindService(instance, app)
 	if err != nil {

@@ -36,7 +36,7 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (l Login) Run(c *cli.Context) {
-	l.ui.Say("API endpoint: %s", term.Cyan(l.config.Target))
+	l.ui.Say("API endpoint: %s", term.EntityNameColor(l.config.Target))
 
 	var (
 		username string
@@ -46,14 +46,14 @@ func (l Login) Run(c *cli.Context) {
 	if len(c.Args()) > 0 {
 		username = c.Args()[0]
 	} else {
-		username = l.ui.Ask("Username%s", term.Cyan(">"))
+		username = l.ui.Ask("Username%s", term.PromptColor(">"))
 	}
 
 	for i := 0; i < maxLoginTries; i++ {
 		if len(c.Args()) > 1 {
 			password = c.Args()[1]
 		} else {
-			password = l.ui.AskForPassword("Password%s", term.Cyan(">"))
+			password = l.ui.AskForPassword("Password%s", term.PromptColor(">"))
 		}
 		l.ui.Say("Authenticating...")
 
@@ -66,7 +66,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.ui.Ok()
 
-		l.ui.Say("Use '%s' to view or set your target organization and space", term.Yellow("cf target"))
+		l.ui.Say("Use '%s' to view or set your target organization and space", term.CommandColor("cf target"))
 
 		return
 	}
@@ -81,7 +81,7 @@ func (l Login) targetOrganization(config *configuration.Configuration, organizat
 		selectedOrg = l.chooseOrg(organizations)
 	}
 
-	l.ui.Say("Targeting org %s...", term.Cyan(selectedOrg.Name))
+	l.ui.Say("Targeting org %s...", term.EntityNameColor(selectedOrg.Name))
 	err := l.saveOrg(config, selectedOrg)
 
 	if err == nil {
@@ -91,10 +91,10 @@ func (l Login) targetOrganization(config *configuration.Configuration, organizat
 
 func (l Login) chooseOrg(orgs []cf.Organization) (org cf.Organization) {
 	for i, org := range orgs {
-		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), org.Name)
+		l.ui.Say("%s: %s", term.SuccessColor(strconv.Itoa(i+1)), org.Name)
 	}
 
-	index, err := strconv.Atoi(l.ui.Ask("Organization%s", term.Cyan(">")))
+	index, err := strconv.Atoi(l.ui.Ask("Organization%s", term.PromptColor(">")))
 
 	if err != nil || index > len(orgs) {
 		l.ui.Failed("Invalid number")
@@ -121,7 +121,7 @@ func (l Login) targetSpace(config *configuration.Configuration, spaces []cf.Spac
 		l.saveSpace(config, spaces[0])
 	} else {
 		selectedSpace := l.chooseSpace(spaces)
-		l.ui.Say("Targeting space %s...", term.Cyan(selectedSpace.Name))
+		l.ui.Say("Targeting space %s...", term.EntityNameColor(selectedSpace.Name))
 		err := l.saveSpace(config, selectedSpace)
 
 		if err == nil {
@@ -132,10 +132,10 @@ func (l Login) targetSpace(config *configuration.Configuration, spaces []cf.Spac
 
 func (l Login) chooseSpace(spaces []cf.Space) (space cf.Space) {
 	for i, space := range spaces {
-		l.ui.Say("%s: %s", term.Green(strconv.Itoa(i+1)), space.Name)
+		l.ui.Say("%s: %s", term.SuccessColor(strconv.Itoa(i+1)), space.Name)
 	}
 
-	index, err := strconv.Atoi(l.ui.Ask("Space%s", term.Cyan(">")))
+	index, err := strconv.Atoi(l.ui.Ask("Space%s", term.PromptColor(">")))
 
 	if err != nil || index > len(spaces) {
 		l.ui.Failed("Invalid number")

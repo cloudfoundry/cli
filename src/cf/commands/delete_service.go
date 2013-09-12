@@ -42,7 +42,7 @@ func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cl
 
 func (cmd *DeleteService) Run(c *cli.Context) {
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
-	cmd.ui.Say("Deleting service %s...", term.Cyan(instance.Name))
+	cmd.ui.Say("Deleting service %s...", term.EntityNameColor(instance.Name))
 
 	err := cmd.serviceRepo.DeleteService(instance)
 	if err != nil {

@@ -39,11 +39,11 @@ func (s *Stop) Run(c *cli.Context) {
 	app := s.appReq.GetApplication()
 
 	if app.State == "stopped" {
-		s.ui.Say(term.Magenta("Application " + app.Name + " is already stopped."))
+		s.ui.Say(term.WarningColor("Application " + app.Name + " is already stopped."))
 		return
 	}
 
-	s.ui.Say("Stopping %s...", term.Cyan(app.Name))
+	s.ui.Say("Stopping %s...", term.EntityNameColor(app.Name))
 
 	err := s.appRepo.Stop(app)
 	if err != nil {

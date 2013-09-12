@@ -37,13 +37,13 @@ func (cmd Api) Run(c *cli.Context) {
 func (cmd Api) showApiEndpoint() {
 	cmd.ui.Say(
 		"API endpoint: %s (API version: %s)",
-		term.Yellow(cmd.config.Target),
-		term.Yellow(cmd.config.ApiVersion),
+		term.EntityNameColor(cmd.config.Target),
+		term.EntityNameColor(cmd.config.ApiVersion),
 	)
 }
 
 func (cmd Api) setNewApiEndpoint(endpoint string) {
-	cmd.ui.Say("Setting api endpoint to %s...", term.Yellow(endpoint))
+	cmd.ui.Say("Setting api endpoint to %s...", term.EntityNameColor(endpoint))
 
 	request, apiErr := api.NewRequest("GET", endpoint+"/v2/info", "", nil)
 
@@ -76,7 +76,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Ok()
 
 	if scheme == "http" {
-		cmd.ui.Say(term.Magenta("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
+		cmd.ui.Say(term.WarningColor("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
 	}
 
 	cmd.showApiEndpoint()

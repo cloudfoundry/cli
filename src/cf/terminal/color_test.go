@@ -7,7 +7,7 @@ import (
 
 func TestColorize(t *testing.T) {
 	text := "Hello World"
-	colorizedText := colorize(text, blue, true)
+	colorizedText := colorize(text, red, true)
 
-	assert.Equal(t, colorizedText, "\033[1;34mHello World\033[0m")
+	assert.Equal(t, colorizedText, "\033[1;31mHello World\033[0m")
 }
