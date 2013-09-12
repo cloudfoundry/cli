@@ -44,4 +44,5 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("\nTIP: Use '%s' to target new space.", term.CommandColor("cf target -s spacename"))
 }

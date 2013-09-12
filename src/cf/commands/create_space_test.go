@@ -45,6 +45,7 @@ func TestCreateSpace(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-space")
 	assert.Equal(t, spaceRepo.CreateSpaceName, "my-space")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[2], "TIP")
 }
 
 func callCreateSpace(args []string, reqFactory *testhelpers.FakeReqFactory, spaceRepo *testhelpers.FakeSpaceRepository) (ui *testhelpers.FakeUI) {
