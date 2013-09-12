@@ -16,7 +16,7 @@ func NewLoginRequirement(ui terminal.UI, config *configuration.Configuration) Lo
 
 func (req LoginRequirement) Execute() (success bool) {
 	if !req.config.IsLoggedIn() {
-		req.ui.Say("Not logged in. Use '%s' to log in.", terminal.Yellow("cf login"))
+		req.ui.Say(terminal.NotLoggedInText())
 		return false
 	}
 	return true

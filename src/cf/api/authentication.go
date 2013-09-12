@@ -52,7 +52,7 @@ func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *Api
 	updatedToken = uaa.config.AccessToken
 
 	if apiErr != nil && apiErr.StatusCode == 401 {
-		fmt.Printf("Not logged in. Use '%s' to log in.\n\n", terminal.Yellow("cf login"))
+		fmt.Printf("%s\n\n", terminal.NotLoggedInText())
 		os.Exit(1)
 	}
 

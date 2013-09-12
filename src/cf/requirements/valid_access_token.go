@@ -18,7 +18,7 @@ func (req ValidAccessTokenRequirement) Execute() (success bool) {
 	_, apiErr := req.appRepo.FindByName("checking_for_valid_access_token")
 
 	if apiErr != nil && apiErr.StatusCode == 401 {
-		req.ui.Say("Not logged in. Use '%s' to log in.", terminal.Yellow("cf login"))
+		req.ui.Say(terminal.NotLoggedInText())
 		return false
 	}
 

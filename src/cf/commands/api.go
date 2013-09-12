@@ -80,6 +80,8 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	}
 
 	cmd.showApiEndpoint()
+
+	cmd.ui.Say(term.NotLoggedInText())
 }
 
 func (cmd Api) saveEndpoint(endpoint string, info *InfoResponse) (err error) {

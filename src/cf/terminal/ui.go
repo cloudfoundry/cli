@@ -11,6 +11,10 @@ import (
 
 type ColoringFunction func(value string, row int, col int) string
 
+func NotLoggedInText() string {
+	return fmt.Sprintf("Not logged in. Use '%s' to log in.\n\n", Yellow("cf login"))
+}
+
 type UI interface {
 	Say(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)

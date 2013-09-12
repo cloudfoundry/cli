@@ -78,6 +78,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "Warning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.")
 	assert.Contains(t, ui.Outputs[3], ts.URL)
 	assert.Contains(t, ui.Outputs[3], "42.0.0")
+	assert.Contains(t, ui.Outputs[4], "Not logged in.")
 
 	savedConfig := testhelpers.SavedConfiguration
 
