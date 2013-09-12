@@ -135,6 +135,13 @@ func (f Factory) NewSetEnv() *SetEnv {
 	)
 }
 
+func (f Factory) NewSpaces() Spaces {
+	return NewSpaces(
+		f.ui,
+		f.repoLocator.GetSpaceRepository(),
+	)
+}
+
 func (f Factory) NewStacks() *Stacks {
 	return NewStacks(
 		f.ui,

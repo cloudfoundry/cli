@@ -244,6 +244,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "spaces",
+			Description: "List all spaces in an organization",
+			Usage:       "cf spaces",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewSpaces()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "stacks",
 			Description: "List all stacks",
 			Usage:       "cf stacks",

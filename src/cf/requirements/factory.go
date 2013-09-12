@@ -15,6 +15,7 @@ type Factory interface {
 	NewLoginRequirement() Requirement
 	NewValidAccessTokenRequirement() Requirement
 	NewSpaceRequirement() Requirement
+	NewOrgRequirement() Requirement
 }
 
 type ApiRequirementFactory struct {
@@ -59,6 +60,13 @@ func (f ApiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
 
 func (f ApiRequirementFactory) NewSpaceRequirement() Requirement {
 	return NewSpaceRequirement(
+		f.ui,
+		f.repoLocator.GetConfig(),
+	)
+}
+
+func (f ApiRequirementFactory) NewOrgRequirement() Requirement {
+	return NewOrgRequirement(
 		f.ui,
 		f.repoLocator.GetConfig(),
 	)
