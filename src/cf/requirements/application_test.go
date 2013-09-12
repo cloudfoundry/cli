@@ -2,7 +2,6 @@ package requirements_test
 
 import (
 	"cf"
-	"cf/configuration"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
@@ -12,10 +11,9 @@ import (
 func TestApplicationReqExecute(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
-	config := &configuration.Configuration{}
 	ui := new(testhelpers.FakeUI)
 
-	appReq := NewApplicationRequirement("foo", ui, config, appRepo)
+	appReq := NewApplicationRequirement("foo", ui, appRepo)
 	success := appReq.Execute()
 
 	assert.True(t, success)

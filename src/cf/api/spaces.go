@@ -13,6 +13,7 @@ type SpaceRepository interface {
 	FindByName(name string) (space cf.Space, apiErr *ApiError)
 	GetSummary() (space cf.Space, apiErr *ApiError)
 	Create(name string) (apiErr *ApiError)
+	Rename(space cf.Space, newName string) (apiErr *ApiError)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -97,6 +98,19 @@ func (repo CloudControllerSpaceRepository) Create(name string) (apiErr *ApiError
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
 
 	request, apiErr := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiErr != nil {
+		return
+	}
+
+	apiErr = repo.apiClient.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiErr *ApiError) {
+	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
+	body := fmt.Sprintf(`{"name":"%s"}`, newName)
+
+	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiErr != nil {
 		return
 	}

@@ -17,6 +17,9 @@ type FakeSpaceRepository struct {
 	SummarySpace cf.Space
 
 	CreateSpaceName string
+
+	RenameSpace cf.Space
+	RenameNewName string
 }
 
 func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
@@ -42,5 +45,11 @@ func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiErr *api.ApiEr
 
 func (repo *FakeSpaceRepository) Create(name string) (apiErr *api.ApiError) {
 	repo.CreateSpaceName = name
+	return
+}
+
+func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiErr *api.ApiError) {
+	repo.RenameSpace = space
+	repo.RenameNewName = newName
 	return
 }

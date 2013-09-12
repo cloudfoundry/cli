@@ -121,6 +121,13 @@ func (f Factory) NewPush() Push {
 	)
 }
 
+func (f Factory) NewRenameSpace() *RenameSpace {
+	return NewRenameSpace(
+		f.ui,
+		f.repoLocator.GetSpaceRepository(),
+	)
+}
+
 func (f Factory) NewRoutes() *Routes {
 	return NewRoutes(
 		f.ui,

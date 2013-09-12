@@ -267,3 +267,26 @@ func TestCreateSpace(t *testing.T) {
 	err := repo.Create("space-name")
 	assert.NoError(t, err)
 }
+
+var renameSpaceEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/spaces/my-space-guid",
+	testhelpers.RequestBodyMatcher(`{"name":"new-space-name"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestRenameSpace(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(renameSpaceEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
+
+	space := cf.Space{Guid: "my-space-guid"}
+	err := repo.Rename(space, "new-space-name")
+	assert.NoError(t, err)
+}

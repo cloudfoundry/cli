@@ -214,6 +214,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "rename-space",
+			Description: "Rename a space",
+			Usage:       "cf rename-space <current-space-name> <new-space-name>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewRenameSpace()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "routes",
 			ShortName:   "r",
 			Description: "List all routes",

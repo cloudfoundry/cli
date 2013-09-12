@@ -16,6 +16,9 @@ type FakeReqFactory struct {
 	ValidAccessTokenSuccess bool
 	TargetedSpaceSuccess bool
 	TargetedOrgSuccess bool
+
+	SpaceName string
+	Space cf.Space
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -44,6 +47,11 @@ func (f *FakeReqFactory) NewTargetedOrgRequirement() requirements.Requirement {
 	return FakeRequirement{ f, f.TargetedOrgSuccess }
 }
 
+func (f *FakeReqFactory) NewSpaceRequirement(name string) requirements.SpaceRequirement {
+	f.SpaceName = name
+	return FakeRequirement{ f, true }
+}
+
 type FakeRequirement struct {
 	factory *FakeReqFactory
 	success bool
@@ -59,4 +67,8 @@ func (r FakeRequirement) GetApplication() cf.Application {
 
 func (r FakeRequirement) GetServiceInstance() cf.ServiceInstance {
 	return r.factory.ServiceInstance
+}
+
+func (r FakeRequirement) GetSpace() cf.Space {
+	return r.factory.Space
 }
