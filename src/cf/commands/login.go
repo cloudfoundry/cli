@@ -39,14 +39,14 @@ func (l Login) Run(c *cli.Context) {
 	l.ui.Say("target: %s", term.Cyan(l.config.Target))
 
 	var (
-		email    string
+		username string
 		password string
 	)
 
 	if len(c.Args()) > 0 {
-		email = c.Args()[0]
+		username = c.Args()[0]
 	} else {
-		email = l.ui.Ask("Username%s", term.Cyan(">"))
+		username = l.ui.Ask("Username%s", term.Cyan(">"))
 	}
 
 	for i := 0; i < maxLoginTries; i++ {
@@ -57,7 +57,7 @@ func (l Login) Run(c *cli.Context) {
 		}
 		l.ui.Say("Authenticating...")
 
-		err := l.authenticator.Authenticate(email, password)
+		err := l.authenticator.Authenticate(username, password)
 
 		if err != nil {
 			l.ui.Failed(err.Error())
