@@ -276,7 +276,7 @@ OPTIONS:
 			Name:        "target",
 			ShortName:   "t",
 			Description: "Set or view the target",
-			Usage:       "cf target <target> --o <organization> --s <space>",
+			Usage:       "cf target [--o <organization>] [--s <space>]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"o", "", "organization"},
 				cli.StringFlag{"s", "", "space"},
