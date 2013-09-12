@@ -21,7 +21,7 @@ func TestApps(t *testing.T) {
 		SummarySpace: cf.Space{Applications: apps},
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 	ui := callApps(spaceRepo, reqFactory)
 
@@ -42,7 +42,7 @@ func TestApps(t *testing.T) {
 
 func TestAppsRequiresLogin(t *testing.T) {
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, SpaceSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 
 	callApps(spaceRepo, reqFactory)
 
@@ -51,7 +51,7 @@ func TestAppsRequiresLogin(t *testing.T) {
 
 func TestAppsRequiresASelectedSpaceAndOrg(t *testing.T) {
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: false}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 
 	callApps(spaceRepo, reqFactory)
 

@@ -31,17 +31,17 @@ func TestPushingRequirements(t *testing.T) {
 	cmd := NewPush(fakeUI, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 	ctxt := testhelpers.NewContext("push", []string{})
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, SpaceSuccess: true}
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
 	testhelpers.CommandDidPassRequirements = true
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: false}
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
@@ -258,7 +258,7 @@ func callPush(args []string,
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("push", args)
 	cmd := NewPush(fakeUI, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, SpaceSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	return

@@ -14,15 +14,15 @@ func TestSpacesRequirements(t *testing.T) {
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
 	config := &configuration.Configuration{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, OrgSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	callSpaces([]string{}, reqFactory, config, spaceRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, OrgSuccess: false}
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
 	callSpaces([]string{}, reqFactory, config, spaceRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, OrgSuccess: true}
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 	callSpaces([]string{}, reqFactory, config, spaceRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
@@ -35,7 +35,7 @@ func TestListingSpaces(t *testing.T) {
 	}
 	config := &configuration.Configuration{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, OrgSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
 	assert.Contains(t, ui.Outputs[0], "Getting spaces")
 	assert.Contains(t, ui.Outputs[1], "OK")

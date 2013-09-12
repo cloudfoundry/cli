@@ -14,8 +14,8 @@ type FakeReqFactory struct {
 
 	LoginSuccess bool
 	ValidAccessTokenSuccess bool
-	SpaceSuccess bool
-	OrgSuccess bool
+	TargetedSpaceSuccess bool
+	TargetedOrgSuccess bool
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -37,11 +37,11 @@ func (f *FakeReqFactory) NewValidAccessTokenRequirement() requirements.Requireme
 }
 
 func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {
-	return FakeRequirement{ f, f.SpaceSuccess }
+	return FakeRequirement{ f, f.TargetedSpaceSuccess }
 }
 
 func (f *FakeReqFactory) NewTargetedOrgRequirement() requirements.Requirement {
-	return FakeRequirement{ f, f.OrgSuccess }
+	return FakeRequirement{ f, f.TargetedOrgSuccess }
 }
 
 type FakeRequirement struct {
