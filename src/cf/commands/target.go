@@ -33,6 +33,9 @@ func NewTarget(ui term.UI, configRepo configuration.ConfigurationRepository, org
 }
 
 func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+	}
 	return
 }
 
@@ -44,20 +47,12 @@ func (t Target) Run(c *cli.Context) {
 	if argsCount == 0 && orgName == "" && spaceName == "" {
 		t.ui.ShowConfiguration(t.config)
 
-		if !t.config.IsLoggedIn() {
-			return
-		}
 		if !t.config.HasOrganization() {
 			t.ui.Say("No org targeted. Use 'cf target -o' to target an org.")
 		}
 		if !t.config.HasSpace() {
 			t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
 		}
-		return
-	}
-
-	if argsCount > 0 {
-		t.setNewTarget(c.Args()[0])
 		return
 	}
 
@@ -75,53 +70,6 @@ func (t Target) Run(c *cli.Context) {
 	}
 
 	return
-}
-
-func (t Target) setNewTarget(target string) {
-	t.ui.Say("Setting target to %s...", term.Yellow(target))
-
-	request, apiErr := api.NewRequest("GET", target+"/v2/info", "", nil)
-
-	if apiErr != nil {
-		t.ui.Failed(apiErr.Error())
-		return
-	}
-
-	scheme := request.URL.Scheme
-	if scheme != "http" && scheme != "https" {
-		t.ui.Failed("API Endpoints should start with https:// or http://")
-		return
-	}
-
-	serverResponse := new(InfoResponse)
-	apiErr = api.PerformRequestAndParseResponse(request, &serverResponse)
-
-	if apiErr != nil {
-		t.ui.Failed(apiErr.Error())
-		return
-	}
-
-	err := t.saveTarget(target, serverResponse)
-
-	if err != nil {
-		t.ui.Failed(err.Error())
-		return
-	}
-
-	t.ui.Ok()
-
-	if scheme == "http" {
-		t.ui.Say(term.Magenta("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
-	}
-	t.ui.ShowConfiguration(t.config)
-}
-
-func (t *Target) saveTarget(target string, info *InfoResponse) (err error) {
-	t.configRepo.ClearSession()
-	t.config.Target = target
-	t.config.ApiVersion = info.ApiVersion
-	t.config.AuthorizationEndpoint = info.AuthorizationEndpoint
-	return t.configRepo.Save()
 }
 
 func (t Target) setOrganization(orgName string) {
