@@ -69,6 +69,15 @@ OPTIONS:
 	app.Version = cf.Version
 	app.Commands = []cli.Command{
 		{
+			Name:        "api",
+			Description: "Set or view target api endpoint",
+			Usage:       "cf api [api endpoint]",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewApi()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "apps",
 			ShortName:   "a",
 			Description: "List all applications in the currently selected space",

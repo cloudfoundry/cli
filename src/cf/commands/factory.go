@@ -17,6 +17,13 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Fact
 	return
 }
 
+func (f Factory) NewApi() Api {
+	return NewApi(
+		f.ui,
+		f.repoLocator.GetConfigurationRepository(),
+	)
+}
+
 func (f Factory) NewApps() Apps {
 	return NewApps(
 		f.ui,
