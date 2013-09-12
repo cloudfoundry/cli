@@ -305,10 +305,7 @@ OPTIONS:
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create organization",
-			Usage:       "cf create-org --name <organization name>",
-			Flags: []cli.Flag{
-				cli.StringFlag{"name", "", "name of the organization"},
-			},
+			Usage:       "cf create-org <organization name>",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewCreateOrganization()
 				cmdRunner.Run(cmd, c)

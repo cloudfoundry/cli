@@ -9,9 +9,17 @@ import (
 	"testing"
 )
 
+func TestCreateOrganizationWithoutArgument(t *testing.T) {
+	fakeUI := callCreateOrganization(
+		[]string{},
+	)
+
+	assert.Contains(t, fakeUI.Outputs[0], "No name provided. Use 'cf create-org <name>' create an organization.")
+}
+
 func TestCreateOrganization(t *testing.T) {
 	fakeUI := callCreateOrganization(
-		[]string{"--name", "my-org"},
+		[]string{"my-org"},
 	)
 
 	assert.Equal(t, len(fakeUI.Outputs), 2)
