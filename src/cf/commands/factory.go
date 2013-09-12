@@ -145,6 +145,7 @@ func (f Factory) NewSetEnv() *SetEnv {
 func (f Factory) NewSpaces() Spaces {
 	return NewSpaces(
 		f.ui,
+		f.repoLocator.GetConfig(),
 		f.repoLocator.GetSpaceRepository(),
 	)
 }
