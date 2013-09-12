@@ -11,12 +11,12 @@ import (
 	"testing"
 )
 
-func testSuccessfulLogin(t *testing.T, args []string, inputs []string) {
+func testSuccessfulLogin(t *testing.T, args []string, inputs []string) (ui *testhelpers.FakeUI) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
-	ui := new(testhelpers.FakeUI)
+	ui = new(testhelpers.FakeUI)
 	ui.Inputs = inputs
 	auth := &testhelpers.FakeAuthenticator{
 		AccessToken:  "my_access_token",
@@ -41,14 +41,20 @@ func testSuccessfulLogin(t *testing.T, args []string, inputs []string) {
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 	assert.Equal(t, auth.Email, "user@example.com")
 	assert.Equal(t, auth.Password, "password")
+
+	return
 }
 
 func TestSuccessfullyLoggingIn(t *testing.T) {
-	testSuccessfulLogin(t, []string{}, []string{"user@example.com", "password"})
+	ui := testSuccessfulLogin(t, []string{}, []string{"user@example.com", "password"})
+
+	assert.Contains(t, ui.PasswordPrompts[0], "Password")
 }
 
 func TestSuccessfullyLoggingInWithUsernameAsArgument(t *testing.T) {
-	testSuccessfulLogin(t, []string{"user@example.com"}, []string{"password"})
+	ui := testSuccessfulLogin(t, []string{"user@example.com"}, []string{"password"})
+
+	assert.Contains(t, ui.PasswordPrompts[0], "Password")
 }
 
 func TestSuccessfullyLoggingInWithUsernameAndPasswordAsArguments(t *testing.T) {
@@ -84,18 +90,18 @@ func TestLoggingInWithMultipleOrgsAndSpaces(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
 	assert.Contains(t, ui.Prompts[0], "Username")
-	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "FirstOrg")
 	assert.Contains(t, ui.Outputs[4], "SecondOrg")
 
-	assert.Contains(t, ui.Prompts[2], "Organization")
+	assert.Contains(t, ui.Prompts[1], "Organization")
 	assert.Contains(t, ui.Outputs[5], "SecondOrg")
 	assert.Contains(t, ui.Outputs[7], "FirstSpace")
 	assert.Contains(t, ui.Outputs[8], "SecondSpace")
 
-	assert.Contains(t, ui.Prompts[3], "Space")
+	assert.Contains(t, ui.Prompts[2], "Space")
 	assert.Contains(t, ui.Outputs[9], "FirstSpace")
 
 	savedConfig := testhelpers.SavedConfiguration
@@ -129,16 +135,16 @@ func TestWhenUserPicksInvalidOrgNumberAndSpaceNumber(t *testing.T) {
 		&testhelpers.FakeAuthenticator{ConfigRepo: configRepo},
 	)
 
-	assert.Contains(t, ui.Prompts[2], "Organization")
+	assert.Contains(t, ui.Prompts[1], "Organization")
 	assert.Contains(t, ui.Outputs[5], "FAILED")
 
-	assert.Contains(t, ui.Prompts[3], "Organization")
+	assert.Contains(t, ui.Prompts[2], "Organization")
 	assert.Contains(t, ui.Outputs[9], "Targeting org")
 
-	assert.Contains(t, ui.Prompts[4], "Space")
+	assert.Contains(t, ui.Prompts[3], "Space")
 	assert.Contains(t, ui.Outputs[13], "FAILED")
 
-	assert.Contains(t, ui.Prompts[5], "Space")
+	assert.Contains(t, ui.Prompts[4], "Space")
 	assert.Contains(t, ui.Outputs[17], "Targeting space")
 
 	savedConfig := testhelpers.SavedConfiguration
@@ -173,7 +179,7 @@ func TestLoggingInWitOneOrgAndOneSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
 	assert.Contains(t, ui.Prompts[0], "Username")
-	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Outputs[3], "FirstOrg")
 	assert.Contains(t, ui.Outputs[4], "OK")
@@ -209,7 +215,7 @@ func TestLoggingInWithoutOrg(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
 	assert.Contains(t, ui.Prompts[0], "Username")
-	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 	assert.Contains(t, ui.Outputs[3], "No orgs found.")
 
@@ -242,7 +248,7 @@ func TestLoggingInWithOneOrgAndNoSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], config.Target)
 
 	assert.Contains(t, ui.Prompts[0], "Username")
-	assert.Contains(t, ui.Prompts[1], "Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 
 	assert.Contains(t, ui.Outputs[5], "API endpoint:")

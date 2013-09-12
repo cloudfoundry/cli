@@ -36,6 +36,7 @@ func CaptureOutput(f func ()) string {
 type FakeUI struct {
 	Outputs []string
 	Prompts []string
+	PasswordPrompts []string
 	Inputs  []string
 	FailedWithUsage bool
 }
@@ -53,7 +54,10 @@ func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 }
 
 func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {
-	return ui.Ask(prompt, args)
+	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
+	answer = ui.Inputs[0]
+	ui.Inputs = ui.Inputs[1:]
+	return
 }
 
 func (ui *FakeUI) Ok() {

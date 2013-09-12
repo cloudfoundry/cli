@@ -43,17 +43,18 @@ func (l Login) Run(c *cli.Context) {
 		password string
 	)
 
-	getArgOrPrompt := func(argNum int, prompt string) string {
-		if len(c.Args()) > argNum {
-			return c.Args()[argNum]
-		}
-		return l.ui.Ask("%s%s", prompt, term.Cyan(">"))
+	if len(c.Args()) > 0 {
+		email = c.Args()[0]
+	} else {
+		email = l.ui.Ask("Username%s", term.Cyan(">"))
 	}
 
-	email = getArgOrPrompt(0, "Username")
-
 	for i := 0; i < maxLoginTries; i++ {
-		password = getArgOrPrompt(1, "Password")
+		if len(c.Args()) > 1 {
+			password = c.Args()[1]
+		} else {
+			password = l.ui.AskForPassword("Password%s", term.Cyan(">"))
+		}
 		l.ui.Say("Authenticating...")
 
 		err := l.authenticator.Authenticate(email, password)

@@ -25,9 +25,9 @@ func TestPasswordCanBeChanged(t *testing.T) {
 	configRepo := &testhelpers.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Current Password")
-	assert.Contains(t, ui.Prompts[1], "New Password")
-	assert.Contains(t, ui.Prompts[2], "Verify Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
+	assert.Contains(t, ui.PasswordPrompts[1], "New Password")
+	assert.Contains(t, ui.PasswordPrompts[2], "Verify Password")
 
 	assert.Equal(t, pwdRepo.ScoredPassword, "new-password")
 	assert.Contains(t, ui.Outputs[0], "Your password strength is: meh")
@@ -52,9 +52,9 @@ func TestPasswordVerification(t *testing.T) {
 	configRepo := &testhelpers.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Current Password")
-	assert.Contains(t, ui.Prompts[1], "New Password")
-	assert.Contains(t, ui.Prompts[2], "Verify Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
+	assert.Contains(t, ui.PasswordPrompts[1], "New Password")
+	assert.Contains(t, ui.PasswordPrompts[2], "Verify Password")
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "Password verification does not match")
@@ -68,9 +68,9 @@ func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
 	configRepo := &testhelpers.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Current Password")
-	assert.Contains(t, ui.Prompts[1], "New Password")
-	assert.Contains(t, ui.Prompts[2], "Verify Password")
+	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
+	assert.Contains(t, ui.PasswordPrompts[1], "New Password")
+	assert.Contains(t, ui.PasswordPrompts[2], "Verify Password")
 
 	assert.Equal(t, pwdRepo.ScoredPassword, "new-password")
 	assert.Contains(t, ui.Outputs[0], "Your password strength is: meh")
