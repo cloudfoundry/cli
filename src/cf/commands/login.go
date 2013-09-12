@@ -36,7 +36,7 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (l Login) Run(c *cli.Context) {
-	l.ui.Say("target: %s", term.Cyan(l.config.Target))
+	l.ui.Say("API endpoint: %s", term.Cyan(l.config.Target))
 
 	var (
 		username string
@@ -66,35 +66,7 @@ func (l Login) Run(c *cli.Context) {
 
 		l.ui.Ok()
 
-		organizations, err := l.orgRepo.FindAll()
-
-		if err != nil {
-			l.ui.Failed(err.Error())
-			return
-		}
-
-		if len(organizations) == 0 {
-			l.ui.Say("No orgs found. Use 'cf create-organization' as an Administrator.")
-			return
-		}
-
-		l.targetOrganization(l.config, organizations)
-
-		spaces, err := l.spaceRepo.FindAll()
-
-		if err != nil {
-			l.ui.Failed(err.Error())
-			return
-		}
-
-		if len(spaces) == 0 {
-			l.ui.ShowConfiguration(l.config)
-			l.ui.Say("No spaces found. Use 'cf create-space' as an Org Manager.")
-			return
-		}
-
-		l.targetSpace(l.config, spaces)
-		l.ui.ShowConfiguration(l.config)
+		l.ui.Say("Use '%s' to view or set your target organization and space", term.Yellow("cf target"))
 
 		return
 	}
