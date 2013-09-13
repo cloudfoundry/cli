@@ -71,7 +71,7 @@ OPTIONS:
 		{
 			Name:        "api",
 			Description: "Set or view target api endpoint",
-			Usage:       "cf api [api endpoint]",
+			Usage:       "cf api [URL]",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewApi()
 				cmdRunner.Run(cmd, c)
@@ -80,7 +80,7 @@ OPTIONS:
 		{
 			Name:        "apps",
 			ShortName:   "a",
-			Description: "List all applications in the currently selected space",
+			Description: "List all applications in the currently targeted space",
 			Usage:       "cf apps",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewApps()
@@ -91,10 +91,10 @@ OPTIONS:
 			Name:        "bind-service",
 			ShortName:   "bs",
 			Description: "Bind a service instance to an application",
-			Usage:       "cf bind-service --app <application name> --service <service instance name>",
+			Usage:       "cf bind-service --app APP --service SERVICE",
 			Flags: []cli.Flag{
-				cli.StringFlag{"app", "", "name of the application"},
-				cli.StringFlag{"service", "", "name of the service instance to bind to the application"},
+				cli.StringFlag{"app", "", "Which app"},
+				cli.StringFlag{"service", "", "Which service instance to bind to the app"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewBindService()
@@ -105,7 +105,7 @@ OPTIONS:
 			Name:        "create-service",
 			ShortName:   "cs",
 			Description: "Create service instance",
-			Usage: "cf create-service --offering <offering> --plan <plan> --name <service instance name>\n" +
+			Usage: "cf create-service --offering [OFFERING] --plan [PLAN] --name <service instance name>\n" +
 				"   cf create-service --offering user-provided --name <service name> --parameters \"<comma separated parameter names>\"",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the service instance"},
@@ -121,7 +121,7 @@ OPTIONS:
 		{
 			Name:        "create-space",
 			Description: "Create a space",
-			Usage:       "cf create-space spacename",
+			Usage:       "cf create-space SPACE",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewCreateSpace()
 				cmdRunner.Run(cmd, c)
@@ -131,9 +131,9 @@ OPTIONS:
 			Name:        "delete",
 			ShortName:   "d",
 			Description: "Delete an application",
-			Usage:       "cf delete -f <application>",
+			Usage:       "cf delete -f APP",
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "force deletion without confirmation"},
+				cli.BoolFlag{"f", "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewDelete()
@@ -144,7 +144,7 @@ OPTIONS:
 			Name:        "delete-service",
 			ShortName:   "ds",
 			Description: "Delete a service instance",
-			Usage:       "cf delete-service <service instance name>",
+			Usage:       "cf delete-service SERVICE",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewDeleteService()
 				cmdRunner.Run(cmd, c)
@@ -153,9 +153,9 @@ OPTIONS:
 		{
 			Name:        "delete-space",
 			Description: "Delete a space",
-			Usage:       "cf delete-space <space-name>",
+			Usage:       "cf delete-space SPACE",
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "force deletion without confirmation"},
+				cli.BoolFlag{"f", "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewDeleteSpace()
@@ -165,7 +165,7 @@ OPTIONS:
 		{
 			Name:        "files",
 			Description: "Print out a list of files in a directory or the contents of a specific file",
-			Usage:       "cf files <appname> [file or directory]",
+			Usage:       "cf files APP [PATH]",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewFiles()
 				cmdRunner.Run(cmd, c)
@@ -175,7 +175,7 @@ OPTIONS:
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",
-			Usage:       "cf login [username [password]]\n\n"+terminal.WarningColor("WARNING:\nProviding your password as a command line option is highly discouraged.\nYour password may be visible to others and may be recorded in your shell history."),
+			Usage:       "cf login [USERNAME] [PASSWORD]\n\n" + terminal.WarningColor("WARNING:\nProviding your password as a command line option is highly discouraged.\nYour password may be visible to others and may be recorded in your shell history."),
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewLogin()
 				cmdRunner.Run(cmd, c)
@@ -204,7 +204,7 @@ OPTIONS:
 		{
 			Name:        "push",
 			ShortName:   "p",
-			Description: "Push an application",
+			Description: "Push an app",
 			Usage: "cf push --name <application> [--domain <domain>] [--host <hostname>] [--instances <num>]\n" +
 				"                                [--memory <memory>] [--buildpack <url>] [--no-[re]start] [--path <path to app>]\n" +
 				"                                [--stack <stack>]",
@@ -228,7 +228,7 @@ OPTIONS:
 		{
 			Name:        "rename-space",
 			Description: "Rename a space",
-			Usage:       "cf rename-space <current-space-name> <new-space-name>",
+			Usage:       "cf rename-space SPACE NEW_SPACE",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewRenameSpace()
 				cmdRunner.Run(cmd, c)
@@ -247,10 +247,10 @@ OPTIONS:
 		{
 			Name:        "services",
 			ShortName:   "s",
-			Description: "List all services in the currently selected space",
+			Description: "List all services in the currently targeted space",
 			Usage:       "cf services [--marketplace]",
 			Flags: []cli.Flag{
-				cli.BoolFlag{"marketplace", "use to list available offerings on the marketplace"},
+				cli.BoolFlag{"marketplace", "List available offerings on the marketplace"},
 			},
 			Action: func(c *cli.Context) {
 				var cmd commands.Command
@@ -266,8 +266,8 @@ OPTIONS:
 		{
 			Name:        "set-env",
 			ShortName:   "se",
-			Description: "Set an environment variable for an application",
-			Usage:       "cf set-env <application> <variable> <value>",
+			Description: "Set an env variable for an app",
+			Usage:       "cf set-env APP NAME VALUE",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewSetEnv()
 				cmdRunner.Run(cmd, c)
@@ -275,7 +275,7 @@ OPTIONS:
 		},
 		{
 			Name:        "spaces",
-			Description: "List all spaces in an organization",
+			Description: "List all spaces in an org",
 			Usage:       "cf spaces",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewSpaces()
@@ -294,7 +294,7 @@ OPTIONS:
 		{
 			Name:        "start",
 			ShortName:   "st",
-			Description: "Start applications",
+			Description: "Start an app",
 			Usage:       "cf start <application>",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewStart()
@@ -304,7 +304,7 @@ OPTIONS:
 		{
 			Name:        "stop",
 			ShortName:   "sp",
-			Description: "Stop applications",
+			Description: "Stop an app",
 			Usage:       "cf stop <application>",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewStop()
@@ -314,8 +314,8 @@ OPTIONS:
 		{
 			Name:        "target",
 			ShortName:   "t",
-			Description: "Set or view the target",
-			Usage:       "cf target [--o <organization>] [--s <space>]",
+			Description: "Set or view the targeted org or space",
+			Usage:       "cf target [-o <organization>] [-s <space>]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"o", "", "organization"},
 				cli.StringFlag{"s", "", "space"},
