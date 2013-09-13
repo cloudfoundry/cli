@@ -12,9 +12,9 @@ func TestDeleteConfirmingWithY(t *testing.T) {
 	ui, reqFactory, appRepo := deleteApp("y", []string{"app-to-delete"})
 
 	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
-	assert.Contains(t, ui.Prompts[0], "Really delete app-to-delete?>")
+	assert.Contains(t, ui.Prompts[0], "Really delete")
 
-	assert.Contains(t, ui.Outputs[0], "Deleting app-to-delete")
+	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Equal(t, appRepo.DeletedApp, reqFactory.Application)
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -23,9 +23,9 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 	ui, reqFactory, appRepo := deleteApp("Yes", []string{"app-to-delete"})
 
 	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
-	assert.Contains(t, ui.Prompts[0], "Really delete app-to-delete?>")
+	assert.Contains(t, ui.Prompts[0], "Really delete")
 
-	assert.Contains(t, ui.Outputs[0], "Deleting app-to-delete")
+	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Equal(t, appRepo.DeletedApp, reqFactory.Application)
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -43,7 +43,8 @@ func TestDeleteWithForceOption(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "app-to-delete")
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting app-to-delete")
+	assert.Contains(t, ui.Outputs[0], "Deleting")
+	assert.Contains(t, ui.Outputs[0], "app-to-delete")
 	assert.Equal(t, appRepo.DeletedApp, reqFactory.Application)
 	assert.Contains(t, ui.Outputs[1], "OK")
 }

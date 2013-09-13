@@ -39,13 +39,17 @@ func (d *Delete) Run(c *cli.Context) {
 	force := c.Bool("f")
 
 	if !force {
-		response := strings.ToLower(d.ui.Ask("Really delete %s?>", app.Name))
+		response := strings.ToLower(d.ui.Ask(
+			"Really delete %s?%s",
+			term.EntityNameColor(app.Name),
+			term.PromptColor(">"),
+		))
 		if response != "y" && response != "yes" {
 			return
 		}
 	}
 
-	d.ui.Say("Deleting %s", app.Name)
+	d.ui.Say("Deleting app %s...", term.EntityNameColor(app.Name))
 	err := d.appRepo.Delete(app)
 	if err != nil {
 		d.ui.Failed(err.Error())
