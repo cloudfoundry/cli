@@ -8,14 +8,11 @@ import (
 type FakeOrgRepository struct {
 	Organizations []cf.Organization
 
-	OrganizationName string
-	OrganizationByName cf.Organization
-	OrganizationByNameErr bool
-}
+	CreateName string
 
-func (repo *FakeOrgRepository) CreateOrgRepository(name string) (apiErr *api.ApiError) {
-	repo.OrganizationName = name
-	return
+	FindByNameName string
+	FindByNameErr bool
+	FindByNameOrganization cf.Organization
 }
 
 func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *api.ApiError) {
@@ -23,14 +20,15 @@ func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *api.Api
 }
 
 func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiErr *api.ApiError) {
-	repo.OrganizationName = name
-	if repo.OrganizationByNameErr {
+	repo.FindByNameName = name
+
+	if repo.FindByNameErr {
 		apiErr = api.NewApiErrorWithMessage("Error finding organization by name.")
 	}
-	return repo.OrganizationByName, apiErr
+	return repo.FindByNameOrganization, apiErr
 }
 
-func (repo FakeOrgRepository) Create(name string) (createdOrg cf.Organization, apiErr *api.ApiError) {
-	repo.OrganizationName = name
+func (repo *FakeOrgRepository) Create(name string) (apiErr *api.ApiError) {
+	repo.CreateName = name
 	return
 }

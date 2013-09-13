@@ -4,6 +4,7 @@ import (
 	"cf/api"
 	"cf/requirements"
 	term "cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -19,26 +20,28 @@ func NewCreateOrganization(ui term.UI, orgRepo api.OrganizationRepository) (cmd 
 }
 
 func (cmd CreateOrganization) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) != 1 {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "create-org")
+		return
+	}
+
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+	}
 	return
 }
 
 func (cmd CreateOrganization) Run(c *cli.Context) {
-	argsCount := len(c.Args())
-
-	if argsCount == 0 {
-		cmd.ui.Say("No name provided. Use 'cf create-org <name>' create an organization.")
-		return
-	}
-
 	name := c.Args()[0]
 
-	cmd.ui.Say("Creating organization %s", term.Cyan(name))
-	_, apiErr := cmd.orgRepo.Create(name)
+	cmd.ui.Say("Creating organization %s...", term.EntityNameColor(name))
+	apiErr := cmd.orgRepo.Create(name)
 	if apiErr != nil {
-		cmd.ui.Failed("Error creating organization", apiErr)
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	cmd.ui.Ok()
-	return
+	cmd.ui.Say("\nTIP: Use '%s' to target new org.", term.CommandColor("cf target -o "+name))
 }

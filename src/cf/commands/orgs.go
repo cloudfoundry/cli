@@ -19,6 +19,9 @@ func NewListOrganizations(ui term.UI, orgRepo api.OrganizationRepository) (cmd L
 }
 
 func (cmd ListOrganizations) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+	}
 	return
 }
 
@@ -27,21 +30,13 @@ func (cmd ListOrganizations) Run(c *cli.Context) {
 
 	orgs, err := cmd.orgRepo.FindAll()
 	if err != nil {
-		cmd.ui.Failed("Error loading organizations", err)
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	cmd.ui.Ok()
 
-	table := [][]string{
-		[]string{"name"},
-	}
-
 	for _, org := range orgs {
-		table = append(table, []string{
-			org.Name,
-		})
+		cmd.ui.Say(org.Name)
 	}
-
-	cmd.ui.DisplayTable(table, nil)
 }

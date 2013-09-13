@@ -60,11 +60,11 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 		cf.Organization{Name: "my-organization", Guid: "my-organization-guid"},
 	}
 	orgRepo.Organizations = orgs
-	orgRepo.OrganizationByName = orgs[0]
+	orgRepo.FindByNameOrganization = orgs[0]
 
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Equal(t, orgRepo.OrganizationName, "my-organization")
+	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
 	assert.Contains(t, ui.Outputs[2], "org:")
 	assert.Contains(t, ui.Outputs[2], "my-organization")
 	assert.Contains(t, ui.Outputs[3], "No space targeted.")
@@ -83,7 +83,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	orgs := []cf.Organization{}
 	orgRepo.Organizations = orgs
-	orgRepo.OrganizationByNameErr = true
+	orgRepo.FindByNameErr = true
 
 	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 

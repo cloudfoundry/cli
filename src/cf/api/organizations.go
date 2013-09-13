@@ -10,7 +10,7 @@ import (
 type OrganizationRepository interface {
 	FindAll() (orgs []cf.Organization, apiErr *ApiError)
 	FindByName(name string) (org cf.Organization, apiErr *ApiError)
-	Create(name string) (org cf.Organization, apiErr *ApiError)
+	Create(name string) (apiErr *ApiError)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -63,7 +63,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Create(name string) (createdOrg cf.Organization, apiErr *ApiError) {
+func (repo CloudControllerOrganizationRepository) Create(name string) (apiErr *ApiError) {
 	path := repo.config.Target + "/v2/organizations"
 	data := fmt.Sprintf(
 		`{"name":"%s"}`, name,
@@ -73,13 +73,6 @@ func (repo CloudControllerOrganizationRepository) Create(name string) (createdOr
 		return
 	}
 
-	resource := new(Resource)
-	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, resource)
-	if apiErr != nil {
-		return
-	}
-
-	createdOrg.Guid = resource.Metadata.Guid
-	createdOrg.Name = resource.Entity.Name
+	apiErr = repo.apiClient.PerformRequest(request)
 	return
 }

@@ -109,35 +109,11 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.Error(t, err)
 }
 
-var createOrgResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
-{
-  "metadata": {
-    "guid": "my-org-guid",
-    "url": "/v2/organizations/my-org-guid",
-    "created_at": "2013-09-11 06:13:15 +0000",
-    "updated_at": null
-  },
-  "entity": {
-    "name": "my-org",
-    "billing_enabled": false,
-    "quota_definition_guid": "f95878e4-181b-4016-af49-b8e2fc521cb7",
-    "status": "active",
-    "quota_definition_url": "/v2/quota_definitions/f95878e4-181b-4016-af49-b8e2fc521cb7",
-    "spaces_url": "/v2/organizations/my-org-guid/spaces",
-    "domains_url": "/v2/organizations/my-org-guid/domains",
-    "users_url": "/v2/organizations/my-org-guid/users",
-    "managers_url": "/v2/organizations/my-org-guid/managers",
-    "billing_managers_url": "/v2/organizations/my-org-guid/billing_managers",
-    "auditors_url": "/v2/organizations/my-org-guid/auditors",
-    "app_events_url": "/v2/organizations/my-org-guid/app_events"
-  }
-}`}
-
 var createOrgEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/organizations",
 	testhelpers.RequestBodyMatcher(`{"name":"my-org"}`),
-	createOrgResponse,
+	testhelpers.TestResponse{Status: http.StatusCreated},
 )
 
 func TestCreateOrganization(t *testing.T) {
@@ -148,9 +124,6 @@ func TestCreateOrganization(t *testing.T) {
 	client := NewApiClient(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, client)
 
-	createdOrg, err := repo.Create("my-org")
+	err := repo.Create("my-org")
 	assert.NoError(t, err)
-
-	assert.Equal(t, createdOrg.Name, "my-org")
-	assert.Equal(t, createdOrg.Guid, "my-org-guid")
 }
