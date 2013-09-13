@@ -174,8 +174,8 @@ OPTIONS:
 		{
 			Name:        "login",
 			ShortName:   "l",
-			Description: "Log user in\n\nWARNING:\nProviding your password as a command line option is highly discouraged.\nYour password may be visible to others and may be recorded in your shell history.",
-			Usage:       "cf login [username [password]]",
+			Description: "Log user in",
+			Usage:       "cf login [username [password]]\n\n"+terminal.WarningColor("WARNING:\nProviding your password as a command line option is highly discouraged.\nYour password may be visible to others and may be recorded in your shell history."),
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewLogin()
 				cmdRunner.Run(cmd, c)
