@@ -59,6 +59,13 @@ func (f Factory) NewDelete() *Delete {
 	)
 }
 
+func (f Factory) NewDeleteOrg() *DeleteOrg {
+	return NewDeleteOrg(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
 func (f Factory) NewDeleteService() *DeleteService {
 	return NewDeleteService(
 		f.ui,

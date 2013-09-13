@@ -20,7 +20,7 @@ type FakeReqFactory struct {
 	SpaceName string
 	Space cf.Space
 
-	OrgName string
+	OrganizationName string
 	Organization cf.Organization
 }
 
@@ -56,7 +56,7 @@ func (f *FakeReqFactory) NewSpaceRequirement(name string) requirements.SpaceRequ
 }
 
 func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.OrganizationRequirement {
-	f.OrgName = name
+	f.OrganizationName = name
 	return FakeRequirement{ f, true }
 }
 

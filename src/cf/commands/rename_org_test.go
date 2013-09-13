@@ -25,7 +25,7 @@ func TestRenameOrgRequirements(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 	callRenameOrg([]string{"my-org", "my-new-org"}, reqFactory, orgRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
-	assert.Equal(t, reqFactory.OrgName, "my-org")
+	assert.Equal(t, reqFactory.OrganizationName, "my-org")
 }
 
 func TestRenameOrgRun(t *testing.T) {

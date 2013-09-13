@@ -16,6 +16,8 @@ type FakeOrgRepository struct {
 
 	RenameOrganization cf.Organization
 	RenameNewName string
+
+	DeletedOrganization cf.Organization
 }
 
 func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *api.ApiError) {
@@ -39,5 +41,10 @@ func (repo *FakeOrgRepository) Create(name string) (apiErr *api.ApiError) {
 func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiErr *api.ApiError) {
 	repo.RenameOrganization = org
 	repo.RenameNewName = newName
+	return
+}
+
+func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiErr *api.ApiError) {
+	repo.DeletedOrganization = org
 	return
 }

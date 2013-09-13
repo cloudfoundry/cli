@@ -151,6 +151,18 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "delete-org",
+			Description: "Delete an org",
+			Usage:       "cf delete-org <org-name>",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"f", "force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewDeleteOrg()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "delete-service",
 			ShortName:   "ds",
 			Description: "Delete a service instance",

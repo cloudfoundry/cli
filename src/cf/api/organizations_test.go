@@ -147,3 +147,23 @@ func TestRenameOrganization(t *testing.T) {
 	err := repo.Rename(org, "my-new-org")
 	assert.NoError(t, err)
 }
+
+var deleteOrgEndpoint = testhelpers.CreateEndpoint(
+	"DELETE",
+	"/v2/organizations/my-org-guid",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusOK},
+)
+
+func TestDeleteOrganization(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(deleteOrgEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, client)
+
+	org := cf.Organization{Guid: "my-org-guid"}
+	err := repo.Delete(org)
+	assert.NoError(t, err)
+}
