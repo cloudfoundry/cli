@@ -7,3 +7,6 @@
 [submodule "src/github.com/cloudfoundry/loggregatorlib"]
 	path = src/github.com/cloudfoundry/loggregatorlib
 	url = https://github.com/cloudfoundry/loggregatorlib.git
+[submodule "src/code.google.com/p/gogoprotobuf"]
+	path = src/code.google.com/p/gogoprotobuf
+	url = https://code.google.com/p/gogoprotobuf/
