@@ -266,3 +266,85 @@ func testRefreshToken(t *testing.T, apiServer *httptest.Server, authServer *http
 	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
 	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
 }
+
+func TestPrepareRedirectTransfersAuthorizationHeader(t *testing.T) {
+	originalReq, err := http.NewRequest("GET", "/foo", nil)
+	assert.NoError(t, err)
+	originalReq.Header.Set("Authorization", "my-auth-token")
+
+	redirectReq, err := http.NewRequest("GET", "/bar", nil)
+	assert.NoError(t, err)
+
+	via := []*http.Request{originalReq}
+
+	err = PrepareRedirect(redirectReq, via)
+
+	assert.NoError(t, err)
+	assert.Equal(t, redirectReq.Header.Get("Authorization"), "my-auth-token")
+}
+
+func TestPrepareRedirectFailsAfterOneRedirect(t *testing.T) {
+	firstReq, err := http.NewRequest("GET", "/foo", nil)
+	assert.NoError(t, err)
+
+	secondReq, err := http.NewRequest("GET", "/manchu", nil)
+	assert.NoError(t, err)
+
+	redirectReq, err := http.NewRequest("GET", "/bar", nil)
+	assert.NoError(t, err)
+
+	via := []*http.Request{firstReq, secondReq}
+
+	err = PrepareRedirect(redirectReq, via)
+
+	assert.Error(t, err)
+}
+
+func TestFollowsRedirectWithTheProperCheckRedirectHandler(t *testing.T) {
+	expectedResponse := "file 1\n file 2\n file 3"
+
+	targetEndpoint := func(writer http.ResponseWriter, request *http.Request) {
+		methodMatches := request.Method == "GET"
+		pathMatches := request.URL.Path == "/some/path"
+		authHeaderMatches := request.Header.Get("Authorization") == "BEARER my_access_token"
+
+		if !methodMatches || !pathMatches || !authHeaderMatches {
+			fmt.Printf("One of the matchers did not match. Method [%t] Path [%t] Auth [%t]",
+				methodMatches, pathMatches, authHeaderMatches)
+
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		writer.WriteHeader(http.StatusOK)
+		fmt.Fprint(writer, expectedResponse)
+	}
+
+	targetServer := httptest.NewTLSServer(http.HandlerFunc(targetEndpoint))
+	defer targetServer.Close()
+
+	redirectEndpoint := func(writer http.ResponseWriter, req *http.Request) {
+		baseEndpoint := testhelpers.CreateEndpoint(
+			"GET",
+			"/do/redirect",
+			nil,
+			testhelpers.TestResponse{Status: http.StatusTemporaryRedirect},
+		)
+
+		writer.Header().Add("Location", fmt.Sprintf("%s/some/path", targetServer.URL))
+		baseEndpoint(writer, req)
+	}
+
+	redirectServer := httptest.NewTLSServer(http.HandlerFunc(redirectEndpoint))
+	defer redirectServer.Close()
+
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+
+	req, err := NewRequest("GET", fmt.Sprintf("%s/do/redirect", redirectServer.URL), "BEARER my_access_token", nil)
+	assert.NoError(t, err)
+
+	response, err := client.PerformRequestForTextResponse(req)
+	assert.NoError(t, err)
+
+	assert.Equal(t, response, expectedResponse)
+}

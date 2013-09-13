@@ -17,6 +17,7 @@ type RepositoryLocator struct {
 	stackRepo         CloudControllerStackRepository
 	serviceRepo       CloudControllerServiceRepository
 	passwordRepo      CloudControllerPasswordRepository
+	logsRepo          LoggregatorLogsRepository
 }
 
 func NewRepositoryLocator(config *configuration.Configuration) (locator RepositoryLocator) {
@@ -35,6 +36,7 @@ func NewRepositoryLocator(config *configuration.Configuration) (locator Reposito
 	locator.stackRepo = NewCloudControllerStackRepository(config, apiClient)
 	locator.serviceRepo = NewCloudControllerServiceRepository(config, apiClient)
 	locator.passwordRepo = NewCloudControllerPasswordRepository(config, apiClient)
+	locator.logsRepo = NewLoggregatorLogsRepository(config, apiClient, LoggregatorHost)
 
 	return
 }
@@ -81,4 +83,8 @@ func (locator RepositoryLocator) GetServiceRepository() ServiceRepository {
 
 func (locator RepositoryLocator) GetPasswordRepository() PasswordRepository {
 	return locator.passwordRepo
+}
+
+func (locator RepositoryLocator) GetLogsRepository() LogsRepository {
+	return locator.logsRepo
 }

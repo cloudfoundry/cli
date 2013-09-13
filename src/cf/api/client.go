@@ -6,6 +6,7 @@ import (
 	term "cf/terminal"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -89,7 +90,10 @@ func newHttpClient() *http.Client {
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		Proxy:           http.ProxyFromEnvironment,
 	}
-	return &http.Client{Transport: tr}
+	return &http.Client{
+		Transport:     tr,
+		CheckRedirect: PrepareRedirect,
+	}
 }
 
 type ApiClient struct {
@@ -116,18 +120,50 @@ func (c ApiClient) PerformRequestAndParseResponse(request *Request, response int
 }
 
 func (c ApiClient) PerformRequestForTextResponse(request *Request) (response string, apiErr *ApiError) {
+	responseBytes, apiErr := c.PerformRequestForResponseBytes(request)
+
+	return string(responseBytes), apiErr
+}
+
+func (c ApiClient) PerformRequestForResponseBytes(request *Request) (response []byte, apiErr *ApiError) {
 	rawResponse, apiErr := c.doRequestHandlingAuth(request)
 	if apiErr != nil {
 		return
 	}
 
-	textBytes, err := ioutil.ReadAll(rawResponse.Body)
+	response, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
 		apiErr = NewApiErrorWithError("Error reading response body:", err)
 		return
 	}
+	return
+}
 
-	response = string(textBytes)
+func PrepareRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) > 1 {
+		return errors.New("stopped after 1 redirect")
+	}
+
+	prevReq := via[len(via)-1]
+
+	req.Header.Set("Authorization", prevReq.Header.Get("Authorization"))
+
+	if traceEnabled() {
+		dumpRequest(req)
+	}
+
+	return nil
+}
+
+func Sanitize(input string) (sanitized string) {
+	re := regexp.MustCompile(`(?m)^Authorization: .*`)
+	sanitized = re.ReplaceAllString(input, "Authorization: "+PRIVATE_DATA_PLACEHOLDER)
+	re = regexp.MustCompile(`password=[^&]*&`)
+	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER+"&")
+	re = regexp.MustCompile(`"access_token":"[^"]*"`)
+	sanitized = re.ReplaceAllString(sanitized, `"access_token":"`+PRIVATE_DATA_PLACEHOLDER+`"`)
+	re = regexp.MustCompile(`"refresh_token":"[^"]*"`)
+	sanitized = re.ReplaceAllString(sanitized, `"refresh_token":"`+PRIVATE_DATA_PLACEHOLDER+`"`)
 	return
 }
 
@@ -163,12 +199,7 @@ func doRequest(request *http.Request) (response *http.Response, apiError *ApiErr
 	httpClient := newHttpClient()
 
 	if traceEnabled() {
-		dumpedRequest, err := httputil.DumpRequest(request, true)
-		if err != nil {
-			fmt.Println("Error dumping request")
-		} else {
-			fmt.Printf("\n%s\n%s\n", term.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
-		}
+		dumpRequest(request)
 	}
 
 	response, err = httpClient.Do(request)
@@ -201,18 +232,6 @@ func doRequest(request *http.Request) (response *http.Response, apiError *ApiErr
 	return
 }
 
-func Sanitize(input string) (sanitized string) {
-	re := regexp.MustCompile(`(?m)^Authorization: .*`)
-	sanitized = re.ReplaceAllString(input, "Authorization: "+PRIVATE_DATA_PLACEHOLDER)
-	re = regexp.MustCompile(`password=[^&]*&`)
-	sanitized = re.ReplaceAllString(sanitized, "password="+PRIVATE_DATA_PLACEHOLDER+"&")
-	re = regexp.MustCompile(`"access_token":"[^"]*"`)
-	sanitized = re.ReplaceAllString(sanitized, `"access_token":"`+PRIVATE_DATA_PLACEHOLDER+`"`)
-	re = regexp.MustCompile(`"refresh_token":"[^"]*"`)
-	sanitized = re.ReplaceAllString(sanitized, `"refresh_token":"`+PRIVATE_DATA_PLACEHOLDER+`"`)
-	return
-}
-
 func parseResponse(rawResponse *http.Response, response interface{}) (apiError *ApiError) {
 	jsonBytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
@@ -232,6 +251,15 @@ func parseResponse(rawResponse *http.Response, response interface{}) (apiError *
 func traceEnabled() bool {
 	traceEnv := strings.ToLower(os.Getenv("CF_TRACE"))
 	return traceEnv == "true" || traceEnv == "yes"
+}
+
+func dumpRequest(req *http.Request) {
+	dumpedRequest, err := httputil.DumpRequest(req, true)
+	if err != nil {
+		fmt.Println("Error dumping request")
+	} else {
+		fmt.Printf("\n%s\n%s\n", term.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
+	}
 }
 
 type errorResponse struct {

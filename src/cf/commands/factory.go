@@ -106,6 +106,14 @@ func (f Factory) NewLogout() Logout {
 	)
 }
 
+func (f Factory) NewLogs() *Logs {
+	return NewLogs(
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
+		f.repoLocator.GetLogsRepository(),
+	)
+}
+
 func (f Factory) NewMarketplaceServices() MarketplaceServices {
 	return NewMarketplaceServices(
 		f.ui,

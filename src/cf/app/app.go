@@ -214,6 +214,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "logs",
+			Description: "Show recent logs for CF applications",
+			Usage:       "cf logs <appName>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewLogs()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "orgs",
 			ShortName:   "o",
 			Description: "List all organizations",
