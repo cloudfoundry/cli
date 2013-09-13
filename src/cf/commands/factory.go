@@ -66,6 +66,13 @@ func (f Factory) NewDeleteService() *DeleteService {
 	)
 }
 
+func (f Factory) NewDeleteSpace() *DeleteSpace {
+	return NewDeleteSpace(
+		f.ui,
+		f.repoLocator.GetSpaceRepository(),
+	)
+}
+
 func (f Factory) NewFiles() *Files {
 	return NewFiles(
 		f.ui,

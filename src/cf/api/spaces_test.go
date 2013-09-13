@@ -290,3 +290,26 @@ func TestRenameSpace(t *testing.T) {
 	err := repo.Rename(space, "new-space-name")
 	assert.NoError(t, err)
 }
+
+var deleteSpaceEndpoint = testhelpers.CreateEndpoint(
+	"DELETE",
+	"/v2/spaces/my-space-guid?recursive=true",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusOK},
+)
+
+func TestDeleteSpace(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(deleteSpaceEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, client)
+
+	space := cf.Space{Guid: "my-space-guid"}
+	err := repo.Delete(space)
+	assert.NoError(t, err)
+}

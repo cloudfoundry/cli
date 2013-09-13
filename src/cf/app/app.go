@@ -151,6 +151,18 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "delete-space",
+			Description: "Delete a space",
+			Usage:       "cf delete-space <space-name>",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"f", "force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewDeleteSpace()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "files",
 			Description: "Print out a list of files in a directory or the contents of a specific file",
 			Usage:       "cf files <appname> [file or directory]",

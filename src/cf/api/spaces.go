@@ -14,6 +14,7 @@ type SpaceRepository interface {
 	GetSummary() (space cf.Space, apiErr *ApiError)
 	Create(name string) (apiErr *ApiError)
 	Rename(space cf.Space, newName string) (apiErr *ApiError)
+	Delete(space cf.Space) (apiErr *ApiError)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -111,6 +112,18 @@ func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 
 	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiErr != nil {
+		return
+	}
+
+	apiErr = repo.apiClient.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiErr *ApiError) {
+	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, space.Guid)
+
+	request, apiErr := NewRequest("DELETE", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
