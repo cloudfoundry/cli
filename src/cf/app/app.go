@@ -246,6 +246,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "rename-org",
+			Description: "Rename an organization",
+			Usage:       "cf rename-space <org-name> <new-org-name>",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewRenameOrg()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "rename-space",
 			Description: "Rename a space",
 			Usage:       "cf rename-space <current-space-name> <new-space-name>",

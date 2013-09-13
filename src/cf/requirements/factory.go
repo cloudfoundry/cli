@@ -17,6 +17,7 @@ type Factory interface {
 	NewSpaceRequirement(name string) SpaceRequirement
 	NewTargetedSpaceRequirement() Requirement
 	NewTargetedOrgRequirement() Requirement
+	NewOrganizationRequirement(name string) OrganizationRequirement
 }
 
 type ApiRequirementFactory struct {
@@ -77,5 +78,13 @@ func (f ApiRequirementFactory) NewTargetedOrgRequirement() Requirement {
 	return NewTargetedOrgRequirement(
 		f.ui,
 		f.repoLocator.GetConfig(),
+	)
+}
+
+func (f ApiRequirementFactory) NewOrganizationRequirement(name string) OrganizationRequirement {
+	return NewOrganizationRequirement(
+		name,
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
 	)
 }

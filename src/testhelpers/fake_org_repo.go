@@ -13,6 +13,9 @@ type FakeOrgRepository struct {
 	FindByNameName string
 	FindByNameErr bool
 	FindByNameOrganization cf.Organization
+
+	RenameOrganization cf.Organization
+	RenameNewName string
 }
 
 func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *api.ApiError) {
@@ -30,5 +33,11 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 
 func (repo *FakeOrgRepository) Create(name string) (apiErr *api.ApiError) {
 	repo.CreateName = name
+	return
+}
+
+func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiErr *api.ApiError) {
+	repo.RenameOrganization = org
+	repo.RenameNewName = newName
 	return
 }

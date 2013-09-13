@@ -128,6 +128,13 @@ func (f Factory) NewPush() Push {
 	)
 }
 
+func (f Factory) NewRenameOrg() *RenameOrg {
+	return NewRenameOrg(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
 func (f Factory) NewRenameSpace() *RenameSpace {
 	return NewRenameSpace(
 		f.ui,

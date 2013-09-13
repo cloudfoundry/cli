@@ -11,6 +11,7 @@ type OrganizationRepository interface {
 	FindAll() (orgs []cf.Organization, apiErr *ApiError)
 	FindByName(name string) (org cf.Organization, apiErr *ApiError)
 	Create(name string) (apiErr *ApiError)
+	Rename(org cf.Organization, name string) (apiErr *ApiError)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -69,6 +70,18 @@ func (repo CloudControllerOrganizationRepository) Create(name string) (apiErr *A
 		`{"name":"%s"}`, name,
 	)
 	request, apiErr := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiErr != nil {
+		return
+	}
+
+	apiErr = repo.apiClient.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiErr *ApiError) {
+	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
+	data := fmt.Sprintf(`{"name":"%s"}`, name)
+	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiErr != nil {
 		return
 	}

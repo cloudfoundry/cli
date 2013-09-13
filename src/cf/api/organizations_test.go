@@ -127,3 +127,23 @@ func TestCreateOrganization(t *testing.T) {
 	err := repo.Create("my-org")
 	assert.NoError(t, err)
 }
+
+var renameOrgEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/organizations/my-org-guid",
+	testhelpers.RequestBodyMatcher(`{"name":"my-new-org"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestRenameOrganization(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(renameOrgEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, client)
+
+	org := cf.Organization{Guid: "my-org-guid"}
+	err := repo.Rename(org, "my-new-org")
+	assert.NoError(t, err)
+}

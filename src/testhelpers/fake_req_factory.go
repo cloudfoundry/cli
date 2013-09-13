@@ -19,6 +19,9 @@ type FakeReqFactory struct {
 
 	SpaceName string
 	Space cf.Space
+
+	OrgName string
+	Organization cf.Organization
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -52,6 +55,13 @@ func (f *FakeReqFactory) NewSpaceRequirement(name string) requirements.SpaceRequ
 	return FakeRequirement{ f, true }
 }
 
+func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.OrganizationRequirement {
+	f.OrgName = name
+	return FakeRequirement{ f, true }
+}
+
+
+
 type FakeRequirement struct {
 	factory *FakeReqFactory
 	success bool
@@ -71,4 +81,8 @@ func (r FakeRequirement) GetServiceInstance() cf.ServiceInstance {
 
 func (r FakeRequirement) GetSpace() cf.Space {
 	return r.factory.Space
+}
+
+func (r FakeRequirement) GetOrganization() cf.Organization {
+	return r.factory.Organization
 }
