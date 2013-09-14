@@ -216,7 +216,7 @@ OPTIONS:
 		{
 			Name:        "logs",
 			Description: "Show recent logs for CF applications",
-			Usage:       "cf logs <appName>",
+			Usage:       "cf logs APP",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewLogs()
 				cmdRunner.Run(cmd, c)
