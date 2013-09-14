@@ -4,6 +4,8 @@ import (
 	"cf"
 	"cf/api"
 	"cf/terminal"
+
+	"github.com/codegangsta/cli"
 )
 
 type Factory struct {
@@ -29,6 +31,10 @@ func (f Factory) NewApps() Apps {
 		f.ui,
 		f.repoLocator.GetSpaceRepository(),
 	)
+}
+
+func (f Factory) NewBashAutocompletion(commands []cli.Command) *BashAutocomplete {
+	return NewBashAutocomplete(f.ui, commands)
 }
 
 func (f Factory) NewBindService() *BindService {

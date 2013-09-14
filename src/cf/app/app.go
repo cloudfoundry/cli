@@ -88,6 +88,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "bash-autocomplete",
+			Description: "Print out code to enable bash autocompletion for cf (see README for directions)",
+			Usage:       "cf bash-autocomplete",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewBashAutocompletion(app.Commands)
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "bind-service",
 			ShortName:   "bs",
 			Description: "Bind a service instance to an application",

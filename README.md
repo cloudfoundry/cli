@@ -1,5 +1,12 @@
 # Cloud Foundry CLI written in Go [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 
+## Usage tips
+
+To enable tab-completion in Bash, you can either:
+
+* Enable tab-completion only for your current shell with `eval "$(cf bash-autocomplete)"`
+* Enable it for all users by putting the script in a central sourced location, e.g. `cf bash-autocomplete > /etc/bash_completion.d/cf`
+
 ## Background
 
 Project to rewrite the Cloud Foundry CLI tool using Go. This project should currently be considered alpha quality
