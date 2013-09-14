@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	"cf/requirements"
 	term "cf/terminal"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
 	"strconv"
@@ -55,7 +56,7 @@ func (p Push) Run(c *cli.Context) {
 		}
 	}
 
-	p.ui.Say("Uploading %s...", app.Name)
+	p.ui.Say("Uploading %s...", term.EntityNameColor(app.Name))
 
 	dir := c.String("path")
 	if dir == "" {
@@ -102,10 +103,10 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 			return
 		}
 		newApp.Stack = stack
-		p.ui.Say("Using stack %s.", stack.Name)
+		p.ui.Say("Using stack %s.", term.EntityNameColor(stack.Name))
 	}
 
-	p.ui.Say("Creating %s...", appName)
+	p.ui.Say("Creating %s...", term.EntityNameColor(appName))
 	app, apiErr = p.appRepo.Create(newApp)
 	if apiErr != nil {
 		p.ui.Failed(apiErr.Error())
@@ -126,10 +127,12 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	}
 
 	route, apiErr := p.routeRepo.FindByHost(hostName)
+
 	if apiErr != nil {
 		newRoute := cf.Route{Host: hostName}
 
-		p.ui.Say("Creating route %s.%s...", newRoute.Host, domain.Name)
+		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
+		p.ui.Say("Creating route %s...", term.EntityNameColor(createdUrl))
 		route, apiErr = p.routeRepo.Create(newRoute, domain)
 		if apiErr != nil {
 			p.ui.Failed(apiErr.Error())
@@ -137,10 +140,12 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 		}
 		p.ui.Ok()
 	} else {
-		p.ui.Say("Using route %s.%s", route.Host, domain.Name)
+		existingUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
+		p.ui.Say("Using route %s", term.EntityNameColor(existingUrl))
 	}
 
-	p.ui.Say("Binding %s.%s to %s...", route.Host, domain.Name, app.Name)
+	finalUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
+	p.ui.Say("Binding %s to %s...", term.EntityNameColor(finalUrl), term.EntityNameColor(app.Name))
 	apiErr = p.routeRepo.Bind(route, app)
 	if apiErr != nil {
 		p.ui.Failed(apiErr.Error())
