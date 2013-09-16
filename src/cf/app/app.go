@@ -226,7 +226,13 @@ OPTIONS:
 				cli.BoolFlag{"recent", "dump recent logs instead of tailing"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRecentLogs()
+				var cmd commands.Command
+				cmd = cmdFactory.NewLogs()
+
+				if c.Bool("recent") {
+					cmd = cmdFactory.NewRecentLogs()
+				}
+
 				cmdRunner.Run(cmd, c)
 			},
 		},

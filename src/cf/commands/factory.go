@@ -106,10 +106,9 @@ func (f Factory) NewLogout() Logout {
 	)
 }
 
-func (f Factory) NewRecentLogs() *RecentLogs {
-	return NewRecentLogs(
+func (f Factory) NewLogs() *Logs {
+	return NewLogs(
 		f.ui,
-		f.repoLocator.GetApplicationRepository(),
 		f.repoLocator.GetLogsRepository(),
 	)
 }
@@ -140,6 +139,14 @@ func (f Factory) NewPush() Push {
 		f.repoLocator.GetDomainRepository(),
 		f.repoLocator.GetRouteRepository(),
 		f.repoLocator.GetStackRepository(),
+	)
+}
+
+func (f Factory) NewRecentLogs() *RecentLogs {
+	return NewRecentLogs(
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
+		f.repoLocator.GetLogsRepository(),
 	)
 }
 

@@ -5,6 +5,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -17,7 +18,7 @@ import (
 	"testing"
 )
 
-var logsEndpoint = func(message *logmessage.Message) http.HandlerFunc {
+var recentLogsEndpoint = func(message *logmessage.Message) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		authMatches := request.Header.Get("authorization") == "BEARER my_access_token"
 		methodMatches := request.Method == "GET"
@@ -51,14 +52,14 @@ func TestRecentLogsFor(t *testing.T) {
 	message, err := logmessage.ParseMessage(expectedMessage)
 	assert.NoError(t, err)
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(logsEndpoint(message)))
+	ts := httptest.NewTLSServer(http.HandlerFunc(recentLogsEndpoint(message)))
 	defer ts.Close()
 
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	redirectHandler := func(hostname string) string { return hostname }
-	logsRepo := NewLoggregatorLogsRepository(config, client, redirectHandler)
+	loggregatorHostResolver := func(hostname string) string { return hostname }
+	logsRepo := NewLoggregatorLogsRepository(config, client, loggregatorHostResolver)
 
 	logs, err := logsRepo.RecentLogsFor(app)
 	assert.NoError(t, err)
@@ -67,6 +68,63 @@ func TestRecentLogsFor(t *testing.T) {
 	actualMessage, err := proto.Marshal(logs[0])
 	assert.NoError(t, err)
 	assert.Equal(t, actualMessage, expectedMessage)
+}
+
+func TestTailsLogsFor(t *testing.T) {
+	expectedMessage := messagetesthelpers.MarshalledLogMessage(t, "My message", "my-app-id")
+
+	websocketEndpoint := func(conn *websocket.Conn) {
+		conn.Write(expectedMessage)
+		conn.Close()
+	}
+
+	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
+	defer websocketServer.Close()
+
+	var redirectEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, request.URL.Path, "/tail/")
+		assert.Equal(t, request.URL.RawQuery, "app=my-app-guid")
+		assert.Equal(t, request.Method, "GET")
+		assert.Contains(t, request.Header.Get("Authorization"), "BEARER my_access_token")
+
+		writer.Header().Set("Location", strings.Replace(websocketServer.URL, "https", "wss", 1))
+		writer.WriteHeader(http.StatusFound)
+	}
+
+	http.HandleFunc("/", redirectEndpoint)
+
+	go http.ListenAndServe(":"+LOGGREGATOR_REDIRECTOR_PORT, nil)
+
+	redirectServer := httptest.NewTLSServer(http.HandlerFunc(redirectEndpoint))
+	defer redirectServer.Close()
+
+	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
+
+	loggregatorHostResolver := func(hostname string) string { return hostname }
+	logsRepo := NewLoggregatorLogsRepository(config, client, loggregatorHostResolver)
+
+	connected := false
+
+	onConnect := func() {
+		connected = true
+	}
+
+	tailedMessages := []*logmessage.LogMessage{}
+
+	onMessage := func(message *logmessage.LogMessage) {
+		tailedMessages = append(tailedMessages, message)
+	}
+
+	logsRepo.TailLogsFor(app, onConnect, onMessage)
+
+	assert.Equal(t, len(tailedMessages), 1)
+	actualMessage, err := proto.Marshal(tailedMessages[0])
+	assert.NoError(t, err)
+	assert.Equal(t, actualMessage, expectedMessage)
+
+	assert.True(t, connected)
 }
 
 func TestLoggregatorHost(t *testing.T) {
