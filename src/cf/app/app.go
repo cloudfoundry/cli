@@ -197,7 +197,12 @@ OPTIONS:
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",
-			Usage:       "cf login [USERNAME] [PASSWORD]\n\n" + terminal.WarningColor("WARNING:\nProviding your password as a command line option is highly discouraged.\nYour password may be visible to others and may be recorded in your shell history."),
+			Usage:       "cf login [USERNAME] [PASSWORD]\n\n" +
+					terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged.\n   Your password may be visible to others and may be recorded in your shell history.\n\n") +
+					"EXAMPLE:\n" +
+					"   cf login (omit username and password to login interactively -- cf will prompt for both)\n" +
+					"   cf login name@example.com pa55woRD (specify username and password to login non-interactively)\n" +
+					"   cf login name@example.com \"my password\" (use quotes for passwords with a space)",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewLogin()
 				cmdRunner.Run(cmd, c)
