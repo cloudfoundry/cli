@@ -1,12 +1,13 @@
 [submodule "src/github.com/stretchr/testify"]
 	path = src/github.com/stretchr/testify
 	url = https://github.com/stretchr/testify.git
-[submodule "src/github.com/codegangsta/cli"]
-	path = src/github.com/codegangsta/cli
-	url = https://github.com/dam5s/cli.git
 [submodule "src/github.com/cloudfoundry/loggregatorlib"]
 	path = src/github.com/cloudfoundry/loggregatorlib
 	url = https://github.com/cloudfoundry/loggregatorlib.git
 [submodule "src/code.google.com/p/gogoprotobuf"]
 	path = src/code.google.com/p/gogoprotobuf
 	url = https://code.google.com/p/gogoprotobuf/
+[submodule "src/github.com/codegangsta/cli"]
+	path = src/github.com/codegangsta/cli
+	url = https://github.com/codegangsta/cli.git
+	branch = master
