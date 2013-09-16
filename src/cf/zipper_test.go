@@ -15,7 +15,7 @@ func TestZipWithDirectory(t *testing.T) {
 	assert.NoError(t, err)
 
 	zipper := ApplicationZipper{}
-	zipFile, err := zipper.Zip(filepath.Clean(dir + "/../fixtures/zip/"))
+	zipFile, err := zipper.Zip(filepath.Join(dir,"../fixtures/zip/"))
 	assert.NoError(t, err)
 
 	byteReader := bytes.NewReader(zipFile.Bytes())
@@ -40,7 +40,7 @@ func TestZipWithDirectory(t *testing.T) {
 	assert.Equal(t, contents, "This is a simple text file.")
 
 	name, contents = readFile(1)
-	assert.Equal(t, name, "subDir/bar.txt")
+	assert.Equal(t, name, filepath.Clean("subDir/bar.txt"))
 	assert.Equal(t, contents, "I am in a subdirectory.")
 }
 
@@ -49,7 +49,7 @@ func TestZipWithZipFile(t *testing.T) {
 	assert.NoError(t, err)
 
 	zipper := ApplicationZipper{}
-	zipFile, err := zipper.Zip(filepath.Clean(dir + "/../fixtures/application.zip"))
+	zipFile, err := zipper.Zip(filepath.Join(dir,"../fixtures/application.zip"))
 	assert.NoError(t, err)
 
 	assert.Equal(t, string(zipFile.Bytes()), "This is an application zip file\n")

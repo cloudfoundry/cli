@@ -46,7 +46,7 @@ func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 			return
 		}
 
-		fileName := strings.TrimPrefix(path, dir+"/")
+		fileName, _ := filepath.Rel(dir, path)
 		if fileShouldBeIgnored(exclusions, fileName) {
 			return
 		}
@@ -97,8 +97,10 @@ func readCfIgnore(dir string) (exclusions []string) {
 	ignores := strings.Split(readFile(cfIgnore), "\n")
 	ignores = append([]string{".cfignore"}, ignores...)
 
+
 	for _, pattern := range ignores {
-		pattern = strings.Trim(pattern,"\r")
+		pattern = filepath.Clean(pattern)
+
 		patternExclusions := exclusionsForPattern(dir, pattern)
 		exclusions = append(exclusions, patternExclusions...)
 	}
@@ -124,6 +126,7 @@ func exclusionsForPattern(dir string, pattern string) (exclusions []string) {
 
 		for _, p := range absolutePaths {
 			relpath, _ := filepath.Rel(starting_dir, p)
+
 			exclusions = append(exclusions, relpath)
 		}
 		return
