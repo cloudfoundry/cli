@@ -92,6 +92,32 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.Equal(t, ui.Outputs[8], "FAILED")
 }
 
+func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
+	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo.Delete()
+	config, _ := configRepo.Get()
+
+	ui := new(testhelpers.FakeUI)
+
+	callLogin(
+		[]string{
+			"foo@example.com",
+			"bar",
+		},
+		ui,
+		configRepo,
+		&testhelpers.FakeOrgRepository{},
+		&testhelpers.FakeSpaceRepository{},
+		&testhelpers.FakeAuthenticator{AuthError: true, ConfigRepo: configRepo},
+	)
+
+	assert.Contains(t, ui.Outputs[0], config.Target)
+	assert.Equal(t, ui.Outputs[1], "Authenticating...")
+	assert.Equal(t, ui.Outputs[2], "FAILED")
+	assert.Contains(t, ui.Outputs[3], "Error authenticating")
+	assert.Equal(t, len(ui.Outputs), 4)
+}
+
 func callLogin(args []string, ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
 	l := NewLogin(ui, configRepo, orgRepo, spaceRepo, auth)
 	l.Run(testhelpers.NewContext("login", args))

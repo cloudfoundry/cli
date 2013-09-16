@@ -47,25 +47,38 @@ func (l Login) Run(c *cli.Context) {
 		username = l.ui.Ask("Username%s", term.PromptColor(">"))
 	}
 
-	for i := 0; i < maxLoginTries; i++ {
-		if len(c.Args()) > 1 {
-			password = c.Args()[1]
-		} else {
-			password = l.ui.AskForPassword("Password%s", term.PromptColor(">"))
-		}
+	if len(c.Args()) > 1 {
+		password = c.Args()[1]
 		l.ui.Say("Authenticating...")
 
-		err := l.authenticator.Authenticate(username, password)
-
-		if err != nil {
-			l.ui.Failed(err.Error())
-			continue
+		apiErr := l.doLogin(username, password)
+		if apiErr != nil {
+			l.ui.Failed(apiErr.Error())
+			return
 		}
 
-		l.ui.Ok()
+	} else {
+		for i := 0; i < maxLoginTries; i++ {
+			password = l.ui.AskForPassword("Password%s", term.PromptColor(">"))
+			l.ui.Say("Authenticating...")
 
-		l.ui.Say("Use '%s' to view or set your target organization and space", term.CommandColor("cf target"))
+			apiErr := l.doLogin(username, password)
+			if apiErr != nil {
+				l.ui.Failed(apiErr.Error())
+				continue
+			}
 
-		return
+			return
+		}
 	}
+	return
+}
+
+func (l Login) doLogin(username, password string) (apiErr *api.ApiError) {
+	apiErr = l.authenticator.Authenticate(username, password)
+	if apiErr == nil {
+		l.ui.Ok()
+		l.ui.Say("Use '%s' to view or set your target organization and space", term.CommandColor("cf target"))
+	}
+	return
 }
