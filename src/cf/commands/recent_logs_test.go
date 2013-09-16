@@ -47,7 +47,7 @@ func TestRecentLogsWithAppName(t *testing.T) {
 	logsRepo := &testhelpers.FakeLogsRepository{RecentLogs: recentLogs}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 
-	ui := callLogs([]string{"my-app"}, config, reqFactory, appRepo, logsRepo)
+	ui := callRecentLogs([]string{"my-app"}, config, reqFactory, appRepo, logsRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app, logsRepo.AppLogged)
@@ -64,17 +64,17 @@ func TestRecentLogsWithoutAppNameShowsUsage(t *testing.T) {
 
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 
-	ui := callLogs([]string{}, config, reqFactory, appRepo, logsRepo)
+	ui := callRecentLogs([]string{}, config, reqFactory, appRepo, logsRepo)
 	assert.True(t, ui.FailedWithUsage)
-	ui = callLogs([]string{"my-app"}, config, reqFactory, appRepo, logsRepo)
+	ui = callRecentLogs([]string{"my-app"}, config, reqFactory, appRepo, logsRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
-func callLogs(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository, logsRepo api.LogsRepository) (ui *testhelpers.FakeUI) {
+func callRecentLogs(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository, logsRepo api.LogsRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("logs", args)
 
-	cmd := NewLogs(ui, appRepo, logsRepo)
+	cmd := NewRecentLogs(ui, appRepo, logsRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -8,22 +8,22 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type Logs struct {
+type RecentLogs struct {
 	ui       term.UI
 	appRepo  api.ApplicationRepository
 	appReq   requirements.ApplicationRequirement
 	logsRepo api.LogsRepository
 }
 
-func NewLogs(ui term.UI, aR api.ApplicationRepository, lR api.LogsRepository) (l *Logs) {
-	l = new(Logs)
+func NewRecentLogs(ui term.UI, aR api.ApplicationRepository, lR api.LogsRepository) (l *RecentLogs) {
+	l = new(RecentLogs)
 	l.ui = ui
 	l.appRepo = aR
 	l.logsRepo = lR
 	return
 }
 
-func (l *Logs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (l *RecentLogs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
 		l.ui.FailWithUsage(c, "logs")
@@ -35,7 +35,7 @@ func (l *Logs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 	return
 }
 
-func (l *Logs) Run(c *cli.Context) {
+func (l *RecentLogs) Run(c *cli.Context) {
 	app := l.appReq.GetApplication()
 	logs, err := l.logsRepo.RecentLogsFor(app)
 

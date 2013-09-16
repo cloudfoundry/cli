@@ -222,8 +222,11 @@ OPTIONS:
 			Name:        "logs",
 			Description: "Show recent logs for CF applications",
 			Usage:       "cf logs APP",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"recent", "dump recent logs instead of tailing"},
+			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewLogs()
+				cmd := cmdFactory.NewRecentLogs()
 				cmdRunner.Run(cmd, c)
 			},
 		},

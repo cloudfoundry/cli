@@ -106,8 +106,8 @@ func (f Factory) NewLogout() Logout {
 	)
 }
 
-func (f Factory) NewLogs() *Logs {
-	return NewLogs(
+func (f Factory) NewRecentLogs() *RecentLogs {
+	return NewRecentLogs(
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
 		f.repoLocator.GetLogsRepository(),
