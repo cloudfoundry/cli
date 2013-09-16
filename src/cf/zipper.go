@@ -89,7 +89,7 @@ func fileShouldBeIgnored(exclusions []string, relativePath string) bool {
 }
 
 func readCfIgnore(dir string) (exclusions []string) {
-	cfIgnore, err := os.Open(dir + "/.cfignore")
+	cfIgnore, err := os.Open(filepath.Join(dir,".cfignore"))
 	if err != nil {
 		return
 	}
@@ -98,6 +98,7 @@ func readCfIgnore(dir string) (exclusions []string) {
 	ignores = append([]string{".cfignore"}, ignores...)
 
 	for _, pattern := range ignores {
+		pattern = strings.Trim(pattern,"\r")
 		patternExclusions := exclusionsForPattern(dir, pattern)
 		exclusions = append(exclusions, patternExclusions...)
 	}
@@ -116,9 +117,9 @@ func exclusionsForPattern(dir string, pattern string) (exclusions []string) {
 
 		absolutePaths := []string{}
 		if f.IsDir() && f.Name() == pattern {
-			absolutePaths, _ = filepath.Glob(dir + "/*")
+			absolutePaths, _ = filepath.Glob(filepath.Join(dir,"*"))
 		} else {
-			absolutePaths, _ = filepath.Glob(dir + "/" + pattern)
+			absolutePaths, _ = filepath.Glob(filepath.Join(dir,pattern))
 		}
 
 		for _, p := range absolutePaths {
