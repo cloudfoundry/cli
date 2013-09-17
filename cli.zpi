@@ -1,0 +1,92 @@
+<!-- Project file for the Zeus IDE - http://www.zeusedit.com -->
+<Project name="cli" sorted="Yes" autosynch="" filename="" st_mtime="">
+    <SccEnable>On</SccEnable>
+    <SccComment></SccComment>
+    <SccProject></SccProject>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+    <TagEnable>On</TagEnable>
+    <TagNone>Off</TagNone>
+    <TagBuildNone>Off</TagBuildNone>
+    <TagBuildOnOpen>On</TagBuildOnOpen>
+    <TagBuildOnSave>On</TagBuildOnSave>
+    <TagNoIntellisense>Off</TagNoIntellisense>
+    <TagWorkspace>On</TagWorkspace>
+    <TagOutputDir>$zudzTags</TagOutputDir>
+    <TagInterval>6</TagInterval>
+    <TagBuildTimed></TagBuildTimed>
+    <Tags />
+    <Server></Server>
+    <UserID></UserID>
+    <Password></Password>
+    <LocalDir></LocalDir>
+    <RemoteDir></RemoteDir>
+    <Classes>Classes</Classes>
+    <Enumerations>Enumerations</Enumerations>
+    <Files>Project Files</Files>
+    <Functions>Functions</Functions>
+    <Imports>Imports</Imports>
+    <Interfaces>Interfaces</Interfaces>
+    <Macros>Macros</Macros>
+    <Packages>Packages</Packages>
+    <Prototypes>Prototypes</Prototypes>
+    <References>References</References>
+    <Structures>Structures</Structures>
+    <Typedefs>Typedefs</Typedefs>
+    <Variables>Variables</Variables>
+    <MakeFile></MakeFile>
+    <SearchPath></SearchPath>
+    <RegexFile></RegexFile>
+    <RegexLine></RegexLine>
+    <RegexInfo></RegexInfo>
+    <RegexError></RegexError>
+    <RegexWarning></RegexWarning>
+    <EnvLib></EnvLib>
+    <EnvPath>$MsBuildPath;$JREHomeBin;$JDKHomeBin;c:\dmd2\windows\bin;</EnvPath>
+    <EnvInclude></EnvInclude>
+    <EnvClassPath></EnvClassPath>
+    <DoxygenAsJava>On</DoxygenAsJava>
+    <DebugCaptureStdOut>Off</DebugCaptureStdOut>
+    <DebugCaptureStdErr>Off</DebugCaptureStdErr>
+    <DebugExecutable></DebugExecutable>
+    <DebugArguments></DebugArguments>
+    <DebugDirectory></DebugDirectory>
+    <DebugDebugger></DebugDebugger>
+    <ReleaseCaptureStdOut>Off</ReleaseCaptureStdOut>
+    <ReleaseCaptureStdErr>Off</ReleaseCaptureStdErr>
+    <ReleaseExecutable></ReleaseExecutable>
+    <ReleaseArguments></ReleaseArguments>
+    <ReleaseDirectory></ReleaseDirectory>
+    <ReleaseDebugger></ReleaseDebugger>
+    <DebugMake></DebugMake>
+    <DebugClean></DebugClean>
+    <DebugCompile></DebugCompile>
+    <DebugRebuild></DebugRebuild>
+    <DebugProjectOutput>Always</DebugProjectOutput>
+    <DebugCompilerOutput>Always</DebugCompilerOutput>
+    <DebugCompilerStdOut>On</DebugCompilerStdOut>
+    <DebugCompilerStdErr>On</DebugCompilerStdErr>
+    <DebugCompilerSaveAll>Off</DebugCompilerSaveAll>
+    <DebugCompilerReload>Off</DebugCompilerReload>
+    <DebugProjectStdOut>On</DebugProjectStdOut>
+    <DebugProjectStdErr>On</DebugProjectStdErr>
+    <DebugProjectSaveAll>Off</DebugProjectSaveAll>
+    <DebugProjectReload>Off</DebugProjectReload>
+    <ReleaseMake>make $ws</ReleaseMake>
+    <ReleaseClean>make clean</ReleaseClean>
+    <ReleaseCompile></ReleaseCompile>
+    <ReleaseRebuild>rebuild $ws</ReleaseRebuild>
+    <ReleaseProjectOutput>Always</ReleaseProjectOutput>
+    <ReleaseCompilerOutput>Always</ReleaseCompilerOutput>
+    <ReleaseCompilerStdOut>On</ReleaseCompilerStdOut>
+    <ReleaseCompilerStdErr>On</ReleaseCompilerStdErr>
+    <ReleaseCompilerSaveAll>Off</ReleaseCompilerSaveAll>
+    <ReleaseCompilerReload>Off</ReleaseCompilerReload>
+    <ReleaseProjectStdOut>On</ReleaseProjectStdOut>
+    <ReleaseProjectStdErr>On</ReleaseProjectStdErr>
+    <ReleaseProjectSaveAll>Off</ReleaseProjectSaveAll>
+    <ReleaseProjectReload>Off</ReleaseProjectReload>
+    <Folder name="Header Files" sorted="Yes" />
+    <Folder name="Resource Files" sorted="Yes" />
+    <Folder name="Source Files" sorted="Yes" />
+</Project>

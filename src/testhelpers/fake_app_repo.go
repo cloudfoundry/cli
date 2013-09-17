@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"cf/api"
 	"net/http"
+	"time"
 )
 
 type FakeApplicationRepository struct {
@@ -99,6 +100,7 @@ func (repo *FakeApplicationRepository) Stop(app cf.Application) (apiErr *api.Api
 }
 
 func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instances[]cf.ApplicationInstance, apiErr *api.ApiError) {
+	time.Sleep(1 * time.Millisecond) //needed for Windows only, otherwise it thinks error codes are not assigned
 	errorCode := repo.GetInstancesErrorCodes[0]
 	repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
 
