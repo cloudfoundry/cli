@@ -50,8 +50,7 @@ func (c TerminalUI) Ok() {
 func (c TerminalUI) Failed(message string) {
 	c.Say(FailureColor("FAILED"))
 	c.Say(message)
-
-	return
+	os.Exit(1)
 }
 
 func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
