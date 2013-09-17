@@ -54,3 +54,25 @@ func TestZipWithZipFile(t *testing.T) {
 
 	assert.Equal(t, string(zipFile.Bytes()), "This is an application zip file\n")
 }
+
+func TestZipWithWarFile(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	zipper := ApplicationZipper{}
+	zipFile, err := zipper.Zip(filepath.Join(dir, "../fixtures/application.war"))
+	assert.NoError(t, err)
+
+	assert.Equal(t, string(zipFile.Bytes()), "This is an application war file\n")
+}
+
+func TestZipWithJarFile(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+
+	zipper := ApplicationZipper{}
+	zipFile, err := zipper.Zip(filepath.Join(dir, "../fixtures/application.jar"))
+	assert.NoError(t, err)
+
+	assert.Equal(t, string(zipFile.Bytes()), "This is an application jar file\n")
+}

@@ -16,12 +16,23 @@ type Zipper interface {
 
 type ApplicationZipper struct{}
 
+var doNotZipExtensions = []string{".zip", ".war", ".jar"}
+
 func (zipper ApplicationZipper) Zip(dirOrZipFile string) (zipBuffer *bytes.Buffer, err error) {
-	if strings.HasSuffix(dirOrZipFile, ".zip") {
+	if shouldNotZip(filepath.Ext(dirOrZipFile)) {
 		return readZipFile(dirOrZipFile)
 	}
 
 	return createZipFile(dirOrZipFile)
+}
+
+func shouldNotZip(extension string) (result bool){
+	for _, ext := range doNotZipExtensions{
+		if ext == extension{
+			return true
+		}
+	}
+	return
 }
 
 func readZipFile(file string) (zipBuffer *bytes.Buffer, err error) {
