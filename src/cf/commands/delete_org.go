@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
@@ -10,15 +12,17 @@ import (
 )
 
 type DeleteOrg struct {
-	ui      term.UI
-	orgRepo api.OrganizationRepository
-	orgReq  requirements.OrganizationRequirement
+	ui         term.UI
+	orgRepo    api.OrganizationRepository
+	orgReq     requirements.OrganizationRequirement
+	configRepo configuration.ConfigurationRepository
 }
 
-func NewDeleteOrg(ui term.UI, sR api.OrganizationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui term.UI, sR api.OrganizationRepository, cR configuration.ConfigurationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
 	cmd.orgRepo = sR
+	cmd.configRepo = cR
 	return
 }
 
@@ -61,6 +65,17 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
+	}
+	config, apiErr := cmd.configRepo.Get()
+	if apiErr != nil {
+		cmd.ui.Failed("Couldn't reset your target. You should logout and log in again.")
+		return
+	}
+
+	if org.Guid == config.Organization.Guid {
+		config.Organization = cf.Organization{}
+		config.Space = cf.Space{}
+		cmd.configRepo.Save()
 	}
 
 	cmd.ui.Ok()

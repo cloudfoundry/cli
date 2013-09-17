@@ -63,6 +63,7 @@ func (f Factory) NewDeleteOrg() *DeleteOrg {
 	return NewDeleteOrg(
 		f.ui,
 		f.repoLocator.GetOrganizationRepository(),
+		f.repoLocator.GetConfigurationRepository(),
 	)
 }
 

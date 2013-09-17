@@ -92,7 +92,7 @@ func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, na
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiErr *ApiError) {
-	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
+	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
 	request, apiErr := NewRequest("DELETE", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return

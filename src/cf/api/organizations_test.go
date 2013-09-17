@@ -150,7 +150,7 @@ func TestRenameOrganization(t *testing.T) {
 
 var deleteOrgEndpoint = testhelpers.CreateEndpoint(
 	"DELETE",
-	"/v2/organizations/my-org-guid",
+	"/v2/organizations/my-org-guid?recursive=true",
 	nil,
 	testhelpers.TestResponse{Status: http.StatusOK},
 )
