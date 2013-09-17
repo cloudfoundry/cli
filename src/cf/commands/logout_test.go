@@ -13,7 +13,7 @@ func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
 	config, _ := configRepo.Get()
 	config.AccessToken = "MyAccessToken"
 	config.Organization = cf.Organization{Name: "MyOrg"}
-	config.Space = cf.Space{Name: "MyOrg"}
+	config.Space = cf.Space{Name: "MySpace"}
 
 	ui := new(testhelpers.FakeUI)
 
