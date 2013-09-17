@@ -9,7 +9,7 @@ import (
 func TestLoadingWithNoConfigFile(t *testing.T) {
 	repo := NewConfigurationDiskRepository()
 	config := repo.loadDefaultConfig(t)
-	defer repo.restoreConfig()
+	defer repo.restoreConfig(t)
 
 	assert.Equal(t, config.Target, "https://api.run.pivotal.io")
 	assert.Equal(t, config.ApiVersion, "2")
@@ -20,7 +20,7 @@ func TestLoadingWithNoConfigFile(t *testing.T) {
 func TestSavingAndLoading(t *testing.T) {
 	repo := NewConfigurationDiskRepository()
 	configToSave := repo.loadDefaultConfig(t)
-	defer repo.restoreConfig()
+	defer repo.restoreConfig(t)
 
 	configToSave.ApiVersion = "3.1.0"
 	configToSave.Target = "https://api.target.example.com"
@@ -47,11 +47,12 @@ func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config 
 	return
 }
 
-func (repo ConfigurationDiskRepository) restoreConfig() {
+func (repo ConfigurationDiskRepository) restoreConfig(t *testing.T) {
 	file, err := ConfigFile()
-	if err != nil {
-		return
-	}
-	os.Rename(file+"test-backup", file)
+	assert.NoError(t, err)
+	err = os.Remove(file)
+	assert.NoError(t, err)
+	err = os.Rename(file+"test-backup", file)
+	assert.NoError(t, err)
 	return
 }
