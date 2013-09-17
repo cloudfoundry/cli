@@ -16,6 +16,7 @@ import (
 type Push struct {
 	ui         term.UI
 	starter    ApplicationStarter
+	stopper    ApplicationStopper
 	zipper     cf.Zipper
 	appRepo    api.ApplicationRepository
 	domainRepo api.DomainRepository
@@ -23,10 +24,11 @@ type Push struct {
 	stackRepo  api.StackRepository
 }
 
-func NewPush(ui term.UI, starter ApplicationStarter, zipper cf.Zipper,
+func NewPush(ui term.UI, starter ApplicationStarter, stopper ApplicationStopper, zipper cf.Zipper,
 	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository) (p Push) {
 	p.ui = ui
 	p.starter = starter
+	p.stopper = stopper
 	p.zipper = zipper
 	p.appRepo = aR
 	p.domainRepo = dR
@@ -81,6 +83,7 @@ func (p Push) Run(c *cli.Context) {
 	}
 
 	p.ui.Ok()
+	p.stopper.ApplicationStop(app)
 	if !c.Bool("no-start") {
 		p.starter.ApplicationStart(app)
 	}

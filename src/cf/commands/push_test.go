@@ -19,16 +19,25 @@ func (starter *FakeAppStarter) ApplicationStart(app cf.Application) {
 	starter.StartedApp = app
 }
 
+type FakeAppStopper struct {
+	StoppedApp cf.Application
+}
+
+func (stopper *FakeAppStopper) ApplicationStop(app cf.Application) {
+	stopper.StoppedApp = app
+}
+
 func TestPushingRequirements(t *testing.T) {
 	fakeUI := new(testhelpers.FakeUI)
 	starter := &FakeAppStarter{}
+	stopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 	domainRepo := &testhelpers.FakeDomainRepository{}
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	stackRepo := &testhelpers.FakeStackRepository{}
 
-	cmd := NewPush(fakeUI, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	cmd := NewPush(fakeUI, starter, stopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 	ctxt := testhelpers.NewContext("push", []string{})
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -55,9 +64,10 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
@@ -86,6 +96,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[7], "OK")
 
 	assert.Equal(t, fakeStarter.StartedApp.Name, "my-new-app")
+	assert.Equal(t, fakeStopper.StoppedApp.Name, "my-new-app")
 }
 
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
@@ -98,17 +109,13 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
-	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
-	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
-	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
-	assert.Equal(t, appRepo.CreatedApp.BuildpackUrl, "")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-
+	assert.Empty(t, routeRepo.CreatedRoute.Host)
+	assert.Empty(t, routeRepo.CreatedRouteDomain.Guid)
 	assert.Contains(t, fakeUI.Outputs[2], "my-new-app.foo.cf-app.com")
 	assert.Equal(t, routeRepo.FindByHostHost, "my-new-app")
 
@@ -116,16 +123,6 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	assert.Equal(t, routeRepo.BoundApp.Name, "my-new-app")
 	assert.Equal(t, routeRepo.BoundRoute.Host, "my-new-app")
 	assert.Contains(t, fakeUI.Outputs[4], "OK")
-
-	expectedAppDir, err := os.Getwd()
-	assert.NoError(t, err)
-
-	assert.Contains(t, fakeUI.Outputs[5], "my-new-app")
-	assert.Equal(t, appRepo.UploadedApp.Guid, "my-new-app-guid")
-	assert.Equal(t, zipper.ZippedDir, expectedAppDir)
-	assert.Contains(t, fakeUI.Outputs[6], "OK")
-
-	assert.Equal(t, fakeStarter.StartedApp.Name, "my-new-app")
 }
 
 func TestPushingAppWithCustomFlags(t *testing.T) {
@@ -135,6 +132,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{FindByNameStack: cf.Stack{Name: "customLinux", Guid: "custom-linux-guid"}}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{ZippedBuffer: bytes.NewBufferString("Zip File!")}
 
 	fakeUI := callPush([]string{
@@ -147,7 +145,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"--path", "/Users/pivotal/workspace/my-new-app",
 		"--stack", "customLinux",
 		"--no-start", "",
-	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "customLinux")
 	assert.Equal(t, stackRepo.FindByNameName, "customLinux")
@@ -188,12 +186,13 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	callPush([]string{
 		"--name", "my-new-app",
 		"--memory", "256M",
-	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, 256)
 }
@@ -205,12 +204,13 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	callPush([]string{
 		"--name", "my-new-app",
 		"--memory", "512",
-	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, 512)
 }
@@ -222,12 +222,13 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	callPush([]string{
 		"--name", "my-new-app",
 		"--memory", "abcM",
-	}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
 }
@@ -239,10 +240,12 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: existingApp}
 	stackRepo := &testhelpers.FakeStackRepository{}
 	fakeStarter := &FakeAppStarter{}
+	fakeStopper := &FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
-	fakeUI := callPush([]string{"--name", "existing-app"}, fakeStarter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	fakeUI := callPush([]string{"--name", "existing-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
+	assert.Equal(t, fakeStopper.StoppedApp.Name, "existing-app")
 	assert.Contains(t, fakeUI.Outputs[0], "existing-app")
 	assert.Equal(t, appRepo.UploadedApp.Guid, "existing-app-guid")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
@@ -250,6 +253,7 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 
 func callPush(args []string,
 	starter ApplicationStarter,
+	stopper ApplicationStopper,
 	zipper cf.Zipper,
 	appRepo api.ApplicationRepository,
 	domainRepo api.DomainRepository,
@@ -258,7 +262,7 @@ func callPush(args []string,
 
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("push", args)
-	cmd := NewPush(fakeUI, starter, zipper, appRepo, domainRepo, routeRepo, stackRepo)
+	cmd := NewPush(fakeUI, starter, stopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 

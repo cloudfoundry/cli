@@ -1,12 +1,17 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/requirements"
 	term "cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
+
+type ApplicationStopper interface {
+	ApplicationStop(app cf.Application)
+}
 
 type Stop struct {
 	ui      term.UI
@@ -35,9 +40,7 @@ func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 	return
 }
 
-func (s *Stop) Run(c *cli.Context) {
-	app := s.appReq.GetApplication()
-
+func (s *Stop) ApplicationStop(app cf.Application) {
 	if app.State == "stopped" {
 		s.ui.Say(term.WarningColor("Application " + app.Name + " is already stopped."))
 		return
@@ -51,4 +54,9 @@ func (s *Stop) Run(c *cli.Context) {
 		return
 	}
 	s.ui.Ok()
+}
+
+func (s *Stop) Run(c *cli.Context) {
+	app := s.appReq.GetApplication()
+	s.ApplicationStop(app)
 }

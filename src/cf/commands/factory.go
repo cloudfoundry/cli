@@ -140,6 +140,7 @@ func (f Factory) NewPush() Push {
 	return NewPush(
 		f.ui,
 		f.NewStart(),
+		f.NewStop(),
 		zipper,
 		f.repoLocator.GetApplicationRepository(),
 		f.repoLocator.GetDomainRepository(),
