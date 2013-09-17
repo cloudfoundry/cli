@@ -81,6 +81,12 @@ func (f Factory) NewDeleteSpace() *DeleteSpace {
 	)
 }
 
+func (f Factory) NewEnv() *Env {
+	return NewEnv(
+		f.ui,
+	)
+}
+
 func (f Factory) NewFiles() *Files {
 	return NewFiles(
 		f.ui,

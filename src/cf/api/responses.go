@@ -29,11 +29,12 @@ type ApplicationResource struct {
 }
 
 type ApplicationEntity struct {
-	Name      string
-	State     string
-	Instances int
-	Memory    int
-	Routes    []RouteResource
+	Name            string
+	State           string
+	Instances       int
+	Memory          int
+	Routes          []RouteResource
+	EnvironmentJson map[string]string `json:"environment_json"`
 }
 
 type RoutesResponse struct {

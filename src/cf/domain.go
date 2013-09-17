@@ -33,6 +33,7 @@ type Application struct {
 	Urls             []string
 	BuildpackUrl     string
 	Stack            Stack
+	EnvironmentVars  map[string]string
 }
 
 func (app Application) Health() string {

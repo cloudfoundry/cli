@@ -24,6 +24,10 @@ var singleAppResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
       },
       "entity": {
         "name": "App1",
+        "environment_json": {
+      		"foo": "bar",
+      		"baz": "boom"
+    	},
         "memory": 256,
         "instances": 1,
         "state": "STOPPED",
@@ -111,6 +115,7 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.Guid, "app1-guid")
 	assert.Equal(t, app.Memory, 128)
 	assert.Equal(t, app.Instances, 1)
+	assert.Equal(t, app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
 
 	assert.Equal(t, len(app.Urls), 1)
 	assert.Equal(t, app.Urls[0], "app1.cfapps.io")

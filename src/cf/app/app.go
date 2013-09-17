@@ -185,6 +185,16 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "env",
+			ShortName:   "e",
+			Description: "Show all env variables for an app",
+			Usage:       "cf env APP",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewEnv()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "files",
 			Description: "Print out a list of files in a directory or the contents of a specific file",
 			Usage:       "cf files APP [PATH]",
