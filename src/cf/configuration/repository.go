@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"runtime"
 	"path/filepath"
+	"runtime"
 )
 
 const (
@@ -76,7 +76,7 @@ func (repo ConfigurationDiskRepository) ClearSession() (err error) {
 // Keep this one public for configtest/configuration.go
 func ConfigFile() (file string, err error) {
 
-	configDir := filepath.Join(userHomeDir(),".cf")
+	configDir := filepath.Join(userHomeDir(), ".cf")
 
 	err = os.MkdirAll(configDir, dirPermissions)
 
@@ -84,7 +84,7 @@ func ConfigFile() (file string, err error) {
 		return
 	}
 
-	file = filepath.Join(configDir,"config.json")
+	file = filepath.Join(configDir, "config.json")
 	return
 }
 
