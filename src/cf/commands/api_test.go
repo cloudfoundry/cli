@@ -3,6 +3,7 @@ package commands_test
 import (
 	. "cf/commands"
 	"cf/configuration"
+	"cf/net"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -133,7 +134,8 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 
 func callApi(args []string, configRepo configuration.ConfigurationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
-	cmd := NewApi(ui, configRepo)
+	gateway := net.NewCloudControllerGateway(nil)
+	cmd := NewApi(ui, gateway, configRepo)
 	ctxt := testhelpers.NewContext("api", args)
 	reqFactory := &testhelpers.FakeReqFactory{}
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)

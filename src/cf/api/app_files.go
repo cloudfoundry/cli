@@ -3,31 +3,32 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/net"
 	"fmt"
 )
 
 type AppFilesRepository interface {
-	ListFiles(app cf.Application, path string) (files string, apiErr *ApiError)
+	ListFiles(app cf.Application, path string) (files string, apiErr *net.ApiError)
 }
 
 type CloudControllerAppFilesRepository struct {
-	config *configuration.Configuration
-	client ApiClient
+	config  *configuration.Configuration
+	gateway net.Gateway
 }
 
-func NewCloudControllerAppFilesRepository(config *configuration.Configuration, client ApiClient) (repo CloudControllerAppFilesRepository) {
+func NewCloudControllerAppFilesRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerAppFilesRepository) {
 	repo.config = config
-	repo.client = client
+	repo.gateway = gateway
 	return
 }
 
-func (repo CloudControllerAppFilesRepository) ListFiles(app cf.Application, path string) (files string, apiErr *ApiError) {
+func (repo CloudControllerAppFilesRepository) ListFiles(app cf.Application, path string) (files string, apiErr *net.ApiError) {
 	url := fmt.Sprintf("%s/v2/apps/%s/instances/0/files/%s", repo.config.Target, app.Guid, path)
-	request, apiErr := NewRequest("GET", url, repo.config.AccessToken, nil)
+	request, apiErr := repo.gateway.NewRequest("GET", url, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
 
-	files, apiErr = repo.client.PerformRequestForTextResponse(request)
+	files, apiErr = repo.gateway.PerformRequestForTextResponse(request)
 	return
 }

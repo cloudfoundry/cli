@@ -2,7 +2,7 @@ package testhelpers
 
 import (
 	"cf/configuration"
-	"cf/api"
+	"cf/net"
 )
 
 type FakeAuthenticator struct {
@@ -17,7 +17,7 @@ type FakeAuthenticator struct {
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiErr *api.ApiError) {
+func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiErr *net.ApiError) {
 	auth.Config, _ = auth.ConfigRepo.Get()
 	auth.Email = email
 	auth.Password = password
@@ -31,11 +31,11 @@ func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiE
 	auth.ConfigRepo.Save()
 
 	if auth.AuthError {
-		apiErr =  &api.ApiError{Message: "Error authenticating."}
+		apiErr =  &net.ApiError{Message: "Error authenticating."}
 	}
 	return
 }
 
-func (auth *FakeAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *api.ApiError) {
+func (auth *FakeAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *net.ApiError) {
 	return
 }

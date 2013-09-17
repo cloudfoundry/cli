@@ -2,10 +2,15 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/net"
 )
 
 type RepositoryLocator struct {
 	config *configuration.Configuration
+
+	authenticator          Authenticator
+	cloudControllerGateway net.Gateway
+	uaaGateway             net.Gateway
 
 	configurationRepo configuration.ConfigurationDiskRepository
 	organizationRepo  CloudControllerOrganizationRepository
@@ -20,23 +25,26 @@ type RepositoryLocator struct {
 	logsRepo          LoggregatorLogsRepository
 }
 
-func NewRepositoryLocator(config *configuration.Configuration) (locator RepositoryLocator) {
-	locator.config = config
-	locator.configurationRepo = configuration.NewConfigurationDiskRepository()
+func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLocator) {
+	loc.config = config
+	loc.configurationRepo = configuration.NewConfigurationDiskRepository()
 
-	authenticator := NewUAAAuthenticator(locator.configurationRepo)
-	apiClient := NewApiClient(authenticator)
+	authGateway := net.NewUAAAuthGateway()
+	loc.authenticator = NewUAAAuthenticator(authGateway, loc.configurationRepo)
 
-	locator.organizationRepo = NewCloudControllerOrganizationRepository(config, apiClient)
-	locator.spaceRepo = NewCloudControllerSpaceRepository(config, apiClient)
-	locator.appRepo = NewCloudControllerApplicationRepository(config, apiClient)
-	locator.appFilesRepo = NewCloudControllerAppFilesRepository(config, apiClient)
-	locator.domainRepo = NewCloudControllerDomainRepository(config, apiClient)
-	locator.routeRepo = NewCloudControllerRouteRepository(config, apiClient)
-	locator.stackRepo = NewCloudControllerStackRepository(config, apiClient)
-	locator.serviceRepo = NewCloudControllerServiceRepository(config, apiClient)
-	locator.passwordRepo = NewCloudControllerPasswordRepository(config, apiClient)
-	locator.logsRepo = NewLoggregatorLogsRepository(config, apiClient, LoggregatorHost)
+	loc.cloudControllerGateway = net.NewCloudControllerGateway(loc.authenticator)
+	loc.uaaGateway = net.NewUAAGateway(loc.authenticator)
+
+	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, loc.cloudControllerGateway)
+	loc.spaceRepo = NewCloudControllerSpaceRepository(config, loc.cloudControllerGateway)
+	loc.appRepo = NewCloudControllerApplicationRepository(config, loc.cloudControllerGateway)
+	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, loc.cloudControllerGateway)
+	loc.domainRepo = NewCloudControllerDomainRepository(config, loc.cloudControllerGateway)
+	loc.routeRepo = NewCloudControllerRouteRepository(config, loc.cloudControllerGateway)
+	loc.stackRepo = NewCloudControllerStackRepository(config, loc.cloudControllerGateway)
+	loc.serviceRepo = NewCloudControllerServiceRepository(config, loc.cloudControllerGateway)
+	loc.passwordRepo = NewCloudControllerPasswordRepository(config, loc.uaaGateway)
+	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.cloudControllerGateway, LoggregatorHost)
 
 	return
 }
@@ -47,6 +55,18 @@ func (locator RepositoryLocator) GetConfig() *configuration.Configuration {
 
 func (locator RepositoryLocator) GetConfigurationRepository() configuration.ConfigurationRepository {
 	return locator.configurationRepo
+}
+
+func (locator RepositoryLocator) GetAuthenticator() Authenticator {
+	return locator.authenticator
+}
+
+func (locator RepositoryLocator) GetCloudControllerGateway() net.Gateway {
+	return locator.cloudControllerGateway
+}
+
+func (locator RepositoryLocator) GetUAAGateway() net.Gateway {
+	return locator.uaaGateway
 }
 
 func (locator RepositoryLocator) GetOrganizationRepository() OrganizationRepository {

@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/net"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
@@ -18,32 +19,32 @@ import (
 const LOGGREGATOR_REDIRECTOR_PORT = "4443"
 
 type LogsRepository interface {
-	RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *ApiError)
+	RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *net.ApiError)
 	TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error)
 }
 
 type LoggregatorLogsRepository struct {
 	config                  *configuration.Configuration
-	apiClient               ApiClient
+	gateway                 net.Gateway
 	loggregatorHostResolver func(string) string
 }
 
-func NewLoggregatorLogsRepository(config *configuration.Configuration, client ApiClient, loggregatorHostResolver func(string) string) (repo LoggregatorLogsRepository) {
+func NewLoggregatorLogsRepository(config *configuration.Configuration, gateway net.Gateway, loggregatorHostResolver func(string) string) (repo LoggregatorLogsRepository) {
 	repo.config = config
-	repo.apiClient = client
+	repo.gateway = gateway
 	repo.loggregatorHostResolver = loggregatorHostResolver
 	return
 }
 
-func (l LoggregatorLogsRepository) RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *ApiError) {
-	host := l.loggregatorHostResolver(l.config.Target)
-	request, apiErr := NewRequest("GET", fmt.Sprintf("%s/dump/?app=%s", host, app.Guid), l.config.AccessToken, nil)
+func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *net.ApiError) {
+	host := repo.loggregatorHostResolver(repo.config.Target)
+	request, apiErr := repo.gateway.NewRequest("GET", fmt.Sprintf("%s/dump/?app=%s", host, app.Guid), repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
 	request.Header.Del("accept")
 
-	bytes, apiErr := l.apiClient.PerformRequestForResponseBytes(request)
+	bytes, apiErr := repo.gateway.PerformRequestForResponseBytes(request)
 
 	if apiErr != nil {
 		return
@@ -52,13 +53,13 @@ func (l LoggregatorLogsRepository) RecentLogsFor(app cf.Application) (logs []*lo
 	logs, err := logmessage.ParseDumpedLogMessages(bytes)
 
 	if err != nil {
-		apiErr = NewApiErrorWithError("Could not parse log messages", err)
+		apiErr = net.NewApiErrorWithError("Could not parse log messages", err)
 	}
 
 	return
 }
 
-func (l LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error) {
+func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error) {
 	const REDIRECT_ERROR = "REDIRECTED"
 
 	tlsConfig := &tls.Config{InsecureSkipVerify: true}
@@ -72,8 +73,8 @@ func (l LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect fun
 		},
 	}
 
-	host := l.loggregatorHostResolver(l.config.Target) + ":" + LOGGREGATOR_REDIRECTOR_PORT
-	request, apiErr := NewRequest("GET", fmt.Sprintf("%s/tail/?app=%s", host, app.Guid), l.config.AccessToken, nil)
+	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + LOGGREGATOR_REDIRECTOR_PORT
+	request, apiErr := repo.gateway.NewRequest("GET", fmt.Sprintf("%s/tail/?app=%s", host, app.Guid), repo.config.AccessToken, nil)
 	if apiErr != nil {
 		err = errors.New(apiErr.Error())
 		return
@@ -91,7 +92,7 @@ func (l LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect fun
 		return
 	}
 
-	config.Header.Add("Authorization", l.config.AccessToken)
+	config.Header.Add("Authorization", repo.config.AccessToken)
 	config.TlsConfig = tlsConfig
 
 	ws, err := websocket.DialConfig(config)

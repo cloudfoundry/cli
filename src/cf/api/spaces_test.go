@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -49,8 +50,8 @@ func TestSpacesFindAll(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 	spaces, err := repo.FindAll()
 
 	assert.NoError(t, err)
@@ -74,8 +75,8 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	var (
 		spaces []cf.Space
@@ -101,8 +102,8 @@ func TestSpacesFindByName(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 	existingOrg := cf.Space{Guid: "staging-space-guid", Name: "staging"}
 
 	org, err := repo.FindByName("staging")
@@ -201,8 +202,8 @@ func TestGetSummary(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space, err := repo.GetSummary()
 	assert.NoError(t, err)
@@ -261,8 +262,8 @@ func TestCreateSpace(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "org-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	err := repo.Create("space-name")
 	assert.NoError(t, err)
@@ -283,8 +284,8 @@ func TestRenameSpace(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space := cf.Space{Guid: "my-space-guid"}
 	err := repo.Rename(space, "new-space-name")
@@ -306,8 +307,8 @@ func TestDeleteSpace(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerSpaceRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space := cf.Space{Guid: "my-space-guid"}
 	err := repo.Delete(space)

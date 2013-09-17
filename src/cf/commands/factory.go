@@ -20,6 +20,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Fact
 func (f Factory) NewApi() Api {
 	return NewApi(
 		f.ui,
+		f.repoLocator.GetCloudControllerGateway(),
 		f.repoLocator.GetConfigurationRepository(),
 	)
 }
@@ -95,14 +96,12 @@ func (f Factory) NewFiles() *Files {
 }
 
 func (f Factory) NewLogin() Login {
-	authenticator := api.NewUAAAuthenticator(f.repoLocator.GetConfigurationRepository())
-
 	return NewLogin(
 		f.ui,
 		f.repoLocator.GetConfigurationRepository(),
 		f.repoLocator.GetOrganizationRepository(),
 		f.repoLocator.GetSpaceRepository(),
-		authenticator,
+		f.repoLocator.GetAuthenticator(),
 	)
 }
 

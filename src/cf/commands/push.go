@@ -3,6 +3,7 @@ package commands
 import (
 	"cf"
 	"cf/api"
+	"cf/net"
 	"cf/requirements"
 	term "cf/terminal"
 	"fmt"
@@ -85,7 +86,7 @@ func (p Push) Run(c *cli.Context) {
 	}
 }
 
-func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, apiErr *api.ApiError) {
+func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, apiErr *net.ApiError) {
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("instances"),

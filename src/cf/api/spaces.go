@@ -3,28 +3,29 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/net"
 	"fmt"
 	"strings"
 )
 
 type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
-	FindAll() (spaces []cf.Space, apiErr *ApiError)
-	FindByName(name string) (space cf.Space, apiErr *ApiError)
-	GetSummary() (space cf.Space, apiErr *ApiError)
-	Create(name string) (apiErr *ApiError)
-	Rename(space cf.Space, newName string) (apiErr *ApiError)
-	Delete(space cf.Space) (apiErr *ApiError)
+	FindAll() (spaces []cf.Space, apiErr *net.ApiError)
+	FindByName(name string) (space cf.Space, apiErr *net.ApiError)
+	GetSummary() (space cf.Space, apiErr *net.ApiError)
+	Create(name string) (apiErr *net.ApiError)
+	Rename(space cf.Space, newName string) (apiErr *net.ApiError)
+	Delete(space cf.Space) (apiErr *net.ApiError)
 }
 
 type CloudControllerSpaceRepository struct {
-	config    *configuration.Configuration
-	apiClient ApiClient
+	config  *configuration.Configuration
+	gateway net.Gateway
 }
 
-func NewCloudControllerSpaceRepository(config *configuration.Configuration, apiClient ApiClient) (repo CloudControllerSpaceRepository) {
+func NewCloudControllerSpaceRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerSpaceRepository) {
 	repo.config = config
-	repo.apiClient = apiClient
+	repo.gateway = gateway
 	return
 }
 
@@ -32,16 +33,16 @@ func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.config.Space
 }
 
-func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr *ApiError) {
+func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", repo.config.Target, repo.config.Organization.Guid)
-	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
 
 	response := new(ApiResponse)
 
-	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
@@ -54,7 +55,7 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiErr *ApiError) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiErr *net.ApiError) {
 	spaces, apiErr := repo.FindAll()
 	lowerName := strings.ToLower(name)
 
@@ -68,19 +69,19 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		}
 	}
 
-	apiErr = NewApiErrorWithMessage("Space not found")
+	apiErr = net.NewApiErrorWithMessage("Space not found")
 	return
 }
 
-func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr *ApiError) {
+func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, apiErr := NewRequest("GET", path, repo.config.AccessToken, nil)
+	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
-	apiErr = repo.apiClient.PerformRequestAndParseResponse(request, response)
+	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
@@ -94,41 +95,41 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string) (apiErr *ApiError) {
+func (repo CloudControllerSpaceRepository) Create(name string) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
 
-	request, apiErr := NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
+	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiErr != nil {
 		return
 	}
 
-	apiErr = repo.apiClient.PerformRequest(request)
+	apiErr = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiErr *ApiError) {
+func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 
-	request, apiErr := NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiErr != nil {
 		return
 	}
 
-	apiErr = repo.apiClient.PerformRequest(request)
+	apiErr = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiErr *ApiError) {
+func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, space.Guid)
 
-	request, apiErr := NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
 
-	apiErr = repo.apiClient.PerformRequest(request)
+	apiErr = repo.gateway.PerformRequest(request)
 	return
 }
 

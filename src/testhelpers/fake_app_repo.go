@@ -3,7 +3,7 @@ package testhelpers
 import (
 	"cf"
 	"bytes"
-	"cf/api"
+	"cf/net"
 	"net/http"
 	"time"
 )
@@ -37,29 +37,29 @@ type FakeApplicationRepository struct {
 	GetInstancesErrorCodes []string
 }
 
-func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Application, apiErr *api.ApiError) {
+func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Application, apiErr *net.ApiError) {
 	repo.AppName = name
 	if repo.AppByNameErr {
-		apiErr = api.NewApiErrorWithMessage("Error finding app by name.")
+		apiErr = net.NewApiErrorWithMessage("Error finding app by name.")
 	}
 	if repo.AppByNameAuthErr {
-		apiErr = api.NewApiError("Authentication failed.", "1000", 401)
+		apiErr = net.NewApiError("Authentication failed.", "1000", 401)
 	}
 	return repo.AppByName, apiErr
 }
 
-func (repo *FakeApplicationRepository) SetEnv(app cf.Application, name string, value string) (apiErr *api.ApiError) {
+func (repo *FakeApplicationRepository) SetEnv(app cf.Application, name string, value string) (apiErr *net.ApiError) {
 	repo.SetEnvApp = app
 	repo.SetEnvName = name
 	repo.SetEnvValue = value
 
 	if repo.SetEnvErr {
-		apiErr = api.NewApiErrorWithMessage("Failed setting env")
+		apiErr = net.NewApiErrorWithMessage("Failed setting env")
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, apiErr *api.ApiError) {
+func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, apiErr *net.ApiError) {
 	repo.CreatedApp = newApp
 
 	createdApp = cf.Application{
@@ -70,36 +70,36 @@ func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp
 	return
 }
 
-func (repo *FakeApplicationRepository) Delete(app cf.Application) (apiErr *api.ApiError){
+func (repo *FakeApplicationRepository) Delete(app cf.Application) (apiErr *net.ApiError){
 	repo.DeletedApp = app
 	return
 }
 
 
-func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *api.ApiError) {
+func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError) {
 	repo.UploadedZipBuffer = zipBuffer
 	repo.UploadedApp = app
 
 	return
 }
 
-func (repo *FakeApplicationRepository) Start(app cf.Application) (apiErr *api.ApiError){
+func (repo *FakeApplicationRepository) Start(app cf.Application) (apiErr *net.ApiError){
 	repo.StartedApp = app
 	if repo.StartAppErr {
-		apiErr = api.NewApiErrorWithMessage("Error starting application")
+		apiErr = net.NewApiErrorWithMessage("Error starting application")
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) Stop(app cf.Application) (apiErr *api.ApiError){
+func (repo *FakeApplicationRepository) Stop(app cf.Application) (apiErr *net.ApiError){
 	repo.StoppedApp = app
 	if repo.StopAppErr {
-		apiErr = api.NewApiErrorWithMessage("Error stopping application")
+		apiErr = net.NewApiErrorWithMessage("Error stopping application")
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instances[]cf.ApplicationInstance, apiErr *api.ApiError) {
+func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instances[]cf.ApplicationInstance, apiErr *net.ApiError) {
 	time.Sleep(1 * time.Millisecond) //needed for Windows only, otherwise it thinks error codes are not assigned
 	errorCode := repo.GetInstancesErrorCodes[0]
 	repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
@@ -108,7 +108,7 @@ func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instanc
 	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]
 
 	if errorCode != "" {
-		apiErr = api.NewApiError("Error staging app", errorCode, http.StatusBadRequest)
+		apiErr = net.NewApiError("Error staging app", errorCode, http.StatusBadRequest)
 		return
 	}
 

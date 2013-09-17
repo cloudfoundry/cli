@@ -2,7 +2,7 @@ package testhelpers
 
 import (
 	"cf"
-	"cf/api"
+	"cf/net"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
@@ -12,7 +12,7 @@ type FakeLogsRepository struct {
 	TailLogMessages []*logmessage.LogMessage
 }
 
-func (l *FakeLogsRepository) RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *api.ApiError){
+func (l *FakeLogsRepository) RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *net.ApiError){
 	l.AppLogged = app
 	return l.RecentLogs, nil
 }

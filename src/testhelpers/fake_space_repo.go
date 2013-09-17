@@ -2,7 +2,7 @@ package testhelpers
 
 import (
 	"cf"
-	"cf/api"
+	"cf/net"
 )
 
 type FakeSpaceRepository struct {
@@ -28,35 +28,35 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiErr *api.ApiError) {
+func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiErr *net.ApiError) {
 	return repo.Spaces, nil
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiErr *api.ApiError) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiErr *net.ApiError) {
 	repo.SpaceName = name
 	if repo.SpaceByNameErr {
-		apiErr = api.NewApiErrorWithMessage("Error finding space by name.")
+		apiErr = net.NewApiErrorWithMessage("Error finding space by name.")
 	}
 	return repo.SpaceByName, apiErr
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiErr *api.ApiError) {
+func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiErr *net.ApiError) {
 	space = repo.SummarySpace
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string) (apiErr *api.ApiError) {
+func (repo *FakeSpaceRepository) Create(name string) (apiErr *net.ApiError) {
 	repo.CreateSpaceName = name
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiErr *api.ApiError) {
+func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiErr *net.ApiError) {
 	repo.RenameSpace = space
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiErr *api.ApiError) {
+func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiErr *net.ApiError) {
 	repo.DeletedSpace = space
 	return
 }

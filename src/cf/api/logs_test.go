@@ -5,6 +5,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
@@ -57,9 +58,9 @@ func TestRecentLogsFor(t *testing.T) {
 
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	loggregatorHostResolver := func(hostname string) string { return hostname }
-	logsRepo := NewLoggregatorLogsRepository(config, client, loggregatorHostResolver)
+	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
 
 	logs, err := logsRepo.RecentLogsFor(app)
 	assert.NoError(t, err)
@@ -98,12 +99,12 @@ func TestTailsLogsFor(t *testing.T) {
 	redirectServer := httptest.NewTLSServer(http.HandlerFunc(redirectEndpoint))
 	defer redirectServer.Close()
 
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
 
 	loggregatorHostResolver := func(hostname string) string { return hostname }
-	logsRepo := NewLoggregatorLogsRepository(config, client, loggregatorHostResolver)
+	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
 
 	connected := false
 

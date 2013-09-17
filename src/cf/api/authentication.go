@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/net"
 	"cf/terminal"
 	"encoding/base64"
 	"fmt"
@@ -11,22 +12,24 @@ import (
 )
 
 type Authenticator interface {
-	Authenticate(email string, password string) (apiErr *ApiError)
-	RefreshAuthToken() (updatedToken string, apiErr *ApiError)
+	Authenticate(email string, password string) (apiErr *net.ApiError)
+	RefreshAuthToken() (updatedToken string, apiErr *net.ApiError)
 }
 
 type UAAAuthenticator struct {
 	configRepo configuration.ConfigurationRepository
 	config     *configuration.Configuration
+	gateway    net.Gateway
 }
 
-func NewUAAAuthenticator(configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticator) {
+func NewUAAAuthenticator(gateway net.Gateway, configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticator) {
+	uaa.gateway = gateway
 	uaa.configRepo = configRepo
 	uaa.config, _ = configRepo.Get()
 	return
 }
 
-func (uaa UAAAuthenticator) Authenticate(email string, password string) (apiErr *ApiError) {
+func (uaa UAAAuthenticator) Authenticate(email string, password string) (apiErr *net.ApiError) {
 	data := url.Values{
 		"username":   {email},
 		"password":   {password},
@@ -41,7 +44,7 @@ func (uaa UAAAuthenticator) Authenticate(email string, password string) (apiErr 
 	return
 }
 
-func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *ApiError) {
+func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *net.ApiError) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken},
 		"grant_type":    {"refresh_token"},
@@ -59,7 +62,7 @@ func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *Api
 	return
 }
 
-func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiErr *ApiError) {
+func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiErr *net.ApiError) {
 	type AuthenticationResponse struct {
 		AccessToken  string `json:"access_token"`
 		TokenType    string `json:"token_type"`
@@ -67,14 +70,14 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiErr *ApiError) {
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)
-	request, apiErr := NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
+	request, apiErr := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if apiErr != nil {
 		return
 	}
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
-	apiErr = PerformRequestAndParseResponse(request, &response)
+	apiErr = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
 	if apiErr != nil {
 		return
@@ -84,7 +87,7 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiErr *ApiError) {
 	uaa.config.RefreshToken = response.RefreshToken
 	err := uaa.configRepo.Save()
 	if err != nil {
-		apiErr = NewApiErrorWithError("Error setting configuration", err)
+		apiErr = net.NewApiErrorWithError("Error setting configuration", err)
 	}
 
 	return

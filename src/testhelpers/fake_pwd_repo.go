@@ -1,6 +1,6 @@
 package testhelpers
 
-import "cf/api"
+import "cf/net"
 
 type FakePasswordRepo struct {
 	Score string
@@ -13,17 +13,17 @@ type FakePasswordRepo struct {
 
 
 
-func (repo *FakePasswordRepo) GetScore(password string) (string, *api.ApiError){
+func (repo *FakePasswordRepo) GetScore(password string) (string, *net.ApiError){
 	repo.ScoredPassword = password
 	return repo.Score, nil
 }
 
-func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr *api.ApiError) {
+func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr *net.ApiError) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
 
 	if repo.UpdateUnauthorized {
-		apiErr = api.NewApiError("Authorization Failed", "unauthorized", 401)
+		apiErr = net.NewApiError("Authorization Failed", "unauthorized", 401)
 	}
 
 	return

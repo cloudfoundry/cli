@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/terminal"
 )
 
@@ -30,7 +31,7 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, config *configur
 }
 
 func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
-	var apiErr *api.ApiError
+	var apiErr *net.ApiError
 	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
 	if apiErr != nil {
 		req.ui.Failed(apiErr.Error())

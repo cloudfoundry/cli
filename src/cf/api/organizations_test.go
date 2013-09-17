@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -49,8 +50,8 @@ func TestOrganizationsFindAll(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerOrganizationRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	organizations, err := repo.FindAll()
 	assert.NoError(t, err)
@@ -69,8 +70,8 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerOrganizationRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	var (
 		organizations []cf.Organization
@@ -92,8 +93,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerOrganizationRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
@@ -121,8 +122,8 @@ func TestCreateOrganization(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerOrganizationRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	err := repo.Create("my-org")
 	assert.NoError(t, err)
@@ -140,8 +141,8 @@ func TestRenameOrganization(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerOrganizationRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	err := repo.Rename(org, "my-new-org")
@@ -160,8 +161,8 @@ func TestDeleteOrganization(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerOrganizationRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	err := repo.Delete(org)

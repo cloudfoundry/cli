@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -53,8 +54,8 @@ func TestFindAll(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerDomainRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domains, err := repo.FindAll()
 	assert.NoError(t, err)
@@ -77,8 +78,8 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerDomainRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domain, err := repo.FindByName("domain2.cf-app.com")
 	assert.NoError(t, err)
@@ -96,8 +97,8 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerDomainRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domain, err := repo.FindByName("")
 	assert.NoError(t, err)

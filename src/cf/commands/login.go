@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
@@ -74,7 +75,7 @@ func (l Login) Run(c *cli.Context) {
 	return
 }
 
-func (l Login) doLogin(username, password string) (apiErr *api.ApiError) {
+func (l Login) doLogin(username, password string) (apiErr *net.ApiError) {
 	apiErr = l.authenticator.Authenticate(username, password)
 	if apiErr == nil {
 		l.ui.Ok()

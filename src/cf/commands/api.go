@@ -1,8 +1,8 @@
 package commands
 
 import (
-	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/requirements"
 	term "cf/terminal"
 	"github.com/codegangsta/cli"
@@ -10,12 +10,14 @@ import (
 
 type Api struct {
 	ui         term.UI
+	gateway    net.Gateway
 	configRepo configuration.ConfigurationRepository
 	config     *configuration.Configuration
 }
 
-func NewApi(ui term.UI, configRepo configuration.ConfigurationRepository) (cmd Api) {
+func NewApi(ui term.UI, gateway net.Gateway, configRepo configuration.ConfigurationRepository) (cmd Api) {
 	cmd.ui = ui
+	cmd.gateway = gateway
 	cmd.configRepo = configRepo
 	cmd.config, _ = cmd.configRepo.Get()
 	return
@@ -45,7 +47,7 @@ func (cmd Api) showApiEndpoint() {
 func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Say("Setting api endpoint to %s...", term.EntityNameColor(endpoint))
 
-	request, apiErr := api.NewRequest("GET", endpoint+"/v2/info", "", nil)
+	request, apiErr := cmd.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
@@ -59,7 +61,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	}
 
 	serverResponse := new(InfoResponse)
-	apiErr = api.PerformRequestAndParseResponse(request, &serverResponse)
+	apiErr = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

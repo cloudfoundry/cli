@@ -3,6 +3,7 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"encoding/base64"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -43,8 +44,8 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 		AccessToken: "BEARER my_access_token",
 		Target:      targetServer.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerPasswordRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerPasswordRepository(config, gateway)
 
 	score, err := repo.GetScore("new-password")
 	assert.NoError(t, err)
@@ -83,8 +84,8 @@ func TestUpdatePassword(t *testing.T) {
 		AccessToken: fmt.Sprintf("BEARER my_access_token.%s.baz", encodedTokenInfo),
 		Target:      targetServer.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerPasswordRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerPasswordRepository(config, gateway)
 
 	err := repo.UpdatePassword("old-password", "new-password")
 	assert.NoError(t, err)

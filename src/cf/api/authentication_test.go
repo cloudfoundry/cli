@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/net"
 	"encoding/base64"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -57,8 +58,9 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
+	gateway := net.NewUAAAuthGateway()
 
-	auth := NewUAAAuthenticator(configRepo)
+	auth := NewUAAAuthenticator(gateway, configRepo)
 	err = auth.Authenticate("foo@example.com", "bar")
 
 	savedConfig := testhelpers.SavedConfiguration
@@ -80,8 +82,9 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
+	gateway := net.NewUAAAuthGateway()
 
-	auth := NewUAAAuthenticator(configRepo)
+	auth := NewUAAAuthenticator(gateway, configRepo)
 	err = auth.Authenticate("foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "Password is incorrect, please try again.")
@@ -103,8 +106,9 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
+	gateway := net.NewUAAAuthGateway()
 
-	auth := NewUAAAuthenticator(configRepo)
+	auth := NewUAAAuthenticator(gateway, configRepo)
 	err = auth.Authenticate("foo@example.com", "bar")
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "Server error, status code: 500, error code: , message: ")

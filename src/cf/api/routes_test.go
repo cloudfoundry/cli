@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -68,8 +69,8 @@ func TestRoutesFindAll(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, gateway)
 
 	routes, err := repo.FindAll()
 	assert.NoError(t, err)
@@ -113,8 +114,8 @@ func TestFindByHost(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, gateway)
 
 	route, err := repo.FindByHost("my-cool-app")
 	assert.NoError(t, err)
@@ -140,8 +141,8 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, gateway)
 
 	_, err := repo.FindByHost("my-cool-app")
 	assert.Error(t, err)
@@ -173,8 +174,8 @@ func TestCreateRoute(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, gateway)
 
 	domain := cf.Domain{Guid: "my-domain-guid"}
 	newRoute := cf.Route{Host: "my-cool-app"}
@@ -200,8 +201,8 @@ func TestBind(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerRouteRepository(config, gateway)
 
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}

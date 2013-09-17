@@ -3,6 +3,7 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -39,8 +40,8 @@ func TestStacksFindByName(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerStackRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stack, err := repo.FindByName("linux")
 	assert.NoError(t, err)
@@ -100,8 +101,8 @@ func TestStacksFindAll(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerStackRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stacks, err := repo.FindAll()
 	assert.NoError(t, err)

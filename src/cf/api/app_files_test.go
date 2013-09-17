@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/net"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -54,8 +55,8 @@ func TestListFiles(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 	}
 
-	client := NewApiClient(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerAppFilesRepository(config, client)
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerAppFilesRepository(config, gateway)
 
 	list, err := repo.ListFiles(cf.Application{Guid: "my-app-guid"}, "some/path")
 
