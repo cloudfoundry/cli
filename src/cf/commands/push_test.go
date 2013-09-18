@@ -11,26 +11,10 @@ import (
 	"testing"
 )
 
-type FakeAppStarter struct {
-	StartedApp cf.Application
-}
-
-func (starter *FakeAppStarter) ApplicationStart(app cf.Application) {
-	starter.StartedApp = app
-}
-
-type FakeAppStopper struct {
-	StoppedApp cf.Application
-}
-
-func (stopper *FakeAppStopper) ApplicationStop(app cf.Application) {
-	stopper.StoppedApp = app
-}
-
 func TestPushingRequirements(t *testing.T) {
 	fakeUI := new(testhelpers.FakeUI)
-	starter := &FakeAppStarter{}
-	stopper := &FakeAppStopper{}
+	starter := &testhelpers.FakeAppStarter{}
+	stopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 	domainRepo := &testhelpers.FakeDomainRepository{}
@@ -63,8 +47,8 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindByHostErr: true}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
@@ -108,8 +92,8 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindByHostRoute: route}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	fakeUI := callPush([]string{"--name", "my-new-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
@@ -131,8 +115,8 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindByHostErr: true}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{FindByNameStack: cf.Stack{Name: "customLinux", Guid: "custom-linux-guid"}}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{ZippedBuffer: bytes.NewBufferString("Zip File!")}
 
 	fakeUI := callPush([]string{
@@ -185,8 +169,8 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	callPush([]string{
@@ -203,8 +187,8 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	callPush([]string{
@@ -221,8 +205,8 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByNameErr: true}
 	stackRepo := &testhelpers.FakeStackRepository{}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	callPush([]string{
@@ -239,8 +223,8 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	existingApp := cf.Application{Name: "existing-app", Guid: "existing-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: existingApp}
 	stackRepo := &testhelpers.FakeStackRepository{}
-	fakeStarter := &FakeAppStarter{}
-	fakeStopper := &FakeAppStopper{}
+	fakeStarter := &testhelpers.FakeAppStarter{}
+	fakeStopper := &testhelpers.FakeAppStopper{}
 	zipper := &testhelpers.FakeZipper{}
 
 	fakeUI := callPush([]string{"--name", "existing-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)

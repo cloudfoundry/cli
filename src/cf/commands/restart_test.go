@@ -1,0 +1,40 @@
+package commands_test
+
+import (
+	"cf"
+	. "cf/commands"
+	"github.com/stretchr/testify/assert"
+	"testhelpers"
+	"testing"
+)
+
+func TestRestartCommandFailsWithUsage(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{}
+	starter := &testhelpers.FakeAppStarter{}
+	stopper := &testhelpers.FakeAppStopper{}
+	ui := callRestart([]string{}, reqFactory, starter, stopper)
+	assert.True(t, ui.FailedWithUsage)
+
+	ui = callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+	assert.False(t, ui.FailedWithUsage)
+}
+
+func TestRestartApplication(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	starter := &testhelpers.FakeAppStarter{}
+	stopper := &testhelpers.FakeAppStopper{}
+	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+
+	assert.Equal(t, stopper.StoppedApp, app)
+	assert.Equal(t, starter.StartedApp, app)
+}
+
+func callRestart(args []string, reqFactory *testhelpers.FakeReqFactory, starter ApplicationStarter, stopper ApplicationStopper) (ui *testhelpers.FakeUI) {
+	ui = new(testhelpers.FakeUI)
+	ctxt := testhelpers.NewContext("restart", args)
+
+	cmd := NewRestart(ui, starter, stopper)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	return
+}

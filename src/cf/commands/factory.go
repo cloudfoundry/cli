@@ -178,6 +178,14 @@ func (f Factory) NewRenameSpace() *RenameSpace {
 	)
 }
 
+func (f Factory) NewRestart() *Restart {
+	return NewRestart(
+		f.ui,
+		f.NewStart(),
+		f.NewStop(),
+	)
+}
+
 func (f Factory) NewRoutes() *Routes {
 	return NewRoutes(
 		f.ui,

@@ -318,6 +318,16 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "restart",
+			ShortName:   "rs",
+			Description: "Restart an application",
+			Usage:       "cf restart APP",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewRestart()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "routes",
 			ShortName:   "r",
 			Description: "List all routes",
