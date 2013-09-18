@@ -82,12 +82,14 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	app = cf.Application{
-		Name:            summaryResponse.Name,
-		Guid:            summaryResponse.Guid,
-		Instances:       summaryResponse.Instances,
-		Memory:          summaryResponse.Memory,
-		EnvironmentVars: res.Entity.EnvironmentJson,
-		Urls:            urls,
+		Name:             summaryResponse.Name,
+		Guid:             summaryResponse.Guid,
+		Instances:        summaryResponse.Instances,
+		RunningInstances: summaryResponse.RunningInstances,
+		Memory:           summaryResponse.Memory,
+		EnvironmentVars:  res.Entity.EnvironmentJson,
+		Urls:             urls,
+		State:            strings.ToLower(summaryResponse.State),
 	}
 
 	return

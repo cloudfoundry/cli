@@ -3,7 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	"cf/terminal"
+	term "cf/terminal"
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -11,12 +11,12 @@ import (
 )
 
 type App struct {
-	ui             terminal.UI
+	ui             term.UI
 	appSummaryRepo api.AppSummaryRepository
 	appReq         requirements.ApplicationRequirement
 }
 
-func NewApp(ui terminal.UI, appSummaryRepo api.AppSummaryRepository) (cmd *App) {
+func NewApp(ui term.UI, appSummaryRepo api.AppSummaryRepository) (cmd *App) {
 	cmd = new(App)
 	cmd.ui = ui
 	cmd.appSummaryRepo = appSummaryRepo
@@ -42,7 +42,7 @@ func (cmd *App) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 
 func (cmd *App) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	cmd.ui.Say("Showing health and status for app %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Showing health and status for app %s...", term.EntityNameColor(app.Name))
 
 	summary, err := cmd.appSummaryRepo.GetSummary(app)
 	if err != nil {
@@ -51,44 +51,12 @@ func (cmd *App) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nhealth: %s", summary.App.Health())
-	cmd.ui.Say("usage: %dM x %d instances", summary.App.Memory, summary.App.Instances)
-	cmd.ui.Say("urls: %s\n", strings.Join(summary.App.Urls, ", "))
+	cmd.ui.Say("\n%s %s", term.HeaderColor("health:"), coloredState(summary.App.Health()))
+	cmd.ui.Say("%s %s x %d instances", term.HeaderColor("usage:"), byteSize(summary.App.Memory*MEGABYTE), summary.App.Instances)
+	cmd.ui.Say("%s %s\n", term.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
 
 	table := [][]string{
 		[]string{"", "status", "since", "cpu", "memory", "disk"},
-	}
-
-	var byteSize = func(bytes int) string {
-		unit := ""
-		value := float64(bytes)
-
-		const (
-			byte  = 1.0
-			kByte = 1024 * byte
-			mByte = 1024 * kByte
-			gByte = 1024 * mByte
-			tByte = 1024 * gByte
-		)
-
-		switch {
-		case bytes >= tByte:
-			unit = "T"
-			value = value / tByte
-		case bytes >= gByte:
-			unit = "G"
-			value = value / gByte
-		case bytes >= mByte:
-			unit = "M"
-			value = value / mByte
-		case bytes >= kByte:
-			unit = "K"
-			value = value / kByte
-		}
-
-		stringValue := fmt.Sprintf("%.1f", value)
-		stringValue = strings.TrimRight(stringValue, ".0")
-		return fmt.Sprintf("%s%s", stringValue, unit)
 	}
 
 	for index, instance := range summary.Instances {
@@ -102,5 +70,13 @@ func (cmd *App) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.DisplayTable(table, nil)
+	cmd.ui.DisplayTable(table, cmd.coloringFunc)
+}
+
+func (cmd *App) coloringFunc(value string, row int, col int) string {
+	if row > 0 && col == 1 {
+		return coloredState(value)
+	}
+
+	return term.DefaultColoringFunc(value, row, col)
 }

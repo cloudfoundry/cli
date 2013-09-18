@@ -47,6 +47,10 @@ func StoppedColor(message string) string {
 	return colorize(message, yellow, true)
 }
 
+func AdvisoryColor(message string) string {
+	return colorize(message, yellow, true)
+}
+
 func FailureColor(message string) string {
 	return colorize(message, red, true)
 }

@@ -43,7 +43,7 @@ func (a Apps) Run(c *cli.Context) {
 	a.ui.Ok()
 
 	table := [][]string{
-		[]string{"name", "status", "usage", "url"},
+		[]string{"name", "status", "usage", "urls"},
 	}
 
 	for _, app := range apps {
@@ -64,17 +64,4 @@ func (a Apps) coloringFunc(value string, row int, col int) string {
 	}
 
 	return term.DefaultColoringFunc(value, row, col)
-}
-
-func coloredState(state string) (colored string) {
-	switch state {
-	case "started":
-		colored = term.SuccessColor("running")
-	case "stopped":
-		colored = term.StoppedColor("stopped")
-	default:
-		colored = term.FailureColor(state)
-	}
-
-	return
 }
