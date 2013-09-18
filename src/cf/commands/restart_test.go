@@ -19,9 +19,27 @@ func TestRestartCommandFailsWithUsage(t *testing.T) {
 	assert.False(t, ui.FailedWithUsage)
 }
 
+func TestRestartRequirements(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	starter := &testhelpers.FakeAppStarter{}
+	stopper := &testhelpers.FakeAppStopper{}
+
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+	assert.True(t, testhelpers.CommandDidPassRequirements)
+
+	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+
+	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+	assert.False(t, testhelpers.CommandDidPassRequirements)
+}
+
 func TestRestartApplication(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	starter := &testhelpers.FakeAppStarter{}
 	stopper := &testhelpers.FakeAppStopper{}
 	callRestart([]string{"my-app"}, reqFactory, starter, stopper)

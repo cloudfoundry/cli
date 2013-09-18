@@ -31,7 +31,11 @@ func (r *Restart) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 
 	r.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{r.appReq}
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedSpaceRequirement(),
+		r.appReq,
+	}
 	return
 }
 
