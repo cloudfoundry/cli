@@ -3,8 +3,8 @@ package commands
 import (
 	"cf/requirements"
 	"cf/terminal"
-	"github.com/codegangsta/cli"
 	"errors"
+	"github.com/codegangsta/cli"
 )
 
 type Restart struct {

@@ -39,6 +39,13 @@ func (f Factory) NewBindService() *BindService {
 	)
 }
 
+func (f Factory) NewCreateOrganization() CreateOrganization {
+	return NewCreateOrganization(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
 func (f Factory) NewCreateService() CreateService {
 	return NewCreateService(
 		f.ui,
@@ -92,6 +99,13 @@ func (f Factory) NewFiles() *Files {
 	return NewFiles(
 		f.ui,
 		f.repoLocator.GetAppFilesRepository(),
+	)
+}
+
+func (f Factory) NewListOrganizations() ListOrganizations {
+	return NewListOrganizations(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
 	)
 }
 
@@ -253,16 +267,9 @@ func (f Factory) NewUnbindService() *UnbindService {
 	)
 }
 
-func (f Factory) NewListOrganizations() ListOrganizations {
-	return NewListOrganizations(
+func (f Factory) NewUnsetEnv() *UnsetEnv {
+	return NewUnsetEnv(
 		f.ui,
-		f.repoLocator.GetOrganizationRepository(),
-	)
-}
-
-func (f Factory) NewCreateOrganization() CreateOrganization {
-	return NewCreateOrganization(
-		f.ui,
-		f.repoLocator.GetOrganizationRepository(),
+		f.repoLocator.GetApplicationRepository(),
 	)
 }

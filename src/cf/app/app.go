@@ -432,6 +432,15 @@ OPTIONS:
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		{
+			Name:        "unset-env",
+			Description: "Remove an env variable",
+			Usage:       "cf unset-env APP NAME",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewUnsetEnv()
+				cmdRunner.Run(cmd, c)
+			},
+		},
 	}
 	return
 }
