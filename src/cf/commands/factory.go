@@ -157,6 +157,13 @@ func (f Factory) NewRecentLogs() *RecentLogs {
 	)
 }
 
+func (f Factory) NewRename() *Rename {
+	return NewRename(
+		f.ui,
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
 func (f Factory) NewRenameOrg() *RenameOrg {
 	return NewRenameOrg(
 		f.ui,

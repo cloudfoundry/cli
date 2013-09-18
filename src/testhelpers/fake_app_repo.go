@@ -30,8 +30,12 @@ type FakeApplicationRepository struct {
 	SetEnvErr   bool
 
 	CreatedApp  cf.Application
+
 	UploadedApp cf.Application
 	UploadedZipBuffer *bytes.Buffer
+
+	RenameApp cf.Application
+	RenameNewName string
 
 	GetInstancesResponses [][]cf.ApplicationInstance
 	GetInstancesErrorCodes []string
@@ -80,6 +84,12 @@ func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *byt
 	repo.UploadedZipBuffer = zipBuffer
 	repo.UploadedApp = app
 
+	return
+}
+
+func (repo *FakeApplicationRepository) Rename(app cf.Application, newName string) (apiErr *net.ApiError) {
+	repo.RenameApp = app
+	repo.RenameNewName = newName
 	return
 }
 

@@ -291,9 +291,18 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "rename",
+			Description: "Rename an application",
+			Usage:       "cf rename APP NEW_APP",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewRename()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "rename-org",
 			Description: "Rename an organization",
-			Usage:       "cf rename-space ORG NEW_ORG",
+			Usage:       "cf rename-org ORG NEW_ORG",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewRenameOrg()
 				cmdRunner.Run(cmd, c)

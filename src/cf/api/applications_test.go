@@ -351,6 +351,26 @@ func TestUploadApplication(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+var renameAppEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/apps/my-app-guid",
+	testhelpers.RequestBodyMatcher(`{"name":"my-new-app"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestRename(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(renameAppEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, gateway)
+
+	org := cf.Application{Guid: "my-app-guid"}
+	err := repo.Rename(org, "my-new-app")
+	assert.NoError(t, err)
+}
+
 var startApplicationEndpoint = testhelpers.CreateEndpoint(
 	"PUT",
 	"/v2/apps/my-cool-app-guid",

@@ -43,7 +43,7 @@ func TestRenameOrgRun(t *testing.T) {
 
 func callRenameOrg(args []string, reqFactory *testhelpers.FakeReqFactory, orgRepo *testhelpers.FakeOrgRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("create-org", args)
+	ctxt := testhelpers.NewContext("rename-org", args)
 	cmd := NewRenameOrg(ui, orgRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return

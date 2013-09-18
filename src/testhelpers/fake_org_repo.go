@@ -10,12 +10,12 @@ type FakeOrgRepository struct {
 
 	CreateName string
 
-	FindByNameName string
-	FindByNameErr bool
+	FindByNameName         string
+	FindByNameErr          bool
 	FindByNameOrganization cf.Organization
 
 	RenameOrganization cf.Organization
-	RenameNewName string
+	RenameNewName      string
 
 	DeletedOrganization cf.Organization
 }
