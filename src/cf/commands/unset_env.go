@@ -44,13 +44,7 @@ func (ue *UnsetEnv) Run(c *cli.Context) {
 
 	ue.ui.Say("Removing env variable %s for app %s...", terminal.EntityNameColor(varName), terminal.EntityNameColor(app.Name))
 
-	var envVars map[string]string
-
-	if app.EnvironmentVars != nil {
-		envVars = app.EnvironmentVars
-	} else {
-		envVars = map[string]string{}
-	}
+	envVars := app.EnvironmentVars
 
 	if !envVarFound(varName, envVars) {
 		ue.ui.Failed(fmt.Sprintf("Env variable %s not found.", varName))

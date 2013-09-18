@@ -62,7 +62,7 @@ func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 }
 
 func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{}}
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 
