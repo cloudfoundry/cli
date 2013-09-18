@@ -5,6 +5,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -51,6 +52,11 @@ func (ue *UnsetEnv) Run(c *cli.Context) {
 		envVars = map[string]string{}
 	}
 
+	if !envVarFound(varName, envVars) {
+		ue.ui.Failed(fmt.Sprintf("Env variable %s not found.", varName))
+		return
+	}
+
 	delete(envVars, varName)
 
 	err := ue.appRepo.SetEnv(app, envVars)
@@ -62,4 +68,14 @@ func (ue *UnsetEnv) Run(c *cli.Context) {
 
 	ue.ui.Ok()
 	ue.ui.Say("TIP: Use 'cf push' to ensure your env variable changes take effect.")
+}
+
+func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {
+	for name, _ := range existingEnvVars {
+		if name == varName {
+			found = true
+			return
+		}
+	}
+	return
 }
