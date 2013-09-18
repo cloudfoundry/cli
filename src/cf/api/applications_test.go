@@ -173,7 +173,7 @@ func TestSetEnv(t *testing.T) {
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
 
-	err := repo.SetEnv(app, "DATABASE_URL", "mysql://example.com/my-db")
+	err := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
 	assert.NoError(t, err)
 }

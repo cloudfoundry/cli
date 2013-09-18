@@ -26,9 +26,9 @@ func (zipper ApplicationZipper) Zip(dirOrZipFile string) (zipBuffer *bytes.Buffe
 	return createZipFile(dirOrZipFile)
 }
 
-func shouldNotZip(extension string) (result bool){
-	for _, ext := range doNotZipExtensions{
-		if ext == extension{
+func shouldNotZip(extension string) (result bool) {
+	for _, ext := range doNotZipExtensions {
+		if ext == extension {
 			return true
 		}
 	}

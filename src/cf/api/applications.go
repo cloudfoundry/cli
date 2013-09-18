@@ -5,6 +5,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -16,7 +17,7 @@ import (
 
 type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, apiErr *net.ApiError)
-	SetEnv(app cf.Application, name string, value string) (apiErr *net.ApiError)
+	SetEnv(app cf.Application, envVars map[string]string) (apiErr *net.ApiError)
 	Create(newApp cf.Application) (createdApp cf.Application, apiErr *net.ApiError)
 	Delete(app cf.Application) (apiErr *net.ApiError)
 	Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError)
@@ -91,10 +92,22 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	return
 }
 
-func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, name string, value string) (apiErr *net.ApiError) {
+func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envVars map[string]string) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
-	data := fmt.Sprintf(`{"environment_json":{"%s":"%s"}}`, name, value)
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+
+	type setEnvReqBody struct {
+		EnvJson map[string]string `json:"environment_json"`
+	}
+
+	body := setEnvReqBody{EnvJson: envVars}
+
+	jsonBytes, err := json.Marshal(body)
+	if err != nil {
+		apiErr = net.NewApiErrorWithError("Error creating json", err)
+		return
+	}
+
+	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 	if apiErr != nil {
 		return
 	}

@@ -44,7 +44,17 @@ func (se *SetEnv) Run(c *cli.Context) {
 
 	se.ui.Say("Updating env variable %s for app %s...", varName, app.Name)
 
-	err := se.appRepo.SetEnv(app, varName, varValue)
+	var envVars map[string]string
+
+	if app.EnvironmentVars != nil {
+		envVars = app.EnvironmentVars
+	} else {
+		envVars = map[string]string{}
+	}
+
+	envVars[varName] = varValue
+
+	err := se.appRepo.SetEnv(app, envVars)
 
 	if err != nil {
 		se.ui.Failed(err.Error())

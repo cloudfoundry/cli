@@ -25,7 +25,7 @@ type FakeApplicationRepository struct {
 	AppByNameAuthErr bool
 
 	SetEnvApp   cf.Application
-	SetEnvName  string
+	SetEnvVars  map[string]string
 	SetEnvValue string
 	SetEnvErr   bool
 
@@ -52,10 +52,9 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 	return repo.AppByName, apiErr
 }
 
-func (repo *FakeApplicationRepository) SetEnv(app cf.Application, name string, value string) (apiErr *net.ApiError) {
+func (repo *FakeApplicationRepository) SetEnv(app cf.Application, envVars map[string]string) (apiErr *net.ApiError) {
 	repo.SetEnvApp = app
-	repo.SetEnvName = name
-	repo.SetEnvValue = value
+	repo.SetEnvVars= envVars
 
 	if repo.SetEnvErr {
 		apiErr = net.NewApiErrorWithMessage("Failed setting env")

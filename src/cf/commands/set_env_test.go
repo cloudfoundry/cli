@@ -10,26 +10,27 @@ import (
 )
 
 func TestSetEnvRequirements(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	callSetEnv(args, reqFactory, appRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
 	callSetEnv(args, reqFactory, appRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
 	testhelpers.CommandDidPassRequirements = true
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
 	callSetEnv(args, reqFactory, appRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
 func TestRunWhenApplicationExists(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"foo": "bar"}}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 
@@ -42,8 +43,10 @@ func TestRunWhenApplicationExists(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.SetEnvApp, app)
-	assert.Equal(t, appRepo.SetEnvName, "DATABASE_URL")
-	assert.Equal(t, appRepo.SetEnvValue, "mysql://example.com/my-db")
+	assert.Equal(t, appRepo.SetEnvVars, map[string]string{
+		"DATABASE_URL": "mysql://example.com/my-db",
+		"foo":          "bar",
+	})
 }
 
 func TestRunWhenSettingTheEnvFails(t *testing.T) {
