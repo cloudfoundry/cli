@@ -16,6 +16,7 @@ type RepositoryLocator struct {
 	organizationRepo  CloudControllerOrganizationRepository
 	spaceRepo         CloudControllerSpaceRepository
 	appRepo           CloudControllerApplicationRepository
+	appSummaryRepo    CloudControllerAppSummaryRepository
 	appFilesRepo      CloudControllerAppFilesRepository
 	domainRepo        CloudControllerDomainRepository
 	routeRepo         CloudControllerRouteRepository
@@ -38,6 +39,7 @@ func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLo
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, loc.cloudControllerGateway)
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, loc.cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, loc.cloudControllerGateway)
+	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, loc.cloudControllerGateway, loc.appRepo)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, loc.cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, loc.cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, loc.cloudControllerGateway)
@@ -79,6 +81,9 @@ func (locator RepositoryLocator) GetSpaceRepository() SpaceRepository {
 
 func (locator RepositoryLocator) GetApplicationRepository() ApplicationRepository {
 	return locator.appRepo
+}
+func (locator RepositoryLocator) GetAppSummaryRepository() AppSummaryRepository {
+	return locator.appSummaryRepo
 }
 
 func (locator RepositoryLocator) GetAppFilesRepository() AppFilesRepository {

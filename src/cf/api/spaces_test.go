@@ -193,7 +193,7 @@ var spaceSummaryEndpoint = testhelpers.CreateEndpoint(
 	spaceSummaryResponse,
 )
 
-func TestGetSummary(t *testing.T) {
+func TestSpacesGetSummary(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(spaceSummaryEndpoint))
 	defer ts.Close()
 

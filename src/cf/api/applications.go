@@ -13,6 +13,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type ApplicationRepository interface {
@@ -209,6 +210,7 @@ type InstancesApiResponse map[string]InstanceApiResponse
 
 type InstanceApiResponse struct {
 	State string
+	Since float64
 }
 
 func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiErr *net.ApiError) {
@@ -231,7 +233,11 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 		if err != nil {
 			continue
 		}
-		instances[index] = cf.ApplicationInstance{State: cf.InstanceState(strings.ToLower(v.State))}
+
+		instances[index] = cf.ApplicationInstance{
+			State: cf.InstanceState(strings.ToLower(v.State)),
+			Since: time.Unix(int64(v.Since), 0),
+		}
 	}
 	return
 }

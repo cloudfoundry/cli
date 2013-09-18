@@ -1,6 +1,9 @@
 package cf
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type InstanceState string
 
@@ -52,6 +55,11 @@ func (app Application) Health() string {
 	return "N/A"
 }
 
+type AppSummary struct {
+	App       Application
+	Instances []ApplicationInstance
+}
+
 type Domain struct {
 	Name string
 	Guid string
@@ -74,7 +82,13 @@ type Stack struct {
 }
 
 type ApplicationInstance struct {
-	State InstanceState
+	State     InstanceState
+	Since     time.Time
+	CpuUsage  float64 // percentage
+	DiskQuota int     // in bytes
+	DiskUsage int
+	MemQuota  int
+	MemUsage  int
 }
 
 type ServicePlan struct {

@@ -25,6 +25,13 @@ func (f Factory) NewApi() Api {
 	)
 }
 
+func (f Factory) NewApp() *App {
+	return NewApp(
+		f.ui,
+		f.repoLocator.GetAppSummaryRepository(),
+	)
+}
+
 func (f Factory) NewApps() Apps {
 	return NewApps(
 		f.ui,

@@ -78,6 +78,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "app",
+			Description: "Display health and status for app",
+			Usage:       "cf app APP",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewApp()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "apps",
 			ShortName:   "a",
 			Description: "List all applications in the currently targeted space",
