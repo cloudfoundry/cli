@@ -9,4 +9,4 @@
 	url = https://code.google.com/p/gogoprotobuf/
 [submodule "src/github.com/codegangsta/cli"]
 	path = src/github.com/codegangsta/cli
-	url = git.github.com:dam5s/cli.git
+	url = https://github.com/dam5s/cli.git
