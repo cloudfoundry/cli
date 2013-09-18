@@ -50,7 +50,7 @@ func (a Apps) Run(c *cli.Context) {
 		table = append(table, []string{
 			app.Name,
 			app.State,
-			fmt.Sprintf("%d x %dM", app.Instances, app.Memory),
+			fmt.Sprintf("%d x %s", app.Instances, byteSize(app.Memory*MEGABYTE)),
 			strings.Join(app.Urls, ", "),
 		})
 	}
