@@ -16,7 +16,7 @@ const (
 
 func byteSize(bytes int) string {
 	unit := ""
-	value := float64(bytes)
+	value := float32(bytes)
 
 	switch {
 	case bytes >= TERABYTE:

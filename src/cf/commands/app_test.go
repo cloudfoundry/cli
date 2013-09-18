@@ -58,19 +58,19 @@ func TestDisplayingAppSummary(t *testing.T) {
 			State:     cf.InstanceRunning,
 			Since:     time1,
 			CpuUsage:  1.0,
-			DiskQuota: 1024 * 1024 * 1024, // 1GB
-			DiskUsage: 32 * 1024 * 1024,   //32MB
-			MemQuota:  64 * 1024 * 1024,   // 64MB
-			MemUsage:  13,                 // 13 B
+			DiskQuota: 1 * GIGABYTE,
+			DiskUsage: 32 * MEGABYTE,
+			MemQuota:  64 * MEGABYTE,
+			MemUsage:  13 * BYTE,
 		},
 		cf.ApplicationInstance{
 			State:     cf.InstanceDown,
 			Since:     time2,
 			CpuUsage:  1.5,
-			DiskQuota: 1024 * 1024 * 1024 * 1024, // 1TB
-			DiskUsage: 16 * 1024 * 1024,          //16MB
-			MemQuota:  64 * 1024 * 1024,          // 64MB
-			MemUsage:  13 * 1024,                 // 13 KB
+			DiskQuota: 1 * TERABYTE,
+			DiskUsage: 16 * MEGABYTE,
+			MemQuota:  64 * MEGABYTE,
+			MemUsage:  13 * KILOBYTE,
 		},
 	}
 	appSummary := cf.AppSummary{App: app, Instances: instances}
