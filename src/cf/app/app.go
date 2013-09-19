@@ -280,8 +280,8 @@ OPTIONS:
 			ShortName:   "p",
 			Description: "Push an app",
 			Usage: "cf push --name APP [--domain DOMAIN] [--host HOST] [--instances NUM]\n" +
-				"                                [--memory MEMORY] [--buildpack URL] [--no-[re]start] [--path PATH]\n" +
-				"                                [--stack STACK]",
+				"                      [--memory MEMORY] [--buildpack URL] [--no-[re]start] [--path PATH]\n" +
+				"                      [--stack STACK]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"name", "", "name of the application"},
 				cli.StringFlag{"domain", "", "domain (for example: cfapps.io)"},
