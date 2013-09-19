@@ -39,7 +39,11 @@ func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config 
 	file, err := ConfigFile()
 	assert.NoError(t, err)
 
-	os.Rename(file, file+"test-backup")
+	_, err = os.Stat(file)
+	if !os.IsNotExist(err) {
+		err = os.Rename(file, file+"test-backup")
+		assert.NoError(t, err)
+	}
 
 	config, err = repo.Get()
 	assert.NoError(t, err)
@@ -50,9 +54,15 @@ func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config 
 func (repo ConfigurationDiskRepository) restoreConfig(t *testing.T) {
 	file, err := ConfigFile()
 	assert.NoError(t, err)
+
 	err = os.Remove(file)
 	assert.NoError(t, err)
-	err = os.Rename(file+"test-backup", file)
-	assert.NoError(t, err)
+
+	_, err = os.Stat(file + "test-backup")
+	if !os.IsNotExist(err) {
+		err = os.Rename(file+"test-backup", file)
+		assert.NoError(t, err)
+	}
+
 	return
 }
