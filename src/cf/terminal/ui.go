@@ -54,7 +54,8 @@ func (c TerminalUI) Failed(message string) {
 }
 
 func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
-	c.Failed("Incorrect Usage.\n")
+	c.Say(FailureColor("FAILED"))
+	c.Say("Incorrect Usage.\n")
 	cli.ShowCommandHelp(ctxt, cmdName)
 	c.Say("")
 	os.Exit(1)
