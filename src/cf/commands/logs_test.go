@@ -41,19 +41,24 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
 	sourceType := logmessage.LogMessage_DEA
+	sourceId := "42"
 	logMessage1 := &logmessage.LogMessage{
 		Message:     []byte("Log Line 1"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
 		SourceType:  &sourceType,
+		SourceId:    &sourceId,
 		Timestamp:   proto.Int64(currentTime.UnixNano()),
 	}
 
+	otherSourceType := logmessage.LogMessage_ROUTER
+	otherSourceId := "49"
 	logMessage2 := &logmessage.LogMessage{
 		Message:     []byte("Log Line 2"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
-		SourceType:  &sourceType,
+		SourceType:  &otherSourceType,
+		SourceId:    &otherSourceId,
 		Timestamp:   proto.Int64(currentTime.UnixNano()),
 	}
 
@@ -73,8 +78,8 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	assert.Equal(t, app, logsRepo.AppLogged)
 	assert.Equal(t, len(ui.Outputs), 3)
 	assert.Contains(t, ui.Outputs[0], "Connected")
-	assert.Contains(t, ui.Outputs[1], "Log Line 1")
-	assert.Contains(t, ui.Outputs[2], "Log Line 2")
+	assert.Contains(t, ui.Outputs[1], "[DEA/42] Log Line 1")
+	assert.Contains(t, ui.Outputs[2], "[ROUTER/49] Log Line 2")
 }
 
 func getDefaultLogsDependencies() (reqFactory *testhelpers.FakeReqFactory, logsRepo *testhelpers.FakeLogsRepository) {
