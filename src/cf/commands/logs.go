@@ -5,7 +5,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
-	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 )
@@ -55,15 +54,4 @@ func (cmd *Logs) Run(c *cli.Context) {
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
-}
-
-func logMessageOutput(lm *logmessage.LogMessage) string {
-	sourceType, _ := logmessage.LogMessage_SourceType_name[int32(*lm.SourceType)]
-	sourceId := "?"
-	if lm.SourceId != nil {
-		sourceId = *lm.SourceId
-	}
-	msg := lm.GetMessage()
-
-	return fmt.Sprintf("[%s/%s] %s", sourceType, sourceId, msg)
 }

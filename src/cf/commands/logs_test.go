@@ -40,32 +40,44 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	///////////////
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
-	sourceType := logmessage.LogMessage_DEA
-	sourceId := "42"
-	logMessage1 := &logmessage.LogMessage{
+	deaSourceType := logmessage.LogMessage_DEA
+	deaSourceId := "42"
+	deaLogMessage := &logmessage.LogMessage{
 		Message:     []byte("Log Line 1"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
-		SourceType:  &sourceType,
-		SourceId:    &sourceId,
+		SourceType:  &deaSourceType,
+		SourceId:    &deaSourceId,
 		Timestamp:   proto.Int64(currentTime.UnixNano()),
 	}
 
-	otherSourceType := logmessage.LogMessage_ROUTER
-	otherSourceId := "49"
-	logMessage2 := &logmessage.LogMessage{
+	routerSourceType := logmessage.LogMessage_ROUTER
+	routerSourceId := "49"
+	routerLogMessage := &logmessage.LogMessage{
 		Message:     []byte("Log Line 2"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
-		SourceType:  &otherSourceType,
-		SourceId:    &otherSourceId,
+		SourceType:  &routerSourceType,
+		SourceId:    &routerSourceId,
+		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	}
+
+	appSourceType := logmessage.LogMessage_WARDEN_CONTAINER
+	appSourceId := "56"
+	appLogMessage := &logmessage.LogMessage{
+		Message:     []byte("Log Line 3"),
+		AppId:       proto.String("my-app"),
+		MessageType: &messageType,
+		SourceType:  &appSourceType,
+		SourceId:    &appSourceId,
 		Timestamp:   proto.Int64(currentTime.UnixNano()),
 	}
 
 	/////////////////
 	logs := []*logmessage.LogMessage{
-		logMessage1,
-		logMessage2,
+		deaLogMessage,
+		routerLogMessage,
+		appLogMessage,
 	}
 
 	reqFactory, logsRepo := getDefaultLogsDependencies()
@@ -76,10 +88,11 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app, logsRepo.AppLogged)
-	assert.Equal(t, len(ui.Outputs), 3)
+	assert.Equal(t, len(ui.Outputs), 4)
 	assert.Contains(t, ui.Outputs[0], "Connected")
 	assert.Contains(t, ui.Outputs[1], "[DEA/42] Log Line 1")
 	assert.Contains(t, ui.Outputs[2], "[ROUTER/49] Log Line 2")
+	assert.Contains(t, ui.Outputs[3], "[APP/56] Log Line 3")
 }
 
 func getDefaultLogsDependencies() (reqFactory *testhelpers.FakeReqFactory, logsRepo *testhelpers.FakeLogsRepository) {

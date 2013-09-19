@@ -4,6 +4,7 @@ import (
 	term "cf/terminal"
 	"fmt"
 	"strings"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 const (
@@ -53,4 +54,18 @@ func coloredState(state string) (colored string) {
 	}
 
 	return
+}
+
+func logMessageOutput(lm *logmessage.LogMessage) string {
+	sourceTypeNames := logmessage.LogMessage_SourceType_name
+	sourceTypeNames[int32(logmessage.LogMessage_WARDEN_CONTAINER)] = "APP"
+
+	sourceType, _ := sourceTypeNames[int32(*lm.SourceType)]
+	sourceId := "?"
+	if lm.SourceId != nil {
+		sourceId = *lm.SourceId
+	}
+	msg := lm.GetMessage()
+
+	return fmt.Sprintf("[%s/%s] %s", sourceType, sourceId, msg)
 }
