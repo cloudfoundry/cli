@@ -125,6 +125,6 @@ func (ui *FakeUI) DisplayTable(table [][]string, coloringFunc term.ColoringFunct
 		for col, value := range line {
 			output = output + coloringFunc(value, row, col) + "  "
 		}
-		ui.Say(output)
+		ui.Say("%s",output)
 	}
 }
