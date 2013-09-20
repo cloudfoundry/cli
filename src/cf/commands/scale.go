@@ -76,7 +76,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 }
 
 func extractMegaBytes(arg string) (megaBytes int, err error) {
-	if  arg != "" {
+	if arg != "" {
 		var byteSize int
 		byteSize, err = bytesFromString(arg)
 		if err != nil {
