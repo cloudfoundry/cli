@@ -10,7 +10,7 @@ import (
 )
 
 func TestScaleRequirements(t *testing.T) {
-	args := []string{"-d 1G", "my-app"}
+	args := []string{"-d", "1G", "my-app"}
 	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
 
 	reqFactory.LoginSuccess = false
@@ -50,7 +50,7 @@ func TestScaleAll(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.DiskQuota, int64(2*GIGABYTE))
+	assert.Equal(t, appRepo.ScaledApp.DiskQuota, 2048) // in megabytes
 	assert.Equal(t, appRepo.ScaledApp.Instances, 5)
 
 	assert.Equal(t, stopper.StoppedApp, app)
@@ -65,7 +65,7 @@ func TestScaleOnlyDisk(t *testing.T) {
 	callScale([]string{"-d", "2G", "my-app"}, reqFactory, starter, stopper, appRepo)
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.DiskQuota, int64(2*GIGABYTE))
+	assert.Equal(t, appRepo.ScaledApp.DiskQuota, 2048) // in megabytes
 	assert.Equal(t, appRepo.ScaledApp.Instances, 0)
 }
 

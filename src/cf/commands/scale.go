@@ -59,7 +59,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 			cmd.ui.FailWithUsage(c, "scale")
 			return
 		}
-		changedApp.DiskQuota = quota
+		changedApp.DiskQuota = quota / MEGABYTE
 	}
 
 	changedApp.Instances = c.Int("i")
