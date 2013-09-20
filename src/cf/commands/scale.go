@@ -62,6 +62,8 @@ func (cmd *Scale) Run(c *cli.Context) {
 		changedApp.DiskQuota = quota
 	}
 
+	changedApp.Instances = c.Int("i")
+
 	cmd.appRepo.Scale(changedApp)
 	cmd.stopper.ApplicationStop(currentApp)
 	cmd.starter.ApplicationStart(currentApp)

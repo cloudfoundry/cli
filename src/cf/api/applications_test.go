@@ -319,11 +319,11 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
 
 	return zipAttachmentContentDispositionMatches &&
-		zipAttachmentContentTypeMatches &&
-		zipAttachmentContentTransferEncodingMatches &&
-		zipAttachmentContentLengthPresent &&
-		zipAttachmentContentPresent &&
-		resourcesContentDispositionMatches
+			zipAttachmentContentTypeMatches &&
+			zipAttachmentContentTransferEncodingMatches &&
+			zipAttachmentContentLengthPresent &&
+			zipAttachmentContentPresent &&
+			resourcesContentDispositionMatches
 }
 
 var uploadApplicationEndpoint = testhelpers.CreateEndpoint(
@@ -371,28 +371,48 @@ func TestRename(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-var scaleDiskQuotaEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/apps/my-app-guid",
-	testhelpers.RequestBodyMatcher(`{"disk_quota":1024}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
+func testScale(t *testing.T, app cf.Application, expectedBody string) {
+	scaleEndpoint := testhelpers.CreateEndpoint(
+		"PUT",
+		"/v2/apps/my-app-guid",
+		testhelpers.RequestBodyMatcher(expectedBody),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
 
-func TestScaleApplicationDiskQuota(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(scaleDiskQuotaEndpoint))
+	ts := httptest.NewTLSServer(http.HandlerFunc(scaleEndpoint))
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
+	err := repo.Scale(app)
+	assert.NoError(t, err)
+}
+
+func TestScaleAll(t *testing.T) {
+	app := cf.Application{
+		Guid:      "my-app-guid",
+		DiskQuota: 1024,
+		Instances: 5,
+	}
+	testScale(t, app, `{"disk_quota":1024,"instances":5}`)
+}
+
+func TestScaleApplicationDiskQuota(t *testing.T) {
 	app := cf.Application{
 		Guid:      "my-app-guid",
 		DiskQuota: 1024,
 	}
+	testScale(t, app, `{"disk_quota":1024}`)
+}
 
-	err := repo.Scale(app)
-	assert.NoError(t, err)
+func TestScaleApplicationInstances(t *testing.T) {
+	app := cf.Application{
+		Guid:      "my-app-guid",
+		Instances: 5,
+	}
+	testScale(t, app, `{"instances":5}`)
 }
 
 var startApplicationEndpoint = testhelpers.CreateEndpoint(

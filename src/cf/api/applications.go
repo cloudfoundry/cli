@@ -203,8 +203,21 @@ func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newN
 
 func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
-	data := fmt.Sprintf(`{"disk_quota":%d}`, app.DiskQuota)
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+
+	values := map[string]int{}
+	if app.DiskQuota > 0 {
+		values["disk_quota"] = app.DiskQuota
+	}
+	if app.Instances > 0 {
+		values["instances"] = app.Instances
+	}
+
+	bodyBytes, err := json.Marshal(values)
+	if err != nil {
+		return net.NewApiErrorWithError("Error generating body", err)
+	}
+
+	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(bodyBytes))
 	if apiErr != nil {
 		return
 	}
