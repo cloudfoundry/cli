@@ -28,12 +28,12 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 }
 
 func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiErr *net.ApiError) {
-	path := repo.config.Target + "/v2/organizations"
+	path := repo.config.Target + "/v2/organizations?inline-relations-depth=1"
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
 	}
-	response := new(ApiResponse)
+	response := new(OrganizationsApiResponse)
 
 	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
@@ -42,7 +42,25 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	}
 
 	for _, r := range response.Resources {
-		orgs = append(orgs, cf.Organization{r.Entity.Name, r.Metadata.Guid})
+		spaces := []cf.Space{}
+
+		for _, s := range r.Entity.Spaces {
+			spaces = append(spaces, cf.Space{Name: s.Entity.Name, Guid: s.Metadata.Guid})
+		}
+
+		domains := []cf.Domain{}
+
+		for _, d := range r.Entity.Domains {
+			domains = append(domains, cf.Domain{Name: d.Entity.Name, Guid: d.Metadata.Guid})
+		}
+
+		orgs = append(orgs, cf.Organization{
+			Name:    r.Entity.Name,
+			Guid:    r.Metadata.Guid,
+			Spaces:  spaces,
+			Domains: domains,
+		},
+		)
 	}
 
 	return

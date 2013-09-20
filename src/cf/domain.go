@@ -15,8 +15,10 @@ const (
 )
 
 type Organization struct {
-	Name string
-	Guid string
+	Name    string
+	Guid    string
+	Spaces  []Space
+	Domains []Domain
 }
 
 type Space struct {

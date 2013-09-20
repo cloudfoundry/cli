@@ -24,7 +24,27 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
         "guid": "org1-guid"
       },
       "entity": {
-        "name": "Org1"
+        "name": "Org1",
+        "spaces": [
+          {
+            "metadata": {
+              "guid": "space1-guid"
+            },
+            "entity": {
+              "name": "Space1"
+            }
+          }
+        ],
+        "domains": [
+          {
+            "metadata": {
+              "guid": "domain1-guid"
+            },
+            "entity": {
+              "name": "cfapps.io"
+            }
+          }
+        ]
       }
     },
     {
@@ -32,7 +52,17 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
         "guid": "org2-guid"
       },
       "entity": {
-        "name": "Org2"
+        "name": "Org2",
+        "spaces": [
+          {
+            "metadata": {
+              "guid": "space2-guid"
+            },
+            "entity": {
+              "name": "Space2"
+            }
+          }
+        ]
       }
     }
   ]
@@ -40,7 +70,7 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
 
 var multipleOrgEndpoint = testhelpers.CreateEndpoint(
 	"GET",
-	"/v2/organizations",
+	"/v2/organizations?inline-relations-depth=1",
 	nil,
 	multipleOrgResponse,
 )
@@ -60,9 +90,19 @@ func TestOrganizationsFindAll(t *testing.T) {
 	firstOrg := organizations[0]
 	assert.Equal(t, firstOrg.Name, "Org1")
 	assert.Equal(t, firstOrg.Guid, "org1-guid")
+	assert.Equal(t, len(firstOrg.Spaces), 1)
+	assert.Equal(t, firstOrg.Spaces[0].Name, "Space1")
+	assert.Equal(t, firstOrg.Spaces[0].Guid, "space1-guid")
+	assert.Equal(t, len(firstOrg.Domains), 1)
+	assert.Equal(t, firstOrg.Domains[0].Name, "cfapps.io")
+	assert.Equal(t, firstOrg.Domains[0].Guid, "domain1-guid")
 	secondOrg := organizations[1]
 	assert.Equal(t, secondOrg.Name, "Org2")
 	assert.Equal(t, secondOrg.Guid, "org2-guid")
+	assert.Equal(t, len(secondOrg.Spaces), 1)
+	assert.Equal(t, secondOrg.Spaces[0].Name, "Space2")
+	assert.Equal(t, secondOrg.Spaces[0].Guid, "space2-guid")
+	assert.Equal(t, len(secondOrg.Domains), 0)
 }
 
 func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
@@ -100,11 +140,13 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	org, err := repo.FindByName("Org1")
 	assert.NoError(t, err)
-	assert.Equal(t, org, existingOrg)
+	assert.Equal(t, org.Name, existingOrg.Name)
+	assert.Equal(t, org.Guid, existingOrg.Guid)
 
 	org, err = repo.FindByName("org1")
 	assert.NoError(t, err)
-	assert.Equal(t, org, existingOrg)
+	assert.Equal(t, org.Name, existingOrg.Name)
+	assert.Equal(t, org.Guid, existingOrg.Guid)
 
 	org, err = repo.FindByName("org that does not exist")
 	assert.Error(t, err)

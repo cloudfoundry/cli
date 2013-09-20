@@ -256,6 +256,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "org",
+			Description: "Show org info",
+			Usage:       "cf org ORG",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewShowOrganization()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "orgs",
 			ShortName:   "o",
 			Description: "List all organizations",

@@ -51,6 +51,21 @@ type RouteEntity struct {
 	Domain Resource
 }
 
+type OrganizationsApiResponse struct {
+	Resources []OrganizationResource
+}
+
+type OrganizationResource struct {
+	Metadata Metadata
+	Entity   OrganizationEntity
+}
+
+type OrganizationEntity struct {
+	Name    string
+	Spaces  []Resource
+	Domains []Resource
+}
+
 type ApplicationSummary struct {
 	Guid             string
 	Name             string

@@ -228,6 +228,12 @@ func (f Factory) NewSetEnv() *SetEnv {
 	)
 }
 
+func (f Factory) NewShowOrganization() *ShowOrganization {
+	return NewShowOrganization(
+		f.ui,
+	)
+}
+
 func (f Factory) NewSpaces() Spaces {
 	return NewSpaces(
 		f.ui,
