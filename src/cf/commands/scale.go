@@ -52,19 +52,38 @@ func (cmd *Scale) Run(c *cli.Context) {
 		Guid: currentApp.Guid,
 	}
 
-	if diskQuota := c.String("d"); diskQuota != "" {
-		quota, err := bytesFromString(diskQuota)
-		if err != nil {
-			cmd.ui.Say("Invalid value for disk quota.")
-			cmd.ui.FailWithUsage(c, "scale")
-			return
-		}
-		changedApp.DiskQuota = quota / MEGABYTE
+	diskQuota, err := extractMegaBytes(c.String("d"))
+	if err != nil {
+		cmd.ui.Say("Invalid value for disk quota.")
+		cmd.ui.FailWithUsage(c, "scale")
+		return
 	}
+	changedApp.DiskQuota = diskQuota
+
+	memory, err := extractMegaBytes(c.String("m"))
+	if err != nil {
+		cmd.ui.Say("Invalid value for memory.")
+		cmd.ui.FailWithUsage(c, "scale")
+		return
+	}
+	changedApp.Memory = memory
 
 	changedApp.Instances = c.Int("i")
 
 	cmd.appRepo.Scale(changedApp)
 	cmd.stopper.ApplicationStop(currentApp)
 	cmd.starter.ApplicationStart(currentApp)
+}
+
+func extractMegaBytes(arg string) (megaBytes int, err error) {
+	if  arg != "" {
+		var byteSize int
+		byteSize, err = bytesFromString(arg)
+		if err != nil {
+			return
+		}
+		megaBytes = byteSize / MEGABYTE
+	}
+
+	return
 }

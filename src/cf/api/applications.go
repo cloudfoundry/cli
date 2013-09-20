@@ -211,6 +211,9 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiE
 	if app.Instances > 0 {
 		values["instances"] = app.Instances
 	}
+	if app.Memory > 0 {
+		values["memory"] = app.Memory
+	}
 
 	bodyBytes, err := json.Marshal(values)
 	if err != nil {

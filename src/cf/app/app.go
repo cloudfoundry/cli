@@ -362,7 +362,7 @@ OPTIONS:
 			Flags: []cli.Flag{
 				cli.StringFlag{"d", "", "disk quota"},
 				cli.IntFlag{"i", 0, "number of instances"},
-				//				cli.StringFlag{"m", "", "memory limit"},
+				cli.StringFlag{"m", "", "memory limit"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewScale()

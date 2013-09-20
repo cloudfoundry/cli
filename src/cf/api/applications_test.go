@@ -395,8 +395,9 @@ func TestScaleAll(t *testing.T) {
 		Guid:      "my-app-guid",
 		DiskQuota: 1024,
 		Instances: 5,
+		Memory: 512,
 	}
-	testScale(t, app, `{"disk_quota":1024,"instances":5}`)
+	testScale(t, app, `{"disk_quota":1024,"instances":5,"memory":512}`)
 }
 
 func TestScaleApplicationDiskQuota(t *testing.T) {
@@ -413,6 +414,14 @@ func TestScaleApplicationInstances(t *testing.T) {
 		Instances: 5,
 	}
 	testScale(t, app, `{"instances":5}`)
+}
+
+func TestScaleApplicationMemory(t *testing.T) {
+	app := cf.Application{
+		Guid:      "my-app-guid",
+		Memory: 512,
+	}
+	testScale(t, app, `{"memory":512}`)
 }
 
 var startApplicationEndpoint = testhelpers.CreateEndpoint(
