@@ -356,6 +356,20 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "scale",
+			Description: "Change the disk quota, instance count, and memory limit for an application",
+			Usage:       "cf scale APP -d DISK -i INSTANCES -m MEMORY",
+			Flags: []cli.Flag{
+				cli.StringFlag{"d", "", "disk quota"},
+				//				cli.IntFlag{"i", 1, "number of instances"},
+				//				cli.StringFlag{"m", "", "memory limit"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewScale()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "services",
 			ShortName:   "s",
 			Description: "List all services in the currently targeted space",

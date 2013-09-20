@@ -23,6 +23,7 @@ type ApplicationRepository interface {
 	Delete(app cf.Application) (apiErr *net.ApiError)
 	Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError)
 	Rename(app cf.Application, newName string) (apiErr *net.ApiError)
+	Scale(app cf.Application) (apiErr *net.ApiError)
 	Start(app cf.Application) (apiErr *net.ApiError)
 	Stop(app cf.Application) (apiErr *net.ApiError)
 	GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiErr *net.ApiError)
@@ -191,6 +192,18 @@ func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipB
 func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newName string) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, newName)
+	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiErr != nil {
+		return
+	}
+
+	apiErr = repo.gateway.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiErr *net.ApiError) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+	data := fmt.Sprintf(`{"disk_quota":%d}`, app.DiskQuota)
 	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiErr != nil {
 		return

@@ -35,6 +35,7 @@ type Application struct {
 	Instances        int
 	RunningInstances int
 	Memory           int
+	DiskQuota        int
 	Urls             []string
 	BuildpackUrl     string
 	Stack            Stack

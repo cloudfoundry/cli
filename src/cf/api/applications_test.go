@@ -371,6 +371,30 @@ func TestRename(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+var scaleDiskQuotaEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/apps/my-app-guid",
+	testhelpers.RequestBodyMatcher(`{"disk_quota":1024}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestScaleApplicationDiskQuota(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(scaleDiskQuotaEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationRepository(config, gateway)
+
+	app := cf.Application{
+		Guid:      "my-app-guid",
+		DiskQuota: 1024,
+	}
+
+	err := repo.Scale(app)
+	assert.NoError(t, err)
+}
+
 var startApplicationEndpoint = testhelpers.CreateEndpoint(
 	"PUT",
 	"/v2/apps/my-cool-app-guid",

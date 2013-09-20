@@ -9,6 +9,9 @@ import (
 )
 
 type FakeApplicationRepository struct {
+
+	ScaledApp cf.Application
+
 	StartedApp cf.Application
 	StartAppErr bool
 
@@ -89,6 +92,11 @@ func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *byt
 func (repo *FakeApplicationRepository) Rename(app cf.Application, newName string) (apiErr *net.ApiError) {
 	repo.RenameApp = app
 	repo.RenameNewName = newName
+	return
+}
+
+func (repo *FakeApplicationRepository) Scale(app cf.Application) (apiErr *net.ApiError){
+	repo.ScaledApp = app
 	return
 }
 

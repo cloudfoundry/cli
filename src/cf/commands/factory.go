@@ -214,6 +214,15 @@ func (f Factory) NewRoutes() *Routes {
 	)
 }
 
+func (f Factory) NewScale() *Scale {
+	return NewScale(
+		f.ui,
+		f.NewStart(),
+		f.NewStop(),
+		f.repoLocator.GetApplicationRepository(),
+	)
+}
+
 func (f Factory) NewServices() Services {
 	return NewServices(
 		f.ui,

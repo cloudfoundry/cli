@@ -1,9 +1,11 @@
 package commands
 
 import (
-	"cf/terminal"
+	term "cf/terminal"
+	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -40,18 +42,48 @@ func byteSize(bytes int) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
+func bytesFromString(s string) (bytes int, err error) {
+	unit := string(s[len(s)-1])
+	stringValue := s[0 : len(s)-1]
+
+	value, err := strconv.ParseInt(stringValue, 10, 0)
+	if err != nil {
+		return
+	}
+
+	var byteValue int64
+
+	switch unit {
+	case "T":
+		byteValue = value * TERABYTE
+	case "G":
+		byteValue = value * GIGABYTE
+	case "M":
+		byteValue = value * MEGABYTE
+	case "K":
+		byteValue = value * KILOBYTE
+	}
+
+	if byteValue == 0 {
+		err = errors.New("Could not parse byte string")
+	}
+
+	bytes = int(byteValue)
+	return
+}
+
 func coloredState(state string) (colored string) {
 	switch state {
 	case "started", "running":
-		colored = terminal.SuccessColor("running")
+		colored = term.SuccessColor("running")
 	case "stopped":
-		colored = terminal.StoppedColor("stopped")
+		colored = term.StoppedColor("stopped")
 	case "flapping":
-		colored = terminal.WarningColor("flapping")
+		colored = term.WarningColor("flapping")
 	case "starting":
-		colored = terminal.AdvisoryColor("starting")
+		colored = term.AdvisoryColor("starting")
 	default:
-		colored = terminal.FailureColor(state)
+		colored = term.FailureColor(state)
 	}
 
 	return
