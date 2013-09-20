@@ -319,11 +319,11 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
 
 	return zipAttachmentContentDispositionMatches &&
-			zipAttachmentContentTypeMatches &&
-			zipAttachmentContentTransferEncodingMatches &&
-			zipAttachmentContentLengthPresent &&
-			zipAttachmentContentPresent &&
-			resourcesContentDispositionMatches
+		zipAttachmentContentTypeMatches &&
+		zipAttachmentContentTransferEncodingMatches &&
+		zipAttachmentContentLengthPresent &&
+		zipAttachmentContentPresent &&
+		resourcesContentDispositionMatches
 }
 
 var uploadApplicationEndpoint = testhelpers.CreateEndpoint(

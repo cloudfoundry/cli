@@ -42,7 +42,7 @@ func TestScaleFailsWithUsage(t *testing.T) {
 func TestScaleAll(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
-	reqFactory.Application =  app
+	reqFactory.Application = app
 
 	ui := callScale([]string{"-d", "2G", "-i", "5", "my-app"}, reqFactory, starter, stopper, appRepo)
 
@@ -60,7 +60,7 @@ func TestScaleAll(t *testing.T) {
 func TestScaleOnlyDisk(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
-	reqFactory.Application =  app
+	reqFactory.Application = app
 
 	callScale([]string{"-d", "2G", "my-app"}, reqFactory, starter, stopper, appRepo)
 
@@ -72,7 +72,7 @@ func TestScaleOnlyDisk(t *testing.T) {
 func TestScaleOnlyInstances(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
-	reqFactory.Application =  app
+	reqFactory.Application = app
 
 	callScale([]string{"-i", "5", "my-app"}, reqFactory, starter, stopper, appRepo)
 
