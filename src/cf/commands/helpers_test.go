@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -16,7 +17,14 @@ func TestLogMessageOutput(t *testing.T) {
 
 	stdout := logmessage.LogMessage_OUT
 	stderr := logmessage.LogMessage_ERR
-	timestamp := int64(1379691210 * time.Second)
+
+	zone, _ := time.Now().Zone()
+	date := fmt.Sprintf("2013 Sep 20 09:33:30 %s", zone)
+	logTime, err := time.Parse("2006 Jan 2 15:04:05 MST", date)
+	assert.NoError(t, err)
+
+	timestamp := logTime.UnixNano()
+
 	sourceId := "0"
 
 	msg := &logmessage.LogMessage{
