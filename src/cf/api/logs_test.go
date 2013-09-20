@@ -72,10 +72,16 @@ func TestRecentLogsFor(t *testing.T) {
 }
 
 func TestTailsLogsFor(t *testing.T) {
-	expectedMessage := messagetesthelpers.MarshalledLogMessage(t, "My message", "my-app-id")
+	expectedMessages := [][]byte{
+		marshalledLogMessageWithTime(t, "My message 3", int64(3000)),
+		marshalledLogMessageWithTime(t, "My message 1", int64(1000)),
+		marshalledLogMessageWithTime(t, "My message 2", int64(2000)),
+	}
 
 	websocketEndpoint := func(conn *websocket.Conn) {
-		conn.Write(expectedMessage)
+		for _, msg := range expectedMessages {
+			conn.Write(msg)
+		}
 		conn.Close()
 	}
 
@@ -112,18 +118,27 @@ func TestTailsLogsFor(t *testing.T) {
 		connected = true
 	}
 
-	tailedMessages := []*logmessage.LogMessage{}
+	tailedMessages := []logmessage.LogMessage{}
 
-	onMessage := func(message *logmessage.LogMessage) {
+	onMessage := func(message logmessage.LogMessage) {
 		tailedMessages = append(tailedMessages, message)
 	}
 
 	logsRepo.TailLogsFor(app, onConnect, onMessage)
 
 	assert.Equal(t, len(tailedMessages), 1)
-	actualMessage, err := proto.Marshal(tailedMessages[0])
+
+	actualMessage, err := proto.Marshal(&tailedMessages[0])
 	assert.NoError(t, err)
-	assert.Equal(t, actualMessage, expectedMessage)
+	assert.Equal(t, actualMessage, expectedMessages[1])
+
+	actualMessage, err = proto.Marshal(&tailedMessages[1])
+	assert.NoError(t, err)
+	assert.Equal(t, actualMessage, expectedMessages[2])
+
+	actualMessage, err = proto.Marshal(&tailedMessages[2])
+	assert.NoError(t, err)
+	assert.Equal(t, actualMessage, expectedMessages[0])
 
 	assert.True(t, connected)
 }
@@ -133,4 +148,21 @@ func TestLoggregatorHost(t *testing.T) {
 	loggregatorHost := LoggregatorHost(apiHost)
 
 	assert.Equal(t, loggregatorHost, "https://loggregator.run.pivotal.io")
+}
+
+func marshalledLogMessageWithTime(t *testing.T, messageString string, timestamp int64) []byte {
+	messageType := logmessage.LogMessage_OUT
+	sourceType := logmessage.LogMessage_DEA
+	protoMessage := &logmessage.LogMessage{
+		Message:     []byte(messageString),
+		AppId:       proto.String("my-app-guid"),
+		MessageType: &messageType,
+		SourceType:  &sourceType,
+		Timestamp:   proto.Int64(timestamp),
+	}
+
+	message, err := proto.Marshal(protoMessage)
+	assert.NoError(t, err)
+
+	return message
 }

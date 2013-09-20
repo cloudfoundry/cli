@@ -14,13 +14,14 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"sort"
 )
 
 const LOGGREGATOR_REDIRECTOR_PORT = "4443"
 
 type LogsRepository interface {
 	RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *net.ApiError)
-	TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error)
+	TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error)
 }
 
 type LoggregatorLogsRepository struct {
@@ -59,7 +60,95 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application) (logs []
 	return
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error) {
+func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error) {
+	location, err := repo.getLocationFromRedirector(app)
+
+	config, err := websocket.NewConfig(location, "http://localhost")
+	if err != nil {
+		return
+	}
+
+	config.Header.Add("Authorization", repo.config.AccessToken)
+	config.TlsConfig = &tls.Config{InsecureSkipVerify: true}
+
+	ws, err := websocket.DialConfig(config)
+	if err != nil {
+		return
+	}
+
+	onConnect()
+	go func() {
+		for {
+			websocket.Message.Send(ws, "I'm alive!")
+			time.Sleep(25 * time.Second)
+		}
+	}()
+
+	ticks := time.Duration(5)
+	c := make(chan logmessage.LogMessage, 100*ticks)
+
+	go func() {
+		for {
+			var data []byte
+			err = websocket.Message.Receive(ws, &data)
+			if err != nil {
+				return
+			}
+
+			logMessage := logmessage.LogMessage{}
+
+			msgErr := proto.Unmarshal(data, &logMessage)
+			if msgErr != nil {
+				continue
+			}
+			c <- logMessage
+		}
+	}()
+
+	tickerChan := time.Tick(ticks *time.Second)
+	sortableMsg := &sortableLogMessages{}
+	var msg logmessage.LogMessage
+
+	for {
+		select {
+		case msg = <- c:
+			sortableMsg.Messages = append(sortableMsg.Messages, msg)
+		case <- tickerChan:
+			sort.Sort(sortableMsg)
+			for _, msg = range sortableMsg.Messages {
+				onMessage(msg)
+			}
+			sortableMsg.Messages = []logmessage.LogMessage{}
+		}
+	}
+
+	return
+}
+
+type sortableLogMessages struct {
+	Messages []logmessage.LogMessage
+}
+
+func (sort *sortableLogMessages) Len() int {
+	return len(sort.Messages)
+}
+
+func (sort *sortableLogMessages) Less(i, j int) bool {
+	msgI := sort.Messages[i]
+	msgJ := sort.Messages[j]
+	return *msgI.Timestamp < *msgJ.Timestamp
+}
+
+func (sort *sortableLogMessages) Swap(i, j int) {
+	sort.Messages[i], sort.Messages[j] = sort.Messages[j], sort.Messages[i]
+}
+
+func LoggregatorHost(apiHost string) string {
+	re := regexp.MustCompile(`^(https?://)[^\.]+\.(.+)\/?`)
+	return re.ReplaceAllString(apiHost, "${1}loggregator.${2}")
+}
+
+func (repo LoggregatorLogsRepository) getLocationFromRedirector(app cf.Application) (loc string, err error) {
 	const REDIRECT_ERROR = "REDIRECTED"
 
 	tlsConfig := &tls.Config{InsecureSkipVerify: true}
@@ -86,47 +175,6 @@ func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect 
 		return
 	}
 
-	location := resp.Header.Get("Location")
-	config, err := websocket.NewConfig(location, "http://localhost")
-	if err != nil {
-		return
-	}
-
-	config.Header.Add("Authorization", repo.config.AccessToken)
-	config.TlsConfig = tlsConfig
-
-	ws, err := websocket.DialConfig(config)
-	if err != nil {
-		return
-	}
-
-	onConnect()
-	go func() {
-		for {
-			websocket.Message.Send(ws, "I'm alive!")
-			time.Sleep(25 * time.Second)
-		}
-	}()
-
-	for {
-		var data []byte
-		err = websocket.Message.Receive(ws, &data)
-		if err != nil {
-			return
-		}
-
-		logMessage := new(logmessage.LogMessage)
-		msgErr := proto.Unmarshal(data, logMessage)
-		if msgErr != nil {
-			continue
-		}
-		onMessage(logMessage)
-	}
-
+	loc = resp.Header.Get("Location")
 	return
-}
-
-func LoggregatorHost(apiHost string) string {
-	re := regexp.MustCompile(`^(https?://)[^\.]+\.(.+)\/?`)
-	return re.ReplaceAllString(apiHost, "${1}loggregator.${2}")
 }

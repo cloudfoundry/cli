@@ -46,8 +46,8 @@ func (cmd *Logs) Run(c *cli.Context) {
 		cmd.ui.Say("Connected, tailing...")
 	}
 
-	onMessage := func(lm *logmessage.LogMessage) {
-		cmd.ui.Say(logMessageOutput(app.Name, lm))
+	onMessage := func(msg logmessage.LogMessage) {
+		cmd.ui.Say(logMessageOutput(app.Name, msg))
 	}
 
 	err := cmd.logsRepo.TailLogsFor(app, onConnect, onMessage)

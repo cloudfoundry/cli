@@ -42,7 +42,7 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	messageType := logmessage.LogMessage_ERR
 	deaSourceType := logmessage.LogMessage_DEA
 	deaSourceId := "42"
-	deaLogMessage := &logmessage.LogMessage{
+	deaLogMessage := logmessage.LogMessage{
 		Message:     []byte("Log Line 1"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
@@ -52,7 +52,7 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	}
 
 	/////////////////
-	logs := []*logmessage.LogMessage{deaLogMessage}
+	logs := []logmessage.LogMessage{deaLogMessage}
 
 	reqFactory, logsRepo := getDefaultLogsDependencies()
 	reqFactory.Application = app

@@ -9,7 +9,7 @@ import (
 type FakeLogsRepository struct {
 	AppLogged cf.Application
 	RecentLogs []*logmessage.LogMessage
-	TailLogMessages []*logmessage.LogMessage
+	TailLogMessages []logmessage.LogMessage
 }
 
 func (l *FakeLogsRepository) RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *net.ApiError){
@@ -18,7 +18,7 @@ func (l *FakeLogsRepository) RecentLogsFor(app cf.Application) (logs []*logmessa
 }
 
 
-func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error){
+func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error){
 	l.AppLogged = app
 	onConnect()
 	for _, message := range l.TailLogMessages{

@@ -89,7 +89,7 @@ func coloredState(state string) (colored string) {
 	return
 }
 
-func logMessageOutput(appName string, lm *logmessage.LogMessage) string {
+func logMessageOutput(appName string, lm logmessage.LogMessage) string {
 	sourceTypeNames := map[logmessage.LogMessage_SourceType]string{
 		logmessage.LogMessage_CLOUD_CONTROLLER: "API",
 		logmessage.LogMessage_ROUTER:           "Router",
