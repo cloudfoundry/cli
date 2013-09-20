@@ -47,7 +47,7 @@ func (cmd *Logs) Run(c *cli.Context) {
 	}
 
 	onMessage := func(lm *logmessage.LogMessage) {
-		cmd.ui.Say(logMessageOutput(lm))
+		cmd.ui.Say(logMessageOutput(app.Name, lm))
 	}
 
 	err := cmd.logsRepo.TailLogsFor(app, onConnect, onMessage)

@@ -45,6 +45,6 @@ func (l *RecentLogs) Run(c *cli.Context) {
 	}
 
 	for _, log := range logs {
-		l.ui.Say(logMessageOutput(log))
+		l.ui.Say(logMessageOutput(app.Name, log))
 	}
 }

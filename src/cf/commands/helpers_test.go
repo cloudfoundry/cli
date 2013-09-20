@@ -1,0 +1,61 @@
+package commands
+
+import (
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
+)
+
+func TestLogMessageOutput(t *testing.T) {
+	cloud_controller := logmessage.LogMessage_CLOUD_CONTROLLER
+	router := logmessage.LogMessage_ROUTER
+	uaa := logmessage.LogMessage_UAA
+	dea := logmessage.LogMessage_DEA
+	wardenContainer := logmessage.LogMessage_WARDEN_CONTAINER
+
+	stdout := logmessage.LogMessage_OUT
+	stderr := logmessage.LogMessage_ERR
+	timestamp := int64(1379691210 * time.Second)
+	sourceId := "0"
+
+	msg := &logmessage.LogMessage{
+		Message:     []byte("Hello World!"),
+		MessageType: &stdout,
+		SourceId:    &sourceId,
+		Timestamp:   &timestamp,
+	}
+
+	msg.SourceType = &cloud_controller
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API/0 Hello World!")
+	msg.MessageType = &stderr
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API/0 STDERR Hello World!")
+
+	sourceId = "1"
+	msg.SourceType = &router
+	msg.MessageType = &stdout
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router/1 Hello World!")
+	msg.MessageType = &stderr
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router/1 STDERR Hello World!")
+
+	sourceId = "2"
+	msg.SourceType = &uaa
+	msg.MessageType = &stdout
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA/2 Hello World!")
+	msg.MessageType = &stderr
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA/2 STDERR Hello World!")
+
+	sourceId = "3"
+	msg.SourceType = &dea
+	msg.MessageType = &stdout
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor/3 Hello World!")
+	msg.MessageType = &stderr
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor/3 STDERR Hello World!")
+
+	sourceId = "4"
+	msg.SourceType = &wardenContainer
+	msg.MessageType = &stdout
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app App/4 Hello World!")
+	msg.MessageType = &stderr
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app App/4 STDERR Hello World!")
+}

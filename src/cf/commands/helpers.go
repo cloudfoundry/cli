@@ -3,8 +3,9 @@ package commands
 import (
 	term "cf/terminal"
 	"fmt"
-	"strings"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"strings"
+	"time"
 )
 
 const (
@@ -56,16 +57,29 @@ func coloredState(state string) (colored string) {
 	return
 }
 
-func logMessageOutput(lm *logmessage.LogMessage) string {
-	sourceTypeNames := logmessage.LogMessage_SourceType_name
-	sourceTypeNames[int32(logmessage.LogMessage_WARDEN_CONTAINER)] = "APP"
+func logMessageOutput(appName string, lm *logmessage.LogMessage) string {
+	sourceTypeNames := map[logmessage.LogMessage_SourceType]string{
+		logmessage.LogMessage_CLOUD_CONTROLLER: "API",
+		logmessage.LogMessage_ROUTER:           "Router",
+		logmessage.LogMessage_UAA:              "UAA",
+		logmessage.LogMessage_DEA:              "Executor",
+		logmessage.LogMessage_WARDEN_CONTAINER: "App",
+	}
 
-	sourceType, _ := sourceTypeNames[int32(*lm.SourceType)]
+	sourceType, _ := sourceTypeNames[*lm.SourceType]
 	sourceId := "?"
 	if lm.SourceId != nil {
 		sourceId = *lm.SourceId
 	}
 	msg := lm.GetMessage()
 
-	return fmt.Sprintf("[%s/%s] %s", sourceType, sourceId, msg)
+	t := time.Unix(0, *lm.Timestamp)
+	timeString := t.Format("Jan 2 15:04:05")
+
+	channel := ""
+	if lm.MessageType != nil && *lm.MessageType == logmessage.LogMessage_ERR {
+		channel = "STDERR "
+	}
+
+	return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msg)
 }
