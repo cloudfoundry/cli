@@ -4,7 +4,7 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -118,7 +118,7 @@ func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
 	assert.Equal(t, len(ui.Outputs), 4)
 }
 
-func callLogin(args []string, ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
+func callLogin(args []string, ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
 	l := NewLogin(ui, configRepo, orgRepo, spaceRepo, auth)
 	l.Run(testhelpers.NewContext("login", args))
 }

@@ -3,19 +3,19 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type RecentLogs struct {
-	ui       term.UI
+	ui       terminal.UI
 	appRepo  api.ApplicationRepository
 	appReq   requirements.ApplicationRequirement
 	logsRepo api.LogsRepository
 }
 
-func NewRecentLogs(ui term.UI, aR api.ApplicationRepository, lR api.LogsRepository) (l *RecentLogs) {
+func NewRecentLogs(ui terminal.UI, aR api.ApplicationRepository, lR api.LogsRepository) (l *RecentLogs) {
 	l = new(RecentLogs)
 	l.ui = ui
 	l.appRepo = aR

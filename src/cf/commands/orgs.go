@@ -3,16 +3,16 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type ListOrganizations struct {
-	ui      term.UI
+	ui      terminal.UI
 	orgRepo api.OrganizationRepository
 }
 
-func NewListOrganizations(ui term.UI, orgRepo api.OrganizationRepository) (cmd ListOrganizations) {
+func NewListOrganizations(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd ListOrganizations) {
 	cmd.ui = ui
 	cmd.orgRepo = orgRepo
 	return

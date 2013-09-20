@@ -5,14 +5,14 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 const maxLoginTries = 3
 
 type Login struct {
-	ui            term.UI
+	ui            terminal.UI
 	config        *configuration.Configuration
 	configRepo    configuration.ConfigurationRepository
 	orgRepo       api.OrganizationRepository
@@ -20,7 +20,7 @@ type Login struct {
 	authenticator api.Authenticator
 }
 
-func NewLogin(ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (l Login) {
+func NewLogin(ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (l Login) {
 	l.ui = ui
 	l.configRepo = configRepo
 	l.config, _ = configRepo.Get()
@@ -35,7 +35,7 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (l Login) Run(c *cli.Context) {
-	l.ui.Say("API endpoint: %s", term.EntityNameColor(l.config.Target))
+	l.ui.Say("API endpoint: %s", terminal.EntityNameColor(l.config.Target))
 
 	var (
 		username string
@@ -45,7 +45,7 @@ func (l Login) Run(c *cli.Context) {
 	if len(c.Args()) > 0 {
 		username = c.Args()[0]
 	} else {
-		username = l.ui.Ask("Username%s", term.PromptColor(">"))
+		username = l.ui.Ask("Username%s", terminal.PromptColor(">"))
 	}
 
 	if len(c.Args()) > 1 {
@@ -60,7 +60,7 @@ func (l Login) Run(c *cli.Context) {
 
 	} else {
 		for i := 0; i < maxLoginTries; i++ {
-			password = l.ui.AskForPassword("Password%s", term.PromptColor(">"))
+			password = l.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
 			l.ui.Say("Authenticating...")
 
 			apiErr := l.doLogin(username, password)
@@ -79,7 +79,7 @@ func (l Login) doLogin(username, password string) (apiErr *net.ApiError) {
 	apiErr = l.authenticator.Authenticate(username, password)
 	if apiErr == nil {
 		l.ui.Ok()
-		l.ui.Say("Use '%s' to view or set your target organization and space", term.CommandColor("cf target"))
+		l.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor("cf target"))
 	}
 	return
 }

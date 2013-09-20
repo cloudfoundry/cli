@@ -3,19 +3,19 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
 )
 
 type DeleteSpace struct {
-	ui        term.UI
+	ui        terminal.UI
 	spaceRepo api.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewDeleteSpace(ui term.UI, sR api.SpaceRepository) (cmd *DeleteSpace) {
+func NewDeleteSpace(ui terminal.UI, sR api.SpaceRepository) (cmd *DeleteSpace) {
 	cmd = new(DeleteSpace)
 	cmd.ui = ui
 	cmd.spaceRepo = sR
@@ -48,15 +48,15 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	if !force {
 		response := strings.ToLower(cmd.ui.Ask(
 			"Really delete space %s and everything associated with it?%s",
-			term.EntityNameColor(space.Name),
-			term.PromptColor(">"),
+			terminal.EntityNameColor(space.Name),
+			terminal.PromptColor(">"),
 		))
 		if response != "y" && response != "yes" {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting space %s...", term.EntityNameColor(space.Name))
+	cmd.ui.Say("Deleting space %s...", terminal.EntityNameColor(space.Name))
 	err := cmd.spaceRepo.Delete(space)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

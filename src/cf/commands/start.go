@@ -5,7 +5,7 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -14,7 +14,7 @@ import (
 )
 
 type Start struct {
-	ui        term.UI
+	ui        terminal.UI
 	config    *configuration.Configuration
 	appRepo   api.ApplicationRepository
 	startTime time.Time
@@ -25,7 +25,7 @@ type ApplicationStarter interface {
 	ApplicationStart(cf.Application)
 }
 
-func NewStart(ui term.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Start) {
+func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Start) {
 	s = new(Start)
 	s.ui = ui
 	s.config = config
@@ -53,11 +53,11 @@ func (s *Start) Run(c *cli.Context) {
 
 func (s *Start) ApplicationStart(app cf.Application) {
 	if app.State == "started" {
-		s.ui.Say(term.WarningColor("Application " + app.Name + " is already started."))
+		s.ui.Say(terminal.WarningColor("Application " + app.Name + " is already started."))
 		return
 	}
 
-	s.ui.Say("Starting %s...", term.EntityNameColor(app.Name))
+	s.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
 
 	apiErr := s.appRepo.Start(app)
 	if apiErr != nil {

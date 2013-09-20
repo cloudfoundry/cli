@@ -4,7 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -12,11 +12,11 @@ import (
 )
 
 type CreateService struct {
-	ui          term.UI
+	ui          terminal.UI
 	serviceRepo api.ServiceRepository
 }
 
-func NewCreateService(ui term.UI, sR api.ServiceRepository) (cmd CreateService) {
+func NewCreateService(ui terminal.UI, sR api.ServiceRepository) (cmd CreateService) {
 	cmd.ui = ui
 	cmd.serviceRepo = sR
 	return
@@ -56,7 +56,7 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 
 	for _, param := range strings.Split(params, ",") {
 		param = strings.Trim(param, " ")
-		paramsMap[param] = cmd.ui.Ask("%s%s", param, term.PromptColor(">"))
+		paramsMap[param] = cmd.ui.Ask("%s%s", param, terminal.PromptColor(">"))
 	}
 
 	cmd.ui.Say("Creating service...")
@@ -89,7 +89,7 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 		return
 	}
 
-	cmd.ui.Say("Creating service %s", term.EntityNameColor(name))
+	cmd.ui.Say("Creating service %s", terminal.EntityNameColor(name))
 	apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

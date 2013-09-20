@@ -4,7 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
@@ -14,12 +14,12 @@ type ApplicationStopper interface {
 }
 
 type Stop struct {
-	ui      term.UI
+	ui      terminal.UI
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui term.UI, appRepo api.ApplicationRepository) (s *Stop) {
+func NewStop(ui terminal.UI, appRepo api.ApplicationRepository) (s *Stop) {
 	s = new(Stop)
 	s.ui = ui
 	s.appRepo = appRepo
@@ -42,11 +42,11 @@ func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 
 func (s *Stop) ApplicationStop(app cf.Application) {
 	if app.State == "stopped" {
-		s.ui.Say(term.WarningColor("Application " + app.Name + " is already stopped."))
+		s.ui.Say(terminal.WarningColor("Application " + app.Name + " is already stopped."))
 		return
 	}
 
-	s.ui.Say("Stopping %s...", term.EntityNameColor(app.Name))
+	s.ui.Say("Stopping %s...", terminal.EntityNameColor(app.Name))
 
 	err := s.appRepo.Stop(app)
 	if err != nil {

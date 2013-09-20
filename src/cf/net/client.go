@@ -1,7 +1,7 @@
 package net
 
 import (
-	term "cf/terminal"
+	"cf/terminal"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -73,7 +73,7 @@ func doRequest(request *http.Request) (response *http.Response, err error) {
 		if err != nil {
 			fmt.Println("Error dumping response")
 		} else {
-			fmt.Printf("\n%s\n%s\n", term.HeaderColor("RESPONSE:"), Sanitize(string(dumpedResponse)))
+			fmt.Printf("\n%s\n%s\n", terminal.HeaderColor("RESPONSE:"), Sanitize(string(dumpedResponse)))
 		}
 	}
 
@@ -90,6 +90,6 @@ func dumpRequest(req *http.Request) {
 	if err != nil {
 		fmt.Println("Error dumping request")
 	} else {
-		fmt.Printf("\n%s\n%s\n", term.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
+		fmt.Printf("\n%s\n%s\n", terminal.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
 	}
 }

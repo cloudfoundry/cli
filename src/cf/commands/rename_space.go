@@ -3,18 +3,18 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type RenameSpace struct {
-	ui        term.UI
+	ui        terminal.UI
 	spaceRepo api.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewRenameSpace(ui term.UI, spaceRepo api.SpaceRepository) (cmd *RenameSpace) {
+func NewRenameSpace(ui terminal.UI, spaceRepo api.SpaceRepository) (cmd *RenameSpace) {
 	cmd = new(RenameSpace)
 	cmd.ui = ui
 	cmd.spaceRepo = spaceRepo
@@ -37,7 +37,7 @@ func (cmd *RenameSpace) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd *RenameSpace) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
-	cmd.ui.Say("Renaming space %s...", term.EntityNameColor(space.Name))
+	cmd.ui.Say("Renaming space %s...", terminal.EntityNameColor(space.Name))
 
 	err := cmd.spaceRepo.Rename(space, c.Args()[1])
 	if err != nil {

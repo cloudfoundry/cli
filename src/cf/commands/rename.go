@@ -3,18 +3,18 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type Rename struct {
-	ui      term.UI
+	ui      terminal.UI
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewRename(ui term.UI, appRepo api.ApplicationRepository) (cmd *Rename) {
+func NewRename(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *Rename) {
 	cmd = new(Rename)
 	cmd.ui = ui
 	cmd.appRepo = appRepo
@@ -38,7 +38,7 @@ func (cmd *Rename) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 func (cmd *Rename) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	new_name := c.Args()[1]
-	cmd.ui.Say("Renaming %s to %s...", term.EntityNameColor(app.Name), term.EntityNameColor(new_name))
+	cmd.ui.Say("Renaming %s to %s...", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(new_name))
 
 	err := cmd.appRepo.Rename(app, new_name)
 	if err != nil {

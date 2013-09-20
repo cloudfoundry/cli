@@ -3,19 +3,19 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
 )
 
 type Delete struct {
-	ui      term.UI
+	ui      terminal.UI
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewDelete(ui term.UI, appRepo api.ApplicationRepository) (d *Delete) {
+func NewDelete(ui terminal.UI, appRepo api.ApplicationRepository) (d *Delete) {
 	d = new(Delete)
 	d.ui = ui
 	d.appRepo = appRepo
@@ -41,15 +41,15 @@ func (d *Delete) Run(c *cli.Context) {
 	if !force {
 		response := strings.ToLower(d.ui.Ask(
 			"Really delete %s?%s",
-			term.EntityNameColor(app.Name),
-			term.PromptColor(">"),
+			terminal.EntityNameColor(app.Name),
+			terminal.PromptColor(">"),
 		))
 		if response != "y" && response != "yes" {
 			return
 		}
 	}
 
-	d.ui.Say("Deleting app %s...", term.EntityNameColor(app.Name))
+	d.ui.Say("Deleting app %s...", terminal.EntityNameColor(app.Name))
 	err := d.appRepo.Delete(app)
 	if err != nil {
 		d.ui.Failed(err.Error())

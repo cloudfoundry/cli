@@ -3,18 +3,18 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type DeleteService struct {
-	ui                 term.UI
+	ui                 terminal.UI
 	serviceRepo        api.ServiceRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewDeleteService(ui term.UI, sR api.ServiceRepository) (cmd *DeleteService) {
+func NewDeleteService(ui terminal.UI, sR api.ServiceRepository) (cmd *DeleteService) {
 	cmd = new(DeleteService)
 	cmd.ui = ui
 	cmd.serviceRepo = sR
@@ -42,7 +42,7 @@ func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cl
 
 func (cmd *DeleteService) Run(c *cli.Context) {
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
-	cmd.ui.Say("Deleting service %s...", term.EntityNameColor(instance.Name))
+	cmd.ui.Say("Deleting service %s...", terminal.EntityNameColor(instance.Name))
 
 	err := cmd.serviceRepo.DeleteService(instance)
 	if err != nil {

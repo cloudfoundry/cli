@@ -3,17 +3,17 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 	"strings"
 )
 
 type MarketplaceServices struct {
-	ui          term.UI
+	ui          terminal.UI
 	serviceRepo api.ServiceRepository
 }
 
-func NewMarketplaceServices(ui term.UI, serviceRepo api.ServiceRepository) (cmd MarketplaceServices) {
+func NewMarketplaceServices(ui terminal.UI, serviceRepo api.ServiceRepository) (cmd MarketplaceServices) {
 	cmd.ui = ui
 	cmd.serviceRepo = serviceRepo
 	return

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"cf/configuration"
-	term "cf/terminal"
+	"cf/terminal"
 	"time"
 	"github.com/codegangsta/cli"
 )
@@ -115,9 +115,9 @@ func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
 
 }
 
-func (ui *FakeUI) DisplayTable(table [][]string, coloringFunc term.ColoringFunction) {
+func (ui *FakeUI) DisplayTable(table [][]string, coloringFunc terminal.ColoringFunction) {
 	if coloringFunc == nil {
-		coloringFunc = term.DefaultColoringFunc
+		coloringFunc = terminal.DefaultColoringFunc
 	}
 
 	for row, line := range table {

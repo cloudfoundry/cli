@@ -3,16 +3,16 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Routes struct {
-	ui        term.UI
+	ui        terminal.UI
 	routeRepo api.RouteRepository
 }
 
-func NewRoutes(ui term.UI, routeRepo api.RouteRepository) (cmd *Routes) {
+func NewRoutes(ui terminal.UI, routeRepo api.RouteRepository) (cmd *Routes) {
 	cmd = new(Routes)
 	cmd.ui = ui
 	cmd.routeRepo = routeRepo

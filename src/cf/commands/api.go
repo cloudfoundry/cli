@@ -4,18 +4,18 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Api struct {
-	ui         term.UI
+	ui         terminal.UI
 	gateway    net.Gateway
 	configRepo configuration.ConfigurationRepository
 	config     *configuration.Configuration
 }
 
-func NewApi(ui term.UI, gateway net.Gateway, configRepo configuration.ConfigurationRepository) (cmd Api) {
+func NewApi(ui terminal.UI, gateway net.Gateway, configRepo configuration.ConfigurationRepository) (cmd Api) {
 	cmd.ui = ui
 	cmd.gateway = gateway
 	cmd.configRepo = configRepo
@@ -39,13 +39,13 @@ func (cmd Api) Run(c *cli.Context) {
 func (cmd Api) showApiEndpoint() {
 	cmd.ui.Say(
 		"API endpoint: %s (API version: %s)",
-		term.EntityNameColor(cmd.config.Target),
-		term.EntityNameColor(cmd.config.ApiVersion),
+		terminal.EntityNameColor(cmd.config.Target),
+		terminal.EntityNameColor(cmd.config.ApiVersion),
 	)
 }
 
 func (cmd Api) setNewApiEndpoint(endpoint string) {
-	cmd.ui.Say("Setting api endpoint to %s...", term.EntityNameColor(endpoint))
+	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
 	request, apiErr := cmd.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 
@@ -78,12 +78,12 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Ok()
 
 	if scheme == "http" {
-		cmd.ui.Say(term.WarningColor("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
+		cmd.ui.Say(terminal.WarningColor("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
 	}
 
 	cmd.showApiEndpoint()
 
-	cmd.ui.Say(term.NotLoggedInText())
+	cmd.ui.Say(terminal.NotLoggedInText())
 }
 
 func (cmd Api) saveEndpoint(endpoint string, info *InfoResponse) (err error) {

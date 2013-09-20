@@ -3,7 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -11,12 +11,12 @@ import (
 )
 
 type App struct {
-	ui             term.UI
+	ui             terminal.UI
 	appSummaryRepo api.AppSummaryRepository
 	appReq         requirements.ApplicationRequirement
 }
 
-func NewApp(ui term.UI, appSummaryRepo api.AppSummaryRepository) (cmd *App) {
+func NewApp(ui terminal.UI, appSummaryRepo api.AppSummaryRepository) (cmd *App) {
 	cmd = new(App)
 	cmd.ui = ui
 	cmd.appSummaryRepo = appSummaryRepo
@@ -42,7 +42,7 @@ func (cmd *App) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 
 func (cmd *App) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	cmd.ui.Say("Showing health and status for app %s...", term.EntityNameColor(app.Name))
+	cmd.ui.Say("Showing health and status for app %s...", terminal.EntityNameColor(app.Name))
 
 	summary, err := cmd.appSummaryRepo.GetSummary(app)
 	if err != nil {
@@ -51,9 +51,9 @@ func (cmd *App) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", term.HeaderColor("health:"), coloredState(summary.App.Health()))
-	cmd.ui.Say("%s %s x %d instances", term.HeaderColor("usage:"), byteSize(summary.App.Memory*MEGABYTE), summary.App.Instances)
-	cmd.ui.Say("%s %s\n", term.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor("health:"), coloredState(summary.App.Health()))
+	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), byteSize(summary.App.Memory*MEGABYTE), summary.App.Instances)
+	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
 
 	table := [][]string{
 		[]string{"", "status", "since", "cpu", "memory", "disk"},
@@ -78,5 +78,5 @@ func (cmd *App) coloringFunc(value string, row int, col int) string {
 		return coloredState(value)
 	}
 
-	return term.DefaultColoringFunc(value, row, col)
+	return terminal.DefaultColoringFunc(value, row, col)
 }

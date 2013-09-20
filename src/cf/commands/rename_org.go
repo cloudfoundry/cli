@@ -3,18 +3,18 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type RenameOrg struct {
-	ui      term.UI
+	ui      terminal.UI
 	orgRepo api.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewRenameOrg(ui term.UI, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
+func NewRenameOrg(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
 	cmd = new(RenameOrg)
 	cmd.ui = ui
 	cmd.orgRepo = orgRepo
@@ -37,7 +37,7 @@ func (cmd *RenameOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd *RenameOrg) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
-	cmd.ui.Say("Renaming org %s...", term.EntityNameColor(org.Name))
+	cmd.ui.Say("Renaming org %s...", terminal.EntityNameColor(org.Name))
 
 	err := cmd.orgRepo.Rename(org, c.Args()[1])
 	if err != nil {

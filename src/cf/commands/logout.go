@@ -3,16 +3,16 @@ package commands
 import (
 	"cf/configuration"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Logout struct {
-	ui         term.UI
+	ui         terminal.UI
 	configRepo configuration.ConfigurationRepository
 }
 
-func NewLogout(ui term.UI, configRepo configuration.ConfigurationRepository) (l Logout) {
+func NewLogout(ui terminal.UI, configRepo configuration.ConfigurationRepository) (l Logout) {
 	l.ui = ui
 	l.configRepo = configRepo
 	return

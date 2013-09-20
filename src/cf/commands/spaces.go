@@ -4,17 +4,17 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Spaces struct {
-	ui        term.UI
+	ui        terminal.UI
 	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 }
 
-func NewSpaces(ui term.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd Spaces) {
+func NewSpaces(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd Spaces) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
@@ -30,7 +30,7 @@ func (cmd Spaces) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 }
 
 func (cmd Spaces) Run(c *cli.Context) {
-	cmd.ui.Say("Getting spaces in %s...", term.EntityNameColor(cmd.config.Organization.Name))
+	cmd.ui.Say("Getting spaces in %s...", terminal.EntityNameColor(cmd.config.Organization.Name))
 
 	spaces, err := cmd.spaceRepo.FindAll()
 	if err != nil {

@@ -5,20 +5,20 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
 )
 
 type DeleteOrg struct {
-	ui         term.UI
+	ui         terminal.UI
 	orgRepo    api.OrganizationRepository
 	orgReq     requirements.OrganizationRequirement
 	configRepo configuration.ConfigurationRepository
 }
 
-func NewDeleteOrg(ui term.UI, sR api.OrganizationRepository, cR configuration.ConfigurationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui terminal.UI, sR api.OrganizationRepository, cR configuration.ConfigurationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
 	cmd.orgRepo = sR
@@ -52,15 +52,15 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	if !force {
 		response := strings.ToLower(cmd.ui.Ask(
 			"Really delete org %s and everything associated with it?%s",
-			term.EntityNameColor(org.Name),
-			term.PromptColor(">"),
+			terminal.EntityNameColor(org.Name),
+			terminal.PromptColor(">"),
 		))
 		if response != "y" && response != "yes" {
 			return
 		}
 	}
 
-	cmd.ui.Say("Deleting org %s...", term.EntityNameColor(org.Name))
+	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(org.Name))
 	err := cmd.orgRepo.Delete(org)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

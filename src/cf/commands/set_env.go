@@ -3,18 +3,18 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type SetEnv struct {
-	ui      term.UI
+	ui      terminal.UI
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui term.UI, appRepo api.ApplicationRepository) (se *SetEnv) {
+func NewSetEnv(ui terminal.UI, appRepo api.ApplicationRepository) (se *SetEnv) {
 	se = new(SetEnv)
 	se.ui = ui
 	se.appRepo = appRepo

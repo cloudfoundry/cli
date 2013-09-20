@@ -3,17 +3,17 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type CreateSpace struct {
-	ui        term.UI
+	ui        terminal.UI
 	spaceRepo api.SpaceRepository
 }
 
-func NewCreateSpace(ui term.UI, sR api.SpaceRepository) (cmd CreateSpace) {
+func NewCreateSpace(ui terminal.UI, sR api.SpaceRepository) (cmd CreateSpace) {
 	cmd.ui = ui
 	cmd.spaceRepo = sR
 	return
@@ -35,7 +35,7 @@ func (cmd CreateSpace) GetRequirements(reqFactory requirements.Factory, c *cli.C
 
 func (cmd CreateSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
-	cmd.ui.Say("Creating space %s...", term.EntityNameColor(spaceName))
+	cmd.ui.Say("Creating space %s...", terminal.EntityNameColor(spaceName))
 
 	err := cmd.spaceRepo.Create(spaceName)
 	if err != nil {
@@ -44,5 +44,5 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new space.", term.CommandColor("cf target -s "+spaceName))
+	cmd.ui.Say("\nTIP: Use '%s' to target new space.", terminal.CommandColor("cf target -s "+spaceName))
 }

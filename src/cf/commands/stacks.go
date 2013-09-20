@@ -3,16 +3,16 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Stacks struct {
-	ui         term.UI
+	ui         terminal.UI
 	stacksRepo api.StackRepository
 }
 
-func NewStacks(ui term.UI, stacksRepo api.StackRepository) (s *Stacks) {
+func NewStacks(ui terminal.UI, stacksRepo api.StackRepository) (s *Stacks) {
 	s = new(Stacks)
 	s.ui = ui
 	s.stacksRepo = stacksRepo

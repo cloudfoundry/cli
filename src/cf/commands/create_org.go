@@ -3,17 +3,17 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type CreateOrganization struct {
-	ui      term.UI
+	ui      terminal.UI
 	orgRepo api.OrganizationRepository
 }
 
-func NewCreateOrganization(ui term.UI, orgRepo api.OrganizationRepository) (cmd CreateOrganization) {
+func NewCreateOrganization(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd CreateOrganization) {
 	cmd.ui = ui
 	cmd.orgRepo = orgRepo
 	return
@@ -35,7 +35,7 @@ func (cmd CreateOrganization) GetRequirements(reqFactory requirements.Factory, c
 func (cmd CreateOrganization) Run(c *cli.Context) {
 	name := c.Args()[0]
 
-	cmd.ui.Say("Creating organization %s...", term.EntityNameColor(name))
+	cmd.ui.Say("Creating organization %s...", terminal.EntityNameColor(name))
 	apiErr := cmd.orgRepo.Create(name)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
@@ -43,5 +43,5 @@ func (cmd CreateOrganization) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new org.", term.CommandColor("cf target -o "+name))
+	cmd.ui.Say("\nTIP: Use '%s' to target new org.", terminal.CommandColor("cf target -o "+name))
 }

@@ -3,19 +3,19 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type UnbindService struct {
-	ui                 term.UI
+	ui                 terminal.UI
 	serviceRepo        api.ServiceRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui term.UI, sR api.ServiceRepository) (cmd *UnbindService) {
+func NewUnbindService(ui terminal.UI, sR api.ServiceRepository) (cmd *UnbindService) {
 	cmd = new(UnbindService)
 	cmd.ui = ui
 	cmd.serviceRepo = sR
@@ -43,7 +43,7 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Unbinding service %s from %s...", term.EntityNameColor(instance.Name), term.EntityNameColor(app.Name))
+	cmd.ui.Say("Unbinding service %s from %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
 	err := cmd.serviceRepo.UnbindService(instance, app)
 	if err != nil {

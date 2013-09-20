@@ -4,17 +4,17 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type Password struct {
-	ui         term.UI
+	ui         terminal.UI
 	pwdRepo    api.PasswordRepository
 	configRepo configuration.ConfigurationRepository
 }
 
-func NewPassword(ui term.UI, pwdRepo api.PasswordRepository, configRepo configuration.ConfigurationRepository) (cmd Password) {
+func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, configRepo configuration.ConfigurationRepository) (cmd Password) {
 	cmd.ui = ui
 	cmd.pwdRepo = pwdRepo
 	cmd.configRepo = configRepo
@@ -29,9 +29,9 @@ func (cmd Password) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 }
 
 func (cmd Password) Run(c *cli.Context) {
-	oldPassword := cmd.ui.AskForPassword("Current Password%s", term.PromptColor(">"))
-	newPassword := cmd.ui.AskForPassword("New Password%s", term.PromptColor(">"))
-	verifiedPassword := cmd.ui.AskForPassword("Verify Password%s", term.PromptColor(">"))
+	oldPassword := cmd.ui.AskForPassword("Current Password%s", terminal.PromptColor(">"))
+	newPassword := cmd.ui.AskForPassword("New Password%s", terminal.PromptColor(">"))
+	verifiedPassword := cmd.ui.AskForPassword("Verify Password%s", terminal.PromptColor(">"))
 
 	if verifiedPassword != newPassword {
 		cmd.ui.Failed("Password verification does not match")

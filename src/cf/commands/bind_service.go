@@ -3,19 +3,19 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type BindService struct {
-	ui                 term.UI
+	ui                 terminal.UI
 	serviceRepo        api.ServiceRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewBindService(ui term.UI, sR api.ServiceRepository) (cmd *BindService) {
+func NewBindService(ui terminal.UI, sR api.ServiceRepository) (cmd *BindService) {
 	cmd = new(BindService)
 	cmd.ui = ui
 	cmd.serviceRepo = sR
@@ -43,7 +43,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Binding service %s to %s...", term.EntityNameColor(instance.Name), term.EntityNameColor(app.Name))
+	cmd.ui.Say("Binding service %s to %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
 	apiErr := cmd.serviceRepo.BindService(instance, app)
 	if apiErr != nil && apiErr.ErrorCode != "90003" {
@@ -54,6 +54,6 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if apiErr != nil && apiErr.ErrorCode == "90003" {
-		cmd.ui.Say("App %s is already bound to %s.", term.EntityNameColor(app.Name), term.EntityNameColor(instance.Name))
+		cmd.ui.Say("App %s is already bound to %s.", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(instance.Name))
 	}
 }

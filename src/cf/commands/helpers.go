@@ -1,7 +1,7 @@
 package commands
 
 import (
-	term "cf/terminal"
+	"cf/terminal"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"strings"
@@ -43,15 +43,15 @@ func byteSize(bytes int) string {
 func coloredState(state string) (colored string) {
 	switch state {
 	case "started", "running":
-		colored = term.SuccessColor("running")
+		colored = terminal.SuccessColor("running")
 	case "stopped":
-		colored = term.StoppedColor("stopped")
+		colored = terminal.StoppedColor("stopped")
 	case "flapping":
-		colored = term.WarningColor("flapping")
+		colored = terminal.WarningColor("flapping")
 	case "starting":
-		colored = term.AdvisoryColor("starting")
+		colored = terminal.AdvisoryColor("starting")
 	default:
-		colored = term.FailureColor(state)
+		colored = terminal.FailureColor(state)
 	}
 
 	return

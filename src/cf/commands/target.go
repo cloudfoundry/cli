@@ -5,7 +5,7 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
@@ -15,14 +15,14 @@ type InfoResponse struct {
 }
 
 type Target struct {
-	ui         term.UI
+	ui         terminal.UI
 	config     *configuration.Configuration
 	configRepo configuration.ConfigurationRepository
 	orgRepo    api.OrganizationRepository
 	spaceRepo  api.SpaceRepository
 }
 
-func NewTarget(ui term.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
+func NewTarget(ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
 	t.ui = ui
 	t.configRepo = configRepo
 	t.config, _ = configRepo.Get()

@@ -3,18 +3,18 @@ package commands
 import (
 	"cf/api"
 	"cf/requirements"
-	term "cf/terminal"
+	"cf/terminal"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
 
 type Apps struct {
-	ui        term.UI
+	ui        terminal.UI
 	spaceRepo api.SpaceRepository
 }
 
-func NewApps(ui term.UI, spaceRepo api.SpaceRepository) (a Apps) {
+func NewApps(ui terminal.UI, spaceRepo api.SpaceRepository) (a Apps) {
 	a.ui = ui
 	a.spaceRepo = spaceRepo
 	return
@@ -63,5 +63,5 @@ func (a Apps) coloringFunc(value string, row int, col int) string {
 		return coloredState(value)
 	}
 
-	return term.DefaultColoringFunc(value, row, col)
+	return terminal.DefaultColoringFunc(value, row, col)
 }
