@@ -56,20 +56,27 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr 
 }
 
 func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiErr *net.ApiError) {
-	spaces, apiErr := repo.FindAll()
-	lowerName := strings.ToLower(name)
+	path := fmt.Sprintf("%s/v2/spaces?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
+
+	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
+		return
+	}
+
+	response := new(ApiResponse)
+
+	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
 	}
 
-	for _, s := range spaces {
-		if strings.ToLower(s.Name) == lowerName {
-			return s, nil
-		}
+	if len(response.Resources) == 0 {
+		apiErr = net.NewApiErrorWithMessage(fmt.Sprintf("Space %s not found", name))
+		return
 	}
-
-	apiErr = net.NewApiErrorWithMessage("Space not found")
+	r := response.Resources[0]
+	space = cf.Space{Name: r.Entity.Name, Guid: r.Metadata.Guid}
 	return
 }
 

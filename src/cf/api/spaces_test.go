@@ -93,8 +93,75 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 	assert.Equal(t, 0, len(spaces))
 }
 
+var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "space1-guid"
+      },
+      "entity": {
+        "name": "Space1",
+        "organization_guid": "org1-guid",
+        "organization": {
+          "metadata": {
+            "guid": "org1-guid"
+          },
+          "entity": {
+            "name": "Org1"
+          }
+        },
+        "apps": [
+          {
+            "metadata": {
+              "guid": "app1-guid"
+            },
+            "entity": {
+              "name": "hello1"
+            }
+          },
+          {
+            "metadata": {
+              "guid": "app2-guid"
+            },
+            "entity": {
+              "name": "hello2"
+            }
+          }
+        ],
+        "domains": [
+          {
+            "metadata": {
+              "guid": "domain1-guid"
+            },
+            "entity": {
+              "name": "cli.cf-app.com",
+              "owning_organization_guid": null,
+              "wildcard": true
+            }
+          }
+        ],
+        "service_instances": [
+
+        ]
+      }
+    }
+  ]
+}`}
+
+var findSpaceByNameEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces?q=name%3Aspace1&inline-relations-depth=1",
+	nil,
+	findSpaceByNameResponse,
+)
+
 func TestSpacesFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
+	ts := httptest.NewTLSServer(http.HandlerFunc(findSpaceByNameEndpoint))
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -104,17 +171,17 @@ func TestSpacesFindByName(t *testing.T) {
 	}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
-	existingOrg := cf.Space{Guid: "staging-space-guid", Name: "staging"}
+	existingSpace := cf.Space{Guid: "space1-guid", Name: "Space1"}
 
-	org, err := repo.FindByName("staging")
+	space, err := repo.FindByName("Space1")
 	assert.NoError(t, err)
-	assert.Equal(t, org, existingOrg)
+	assert.Equal(t, space, existingSpace)
 
-	org, err = repo.FindByName("Staging")
+	space, err = repo.FindByName("Space1")
 	assert.NoError(t, err)
-	assert.Equal(t, org, existingOrg)
+	assert.Equal(t, space, existingSpace)
 
-	org, err = repo.FindByName("space that does not exist")
+	space, err = repo.FindByName("space that does not exist")
 	assert.Error(t, err)
 }
 
