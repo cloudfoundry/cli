@@ -28,7 +28,7 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 }
 
 func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiErr *net.ApiError) {
-	path := repo.config.Target + "/v2/organizations?inline-relations-depth=1"
+	path := repo.config.Target + "/v2/organizations"
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
@@ -42,23 +42,9 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	}
 
 	for _, r := range response.Resources {
-		spaces := []cf.Space{}
-
-		for _, s := range r.Entity.Spaces {
-			spaces = append(spaces, cf.Space{Name: s.Entity.Name, Guid: s.Metadata.Guid})
-		}
-
-		domains := []cf.Domain{}
-
-		for _, d := range r.Entity.Domains {
-			domains = append(domains, cf.Domain{Name: d.Entity.Name, Guid: d.Metadata.Guid})
-		}
-
 		orgs = append(orgs, cf.Organization{
-			Name:    r.Entity.Name,
-			Guid:    r.Metadata.Guid,
-			Spaces:  spaces,
-			Domains: domains,
+			Name: r.Entity.Name,
+			Guid: r.Metadata.Guid,
 		},
 		)
 	}
@@ -67,20 +53,44 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 }
 
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiErr *net.ApiError) {
-	orgs, apiErr := repo.FindAll()
-	lowerName := strings.ToLower(name)
+	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
+	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
+		return
+	}
+	response := new(OrganizationsApiResponse)
+
+	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
 	}
 
-	for _, o := range orgs {
-		if strings.ToLower(o.Name) == lowerName {
-			return o, nil
-		}
+	if len(response.Resources) == 0 {
+		apiErr = net.NewApiErrorWithMessage(fmt.Sprintf("Organization %s not found", name))
+		return
 	}
 
-	apiErr = net.NewApiErrorWithMessage("Organization not found")
+	r := response.Resources[0]
+	spaces := []cf.Space{}
+
+	for _, s := range r.Entity.Spaces {
+		spaces = append(spaces, cf.Space{Name: s.Entity.Name, Guid: s.Metadata.Guid})
+	}
+
+	domains := []cf.Domain{}
+
+	for _, d := range r.Entity.Domains {
+		domains = append(domains, cf.Domain{Name: d.Entity.Name, Guid: d.Metadata.Guid})
+	}
+
+	org = cf.Organization{
+		Name:    r.Entity.Name,
+		Guid:    r.Metadata.Guid,
+		Spaces:  spaces,
+		Domains: domains,
+	}
+
 	return
 }
 

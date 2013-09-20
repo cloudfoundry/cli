@@ -24,27 +24,7 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
         "guid": "org1-guid"
       },
       "entity": {
-        "name": "Org1",
-        "spaces": [
-          {
-            "metadata": {
-              "guid": "space1-guid"
-            },
-            "entity": {
-              "name": "Space1"
-            }
-          }
-        ],
-        "domains": [
-          {
-            "metadata": {
-              "guid": "domain1-guid"
-            },
-            "entity": {
-              "name": "cfapps.io"
-            }
-          }
-        ]
+        "name": "Org1"
       }
     },
     {
@@ -52,17 +32,7 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
         "guid": "org2-guid"
       },
       "entity": {
-        "name": "Org2",
-        "spaces": [
-          {
-            "metadata": {
-              "guid": "space2-guid"
-            },
-            "entity": {
-              "name": "Space2"
-            }
-          }
-        ]
+        "name": "Org2"
       }
     }
   ]
@@ -70,7 +40,7 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
 
 var multipleOrgEndpoint = testhelpers.CreateEndpoint(
 	"GET",
-	"/v2/organizations?inline-relations-depth=1",
+	"/v2/organizations",
 	nil,
 	multipleOrgResponse,
 )
@@ -90,19 +60,10 @@ func TestOrganizationsFindAll(t *testing.T) {
 	firstOrg := organizations[0]
 	assert.Equal(t, firstOrg.Name, "Org1")
 	assert.Equal(t, firstOrg.Guid, "org1-guid")
-	assert.Equal(t, len(firstOrg.Spaces), 1)
-	assert.Equal(t, firstOrg.Spaces[0].Name, "Space1")
-	assert.Equal(t, firstOrg.Spaces[0].Guid, "space1-guid")
-	assert.Equal(t, len(firstOrg.Domains), 1)
-	assert.Equal(t, firstOrg.Domains[0].Name, "cfapps.io")
-	assert.Equal(t, firstOrg.Domains[0].Guid, "domain1-guid")
+
 	secondOrg := organizations[1]
 	assert.Equal(t, secondOrg.Name, "Org2")
 	assert.Equal(t, secondOrg.Guid, "org2-guid")
-	assert.Equal(t, len(secondOrg.Spaces), 1)
-	assert.Equal(t, secondOrg.Spaces[0].Name, "Space2")
-	assert.Equal(t, secondOrg.Spaces[0].Guid, "space2-guid")
-	assert.Equal(t, len(secondOrg.Domains), 0)
 }
 
 func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
@@ -128,8 +89,53 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	assert.Equal(t, 0, len(organizations))
 }
 
+var findOrgByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "org1-guid"
+      },
+      "entity": {
+        "name": "Org1",
+        "spaces": [
+          {
+            "metadata": {
+              "guid": "space1-guid"
+            },
+            "entity": {
+              "name": "Space1"
+            }
+          }
+        ],
+        "domains": [
+          {
+            "metadata": {
+              "guid": "domain1-guid"
+            },
+            "entity": {
+              "name": "cfapps.io"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}`}
+
+var findOrgByNameEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+	nil,
+	findOrgByNameResponse,
+)
+
 func TestOrganizationsFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
+	ts := httptest.NewTLSServer(http.HandlerFunc(findOrgByNameEndpoint))
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -142,6 +148,12 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
+	assert.Equal(t, len(org.Spaces), 1)
+	assert.Equal(t, org.Spaces[0].Name, "Space1")
+	assert.Equal(t, org.Spaces[0].Guid, "space1-guid")
+	assert.Equal(t, len(org.Domains), 1)
+	assert.Equal(t, org.Domains[0].Name, "cfapps.io")
+	assert.Equal(t, org.Domains[0].Guid, "domain1-guid")
 
 	org, err = repo.FindByName("org1")
 	assert.NoError(t, err)
