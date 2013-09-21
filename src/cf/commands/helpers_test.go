@@ -27,7 +27,7 @@ func TestLogMessageOutput(t *testing.T) {
 
 	sourceId := "0"
 
-	msg := &logmessage.LogMessage{
+	msg := logmessage.LogMessage{
 		Message:     []byte("Hello World!"),
 		MessageType: &stdout,
 		SourceId:    &sourceId,

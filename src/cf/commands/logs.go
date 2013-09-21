@@ -50,7 +50,7 @@ func (cmd *Logs) Run(c *cli.Context) {
 		cmd.ui.Say(logMessageOutput(app.Name, msg))
 	}
 
-	err := cmd.logsRepo.TailLogsFor(app, onConnect, onMessage)
+	err := cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}

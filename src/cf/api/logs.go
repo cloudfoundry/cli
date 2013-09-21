@@ -12,16 +12,16 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"net/http"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
-	"sort"
 )
 
 const LOGGREGATOR_REDIRECTOR_PORT = "4443"
 
 type LogsRepository interface {
 	RecentLogsFor(app cf.Application) (logs []*logmessage.LogMessage, apiErr *net.ApiError)
-	TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error)
+	TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration) (err error)
 }
 
 type LoggregatorLogsRepository struct {
@@ -60,7 +60,7 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application) (logs []
 	return
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error) {
+func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration) (err error) {
 	location, err := repo.getLocationFromRedirector(app)
 
 	config, err := websocket.NewConfig(location, "http://localhost")
@@ -77,52 +77,63 @@ func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect 
 	}
 
 	onConnect()
-	go func() {
-		for {
-			websocket.Message.Send(ws, "I'm alive!")
-			time.Sleep(25 * time.Second)
-		}
-	}()
 
-	ticks := time.Duration(5)
-	c := make(chan logmessage.LogMessage, 100*ticks)
+	msgChan := make(chan logmessage.LogMessage, 100*printInterval)
+	errChan := make(chan error, 0)
 
-	go func() {
-		for {
-			var data []byte
-			err = websocket.Message.Receive(ws, &data)
-			if err != nil {
-				return
-			}
+	go repo.listenForMessages(ws, msgChan, errChan)
+	go repo.sendKeepAlive(ws)
 
-			logMessage := logmessage.LogMessage{}
-
-			msgErr := proto.Unmarshal(data, &logMessage)
-			if msgErr != nil {
-				continue
-			}
-			c <- logMessage
-		}
-	}()
-
-	tickerChan := time.Tick(ticks *time.Second)
+	tickerChan := time.Tick(printInterval * time.Second)
 	sortableMsg := &sortableLogMessages{}
 	var msg logmessage.LogMessage
 
 	for {
 		select {
-		case msg = <- c:
+		case err = <-errChan:
+			break
+		case msg = <-msgChan:
 			sortableMsg.Messages = append(sortableMsg.Messages, msg)
-		case <- tickerChan:
+		case <-tickerChan:
 			sort.Sort(sortableMsg)
 			for _, msg = range sortableMsg.Messages {
 				onMessage(msg)
 			}
 			sortableMsg.Messages = []logmessage.LogMessage{}
 		}
+		if err != nil {
+			break
+		}
 	}
 
 	return
+}
+
+func (repo LoggregatorLogsRepository) sendKeepAlive(ws *websocket.Conn) {
+	for {
+		websocket.Message.Send(ws, "I'm alive!")
+		time.Sleep(25 * time.Second)
+	}
+}
+
+func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgChan chan<- logmessage.LogMessage, errChan chan<- error) {
+	var err error
+	for {
+		var data []byte
+		err = websocket.Message.Receive(ws, &data)
+		if err != nil {
+			errChan <- err
+			return
+		}
+
+		logMessage := logmessage.LogMessage{}
+
+		msgErr := proto.Unmarshal(data, &logMessage)
+		if msgErr != nil {
+			continue
+		}
+		msgChan <- logMessage
+	}
 }
 
 type sortableLogMessages struct {

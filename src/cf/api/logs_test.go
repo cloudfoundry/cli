@@ -17,6 +17,7 @@ import (
 	"strings"
 	"testhelpers"
 	"testing"
+	"time"
 )
 
 var recentLogsEndpoint = func(message *logmessage.Message) http.HandlerFunc {
@@ -72,23 +73,25 @@ func TestRecentLogsFor(t *testing.T) {
 }
 
 func TestTailsLogsFor(t *testing.T) {
-	expectedMessages := [][]byte{
+
+	// out of order messages we will send
+	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message 3", int64(3000)),
 		marshalledLogMessageWithTime(t, "My message 1", int64(1000)),
 		marshalledLogMessageWithTime(t, "My message 2", int64(2000)),
 	}
 
 	websocketEndpoint := func(conn *websocket.Conn) {
-		for _, msg := range expectedMessages {
+		for _, msg := range messagesSent {
 			conn.Write(msg)
 		}
+		time.Sleep(time.Duration(2) * time.Second)
 		conn.Close()
 	}
-
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
 	defer websocketServer.Close()
 
-	var redirectEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	var logRedirectEndpoint = func(writer http.ResponseWriter, request *http.Request) {
 		assert.Equal(t, request.URL.Path, "/tail/")
 		assert.Equal(t, request.URL.RawQuery, "app=my-app-guid")
 		assert.Equal(t, request.Method, "GET")
@@ -97,50 +100,46 @@ func TestTailsLogsFor(t *testing.T) {
 		writer.Header().Set("Location", strings.Replace(websocketServer.URL, "https", "wss", 1))
 		writer.WriteHeader(http.StatusFound)
 	}
-
-	http.HandleFunc("/", redirectEndpoint)
-
+	http.HandleFunc("/", logRedirectEndpoint)
 	go http.ListenAndServe(":"+LOGGREGATOR_REDIRECTOR_PORT, nil)
-
-	redirectServer := httptest.NewTLSServer(http.HandlerFunc(redirectEndpoint))
-	defer redirectServer.Close()
 
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
-
 	loggregatorHostResolver := func(hostname string) string { return hostname }
+
 	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
 
 	connected := false
-
 	onConnect := func() {
 		connected = true
 	}
 
+	// ordered messages we expect to receive
 	tailedMessages := []logmessage.LogMessage{}
-
 	onMessage := func(message logmessage.LogMessage) {
 		tailedMessages = append(tailedMessages, message)
 	}
 
-	logsRepo.TailLogsFor(app, onConnect, onMessage)
+	// method under test
+	logsRepo.TailLogsFor(app, onConnect, onMessage, time.Duration(1))
 
-	assert.Equal(t, len(tailedMessages), 1)
+	assert.True(t, connected)
+
+	assert.Equal(t, len(tailedMessages), 3)
 
 	actualMessage, err := proto.Marshal(&tailedMessages[0])
 	assert.NoError(t, err)
-	assert.Equal(t, actualMessage, expectedMessages[1])
+	assert.Equal(t, actualMessage, messagesSent[1])
 
 	actualMessage, err = proto.Marshal(&tailedMessages[1])
 	assert.NoError(t, err)
-	assert.Equal(t, actualMessage, expectedMessages[2])
+	assert.Equal(t, actualMessage, messagesSent[2])
 
 	actualMessage, err = proto.Marshal(&tailedMessages[2])
 	assert.NoError(t, err)
-	assert.Equal(t, actualMessage, expectedMessages[0])
+	assert.Equal(t, actualMessage, messagesSent[0])
 
-	assert.True(t, connected)
 }
 
 func TestLoggregatorHost(t *testing.T) {
