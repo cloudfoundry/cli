@@ -6,8 +6,8 @@ mkdir -p release
 echo "Created release dir."
 
 CURRENT_SHA=`git rev-parse HEAD | cut -c1-10`
-
-sed -i "" -e "s/SHA/$CURRENT_SHA/g" src/cf/version.go
+# Linux specific
+sed -i -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/version.go
 echo "Bumped SHA in version."
 
 PLATFORMS="darwin/amd64 linux/amd64 windows/amd64"
