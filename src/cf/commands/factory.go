@@ -167,6 +167,7 @@ func (f Factory) NewPush() Push {
 		f.repoLocator.GetDomainRepository(),
 		f.repoLocator.GetRouteRepository(),
 		f.repoLocator.GetStackRepository(),
+		f.repoLocator.GetApplicationBitsRepository(),
 	)
 }
 

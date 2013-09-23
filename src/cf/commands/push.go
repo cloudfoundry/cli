@@ -14,18 +14,21 @@ import (
 )
 
 type Push struct {
-	ui         terminal.UI
-	starter    ApplicationStarter
-	stopper    ApplicationStopper
-	zipper     cf.Zipper
-	appRepo    api.ApplicationRepository
-	domainRepo api.DomainRepository
-	routeRepo  api.RouteRepository
-	stackRepo  api.StackRepository
+	ui          terminal.UI
+	starter     ApplicationStarter
+	stopper     ApplicationStopper
+	zipper      cf.Zipper
+	appRepo     api.ApplicationRepository
+	domainRepo  api.DomainRepository
+	routeRepo   api.RouteRepository
+	stackRepo   api.StackRepository
+	appBitsRepo api.ApplicationBitsRepository
 }
 
 func NewPush(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper, zipper cf.Zipper,
-	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository) (p Push) {
+	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository,
+	appBitsRepo api.ApplicationBitsRepository) (p Push) {
+
 	p.ui = ui
 	p.starter = starter
 	p.stopper = stopper
@@ -34,6 +37,7 @@ func NewPush(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStop
 	p.domainRepo = dR
 	p.routeRepo = rR
 	p.stackRepo = sR
+	p.appBitsRepo = appBitsRepo
 	return
 }
 
@@ -76,16 +80,16 @@ func (p Push) Run(c *cli.Context) {
 		return
 	}
 
-	apiErr = p.appRepo.Upload(app, zipBuffer)
+	apiErr = p.appBitsRepo.Upload(app, zipBuffer)
 	if apiErr != nil {
 		p.ui.Failed(apiErr.Error())
 		return
 	}
 
 	p.ui.Ok()
-	p.stopper.ApplicationStop(app)
+	updatedApp, _ := p.stopper.ApplicationStop(app)
 	if !c.Bool("no-start") {
-		p.starter.ApplicationStart(app)
+		p.starter.ApplicationStart(updatedApp)
 	}
 }
 

@@ -2,7 +2,6 @@ package testhelpers
 
 import (
 	"cf"
-	"bytes"
 	"cf/net"
 	"net/http"
 	"time"
@@ -35,9 +34,6 @@ type FakeApplicationRepository struct {
 	SetEnvErr   bool
 
 	CreatedApp  cf.Application
-
-	UploadedApp cf.Application
-	UploadedZipBuffer *bytes.Buffer
 
 	RenameApp cf.Application
 	RenameNewName string
@@ -80,14 +76,6 @@ func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp
 
 func (repo *FakeApplicationRepository) Delete(app cf.Application) (apiErr *net.ApiError){
 	repo.DeletedApp = app
-	return
-}
-
-
-func (repo *FakeApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError) {
-	repo.UploadedZipBuffer = zipBuffer
-	repo.UploadedApp = app
-
 	return
 }
 

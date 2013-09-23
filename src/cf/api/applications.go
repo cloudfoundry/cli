@@ -7,9 +7,6 @@ import (
 	"cf/net"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
-	"net/textproto"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,7 +18,6 @@ type ApplicationRepository interface {
 	SetEnv(app cf.Application, envVars map[string]string) (apiErr *net.ApiError)
 	Create(newApp cf.Application) (createdApp cf.Application, apiErr *net.ApiError)
 	Delete(app cf.Application) (apiErr *net.ApiError)
-	Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError)
 	Rename(app cf.Application, newName string) (apiErr *net.ApiError)
 	Scale(app cf.Application) (apiErr *net.ApiError)
 	Start(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError)
@@ -169,26 +165,6 @@ func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (api
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError) {
-	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, app.Guid)
-
-	body, boundary, err := createApplicationUploadBody(zipBuffer)
-	if err != nil {
-		apiErr = net.NewApiErrorWithError("Error creating upload", err)
-		return
-	}
-
-	request, apiErr := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
-	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
-	request.Header.Set("Content-Type", contentType)
-	if apiErr != nil {
-		return
-	}
-
-	apiErr = repo.gateway.PerformRequest(request)
-	return
-}
-
 func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newName string) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, newName)
@@ -301,43 +277,4 @@ func validateApplication(app cf.Application) (apiErr *net.ApiError) {
 	}
 
 	return
-}
-
-func createApplicationUploadBody(zipBuffer *bytes.Buffer) (body *bytes.Buffer, boundary string, err error) {
-	body = new(bytes.Buffer)
-
-	writer := multipart.NewWriter(body)
-	boundary = writer.Boundary()
-
-	part, err := writer.CreateFormField("resources")
-	if err != nil {
-		return
-	}
-
-	_, err = io.Copy(part, bytes.NewBufferString("[]"))
-	if err != nil {
-		return
-	}
-
-	part, err = createZipPartWriter(zipBuffer, writer)
-	if err != nil {
-		return
-	}
-
-	_, err = io.Copy(part, zipBuffer)
-	if err != nil {
-		return
-	}
-
-	err = writer.Close()
-	return
-}
-
-func createZipPartWriter(zipBuffer *bytes.Buffer, writer *multipart.Writer) (io.Writer, error) {
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition", `form-data; name="application"; filename="application.zip"`)
-	h.Set("Content-Type", "application/zip")
-	h.Set("Content-Length", fmt.Sprintf("%d", zipBuffer.Len()))
-	h.Set("Content-Transfer-Encoding", "binary")
-	return writer.CreatePart(h)
 }
