@@ -8,6 +8,8 @@ Project to rewrite the Cloud Foundry CLI tool using Go. This project should curr
 software and should not be used in production environments. If you need something more stable, please check
 out the [RubyGem](https://github.com/cloudfoundry/cf).
 
+For a view on the current status of the project, check [cftracker](http://cftracker.cfapps.io/cfcli).
+
 Building
 ========
 
