@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func targetTestDependencies() (orgRepo *testhelpers.FakeOrgRepository, spaceRepo *testhelpers.FakeSpaceRepository, configRepo *testhelpers.FakeConfigRepository, reqFactory *testhelpers.FakeReqFactory) {
+func getTargetDependencies() (orgRepo *testhelpers.FakeOrgRepository, spaceRepo *testhelpers.FakeSpaceRepository, configRepo *testhelpers.FakeConfigRepository, reqFactory *testhelpers.FakeReqFactory) {
 	orgRepo = &testhelpers.FakeOrgRepository{}
 	spaceRepo = &testhelpers.FakeSpaceRepository{}
 	configRepo = &testhelpers.FakeConfigRepository{}
@@ -19,7 +19,7 @@ func targetTestDependencies() (orgRepo *testhelpers.FakeOrgRepository, spaceRepo
 }
 
 func TestTargetRequirements(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 	reqFactory.LoginSuccess = false
 
 	callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
@@ -32,7 +32,7 @@ func TestTargetRequirements(t *testing.T) {
 }
 
 func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	config := configRepo.Login()
 	config.Target = "https://api.run.pivotal.io"
@@ -49,7 +49,7 @@ func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
 // Start test with organization option
 
 func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Login()
 	config, err := configRepo.Get()
@@ -76,7 +76,7 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 }
 
 func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
 	configRepo.Login()
@@ -103,7 +103,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 // Start test with space option
 
 func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
 	configRepo.Login()
@@ -119,7 +119,7 @@ func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 }
 
 func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
 	config := configRepo.Login()
@@ -143,7 +143,7 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 }
 
 func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := targetTestDependencies()
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
 	config := configRepo.Login()

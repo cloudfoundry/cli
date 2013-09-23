@@ -12,7 +12,7 @@ import (
 )
 
 func TestLogsFailWithUsage(t *testing.T) {
-	reqFactory, logsRepo := getDefaultLogsDependencies()
+	reqFactory, logsRepo := getLogsDependencies()
 
 	fakeUI := callLogs([]string{}, reqFactory, logsRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -22,7 +22,7 @@ func TestLogsFailWithUsage(t *testing.T) {
 }
 
 func TestLogsRequirements(t *testing.T) {
-	reqFactory, logsRepo := getDefaultLogsDependencies()
+	reqFactory, logsRepo := getLogsDependencies()
 
 	reqFactory.LoginSuccess = true
 	callLogs([]string{"my-app"}, reqFactory, logsRepo)
@@ -54,7 +54,7 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	/////////////////
 	logs := []logmessage.LogMessage{deaLogMessage}
 
-	reqFactory, logsRepo := getDefaultLogsDependencies()
+	reqFactory, logsRepo := getLogsDependencies()
 	reqFactory.Application = app
 	logsRepo.TailLogMessages = logs
 
@@ -67,7 +67,7 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "Log Line 1")
 }
 
-func getDefaultLogsDependencies() (reqFactory *testhelpers.FakeReqFactory, logsRepo *testhelpers.FakeLogsRepository) {
+func getLogsDependencies() (reqFactory *testhelpers.FakeReqFactory, logsRepo *testhelpers.FakeLogsRepository) {
 	logsRepo = &testhelpers.FakeLogsRepository{}
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true}
 	return

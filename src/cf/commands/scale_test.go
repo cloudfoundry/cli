@@ -11,7 +11,7 @@ import (
 
 func TestScaleRequirements(t *testing.T) {
 	args := []string{"-d", "1G", "my-app"}
-	reqFactory, restarter, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 
 	reqFactory.LoginSuccess = false
 	reqFactory.TargetedSpaceSuccess = true
@@ -31,7 +31,7 @@ func TestScaleRequirements(t *testing.T) {
 }
 
 func TestScaleFailsWithUsage(t *testing.T) {
-	reqFactory, restarter, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 
 	ui := callScale([]string{}, reqFactory, restarter, appRepo)
 
@@ -41,7 +41,7 @@ func TestScaleFailsWithUsage(t *testing.T) {
 
 func TestScaleAll(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, restarter, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
 	ui := callScale([]string{"-d", "2G", "-i", "5", "-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
@@ -60,7 +60,7 @@ func TestScaleAll(t *testing.T) {
 
 func TestScaleOnlyDisk(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, restarter, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
 	callScale([]string{"-d", "2G", "my-app"}, reqFactory, restarter, appRepo)
@@ -73,7 +73,7 @@ func TestScaleOnlyDisk(t *testing.T) {
 
 func TestScaleOnlyInstances(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, restarter, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
 	callScale([]string{"-i", "5", "my-app"}, reqFactory, restarter, appRepo)
@@ -86,7 +86,7 @@ func TestScaleOnlyInstances(t *testing.T) {
 
 func TestScaleOnlyMemory(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, restarter, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
 	callScale([]string{"-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
@@ -97,7 +97,7 @@ func TestScaleOnlyMemory(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.Instances, 0)
 }
 
-func getDefaultDependencies() (reqFactory *testhelpers.FakeReqFactory, restarter *testhelpers.FakeAppRestarter, appRepo *testhelpers.FakeApplicationRepository) {
+func getScaleDependencies() (reqFactory *testhelpers.FakeReqFactory, restarter *testhelpers.FakeAppRestarter, appRepo *testhelpers.FakeApplicationRepository) {
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	restarter = &testhelpers.FakeAppRestarter{}
 	appRepo = &testhelpers.FakeApplicationRepository{}

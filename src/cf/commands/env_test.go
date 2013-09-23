@@ -9,7 +9,7 @@ import (
 )
 
 func TestEnvRequirements(t *testing.T) {
-	reqFactory := getDefaultEnvDependencies()
+	reqFactory := getEnvDependencies()
 
 	reqFactory.LoginSuccess = true
 	callEnv([]string{"my-app"}, reqFactory)
@@ -22,7 +22,7 @@ func TestEnvRequirements(t *testing.T) {
 }
 
 func TestEnvFailsWithUsage(t *testing.T) {
-	reqFactory := getDefaultEnvDependencies()
+	reqFactory := getEnvDependencies()
 	ui := callEnv([]string{}, reqFactory)
 
 	assert.True(t, ui.FailedWithUsage)
@@ -30,7 +30,7 @@ func TestEnvFailsWithUsage(t *testing.T) {
 }
 
 func TestEnvListsEnvironmentVariables(t *testing.T) {
-	reqFactory := getDefaultEnvDependencies()
+	reqFactory := getEnvDependencies()
 	reqFactory.Application.EnvironmentVars = map[string]string{
 		"my-key":  "my-value",
 		"my-key2": "my-value2",
@@ -50,7 +50,7 @@ func TestEnvListsEnvironmentVariables(t *testing.T) {
 }
 
 func TestEnvShowsEmptyMessage(t *testing.T) {
-	reqFactory := getDefaultEnvDependencies()
+	reqFactory := getEnvDependencies()
 	reqFactory.Application.EnvironmentVars = map[string]string{}
 
 	ui := callEnv([]string{"my-app"}, reqFactory)
@@ -72,7 +72,7 @@ func callEnv(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhel
 	return
 }
 
-func getDefaultEnvDependencies() (reqFactory *testhelpers.FakeReqFactory) {
+func getEnvDependencies() (reqFactory *testhelpers.FakeReqFactory) {
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, Application: cf.Application{Name: "my-app"}}
 	return
 }
