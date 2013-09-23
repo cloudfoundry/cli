@@ -1,11 +1,11 @@
 package commands
 
 import (
+	"cf"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"cf"
 )
 
 type Restart struct {

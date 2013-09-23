@@ -286,9 +286,9 @@ func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.A
 	apiErr = repo.gateway.PerformRequestForJSONResponse(request, &response)
 
 	updatedApp = cf.Application{
-		Name:             response.Entity.Name,
-		Guid:             response.Metadata.Guid,
-		State:            strings.ToLower(response.Entity.State),
+		Name:  response.Entity.Name,
+		Guid:  response.Metadata.Guid,
+		State: strings.ToLower(response.Entity.State),
 	}
 
 	return

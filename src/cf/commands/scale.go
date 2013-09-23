@@ -10,10 +10,10 @@ import (
 )
 
 type Scale struct {
-	ui      terminal.UI
+	ui        terminal.UI
 	restarter ApplicationRestarter
-	appReq  requirements.ApplicationRequirement
-	appRepo api.ApplicationRepository
+	appReq    requirements.ApplicationRequirement
+	appRepo   api.ApplicationRepository
 }
 
 func NewScale(ui terminal.UI, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
