@@ -39,8 +39,6 @@ func (cmd CreateService) Run(c *cli.Context) {
 	name := c.String("name")
 	offeringName := c.String("offering")
 
-	println(strings.Join(c.Args(), ","))
-
 	if offeringName == "user-provided" {
 		params := c.String("parameters")
 		cmd.createUserProvidedService(name, params)

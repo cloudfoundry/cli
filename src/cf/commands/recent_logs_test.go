@@ -22,7 +22,7 @@ func TestRecentLogsWithAppName(t *testing.T) {
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
 	sourceType := logmessage.LogMessage_DEA
-	logMessage1 := &logmessage.LogMessage{
+	logMessage1 := logmessage.LogMessage{
 		Message:     []byte("Log Line 1"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
@@ -30,7 +30,7 @@ func TestRecentLogsWithAppName(t *testing.T) {
 		Timestamp:   proto.Int64(currentTime.UnixNano()),
 	}
 
-	logMessage2 := &logmessage.LogMessage{
+	logMessage2 := logmessage.LogMessage{
 		Message:     []byte("Log Line 2"),
 		AppId:       proto.String("my-app"),
 		MessageType: &messageType,
@@ -39,7 +39,7 @@ func TestRecentLogsWithAppName(t *testing.T) {
 	}
 
 	/////////////////
-	recentLogs := []*logmessage.LogMessage{
+	recentLogs := []logmessage.LogMessage{
 		logMessage1,
 		logMessage2,
 	}
@@ -51,9 +51,10 @@ func TestRecentLogsWithAppName(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app, logsRepo.AppLogged)
-	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Outputs[0], "Log Line 1")
-	assert.Contains(t, ui.Outputs[1], "Log Line 2")
+	assert.Equal(t, len(ui.Outputs), 3)
+	assert.Contains(t, ui.Outputs[0], "Connected, dumping recent logs...")
+	assert.Contains(t, ui.Outputs[1], "Log Line 1")
+	assert.Contains(t, ui.Outputs[2], "Log Line 2")
 }
 
 func TestRecentLogsWithoutAppNameShowsUsage(t *testing.T) {

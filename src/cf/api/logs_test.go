@@ -50,26 +50,63 @@ var recentLogsEndpoint = func(message *logmessage.Message) http.HandlerFunc {
 }
 
 func TestRecentLogsFor(t *testing.T) {
-	expectedMessage := messagetesthelpers.MarshalledLogMessage(t, "My message", "my-app-id")
-	message, err := logmessage.ParseMessage(expectedMessage)
+
+	// out of order messages we will send
+	messagesSent := [][]byte{
+		messagetesthelpers.MarshalledLogMessage(t, "My message", "my-app-id"),
+	}
+
+	websocketEndpoint := func(conn *websocket.Conn) {
+		for _, msg := range messagesSent {
+			conn.Write(msg)
+		}
+		time.Sleep(time.Duration(2) * time.Second)
+		conn.Close()
+	}
+	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
+	defer websocketServer.Close()
+
+	expectedMessage, err := logmessage.ParseMessage(messagesSent[0])
 	assert.NoError(t, err)
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(recentLogsEndpoint(message)))
-	defer ts.Close()
+	logRedirectEndpoint := func(writer http.ResponseWriter, request *http.Request) {
+		assert.Equal(t, request.URL.Path, "/dump/")
+		assert.Equal(t, request.URL.RawQuery, "app=my-app-guid")
+		assert.Equal(t, request.Method, "GET")
+		assert.Contains(t, request.Header.Get("Authorization"), "BEARER my_access_token")
 
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+		writer.Header().Set("Location", strings.Replace(websocketServer.URL, "https", "wss", 1))
+		writer.WriteHeader(http.StatusFound)
+	}
+
+	http.HandleFunc("/dump/", logRedirectEndpoint)
+	go http.ListenAndServe(":"+LOGGREGATOR_REDIRECTOR_PORT, nil)
+
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
 	loggregatorHostResolver := func(hostname string) string { return hostname }
+
 	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
 
-	logs, err := logsRepo.RecentLogsFor(app)
+	connected := false
+	onConnect := func() {
+		connected = true
+	}
+
+	// ordered messages we expect to receive
+	dumpedMessages := []logmessage.LogMessage{}
+	onMessage := func(message logmessage.LogMessage) {
+		dumpedMessages = append(dumpedMessages, message)
+	}
+
+	// method under test
+	err = logsRepo.RecentLogsFor(app, onConnect, onMessage)
 	assert.NoError(t, err)
 
-	assert.Equal(t, len(logs), 1)
-	actualMessage, err := proto.Marshal(logs[0])
-	assert.NoError(t, err)
-	assert.Equal(t, actualMessage, expectedMessage)
+	assert.Equal(t, len(dumpedMessages), 1)
+	assert.Equal(t, dumpedMessages[0].GetMessage(), expectedMessage.GetLogMessage().GetMessage())
+	assert.Equal(t, dumpedMessages[0].GetMessageType(), expectedMessage.GetLogMessage().GetMessageType())
 }
 
 func TestTailsLogsFor(t *testing.T) {
@@ -100,7 +137,7 @@ func TestTailsLogsFor(t *testing.T) {
 		writer.Header().Set("Location", strings.Replace(websocketServer.URL, "https", "wss", 1))
 		writer.WriteHeader(http.StatusFound)
 	}
-	http.HandleFunc("/", logRedirectEndpoint)
+	http.HandleFunc("/tail/", logRedirectEndpoint)
 	go http.ListenAndServe(":"+LOGGREGATOR_REDIRECTOR_PORT, nil)
 
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})

@@ -5,6 +5,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 )
 
@@ -37,14 +38,17 @@ func (l *RecentLogs) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 
 func (l *RecentLogs) Run(c *cli.Context) {
 	app := l.appReq.GetApplication()
-	logs, err := l.logsRepo.RecentLogsFor(app)
 
-	if err != nil {
-		l.ui.Failed(err.Error())
-		return
+	onConnect := func() {
+		l.ui.Say("Connected, dumping recent logs...")
 	}
 
-	for _, log := range logs {
-		l.ui.Say(logMessageOutput(app.Name, *log))
+	onMessage := func(msg logmessage.LogMessage) {
+		l.ui.Say(logMessageOutput(app.Name, msg))
+	}
+
+	err := l.logsRepo.RecentLogsFor(app, onConnect, onMessage)
+	if err != nil {
+		l.ui.Failed(err.Error())
 	}
 }
