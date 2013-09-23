@@ -5,9 +5,12 @@ import (
 )
 
 type FakeAppStarter struct {
+	AppToStart cf.Application
 	StartedApp cf.Application
 }
 
-func (starter *FakeAppStarter) ApplicationStart(app cf.Application) {
-	starter.StartedApp = app
+func (starter *FakeAppStarter) ApplicationStart(appToStart cf.Application) (startedApp cf.Application, err error) {
+	starter.AppToStart = appToStart
+	startedApp = starter.StartedApp
+	return
 }

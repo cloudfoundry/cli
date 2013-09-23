@@ -69,7 +69,7 @@ func TestStartApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "Start successful! App my-app available at http://my-app.example.com")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
 }
 
 func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
@@ -90,7 +90,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "Start successful!")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
 }
 
 func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
@@ -197,7 +197,7 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
 	assert.Contains(t, ui.Outputs[2], "Error starting application")
-	assert.Equal(t, appRepo.StartedApp.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
 }
 
 func TestStartApplicationIsAlreadyStarted(t *testing.T) {
@@ -212,7 +212,7 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "is already started")
-	assert.Equal(t, appRepo.StartedApp.Guid, "")
+	assert.Equal(t, appRepo.StartAppToStart.Guid, "")
 }
 
 func callStart(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {

@@ -12,11 +12,13 @@ type FakeApplicationRepository struct {
 
 	ScaledApp cf.Application
 
-	StartedApp cf.Application
+	StartAppToStart cf.Application
 	StartAppErr bool
+	StartUpdatedApp cf.Application
 
-	StoppedApp cf.Application
+	StopAppToStop cf.Application
 	StopAppErr bool
+	StopUpdatedApp cf.Application
 
 	DeletedApp cf.Application
 
@@ -100,19 +102,21 @@ func (repo *FakeApplicationRepository) Scale(app cf.Application) (apiErr *net.Ap
 	return
 }
 
-func (repo *FakeApplicationRepository) Start(app cf.Application) (apiErr *net.ApiError){
-	repo.StartedApp = app
+func (repo *FakeApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError){
+	repo.StartAppToStart = app
 	if repo.StartAppErr {
 		apiErr = net.NewApiErrorWithMessage("Error starting application")
 	}
+	updatedApp = repo.StartUpdatedApp
 	return
 }
 
-func (repo *FakeApplicationRepository) Stop(app cf.Application) (apiErr *net.ApiError){
-	repo.StoppedApp = app
+func (repo *FakeApplicationRepository) Stop(appToStop cf.Application) (updatedApp cf.Application, apiErr *net.ApiError){
+	repo.StopAppToStop = appToStop
 	if repo.StopAppErr {
 		apiErr = net.NewApiErrorWithMessage("Error stopping application")
 	}
+	updatedApp = repo.StopUpdatedApp
 	return
 }
 

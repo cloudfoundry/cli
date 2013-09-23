@@ -431,7 +431,7 @@ var startApplicationEndpoint = testhelpers.CreateEndpoint(
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
-    "guid": "my-cool-app-guid",
+    "guid": "my-updated-app-guid"
   },
   "entity": {
     "name": "cli1",
@@ -453,8 +453,11 @@ func TestStartApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	err := repo.Start(app)
+	updatedApp, err := repo.Start(app)
 	assert.NoError(t, err)
+	assert.Equal(t, "cli1", updatedApp.Name)
+	assert.Equal(t, "started", updatedApp.State)
+	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
 }
 
 var stopApplicationEndpoint = testhelpers.CreateEndpoint(
@@ -464,7 +467,7 @@ var stopApplicationEndpoint = testhelpers.CreateEndpoint(
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
-    "guid": "my-cool-app-guid",
+    "guid": "my-updated-app-guid"
   },
   "entity": {
     "name": "cli1",
@@ -486,8 +489,11 @@ func TestStopApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	err := repo.Stop(app)
+	updatedApp, err := repo.Stop(app)
 	assert.NoError(t, err)
+	assert.Equal(t, "cli1", updatedApp.Name)
+	assert.Equal(t, "stopped", updatedApp.State)
+	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
 }
 
 var successfulGetInstancesEndpoint = testhelpers.CreateEndpoint(

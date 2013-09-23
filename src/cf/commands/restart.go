@@ -5,6 +5,7 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
+	"cf"
 )
 
 type Restart struct {
@@ -12,6 +13,10 @@ type Restart struct {
 	starter ApplicationStarter
 	stopper ApplicationStopper
 	appReq  requirements.ApplicationRequirement
+}
+
+type ApplicationRestarter interface {
+	ApplicationRestart(app cf.Application)
 }
 
 func NewRestart(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper) (cmd *Restart) {
@@ -41,6 +46,18 @@ func (r *Restart) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 
 func (r *Restart) Run(c *cli.Context) {
 	app := r.appReq.GetApplication()
-	r.stopper.ApplicationStop(app)
-	r.starter.ApplicationStart(app)
+	r.ApplicationRestart(app)
+}
+
+func (r *Restart) ApplicationRestart(app cf.Application) {
+	stoppedApp, err := r.stopper.ApplicationStop(app)
+	if err != nil {
+		r.ui.Failed(err.Error())
+		return
+	}
+
+	_, err = r.starter.ApplicationStart(stoppedApp)
+	if err != nil {
+		r.ui.Failed(err.Error())
+	}
 }

@@ -22,7 +22,7 @@ type Start struct {
 }
 
 type ApplicationStarter interface {
-	ApplicationStart(cf.Application)
+	ApplicationStart(cf.Application) (startedApp cf.Application, err error)
 }
 
 func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Start) {
@@ -51,7 +51,7 @@ func (s *Start) Run(c *cli.Context) {
 	s.ApplicationStart(s.appReq.GetApplication())
 }
 
-func (s *Start) ApplicationStart(app cf.Application) {
+func (s *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
 	if app.State == "started" {
 		s.ui.Say(terminal.WarningColor("Application " + app.Name + " is already started."))
 		return
@@ -59,7 +59,7 @@ func (s *Start) ApplicationStart(app cf.Application) {
 
 	s.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
 
-	apiErr := s.appRepo.Start(app)
+	updatedApp, apiErr := s.appRepo.Start(app)
 	if apiErr != nil {
 		s.ui.Failed(apiErr.Error())
 		return
@@ -89,6 +89,8 @@ func (s *Start) ApplicationStart(app cf.Application) {
 		s.ui.Wait(1 * time.Second)
 		instances, _ = s.appRepo.GetInstances(app)
 	}
+
+	return
 }
 
 func (s Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {

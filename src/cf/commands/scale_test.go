@@ -11,29 +11,29 @@ import (
 
 func TestScaleRequirements(t *testing.T) {
 	args := []string{"-d", "1G", "my-app"}
-	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getDefaultDependencies()
 
 	reqFactory.LoginSuccess = false
 	reqFactory.TargetedSpaceSuccess = true
-	callScale(args, reqFactory, starter, stopper, appRepo)
+	callScale(args, reqFactory, restarter, appRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = false
-	callScale(args, reqFactory, starter, stopper, appRepo)
+	callScale(args, reqFactory, restarter, appRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = true
-	callScale(args, reqFactory, starter, stopper, appRepo)
+	callScale(args, reqFactory, restarter, appRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
 
 func TestScaleFailsWithUsage(t *testing.T) {
-	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getDefaultDependencies()
 
-	ui := callScale([]string{}, reqFactory, starter, stopper, appRepo)
+	ui := callScale([]string{}, reqFactory, restarter, appRepo)
 
 	assert.True(t, ui.FailedWithUsage)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
@@ -41,10 +41,10 @@ func TestScaleFailsWithUsage(t *testing.T) {
 
 func TestScaleAll(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getDefaultDependencies()
 	reqFactory.Application = app
 
-	ui := callScale([]string{"-d", "2G", "-i", "5", "-m", "512M", "my-app"}, reqFactory, starter, stopper, appRepo)
+	ui := callScale([]string{"-d", "2G", "-i", "5", "-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Scaling")
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -54,16 +54,16 @@ func TestScaleAll(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.Memory, 512)
 	assert.Equal(t, appRepo.ScaledApp.Instances, 5)
 
-	assert.Equal(t, stopper.StoppedApp, app)
-	assert.Equal(t, starter.StartedApp, app)
+	assert.Equal(t, restarter.AppToRestart.Guid, app.Guid)
+	assert.Equal(t, restarter.AppToRestart.Name, app.Name)
 }
 
 func TestScaleOnlyDisk(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getDefaultDependencies()
 	reqFactory.Application = app
 
-	callScale([]string{"-d", "2G", "my-app"}, reqFactory, starter, stopper, appRepo)
+	callScale([]string{"-d", "2G", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
 	assert.Equal(t, appRepo.ScaledApp.DiskQuota, 2048) // in megabytes
@@ -73,10 +73,10 @@ func TestScaleOnlyDisk(t *testing.T) {
 
 func TestScaleOnlyInstances(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getDefaultDependencies()
 	reqFactory.Application = app
 
-	callScale([]string{"-i", "5", "my-app"}, reqFactory, starter, stopper, appRepo)
+	callScale([]string{"-i", "5", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
 	assert.Equal(t, appRepo.ScaledApp.DiskQuota, 0)
@@ -86,10 +86,10 @@ func TestScaleOnlyInstances(t *testing.T) {
 
 func TestScaleOnlyMemory(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, starter, stopper, appRepo := getDefaultDependencies()
+	reqFactory, restarter, appRepo := getDefaultDependencies()
 	reqFactory.Application = app
 
-	callScale([]string{"-m", "512M", "my-app"}, reqFactory, starter, stopper, appRepo)
+	callScale([]string{"-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
 	assert.Equal(t, appRepo.ScaledApp.DiskQuota, 0)
@@ -97,18 +97,17 @@ func TestScaleOnlyMemory(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.Instances, 0)
 }
 
-func getDefaultDependencies() (reqFactory *testhelpers.FakeReqFactory, starter *testhelpers.FakeAppStarter, stopper *testhelpers.FakeAppStopper, appRepo *testhelpers.FakeApplicationRepository) {
+func getDefaultDependencies() (reqFactory *testhelpers.FakeReqFactory, restarter *testhelpers.FakeAppRestarter, appRepo *testhelpers.FakeApplicationRepository) {
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	starter = &testhelpers.FakeAppStarter{}
-	stopper = &testhelpers.FakeAppStopper{}
+	restarter = &testhelpers.FakeAppRestarter{}
 	appRepo = &testhelpers.FakeApplicationRepository{}
 	return
 }
 
-func callScale(args []string, reqFactory *testhelpers.FakeReqFactory, starter ApplicationStarter, stopper ApplicationStopper, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
+func callScale(args []string, reqFactory *testhelpers.FakeReqFactory, restarter *testhelpers.FakeAppRestarter, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("scale", args)
-	cmd := NewScale(ui, starter, stopper, appRepo)
+	cmd := NewScale(ui, restarter, appRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

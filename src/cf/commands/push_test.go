@@ -79,8 +79,8 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Equal(t, zipper.ZippedDir, expectedAppDir)
 	assert.Contains(t, fakeUI.Outputs[7], "OK")
 
-	assert.Equal(t, fakeStarter.StartedApp.Name, "my-new-app")
-	assert.Equal(t, fakeStopper.StoppedApp.Name, "my-new-app")
+	assert.Equal(t, fakeStarter.AppToStart.Name, "my-new-app")
+	assert.Equal(t, fakeStopper.AppToStop.Name, "my-new-app")
 }
 
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
@@ -160,7 +160,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, appRepo.UploadedZipBuffer, zipper.ZippedBuffer)
 	assert.Contains(t, fakeUI.Outputs[8], "OK")
 
-	assert.Equal(t, fakeStarter.StartedApp.Name, "")
+	assert.Equal(t, fakeStarter.AppToStart.Name, "")
 }
 
 func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
@@ -229,7 +229,7 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 
 	fakeUI := callPush([]string{"--name", "existing-app"}, fakeStarter, fakeStopper, zipper, appRepo, domainRepo, routeRepo, stackRepo)
 
-	assert.Equal(t, fakeStopper.StoppedApp.Name, "existing-app")
+	assert.Equal(t, fakeStopper.AppToStop.Name, "existing-app")
 	assert.Contains(t, fakeUI.Outputs[0], "existing-app")
 	assert.Equal(t, appRepo.UploadedApp.Guid, "existing-app-guid")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")

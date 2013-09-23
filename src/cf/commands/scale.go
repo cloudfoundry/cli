@@ -11,17 +11,15 @@ import (
 
 type Scale struct {
 	ui      terminal.UI
-	starter ApplicationStarter
-	stopper ApplicationStopper
+	restarter ApplicationRestarter
 	appReq  requirements.ApplicationRequirement
 	appRepo api.ApplicationRepository
 }
 
-func NewScale(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper, appRepo api.ApplicationRepository) (cmd *Scale) {
+func NewScale(ui terminal.UI, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
 	cmd = new(Scale)
 	cmd.ui = ui
-	cmd.starter = starter
-	cmd.stopper = stopper
+	cmd.restarter = restarter
 	cmd.appRepo = appRepo
 	return
 }
@@ -67,12 +65,10 @@ func (cmd *Scale) Run(c *cli.Context) {
 		return
 	}
 	changedApp.Memory = memory
-
 	changedApp.Instances = c.Int("i")
 
 	cmd.appRepo.Scale(changedApp)
-	cmd.stopper.ApplicationStop(currentApp)
-	cmd.starter.ApplicationStart(currentApp)
+	cmd.restarter.ApplicationRestart(currentApp)
 }
 
 func extractMegaBytes(arg string) (megaBytes int, err error) {

@@ -217,8 +217,7 @@ func (f Factory) NewRoutes() *Routes {
 func (f Factory) NewScale() *Scale {
 	return NewScale(
 		f.ui,
-		f.NewStart(),
-		f.NewStop(),
+		f.NewRestart(),
 		f.repoLocator.GetApplicationRepository(),
 	)
 }

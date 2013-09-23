@@ -24,8 +24,8 @@ type ApplicationRepository interface {
 	Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError)
 	Rename(app cf.Application, newName string) (apiErr *net.ApiError)
 	Scale(app cf.Application) (apiErr *net.ApiError)
-	Start(app cf.Application) (apiErr *net.ApiError)
-	Stop(app cf.Application) (apiErr *net.ApiError)
+	Start(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError)
+	Stop(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError)
 	GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiErr *net.ApiError)
 }
 
@@ -229,11 +229,11 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiE
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Start(app cf.Application) (apiErr *net.ApiError) {
+func (repo CloudControllerApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError) {
 	return repo.changeApplicationState(app, "STARTED")
 }
 
-func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (apiErr *net.ApiError) {
+func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError) {
 	return repo.changeApplicationState(app, "STOPPED")
 }
 
@@ -273,7 +273,7 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 	return
 }
 
-func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.Application, state string) (apiErr *net.ApiError) {
+func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.Application, state string) (updatedApp cf.Application, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	body := fmt.Sprintf(`{"console":true,"state":"%s"}`, state)
 	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
@@ -282,7 +282,15 @@ func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.A
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	response := ApplicationResource{}
+	apiErr = repo.gateway.PerformRequestForJSONResponse(request, &response)
+
+	updatedApp = cf.Application{
+		Name:             response.Entity.Name,
+		Guid:             response.Metadata.Guid,
+		State:            strings.ToLower(response.Entity.State),
+	}
+
 	return
 }
 

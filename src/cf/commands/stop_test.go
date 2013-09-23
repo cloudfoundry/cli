@@ -32,7 +32,7 @@ func TestStopApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StoppedApp.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StopAppToStop.Guid, "my-app-guid")
 }
 
 func TestStopApplicationWhenStopFails(t *testing.T) {
@@ -45,7 +45,7 @@ func TestStopApplicationWhenStopFails(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
 	assert.Contains(t, ui.Outputs[2], "Error stopping application")
-	assert.Equal(t, appRepo.StoppedApp.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StopAppToStop.Guid, "my-app-guid")
 }
 
 func TestStopApplicationIsAlreadyStopped(t *testing.T) {
@@ -57,7 +57,29 @@ func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "is already stopped")
-	assert.Equal(t, appRepo.StoppedApp.Guid, "")
+	assert.Equal(t, appRepo.StopAppToStop.Guid, "")
+}
+
+func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
+	appToStop := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
+	expectedStoppedApp := cf.Application{Name: "my-stopped-app", Guid: "my-stopped-app-guid", State: "stopped"}
+
+	appRepo := &testhelpers.FakeApplicationRepository{StopUpdatedApp: expectedStoppedApp}
+	stopper := NewStop(new(testhelpers.FakeUI), appRepo)
+	actualStoppedApp, err := stopper.ApplicationStop(appToStop)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedStoppedApp, actualStoppedApp)
+}
+
+func TestApplicationStopReturnsUpdatedAppWhenAppIsAlreadyStopped(t *testing.T) {
+	appToStop := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "stopped"}
+	appRepo := &testhelpers.FakeApplicationRepository{}
+	stopper := NewStop(new(testhelpers.FakeUI), appRepo)
+	updatedApp, err := stopper.ApplicationStop(appToStop)
+
+	assert.NoError(t, err)
+	assert.Equal(t, appToStop, updatedApp)
 }
 
 func callStop(args []string, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {

@@ -10,7 +10,7 @@ import (
 )
 
 type ApplicationStopper interface {
-	ApplicationStop(app cf.Application)
+	ApplicationStop(app cf.Application) (updatedApp cf.Application, err error)
 }
 
 type Stop struct {
@@ -40,20 +40,24 @@ func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 	return
 }
 
-func (s *Stop) ApplicationStop(app cf.Application) {
+func (s *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application, err error) {
 	if app.State == "stopped" {
+		updatedApp = app
 		s.ui.Say(terminal.WarningColor("Application " + app.Name + " is already stopped."))
 		return
 	}
 
 	s.ui.Say("Stopping %s...", terminal.EntityNameColor(app.Name))
 
-	err := s.appRepo.Stop(app)
-	if err != nil {
-		s.ui.Failed(err.Error())
+	updatedApp, apiErr := s.appRepo.Stop(app)
+	if apiErr != nil {
+		err = errors.New(apiErr.Error())
+		s.ui.Failed(apiErr.Error())
 		return
 	}
+
 	s.ui.Ok()
+	return
 }
 
 func (s *Stop) Run(c *cli.Context) {
