@@ -17,7 +17,7 @@ func TestBindCommand(t *testing.T) {
 		ServiceInstance: serviceInstance,
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{}
-	fakeUI := callBindService([]string{"--service", "my-service", "--app", "my-app"}, reqFactory, serviceRepo)
+	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
@@ -40,7 +40,7 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 		ServiceInstance: serviceInstance,
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{BindServiceErrorCode: "90003"}
-	fakeUI := callBindService([]string{"--service", "my-service", "--app", "my-app"}, reqFactory, serviceRepo)
+	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Binding service")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
@@ -51,13 +51,13 @@ func TestBindCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
 	serviceRepo := &testhelpers.FakeServiceRepo{}
 
-	fakeUI := callBindService([]string{"--service", "my-service"}, reqFactory, serviceRepo)
+	fakeUI := callBindService([]string{"my-service"}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callBindService([]string{"--app", "my-app"}, reqFactory, serviceRepo)
+	fakeUI = callBindService([]string{"my-app"}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callBindService([]string{"--app", "my-app", "--service", "my-service"}, reqFactory, serviceRepo)
+	fakeUI = callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 

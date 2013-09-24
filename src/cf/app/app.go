@@ -100,11 +100,7 @@ OPTIONS:
 			Name:        "bind-service",
 			ShortName:   "bs",
 			Description: "Bind a service instance to an application",
-			Usage:       "cf bind-service --app APP --service SERVICE",
-			Flags: []cli.Flag{
-				cli.StringFlag{"app", "", "Which app"},
-				cli.StringFlag{"service", "", "Which service instance to bind to the app"},
-			},
+			Usage:       "cf bind-service APP SERVICE_INSTANCE",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewBindService()
 				cmdRunner.Run(cmd, c)
