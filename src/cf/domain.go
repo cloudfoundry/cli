@@ -26,6 +26,8 @@ type Space struct {
 	Guid             string
 	Applications     []Application
 	ServiceInstances []ServiceInstance
+	Organization     Organization
+	Domains          []Domain
 }
 
 type Application struct {

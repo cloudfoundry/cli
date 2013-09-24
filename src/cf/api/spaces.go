@@ -63,7 +63,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		return
 	}
 
-	response := new(ApiResponse)
+	response := new(SpaceApiResponse)
 
 	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
@@ -76,7 +76,31 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		return
 	}
 	r := response.Resources[0]
-	space = cf.Space{Name: r.Entity.Name, Guid: r.Metadata.Guid}
+	apps := []cf.Application{}
+	for _, app := range r.Entity.Applications {
+		apps = append(apps, cf.Application{Name: app.Entity.Name, Guid: app.Metadata.Guid})
+	}
+
+	domains := []cf.Domain{}
+	for _, domain := range r.Entity.Domains {
+		domains = append(domains, cf.Domain{Name: domain.Entity.Name, Guid: domain.Metadata.Guid})
+	}
+
+	services := []cf.ServiceInstance{}
+	for _, service := range r.Entity.ServiceInstances {
+		services = append(services, cf.ServiceInstance{Name: service.Entity.Name, Guid: service.Metadata.Guid})
+	}
+	space = cf.Space{
+		Name: r.Entity.Name,
+		Guid: r.Metadata.Guid,
+		Organization: cf.Organization{
+			Name: r.Entity.Organization.Entity.Name,
+			Guid: r.Entity.Organization.Metadata.Guid,
+		},
+		Applications:     apps,
+		Domains:          domains,
+		ServiceInstances: services,
+	}
 	return
 }
 

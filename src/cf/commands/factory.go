@@ -250,6 +250,13 @@ func (f Factory) NewShowOrganization() *ShowOrganization {
 	)
 }
 
+func (f Factory) NewShowSpace() *ShowSpace {
+	return NewShowSpace(
+		f.ui,
+		f.repoLocator.GetConfig(),
+	)
+}
+
 func (f Factory) NewSpaces() Spaces {
 	return NewSpaces(
 		f.ui,

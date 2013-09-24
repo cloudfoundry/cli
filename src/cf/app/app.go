@@ -408,6 +408,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "space",
+			Description: "Show currently targeted space's info",
+			Usage:       "cf space",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewShowSpace()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "spaces",
 			Description: "List all spaces in an org",
 			Usage:       "cf spaces",

@@ -121,7 +121,7 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
               "guid": "app1-guid"
             },
             "entity": {
-              "name": "hello1"
+              "name": "app1"
             }
           },
           {
@@ -129,7 +129,7 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
               "guid": "app2-guid"
             },
             "entity": {
-              "name": "hello2"
+              "name": "app2"
             }
           }
         ],
@@ -139,14 +139,19 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
               "guid": "domain1-guid"
             },
             "entity": {
-              "name": "cli.cf-app.com",
-              "owning_organization_guid": null,
-              "wildcard": true
+              "name": "domain1"
             }
           }
         ],
         "service_instances": [
-
+          {
+			"metadata": {
+              "guid": "service1-guid"
+            },
+            "entity": {
+              "name": "service1"
+            }
+          }
         ]
       }
     }
@@ -171,13 +176,38 @@ func TestSpacesFindByName(t *testing.T) {
 	}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
-	existingSpace := cf.Space{Guid: "space1-guid", Name: "Space1"}
+	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
+	apps := []cf.Application{
+		cf.Application{Name: "app1", Guid: "app1-guid"},
+		cf.Application{Name: "app2", Guid: "app2-guid"},
+	}
+	domains := []cf.Domain{
+		cf.Domain{Name: "domain1", Guid: "domain1-guid"},
+	}
+	services := []cf.ServiceInstance{
+		cf.ServiceInstance{Name: "service1", Guid: "service1-guid"},
+	}
+	existingSpace := cf.Space{
+		Guid:             "space1-guid",
+		Name:             "Space1",
+		Organization:     existingOrg,
+		Applications:     apps,
+		Domains:          domains,
+		ServiceInstances: services,
+	}
 
 	space, err := repo.FindByName("Space1")
 	assert.NoError(t, err)
-	assert.Equal(t, space, existingSpace)
 
-	space, err = repo.FindByName("Space1")
+	assert.Equal(t, space.Name, "Space1")
+	assert.Equal(t, space.Guid, "space1-guid")
+
+	assert.Equal(t, space.Organization, existingOrg)
+	assert.Equal(t, space.Applications, apps)
+	assert.Equal(t, space.Domains, domains)
+	assert.Equal(t, space.ServiceInstances, services)
+
+	space, err = repo.FindByName("space1")
 	assert.NoError(t, err)
 	assert.Equal(t, space, existingSpace)
 

@@ -157,6 +157,23 @@ type ServiceBindingEntity struct {
 	AppGuid string `json:"app_guid"`
 }
 
+type SpaceApiResponse struct {
+	Resources []SpaceResource
+}
+
+type SpaceResource struct {
+	Metadata Metadata
+	Entity   SpaceEntity
+}
+
+type SpaceEntity struct {
+	Name             string
+	Organization     Resource
+	Applications     []Resource `json:"apps"`
+	Domains          []Resource
+	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
+}
+
 type StackApiResponse struct {
 	Resources []StackResource
 }
