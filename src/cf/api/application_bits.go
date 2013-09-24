@@ -13,6 +13,8 @@ import (
 
 type ApplicationBitsRepository interface {
 	Upload(app cf.Application, zipBuffer *bytes.Buffer) (apiErr *net.ApiError)
+	CreateUploadDir(app cf.Application, appDir string) (uploadDir string, err error)
+	GetFilesToUpload(app cf.Application, allAppFiles []cf.AppFile) (appFilesToUpload []cf.AppFile, err error)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -43,6 +45,35 @@ func (repo CloudControllerApplicationBitsRepository) Upload(app cf.Application, 
 	}
 
 	apiErr = repo.gateway.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerApplicationBitsRepository) CreateUploadDir(app cf.Application, appDir string) (uploadDir string, err error) {
+	// if dir is not war or jar or zip
+	allAppFiles, err := cf.AppFilesInDir(appDir)
+	if err != nil {
+		return
+	}
+
+	appFilesToUpload, err := repo.GetFilesToUpload(app, allAppFiles)
+	if err != nil {
+		return
+	}
+
+	uploadDir = cf.TempDirForApp(app)
+
+	err = cf.InitializeDir(uploadDir)
+	if err != nil {
+		return
+	}
+
+	err = cf.CopyFiles(appFilesToUpload, appDir, uploadDir)
+
+	return
+}
+
+func (repo CloudControllerApplicationBitsRepository) GetFilesToUpload(app cf.Application, allAppFiles []cf.AppFile) (appFilesToUpload []cf.AppFile, err error) {
+	appFilesToUpload = allAppFiles
 	return
 }
 

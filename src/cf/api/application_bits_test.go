@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testhelpers"
 	"testing"
@@ -62,4 +64,27 @@ func TestUploadApplication(t *testing.T) {
 
 	err := repo.Upload(app, zipBuffer)
 	assert.NoError(t, err)
+}
+
+func TestCreateUploadDir(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(uploadApplicationEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerApplicationBitsRepository(config, gateway)
+
+	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+	dir = filepath.Join(dir, "../../fixtures/zip")
+
+	uploadDir, err := repo.CreateUploadDir(app, dir)
+	assert.NoError(t, err)
+
+	assert.Equal(t, uploadDir, cf.TempDirForApp(app))
 }

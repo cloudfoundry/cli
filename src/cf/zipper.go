@@ -45,29 +45,14 @@ func readZipFile(file string) (zipBuffer *bytes.Buffer, err error) {
 func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 	zipBuffer = new(bytes.Buffer)
 	writer := zip.NewWriter(zipBuffer)
-	exclusions := readCfIgnore(dir)
 
-	addFileToZip := func(path string, f os.FileInfo, inErr error) (err error) {
-		err = inErr
-		if err != nil {
-			return
-		}
-
-		if f.IsDir() {
-			return
-		}
-
-		fileName, _ := filepath.Rel(dir, path)
-		if fileShouldBeIgnored(exclusions, fileName) {
-			return
-		}
-
+	err = walkAppFiles(dir, func(fileName string, fullPath string) {
 		zipFile, err := writer.Create(fileName)
 		if err != nil {
 			return
 		}
 
-		content, err := ioutil.ReadFile(path)
+		content, err := ioutil.ReadFile(fullPath)
 		if err != nil {
 			return
 		}
@@ -78,9 +63,7 @@ func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 		}
 
 		return
-	}
-
-	err = filepath.Walk(dir, addFileToZip)
+	})
 
 	if err != nil {
 		return

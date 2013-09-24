@@ -74,6 +74,12 @@ func (p Push) Run(c *cli.Context) {
 		}
 	}
 
+	dir, err = p.appBitsRepo.CreateUploadDir(app, dir)
+	if err != nil {
+		p.ui.Failed(err.Error())
+		return
+	}
+
 	zipBuffer, err := p.zipper.Zip(dir)
 	if err != nil {
 		p.ui.Failed(err.Error())

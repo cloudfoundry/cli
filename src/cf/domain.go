@@ -65,6 +65,12 @@ type AppSummary struct {
 	Instances []ApplicationInstance
 }
 
+type AppFile struct {
+	Path string
+	Sha1 string
+	Size int
+}
+
 type Domain struct {
 	Name string
 	Guid string

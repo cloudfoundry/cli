@@ -69,6 +69,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[6], "my-new-app")
 	assert.Equal(t, appBitsRepo.UploadedApp.Guid, "my-new-app-guid")
+	assert.Equal(t, appBitsRepo.CreateUploadDirAppDir, expectedAppDir)
 	assert.Equal(t, zipper.ZippedDir, expectedAppDir)
 	assert.Contains(t, fakeUI.Outputs[7], "OK")
 
@@ -150,7 +151,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[7], "my-new-app")
 	assert.Equal(t, appBitsRepo.UploadedApp.Guid, "my-new-app-guid")
-	assert.Equal(t, zipper.ZippedDir, "/Users/pivotal/workspace/my-new-app")
+	assert.Equal(t, appBitsRepo.CreateUploadDirAppDir, "/Users/pivotal/workspace/my-new-app")
 	assert.Equal(t, appBitsRepo.UploadedZipBuffer, zipper.ZippedBuffer)
 	assert.Contains(t, fakeUI.Outputs[8], "OK")
 
