@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf"
 	"cf/configuration"
 	"cf/net"
 )
@@ -40,7 +41,7 @@ func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLo
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, loc.cloudControllerGateway)
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, loc.cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, loc.cloudControllerGateway)
-	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, loc.cloudControllerGateway)
+	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, loc.cloudControllerGateway, cf.ApplicationZipper{})
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, loc.cloudControllerGateway, loc.appRepo)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, loc.cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, loc.cloudControllerGateway)

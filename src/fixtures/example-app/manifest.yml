@@ -1,0 +1,8 @@
+---
+applications:
+- name: hello
+  memory: 128M
+  instances: 1
+  host: hello
+  domain: cli.cf-app.com
+  path: .

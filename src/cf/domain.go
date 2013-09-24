@@ -68,7 +68,7 @@ type AppSummary struct {
 type AppFile struct {
 	Path string
 	Sha1 string
-	Size int
+	Size int64
 }
 
 type Domain struct {

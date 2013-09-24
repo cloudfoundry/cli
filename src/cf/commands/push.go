@@ -17,7 +17,6 @@ type Push struct {
 	ui          terminal.UI
 	starter     ApplicationStarter
 	stopper     ApplicationStopper
-	zipper      cf.Zipper
 	appRepo     api.ApplicationRepository
 	domainRepo  api.DomainRepository
 	routeRepo   api.RouteRepository
@@ -25,14 +24,13 @@ type Push struct {
 	appBitsRepo api.ApplicationBitsRepository
 }
 
-func NewPush(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper, zipper cf.Zipper,
+func NewPush(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper,
 	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository,
 	appBitsRepo api.ApplicationBitsRepository) (p Push) {
 
 	p.ui = ui
 	p.starter = starter
 	p.stopper = stopper
-	p.zipper = zipper
 	p.appRepo = aR
 	p.domainRepo = dR
 	p.routeRepo = rR
@@ -74,23 +72,7 @@ func (p Push) Run(c *cli.Context) {
 		}
 	}
 
-	dir, err = p.appBitsRepo.CreateUploadDir(app, dir)
-	if err != nil {
-		p.ui.Failed(err.Error())
-		return
-	}
-
-	zipBuffer, err := p.zipper.Zip(dir)
-	if err != nil {
-		p.ui.Failed(err.Error())
-		return
-	}
-
-	apiErr = p.appBitsRepo.Upload(app, zipBuffer)
-	if apiErr != nil {
-		p.ui.Failed(apiErr.Error())
-		return
-	}
+	apiErr = p.appBitsRepo.UploadApp(app, dir)
 
 	p.ui.Ok()
 	updatedApp, _ := p.stopper.ApplicationStop(app)

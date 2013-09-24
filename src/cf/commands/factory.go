@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"cf"
 	"cf/api"
 	"cf/terminal"
 )
@@ -156,13 +155,10 @@ func (f Factory) NewPassword() Password {
 }
 
 func (f Factory) NewPush() Push {
-	zipper := cf.ApplicationZipper{}
-
 	return NewPush(
 		f.ui,
 		f.NewStart(),
 		f.NewStop(),
-		zipper,
 		f.repoLocator.GetApplicationRepository(),
 		f.repoLocator.GetDomainRepository(),
 		f.repoLocator.GetRouteRepository(),

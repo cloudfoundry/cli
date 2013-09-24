@@ -37,6 +37,12 @@ type ApplicationEntity struct {
 	EnvironmentJson map[string]string `json:"environment_json"`
 }
 
+type AppFile struct {
+	Path string `json:"fn"`
+	Sha1 string `json:"sha1"`
+	Size int64  `json:"size"`
+}
+
 type RoutesResponse struct {
 	Routes []RouteResource `json:"resources"`
 }

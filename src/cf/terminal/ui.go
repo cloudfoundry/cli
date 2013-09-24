@@ -17,6 +17,7 @@ func NotLoggedInText() string {
 
 type UI interface {
 	Say(message string, args ...interface{})
+	Warn(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Ok()
@@ -33,6 +34,12 @@ type TerminalUI struct {
 
 func (c TerminalUI) Say(message string, args ...interface{}) {
 	fmt.Printf(message+"\n", args...)
+	return
+}
+
+func (c TerminalUI) Warn(message string, args ...interface{}) {
+	message = fmt.Sprintf(message, args...)
+	c.Say(WarningColor(message))
 	return
 }
 

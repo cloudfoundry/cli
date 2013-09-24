@@ -1,14 +1,37 @@
 package cf
 
 import (
+	"crypto/sha1"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
 func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
-	err = walkAppFiles(dir, func(fileName string, _ string) {
-		appFiles = append(appFiles, AppFile{Path: fileName})
+	err = walkAppFiles(dir, func(fileName string, fullPath string) {
+		fileInfo, err := os.Lstat(fullPath)
+		if err != nil {
+			return
+		}
+		size := fileInfo.Size()
+
+		h := sha1.New()
+		fileBytes, err := ioutil.ReadFile(fullPath)
+		if err != nil {
+			return
+		}
+
+		h.Write(fileBytes)
+		sha1Bytes := h.Sum(nil)
+		sha1 := fmt.Sprintf("%x", sha1Bytes)
+
+		appFiles = append(appFiles, AppFile{
+			Path: fileName,
+			Sha1: sha1,
+			Size: size,
+		})
 	})
 	return
 }
@@ -62,6 +85,21 @@ func copyFile(fromPath, toPath string) (err error) {
 	defer dst.Close()
 
 	_, err = io.Copy(dst, src)
+	return
+}
+
+func IsDirEmpty(dir string) (isEmpty bool, err error) {
+	dirFile, err := os.Open(dir)
+	if err != nil {
+		return
+	}
+
+	_, readErr := dirFile.Readdirnames(1)
+	if readErr != nil {
+		isEmpty = true
+	} else {
+		isEmpty = false
+	}
 	return
 }
 

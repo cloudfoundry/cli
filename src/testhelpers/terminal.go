@@ -46,6 +46,11 @@ func (ui *FakeUI) Say(message string, args ...interface{}) {
 	return
 }
 
+func (ui *FakeUI) Warn(message string, args ...interface{}) {
+	ui.Say(message,args...)
+	return
+}
+
 func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
 	answer = ui.Inputs[0]

@@ -18,6 +18,14 @@ type TestResponse struct {
 	Status int
 }
 
+func RemoveWhiteSpaceFromBody(body string) string {
+	body = strings.Replace(body, " ", "", -1)
+	body = strings.Replace(body, "\n", "", -1)
+	body = strings.Replace(body, "\r", "", -1)
+	body = strings.Replace(body, "\t", "", -1)
+	return body
+}
+
 var RequestBodyMatcher = func(expectedBody string) RequestMatcher {
 	return func(request *http.Request) bool {
 		bodyBytes, err := ioutil.ReadAll(request.Body)

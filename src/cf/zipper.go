@@ -44,7 +44,14 @@ func readZipFile(file string) (zipBuffer *bytes.Buffer, err error) {
 
 func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 	zipBuffer = new(bytes.Buffer)
+
+	isEmpty, err := IsDirEmpty(dir)
+	if isEmpty {
+		return
+	}
+
 	writer := zip.NewWriter(zipBuffer)
+	defer writer.Close()
 
 	err = walkAppFiles(dir, func(fileName string, fullPath string) {
 		zipFile, err := writer.Create(fileName)
@@ -65,11 +72,6 @@ func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 		return
 	})
 
-	if err != nil {
-		return
-	}
-
-	err = writer.Close()
 	return
 }
 
