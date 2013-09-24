@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p release
+echo "Created release dir."
+
+CURRENT_SHA=`git rev-parse HEAD | cut -c1-10`
+# Linux specific
+sed -i "" -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/version.go
+echo "Bumped SHA in version."
+
+PLATFORMS="darwin/amd64 linux/amd64 windows/amd64"
+
+function build-architecture {
+  GOOS=${1%/*}
+  GOARCH=${1#*/}
+  printf "Creating $GOOS $GOARCH binary..."
+
+  GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build" >/dev/null 2>&1
+  cd out
+
+  if [ $GOOS == windows ]; then
+    mv go-cf go-cf.exe
+    tar cvzf ../release/go-cf-$GOOS-$GOARCH.tgz go-cf.exe >/dev/null 2>&1
+  else
+    tar cvzf ../release/go-cf-$GOOS-$GOARCH.tgz go-cf >/dev/null 2>&1
+  fi
+
+  cd ..
+  echo " done."
+}
+
+for PLATFORM in $PLATFORMS; do
+  build-architecture $PLATFORM
+done
+
+git checkout $(dirname $0)/../src/cf/version.go
+echo "Cleaned up version."
