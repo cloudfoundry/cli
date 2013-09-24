@@ -194,7 +194,7 @@ func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceIn
 	return
 }
 
-func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError){
+func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
 	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))

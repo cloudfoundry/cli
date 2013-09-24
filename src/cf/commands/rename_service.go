@@ -2,26 +2,26 @@ package commands
 
 import (
 	"cf/api"
-	"cf/terminal"
 	"cf/requirements"
-	"github.com/codegangsta/cli"
+	"cf/terminal"
 	"errors"
+	"github.com/codegangsta/cli"
 )
 
 type RenameService struct {
-	ui terminal.UI
-	serviceRepo api.ServiceRepository
+	ui                 terminal.UI
+	serviceRepo        api.ServiceRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewRenameService (ui terminal.UI, serviceRepo api.ServiceRepository) (cmd *RenameService){
+func NewRenameService(ui terminal.UI, serviceRepo api.ServiceRepository) (cmd *RenameService) {
 	cmd = new(RenameService)
 	cmd.ui = ui
 	cmd.serviceRepo = serviceRepo
 	return
 }
 
-func (cmd *RenameService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error){
+func (cmd *RenameService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "rename-service")
@@ -39,7 +39,7 @@ func (cmd *RenameService) GetRequirements(reqFactory requirements.Factory, c *cl
 	return
 }
 
-func (cmd *RenameService) Run(c *cli.Context){
+func (cmd *RenameService) Run(c *cli.Context) {
 	newName := c.Args()[1]
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 

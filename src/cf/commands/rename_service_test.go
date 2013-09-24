@@ -1,11 +1,11 @@
 package commands_test
 
 import (
-	"testing"
-	. "cf/commands"
-	"testhelpers"
-	"github.com/stretchr/testify/assert"
 	"cf"
+	. "cf/commands"
+	"github.com/stretchr/testify/assert"
+	"testhelpers"
+	"testing"
 )
 
 func TestRenameServiceFailsWithUsage(t *testing.T) {
@@ -22,11 +22,11 @@ func TestRenameServiceFailsWithUsage(t *testing.T) {
 }
 
 func TestRenameServiceRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess : true}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 	callRenameService([]string{"my-service", "new-name"}, reqFactory)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess : false}
+	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 	callRenameService([]string{"my-service", "new-name"}, reqFactory)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 
@@ -34,8 +34,8 @@ func TestRenameServiceRequirements(t *testing.T) {
 }
 
 func TestRenameService(t *testing.T) {
-	serviceInstance := cf.ServiceInstance{Name: "different-name", Guid:"different-name-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess : true, ServiceInstance: serviceInstance}
+	serviceInstance := cf.ServiceInstance{Name: "different-name", Guid: "different-name-guid"}
+	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
 	fakeUI, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, reqFactory)
 
 	assert.Equal(t, fakeUI.Outputs[0], "Renaming service different-name...")
