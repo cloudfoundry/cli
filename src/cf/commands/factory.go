@@ -193,6 +193,13 @@ func (f Factory) NewRenameOrg() *RenameOrg {
 	)
 }
 
+func (f Factory) NewRenameService() *RenameService {
+	return NewRenameService(
+		f.ui,
+		f.repoLocator.GetServiceRepository(),
+	)
+}
+
 func (f Factory) NewRenameSpace() *RenameSpace {
 	return NewRenameSpace(
 		f.ui,

@@ -26,6 +26,9 @@ type FakeServiceRepo struct {
 	UnbindServiceApplication cf.Application
 
 	DeleteServiceServiceInstance cf.ServiceInstance
+
+	RenameServiceServiceInstance cf.ServiceInstance
+	RenameServiceNewName string
 }
 
 func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError) {
@@ -70,5 +73,11 @@ func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.A
 
 func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError) {
 	repo.DeleteServiceServiceInstance = instance
+	return
+}
+
+func (repo *FakeServiceRepo) RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError){
+	repo.RenameServiceServiceInstance = instance
+	repo.RenameServiceNewName = newName
 	return
 }

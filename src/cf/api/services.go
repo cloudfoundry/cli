@@ -18,6 +18,7 @@ type ServiceRepository interface {
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
 	UnbindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
 	DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError)
+	RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError)
 }
 
 type CloudControllerServiceRepository struct {
@@ -185,6 +186,18 @@ func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceIn
 
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
 	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiErr != nil {
+		return
+	}
+
+	apiErr = repo.gateway.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError){
+	body := fmt.Sprintf(`{"name":"%s"}`, newName)
+	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
+	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiErr != nil {
 		return
 	}

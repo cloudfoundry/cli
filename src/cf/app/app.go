@@ -327,6 +327,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "rename-service",
+			Description: "Rename a service",
+			Usage:       "cf rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewRenameService()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "rename-space",
 			Description: "Rename a space",
 			Usage:       "cf rename-space SPACE NEW_SPACE",

@@ -339,3 +339,27 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 	err := repo.DeleteService(serviceInstance)
 	assert.Equal(t, err.Error(), "Cannot delete service instance, apps are still bound to it")
 }
+
+var renameServiceInstanceEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/service_instances/my-service-instance-guid",
+	testhelpers.RequestBodyMatcher(`{"name":"new-name"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestRenameService(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(renameServiceInstanceEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, gateway)
+
+	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
+	err := repo.RenameService(serviceInstance, "new-name")
+	assert.NoError(t, err)
+}
