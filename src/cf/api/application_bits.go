@@ -198,14 +198,28 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 	res := []AppFile{}
 	apiErr = repo.gateway.PerformRequestForJSONResponse(req, &res)
 
+	appFilesToUpload = make([]cf.AppFile, len(allAppFiles))
+	copy(appFilesToUpload, allAppFiles)
 	for _, file := range res {
-		appFilesToUpload = append(appFilesToUpload, cf.AppFile{
+		appFile := cf.AppFile{
 			Path: file.Path,
 			Sha1: file.Sha1,
 			Size: file.Size,
-		})
+		}
+		appFilesToUpload = deleteAppFile(appFilesToUpload, appFile)
 	}
+
 	return
+}
+
+func deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
+	for i, file := range appFiles {
+		if file.Path == targetFile.Path {
+			appFiles[i] = appFiles[len(appFiles)-1]
+			return appFiles[:len(appFiles)-1]
+		}
+	}
+	return appFiles
 }
 
 func createApplicationUploadBody(zipBuffer *bytes.Buffer, resourcesJson []byte) (body *bytes.Buffer, boundary string, err error) {

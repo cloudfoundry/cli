@@ -166,7 +166,8 @@ func testUploadApp(t *testing.T, dir string) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, files, []string{
-		filepath.Join(uploadDir, "app.rb"),
-		filepath.Join(uploadDir, "config.ru"),
+		filepath.Join(uploadDir, "Gemfile"),
+		filepath.Join(uploadDir, "Gemfile.lock"),
+		filepath.Join(uploadDir, "manifest.yml"),
 	})
 }
