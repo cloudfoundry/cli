@@ -6,6 +6,7 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
+	"cf/net"
 )
 
 type CreateSpace struct {
@@ -39,6 +40,11 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 
 	err := cmd.spaceRepo.Create(spaceName)
 	if err != nil {
+		if err.ErrorCode == net.SPACE_EXISTS {
+			cmd.ui.Ok()
+			cmd.ui.Say("Space %s already exists.", spaceName)
+			return
+		}
 		cmd.ui.Failed(err.Error())
 		return
 	}

@@ -17,6 +17,7 @@ type FakeSpaceRepository struct {
 	SummarySpace cf.Space
 
 	CreateSpaceName string
+	CreateSpaceExists bool
 
 	RenameSpace cf.Space
 	RenameNewName string
@@ -46,6 +47,10 @@ func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiErr *net.ApiEr
 }
 
 func (repo *FakeSpaceRepository) Create(name string) (apiErr *net.ApiError) {
+	if repo.CreateSpaceExists {
+		apiErr = &net.ApiError{ErrorCode: net.SPACE_EXISTS}
+		return
+	}
 	repo.CreateSpaceName = name
 	return
 }
