@@ -71,9 +71,9 @@ func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, len(ui.Outputs), 3)
 	assert.Contains(t, ui.Outputs[0], "Removing env variable")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "not found.")
+	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "DATABASE_URL")
+	assert.Contains(t, ui.Outputs[2], "was not set.")
 }
 
 func TestUnsetEnvFailsWithUsage(t *testing.T) {

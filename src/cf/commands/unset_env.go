@@ -5,7 +5,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
-	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -47,7 +46,8 @@ func (ue *UnsetEnv) Run(c *cli.Context) {
 	envVars := app.EnvironmentVars
 
 	if !envVarFound(varName, envVars) {
-		ue.ui.Failed(fmt.Sprintf("Env variable %s not found.", varName))
+		ue.ui.Ok()
+		ue.ui.Say("Env variable %s was not set.", varName)
 		return
 	}
 
