@@ -86,10 +86,14 @@ func traceEnabled() bool {
 }
 
 func dumpRequest(req *http.Request) {
-	dumpedRequest, err := httputil.DumpRequest(req, true)
+	shouldDisplayBody := !strings.Contains(req.Header.Get("Content-Type"), "multipart/form-data")
+	dumpedRequest, err := httputil.DumpRequest(req, shouldDisplayBody)
 	if err != nil {
 		fmt.Println("Error dumping request")
 	} else {
 		fmt.Printf("\n%s\n%s\n", terminal.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
+		if !shouldDisplayBody {
+			fmt.Println("[MULTIPART/FORM-DATA CONTENT HIDDEN]")
+		}
 	}
 }
