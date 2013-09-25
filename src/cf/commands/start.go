@@ -11,6 +11,7 @@ import (
 	"github.com/codegangsta/cli"
 	"strings"
 	"time"
+	"cf/net"
 )
 
 type Start struct {
@@ -70,7 +71,7 @@ func (s *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application,
 	instances, apiErr := s.appRepo.GetInstances(app)
 
 	for apiErr != nil {
-		if apiErr.ErrorCode != "170002" {
+		if apiErr.ErrorCode != net.APP_NOT_STAGED {
 			s.ui.Say("")
 			s.ui.Failed(apiErr.Error())
 			return

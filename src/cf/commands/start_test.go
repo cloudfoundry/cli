@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
+	"cf/net"
 )
 
 var defaultAppForStart = cf.Application{
@@ -111,7 +112,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		},
 	}
 
-	errorCodes := []string{"170002", "170002", "", "", ""}
+	errorCodes := []string{net.APP_NOT_STAGED, net.APP_NOT_STAGED, "", "", ""}
 
 	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 
