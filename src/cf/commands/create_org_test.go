@@ -48,7 +48,6 @@ func TestCreateOrganizationWhenAlreadyExists(t *testing.T){
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 	fakeUI := callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)
 
-	println(fakeUI.DumpOutputs())
 	assert.Contains(t, fakeUI.Outputs[0], "Creating organization")
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
