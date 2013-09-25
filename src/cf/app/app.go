@@ -201,6 +201,7 @@ OPTIONS:
 		},
 		{
 			Name:        "files",
+			ShortName:   "f",
 			Description: "Print out a list of files in a directory or the contents of a specific file",
 			Usage:       "cf files APP [PATH]",
 			Action: func(c *cli.Context) {
