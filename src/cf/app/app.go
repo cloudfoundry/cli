@@ -468,11 +468,7 @@ OPTIONS:
 			Name:        "unbind-service",
 			ShortName:   "us",
 			Description: "Unbind a service instance from an application",
-			Usage:       "cf unbind-service --app APP --service SERVICE",
-			Flags: []cli.Flag{
-				cli.StringFlag{"app", "", "name of the application"},
-				cli.StringFlag{"service", "", "name of the service instance to unbind from the application"},
-			},
+			Usage:       "cf unbind-service APP SERVICE_INSTANCE",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewUnbindService()
 				cmdRunner.Run(cmd, c)

@@ -17,7 +17,7 @@ func TestUnbindCommand(t *testing.T) {
 		ServiceInstance: serviceInstance,
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-	fakeUI := callUnbindService([]string{"--service", "my-service", "--app", "my-app"}, reqFactory, serviceRepo)
+	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
@@ -36,13 +36,13 @@ func TestUnbindCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
 	serviceRepo := &testhelpers.FakeServiceRepo{}
 
-	fakeUI := callUnbindService([]string{"--service", "my-service"}, reqFactory, serviceRepo)
+	fakeUI := callUnbindService([]string{"my-service"}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callUnbindService([]string{"--app", "my-app"}, reqFactory, serviceRepo)
+	fakeUI = callUnbindService([]string{"my-app"}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callUnbindService([]string{"--app", "my-app", "--service", "my-service"}, reqFactory, serviceRepo)
+	fakeUI = callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 

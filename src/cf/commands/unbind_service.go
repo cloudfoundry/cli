@@ -23,14 +23,14 @@ func NewUnbindService(ui terminal.UI, sR api.ServiceRepository) (cmd *UnbindServ
 }
 
 func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	appName := c.String("app")
-	serviceName := c.String("service")
-
-	if appName == "" || serviceName == "" {
+	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "unbind-service")
 		return
 	}
+
+	appName := c.Args()[0]
+	serviceName := c.Args()[1]
 
 	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
