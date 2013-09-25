@@ -44,7 +44,9 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[0], "Binding service")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[2], "my-app")
 	assert.Contains(t, fakeUI.Outputs[2], "is already bound")
+	assert.Contains(t, fakeUI.Outputs[2], "my-service")
 }
 
 func TestBindCommandFailsWithUsage(t *testing.T) {
