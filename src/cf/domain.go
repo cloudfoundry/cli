@@ -36,8 +36,8 @@ type Application struct {
 	State            string
 	Instances        int
 	RunningInstances int
-	Memory           int
-	DiskQuota        int
+	Memory           uint64 // in Megabytes
+	DiskQuota        uint64 // in Megabytes
 	Urls             []string
 	BuildpackUrl     string
 	Stack            Stack
@@ -96,10 +96,10 @@ type ApplicationInstance struct {
 	State     InstanceState
 	Since     time.Time
 	CpuUsage  float64 // percentage
-	DiskQuota int     // in bytes
-	DiskUsage int
-	MemQuota  int
-	MemUsage  int
+	DiskQuota uint64  // in bytes
+	DiskUsage uint64
+	MemQuota  uint64
+	MemUsage  uint64
 }
 
 type ServicePlan struct {

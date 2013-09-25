@@ -48,7 +48,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
-	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
+	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(128))
 	assert.Equal(t, appRepo.CreatedApp.BuildpackUrl, "")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
@@ -129,7 +129,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 3)
-	assert.Equal(t, appRepo.CreatedApp.Memory, 2048)
+	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(2048))
 	assert.Equal(t, appRepo.CreatedApp.Stack.Guid, "custom-linux-guid")
 	assert.Equal(t, appRepo.CreatedApp.BuildpackUrl, "https://github.com/heroku/heroku-buildpack-play.git")
 	assert.Contains(t, fakeUI.Outputs[2], "OK")
@@ -166,7 +166,7 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 		"--memory", "256M",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreatedApp.Memory, 256)
+	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(256))
 }
 
 func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
@@ -181,7 +181,7 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 		"--memory", "512",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreatedApp.Memory, 512)
+	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(512))
 }
 
 func TestPushingAppWithInvalidMemory(t *testing.T) {
@@ -196,7 +196,7 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 		"--memory", "abcM",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreatedApp.Memory, 128)
+	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(128))
 }
 
 func TestPushingAppWhenItAlreadyExists(t *testing.T) {

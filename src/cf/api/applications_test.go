@@ -112,7 +112,7 @@ func TestFindByName(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
-	assert.Equal(t, app.Memory, 128)
+	assert.Equal(t, app.Memory, uint64(128))
 	assert.Equal(t, app.Instances, 1)
 	assert.Equal(t, app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
 

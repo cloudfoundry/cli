@@ -102,9 +102,9 @@ func TestAppSummaryGetSummary(t *testing.T) {
 
 	time0 := time.Unix(1379522342, 0)
 	assert.Equal(t, instance0.Since, time0)
-	assert.Equal(t, instance0.DiskQuota, 1073741824)
-	assert.Equal(t, instance0.DiskUsage, 56037376)
-	assert.Equal(t, instance0.MemQuota, 67108864)
-	assert.Equal(t, instance0.MemUsage, 19218432)
+	assert.Exactly(t, instance0.DiskQuota, uint64(1073741824))
+	assert.Exactly(t, instance0.DiskUsage, uint64(56037376))
+	assert.Exactly(t, instance0.MemQuota, uint64(67108864))
+	assert.Exactly(t, instance0.MemUsage, uint64(19218432))
 	assert.Equal(t, instance0.CpuUsage, 3.659571249238058e-05)
 }

@@ -47,12 +47,12 @@ type StatsApiResponse map[string]InstanceStatsApiResponse
 
 type InstanceStatsApiResponse struct {
 	Stats struct {
-		DiskQuota int `json:"disk_quota"`
-		MemQuota  int `json:"mem_quota"`
+		DiskQuota uint64 `json:"disk_quota"`
+		MemQuota  uint64 `json:"mem_quota"`
 		Usage     struct {
 			Cpu  float64
-			Disk int
-			Mem  int
+			Disk uint64
+			Mem  uint64
 		}
 	}
 }

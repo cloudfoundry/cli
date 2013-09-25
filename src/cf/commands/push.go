@@ -152,19 +152,19 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	return
 }
 
-func getMemoryLimit(arg string) (memory int) {
+func getMemoryLimit(arg string) (memory uint64) {
 	var err error
 
 	switch {
 	case strings.HasSuffix(arg, "M"):
 		trimmedArg := arg[:len(arg)-1]
-		memory, err = strconv.Atoi(trimmedArg)
+		memory, err = strconv.ParseUint(trimmedArg, 10, 0)
 	case strings.HasSuffix(arg, "G"):
 		trimmedArg := arg[:len(arg)-1]
-		memory, err = strconv.Atoi(trimmedArg)
+		memory, err = strconv.ParseUint(trimmedArg, 10, 0)
 		memory = memory * 1024
 	default:
-		memory, err = strconv.Atoi(arg)
+		memory, err = strconv.ParseUint(arg, 10, 0)
 	}
 
 	if err != nil {

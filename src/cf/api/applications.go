@@ -180,7 +180,7 @@ func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newN
 func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 
-	values := map[string]int{}
+	values := map[string]interface{}{}
 	if app.DiskQuota > 0 {
 		values["disk_quota"] = app.DiskQuota
 	}

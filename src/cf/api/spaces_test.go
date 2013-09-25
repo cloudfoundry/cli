@@ -318,7 +318,7 @@ func TestSpacesGetSummary(t *testing.T) {
 	assert.Equal(t, app1.State, "started")
 	assert.Equal(t, app1.Instances, 1)
 	assert.Equal(t, app1.RunningInstances, 1)
-	assert.Equal(t, app1.Memory, 128)
+	assert.Equal(t, app1.Memory, uint64(128))
 
 	app2 := space.Applications[1]
 	assert.Equal(t, app2.Name, "app2")
@@ -330,7 +330,7 @@ func TestSpacesGetSummary(t *testing.T) {
 	assert.Equal(t, app2.State, "started")
 	assert.Equal(t, app2.Instances, 3)
 	assert.Equal(t, app2.RunningInstances, 1)
-	assert.Equal(t, app2.Memory, 512)
+	assert.Equal(t, app2.Memory, uint64(512))
 
 	instance1 := space.ServiceInstances[0]
 	assert.Equal(t, instance1.Name, "my-service-instance")

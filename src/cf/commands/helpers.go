@@ -18,7 +18,7 @@ const (
 	TERABYTE = 1024 * GIGABYTE
 )
 
-func byteSize(bytes int) string {
+func byteSize(bytes uint64) string {
 	unit := ""
 	value := float32(bytes)
 
@@ -42,33 +42,33 @@ func byteSize(bytes int) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
-func bytesFromString(s string) (bytes int, err error) {
+func bytesFromString(s string) (bytes uint64, err error) {
 	unit := string(s[len(s)-1])
 	stringValue := s[0 : len(s)-1]
 
-	value, err := strconv.ParseInt(stringValue, 10, 0)
+	value, err := strconv.ParseUint(stringValue, 10, 0)
 	if err != nil {
 		return
 	}
 
-	var byteValue int64
+	//	var byteValue uint64
 
 	switch unit {
 	case "T":
-		byteValue = value * TERABYTE
+		bytes = value * TERABYTE
 	case "G":
-		byteValue = value * GIGABYTE
+		bytes = value * GIGABYTE
 	case "M":
-		byteValue = value * MEGABYTE
+		bytes = value * MEGABYTE
 	case "K":
-		byteValue = value * KILOBYTE
+		bytes = value * KILOBYTE
 	}
 
-	if byteValue == 0 {
+	if bytes == 0 {
 		err = errors.New("Could not parse byte string")
 	}
 
-	bytes = int(byteValue)
+	//	bytes = int(byteValue)
 	return
 }
 

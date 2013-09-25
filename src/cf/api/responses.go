@@ -77,7 +77,7 @@ type ApplicationSummary struct {
 	Name             string
 	Routes           []RouteSummary
 	RunningInstances int `json:"running_instances"`
-	Memory           int
+	Memory           uint64
 	Instances        int
 	Urls             []string
 	State            string

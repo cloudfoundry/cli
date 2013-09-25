@@ -71,9 +71,9 @@ func (cmd *Scale) Run(c *cli.Context) {
 	cmd.restarter.ApplicationRestart(currentApp)
 }
 
-func extractMegaBytes(arg string) (megaBytes int, err error) {
+func extractMegaBytes(arg string) (megaBytes uint64, err error) {
 	if arg != "" {
-		var byteSize int
+		var byteSize uint64
 		byteSize, err = bytesFromString(arg)
 		if err != nil {
 			return
