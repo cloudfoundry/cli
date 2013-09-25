@@ -52,6 +52,12 @@ func (se *SetEnv) Run(c *cli.Context) {
 		envVars = map[string]string{}
 	}
 
+	if envVarFound(varName, envVars) {
+		se.ui.Ok()
+		se.ui.Say("Env var %s was already set.", varName)
+		return
+	}
+
 	envVars[varName] = varValue
 
 	err := se.appRepo.SetEnv(app, envVars)

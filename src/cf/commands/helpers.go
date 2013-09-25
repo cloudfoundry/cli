@@ -115,3 +115,13 @@ func logMessageOutput(appName string, lm logmessage.LogMessage) string {
 
 	return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msg)
 }
+
+func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {
+	for name, _ := range existingEnvVars {
+		if name == varName {
+			found = true
+			return
+		}
+	}
+	return
+}

@@ -49,6 +49,23 @@ func TestRunWhenApplicationExists(t *testing.T) {
 	})
 }
 
+func TestSetEnvWhenItAlreadyExists(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}}
+	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testhelpers.FakeApplicationRepository{}
+
+	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
+	ui := callSetEnv(args, reqFactory, appRepo)
+
+	assert.Equal(t, len(ui.Outputs), 3)
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "DATABASE_URL")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[2], "DATABASE_URL")
+	assert.Contains(t, ui.Outputs[2], "was already set.")
+
+}
+
 func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
