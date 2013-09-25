@@ -14,6 +14,7 @@ type FakeOrgRepository struct {
 	FindByNameName         string
 	FindByNameErr          bool
 	FindByNameOrganization cf.Organization
+	DidNotFindOrganizationByName bool
 
 	RenameOrganization cf.Organization
 	RenameNewName      string
@@ -25,13 +26,19 @@ func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *net.Api
 	return repo.Organizations, nil
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiErr *net.ApiError) {
+func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, found bool, apiErr *net.ApiError) {
+
 	repo.FindByNameName = name
+
+	if repo.DidNotFindOrganizationByName{
+		found = false
+		return
+	}
 
 	if repo.FindByNameErr {
 		apiErr = net.NewApiErrorWithMessage("Error finding organization by name.")
 	}
-	return repo.FindByNameOrganization, apiErr
+	return repo.FindByNameOrganization, true, apiErr
 }
 
 func (repo *FakeOrgRepository) Create(name string) (apiErr *net.ApiError) {

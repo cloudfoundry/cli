@@ -78,7 +78,7 @@ func (t Target) setOrganization(orgName string) {
 		return
 	}
 
-	org, err := t.orgRepo.FindByName(orgName)
+	org, _, err := t.orgRepo.FindByName(orgName)
 	if err != nil {
 		t.ui.Failed("Could not set organization.")
 		return

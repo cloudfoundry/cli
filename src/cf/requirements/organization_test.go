@@ -20,3 +20,13 @@ func TestOrgReqExecute(t *testing.T) {
 	assert.Equal(t, orgRepo.FindByNameName, "foo")
 	assert.Equal(t, orgReq.GetOrganization(), org)
 }
+
+func TestOrgReqWhenOrgDoesNotExist(t *testing.T) {
+	orgRepo := &testhelpers.FakeOrgRepository{DidNotFindOrganizationByName: true}
+	ui := new(testhelpers.FakeUI)
+
+	orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
+	success := orgReq.Execute()
+
+	assert.False(t, success)
+}

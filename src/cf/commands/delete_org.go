@@ -27,26 +27,27 @@ func NewDeleteOrg(ui terminal.UI, sR api.OrganizationRepository, cR configuratio
 }
 
 func (cmd *DeleteOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	var orgName string
-
-	if len(c.Args()) == 1 {
-		orgName = c.Args()[0]
-	}
-
-	if orgName == "" {
+	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-org")
 		return
+
 	}
-
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(orgName)
-
-	reqs = []requirements.Requirement{cmd.orgReq}
 	return
 }
 
 func (cmd *DeleteOrg) Run(c *cli.Context) {
-	org := cmd.orgReq.GetOrganization()
+	orgName := c.Args()[0]
+	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(orgName))
+
+	org, found, apiErr := cmd.orgRepo.FindByName(orgName)
+
+	if !found {
+		cmd.ui.Ok()
+		cmd.ui.Say("Orgaization %s was already deleted.", orgName)
+		return
+	}
+
 	force := c.Bool("f")
 
 	if !force {
@@ -60,14 +61,13 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(org.Name))
-	err := cmd.orgRepo.Delete(org)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	apiErr = cmd.orgRepo.Delete(org)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
-	config, apiErr := cmd.configRepo.Get()
-	if apiErr != nil {
+	config, err := cmd.configRepo.Get()
+	if err != nil {
 		cmd.ui.Failed("Couldn't reset your target. You should logout and log in again.")
 		return
 	}

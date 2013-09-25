@@ -144,8 +144,9 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
-	org, err := repo.FindByName("Org1")
+	org, found, err := repo.FindByName("Org1")
 	assert.NoError(t, err)
+	assert.True(t, found)
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
 	assert.Equal(t, len(org.Spaces), 1)
@@ -155,13 +156,40 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.Equal(t, org.Domains[0].Name, "cfapps.io")
 	assert.Equal(t, org.Domains[0].Guid, "domain1-guid")
 
-	org, err = repo.FindByName("org1")
+	org, found, err = repo.FindByName("org1")
 	assert.NoError(t, err)
-	assert.Equal(t, org.Name, existingOrg.Name)
-	assert.Equal(t, org.Guid, existingOrg.Guid)
+	assert.True(t, found)
+}
 
-	org, err = repo.FindByName("org that does not exist")
-	assert.Error(t, err)
+var findOrgByNameDoesNotExistResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "total_results": 0,
+  "total_pages": 0,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+
+  ]
+}`}
+
+var findOrgByNameDoesNotExistEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+	nil,
+	findOrgByNameDoesNotExistResponse,
+)
+
+func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findOrgByNameDoesNotExistEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
+
+	_, found, err := repo.FindByName("org1")
+	assert.NoError(t, err)
+	assert.False(t, found)
 }
 
 var createOrgEndpoint = testhelpers.CreateEndpoint(

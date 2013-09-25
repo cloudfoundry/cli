@@ -10,7 +10,7 @@ import (
 
 type OrganizationRepository interface {
 	FindAll() (orgs []cf.Organization, apiErr *net.ApiError)
-	FindByName(name string) (org cf.Organization, apiErr *net.ApiError)
+	FindByName(name string) (org cf.Organization, found bool, apiErr *net.ApiError)
 	Create(name string) (apiErr *net.ApiError)
 	Rename(org cf.Organization, name string) (apiErr *net.ApiError)
 	Delete(org cf.Organization) (apiErr *net.ApiError)
@@ -52,7 +52,7 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiErr *net.ApiError) {
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, found bool, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
@@ -67,10 +67,10 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	}
 
 	if len(response.Resources) == 0 {
-		apiErr = net.NewApiErrorWithMessage(fmt.Sprintf("Organization %s not found", name))
 		return
 	}
 
+	found = true
 	r := response.Resources[0]
 	spaces := []cf.Space{}
 
