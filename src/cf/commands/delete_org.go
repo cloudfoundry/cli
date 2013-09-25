@@ -38,27 +38,33 @@ func (cmd *DeleteOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd *DeleteOrg) Run(c *cli.Context) {
 	orgName := c.Args()[0]
-	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(orgName))
-
-	org, found, apiErr := cmd.orgRepo.FindByName(orgName)
-
-	if !found {
-		cmd.ui.Ok()
-		cmd.ui.Say("Orgaization %s was already deleted.", orgName)
-		return
-	}
 
 	force := c.Bool("f")
 
 	if !force {
 		response := strings.ToLower(cmd.ui.Ask(
 			"Really delete org %s and everything associated with it?%s",
-			terminal.EntityNameColor(org.Name),
+			terminal.EntityNameColor(orgName),
 			terminal.PromptColor(">"),
 		))
 		if response != "y" && response != "yes" {
 			return
 		}
+	}
+
+	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(orgName))
+
+	org, found, apiErr := cmd.orgRepo.FindByName(orgName)
+
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+		return
+	}
+
+	if !found {
+		cmd.ui.Ok()
+		cmd.ui.Say("Orgaization %s was already deleted.", terminal.EntityNameColor(orgName))
+		return
 	}
 
 	apiErr = cmd.orgRepo.Delete(org)

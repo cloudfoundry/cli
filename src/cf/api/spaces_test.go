@@ -187,18 +187,11 @@ func TestSpacesFindByName(t *testing.T) {
 	services := []cf.ServiceInstance{
 		cf.ServiceInstance{Name: "service1", Guid: "service1-guid"},
 	}
-	existingSpace := cf.Space{
-		Guid:             "space1-guid",
-		Name:             "Space1",
-		Organization:     existingOrg,
-		Applications:     apps,
-		Domains:          domains,
-		ServiceInstances: services,
-	}
 
-	space, err := repo.FindByName("Space1")
+	space, found, err := repo.FindByName("Space1")
 	assert.NoError(t, err)
 
+	assert.True(t, found)
 	assert.Equal(t, space.Name, "Space1")
 	assert.Equal(t, space.Guid, "space1-guid")
 
@@ -207,12 +200,44 @@ func TestSpacesFindByName(t *testing.T) {
 	assert.Equal(t, space.Domains, domains)
 	assert.Equal(t, space.ServiceInstances, services)
 
-	space, err = repo.FindByName("space1")
+	space, found, err = repo.FindByName("space1")
 	assert.NoError(t, err)
-	assert.Equal(t, space, existingSpace)
+	assert.True(t, found)
+}
 
-	space, err = repo.FindByName("space that does not exist")
-	assert.Error(t, err)
+var didNotFindSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "total_results": 0,
+  "total_pages": 0,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+
+  ]
+}`}
+
+var didNotFindSpaceByNameEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces?q=name%3Aspace1&inline-relations-depth=1",
+	nil,
+	didNotFindSpaceByNameResponse,
+)
+
+func TestSpacesDidNotFindByName(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(didNotFindSpaceByNameEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken:  "BEARER my_access_token",
+		Target:       ts.URL,
+		Organization: cf.Organization{Guid: "some-org-guid"},
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerSpaceRepository(config, gateway)
+
+	_, found, err := repo.FindByName("space1")
+	assert.NoError(t, err)
+	assert.False(t, found)
 }
 
 var spaceSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `

@@ -98,6 +98,28 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "No org targeted.")
 }
 
+func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
+	configRepo.Delete()
+	configRepo.Login()
+
+	config, err := configRepo.Get()
+	assert.NoError(t, err)
+	org := cf.Organization{Guid: "previous-org-guid", Name: "previous-org"}
+	config.Organization = org
+	err = configRepo.Save()
+	assert.NoError(t, err)
+
+	orgRepo.DidNotFindOrganizationByName = true
+
+	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
+
+	println(ui.DumpOutputs())
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "my-organization")
+	assert.Contains(t, ui.Outputs[1], "not found")
+}
+
 // End test with organization option
 
 // Start test with space option
@@ -159,6 +181,22 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[3], "No space targeted.")
+}
+
+func TestTargetSpacehenSpaceNotFound(t *testing.T) {
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
+
+	configRepo.Delete()
+	config := configRepo.Login()
+	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+
+	spaceRepo.DidNotFindSpaceByName = true
+
+	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
+
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+	assert.Contains(t, ui.Outputs[1], "my-space")
+	assert.Contains(t, ui.Outputs[1], "not found")
 }
 
 // End test with space option

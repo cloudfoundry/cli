@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -78,9 +79,14 @@ func (t Target) setOrganization(orgName string) {
 		return
 	}
 
-	org, _, err := t.orgRepo.FindByName(orgName)
+	org, found, err := t.orgRepo.FindByName(orgName)
 	if err != nil {
 		t.ui.Failed("Could not set organization.")
+		return
+	}
+
+	if !found {
+		t.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
 		return
 	}
 
@@ -100,9 +106,14 @@ func (t Target) setSpace(spaceName string) {
 		return
 	}
 
-	space, err := t.spaceRepo.FindByName(spaceName)
+	space, found, err := t.spaceRepo.FindByName(spaceName)
 	if err != nil {
 		t.ui.Failed("You do not have access to that space.")
+		return
+	}
+
+	if !found {
+		t.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
 		return
 	}
 

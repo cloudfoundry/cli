@@ -20,3 +20,13 @@ func TestSpaceReqExecute(t *testing.T) {
 	assert.Equal(t, spaceRepo.SpaceName, "foo")
 	assert.Equal(t, spaceReq.GetSpace(), space)
 }
+
+func TestSpaceReqExecuteWhenSpaceNotFound(t *testing.T) {
+	spaceRepo := &testhelpers.FakeSpaceRepository{DidNotFindSpaceByName: true}
+	ui := new(testhelpers.FakeUI)
+
+	spaceReq := NewSpaceRequirement("foo", ui, spaceRepo)
+	success := spaceReq.Execute()
+
+	assert.False(t, success)
+}
