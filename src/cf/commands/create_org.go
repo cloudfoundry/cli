@@ -2,11 +2,11 @@ package commands
 
 import (
 	"cf/api"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"cf/net"
 )
 
 type CreateOrganization struct {

@@ -43,7 +43,7 @@ func TestCreateOrganization(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func TestCreateOrganizationWhenAlreadyExists(t *testing.T){
+func TestCreateOrganizationWhenAlreadyExists(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{CreateOrgExists: true}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 	fakeUI := callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)

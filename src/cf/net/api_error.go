@@ -2,8 +2,8 @@ package net
 
 import "fmt"
 
-const(
-	ORG_EXISTS = "30002"
+const (
+	ORG_EXISTS   = "30002"
 	SPACE_EXISTS = "40002"
 )
 
