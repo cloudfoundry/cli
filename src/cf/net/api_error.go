@@ -2,6 +2,10 @@ package net
 
 import "fmt"
 
+const(
+	ORG_EXISTS = "30002"
+)
+
 type ApiError struct {
 	Message    string
 	ErrorCode  string

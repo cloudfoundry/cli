@@ -6,6 +6,7 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
+	"cf/net"
 )
 
 type CreateOrganization struct {
@@ -38,6 +39,12 @@ func (cmd CreateOrganization) Run(c *cli.Context) {
 	cmd.ui.Say("Creating organization %s...", terminal.EntityNameColor(name))
 	apiErr := cmd.orgRepo.Create(name)
 	if apiErr != nil {
+		if apiErr.ErrorCode == net.ORG_EXISTS {
+			cmd.ui.Ok()
+			cmd.ui.Say("Org %s already exists.", name)
+			return
+		}
+
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}

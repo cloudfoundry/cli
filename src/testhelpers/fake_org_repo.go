@@ -9,6 +9,7 @@ type FakeOrgRepository struct {
 	Organizations []cf.Organization
 
 	CreateName string
+	CreateOrgExists bool
 
 	FindByNameName         string
 	FindByNameErr          bool
@@ -34,6 +35,10 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 }
 
 func (repo *FakeOrgRepository) Create(name string) (apiErr *net.ApiError) {
+	if repo.CreateOrgExists {
+		apiErr = &net.ApiError{ErrorCode: net.ORG_EXISTS}
+		return
+	}
 	repo.CreateName = name
 	return
 }
