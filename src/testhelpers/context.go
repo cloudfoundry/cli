@@ -4,6 +4,7 @@ import (
 	"cf/app"
 	"flag"
 	"github.com/codegangsta/cli"
+	"strings"
 )
 
 func NewContext(cmdName string, args []string) (*cli.Context) {
@@ -14,7 +15,21 @@ func NewContext(cmdName string, args []string) (*cli.Context) {
 		targetCommand.Flags[i].Apply(flagSet)
 	}
 
-	flagSet.Parse(args)
+	// move all flag args to the beginning of the list, go requires them all upfront
+	firstFlagIndex := -1
+	for index, arg := range args {
+		if strings.HasPrefix(arg, "-") {
+			firstFlagIndex = index
+			break
+		}
+	}
+	if firstFlagIndex > 0 {
+		args := args[0:firstFlagIndex]
+		flags := args[firstFlagIndex:]
+		flagSet.Parse(append(flags, args...))
+	} else {
+		flagSet.Parse(args[0:])
+	}
 
 	globalSet := new(flag.FlagSet)
 
