@@ -128,16 +128,22 @@ type ServiceOfferingResource struct {
 }
 
 type ServiceOfferingEntity struct {
-	Label        string
-	Version      string
-	Description  string
-	Provider     string
-	ServicePlans []ServicePlanResource `json:"service_plans"`
+	Label            string
+	Version          string
+	Description      string
+	DocumentationUrl string `json:"documentation_url"`
+	Provider         string
+	ServicePlans     []ServicePlanResource `json:"service_plans"`
 }
 
 type ServicePlanResource struct {
 	Metadata Metadata
-	Entity   Entity
+	Entity   ServicePlanEntity
+}
+
+type ServicePlanEntity struct {
+	Name            string
+	ServiceOffering ServiceOfferingResource `json:"service"`
 }
 
 type ServiceInstancesApiResponse struct {

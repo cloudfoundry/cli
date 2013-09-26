@@ -120,7 +120,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
 		return
@@ -137,8 +137,15 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	resource := response.Resources[0]
+	serviceOfferingEntity := resource.Entity.ServicePlan.Entity.ServiceOffering.Entity
 	instance.Guid = resource.Metadata.Guid
 	instance.Name = resource.Entity.Name
+
+	instance.ServiceOffering.Label = serviceOfferingEntity.Label
+	instance.ServiceOffering.DocumentationUrl = serviceOfferingEntity.DocumentationUrl
+	instance.ServiceOffering.Description = serviceOfferingEntity.Description
+
+	instance.ServicePlan.Name = resource.Entity.ServicePlan.Entity.Name
 	instance.ServiceBindings = []cf.ServiceBinding{}
 	instance.ServicePlan = cf.ServicePlan{Name: resource.Entity.ServicePlan.Entity.Name}
 

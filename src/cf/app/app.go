@@ -389,6 +389,15 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "service",
+			Description: "Show service instance info",
+			Usage:       "cf service SERVICE_INSTANCE",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewShowService()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "services",
 			ShortName:   "s",
 			Description: "List all services in the currently targeted space",

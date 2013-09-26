@@ -253,6 +253,13 @@ func (f Factory) NewShowSpace() *ShowSpace {
 	)
 }
 
+func (f Factory) NewShowService() ShowService {
+	return NewShowService(
+		f.ui,
+		f.repoLocator.GetServiceRepository(),
+	)
+}
+
 func (f Factory) NewSpaces() Spaces {
 	return NewSpaces(
 		f.ui,

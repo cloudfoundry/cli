@@ -214,7 +214,14 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
         ],
         "service_plan": {
    		  "entity": {
-            "name": "plan-name"
+            "name": "plan-name",
+            "service": {
+              "entity": {
+                "label": "mysql",
+                "description": "MySQL database",
+                "documentation_url": "http://info.example.com"
+              }
+            }
           }
    		}
       }
@@ -246,6 +253,10 @@ func TestFindInstanceByName(t *testing.T) {
 	assert.Equal(t, found, true)
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
+	assert.Equal(t, instance.ServiceOffering.Label, "mysql")
+	assert.Equal(t, instance.ServiceOffering.DocumentationUrl, "http://info.example.com")
+	assert.Equal(t, instance.ServiceOffering.Description, "MySQL database")
+	assert.Equal(t, instance.ServicePlan.Name, "plan-name")
 	assert.Equal(t, len(instance.ServiceBindings), 2)
 
 	binding := instance.ServiceBindings[0]

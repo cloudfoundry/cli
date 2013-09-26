@@ -109,12 +109,13 @@ type ServicePlan struct {
 }
 
 type ServiceOffering struct {
-	Guid        string
-	Label       string
-	Provider    string
-	Version     string
-	Description string
-	Plans       []ServicePlan
+	Guid             string
+	Label            string
+	Provider         string
+	Version          string
+	Description      string
+	DocumentationUrl string
+	Plans            []ServicePlan
 }
 
 type ServiceInstance struct {
@@ -123,6 +124,7 @@ type ServiceInstance struct {
 	ServiceBindings  []ServiceBinding
 	ServicePlan      ServicePlan
 	ApplicationNames []string
+	ServiceOffering  ServiceOffering
 }
 
 type ServiceBinding struct {
