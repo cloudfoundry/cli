@@ -34,9 +34,12 @@ ENVIRONMENT VARIABLES:
 `
 
 	cli.CommandHelpTemplate = `NAME:
-   {{.Name}} - {{.Description}}
+   {{.Name}} - {{.Description}}{{with .ShortName}}
 
-USAGE:
+ALIAS:
+   {{.}}
+
+{{end}}USAGE:
    {{.Usage}}{{with .Flags}}
 
 OPTIONS:
