@@ -73,7 +73,7 @@ OPTIONS:
 	app.Commands = []cli.Command{
 		{
 			Name:        "api",
-			Description: "Set or view target api endpoint",
+			Description: "Set or view target api url",
 			Usage:       "cf api [URL]",
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewApi()
