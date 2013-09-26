@@ -10,6 +10,8 @@ type FakeDomainRepository struct {
 
 	FindByNameName string
 	FindByNameDomain cf.Domain
+
+	CreateDomainName string
 }
 
 func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiErr *net.ApiError){
@@ -19,4 +21,9 @@ func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiErr *net.Ap
 func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiErr *net.ApiError){
 	repo.FindByNameName = name
 	return repo.FindByNameDomain, nil
+}
+
+func (repo *FakeDomainRepository) Create(domain cf.Domain) (apiErr *net.ApiError){
+	repo.CreateDomainName = domain.Name
+	return nil
 }

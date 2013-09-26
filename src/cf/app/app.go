@@ -110,6 +110,19 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "create-domain",
+			Description: "Associate a domain name with an organization (or globally)",
+			Usage:       "cf create-domain DOMAIN_NAME --shared\n" +
+			             "cf create-domain DOMAIN_NAME --org ORG",
+			Flags: []cli.Flag{
+				cli.BoolFlag{"shared", "create shared domain"},
+			},
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewCreateSharedDomain()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create organization",

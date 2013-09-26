@@ -45,6 +45,13 @@ func (f Factory) NewBindService() *BindService {
 	)
 }
 
+func (f Factory) NewCreateSharedDomain() CreateSharedDomain {
+	return NewCreateSharedDomain(
+		f.ui,
+		f.repoLocator.GetDomainRepository(),
+	)
+}
+
 func (f Factory) NewCreateOrganization() CreateOrganization {
 	return NewCreateOrganization(
 		f.ui,

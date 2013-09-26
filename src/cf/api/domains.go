@@ -11,6 +11,7 @@ import (
 type DomainRepository interface {
 	FindAll() (domains []cf.Domain, apiErr *net.ApiError)
 	FindByName(name string) (domain cf.Domain, apiErr *net.ApiError)
+	Create(domain cf.Domain) (apiErr *net.ApiError)
 }
 
 type CloudControllerDomainRepository struct {
@@ -64,5 +65,9 @@ func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.D
 		}
 	}
 
+	return
+}
+
+func (repo CloudControllerDomainRepository) Create(domain cf.Domain) (apiErr *net.ApiError) {
 	return
 }
