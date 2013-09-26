@@ -253,6 +253,16 @@ OPTIONS:
 			},
 		},
 		{
+			Name:        "marketplace",
+			ShortName:   "m",
+			Description: "List available offerings in the marketplace",
+			Usage:       "cf marketplace",
+			Action: func(c *cli.Context) {
+				cmd := cmdFactory.NewMarketplaceServices()
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "org",
 			Description: "Show org info",
 			Usage:       "cf org ORG",
@@ -379,18 +389,9 @@ OPTIONS:
 			Name:        "services",
 			ShortName:   "s",
 			Description: "List all services in the currently targeted space",
-			Usage:       "cf services [--marketplace]",
-			Flags: []cli.Flag{
-				cli.BoolFlag{"marketplace", "List available offerings on the marketplace"},
-			},
+			Usage:       "cf services",
 			Action: func(c *cli.Context) {
-				var cmd commands.Command
-				cmd = cmdFactory.NewServices()
-
-				if c.Bool("marketplace") {
-					cmd = cmdFactory.NewMarketplaceServices()
-				}
-
+				cmd := cmdFactory.NewServices()
 				cmdRunner.Run(cmd, c)
 			},
 		},
