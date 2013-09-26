@@ -17,7 +17,7 @@ func New() (app *cli.App, err error) {
    {{.Name}} - {{.Usage}}
 
 USAGE:
-   [environment variables] {{.Name}} [global options] command [command options] [arguments...]
+   [environment variables] {{.Name}} [global options] command [arguments...] [command options]
 
 VERSION:
    {{.Version}}
