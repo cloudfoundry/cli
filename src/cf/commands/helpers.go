@@ -113,7 +113,11 @@ func logMessageOutput(appName string, lm logmessage.LogMessage) string {
 		channel = "STDERR "
 	}
 
-	return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msg)
+	if lm.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
+		return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msg)
+	} else {
+		return fmt.Sprintf("%s %s %s %s%s", timeString, appName, sourceType, channel, msg)
+	}
 }
 
 func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {

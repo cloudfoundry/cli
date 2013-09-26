@@ -35,30 +35,30 @@ func TestLogMessageOutput(t *testing.T) {
 	}
 
 	msg.SourceType = &cloud_controller
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API/0 Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API Hello World!")
 	msg.MessageType = &stderr
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API/0 STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API STDERR Hello World!")
 
 	sourceId = "1"
 	msg.SourceType = &router
 	msg.MessageType = &stdout
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router/1 Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router Hello World!")
 	msg.MessageType = &stderr
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router/1 STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router STDERR Hello World!")
 
 	sourceId = "2"
 	msg.SourceType = &uaa
 	msg.MessageType = &stdout
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA/2 Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA Hello World!")
 	msg.MessageType = &stderr
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA/2 STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA STDERR Hello World!")
 
 	sourceId = "3"
 	msg.SourceType = &dea
 	msg.MessageType = &stdout
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor/3 Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor Hello World!")
 	msg.MessageType = &stderr
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor/3 STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor STDERR Hello World!")
 
 	sourceId = "4"
 	msg.SourceType = &wardenContainer
