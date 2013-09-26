@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
@@ -61,5 +62,5 @@ func (ue *UnsetEnv) Run(c *cli.Context) {
 	}
 
 	ue.ui.Ok()
-	ue.ui.Say("TIP: Use 'cf push' to ensure your env variable changes take effect.")
+	ue.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect.", cf.Name)
 }

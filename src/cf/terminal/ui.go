@@ -1,6 +1,7 @@
 package terminal
 
 import (
+	"cf"
 	"cf/configuration"
 	"fmt"
 	"github.com/codegangsta/cli"
@@ -12,7 +13,7 @@ import (
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor("cf login"))
+	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor(cf.Name+" login"))
 }
 
 type UI interface {
@@ -75,7 +76,7 @@ func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
 		EntityNameColor(config.ApiVersion))
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out. Use '%s' to login.", CommandColor("cf login USERNAME"))
+		ui.Say("Logged out. Use '%s' to login.", CommandColor(cf.Name+" login USERNAME"))
 	} else {
 		ui.Say("user:            %s", EntityNameColor(config.UserEmail()))
 	}

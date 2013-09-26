@@ -10,6 +10,7 @@ import (
 	"cf/terminal"
 	"time"
 	"github.com/codegangsta/cli"
+	"cf"
 )
 
 func CaptureOutput(f func ()) string {
@@ -95,7 +96,7 @@ func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
 		config.ApiVersion)
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out. Use '%s' to login.", "cf login USERNAME")
+		ui.Say("Logged out. Use '%s login USERNAME' to login.", cf.Name)
 		return
 	} else {
 		ui.Say("user:            %s", config.UserEmail())

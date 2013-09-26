@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/net"
 	"cf/requirements"
@@ -50,5 +51,5 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new space.", terminal.CommandColor("cf target -s "+spaceName))
+	cmd.ui.Say("\nTIP: Use '%s' to target new space.", terminal.CommandColor(cf.Name+" target -s "+spaceName))
 }

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/net"
@@ -79,7 +80,7 @@ func (l Login) doLogin(username, password string) (apiErr *net.ApiError) {
 	apiErr = l.authenticator.Authenticate(username, password)
 	if apiErr == nil {
 		l.ui.Ok()
-		l.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor("cf target"))
+		l.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor(cf.Name+" target"))
 	}
 	return
 }

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/net"
 	"cf/requirements"
@@ -50,5 +51,5 @@ func (cmd CreateOrganization) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new org.", terminal.CommandColor("cf target -o "+name))
+	cmd.ui.Say("\nTIP: Use '%s' to target new org.", terminal.CommandColor(cf.Name+" target -o "+name))
 }

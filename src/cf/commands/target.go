@@ -49,10 +49,10 @@ func (t Target) Run(c *cli.Context) {
 		t.ui.ShowConfiguration(t.config)
 
 		if !t.config.HasOrganization() {
-			t.ui.Say("No org targeted. Use 'cf target -o' to target an org.")
+			t.ui.Say("No org targeted. Use '%s target -o' to target an org.", cf.Name)
 		}
 		if !t.config.HasSpace() {
-			t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
+			t.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
 		}
 		return
 	}
@@ -60,7 +60,7 @@ func (t Target) Run(c *cli.Context) {
 	if orgName != "" {
 		t.setOrganization(orgName)
 		if t.config.IsLoggedIn() {
-			t.ui.Say("No space targeted. Use 'cf target -s' to target a space.")
+			t.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
 		}
 		return
 	}
@@ -75,7 +75,7 @@ func (t Target) Run(c *cli.Context) {
 
 func (t Target) setOrganization(orgName string) {
 	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set an organization. Use 'cf login'.")
+		t.ui.Failed("You must be logged in to set an organization. Use '%s login'.", cf.Name)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (t Target) setOrganization(orgName string) {
 
 func (t Target) setSpace(spaceName string) {
 	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set a space. Use 'cf login'.")
+		t.ui.Failed("You must be logged in to set a space. Use '%s login'.", cf.Name)
 		return
 	}
 

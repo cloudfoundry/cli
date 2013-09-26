@@ -1,6 +1,7 @@
 package requirements
 
 import (
+	"cf"
 	"cf/configuration"
 	"cf/terminal"
 	"fmt"
@@ -18,7 +19,7 @@ func NewTargetedOrgRequirement(ui terminal.UI, config *configuration.Configurati
 func (req TargetedOrgRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org targeted. See '%s' to target an org.",
-			terminal.CommandColor("cf target --o ORGNAME"))
+			terminal.CommandColor(cf.Name+" target --o ORGNAME"))
 		req.ui.Failed(message)
 		return false
 	}
