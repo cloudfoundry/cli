@@ -41,7 +41,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 
 	response := new(ServiceOfferingsApiResponse)
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 	if apiErr != nil {
 		return
 	}
@@ -113,7 +113,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	response := new(ServiceInstancesApiResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 	if apiErr != nil {
 		return
 	}

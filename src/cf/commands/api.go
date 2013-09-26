@@ -61,7 +61,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	}
 
 	serverResponse := new(InfoResponse)
-	apiErr = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
+	_, apiErr = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

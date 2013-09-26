@@ -29,6 +29,6 @@ func (repo CloudControllerAppFilesRepository) ListFiles(app cf.Application, path
 		return
 	}
 
-	files, apiErr = repo.gateway.PerformRequestForTextResponse(request)
+	files, _, apiErr = repo.gateway.PerformRequestForTextResponse(request)
 	return
 }

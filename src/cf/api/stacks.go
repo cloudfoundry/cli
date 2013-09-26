@@ -31,7 +31,7 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	}
 
 	findResponse := new(ApiResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
 	if apiErr != nil {
 		return
 	}
@@ -56,7 +56,7 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiErr 
 	}
 
 	listResponse := new(StackApiResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
 	if apiErr != nil {
 		return
 	}

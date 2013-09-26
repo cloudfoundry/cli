@@ -54,7 +54,7 @@ func (repo CloudControllerPasswordRepository) GetScore(password string) (score s
 	scoreRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	scoreResponse := ScoreResponse{}
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(scoreRequest, &scoreResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(scoreRequest, &scoreResponse)
 	if apiErr != nil {
 		return
 	}
@@ -93,7 +93,7 @@ func (repo *CloudControllerPasswordRepository) getTargetInfo() (response InfoRes
 
 		response = InfoResponse{}
 
-		apiErr = repo.gateway.PerformRequestForJSONResponse(request, &response)
+		_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &response)
 
 		repo.infoResponse = response
 	}

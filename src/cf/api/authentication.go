@@ -77,7 +77,7 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiErr *net.ApiError)
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
-	apiErr = uaa.gateway.PerformRequestForJSONResponse(request, &response)
+	_, apiErr = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
 	if apiErr != nil {
 		return

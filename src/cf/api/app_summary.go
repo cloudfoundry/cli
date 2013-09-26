@@ -66,7 +66,7 @@ func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.
 
 	apiResponse := StatsApiResponse{}
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
 	if apiErr != nil {
 		return
 	}

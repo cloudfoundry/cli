@@ -196,7 +196,7 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 	}
 
 	res := []AppFile{}
-	apiErr = repo.gateway.PerformRequestForJSONResponse(req, &res)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(req, &res)
 
 	appFilesToUpload = make([]cf.AppFile, len(allAppFiles))
 	copy(appFilesToUpload, allAppFiles)

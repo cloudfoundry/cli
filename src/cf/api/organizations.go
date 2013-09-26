@@ -35,7 +35,7 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	}
 	response := new(OrganizationsApiResponse)
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
@@ -60,7 +60,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	}
 	response := new(OrganizationsApiResponse)
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return

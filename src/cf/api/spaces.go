@@ -42,7 +42,7 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr 
 
 	response := new(ApiResponse)
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
@@ -65,7 +65,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 
 	response := new(SpaceApiResponse)
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return
@@ -113,7 +113,7 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr 
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 
 	if apiErr != nil {
 		return

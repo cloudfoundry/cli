@@ -61,7 +61,7 @@ func (gateway Gateway) PerformRequest(request *Request) (apiErr *ApiError) {
 	return
 }
 
-func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, apiErr *ApiError) {
+func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, apiErr *ApiError) {
 	rawResponse, apiErr := gateway.doRequestHandlingAuth(request)
 	if apiErr != nil {
 		return
@@ -74,14 +74,14 @@ func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes [
 	return
 }
 
-func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response string, apiErr *ApiError) {
-	bytes, apiErr := gateway.PerformRequestForResponseBytes(request)
+func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response string, headers http.Header, apiErr *ApiError) {
+	bytes, headers, apiErr := gateway.PerformRequestForResponseBytes(request)
 	response = string(bytes)
 	return
 }
 
-func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (apiErr *ApiError) {
-	bytes, apiErr := gateway.PerformRequestForResponseBytes(request)
+func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiErr *ApiError) {
+	bytes, headers, apiErr := gateway.PerformRequestForResponseBytes(request)
 	if apiErr != nil {
 		return
 	}

@@ -32,7 +32,7 @@ func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, apiE
 	}
 
 	response := new(ApiResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 	if apiErr != nil {
 		return
 	}

@@ -44,7 +44,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	findResponse := new(ApplicationsApiResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
 	if apiErr != nil {
 		return
 	}
@@ -61,7 +61,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	summaryResponse := new(ApplicationSummary)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, summaryResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, summaryResponse)
 	if apiErr != nil {
 		return
 	}
@@ -137,7 +137,7 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 	}
 
 	resource := new(Resource)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
 	if apiErr != nil {
 		return
 	}
@@ -230,7 +230,7 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 
 	apiResponse := InstancesApiResponse{}
 
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
 	if apiErr != nil {
 		return
 	}
@@ -260,7 +260,7 @@ func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.A
 	}
 
 	response := ApplicationResource{}
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, &response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &response)
 
 	updatedApp = cf.Application{
 		Name:  response.Entity.Name,

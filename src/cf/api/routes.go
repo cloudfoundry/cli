@@ -35,7 +35,7 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiErr 
 	}
 
 	response := new(RoutesResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 	if apiErr != nil {
 		return
 	}
@@ -64,7 +64,7 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	}
 
 	response := new(ApiResponse)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
 	if apiErr != nil {
 		return
 	}
@@ -93,7 +93,7 @@ func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.D
 	}
 
 	resource := new(Resource)
-	apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
 	if apiErr != nil {
 		return
 	}
