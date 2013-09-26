@@ -321,8 +321,32 @@ func TestUnbindService(t *testing.T) {
 		ServiceBindings: serviceBindings,
 	}
 	app := cf.Application{Guid: "app-2-guid"}
-	err := repo.UnbindService(serviceInstance, app)
+	found, err := repo.UnbindService(serviceInstance, app)
 	assert.NoError(t, err)
+	assert.Equal(t, found, true)
+}
+
+func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(deleteBindingEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, gateway)
+
+	serviceBindings := []cf.ServiceBinding{}
+
+	serviceInstance := cf.ServiceInstance{
+		Guid:            "my-service-instance-guid",
+		ServiceBindings: serviceBindings,
+	}
+	app := cf.Application{Guid: "app-2-guid"}
+	found, err := repo.UnbindService(serviceInstance, app)
+	assert.NoError(t, err)
+	assert.Equal(t, found, false)
 }
 
 var deleteServiceInstanceEndpoint = testhelpers.CreateEndpoint(

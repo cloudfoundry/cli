@@ -25,6 +25,7 @@ type FakeServiceRepo struct {
 
 	UnbindServiceServiceInstance cf.ServiceInstance
 	UnbindServiceApplication cf.Application
+	UnbindServiceBindingNotFound bool
 
 	DeleteServiceServiceInstance cf.ServiceInstance
 
@@ -70,9 +71,10 @@ func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.App
 	return
 }
 
-func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError) {
 	repo.UnbindServiceServiceInstance = instance
 	repo.UnbindServiceApplication = app
+	found = !repo.UnbindServiceBindingNotFound
 	return
 }
 

@@ -45,11 +45,16 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Unbinding service %s from %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
-	err := cmd.serviceRepo.UnbindService(instance, app)
+	found, err := cmd.serviceRepo.UnbindService(instance, app)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	cmd.ui.Ok()
+
+	if !found {
+		cmd.ui.Warn("Binding between %s and %s did not exist", instance.Name, app.Name)
+	}
+
 }

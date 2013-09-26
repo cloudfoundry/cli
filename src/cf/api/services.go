@@ -16,7 +16,7 @@ type ServiceRepository interface {
 	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
-	UnbindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
+	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError)
 	DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError)
 	RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError)
 }
@@ -155,7 +155,7 @@ func (repo CloudControllerServiceRepository) BindService(instance cf.ServiceInst
 	return
 }
 
-func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError) {
 	var path string
 
 	for _, binding := range instance.ServiceBindings {
@@ -166,8 +166,9 @@ func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceIn
 	}
 
 	if path == "" {
-		apiErr = net.NewApiErrorWithMessage("Error finding service binding")
 		return
+	} else {
+		found = true
 	}
 
 	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
