@@ -15,9 +15,7 @@ func TestServices(t *testing.T) {
 			ServicePlan: cf.ServicePlan{
 				Name: "spark",
 				ServiceOffering: cf.ServiceOffering{
-					Label:    "cleardb",
-					Provider: "cleardb provider",
-					Version:  "1.0",
+					Label: "cleardb",
 				},
 			},
 			ApplicationNames: []string{"cli1", "cli2"},
@@ -27,9 +25,7 @@ func TestServices(t *testing.T) {
 			ServicePlan: cf.ServicePlan{
 				Name: "spark",
 				ServiceOffering: cf.ServiceOffering{
-					Label:    "cleardb",
-					Provider: "cleardb provider",
-					Version:  "1.1",
+					Label: "cleardb",
 				},
 			},
 			ApplicationNames: []string{"cli1"},
@@ -49,15 +45,11 @@ func TestServices(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[3], "my-service-1")
 	assert.Contains(t, ui.Outputs[3], "cleardb")
-	assert.Contains(t, ui.Outputs[3], "cleardb provider")
-	assert.Contains(t, ui.Outputs[3], "1.0")
 	assert.Contains(t, ui.Outputs[3], "spark")
 	assert.Contains(t, ui.Outputs[3], "cli1, cli2")
 
 	assert.Contains(t, ui.Outputs[4], "my-service-2")
 	assert.Contains(t, ui.Outputs[4], "cleardb")
-	assert.Contains(t, ui.Outputs[4], "cleardb provider")
-	assert.Contains(t, ui.Outputs[4], "1.1")
 	assert.Contains(t, ui.Outputs[4], "spark")
 	assert.Contains(t, ui.Outputs[4], "cli1")
 }

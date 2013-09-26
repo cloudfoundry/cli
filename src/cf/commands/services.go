@@ -36,15 +36,13 @@ func (cmd Services) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	table := [][]string{
-		[]string{"name", "service", "provider", "version", "plan", "bound apps"},
+		[]string{"name", "service", "plan", "bound apps"},
 	}
 
 	for _, instance := range space.ServiceInstances {
 		table = append(table, []string{
 			instance.Name,
 			instance.ServicePlan.ServiceOffering.Label,
-			instance.ServicePlan.ServiceOffering.Provider,
-			instance.ServicePlan.ServiceOffering.Version,
 			instance.ServicePlan.Name,
 			strings.Join(instance.ApplicationNames, ", "),
 		})

@@ -36,7 +36,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	table := [][]string{
-		[]string{"service", "version", "provider", "plans", "description"},
+		[]string{"service", "plans", "description"},
 	}
 
 	for _, offering := range serviceOfferings {
@@ -47,8 +47,6 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 
 		table = append(table, []string{
 			offering.Label,
-			offering.Version,
-			offering.Provider,
 			strings.Join(planNames, ", "),
 			offering.Description,
 		})
