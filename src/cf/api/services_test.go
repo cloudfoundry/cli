@@ -199,8 +199,9 @@ func TestFindInstanceByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	instance, err := repo.FindInstanceByName("my-service")
+	instance, found, err := repo.FindInstanceByName("my-service")
 	assert.NoError(t, err)
+	assert.Equal(t, found, true)
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
 	assert.Equal(t, len(instance.ServiceBindings), 2)
@@ -209,6 +210,34 @@ func TestFindInstanceByName(t *testing.T) {
 	assert.Equal(t, binding.Url, "/v2/service_bindings/service-binding-1-guid")
 	assert.Equal(t, binding.Guid, "service-binding-1-guid")
 	assert.Equal(t, binding.AppGuid, "app-1-guid")
+}
+
+var serviceNotFoundResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
+  "resources": []
+}`}
+
+var serviceNotFoundEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+	nil,
+	serviceNotFoundResponse,
+)
+
+func TestFindInstanceByNameForNonExistentService(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(serviceNotFoundEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, gateway)
+
+	_, found, err := repo.FindInstanceByName("my-service")
+	assert.NoError(t, err)
+	assert.Equal(t, found, false)
 }
 
 var bindServiceEndpoint = testhelpers.CreateEndpoint(

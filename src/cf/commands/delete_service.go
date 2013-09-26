@@ -34,15 +34,24 @@ func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cl
 		return
 	}
 
-	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
-
-	reqs = []requirements.Requirement{cmd.serviceInstanceReq}
 	return
 }
 
 func (cmd *DeleteService) Run(c *cli.Context) {
-	instance := cmd.serviceInstanceReq.GetServiceInstance()
-	cmd.ui.Say("Deleting service %s...", terminal.EntityNameColor(instance.Name))
+	serviceName := c.Args()[0]
+
+	cmd.ui.Say("Deleting service %s...", terminal.EntityNameColor(serviceName))
+
+	instance, found, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+	}
+
+	if !found {
+		cmd.ui.Ok()
+		cmd.ui.Warn("Service %s does not exist.", serviceName)
+		return
+	}
 
 	err := cmd.serviceRepo.DeleteService(instance)
 	if err != nil {

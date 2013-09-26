@@ -31,8 +31,16 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, config *configur
 }
 
 func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
-	var apiErr *net.ApiError
-	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
+	var (
+		apiErr *net.ApiError
+		found  bool
+	)
+	req.serviceInstance, found, apiErr = req.serviceRepo.FindInstanceByName(req.name)
+	if !found {
+		req.ui.Failed("Service %s does not exist.", req.name)
+		return false
+	}
+
 	if apiErr != nil {
 		req.ui.Failed(apiErr.Error())
 		return false

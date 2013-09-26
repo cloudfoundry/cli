@@ -11,17 +11,28 @@ import (
 
 func TestDeleteServiceCommand(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{ServiceInstance: serviceInstance}
+	reqFactory := &testhelpers.FakeReqFactory{}
 	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
 	fakeUI := callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
-
-	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
 
 	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
 	assert.Contains(t, fakeUI.Outputs[0], "my-service")
 
 	assert.Equal(t, serviceRepo.DeleteServiceServiceInstance, serviceInstance)
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
+}
+
+func TestDeleteServiceCommandOnNonExistentService(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{}
+	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameNotFound: true}
+	fakeUI := callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
+
+	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
+	assert.Contains(t, fakeUI.Outputs[0], "my-service")
+
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[2], "my-service")
+	assert.Contains(t, fakeUI.Outputs[2], "not exist")
 }
 
 func TestDeleteServiceCommandFailsWithUsage(t *testing.T) {

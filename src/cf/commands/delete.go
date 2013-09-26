@@ -28,20 +28,18 @@ func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 		cmd.ui.FailWithUsage(c, "delete")
 		return
 	}
-	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{cmd.appReq}
 	return
 }
 
 func (d *Delete) Run(c *cli.Context) {
-	app := d.appReq.GetApplication()
+	appName := c.Args()[0]
 	force := c.Bool("f")
 
 	if !force {
 		response := strings.ToLower(d.ui.Ask(
 			"Really delete %s?%s",
-			terminal.EntityNameColor(app.Name),
+			terminal.EntityNameColor(appName),
 			terminal.PromptColor(">"),
 		))
 		if response != "y" && response != "yes" {
@@ -49,10 +47,23 @@ func (d *Delete) Run(c *cli.Context) {
 		}
 	}
 
-	d.ui.Say("Deleting app %s...", terminal.EntityNameColor(app.Name))
-	err := d.appRepo.Delete(app)
-	if err != nil {
-		d.ui.Failed(err.Error())
+	d.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
+
+	app, found, apiErr := d.appRepo.FindByName(appName)
+	if apiErr != nil {
+		d.ui.Failed(apiErr.Message)
+		return
+	}
+
+	if !found {
+		d.ui.Ok()
+		d.ui.Warn("App %s does not exist.", appName)
+		return
+	}
+
+	apiErr = d.appRepo.Delete(app)
+	if apiErr != nil {
+		d.ui.Failed(apiErr.Error())
 		return
 	}
 

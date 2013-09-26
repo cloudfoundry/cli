@@ -14,7 +14,7 @@ type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError)
 	CreateServiceInstance(name string, plan cf.ServicePlan) (apiErr *net.ApiError)
 	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError)
-	FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError)
+	FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
 	UnbindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
 	DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError)
@@ -105,7 +105,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
@@ -119,7 +119,6 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	if len(response.Resources) == 0 {
-		apiErr = net.NewApiErrorWithMessage("Service %s not found", name)
 		return
 	}
 
@@ -137,6 +136,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 		instance.ServiceBindings = append(instance.ServiceBindings, newBinding)
 	}
 
+	found = true
 	return
 }
 
