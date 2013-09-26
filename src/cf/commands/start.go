@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,7 +12,6 @@ import (
 	"github.com/codegangsta/cli"
 	"strings"
 	"time"
-	"cf/net"
 )
 
 type Start struct {

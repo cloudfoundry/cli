@@ -114,7 +114,6 @@ func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
 
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	println(ui.DumpOutputs())
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "my-organization")
 	assert.Contains(t, ui.Outputs[1], "not found")

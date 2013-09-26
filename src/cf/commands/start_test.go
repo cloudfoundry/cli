@@ -5,10 +5,10 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
-	"cf/net"
 )
 
 var defaultAppForStart = cf.Application{

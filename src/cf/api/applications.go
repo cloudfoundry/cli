@@ -14,7 +14,7 @@ import (
 )
 
 type ApplicationRepository interface {
-	FindByName(name string) (app cf.Application, apiErr *net.ApiError)
+	FindByName(name string) (app cf.Application, found bool, apiErr *net.ApiError)
 	SetEnv(app cf.Application, envVars map[string]string) (apiErr *net.ApiError)
 	Create(newApp cf.Application) (createdApp cf.Application, apiErr *net.ApiError)
 	Delete(app cf.Application) (apiErr *net.ApiError)
@@ -36,7 +36,7 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, apiErr *net.ApiError) {
+func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, found bool, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
@@ -50,7 +50,6 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiErr = net.NewApiErrorWithMessage(fmt.Sprintf("Application %s not found", name))
 		return
 	}
 
@@ -88,6 +87,8 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 		Urls:             urls,
 		State:            strings.ToLower(summaryResponse.State),
 	}
+
+	found = true
 
 	return
 }

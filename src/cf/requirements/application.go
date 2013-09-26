@@ -29,7 +29,7 @@ func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRe
 
 func (req *ApplicationApiRequirement) Execute() (success bool) {
 	var apiErr *net.ApiError
-	req.application, apiErr = req.appRepo.FindByName(req.name)
+	req.application, _, apiErr = req.appRepo.FindByName(req.name)
 
 	if apiErr != nil {
 		req.ui.Failed(apiErr.Error())

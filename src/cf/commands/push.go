@@ -49,14 +49,19 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 
 func (p Push) Run(c *cli.Context) {
 	var err error
-
 	appName := c.String("name")
-	app, apiErr := p.appRepo.FindByName(appName)
 
+	app, found, apiErr := p.appRepo.FindByName(appName)
 	if apiErr != nil {
+		p.ui.Failed(apiErr.Error())
+		return
+	}
+
+	if !found {
 		app, apiErr = p.createApp(appName, c)
 
 		if apiErr != nil {
+			p.ui.Failed(apiErr.Error())
 			return
 		}
 	}
