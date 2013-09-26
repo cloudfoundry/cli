@@ -69,7 +69,8 @@ func (ui *FakeUI) Ok() {
 	ui.Say("OK")
 }
 
-func (ui *FakeUI) Failed(message string) {
+func (ui *FakeUI) Failed(message string, args ...interface{}) {
+	message = fmt.Sprintf(message, args...)
 	ui.Say("FAILED")
 	ui.Say(message)
 	return

@@ -21,7 +21,7 @@ type UI interface {
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Ok()
-	Failed(message string)
+	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
 	ShowConfiguration(*configuration.Configuration)
 	LoadingIndication()
@@ -54,7 +54,8 @@ func (c TerminalUI) Ok() {
 	c.Say(SuccessColor("OK"))
 }
 
-func (c TerminalUI) Failed(message string) {
+func (c TerminalUI) Failed(message string, args ...interface{}) {
+	message = fmt.Sprintf(message, args...)
 	c.Say(FailureColor("FAILED"))
 	c.Say(message)
 	os.Exit(1)
