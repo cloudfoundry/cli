@@ -11,6 +11,7 @@ type FakeServiceRepo struct {
 
 	CreateServiceInstanceName string
 	CreateServiceInstancePlan cf.ServicePlan
+	CreateServiceAlreadyExists bool
 
 	CreateUserProvidedServiceInstanceName string
 	CreateUserProvidedServiceInstanceParameters map[string]string
@@ -38,9 +39,11 @@ func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOfferi
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError) {
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlan = plan
+	alreadyExists = repo.CreateServiceAlreadyExists
+
 	return
 }
 

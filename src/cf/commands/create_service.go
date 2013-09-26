@@ -88,13 +88,19 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 	}
 
 	cmd.ui.Say("Creating service %s", terminal.EntityNameColor(name))
-	apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan)
+
+	var alreadyExists bool
+	alreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	cmd.ui.Ok()
+
+	if alreadyExists {
+		cmd.ui.Warn("Service %s already exists", name)
+	}
 	return
 }
 

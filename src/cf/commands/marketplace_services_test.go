@@ -30,7 +30,7 @@ func TestMarketplaceServices(t *testing.T) {
 	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 	ui := &testhelpers.FakeUI{}
 
-	ctxt := testhelpers.NewContext("services", []string{"--marketplace"})
+	ctxt := testhelpers.NewContext("marketplace", []string{})
 	reqFactory := &testhelpers.FakeReqFactory{}
 
 	cmd := NewMarketplaceServices(ui, serviceRepo)

@@ -12,7 +12,7 @@ import (
 
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError)
-	CreateServiceInstance(name string, plan cf.ServicePlan) (apiErr *net.ApiError)
+	CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError)
 	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
@@ -64,7 +64,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
 
 	data := fmt.Sprintf(
@@ -77,6 +77,20 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 	}
 
 	apiErr = repo.gateway.PerformRequest(request)
+
+	if apiErr != nil && apiErr.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
+
+		instance, found, findInstanceErr := repo.FindInstanceByName(name)
+
+		if found && findInstanceErr == nil &&
+			instance.ServicePlan.Name == plan.Name &&
+			instance.ServicePlan.ServiceOffering.Label == plan.ServiceOffering.Label {
+			apiErr = nil
+			alreadyExists = true
+			return
+		}
+	}
+
 	return
 }
 
@@ -126,6 +140,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	instance.Guid = resource.Metadata.Guid
 	instance.Name = resource.Entity.Name
 	instance.ServiceBindings = []cf.ServiceBinding{}
+	instance.ServicePlan = cf.ServicePlan{Name: resource.Entity.ServicePlan.Entity.Name}
 
 	for _, bindingResource := range resource.Entity.ServiceBindings {
 		newBinding := cf.ServiceBinding{

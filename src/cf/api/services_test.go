@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testhelpers"
 	"testing"
 )
@@ -115,8 +116,44 @@ func TestCreateServiceInstance(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	err := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
+	alreadyExists, err := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
 	assert.NoError(t, err)
+	assert.Equal(t, alreadyExists, false)
+}
+
+var serviceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/service_instances",
+	testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+	testhelpers.TestResponse{
+		Status: http.StatusBadRequest,
+		Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+	},
+)
+
+var instanceAlreadyExistsEndpoints = func(res http.ResponseWriter, req *http.Request) {
+	if strings.Contains(req.RequestURI, "/v2/service_instances") {
+		serviceInstanceAlreadyExistsEndpoint(res, req)
+	} else {
+		findServiceInstanceEndpoint(res, req)
+	}
+}
+
+func TestCreateServiceInstanceWhenServiceAlreadyExists(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(instanceAlreadyExistsEndpoints))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, gateway)
+
+	alreadyExists, err := repo.CreateServiceInstance("my-service", cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"})
+	assert.NoError(t, err)
+	assert.Equal(t, alreadyExists, true)
 }
 
 var createUserProvidedServiceInstanceEndpoint = testhelpers.CreateEndpoint(
@@ -174,7 +211,12 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
               "app_guid": "app-2-guid"
             }
           }
-        ]
+        ],
+        "service_plan": {
+   		  "entity": {
+            "name": "plan-name"
+          }
+   		}
       }
     }
   ]
