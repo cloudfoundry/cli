@@ -48,7 +48,7 @@ func (ue *UnsetEnv) Run(c *cli.Context) {
 
 	if !envVarFound(varName, envVars) {
 		ue.ui.Ok()
-		ue.ui.Say("Env variable %s was not set.", varName)
+		ue.ui.Warn("Env variable %s was not set.", varName)
 		return
 	}
 

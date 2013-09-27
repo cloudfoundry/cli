@@ -42,7 +42,7 @@ func (cmd CreateOrganization) Run(c *cli.Context) {
 	if apiErr != nil {
 		if apiErr.ErrorCode == net.ORG_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Say("Org %s already exists.", name)
+			cmd.ui.Warn("Org %s already exists.", name)
 			return
 		}
 

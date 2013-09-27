@@ -261,7 +261,7 @@ func (repo CloudControllerApplicationRepository) updateApplication(app cf.Applic
 
 	body, err := json.Marshal(updates)
 	if err != nil {
-		apiErr = net.NewApiErrorWithError("Could not serialize app updates.",err)
+		apiErr = net.NewApiErrorWithError("Could not serialize app updates.", err)
 		return
 	}
 

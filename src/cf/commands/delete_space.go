@@ -47,7 +47,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting space %s...", terminal.EntityNameColor(spaceName))
+	cmd.ui.Warn("Deleting space %s...", terminal.EntityNameColor(spaceName))
 
 	space, found, apiErr := cmd.spaceRepo.FindByName(spaceName)
 
