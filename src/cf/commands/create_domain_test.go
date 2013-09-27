@@ -14,7 +14,6 @@ func TestCreateDomain(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: cf.Organization{Name: "myOrg"}}
 	fakeUI := callCreateDomain([]string{"example.com", "myOrg"}, reqFactory, domainRepo, orgRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 2)
 	assert.Equal(t, domainRepo.CreateDomainDomainToCreate.Name, "example.com")
 	assert.Equal(t, domainRepo.CreateDomainOwningOrg.Name, "myOrg")
 	assert.Contains(t, fakeUI.Outputs[0], "example.com")

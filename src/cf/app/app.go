@@ -111,8 +111,8 @@ OPTIONS:
 		},
 		{
 			Name:        "create-domain",
-			Description: "Associate a domain name with an organization",
-			Usage:       fmt.Sprintf("%s create-domain DOMAIN_NAME ORG", cf.Name),
+			Description: "Add a domain to an org",
+			Usage:       fmt.Sprintf("%s create-domain DOMAIN ORG", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewCreateDomain()
 				cmdRunner.Run(cmd, c)

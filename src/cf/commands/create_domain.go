@@ -57,4 +57,5 @@ func (cmd CreateDomain) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("TIP: Use '%s map-domain' to assign it to a space.", cf.Name)
 }
