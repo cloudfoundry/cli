@@ -77,13 +77,13 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 
 	offering, err := findOffering(offerings, offeringName)
 	if err != nil {
-		cmd.ui.Failed("Offering not found")
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	plan, err := findPlan(offering.Plans, planName)
 	if err != nil {
-		cmd.ui.Failed("Plan not found")
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
