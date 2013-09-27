@@ -298,20 +298,19 @@ OPTIONS:
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push an app",
-			Usage: fmt.Sprintf("%s push --name APP [--domain DOMAIN] [--host HOST] [--instances NUM]\n", cf.Name) +
-				"                      [--memory MEMORY] [--buildpack URL] [--no-[re]start] [--path PATH]\n" +
-				"                      [--stack STACK]",
+			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name) +
+				"               [-m MEMORY] [-b URL] [--no-[re]start] [-p PATH]\n" +
+				"               [-s STACK]",
 			Flags: []cli.Flag{
-				cli.StringFlag{"name", "", "name of the application"},
-				cli.StringFlag{"domain", "", "domain (for example: example.com)"},
-				cli.StringFlag{"host", "", "hostname (for example: my-subdomain)"},
-				cli.IntFlag{"instances", 1, "number of instances"},
-				cli.StringFlag{"memory", "128", "memory limit (for example: 256, 1G, 1024M)"},
-				cli.StringFlag{"buildpack", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.StringFlag{"d", "", "domain (for example: example.com)"},
+				cli.StringFlag{"n", "", "hostname (for example: my-subdomain)"},
+				cli.IntFlag{"i", 1, "number of instances"},
+				cli.StringFlag{"m", "128", "memory limit (for example: 256, 1G, 1024M)"},
+				cli.StringFlag{"b", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
 				cli.BoolFlag{"no-start", "do not start an application after pushing"},
 				cli.BoolFlag{"no-restart", "do not restart an application after pushing"},
-				cli.StringFlag{"path", "", "path of application directory or zip file"},
-				cli.StringFlag{"stack", "", "stack to use"},
+				cli.StringFlag{"p", "", "path of application directory or zip file"},
+				cli.StringFlag{"s", "", "stack to use"},
 			},
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewPush()

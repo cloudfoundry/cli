@@ -49,7 +49,13 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 
 func (p Push) Run(c *cli.Context) {
 	var err error
-	appName := c.String("name")
+
+	if len(c.Args()) != 1 {
+		p.ui.FailWithUsage(c, "push")
+		return
+	}
+
+	appName := c.Args()[0]
 
 	app, found, apiErr := p.appRepo.FindByName(appName)
 	if apiErr != nil {
@@ -68,7 +74,7 @@ func (p Push) Run(c *cli.Context) {
 
 	p.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
-	dir := c.String("path")
+	dir := c.String("p")
 	if dir == "" {
 		dir, err = os.Getwd()
 		if err != nil {
@@ -89,12 +95,12 @@ func (p Push) Run(c *cli.Context) {
 func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, apiErr *net.ApiError) {
 	newApp := cf.Application{
 		Name:         appName,
-		Instances:    c.Int("instances"),
-		Memory:       getMemoryLimit(c.String("memory")),
-		BuildpackUrl: c.String("buildpack"),
+		Instances:    c.Int("i"),
+		Memory:       getMemoryLimit(c.String("m")),
+		BuildpackUrl: c.String("b"),
 	}
 
-	stackName := c.String("stack")
+	stackName := c.String("s")
 	if stackName != "" {
 		var stack cf.Stack
 		stack, apiErr = p.stackRepo.FindByName(stackName)
@@ -115,14 +121,14 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	}
 	p.ui.Ok()
 
-	domain, apiErr := p.domainRepo.FindByName(c.String("domain"))
+	domain, apiErr := p.domainRepo.FindByName(c.String("d"))
 
 	if apiErr != nil {
 		p.ui.Failed(apiErr.Error())
 		return
 	}
 
-	hostName := c.String("host")
+	hostName := c.String("n")
 	if hostName == "" {
 		hostName = app.Name
 	}

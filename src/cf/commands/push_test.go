@@ -43,7 +43,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	appRepo.DidNotFindByName = true
 	stopper.StoppedApp = cf.Application{Name: "my-stopped-app"}
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush([]string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
@@ -87,7 +87,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	routeRepo.FindByHostRoute = route
 	appRepo.DidNotFindByName = true
 
-	fakeUI := callPush([]string{"--name", "my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush([]string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Empty(t, routeRepo.CreatedRoute.Host)
 	assert.Empty(t, routeRepo.CreatedRouteDomain.Guid)
@@ -112,15 +112,15 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	stackRepo.FindByNameStack = stack
 
 	fakeUI := callPush([]string{
-		"--name", "my-new-app",
-		"--domain", "bar.cf-app.com",
-		"--host", "my-hostname",
-		"--instances", "3",
-		"--memory", "2G",
-		"--buildpack", "https://github.com/heroku/heroku-buildpack-play.git",
-		"--path", "/Users/pivotal/workspace/my-new-app",
-		"--stack", "customLinux",
-		"--no-start", "",
+		"-d", "bar.cf-app.com",
+		"-n", "my-hostname",
+		"-i", "3",
+		"-m", "2G",
+		"-b", "https://github.com/heroku/heroku-buildpack-play.git",
+		"-p", "/Users/pivotal/workspace/my-new-app",
+		"-s", "customLinux",
+		"--no-start",
+		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "customLinux")
@@ -162,8 +162,8 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	appRepo.DidNotFindByName = true
 
 	callPush([]string{
-		"--name", "my-new-app",
-		"--memory", "256M",
+		"-m", "256M",
+		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(256))
@@ -177,8 +177,8 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 	appRepo.DidNotFindByName = true
 
 	callPush([]string{
-		"--name", "my-new-app",
-		"--memory", "512",
+		"-m", "512",
+		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(512))
@@ -192,8 +192,8 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 	appRepo.DidNotFindByName = true
 
 	callPush([]string{
-		"--name", "my-new-app",
-		"--memory", "abcM",
+		"-m", "abcM",
+		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(128))
@@ -205,7 +205,7 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	existingApp := cf.Application{Name: "existing-app", Guid: "existing-app-guid"}
 	appRepo.AppByName = existingApp
 
-	fakeUI := callPush([]string{"--name", "existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush([]string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, stopper.AppToStop.Name, "existing-app")
 	assert.Contains(t, fakeUI.Outputs[0], "existing-app")
