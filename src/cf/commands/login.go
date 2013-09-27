@@ -21,13 +21,13 @@ type Login struct {
 	authenticator api.Authenticator
 }
 
-func NewLogin(ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (l Login) {
-	l.ui = ui
-	l.configRepo = configRepo
-	l.config, _ = configRepo.Get()
-	l.orgRepo = orgRepo
-	l.spaceRepo = spaceRepo
-	l.authenticator = authenticator
+func NewLogin(ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, authenticator api.Authenticator) (cmd Login) {
+	cmd.ui = ui
+	cmd.configRepo = configRepo
+	cmd.config, _ = configRepo.Get()
+	cmd.orgRepo = orgRepo
+	cmd.spaceRepo = spaceRepo
+	cmd.authenticator = authenticator
 	return
 }
 
@@ -35,8 +35,8 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	return
 }
 
-func (l Login) Run(c *cli.Context) {
-	l.ui.Say("API endpoint: %s", terminal.EntityNameColor(l.config.Target))
+func (cmd Login) Run(c *cli.Context) {
+	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.Target))
 
 	var (
 		username string
@@ -46,27 +46,27 @@ func (l Login) Run(c *cli.Context) {
 	if len(c.Args()) > 0 {
 		username = c.Args()[0]
 	} else {
-		username = l.ui.Ask("Username%s", terminal.PromptColor(">"))
+		username = cmd.ui.Ask("Username%s", terminal.PromptColor(">"))
 	}
 
 	if len(c.Args()) > 1 {
 		password = c.Args()[1]
-		l.ui.Say("Authenticating...")
+		cmd.ui.Say("Authenticating...")
 
-		apiErr := l.doLogin(username, password)
+		apiErr := cmd.doLogin(username, password)
 		if apiErr != nil {
-			l.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(apiErr.Error())
 			return
 		}
 
 	} else {
 		for i := 0; i < maxLoginTries; i++ {
-			password = l.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
-			l.ui.Say("Authenticating...")
+			password = cmd.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
+			cmd.ui.Say("Authenticating...")
 
-			apiErr := l.doLogin(username, password)
+			apiErr := cmd.doLogin(username, password)
 			if apiErr != nil {
-				l.ui.Failed(apiErr.Error())
+				cmd.ui.Failed(apiErr.Error())
 				continue
 			}
 
@@ -76,11 +76,11 @@ func (l Login) Run(c *cli.Context) {
 	return
 }
 
-func (l Login) doLogin(username, password string) (apiErr *net.ApiError) {
-	apiErr = l.authenticator.Authenticate(username, password)
+func (cmd Login) doLogin(username, password string) (apiErr *net.ApiError) {
+	apiErr = cmd.authenticator.Authenticate(username, password)
 	if apiErr == nil {
-		l.ui.Ok()
-		l.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor(cf.Name+" target"))
+		cmd.ui.Ok()
+		cmd.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor(cf.Name+" target"))
 	}
 	return
 }

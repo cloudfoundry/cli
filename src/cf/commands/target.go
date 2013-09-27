@@ -23,12 +23,12 @@ type Target struct {
 	spaceRepo  api.SpaceRepository
 }
 
-func NewTarget(ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (t Target) {
-	t.ui = ui
-	t.configRepo = configRepo
-	t.config, _ = configRepo.Get()
-	t.orgRepo = orgRepo
-	t.spaceRepo = spaceRepo
+func NewTarget(ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository) (cmd Target) {
+	cmd.ui = ui
+	cmd.configRepo = configRepo
+	cmd.config, _ = configRepo.Get()
+	cmd.orgRepo = orgRepo
+	cmd.spaceRepo = spaceRepo
 
 	return
 }
@@ -40,92 +40,92 @@ func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 	return
 }
 
-func (t Target) Run(c *cli.Context) {
+func (cmd Target) Run(c *cli.Context) {
 	argsCount := len(c.Args())
 	orgName := c.String("o")
 	spaceName := c.String("s")
 
 	if argsCount == 0 && orgName == "" && spaceName == "" {
-		t.ui.ShowConfiguration(t.config)
+		cmd.ui.ShowConfiguration(cmd.config)
 
-		if !t.config.HasOrganization() {
-			t.ui.Say("No org targeted. Use '%s target -o' to target an org.", cf.Name)
+		if !cmd.config.HasOrganization() {
+			cmd.ui.Say("No org targeted. Use '%s target -o' to target an org.", cf.Name)
 		}
-		if !t.config.HasSpace() {
-			t.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
+		if !cmd.config.HasSpace() {
+			cmd.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
 		}
 		return
 	}
 
 	if orgName != "" {
-		t.setOrganization(orgName)
-		if t.config.IsLoggedIn() {
-			t.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
+		cmd.setOrganization(orgName)
+		if cmd.config.IsLoggedIn() {
+			cmd.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
 		}
 		return
 	}
 
 	if spaceName != "" {
-		t.setSpace(spaceName)
+		cmd.setSpace(spaceName)
 		return
 	}
 
 	return
 }
 
-func (t Target) setOrganization(orgName string) {
-	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set an organization. Use '%s login'.", cf.Name)
+func (cmd Target) setOrganization(orgName string) {
+	if !cmd.config.IsLoggedIn() {
+		cmd.ui.Failed("You must be logged in to set an organization. Use '%s login'.", cf.Name)
 		return
 	}
 
-	org, found, err := t.orgRepo.FindByName(orgName)
+	org, found, err := cmd.orgRepo.FindByName(orgName)
 	if err != nil {
-		t.ui.Failed("Could not set organization.")
+		cmd.ui.Failed("Could not set organization.")
 		return
 	}
 
 	if !found {
-		t.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
+		cmd.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
 		return
 	}
 
-	t.config.Organization = org
-	t.config.Space = cf.Space{}
-	t.saveAndShowConfig()
+	cmd.config.Organization = org
+	cmd.config.Space = cf.Space{}
+	cmd.saveAndShowConfig()
 }
 
-func (t Target) setSpace(spaceName string) {
-	if !t.config.IsLoggedIn() {
-		t.ui.Failed("You must be logged in to set a space. Use '%s login'.", cf.Name)
+func (cmd Target) setSpace(spaceName string) {
+	if !cmd.config.IsLoggedIn() {
+		cmd.ui.Failed("You must be logged in to set a space. Use '%s login'.", cf.Name)
 		return
 	}
 
-	if !t.config.HasOrganization() {
-		t.ui.Failed("Organization must be set before targeting space.")
+	if !cmd.config.HasOrganization() {
+		cmd.ui.Failed("Organization must be set before targeting space.")
 		return
 	}
 
-	space, found, err := t.spaceRepo.FindByName(spaceName)
+	space, found, err := cmd.spaceRepo.FindByName(spaceName)
 	if err != nil {
-		t.ui.Failed("You do not have access to that space.")
+		cmd.ui.Failed("You do not have access to that space.")
 		return
 	}
 
 	if !found {
-		t.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
+		cmd.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
 		return
 	}
 
-	t.config.Space = space
-	t.saveAndShowConfig()
+	cmd.config.Space = space
+	cmd.saveAndShowConfig()
 }
 
-func (t Target) saveAndShowConfig() {
-	err := t.configRepo.Save()
+func (cmd Target) saveAndShowConfig() {
+	err := cmd.configRepo.Save()
 	if err != nil {
-		t.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
-	t.ui.ShowConfiguration(t.config)
+	cmd.ui.ShowConfiguration(cmd.config)
 }

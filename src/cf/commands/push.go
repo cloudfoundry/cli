@@ -26,16 +26,16 @@ type Push struct {
 
 func NewPush(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper,
 	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository,
-	appBitsRepo api.ApplicationBitsRepository) (p Push) {
+	appBitsRepo api.ApplicationBitsRepository) (cmd Push) {
 
-	p.ui = ui
-	p.starter = starter
-	p.stopper = stopper
-	p.appRepo = aR
-	p.domainRepo = dR
-	p.routeRepo = rR
-	p.stackRepo = sR
-	p.appBitsRepo = appBitsRepo
+	cmd.ui = ui
+	cmd.starter = starter
+	cmd.stopper = stopper
+	cmd.appRepo = aR
+	cmd.domainRepo = dR
+	cmd.routeRepo = rR
+	cmd.stackRepo = sR
+	cmd.appBitsRepo = appBitsRepo
 	return
 }
 
@@ -47,55 +47,55 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 	return
 }
 
-func (p Push) Run(c *cli.Context) {
+func (cmd Push) Run(c *cli.Context) {
 	var err error
 
 	if len(c.Args()) != 1 {
-		p.ui.FailWithUsage(c, "push")
+		cmd.ui.FailWithUsage(c, "push")
 		return
 	}
 
 	appName := c.Args()[0]
 
-	app, found, apiErr := p.appRepo.FindByName(appName)
+	app, found, apiErr := cmd.appRepo.FindByName(appName)
 	if apiErr != nil {
-		p.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	if !found {
-		app, apiErr = p.createApp(appName, c)
+		app, apiErr = cmd.createApp(appName, c)
 
 		if apiErr != nil {
-			p.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(apiErr.Error())
 			return
 		}
 	}
 
-	p.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
 	dir := c.String("p")
 	if dir == "" {
 		dir, err = os.Getwd()
 		if err != nil {
-			p.ui.Failed(err.Error())
+			cmd.ui.Failed(err.Error())
 			return
 		}
 	}
 
-	apiErr = p.appBitsRepo.UploadApp(app, dir)
+	apiErr = cmd.appBitsRepo.UploadApp(app, dir)
 
-	p.ui.Ok()
-	updatedApp, _ := p.stopper.ApplicationStop(app)
+	cmd.ui.Ok()
+	updatedApp, _ := cmd.stopper.ApplicationStop(app)
 	if !c.Bool("no-start") {
 		if c.String("b") != "" {
 			updatedApp.BuildpackUrl = c.String("b")
 		}
-		p.starter.ApplicationStart(updatedApp)
+		cmd.starter.ApplicationStart(updatedApp)
 	}
 }
 
-func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, apiErr *net.ApiError) {
+func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiErr *net.ApiError) {
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("i"),
@@ -106,28 +106,28 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 	stackName := c.String("s")
 	if stackName != "" {
 		var stack cf.Stack
-		stack, apiErr = p.stackRepo.FindByName(stackName)
+		stack, apiErr = cmd.stackRepo.FindByName(stackName)
 
 		if apiErr != nil {
-			p.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(apiErr.Error())
 			return
 		}
 		newApp.Stack = stack
-		p.ui.Say("Using stack %s.", terminal.EntityNameColor(stack.Name))
+		cmd.ui.Say("Using stack %s.", terminal.EntityNameColor(stack.Name))
 	}
 
-	p.ui.Say("Creating %s...", terminal.EntityNameColor(appName))
-	app, apiErr = p.appRepo.Create(newApp)
+	cmd.ui.Say("Creating %s...", terminal.EntityNameColor(appName))
+	app, apiErr = cmd.appRepo.Create(newApp)
 	if apiErr != nil {
-		p.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
-	p.ui.Ok()
+	cmd.ui.Ok()
 
-	domain, apiErr := p.domainRepo.FindByName(c.String("d"))
+	domain, apiErr := cmd.domainRepo.FindByName(c.String("d"))
 
 	if apiErr != nil {
-		p.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -136,32 +136,32 @@ func (p Push) createApp(appName string, c *cli.Context) (app cf.Application, api
 		hostName = app.Name
 	}
 
-	route, apiErr := p.routeRepo.FindByHost(hostName)
+	route, apiErr := cmd.routeRepo.FindByHost(hostName)
 
 	if apiErr != nil {
 		newRoute := cf.Route{Host: hostName}
 
 		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
-		p.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
-		route, apiErr = p.routeRepo.Create(newRoute, domain)
+		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
+		route, apiErr = cmd.routeRepo.Create(newRoute, domain)
 		if apiErr != nil {
-			p.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(apiErr.Error())
 			return
 		}
-		p.ui.Ok()
+		cmd.ui.Ok()
 	} else {
 		existingUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
-		p.ui.Say("Using route %s", terminal.EntityNameColor(existingUrl))
+		cmd.ui.Say("Using route %s", terminal.EntityNameColor(existingUrl))
 	}
 
 	finalUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
-	p.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
-	apiErr = p.routeRepo.Bind(route, app)
+	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
+	apiErr = cmd.routeRepo.Bind(route, app)
 	if apiErr != nil {
-		p.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
-	p.ui.Ok()
+	cmd.ui.Ok()
 
 	return
 }

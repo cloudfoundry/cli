@@ -19,28 +19,28 @@ func NewRoutes(ui terminal.UI, routeRepo api.RouteRepository) (cmd *Routes) {
 	return
 }
 
-func (r Routes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Routes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (r Routes) Run(c *cli.Context) {
-	r.ui.Say("Getting routes")
+func (cmd Routes) Run(c *cli.Context) {
+	cmd.ui.Say("Getting routes")
 
-	routes, err := r.routeRepo.FindAll()
+	routes, err := cmd.routeRepo.FindAll()
 
 	if err != nil {
-		r.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	r.ui.Ok()
+	cmd.ui.Ok()
 
 	if len(routes) == 0 {
-		r.ui.Say("No routes found")
+		cmd.ui.Say("No routes found")
 		return
 	}
 
 	for _, route := range routes {
-		r.ui.Say(route.URL())
+		cmd.ui.Say(route.URL())
 	}
 }

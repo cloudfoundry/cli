@@ -38,29 +38,29 @@ func (cmd *UnsetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 	return
 }
 
-func (ue *UnsetEnv) Run(c *cli.Context) {
+func (cmd *UnsetEnv) Run(c *cli.Context) {
 	varName := c.Args()[1]
-	app := ue.appReq.GetApplication()
+	app := cmd.appReq.GetApplication()
 
-	ue.ui.Say("Removing env variable %s for app %s...", terminal.EntityNameColor(varName), terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Removing env variable %s for app %s...", terminal.EntityNameColor(varName), terminal.EntityNameColor(app.Name))
 
 	envVars := app.EnvironmentVars
 
 	if !envVarFound(varName, envVars) {
-		ue.ui.Ok()
-		ue.ui.Warn("Env variable %s was not set.", varName)
+		cmd.ui.Ok()
+		cmd.ui.Warn("Env variable %s was not set.", varName)
 		return
 	}
 
 	delete(envVars, varName)
 
-	err := ue.appRepo.SetEnv(app, envVars)
+	err := cmd.appRepo.SetEnv(app, envVars)
 
 	if err != nil {
-		ue.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	ue.ui.Ok()
-	ue.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect.", cf.Name)
+	cmd.ui.Ok()
+	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect.", cf.Name)
 }

@@ -26,75 +26,75 @@ type ApplicationStarter interface {
 	ApplicationStart(cf.Application) (startedApp cf.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (s *Start) {
-	s = new(Start)
-	s.ui = ui
-	s.config = config
-	s.appRepo = appRepo
+func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Start) {
+	cmd = new(Start)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.appRepo = appRepo
 
 	return
 }
 
-func (s *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
-		s.ui.FailWithUsage(c, "start")
+		cmd.ui.FailWithUsage(c, "start")
 		return
 	}
 
-	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{s.appReq}
+	reqs = []requirements.Requirement{cmd.appReq}
 	return
 }
 
-func (s *Start) Run(c *cli.Context) {
-	s.ApplicationStart(s.appReq.GetApplication())
+func (cmd *Start) Run(c *cli.Context) {
+	cmd.ApplicationStart(cmd.appReq.GetApplication())
 }
 
-func (s *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
+func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
 	if app.State == "started" {
-		s.ui.Say(terminal.WarningColor("Application " + app.Name + " is already started."))
+		cmd.ui.Say(terminal.WarningColor("Application " + app.Name + " is already started."))
 		return
 	}
 
-	s.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
 
-	updatedApp, apiErr := s.appRepo.Start(app)
+	updatedApp, apiErr := cmd.appRepo.Start(app)
 	if apiErr != nil {
-		s.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	s.ui.Ok()
+	cmd.ui.Ok()
 
-	instances, apiErr := s.appRepo.GetInstances(app)
+	instances, apiErr := cmd.appRepo.GetInstances(app)
 
 	for apiErr != nil {
 		if apiErr.ErrorCode != net.APP_NOT_STAGED {
-			s.ui.Say("")
-			s.ui.Failed(apiErr.Error())
+			cmd.ui.Say("")
+			cmd.ui.Failed(apiErr.Error())
 			return
 		}
 
-		s.ui.Wait(1 * time.Second)
-		instances, apiErr = s.appRepo.GetInstances(app)
-		s.ui.LoadingIndication()
+		cmd.ui.Wait(1 * time.Second)
+		instances, apiErr = cmd.appRepo.GetInstances(app)
+		cmd.ui.LoadingIndication()
 	}
 
-	s.ui.Say("")
+	cmd.ui.Say("")
 
-	s.startTime = time.Now()
+	cmd.startTime = time.Now()
 
-	for s.displayInstancesStatus(app, instances) {
-		s.ui.Wait(1 * time.Second)
-		instances, _ = s.appRepo.GetInstances(app)
+	for cmd.displayInstancesStatus(app, instances) {
+		cmd.ui.Wait(1 * time.Second)
+		instances, _ = cmd.appRepo.GetInstances(app)
 	}
 
 	return
 }
 
-func (s Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {
+func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {
 	totalCount := len(instances)
 	runningCount, startingCount, flappingCount, downCount := 0, 0, 0, 0
 
@@ -112,7 +112,7 @@ func (s Start) displayInstancesStatus(app cf.Application, instances []cf.Applica
 	}
 
 	if flappingCount > 0 {
-		s.ui.Failed("Start unsuccessful")
+		cmd.ui.Failed("Start unsuccessful")
 		return false
 	}
 
@@ -120,18 +120,18 @@ func (s Start) displayInstancesStatus(app cf.Application, instances []cf.Applica
 
 	if anyInstanceRunning {
 		if len(app.Urls) == 0 {
-			s.ui.Say("Start successful!")
+			cmd.ui.Say("Start successful!")
 		} else {
-			s.ui.Say("Start successful! App %s available at %s", app.Name, app.Urls[0])
+			cmd.ui.Say("Start successful! App %s available at %s", app.Name, app.Urls[0])
 		}
 		return false
 	} else {
 		details := instancesDetails(runningCount, startingCount, downCount)
-		s.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
+		cmd.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
 	}
 
-	if time.Since(s.startTime) > s.config.ApplicationStartTimeout*time.Second {
-		s.ui.Failed("Start app timeout")
+	if time.Since(cmd.startTime) > cmd.config.ApplicationStartTimeout*time.Second {
+		cmd.ui.Failed("Start app timeout")
 		return false
 	}
 

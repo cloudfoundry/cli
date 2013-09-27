@@ -12,9 +12,9 @@ type Logout struct {
 	configRepo configuration.ConfigurationRepository
 }
 
-func NewLogout(ui terminal.UI, configRepo configuration.ConfigurationRepository) (l Logout) {
-	l.ui = ui
-	l.configRepo = configRepo
+func NewLogout(ui terminal.UI, configRepo configuration.ConfigurationRepository) (cmd Logout) {
+	cmd.ui = ui
+	cmd.configRepo = configRepo
 	return
 }
 
@@ -22,14 +22,14 @@ func (cmd Logout) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 	return
 }
 
-func (l Logout) Run(c *cli.Context) {
-	l.ui.Say("Logging out...")
-	err := l.configRepo.ClearSession()
+func (cmd Logout) Run(c *cli.Context) {
+	cmd.ui.Say("Logging out...")
+	err := cmd.configRepo.ClearSession()
 
 	if err != nil {
-		l.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	l.ui.Ok()
+	cmd.ui.Ok()
 }

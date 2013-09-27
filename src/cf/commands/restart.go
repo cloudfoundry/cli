@@ -27,38 +27,38 @@ func NewRestart(ui terminal.UI, starter ApplicationStarter, stopper ApplicationS
 	return
 }
 
-func (r *Restart) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Restart) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
-		r.ui.FailWithUsage(c, "restart")
+		cmd.ui.FailWithUsage(c, "restart")
 		return
 	}
 
-	r.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedSpaceRequirement(),
-		r.appReq,
+		cmd.appReq,
 	}
 	return
 }
 
-func (r *Restart) Run(c *cli.Context) {
-	app := r.appReq.GetApplication()
-	r.ApplicationRestart(app)
+func (cmd *Restart) Run(c *cli.Context) {
+	app := cmd.appReq.GetApplication()
+	cmd.ApplicationRestart(app)
 }
 
-func (r *Restart) ApplicationRestart(app cf.Application) {
-	stoppedApp, err := r.stopper.ApplicationStop(app)
+func (cmd *Restart) ApplicationRestart(app cf.Application) {
+	stoppedApp, err := cmd.stopper.ApplicationStop(app)
 	if err != nil {
-		r.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	_, err = r.starter.ApplicationStart(stoppedApp)
+	_, err = cmd.starter.ApplicationStart(stoppedApp)
 	if err != nil {
-		r.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 }

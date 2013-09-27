@@ -14,13 +14,13 @@ type Apps struct {
 	spaceRepo api.SpaceRepository
 }
 
-func NewApps(ui terminal.UI, spaceRepo api.SpaceRepository) (a Apps) {
-	a.ui = ui
-	a.spaceRepo = spaceRepo
+func NewApps(ui terminal.UI, spaceRepo api.SpaceRepository) (cmd Apps) {
+	cmd.ui = ui
+	cmd.spaceRepo = spaceRepo
 	return
 }
 
-func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedSpaceRequirement(),
@@ -28,19 +28,19 @@ func (a Apps) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (
 	return
 }
 
-func (a Apps) Run(c *cli.Context) {
-	a.ui.Say("Getting applications in %s...", a.spaceRepo.GetCurrentSpace().Name)
+func (cmd Apps) Run(c *cli.Context) {
+	cmd.ui.Say("Getting applications in %s...", cmd.spaceRepo.GetCurrentSpace().Name)
 
-	space, err := a.spaceRepo.GetSummary()
+	space, err := cmd.spaceRepo.GetSummary()
 
 	if err != nil {
-		a.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	apps := space.Applications
 
-	a.ui.Ok()
+	cmd.ui.Ok()
 
 	table := [][]string{
 		[]string{"name", "status", "usage", "urls"},
@@ -55,10 +55,10 @@ func (a Apps) Run(c *cli.Context) {
 		})
 	}
 
-	a.ui.DisplayTable(table, a.coloringFunc)
+	cmd.ui.DisplayTable(table, cmd.coloringFunc)
 }
 
-func (a Apps) coloringFunc(value string, row int, col int) string {
+func (cmd Apps) coloringFunc(value string, row int, col int) string {
 	if row > 0 && col == 1 {
 		return coloredState(value)
 	}

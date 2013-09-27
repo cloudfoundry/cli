@@ -19,48 +19,48 @@ type Stop struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui terminal.UI, appRepo api.ApplicationRepository) (s *Stop) {
-	s = new(Stop)
-	s.ui = ui
-	s.appRepo = appRepo
+func NewStop(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *Stop) {
+	cmd = new(Stop)
+	cmd.ui = ui
+	cmd.appRepo = appRepo
 
 	return
 }
 
-func (s *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
-		s.ui.FailWithUsage(c, "stop")
+		cmd.ui.FailWithUsage(c, "stop")
 		return
 	}
 
-	s.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{s.appReq}
+	reqs = []requirements.Requirement{cmd.appReq}
 	return
 }
 
-func (s *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application, err error) {
+func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application, err error) {
 	if app.State == "stopped" {
 		updatedApp = app
-		s.ui.Say(terminal.WarningColor("Application " + app.Name + " is already stopped."))
+		cmd.ui.Say(terminal.WarningColor("Application " + app.Name + " is already stopped."))
 		return
 	}
 
-	s.ui.Say("Stopping %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Stopping %s...", terminal.EntityNameColor(app.Name))
 
-	updatedApp, apiErr := s.appRepo.Stop(app)
+	updatedApp, apiErr := cmd.appRepo.Stop(app)
 	if apiErr != nil {
 		err = errors.New(apiErr.Error())
-		s.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	s.ui.Ok()
+	cmd.ui.Ok()
 	return
 }
 
-func (s *Stop) Run(c *cli.Context) {
-	app := s.appReq.GetApplication()
-	s.ApplicationStop(app)
+func (cmd *Stop) Run(c *cli.Context) {
+	app := cmd.appReq.GetApplication()
+	cmd.ApplicationStop(app)
 }

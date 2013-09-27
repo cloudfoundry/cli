@@ -16,39 +16,39 @@ type RecentLogs struct {
 	logsRepo api.LogsRepository
 }
 
-func NewRecentLogs(ui terminal.UI, aR api.ApplicationRepository, lR api.LogsRepository) (l *RecentLogs) {
-	l = new(RecentLogs)
-	l.ui = ui
-	l.appRepo = aR
-	l.logsRepo = lR
+func NewRecentLogs(ui terminal.UI, aR api.ApplicationRepository, lR api.LogsRepository) (cmd *RecentLogs) {
+	cmd = new(RecentLogs)
+	cmd.ui = ui
+	cmd.appRepo = aR
+	cmd.logsRepo = lR
 	return
 }
 
-func (l *RecentLogs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *RecentLogs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) == 0 {
 		err = errors.New("Incorrect Usage")
-		l.ui.FailWithUsage(c, "logs")
+		cmd.ui.FailWithUsage(c, "logs")
 		return
 	}
 
-	l.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
-	reqs = []requirements.Requirement{l.appReq}
+	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
+	reqs = []requirements.Requirement{cmd.appReq}
 	return
 }
 
-func (l *RecentLogs) Run(c *cli.Context) {
-	app := l.appReq.GetApplication()
+func (cmd *RecentLogs) Run(c *cli.Context) {
+	app := cmd.appReq.GetApplication()
 
 	onConnect := func() {
-		l.ui.Say("Connected, dumping recent logs...")
+		cmd.ui.Say("Connected, dumping recent logs...")
 	}
 
 	onMessage := func(msg logmessage.LogMessage) {
-		l.ui.Say(logMessageOutput(app.Name, msg))
+		cmd.ui.Say(logMessageOutput(app.Name, msg))
 	}
 
-	err := l.logsRepo.RecentLogsFor(app, onConnect, onMessage)
+	err := cmd.logsRepo.RecentLogsFor(app, onConnect, onMessage)
 	if err != nil {
-		l.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 	}
 }

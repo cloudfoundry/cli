@@ -15,10 +15,10 @@ type Delete struct {
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewDelete(ui terminal.UI, appRepo api.ApplicationRepository) (d *Delete) {
-	d = new(Delete)
-	d.ui = ui
-	d.appRepo = appRepo
+func NewDelete(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *Delete) {
+	cmd = new(Delete)
+	cmd.ui = ui
+	cmd.appRepo = appRepo
 	return
 }
 
@@ -32,12 +32,12 @@ func (cmd *Delete) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 	return
 }
 
-func (d *Delete) Run(c *cli.Context) {
+func (cmd *Delete) Run(c *cli.Context) {
 	appName := c.Args()[0]
 	force := c.Bool("f")
 
 	if !force {
-		response := strings.ToLower(d.ui.Ask(
+		response := strings.ToLower(cmd.ui.Ask(
 			"Really delete %s?%s",
 			terminal.EntityNameColor(appName),
 			terminal.PromptColor(">"),
@@ -47,26 +47,26 @@ func (d *Delete) Run(c *cli.Context) {
 		}
 	}
 
-	d.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
+	cmd.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
 
-	app, found, apiErr := d.appRepo.FindByName(appName)
+	app, found, apiErr := cmd.appRepo.FindByName(appName)
 	if apiErr != nil {
-		d.ui.Failed(apiErr.Message)
+		cmd.ui.Failed(apiErr.Message)
 		return
 	}
 
 	if !found {
-		d.ui.Ok()
-		d.ui.Warn("App %s does not exist.", appName)
+		cmd.ui.Ok()
+		cmd.ui.Warn("App %s does not exist.", appName)
 		return
 	}
 
-	apiErr = d.appRepo.Delete(app)
+	apiErr = cmd.appRepo.Delete(app)
 	if apiErr != nil {
-		d.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	d.ui.Ok()
+	cmd.ui.Ok()
 	return
 }

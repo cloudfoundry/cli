@@ -12,27 +12,27 @@ type Stacks struct {
 	stacksRepo api.StackRepository
 }
 
-func NewStacks(ui terminal.UI, stacksRepo api.StackRepository) (s *Stacks) {
-	s = new(Stacks)
-	s.ui = ui
-	s.stacksRepo = stacksRepo
+func NewStacks(ui terminal.UI, stacksRepo api.StackRepository) (cmd *Stacks) {
+	cmd = new(Stacks)
+	cmd.ui = ui
+	cmd.stacksRepo = stacksRepo
 	return
 }
 
-func (s *Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (s *Stacks) Run(c *cli.Context) {
-	s.ui.Say("Getting stacks")
+func (cmd *Stacks) Run(c *cli.Context) {
+	cmd.ui.Say("Getting stacks")
 
-	stacks, err := s.stacksRepo.FindAll()
+	stacks, err := cmd.stacksRepo.FindAll()
 	if err != nil {
-		s.ui.Failed(err.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	s.ui.Ok()
+	cmd.ui.Ok()
 
 	table := [][]string{
 		[]string{"name", "description"},
@@ -45,5 +45,5 @@ func (s *Stacks) Run(c *cli.Context) {
 		})
 	}
 
-	s.ui.DisplayTable(table, nil)
+	cmd.ui.DisplayTable(table, nil)
 }
