@@ -45,10 +45,11 @@ func (f Factory) NewBindService() *BindService {
 	)
 }
 
-func (f Factory) NewCreateSharedDomain() CreateSharedDomain {
-	return NewCreateSharedDomain(
+func (f Factory) NewCreateDomain() CreateDomain {
+	return NewCreateDomain(
 		f.ui,
 		f.repoLocator.GetDomainRepository(),
+		f.repoLocator.GetOrganizationRepository(),
 	)
 }
 

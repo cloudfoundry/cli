@@ -120,7 +120,7 @@ var createDomainResponse = `
 var createDomainEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/domains",
-	testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true}`),
+	testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"owning_organization_guid":"domain1-guid"}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
 )
 
@@ -138,7 +138,8 @@ func TestCreateDomain(t *testing.T) {
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domainToCreate := cf.Domain{Name: "example.com"}
-	createdDomain, err := repo.Create(domainToCreate)
+	owningOrg := cf.Organization{Guid: "domain1-guid"}
+	createdDomain, err := repo.Create(domainToCreate, owningOrg)
 	assert.NoError(t, err)
 	assert.Equal(t, createdDomain.Guid, "abc-123")
 }
