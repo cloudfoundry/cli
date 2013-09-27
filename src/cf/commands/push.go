@@ -88,6 +88,9 @@ func (p Push) Run(c *cli.Context) {
 	p.ui.Ok()
 	updatedApp, _ := p.stopper.ApplicationStop(app)
 	if !c.Bool("no-start") {
+		if c.String("b") != "" {
+			updatedApp.BuildpackUrl = c.String("b")
+		}
 		p.starter.ApplicationStart(updatedApp)
 	}
 }

@@ -207,11 +207,15 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiE
 }
 
 func (repo CloudControllerApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError) {
-	return repo.changeApplicationState(app, "STARTED")
+	updates := map[string]interface{}{"state": "STARTED"}
+	if app.BuildpackUrl != "" {
+		updates["buildpack"] = app.BuildpackUrl
+	}
+	return repo.updateApplication(app, updates)
 }
 
 func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (updatedApp cf.Application, apiErr *net.ApiError) {
-	return repo.changeApplicationState(app, "STOPPED")
+	return repo.updateApplication(app, map[string]interface{}{"state": "STOPPED"})
 }
 
 type InstancesApiResponse map[string]InstanceApiResponse
@@ -250,10 +254,18 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 	return
 }
 
-func (repo CloudControllerApplicationRepository) changeApplicationState(app cf.Application, state string) (updatedApp cf.Application, apiErr *net.ApiError) {
+func (repo CloudControllerApplicationRepository) updateApplication(app cf.Application, updates map[string]interface{}) (updatedApp cf.Application, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
-	body := fmt.Sprintf(`{"console":true,"state":"%s"}`, state)
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+
+	updates["console"] = true
+
+	body, err := json.Marshal(updates)
+	if err != nil {
+		apiErr = net.NewApiErrorWithError("Could not serialize app updates.",err)
+		return
+	}
+
+	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(body))
 
 	if apiErr != nil {
 		return
