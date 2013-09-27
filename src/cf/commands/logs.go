@@ -53,5 +53,6 @@ func (cmd *Logs) Run(c *cli.Context) {
 	err := cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
+		return
 	}
 }

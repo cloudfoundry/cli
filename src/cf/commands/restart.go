@@ -59,5 +59,6 @@ func (r *Restart) ApplicationRestart(app cf.Application) {
 	_, err = r.starter.ApplicationStart(stoppedApp)
 	if err != nil {
 		r.ui.Failed(err.Error())
+		return
 	}
 }

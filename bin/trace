@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+CF_TRACE=true $(dirname $0)/go run src/main/cf.go $*

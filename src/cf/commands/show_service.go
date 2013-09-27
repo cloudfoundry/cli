@@ -4,6 +4,7 @@ import (
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -19,6 +20,12 @@ func NewShowService(ui terminal.UI, sR api.ServiceRepository) (cmd ShowService) 
 }
 
 func (cmd ShowService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) < 1 {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "service")
+		return
+	}
+
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedSpaceRequirement(),
@@ -27,21 +34,22 @@ func (cmd ShowService) GetRequirements(reqFactory requirements.Factory, c *cli.C
 }
 
 func (cmd ShowService) Run(c *cli.Context) {
-	if len(c.Args()) < 1 {
-		cmd.ui.FailWithUsage(c, "service")
+	serviceName := c.Args()[0]
+
+	cmd.ui.Say("Getting service instance %s...", terminal.EntityNameColor(serviceName))
+
+	serviceInstance, found, err := cmd.serviceRepo.FindInstanceByName(serviceName)
+
+	if !found {
+		cmd.ui.Failed("Service instance %s does not exist.", serviceName)
 		return
 	}
-	//call the CC API and get service info
-	serviceInstance, _, err := cmd.serviceRepo.FindInstanceByName(c.Args()[0])
 
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	//TODO: check found
-
-	cmd.ui.Say("Getting service instance %s...", terminal.EntityNameColor(serviceInstance.Name))
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 	cmd.ui.Say("service instance: %s", terminal.EntityNameColor(serviceInstance.Name))

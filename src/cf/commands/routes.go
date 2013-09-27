@@ -30,6 +30,7 @@ func (r Routes) Run(c *cli.Context) {
 
 	if err != nil {
 		r.ui.Failed(err.Error())
+		return
 	}
 
 	r.ui.Ok()
