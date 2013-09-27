@@ -112,8 +112,8 @@ OPTIONS:
 		{
 			Name:        "create-domain",
 			Description: "Associate a domain name with an organization (or globally)",
-			Usage:       "cf create-domain DOMAIN_NAME --shared\n" +
-			             "cf create-domain DOMAIN_NAME --org ORG",
+			Usage: "cf create-domain DOMAIN_NAME --shared\n" +
+				"cf create-domain DOMAIN_NAME --org ORG",
 			Flags: []cli.Flag{
 				cli.BoolFlag{"shared", "create shared domain"},
 			},

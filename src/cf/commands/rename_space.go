@@ -2,22 +2,22 @@ package commands
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"cf/configuration"
 )
 
 type RenameSpace struct {
-	ui        terminal.UI
-	spaceRepo api.SpaceRepository
-	spaceReq  requirements.SpaceRequirement
+	ui         terminal.UI
+	spaceRepo  api.SpaceRepository
+	spaceReq   requirements.SpaceRequirement
 	configRepo configuration.ConfigurationRepository
 	config     *configuration.Configuration
 }
 
-func NewRenameSpace(ui terminal.UI, spaceRepo api.SpaceRepository,configRepo configuration.ConfigurationRepository) (cmd *RenameSpace) {
+func NewRenameSpace(ui terminal.UI, spaceRepo api.SpaceRepository, configRepo configuration.ConfigurationRepository) (cmd *RenameSpace) {
 	cmd = new(RenameSpace)
 	cmd.ui = ui
 	cmd.spaceRepo = spaceRepo

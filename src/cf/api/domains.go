@@ -11,7 +11,7 @@ import (
 type DomainRepository interface {
 	FindAll() (domains []cf.Domain, apiErr *net.ApiError)
 	FindByName(name string) (domain cf.Domain, apiErr *net.ApiError)
-	Create(domain cf.Domain) (apiErr *net.ApiError)
+	Create(domainToCreate cf.Domain) (createdDomain cf.Domain, apiErr *net.ApiError)
 }
 
 type CloudControllerDomainRepository struct {
@@ -68,6 +68,23 @@ func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.D
 	return
 }
 
-func (repo CloudControllerDomainRepository) Create(domain cf.Domain) (apiErr *net.ApiError) {
+func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain) (createdDomain cf.Domain, apiErr *net.ApiError) {
+	path := repo.config.Target + "/v2/domains"
+	data := fmt.Sprintf(
+		`{"name":"%s","wildcard":true}`, domainToCreate.Name,
+	)
+	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiErr != nil {
+		return
+	}
+
+	resource := new(Resource)
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	if apiErr != nil {
+		return
+	}
+
+	createdDomain.Guid = resource.Metadata.Guid
+	createdDomain.Name = resource.Entity.Name
 	return
 }

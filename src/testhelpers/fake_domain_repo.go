@@ -23,7 +23,7 @@ func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, api
 	return repo.FindByNameDomain, nil
 }
 
-func (repo *FakeDomainRepository) Create(domain cf.Domain) (apiErr *net.ApiError){
-	repo.CreateDomainName = domain.Name
-	return nil
+func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain) (createdDomain cf.Domain, apiErr *net.ApiError){
+	repo.CreateDomainName = domainToCreate.Name
+	return
 }

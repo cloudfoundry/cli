@@ -1,12 +1,12 @@
 package commands
 
 import (
+	"cf"
+	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"cf/api"
-	"cf"
 )
 
 type CreateSharedDomain struct {
@@ -36,7 +36,7 @@ func (csd CreateSharedDomain) Run(c *cli.Context) {
 
 	csd.ui.Say("Creating shared domain %s", domainName)
 
-	apiErr := csd.domainRepo.Create(domain)
+	_, apiErr := csd.domainRepo.Create(domain)
 
 	if apiErr != nil {
 		csd.ui.Failed(apiErr.Error())

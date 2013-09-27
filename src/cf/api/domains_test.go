@@ -106,3 +106,39 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	assert.Equal(t, domain.Name, "domain1.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain1-guid")
 }
+
+var createDomainResponse = `
+{
+    "metadata": {
+        "guid": "abc-123"
+    },
+    "entity": {
+        "name": "example.com"
+    }
+}`
+
+var createDomainEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/domains",
+	testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true}`),
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
+)
+
+func TestCreateDomain(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(createDomainEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
+
+	domainToCreate := cf.Domain{Name: "example.com"}
+	createdDomain, err := repo.Create(domainToCreate)
+	assert.NoError(t, err)
+	assert.Equal(t, createdDomain.Guid, "abc-123")
+}

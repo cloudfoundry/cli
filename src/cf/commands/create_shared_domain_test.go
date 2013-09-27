@@ -29,7 +29,6 @@ func TestCreateSharedDomainFailsWithUsage(t *testing.T) {
 	assert.False(t, ui.FailedWithUsage)
 }
 
-
 func callCreateSharedDomain(args []string, reqFactory *testhelpers.FakeReqFactory, domainRepo *testhelpers.FakeDomainRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("create-domain", args)
