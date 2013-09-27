@@ -419,7 +419,7 @@ OPTIONS:
 			Name:        "set-env",
 			ShortName:   "se",
 			Description: "Set an env variable for an app",
-			Usage:       fmt.Sprintf("%s set-env cf.Name VALUE", cf.Name),
+			Usage:       fmt.Sprintf("%s set-env APP NAME VALUE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewSetEnv()
 				cmdRunner.Run(cmd, c)
