@@ -25,3 +25,5 @@ out/
 release/
 
 *.iml
+*.zpi
+*.zwi
