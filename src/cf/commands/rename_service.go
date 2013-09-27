@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -46,7 +48,11 @@ func (cmd *RenameService) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming service %s...", serviceInstance.Name)
 	err := cmd.serviceRepo.RenameService(serviceInstance, newName)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
+		if err.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
+			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", err.Error(), cf.Name)
+		} else {
+			cmd.ui.Failed(err.Error())
+		}
 		return
 	}
 	cmd.ui.Ok()

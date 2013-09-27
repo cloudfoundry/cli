@@ -350,7 +350,7 @@ OPTIONS:
 		},
 		{
 			Name:        "rename-service",
-			Description: "Rename a service",
+			Description: "Rename a service instance",
 			Usage:       fmt.Sprintf("%s rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd := cmdFactory.NewRenameService()
