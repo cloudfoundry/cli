@@ -200,6 +200,7 @@ func (f Factory) NewRenameSpace() *RenameSpace {
 	return NewRenameSpace(
 		f.ui,
 		f.repoLocator.GetSpaceRepository(),
+		f.repoLocator.GetConfigurationRepository(),
 	)
 }
 

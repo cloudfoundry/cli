@@ -44,7 +44,7 @@ func TestRenameSpaceRun(t *testing.T) {
 func callRenameSpace(args []string, reqFactory *testhelpers.FakeReqFactory, spaceRepo *testhelpers.FakeSpaceRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("create-space", args)
-	cmd := NewRenameSpace(ui, spaceRepo)
+	cmd := NewRenameSpace(ui, spaceRepo, testhelpers.FakeConfigRepository{})
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
