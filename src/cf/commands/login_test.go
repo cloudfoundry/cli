@@ -26,8 +26,6 @@ func testSuccessfulLogin(t *testing.T, args []string, inputs []string) (ui *test
 		args,
 		ui,
 		configRepo,
-		&testhelpers.FakeOrgRepository{},
-		&testhelpers.FakeSpaceRepository{},
 		auth,
 	)
 
@@ -78,8 +76,6 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		[]string{},
 		ui,
 		configRepo,
-		&testhelpers.FakeOrgRepository{},
-		&testhelpers.FakeSpaceRepository{},
 		&testhelpers.FakeAuthenticator{AuthError: true, ConfigRepo: configRepo},
 	)
 
@@ -106,8 +102,6 @@ func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
 		},
 		ui,
 		configRepo,
-		&testhelpers.FakeOrgRepository{},
-		&testhelpers.FakeSpaceRepository{},
 		&testhelpers.FakeAuthenticator{AuthError: true, ConfigRepo: configRepo},
 	)
 
@@ -118,7 +112,7 @@ func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
 	assert.Equal(t, len(ui.Outputs), 4)
 }
 
-func callLogin(args []string, ui terminal.UI, configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository, spaceRepo api.SpaceRepository, auth api.Authenticator) {
-	l := NewLogin(ui, configRepo, orgRepo, spaceRepo, auth)
+func callLogin(args []string, ui terminal.UI, configRepo configuration.ConfigurationRepository, auth api.Authenticator) {
+	l := NewLogin(ui, configRepo, auth)
 	l.Run(testhelpers.NewContext("login", args))
 }
