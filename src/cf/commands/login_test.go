@@ -29,7 +29,7 @@ func testSuccessfulLogin(t *testing.T, args []string, inputs []string) (ui *test
 		auth,
 	)
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig, _ := configRepo.Get()
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")

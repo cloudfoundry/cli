@@ -49,7 +49,7 @@ func TestOrganizationsFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
@@ -70,7 +70,7 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
@@ -138,7 +138,7 @@ func TestOrganizationsFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findOrgByNameEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
@@ -183,7 +183,7 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findOrgByNameDoesNotExistEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
@@ -203,7 +203,7 @@ func TestCreateOrganization(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createOrgEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
@@ -222,7 +222,7 @@ func TestRenameOrganization(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(renameOrgEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
@@ -242,7 +242,7 @@ func TestDeleteOrganization(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(deleteOrgEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 

@@ -12,7 +12,7 @@ import (
 
 func TestSpacesRequirements(t *testing.T) {
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	config := &configuration.Configuration{}
+	config := configuration.Configuration{}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	callSpaces([]string{}, reqFactory, config, spaceRepo)
@@ -33,7 +33,7 @@ func TestListingSpaces(t *testing.T) {
 			cf.Space{Name: "space1"}, cf.Space{Name: "space2"},
 		},
 	}
-	config := &configuration.Configuration{}
+	config := configuration.Configuration{}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
@@ -43,7 +43,7 @@ func TestListingSpaces(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "space2")
 }
 
-func callSpaces(args []string, reqFactory *testhelpers.FakeReqFactory, config *configuration.Configuration, spaceRepo api.SpaceRepository) (ui *testhelpers.FakeUI) {
+func callSpaces(args []string, reqFactory *testhelpers.FakeReqFactory, config configuration.Configuration, spaceRepo api.SpaceRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("spaces", args)
 

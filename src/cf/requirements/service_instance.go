@@ -16,12 +16,12 @@ type ServiceInstanceRequirement interface {
 type ServiceInstanceApiRequirement struct {
 	name            string
 	ui              terminal.UI
-	config          *configuration.Configuration
+	config          configuration.Configuration
 	serviceRepo     api.ServiceRepository
 	serviceInstance cf.ServiceInstance
 }
 
-func NewServiceInstanceRequirement(name string, ui terminal.UI, config *configuration.Configuration, sR api.ServiceRepository) (req *ServiceInstanceApiRequirement) {
+func NewServiceInstanceRequirement(name string, ui terminal.UI, config configuration.Configuration, sR api.ServiceRepository) (req *ServiceInstanceApiRequirement) {
 	req = new(ServiceInstanceApiRequirement)
 	req.name = name
 	req.ui = ui

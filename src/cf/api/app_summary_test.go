@@ -76,7 +76,7 @@ func TestAppSummaryGetSummary(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(appDetailsEndpoints))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}

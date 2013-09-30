@@ -36,6 +36,7 @@ func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
 
 	config := configRepo.Login()
 	config.Target = "https://api.run.pivotal.io"
+	configRepo.Save(config)
 
 	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
@@ -54,7 +55,9 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	configRepo.Login()
 	config, err := configRepo.Get()
 	assert.NoError(t, err)
+
 	config.Space = cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	configRepo.Save(config)
 
 	orgs := []cf.Organization{
 		cf.Organization{Name: "my-organization", Guid: "my-organization-guid"},
@@ -107,7 +110,7 @@ func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
 	assert.NoError(t, err)
 	org := cf.Organization{Guid: "previous-org-guid", Name: "previous-org"}
 	config.Organization = org
-	err = configRepo.Save()
+	err = configRepo.Save(config)
 	assert.NoError(t, err)
 
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
@@ -141,8 +144,10 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
+
 	config := configRepo.Login()
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	configRepo.Save(config)
 
 	spaces := []cf.Space{
 		cf.Space{Name: "my-space", Guid: "my-space-guid"},
@@ -165,8 +170,10 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
+
 	config := configRepo.Login()
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	configRepo.Save(config)
 
 	spaceRepo.SpaceByNameErr = true
 
@@ -186,6 +193,7 @@ func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
 	configRepo.Delete()
 	config := configRepo.Login()
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	configRepo.Save(config)
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 

@@ -8,7 +8,7 @@ import (
 type FakeAuthenticator struct {
 	ConfigRepo FakeConfigRepository
 
-	Config *configuration.Configuration
+	Config configuration.Configuration
 	Email string
 	Password string
 
@@ -28,7 +28,7 @@ func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiE
 
 	auth.Config.AccessToken = auth.AccessToken
 	auth.Config.RefreshToken = auth.RefreshToken
-	auth.ConfigRepo.Save()
+	auth.ConfigRepo.Save(auth.Config)
 
 	if auth.AuthError {
 		apiErr =  &net.ApiError{Message: "Error authenticating."}

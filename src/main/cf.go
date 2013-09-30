@@ -6,8 +6,6 @@ import (
 	"cf/requirements"
 	"cf/commands"
 	"cf/api"
-	"cf"
-	"fmt"
 	"cf/terminal"
 	"cf/configuration"
 	"github.com/codegangsta/cli"
@@ -65,17 +63,11 @@ OPTIONS:
 
 }
 
-func loadConfig(termUI terminal.UI) (config *configuration.Configuration) {
+func loadConfig(termUI terminal.UI) (config configuration.Configuration) {
 	configRepo := configuration.NewConfigurationDiskRepository()
 	config, err := configRepo.Get()
 	if err != nil {
-		termUI.Failed(fmt.Sprintf(
-			"Error loading config. Please reset target (%s) and log in (%s).",
-			terminal.CommandColor(fmt.Sprintf("%s target", cf.Name)),
-			terminal.CommandColor(fmt.Sprintf("%s login", cf.Name)),
-		))
-		configRepo.Delete()
-		os.Exit(1)
+		termUI.ConfigFailure(err)
 		return
 	}
 	return

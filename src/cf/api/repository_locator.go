@@ -7,7 +7,7 @@ import (
 )
 
 type RepositoryLocator struct {
-	config *configuration.Configuration
+	config configuration.Configuration
 
 	authenticator          Authenticator
 	cloudControllerGateway net.Gateway
@@ -28,7 +28,7 @@ type RepositoryLocator struct {
 	logsRepo          LoggregatorLogsRepository
 }
 
-func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLocator) {
+func NewRepositoryLocator(config configuration.Configuration) (loc RepositoryLocator) {
 	loc.config = config
 	loc.configurationRepo = configuration.NewConfigurationDiskRepository()
 
@@ -54,7 +54,7 @@ func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLo
 	return
 }
 
-func (locator RepositoryLocator) GetConfig() *configuration.Configuration {
+func (locator RepositoryLocator) GetConfig() configuration.Configuration {
 	return locator.config
 }
 

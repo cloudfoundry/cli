@@ -65,7 +65,7 @@ func TestRoutesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findAllEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -110,7 +110,7 @@ func TestFindByHost(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -137,7 +137,7 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostNotFoundEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -169,7 +169,7 @@ func TestCreateRoute(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createRouteEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -197,7 +197,7 @@ func TestBind(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(bindRouteEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}

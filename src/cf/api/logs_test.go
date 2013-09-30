@@ -84,7 +84,7 @@ func TestRecentLogsFor(t *testing.T) {
 
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
 	loggregatorHostResolver := func(hostname string) string { return hostname }
 
 	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
@@ -142,7 +142,7 @@ func TestTailsLogsFor(t *testing.T) {
 
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
+	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
 	loggregatorHostResolver := func(hostname string) string { return hostname }
 
 	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)

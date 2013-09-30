@@ -58,12 +58,17 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
-	gateway := net.NewUAAAuthGateway()
+	configRepo.Save(config)
+	newConfig, err := configRepo.Get()
+	assert.Equal(t, newConfig.AuthorizationEndpoint, ts.URL)
 
+	gateway := net.NewUAAAuthGateway()
 	auth := NewUAAAuthenticator(gateway, configRepo)
 	err = auth.Authenticate("foo@example.com", "bar")
-
-	savedConfig := testhelpers.SavedConfiguration
+	assert.NoError(t, err)
+	savedConfig, err := configRepo.Get()
+	assert.NoError(t, err)
+	assert.Equal(t, savedConfig.AuthorizationEndpoint, ts.URL)
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 }
@@ -88,7 +93,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	err = auth.Authenticate("foo@example.com", "oops wrong pass")
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "Password is incorrect, please try again.")
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig, _ := configRepo.Get()
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
@@ -106,12 +111,13 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
-	gateway := net.NewUAAAuthGateway()
+	configRepo.Save(config)
 
+	gateway := net.NewUAAAuthGateway()
 	auth := NewUAAAuthenticator(gateway, configRepo)
 	err = auth.Authenticate("foo@example.com", "bar")
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "Server error, status code: 500, error code: , message: ")
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig, _ := configRepo.Get()
 	assert.Empty(t, savedConfig.AccessToken)
 }

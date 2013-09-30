@@ -24,7 +24,8 @@ type UI interface {
 	Ok()
 	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
-	ShowConfiguration(*configuration.Configuration)
+	ConfigFailure(err error)
+	ShowConfiguration(configuration.Configuration)
 	LoadingIndication()
 	Wait(duration time.Duration)
 	DisplayTable(table [][]string, coloringFunc ColoringFunction)
@@ -70,7 +71,14 @@ func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 	os.Exit(1)
 }
 
-func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
+func (c TerminalUI) ConfigFailure(err error) {
+	c.Failed("Error loading config. Please reset the api '%s' and log in '%s'.\n%s",
+		CommandColor(fmt.Sprintf("%s api", cf.Name)),
+		CommandColor(fmt.Sprintf("%s login", cf.Name)),
+		err.Error())
+}
+
+func (ui TerminalUI) ShowConfiguration(config configuration.Configuration) {
 	ui.Say("API endpoint: %s (API version: %s)",
 		EntityNameColor(config.Target),
 		EntityNameColor(config.ApiVersion))

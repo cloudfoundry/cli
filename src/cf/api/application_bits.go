@@ -21,12 +21,12 @@ type ApplicationBitsRepository interface {
 }
 
 type CloudControllerApplicationBitsRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Configuration
 	gateway net.Gateway
 	zipper  cf.Zipper
 }
 
-func NewCloudControllerApplicationBitsRepository(config *configuration.Configuration, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerApplicationBitsRepository) {
+func NewCloudControllerApplicationBitsRepository(config configuration.Configuration, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerApplicationBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper

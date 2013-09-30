@@ -10,11 +10,11 @@ import (
 
 type Spaces struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Configuration
 	spaceRepo api.SpaceRepository
 }
 
-func NewSpaces(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd Spaces) {
+func NewSpaces(ui terminal.UI, config configuration.Configuration, spaceRepo api.SpaceRepository) (cmd Spaces) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo

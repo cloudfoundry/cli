@@ -11,7 +11,7 @@ import (
 
 func TestTargetedOrgRequirement(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		Organization: cf.Organization{
 			Name: "my-org",
 			Guid: "my-org-guid",

@@ -12,14 +12,12 @@ type Api struct {
 	ui         terminal.UI
 	gateway    net.Gateway
 	configRepo configuration.ConfigurationRepository
-	config     *configuration.Configuration
 }
 
 func NewApi(ui terminal.UI, gateway net.Gateway, configRepo configuration.ConfigurationRepository) (cmd Api) {
 	cmd.ui = ui
 	cmd.gateway = gateway
 	cmd.configRepo = configRepo
-	cmd.config, _ = cmd.configRepo.Get()
 	return
 }
 
@@ -37,10 +35,14 @@ func (cmd Api) Run(c *cli.Context) {
 }
 
 func (cmd Api) showApiEndpoint() {
+	config, err := cmd.configRepo.Get()
+	if err != nil {
+		cmd.ui.Failed("Error reading config.\n%s", err.Error())
+	}
 	cmd.ui.Say(
 		"API endpoint: %s (API version: %s)",
-		terminal.EntityNameColor(cmd.config.Target),
-		terminal.EntityNameColor(cmd.config.ApiVersion),
+		terminal.EntityNameColor(config.Target),
+		terminal.EntityNameColor(config.ApiVersion),
 	)
 }
 
@@ -88,8 +90,13 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 
 func (cmd Api) saveEndpoint(endpoint string, info *InfoResponse) (err error) {
 	cmd.configRepo.ClearSession()
-	cmd.config.Target = endpoint
-	cmd.config.ApiVersion = info.ApiVersion
-	cmd.config.AuthorizationEndpoint = info.AuthorizationEndpoint
-	return cmd.configRepo.Save()
+	config, err := cmd.configRepo.Get()
+	if err != nil {
+		return
+	}
+	config.Target = endpoint
+	config.ApiVersion = info.ApiVersion
+	config.AuthorizationEndpoint = info.AuthorizationEndpoint
+	err = cmd.configRepo.Save(config)
+	return
 }

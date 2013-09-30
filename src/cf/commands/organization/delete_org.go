@@ -81,7 +81,7 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	if org.Guid == config.Organization.Guid {
 		config.Organization = cf.Organization{}
 		config.Space = cf.Space{}
-		cmd.configRepo.Save()
+		cmd.configRepo.Save(config)
 	}
 
 	cmd.ui.Ok()

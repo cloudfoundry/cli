@@ -15,11 +15,11 @@ type DomainRepository interface {
 }
 
 type CloudControllerDomainRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Configuration
 	gateway net.Gateway
 }
 
-func NewCloudControllerDomainRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerDomainRepository) {
+func NewCloudControllerDomainRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerDomainRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

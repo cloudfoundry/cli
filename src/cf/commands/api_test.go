@@ -18,6 +18,7 @@ func TestApiWithoutArgument(t *testing.T) {
 	assert.NoError(t, err)
 	config.Target = "https://api.run.pivotal.io"
 	config.ApiVersion = "2.0"
+	configRepo.Save(config)
 
 	ui := callApi([]string{}, configRepo)
 
@@ -54,12 +55,13 @@ func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	configRepo := &testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
 	configRepo.Login()
+
 	ui := callApi([]string{ts.URL}, configRepo)
 
 	assert.Contains(t, ui.Outputs[2], ts.URL)
 	assert.Contains(t, ui.Outputs[2], "42.0.0")
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig, _ := configRepo.Get()
 
 	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
@@ -81,7 +83,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "42.0.0")
 	assert.Contains(t, ui.Outputs[4], "Not logged in.")
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig, _ := configRepo.Get()
 
 	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")

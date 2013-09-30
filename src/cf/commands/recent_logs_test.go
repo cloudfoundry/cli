@@ -14,7 +14,7 @@ import (
 )
 
 func TestRecentLogsWithAppName(t *testing.T) {
-	config := &configuration.Configuration{}
+	config := configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
 
@@ -58,7 +58,7 @@ func TestRecentLogsWithAppName(t *testing.T) {
 }
 
 func TestRecentLogsWithoutAppNameShowsUsage(t *testing.T) {
-	config := &configuration.Configuration{}
+	config := configuration.Configuration{}
 	appRepo := &testhelpers.FakeApplicationRepository{}
 	logsRepo := &testhelpers.FakeLogsRepository{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
@@ -71,7 +71,7 @@ func TestRecentLogsWithoutAppNameShowsUsage(t *testing.T) {
 	assert.False(t, ui.FailedWithUsage)
 }
 
-func callRecentLogs(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository, logsRepo api.LogsRepository) (ui *testhelpers.FakeUI) {
+func callRecentLogs(args []string, config configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository, logsRepo api.LogsRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("logs", args)
 

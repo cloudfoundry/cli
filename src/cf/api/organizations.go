@@ -17,11 +17,11 @@ type OrganizationRepository interface {
 }
 
 type CloudControllerOrganizationRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Configuration
 	gateway net.Gateway
 }
 
-func NewCloudControllerOrganizationRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerOrganizationRepository) {
+func NewCloudControllerOrganizationRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerOrganizationRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

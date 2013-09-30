@@ -11,10 +11,11 @@ func TestLoadingWithNoConfigFile(t *testing.T) {
 	config := repo.loadDefaultConfig(t)
 	defer repo.restoreConfig(t)
 
-	assert.Equal(t, config.Target, "https://api.run.pivotal.io")
-	assert.Equal(t, config.ApiVersion, "2")
-	assert.Equal(t, config.AuthorizationEndpoint, "https://login.run.pivotal.io")
+	assert.Equal(t, config.Target, "")
+	assert.Equal(t, config.ApiVersion, "")
+	assert.Equal(t, config.AuthorizationEndpoint, "")
 	assert.Equal(t, config.AccessToken, "")
+	assert.Equal(t, config.ApplicationStartTimeout, 30)
 }
 
 func TestSavingAndLoading(t *testing.T) {
@@ -27,15 +28,15 @@ func TestSavingAndLoading(t *testing.T) {
 	configToSave.AuthorizationEndpoint = "https://login.target.example.com"
 	configToSave.AccessToken = "bearer my_access_token"
 
-	repo.Save()
+	err := repo.Save(configToSave)
+	assert.NoError(t, err)
 
-	singleton = nil
 	savedConfig, err := repo.Get()
 	assert.NoError(t, err)
 	assert.Equal(t, savedConfig, configToSave)
 }
 
-func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config *Configuration) {
+func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config Configuration) {
 	file, err := ConfigFile()
 	assert.NoError(t, err)
 

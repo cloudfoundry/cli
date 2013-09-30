@@ -26,11 +26,11 @@ type ApplicationRepository interface {
 }
 
 type CloudControllerApplicationRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Configuration
 	gateway net.Gateway
 }
 
-func NewCloudControllerApplicationRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
+func NewCloudControllerApplicationRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

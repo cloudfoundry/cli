@@ -9,10 +9,10 @@ import (
 
 type TargetedSpaceRequirement struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Configuration
 }
 
-func NewTargetedSpaceRequirement(ui terminal.UI, config *configuration.Configuration) TargetedSpaceRequirement {
+func NewTargetedSpaceRequirement(ui terminal.UI, config configuration.Configuration) TargetedSpaceRequirement {
 	return TargetedSpaceRequirement{ui, config}
 }
 

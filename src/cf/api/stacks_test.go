@@ -36,7 +36,7 @@ func TestStacksFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(singleStackEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -97,7 +97,7 @@ func TestStacksFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(allStacksEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}

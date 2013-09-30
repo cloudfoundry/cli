@@ -16,11 +16,11 @@ type RouteRepository interface {
 }
 
 type CloudControllerRouteRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Configuration
 	gateway net.Gateway
 }
 
-func NewCloudControllerRouteRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerRouteRepository) {
+func NewCloudControllerRouteRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerRouteRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

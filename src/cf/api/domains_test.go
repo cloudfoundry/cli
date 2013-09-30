@@ -49,7 +49,7 @@ func TestFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -73,7 +73,7 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -92,7 +92,7 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -128,7 +128,7 @@ func TestCreateDomain(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createDomainEndpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
+	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
