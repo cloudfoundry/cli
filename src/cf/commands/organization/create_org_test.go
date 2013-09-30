@@ -1,9 +1,7 @@
-package commands_test
+package organization_test
 
 import (
-	/*	"cf"*/
-	/*	"cf/api"*/
-	. "cf/commands"
+	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -13,10 +11,10 @@ func TestCreateOrgFailsWithUsage(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 
-	fakeUI := callCreateOrganization([]string{}, reqFactory, orgRepo)
+	fakeUI := callCreateOrg([]string{}, reqFactory, orgRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)
+	fakeUI = callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
@@ -24,18 +22,18 @@ func TestCreateOrgRequirements(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)
+	callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
-	callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)
+	callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
-func TestCreateOrganization(t *testing.T) {
+func TestCreateOrg(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	fakeUI := callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)
+	fakeUI := callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating organization")
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
@@ -43,10 +41,10 @@ func TestCreateOrganization(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func TestCreateOrganizationWhenAlreadyExists(t *testing.T) {
+func TestCreateOrgWhenAlreadyExists(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{CreateOrgExists: true}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	fakeUI := callCreateOrganization([]string{"my-org"}, reqFactory, orgRepo)
+	fakeUI := callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating organization")
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
@@ -55,10 +53,10 @@ func TestCreateOrganizationWhenAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "already exists.")
 }
 
-func callCreateOrganization(args []string, reqFactory *testhelpers.FakeReqFactory, orgRepo *testhelpers.FakeOrgRepository) (fakeUI *testhelpers.FakeUI) {
+func callCreateOrg(args []string, reqFactory *testhelpers.FakeReqFactory, orgRepo *testhelpers.FakeOrgRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("create-org", args)
-	cmd := NewCreateOrganization(fakeUI, orgRepo)
+	cmd := NewCreateOrg(fakeUI, orgRepo)
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return

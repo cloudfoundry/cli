@@ -1,36 +1,35 @@
-package commands_test
+package organization_test
 
 import (
 	"cf"
-	//	"cf/api"
-	. "cf/commands"
+	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
 )
 
-func TestShowOrganizationRequirements(t *testing.T) {
+func TestShowOrgRequirements(t *testing.T) {
 	args := []string{"my-org"}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	callShowOrganization(args, reqFactory)
+	callShowOrg(args, reqFactory)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
-	callShowOrganization(args, reqFactory)
+	callShowOrg(args, reqFactory)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
-func TestShowOrganizationFailsWithUsage(t *testing.T) {
+func TestShowOrgFailsWithUsage(t *testing.T) {
 	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 	args := []string{"my-org"}
-	ui := callShowOrganization(args, reqFactory)
+	ui := callShowOrg(args, reqFactory)
 	assert.False(t, ui.FailedWithUsage)
 
 	args = []string{}
-	ui = callShowOrganization(args, reqFactory)
+	ui = callShowOrg(args, reqFactory)
 	assert.True(t, ui.FailedWithUsage)
 }
 
@@ -49,7 +48,7 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 	args := []string{"my-org"}
-	ui := callShowOrganization(args, reqFactory)
+	ui := callShowOrg(args, reqFactory)
 
 	assert.Equal(t, reqFactory.OrganizationName, "my-org")
 
@@ -64,11 +63,11 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "development, staging")
 }
 
-func callShowOrganization(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
+func callShowOrg(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("org", args)
 
-	cmd := NewShowOrganization(ui)
+	cmd := NewShowOrg(ui)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

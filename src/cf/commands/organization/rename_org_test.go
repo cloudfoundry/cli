@@ -1,8 +1,8 @@
-package commands_test
+package organization_test
 
 import (
 	"cf"
-	. "cf/commands"
+	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"

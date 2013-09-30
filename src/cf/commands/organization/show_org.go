@@ -1,4 +1,4 @@
-package commands
+package organization
 
 import (
 	"cf/requirements"
@@ -8,18 +8,18 @@ import (
 	"strings"
 )
 
-type ShowOrganization struct {
+type ShowOrg struct {
 	ui     terminal.UI
 	orgReq requirements.OrganizationRequirement
 }
 
-func NewShowOrganization(ui terminal.UI) (cmd *ShowOrganization) {
-	cmd = new(ShowOrganization)
+func NewShowOrg(ui terminal.UI) (cmd *ShowOrg) {
+	cmd = new(ShowOrg)
 	cmd.ui = ui
 	return
 }
 
-func (cmd *ShowOrganization) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ShowOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "org")
@@ -35,7 +35,7 @@ func (cmd *ShowOrganization) GetRequirements(reqFactory requirements.Factory, c 
 	return
 }
 
-func (cmd *ShowOrganization) Run(c *cli.Context) {
+func (cmd *ShowOrg) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	cmd.ui.Say("Getting info for org %s", org.Name)
 	cmd.ui.Ok()

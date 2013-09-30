@@ -1,26 +1,26 @@
-package commands_test
+package organization_test
 
 import (
 	"cf"
-	. "cf/commands"
+	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
 )
 
-func TestOrgsRequirements(t *testing.T) {
+func TestListOrgsRequirements(t *testing.T) {
 	orgRepo := &testhelpers.FakeOrgRepository{}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	callOrgs(reqFactory, orgRepo)
+	callListOrgs(reqFactory, orgRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
-	callOrgs(reqFactory, orgRepo)
+	callListOrgs(reqFactory, orgRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
-func TestOrgs(t *testing.T) {
+func TestListOrgs(t *testing.T) {
 	orgs := []cf.Organization{
 		cf.Organization{Name: "Organization-1"},
 		cf.Organization{Name: "Organization-2"},
@@ -31,7 +31,7 @@ func TestOrgs(t *testing.T) {
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 
-	ui := callOrgs(reqFactory, orgRepo)
+	ui := callListOrgs(reqFactory, orgRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting organizations")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -39,10 +39,10 @@ func TestOrgs(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "Organization-2")
 }
 
-func callOrgs(reqFactory *testhelpers.FakeReqFactory, orgRepo *testhelpers.FakeOrgRepository) (fakeUI *testhelpers.FakeUI) {
+func callListOrgs(reqFactory *testhelpers.FakeReqFactory, orgRepo *testhelpers.FakeOrgRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("orgs", []string{})
-	cmd := NewListOrganizations(fakeUI, orgRepo)
+	cmd := NewListOrgs(fakeUI, orgRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

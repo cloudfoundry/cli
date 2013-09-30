@@ -1,4 +1,4 @@
-package commands
+package organization
 
 import (
 	"cf/api"
@@ -7,25 +7,25 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type ListOrganizations struct {
+type ListOrgs struct {
 	ui      terminal.UI
 	orgRepo api.OrganizationRepository
 }
 
-func NewListOrganizations(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd ListOrganizations) {
+func NewListOrgs(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd ListOrgs) {
 	cmd.ui = ui
 	cmd.orgRepo = orgRepo
 	return
 }
 
-func (cmd ListOrganizations) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 	}
 	return
 }
 
-func (cmd ListOrganizations) Run(c *cli.Context) {
+func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("Getting organizations...")
 
 	orgs, err := cmd.orgRepo.FindAll()

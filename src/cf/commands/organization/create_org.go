@@ -1,4 +1,4 @@
-package commands
+package organization
 
 import (
 	"cf"
@@ -10,18 +10,18 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type CreateOrganization struct {
+type CreateOrg struct {
 	ui      terminal.UI
 	orgRepo api.OrganizationRepository
 }
 
-func NewCreateOrganization(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd CreateOrganization) {
+func NewCreateOrg(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd CreateOrg) {
 	cmd.ui = ui
 	cmd.orgRepo = orgRepo
 	return
 }
 
-func (cmd CreateOrganization) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-org")
@@ -34,7 +34,7 @@ func (cmd CreateOrganization) GetRequirements(reqFactory requirements.Factory, c
 	return
 }
 
-func (cmd CreateOrganization) Run(c *cli.Context) {
+func (cmd CreateOrg) Run(c *cli.Context) {
 	name := c.Args()[0]
 
 	cmd.ui.Say("Creating organization %s...", terminal.EntityNameColor(name))

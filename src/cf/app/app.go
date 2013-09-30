@@ -124,7 +124,7 @@ OPTIONS:
 			Description: "Create organization",
 			Usage:       fmt.Sprintf("%s create-org ORG", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateOrganization()
+				cmd := cmdFactory.NewCreateOrg()
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -279,7 +279,7 @@ OPTIONS:
 			Description: "Show org info",
 			Usage:       fmt.Sprintf("%s org ORG", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewShowOrganization()
+				cmd := cmdFactory.NewShowOrg()
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -289,7 +289,7 @@ OPTIONS:
 			Description: "List all organizations",
 			Usage:       fmt.Sprintf("%s orgs", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewListOrganizations()
+				cmd := cmdFactory.NewListOrgs()
 				cmdRunner.Run(cmd, c)
 			},
 		},

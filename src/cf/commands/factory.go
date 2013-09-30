@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/api"
+	"cf/commands/organization"
 	"cf/terminal"
 )
 
@@ -15,6 +16,45 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Fact
 	factory.repoLocator = repoLocator
 	return
 }
+
+// ORGANIZATION COMMANDS
+
+func (f Factory) NewCreateOrg() organization.CreateOrg {
+	return organization.NewCreateOrg(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
+func (f Factory) NewListOrgs() organization.ListOrgs {
+	return organization.NewListOrgs(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
+func (f Factory) NewShowOrg() *organization.ShowOrg {
+	return organization.NewShowOrg(
+		f.ui,
+	)
+}
+
+func (f Factory) NewRenameOrg() *organization.RenameOrg {
+	return organization.NewRenameOrg(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+	)
+}
+
+func (f Factory) NewDeleteOrg() *organization.DeleteOrg {
+	return organization.NewDeleteOrg(
+		f.ui,
+		f.repoLocator.GetOrganizationRepository(),
+		f.repoLocator.GetConfigurationRepository(),
+	)
+}
+
+// todo - reorder the below as necessary
 
 func (f Factory) NewApi() Api {
 	return NewApi(
@@ -53,13 +93,6 @@ func (f Factory) NewCreateDomain() CreateDomain {
 	)
 }
 
-func (f Factory) NewCreateOrganization() CreateOrganization {
-	return NewCreateOrganization(
-		f.ui,
-		f.repoLocator.GetOrganizationRepository(),
-	)
-}
-
 func (f Factory) NewCreateService() CreateService {
 	return NewCreateService(
 		f.ui,
@@ -78,14 +111,6 @@ func (f Factory) NewDelete() *Delete {
 	return NewDelete(
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
-	)
-}
-
-func (f Factory) NewDeleteOrg() *DeleteOrg {
-	return NewDeleteOrg(
-		f.ui,
-		f.repoLocator.GetOrganizationRepository(),
-		f.repoLocator.GetConfigurationRepository(),
 	)
 }
 
@@ -113,13 +138,6 @@ func (f Factory) NewFiles() *Files {
 	return NewFiles(
 		f.ui,
 		f.repoLocator.GetAppFilesRepository(),
-	)
-}
-
-func (f Factory) NewListOrganizations() ListOrganizations {
-	return NewListOrganizations(
-		f.ui,
-		f.repoLocator.GetOrganizationRepository(),
 	)
 }
 
@@ -188,13 +206,6 @@ func (f Factory) NewRename() *Rename {
 	)
 }
 
-func (f Factory) NewRenameOrg() *RenameOrg {
-	return NewRenameOrg(
-		f.ui,
-		f.repoLocator.GetOrganizationRepository(),
-	)
-}
-
 func (f Factory) NewRenameService() *RenameService {
 	return NewRenameService(
 		f.ui,
@@ -244,12 +255,6 @@ func (f Factory) NewSetEnv() *SetEnv {
 	return NewSetEnv(
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
-	)
-}
-
-func (f Factory) NewShowOrganization() *ShowOrganization {
-	return NewShowOrganization(
-		f.ui,
 	)
 }
 
