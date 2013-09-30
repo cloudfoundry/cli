@@ -54,6 +54,6 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if apiErr != nil && apiErr.ErrorCode == "90003" {
-		cmd.ui.Warn("App %s is already bound to %s.", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(instance.Name))
+		cmd.ui.Warn("App %s is already bound to %s.", app.Name, instance.Name)
 	}
 }

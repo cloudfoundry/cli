@@ -55,7 +55,7 @@ func (se *SetEnv) Run(c *cli.Context) {
 
 	if envVarFound(varName, envVars) {
 		se.ui.Ok()
-		se.ui.Say("Env var %s was already set.", varName)
+		se.ui.Warn("Env var %s was already set.", varName)
 		return
 	}
 

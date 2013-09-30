@@ -63,7 +63,7 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 
 	if !found {
 		cmd.ui.Ok()
-		cmd.ui.Warn("Orgaization %s was already deleted.", terminal.EntityNameColor(orgName))
+		cmd.ui.Warn("Organization %s was already deleted.", orgName)
 		return
 	}
 
