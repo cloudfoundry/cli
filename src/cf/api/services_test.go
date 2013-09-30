@@ -248,9 +248,9 @@ func TestFindInstanceByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	instance, found, err := repo.FindInstanceByName("my-service")
+	instance, err := repo.FindInstanceByName("my-service")
 	assert.NoError(t, err)
-	assert.Equal(t, found, true)
+	assert.True(t, instance.IsFound())
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
 	assert.Equal(t, instance.ServiceOffering.Label, "mysql")
@@ -288,9 +288,9 @@ func TestFindInstanceByNameForNonExistentService(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	_, found, err := repo.FindInstanceByName("my-service")
+	instance, err := repo.FindInstanceByName("my-service")
 	assert.NoError(t, err)
-	assert.Equal(t, found, false)
+	assert.False(t, instance.IsFound())
 }
 
 var bindServiceEndpoint = testhelpers.CreateEndpoint(
@@ -376,7 +376,7 @@ func TestUnbindService(t *testing.T) {
 	app := cf.Application{Guid: "app-2-guid"}
 	found, err := repo.UnbindService(serviceInstance, app)
 	assert.NoError(t, err)
-	assert.Equal(t, found, true)
+	assert.True(t, found)
 }
 
 func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
@@ -399,7 +399,7 @@ func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
 	app := cf.Application{Guid: "app-2-guid"}
 	found, err := repo.UnbindService(serviceInstance, app)
 	assert.NoError(t, err)
-	assert.Equal(t, found, false)
+	assert.False(t, found)
 }
 
 var deleteServiceInstanceEndpoint = testhelpers.CreateEndpoint(

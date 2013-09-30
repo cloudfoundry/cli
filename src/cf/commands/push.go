@@ -57,13 +57,14 @@ func (cmd Push) Run(c *cli.Context) {
 
 	appName := c.Args()[0]
 
-	app, found, apiErr := cmd.appRepo.FindByName(appName)
+	app, apiErr := cmd.appRepo.FindByName(appName)
+	// todo - confirm the behavior here; should happen after isFound
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	if !found {
+	if !app.IsFound() {
 		app, apiErr = cmd.createApp(appName, c)
 
 		if apiErr != nil {

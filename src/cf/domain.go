@@ -21,6 +21,10 @@ type Organization struct {
 	Domains []Domain
 }
 
+func (org Organization) IsFound() bool {
+	return org.Name != "" && org.Guid != ""
+}
+
 type Space struct {
 	Name             string
 	Guid             string
@@ -28,6 +32,10 @@ type Space struct {
 	ServiceInstances []ServiceInstance
 	Organization     Organization
 	Domains          []Domain
+}
+
+func (space Space) IsFound() bool {
+	return space.Name != "" && space.Guid != ""
 }
 
 type Application struct {
@@ -42,6 +50,10 @@ type Application struct {
 	BuildpackUrl     string
 	Stack            Stack
 	EnvironmentVars  map[string]string
+}
+
+func (app Application) IsFound() bool {
+	return app.Name != "" && app.Guid != ""
 }
 
 func (app Application) Health() string {
@@ -125,6 +137,10 @@ type ServiceInstance struct {
 	ServicePlan      ServicePlan
 	ApplicationNames []string
 	ServiceOffering  ServiceOffering
+}
+
+func (serviceInstance ServiceInstance) IsFound() bool {
+	return serviceInstance.Name != "" && serviceInstance.Guid != ""
 }
 
 type ServiceBinding struct {

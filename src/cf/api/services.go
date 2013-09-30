@@ -14,7 +14,7 @@ type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError)
 	CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError)
 	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError)
-	FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError)
+	FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
 	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError)
 	DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError)
@@ -80,11 +80,12 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 
 	if apiErr != nil && apiErr.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
 
-		instance, found, findInstanceErr := repo.FindInstanceByName(name)
+		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
 
-		if found && findInstanceErr == nil &&
-			instance.ServicePlan.Name == plan.Name &&
-			instance.ServicePlan.ServiceOffering.Label == plan.ServiceOffering.Label {
+		if findInstanceErr == nil && serviceInstance.IsFound() &&
+			serviceInstance.ServicePlan.Name == plan.Name &&
+			serviceInstance.ServicePlan.ServiceOffering.Label == plan.ServiceOffering.Label {
+
 			apiErr = nil
 			alreadyExists = true
 			return
@@ -119,7 +120,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, found bool, apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiErr != nil {
@@ -158,7 +159,6 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 		instance.ServiceBindings = append(instance.ServiceBindings, newBinding)
 	}
 
-	found = true
 	return
 }
 

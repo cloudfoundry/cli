@@ -49,14 +49,15 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	cmd.ui.Warn("Deleting space %s...", spaceName)
 
-	space, found, apiErr := cmd.spaceRepo.FindByName(spaceName)
+	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 
+	// todo - confirm the behavior here; should happen after isFound
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	if !found {
+	if !space.IsFound() {
 		cmd.ui.Ok()
 		cmd.ui.Say("Space %s was already deleted.", terminal.EntityNameColor(spaceName))
 		return

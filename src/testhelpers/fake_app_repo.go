@@ -28,8 +28,6 @@ type FakeApplicationRepository struct {
 	AppByNameErr bool
 	AppByNameAuthErr bool
 
-	DidNotFindByName bool
-
 	SetEnvApp   cf.Application
 	SetEnvVars  map[string]string
 	SetEnvValue string
@@ -44,12 +42,9 @@ type FakeApplicationRepository struct {
 	GetInstancesErrorCodes []string
 }
 
-func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Application, found bool, apiErr *net.ApiError) {
+func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Application, apiErr *net.ApiError) {
 	repo.AppName = name
-
-	if repo.DidNotFindByName {
-		return
-	}
+	app = repo.AppByName
 
 	if repo.AppByNameErr {
 		apiErr = net.NewApiErrorWithMessage("Error finding app by name.")
@@ -57,7 +52,8 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 	if repo.AppByNameAuthErr {
 		apiErr = net.NewApiError("Authentication failed.", "1000", 401)
 	}
-	return repo.AppByName, true, apiErr
+
+	return
 }
 
 func (repo *FakeApplicationRepository) SetEnv(app cf.Application, envVars map[string]string) (apiErr *net.ApiError) {

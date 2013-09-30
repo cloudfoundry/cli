@@ -53,7 +53,7 @@ func TestDeleteSpaceWithForceOption(t *testing.T) {
 
 func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
-	spaceRepo := &testhelpers.FakeSpaceRepository{DidNotFindSpaceByName: true}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
@@ -66,6 +66,23 @@ func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "space-to-delete")
 	assert.Contains(t, ui.Outputs[2], "was already deleted.")
 }
+
+func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
+
+	ui := &testhelpers.FakeUI{}
+	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
+
+	cmd := NewDeleteSpace(ui, spaceRepo)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+
+	assert.Equal(t, len(ui.Outputs), 3)
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[2], "space-to-delete")
+	assert.Contains(t, ui.Outputs[2], "was already deleted.")
+}
+
 func TestDeleteSpaceCommandWith(t *testing.T) {
 	ui, _ := deleteSpace("Yes", []string{})
 	assert.True(t, ui.FailedWithUsage)

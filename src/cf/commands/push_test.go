@@ -40,7 +40,6 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	domainRepo.FindByNameDomain = domains[0]
 	routeRepo.FindByHostErr = true
-	appRepo.DidNotFindByName = true
 	stopper.StoppedApp = cf.Application{Name: "my-stopped-app"}
 
 	fakeUI := callPush([]string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -85,7 +84,6 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 
 	domainRepo.FindByNameDomain = domains[0]
 	routeRepo.FindByHostRoute = route
-	appRepo.DidNotFindByName = true
 
 	fakeUI := callPush([]string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
@@ -108,7 +106,6 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 
 	domainRepo.FindByNameDomain = domain
 	routeRepo.FindByHostErr = true
-	appRepo.DidNotFindByName = true
 	stackRepo.FindByNameStack = stack
 
 	fakeUI := callPush([]string{
@@ -159,7 +156,6 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 
 	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
 	domainRepo.FindByNameDomain = domain
-	appRepo.DidNotFindByName = true
 
 	callPush([]string{
 		"-m", "256M",
@@ -174,7 +170,6 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 
 	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
 	domainRepo.FindByNameDomain = domain
-	appRepo.DidNotFindByName = true
 
 	callPush([]string{
 		"-m", "512",
@@ -189,7 +184,6 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 
 	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
 	domainRepo.FindByNameDomain = domain
-	appRepo.DidNotFindByName = true
 
 	callPush([]string{
 		"-m", "abcM",

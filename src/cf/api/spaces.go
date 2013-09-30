@@ -11,7 +11,7 @@ import (
 type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
 	FindAll() (spaces []cf.Space, apiErr *net.ApiError)
-	FindByName(name string) (space cf.Space, found bool, apiErr *net.ApiError)
+	FindByName(name string) (space cf.Space, apiErr *net.ApiError)
 	GetSummary() (space cf.Space, apiErr *net.ApiError)
 	Create(name string) (apiErr *net.ApiError)
 	Rename(space cf.Space, newName string) (apiErr *net.ApiError)
@@ -55,7 +55,7 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, found bool, apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiErr *net.ApiError) {
 	path := fmt.Sprintf("%s/v2/spaces?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
 
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
@@ -101,7 +101,6 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		Domains:          domains,
 		ServiceInstances: services,
 	}
-	found = true
 	return
 }
 

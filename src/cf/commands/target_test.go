@@ -110,8 +110,6 @@ func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
 	err = configRepo.Save()
 	assert.NoError(t, err)
 
-	orgRepo.DidNotFindOrganizationByName = true
-
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
@@ -188,8 +186,6 @@ func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
 	configRepo.Delete()
 	config := configRepo.Login()
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
-
-	spaceRepo.DidNotFindSpaceByName = true
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 

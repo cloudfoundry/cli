@@ -22,7 +22,7 @@ func TestSpaceReqExecute(t *testing.T) {
 }
 
 func TestSpaceReqExecuteWhenSpaceNotFound(t *testing.T) {
-	spaceRepo := &testhelpers.FakeSpaceRepository{DidNotFindSpaceByName: true}
+	spaceRepo := &testhelpers.FakeSpaceRepository{}
 	ui := new(testhelpers.FakeUI)
 
 	spaceReq := NewSpaceRequirement("foo", ui, spaceRepo)

@@ -49,13 +49,15 @@ func (cmd *Delete) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
 
-	app, found, apiErr := cmd.appRepo.FindByName(appName)
+	app, apiErr := cmd.appRepo.FindByName(appName)
+
+	// todo - confirm the behavior here; should happen after isFound
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Message)
 		return
 	}
 
-	if !found {
+	if !app.IsFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return

@@ -22,7 +22,7 @@ func TestOrgReqExecute(t *testing.T) {
 }
 
 func TestOrgReqWhenOrgDoesNotExist(t *testing.T) {
-	orgRepo := &testhelpers.FakeOrgRepository{DidNotFindOrganizationByName: true}
+	orgRepo := &testhelpers.FakeOrgRepository{}
 	ui := new(testhelpers.FakeUI)
 
 	orgReq := NewOrganizationRequirement("foo", ui, orgRepo)

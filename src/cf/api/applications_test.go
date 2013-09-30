@@ -108,9 +108,9 @@ func TestFindByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	app, found, err := repo.FindByName("App1")
+	app, err := repo.FindByName("App1")
 	assert.NoError(t, err)
-	assert.Equal(t, found, true)
+	assert.True(t, app.IsFound())
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
 	assert.Equal(t, app.Memory, uint64(128))
@@ -145,9 +145,9 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	_, found, err := repo.FindByName("App1")
+	app, err := repo.FindByName("App1")
 	assert.NoError(t, err)
-	assert.Equal(t, found, false)
+	assert.False(t, app.IsFound())
 }
 
 var setEnvEndpoint = testhelpers.CreateEndpoint(

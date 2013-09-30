@@ -54,14 +54,14 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(orgName))
 
-	org, found, apiErr := cmd.orgRepo.FindByName(orgName)
+	org, apiErr := cmd.orgRepo.FindByName(orgName)
 
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	if !found {
+	if !org.IsFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Organization %s was already deleted.", orgName)
 		return

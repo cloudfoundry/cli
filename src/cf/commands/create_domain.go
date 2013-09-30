@@ -39,8 +39,8 @@ func (cmd CreateDomain) Run(c *cli.Context) {
 
 	domain := cf.Domain{Name: domainName}
 
-	owningOrg, found, apiErr := cmd.orgRepo.FindByName(orgName)
-	if !found {
+	owningOrg, apiErr := cmd.orgRepo.FindByName(orgName)
+	if !owningOrg.IsFound() {
 		cmd.ui.Failed("Org %s could not be found.", orgName)
 		return
 	}

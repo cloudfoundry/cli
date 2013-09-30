@@ -51,7 +51,7 @@ func TestDeleteWithForceOption(t *testing.T) {
 
 func TestDeleteAppThatDoesNotExist(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
-	appRepo := &testhelpers.FakeApplicationRepository{DidNotFindByName: true}
+	appRepo := &testhelpers.FakeApplicationRepository{}
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "app-to-delete"})

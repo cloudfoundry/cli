@@ -188,10 +188,10 @@ func TestSpacesFindByName(t *testing.T) {
 		cf.ServiceInstance{Name: "service1", Guid: "service1-guid"},
 	}
 
-	space, found, err := repo.FindByName("Space1")
+	space, err := repo.FindByName("Space1")
 	assert.NoError(t, err)
 
-	assert.True(t, found)
+	assert.True(t, space.IsFound())
 	assert.Equal(t, space.Name, "Space1")
 	assert.Equal(t, space.Guid, "space1-guid")
 
@@ -200,9 +200,9 @@ func TestSpacesFindByName(t *testing.T) {
 	assert.Equal(t, space.Domains, domains)
 	assert.Equal(t, space.ServiceInstances, services)
 
-	space, found, err = repo.FindByName("space1")
+	space, err = repo.FindByName("space1")
 	assert.NoError(t, err)
-	assert.True(t, found)
+	assert.True(t, space.IsFound())
 }
 
 var didNotFindSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -235,9 +235,9 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
-	_, found, err := repo.FindByName("space1")
+	space, err := repo.FindByName("space1")
 	assert.NoError(t, err)
-	assert.False(t, found)
+	assert.False(t, space.IsFound())
 }
 
 var spaceSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `

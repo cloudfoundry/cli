@@ -11,7 +11,7 @@ import (
 func TestCreateDomain(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 	domainRepo := &testhelpers.FakeDomainRepository{}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: cf.Organization{Name: "myOrg"}}
+	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: cf.Organization{Name: "myOrg", Guid: "myOrg-guid"}}
 	fakeUI := callCreateDomain([]string{"example.com", "myOrg"}, reqFactory, domainRepo, orgRepo)
 
 	assert.Equal(t, domainRepo.CreateDomainDomainToCreate.Name, "example.com")

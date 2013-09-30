@@ -144,9 +144,9 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
-	org, found, err := repo.FindByName("Org1")
+	org, err := repo.FindByName("Org1")
 	assert.NoError(t, err)
-	assert.True(t, found)
+	assert.True(t, org.IsFound())
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
 	assert.Equal(t, len(org.Spaces), 1)
@@ -156,9 +156,9 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.Equal(t, org.Domains[0].Name, "cfapps.io")
 	assert.Equal(t, org.Domains[0].Guid, "domain1-guid")
 
-	org, found, err = repo.FindByName("org1")
+	org, err = repo.FindByName("org1")
 	assert.NoError(t, err)
-	assert.True(t, found)
+	assert.True(t, org.IsFound())
 }
 
 var findOrgByNameDoesNotExistResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -187,9 +187,9 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	_, found, err := repo.FindByName("org1")
+	org, err := repo.FindByName("org1")
 	assert.NoError(t, err)
-	assert.False(t, found)
+	assert.False(t, org.IsFound())
 }
 
 var createOrgEndpoint = testhelpers.CreateEndpoint(

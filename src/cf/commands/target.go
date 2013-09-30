@@ -88,14 +88,15 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 		return
 	}
 
-	org, found, apiErr := cmd.orgRepo.FindByName(orgName)
+	org, apiErr := cmd.orgRepo.FindByName(orgName)
+	// todo - confirm the behavior here; should happen after isFound
 	if apiErr != nil {
 		err = apiErr
 		cmd.ui.Failed("Could not set organization.")
 		return
 	}
 
-	if !found {
+	if !org.IsFound() {
 		cmd.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
 		return errors.New("Org not found")
 	}
@@ -117,14 +118,15 @@ func (cmd Target) setSpace(spaceName string) (err error) {
 		return
 	}
 
-	space, found, apiErr := cmd.spaceRepo.FindByName(spaceName)
+	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
+	// todo - confirm the behavior here; should happen after isFound
 	if apiErr != nil {
 		err = apiErr
 		cmd.ui.Failed("You do not have access to that space.")
 		return
 	}
 
-	if !found {
+	if !space.IsFound() {
 		cmd.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
 		return errors.New("Space not found")
 	}

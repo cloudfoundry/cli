@@ -31,12 +31,11 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, config *configur
 }
 
 func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
-	var (
-		apiErr *net.ApiError
-		found  bool
-	)
-	req.serviceInstance, found, apiErr = req.serviceRepo.FindInstanceByName(req.name)
-	if !found {
+	var apiErr *net.ApiError
+	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
+
+	// todo - this seems like a special case; confirm?
+	if !req.serviceInstance.IsFound() {
 		req.ui.Failed("Service %s does not exist.", req.name)
 		return false
 	}
@@ -45,6 +44,7 @@ func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
 		req.ui.Failed(apiErr.Error())
 		return false
 	}
+
 	return true
 }
 

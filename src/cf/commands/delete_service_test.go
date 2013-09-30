@@ -24,7 +24,7 @@ func TestDeleteServiceCommand(t *testing.T) {
 
 func TestDeleteServiceCommandOnNonExistentService(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
-	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameNotFound: true}
+	serviceRepo := &testhelpers.FakeServiceRepo{}
 	fakeUI := callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
