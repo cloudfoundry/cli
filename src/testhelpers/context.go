@@ -5,6 +5,7 @@ import (
 	"flag"
 	"github.com/codegangsta/cli"
 	"strings"
+	"cf/commands"
 )
 
 func NewContext(cmdName string, args []string) (*cli.Context) {
@@ -37,7 +38,9 @@ func NewContext(cmdName string, args []string) (*cli.Context) {
 }
 
 func findCommand(cmdName string) (cmd cli.Command) {
-	myApp, _ := app.New()
+	cmdFactory := commands.ConcreteFactory{}
+	reqFactory := &FakeReqFactory{}
+	myApp, _ := app.NewApp(cmdFactory, reqFactory)
 
 	for _, cmd := range myApp.Commands {
 		if cmd.Name == cmdName {

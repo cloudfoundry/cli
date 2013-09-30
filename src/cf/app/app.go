@@ -2,68 +2,15 @@ package app
 
 import (
 	"cf"
-	"cf/api"
 	"cf/commands"
-	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"os"
 )
 
-func New() (app *cli.App, err error) {
-	cli.AppHelpTemplate = `NAME:
-   {{.Name}} - {{.Usage}}
+func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *cli.App, err error) {
 
-USAGE:
-   [environment variables] {{.Name}} [global options] command [arguments...] [command options]
-
-VERSION:
-   {{.Version}}
-
-COMMANDS:
-   {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Description}}
-   {{end}}
-GLOBAL OPTIONS:
-   {{range .Flags}}{{.}}
-   {{end}}
-ENVIRONMENT VARIABLES:
-   CF_TRACE=true - will output HTTP requests and responses during command
-   HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
-`
-
-	cli.CommandHelpTemplate = `NAME:
-   {{.Name}} - {{.Description}}
-{{with .ShortName}}
-ALIAS:
-   {{.}}
-{{end}}
-USAGE:
-   {{.Usage}}{{with .Flags}}
-
-OPTIONS:
-   {{range .}}{{.}}
-   {{end}}{{else}}
-{{end}}`
-
-	termUI := new(terminal.TerminalUI)
-	configRepo := configuration.NewConfigurationDiskRepository()
-	config, err := configRepo.Get()
-	if err != nil {
-		termUI.Failed(fmt.Sprintf(
-			"Error loading config. Please reset target (%s) and log in (%s).",
-			terminal.CommandColor(fmt.Sprintf("%s target", cf.Name)),
-			terminal.CommandColor(fmt.Sprintf("%s login", cf.Name)),
-		))
-		configRepo.Delete()
-		os.Exit(1)
-		return
-	}
-
-	repoLocator := api.NewRepositoryLocator(config)
-	cmdFactory := commands.NewFactory(termUI, repoLocator)
-	reqFactory := requirements.NewFactory(termUI, repoLocator)
 	cmdRunner := commands.NewRunner(reqFactory)
 
 	app = cli.NewApp()
@@ -76,7 +23,7 @@ OPTIONS:
 			Description: "Set or view target api url",
 			Usage:       fmt.Sprintf("%s api [URL]", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewApi()
+				cmd, _ := cmdFactory.GetByCmdName("api")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -85,7 +32,7 @@ OPTIONS:
 			Description: "Display health and status for app",
 			Usage:       fmt.Sprintf("%s app APP", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewApp()
+				cmd, _ := cmdFactory.GetByCmdName("app")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -95,7 +42,7 @@ OPTIONS:
 			Description: "List all applications in the currently targeted space",
 			Usage:       fmt.Sprintf("%s apps", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewApps()
+				cmd, _ := cmdFactory.GetByCmdName("apps")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -105,7 +52,7 @@ OPTIONS:
 			Description: "Bind a service instance to an application",
 			Usage:       fmt.Sprintf("%s bind-service APP SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewBindService()
+				cmd, _ := cmdFactory.GetByCmdName("bind-service")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -114,7 +61,7 @@ OPTIONS:
 			Description: "Add a domain to an org",
 			Usage:       fmt.Sprintf("%s create-domain DOMAIN ORG", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateDomain()
+				cmd, _ := cmdFactory.GetByCmdName("create-domain")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -124,7 +71,7 @@ OPTIONS:
 			Description: "Create organization",
 			Usage:       fmt.Sprintf("%s create-org ORG", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateOrg()
+				cmd, _ := cmdFactory.GetByCmdName("create-org")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -141,7 +88,7 @@ OPTIONS:
 				cli.StringFlag{"parameters", "", "list of comma separated parameter names to use for user-provided services (eg. \"n1,n2\")"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateService()
+				cmd, _ := cmdFactory.GetByCmdName("create-service")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -150,7 +97,7 @@ OPTIONS:
 			Description: "Create a space",
 			Usage:       fmt.Sprintf("%s create-space SPACE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewCreateSpace()
+				cmd, _ := cmdFactory.GetByCmdName("create-space")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -163,7 +110,7 @@ OPTIONS:
 				cli.BoolFlag{"f", "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewDelete()
+				cmd, _ := cmdFactory.GetByCmdName("delete")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -175,7 +122,7 @@ OPTIONS:
 				cli.BoolFlag{"f", "force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewDeleteOrg()
+				cmd, _ := cmdFactory.GetByCmdName("delete-org")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -185,7 +132,7 @@ OPTIONS:
 			Description: "Delete a service instance",
 			Usage:       fmt.Sprintf("%s delete-service SERVICE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewDeleteService()
+				cmd, _ := cmdFactory.GetByCmdName("delete-service")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -197,7 +144,7 @@ OPTIONS:
 				cli.BoolFlag{"f", "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewDeleteSpace()
+				cmd, _ := cmdFactory.GetByCmdName("delete-space")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -207,7 +154,7 @@ OPTIONS:
 			Description: "Show all env variables for an app",
 			Usage:       fmt.Sprintf("%s env APP", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewEnv()
+				cmd, _ := cmdFactory.GetByCmdName("env")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -217,7 +164,7 @@ OPTIONS:
 			Description: "Print out a list of files in a directory or the contents of a specific file",
 			Usage:       fmt.Sprintf("%s files APP [PATH]", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewFiles()
+				cmd, _ := cmdFactory.GetByCmdName("files")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -232,7 +179,7 @@ OPTIONS:
 				fmt.Sprintf("   %s login name@example.com pa55woRD (specify username and password to login non-interactively)\n", cf.Name) +
 				fmt.Sprintf("   %s login name@example.com \"my password\" (use quotes for passwords with a space)", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewLogin()
+				cmd, _ := cmdFactory.GetByCmdName("login")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -242,7 +189,7 @@ OPTIONS:
 			Description: "Log user out",
 			Usage:       fmt.Sprintf("%s logout", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewLogout()
+				cmd, _ := cmdFactory.GetByCmdName("logout")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -255,10 +202,10 @@ OPTIONS:
 			},
 			Action: func(c *cli.Context) {
 				var cmd commands.Command
-				cmd = cmdFactory.NewLogs()
+				cmd, _ = cmdFactory.GetByCmdName("logs")
 
 				if c.Bool("recent") {
-					cmd = cmdFactory.NewRecentLogs()
+					cmd, _ = cmdFactory.GetByCmdName("logs-recent")
 				}
 
 				cmdRunner.Run(cmd, c)
@@ -270,7 +217,7 @@ OPTIONS:
 			Description: "List available offerings in the marketplace",
 			Usage:       fmt.Sprintf("%s marketplace", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewMarketplaceServices()
+				cmd, _ := cmdFactory.GetByCmdName("marketplace")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -279,7 +226,7 @@ OPTIONS:
 			Description: "Show org info",
 			Usage:       fmt.Sprintf("%s org ORG", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewShowOrg()
+				cmd, _ := cmdFactory.GetByCmdName("org")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -289,7 +236,7 @@ OPTIONS:
 			Description: "List all organizations",
 			Usage:       fmt.Sprintf("%s orgs", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewListOrgs()
+				cmd, _ := cmdFactory.GetByCmdName("orgs")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -299,7 +246,7 @@ OPTIONS:
 			Description: "Change user password",
 			Usage:       fmt.Sprintf("%s passwd", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewPassword()
+				cmd, _ := cmdFactory.GetByCmdName("passwd")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -322,7 +269,7 @@ OPTIONS:
 				cli.StringFlag{"s", "", "stack to use"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewPush()
+				cmd, _ := cmdFactory.GetByCmdName("push")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -331,7 +278,7 @@ OPTIONS:
 			Description: "Rename an application",
 			Usage:       fmt.Sprintf("%s rename APP NEW_APP", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRename()
+				cmd, _ := cmdFactory.GetByCmdName("rename")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -340,7 +287,7 @@ OPTIONS:
 			Description: "Rename an organization",
 			Usage:       fmt.Sprintf("%s rename-org ORG NEW_ORG", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRenameOrg()
+				cmd, _ := cmdFactory.GetByCmdName("rename-org")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -349,7 +296,7 @@ OPTIONS:
 			Description: "Rename a service instance",
 			Usage:       fmt.Sprintf("%s rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRenameService()
+				cmd, _ := cmdFactory.GetByCmdName("rename-service")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -358,7 +305,7 @@ OPTIONS:
 			Description: "Rename a space",
 			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRenameSpace()
+				cmd, _ := cmdFactory.GetByCmdName("rename-space")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -368,7 +315,7 @@ OPTIONS:
 			Description: "Restart an application",
 			Usage:       fmt.Sprintf("%s restart APP", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRestart()
+				cmd, _ := cmdFactory.GetByCmdName("restart")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -378,7 +325,7 @@ OPTIONS:
 			Description: "List all routes",
 			Usage:       fmt.Sprintf("%s routes", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewRoutes()
+				cmd, _ := cmdFactory.GetByCmdName("routes")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -392,7 +339,7 @@ OPTIONS:
 				cli.StringFlag{"m", "", "memory limit"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewScale()
+				cmd, _ := cmdFactory.GetByCmdName("scale")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -401,7 +348,7 @@ OPTIONS:
 			Description: "Show service instance info",
 			Usage:       fmt.Sprintf("%s service SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewShowService()
+				cmd, _ := cmdFactory.GetByCmdName("service")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -411,7 +358,7 @@ OPTIONS:
 			Description: "List all services in the currently targeted space",
 			Usage:       fmt.Sprintf("%s services", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewServices()
+				cmd, _ := cmdFactory.GetByCmdName("services")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -421,7 +368,7 @@ OPTIONS:
 			Description: "Set an env variable for an app",
 			Usage:       fmt.Sprintf("%s set-env APP NAME VALUE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewSetEnv()
+				cmd, _ := cmdFactory.GetByCmdName("set-env")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -430,7 +377,7 @@ OPTIONS:
 			Description: "Show currently targeted space's info",
 			Usage:       fmt.Sprintf("%s space", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewShowSpace()
+				cmd, _ := cmdFactory.GetByCmdName("space")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -439,7 +386,7 @@ OPTIONS:
 			Description: "List all spaces in an org",
 			Usage:       fmt.Sprintf("%s spaces", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewSpaces()
+				cmd, _ := cmdFactory.GetByCmdName("spaces")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -448,7 +395,7 @@ OPTIONS:
 			Description: "List all stacks",
 			Usage:       fmt.Sprintf("%s stacks", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewStacks()
+				cmd, _ := cmdFactory.GetByCmdName("stacks")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -458,7 +405,7 @@ OPTIONS:
 			Description: "Start an app",
 			Usage:       fmt.Sprintf("%s start APP", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewStart()
+				cmd, _ := cmdFactory.GetByCmdName("start")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -468,7 +415,7 @@ OPTIONS:
 			Description: "Stop an app",
 			Usage:       fmt.Sprintf("%s stop APP", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewStop()
+				cmd, _ := cmdFactory.GetByCmdName("stop")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -482,7 +429,7 @@ OPTIONS:
 				cli.StringFlag{"s", "", "space"},
 			},
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewTarget()
+				cmd, _ := cmdFactory.GetByCmdName("target")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -492,7 +439,7 @@ OPTIONS:
 			Description: "Unbind a service instance from an application",
 			Usage:       fmt.Sprintf("%s unbind-service APP SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewUnbindService()
+				cmd, _ := cmdFactory.GetByCmdName("unbind-service")
 				cmdRunner.Run(cmd, c)
 			},
 		},
@@ -501,7 +448,7 @@ OPTIONS:
 			Description: "Remove an env variable",
 			Usage:       fmt.Sprintf("%s unset-env cf.Name", cf.Name),
 			Action: func(c *cli.Context) {
-				cmd := cmdFactory.NewUnsetEnv()
+				cmd, _ := cmdFactory.GetByCmdName("unset-env")
 				cmdRunner.Run(cmd, c)
 			},
 		},
