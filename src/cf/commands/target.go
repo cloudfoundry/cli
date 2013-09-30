@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -41,11 +42,10 @@ func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 }
 
 func (cmd Target) Run(c *cli.Context) {
-	argsCount := len(c.Args())
 	orgName := c.String("o")
 	spaceName := c.String("s")
 
-	if argsCount == 0 && orgName == "" && spaceName == "" {
+	if orgName == "" && spaceName == "" {
 		cmd.ui.ShowConfiguration(cmd.config)
 
 		if !cmd.config.HasOrganization() {
@@ -58,44 +58,55 @@ func (cmd Target) Run(c *cli.Context) {
 	}
 
 	if orgName != "" {
-		cmd.setOrganization(orgName)
-		if cmd.config.IsLoggedIn() {
+		err := cmd.setOrganization(orgName)
+
+		if spaceName == "" && cmd.config.IsLoggedIn() {
+			cmd.showConfig()
 			cmd.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
+			return
 		}
-		return
+
+		if err != nil {
+			return
+		}
 	}
 
 	if spaceName != "" {
-		cmd.setSpace(spaceName)
-		return
-	}
+		err := cmd.setSpace(spaceName)
 
+		if err != nil {
+			return
+		}
+	}
+	cmd.showConfig()
 	return
 }
 
-func (cmd Target) setOrganization(orgName string) {
+func (cmd Target) setOrganization(orgName string) (err error) {
 	if !cmd.config.IsLoggedIn() {
 		cmd.ui.Failed("You must be logged in to set an organization. Use '%s login'.", cf.Name)
 		return
 	}
 
-	org, found, err := cmd.orgRepo.FindByName(orgName)
-	if err != nil {
+	org, found, apiErr := cmd.orgRepo.FindByName(orgName)
+	if apiErr != nil {
+		err = apiErr
 		cmd.ui.Failed("Could not set organization.")
 		return
 	}
 
 	if !found {
 		cmd.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
-		return
+		return errors.New("Org not found")
 	}
 
 	cmd.config.Organization = org
 	cmd.config.Space = cf.Space{}
-	cmd.saveAndShowConfig()
+	cmd.saveConfig()
+	return
 }
 
-func (cmd Target) setSpace(spaceName string) {
+func (cmd Target) setSpace(spaceName string) (err error) {
 	if !cmd.config.IsLoggedIn() {
 		cmd.ui.Failed("You must be logged in to set a space. Use '%s login'.", cf.Name)
 		return
@@ -106,26 +117,31 @@ func (cmd Target) setSpace(spaceName string) {
 		return
 	}
 
-	space, found, err := cmd.spaceRepo.FindByName(spaceName)
-	if err != nil {
+	space, found, apiErr := cmd.spaceRepo.FindByName(spaceName)
+	if apiErr != nil {
+		err = apiErr
 		cmd.ui.Failed("You do not have access to that space.")
 		return
 	}
 
 	if !found {
 		cmd.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
-		return
+		return errors.New("Space not found")
 	}
 
 	cmd.config.Space = space
-	cmd.saveAndShowConfig()
+	cmd.saveConfig()
+	return
 }
 
-func (cmd Target) saveAndShowConfig() {
+func (cmd Target) saveConfig() {
 	err := cmd.configRepo.Save()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
+}
+
+func (cmd Target) showConfig() {
 	cmd.ui.ShowConfiguration(cmd.config)
 }

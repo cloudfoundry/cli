@@ -27,7 +27,7 @@ func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *net.Api
 }
 
 func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, found bool, apiErr *net.ApiError) {
-
+	found = true
 	repo.FindByNameName = name
 
 	if repo.DidNotFindOrganizationByName{
@@ -38,7 +38,9 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, fou
 	if repo.FindByNameErr {
 		apiErr = net.NewApiErrorWithMessage("Error finding organization by name.")
 	}
-	return repo.FindByNameOrganization, true, apiErr
+
+	org = repo.FindByNameOrganization
+	return
 }
 
 func (repo *FakeOrgRepository) Create(name string) (apiErr *net.ApiError) {

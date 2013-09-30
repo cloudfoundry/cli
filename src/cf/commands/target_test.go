@@ -182,7 +182,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "No space targeted.")
 }
 
-func TestTargetSpacehenSpaceNotFound(t *testing.T) {
+func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
 	configRepo.Delete()
@@ -199,6 +199,59 @@ func TestTargetSpacehenSpaceNotFound(t *testing.T) {
 }
 
 // End test with space option
+
+// Targeting both organization and space
+
+func TestTargetOrganizationAndSpace(t *testing.T) {
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
+	configRepo.Delete()
+	configRepo.Login()
+
+	org := cf.Organization{Name: "my-organization", Guid: "my-organization-guid"}
+	orgRepo.FindByNameOrganization = org
+
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	spaceRepo.SpaceByName = space
+
+	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
+
+	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
+	assert.Contains(t, ui.Outputs[2], "org:")
+	assert.Contains(t, ui.Outputs[2], "my-organization")
+
+	assert.Equal(t, spaceRepo.SpaceName, "my-space")
+	assert.Contains(t, ui.Outputs[3], "space:")
+	assert.Contains(t, ui.Outputs[3], "my-space")
+
+	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
+
+	assert.Contains(t, ui.Outputs[2], "my-organization")
+	assert.Contains(t, ui.Outputs[3], "my-space")
+}
+
+func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
+	configRepo.Delete()
+	configRepo.Login()
+
+	org := cf.Organization{Name: "my-organization", Guid: "my-organization-guid"}
+	orgRepo.FindByNameOrganization = org
+
+	spaceRepo.SpaceByNameErr = true
+
+	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
+
+	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
+	assert.Equal(t, spaceRepo.SpaceName, "my-space")
+	assert.Contains(t, ui.Outputs[0], "FAILED")
+
+	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
+
+	assert.Contains(t, ui.Outputs[2], "my-organization")
+	assert.Contains(t, ui.Outputs[3], "No space targeted.")
+}
+
+// End test with org and space options
 
 func callTarget(args []string, reqFactory *testhelpers.FakeReqFactory,
 	configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository,
