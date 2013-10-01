@@ -1,3 +1,7 @@
+// Test only works on unix machines at the moment
+
+// +build darwin freebsd linux netbsd openbsd
+
 package app
 
 import (
