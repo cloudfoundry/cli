@@ -12,21 +12,21 @@ type FakeApplicationRepository struct {
 	ScaledApp cf.Application
 
 	StartAppToStart cf.Application
-	StartAppErr bool
+	StartAppErr     bool
 	StartUpdatedApp cf.Application
 
-	StopAppToStop cf.Application
-	StopAppErr bool
+	StopAppToStop  cf.Application
+	StopAppErr     bool
 	StopUpdatedApp cf.Application
 
 	DeletedApp cf.Application
 
 	FindAllApps []cf.Application
 
-	AppName      string
-	AppByName    cf.Application
-	AppByNameErr bool
-	AppByNameAuthErr bool
+	FindByNameName      string
+	FindByNameApp       cf.Application
+	FindByNameErr       bool
+	FindByNameAuthErr   bool
 
 	SetEnvApp   cf.Application
 	SetEnvVars  map[string]string
@@ -35,21 +35,21 @@ type FakeApplicationRepository struct {
 
 	CreatedApp  cf.Application
 
-	RenameApp cf.Application
+	RenameApp     cf.Application
 	RenameNewName string
 
-	GetInstancesResponses [][]cf.ApplicationInstance
+	GetInstancesResponses  [][]cf.ApplicationInstance
 	GetInstancesErrorCodes []string
 }
 
 func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Application, apiStatus net.ApiStatus) {
-	repo.AppName = name
-	app = repo.AppByName
+	repo.FindByNameName = name
+	app = repo.FindByNameApp
 
-	if repo.AppByNameErr {
+	if repo.FindByNameErr {
 		apiStatus = net.NewApiStatusWithMessage("Error finding app by name.")
 	}
-	if repo.AppByNameAuthErr {
+	if repo.FindByNameAuthErr {
 		apiStatus = net.NewApiStatus("Authentication failed.", "1000", 401)
 	}
 
@@ -58,7 +58,7 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 
 func (repo *FakeApplicationRepository) SetEnv(app cf.Application, envVars map[string]string) (apiStatus net.ApiStatus) {
 	repo.SetEnvApp = app
-	repo.SetEnvVars= envVars
+	repo.SetEnvVars = envVars
 
 	if repo.SetEnvErr {
 		apiStatus = net.NewApiStatusWithMessage("Failed setting env")
@@ -77,7 +77,7 @@ func (repo *FakeApplicationRepository) Create(newApp cf.Application) (createdApp
 	return
 }
 
-func (repo *FakeApplicationRepository) Delete(app cf.Application) (apiStatus net.ApiStatus){
+func (repo *FakeApplicationRepository) Delete(app cf.Application) (apiStatus net.ApiStatus) {
 	repo.DeletedApp = app
 	return
 }
@@ -88,12 +88,12 @@ func (repo *FakeApplicationRepository) Rename(app cf.Application, newName string
 	return
 }
 
-func (repo *FakeApplicationRepository) Scale(app cf.Application) (apiStatus net.ApiStatus){
+func (repo *FakeApplicationRepository) Scale(app cf.Application) (apiStatus net.ApiStatus) {
 	repo.ScaledApp = app
 	return
 }
 
-func (repo *FakeApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiStatus net.ApiStatus){
+func (repo *FakeApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiStatus net.ApiStatus) {
 	repo.StartAppToStart = app
 	if repo.StartAppErr {
 		apiStatus = net.NewApiStatusWithMessage("Error starting application")
@@ -102,7 +102,7 @@ func (repo *FakeApplicationRepository) Start(app cf.Application) (updatedApp cf.
 	return
 }
 
-func (repo *FakeApplicationRepository) Stop(appToStop cf.Application) (updatedApp cf.Application, apiStatus net.ApiStatus){
+func (repo *FakeApplicationRepository) Stop(appToStop cf.Application) (updatedApp cf.Application, apiStatus net.ApiStatus) {
 	repo.StopAppToStop = appToStop
 	if repo.StopAppErr {
 		apiStatus = net.NewApiStatusWithMessage("Error stopping application")
@@ -112,7 +112,7 @@ func (repo *FakeApplicationRepository) Stop(appToStop cf.Application) (updatedAp
 }
 
 func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instances[]cf.ApplicationInstance, apiStatus net.ApiStatus) {
-	time.Sleep(1 * time.Millisecond) //needed for Windows only, otherwise it thinks error codes are not assigned
+	time.Sleep(1*time.Millisecond) //needed for Windows only, otherwise it thinks error codes are not assigned
 	errorCode := repo.GetInstancesErrorCodes[0]
 	repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
 

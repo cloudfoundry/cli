@@ -10,13 +10,13 @@ import (
 
 func TestApplicationReqExecute(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 	ui := new(testhelpers.FakeUI)
 
 	appReq := NewApplicationRequirement("foo", ui, appRepo)
 	success := appReq.Execute()
 
 	assert.True(t, success)
-	assert.Equal(t, appRepo.AppName, "foo")
+	assert.Equal(t, appRepo.FindByNameName, "foo")
 	assert.Equal(t, appReq.GetApplication(), app)
 }

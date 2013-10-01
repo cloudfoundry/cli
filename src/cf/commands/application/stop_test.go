@@ -11,7 +11,7 @@ import (
 
 func TestStopCommandFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 
 	ui := callStop([]string{}, reqFactory, appRepo)
@@ -23,7 +23,7 @@ func TestStopCommandFailsWithUsage(t *testing.T) {
 
 func TestStopApplication(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 	args := []string{"my-app"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 	ui := callStop(args, reqFactory, appRepo)
@@ -37,7 +37,7 @@ func TestStopApplication(t *testing.T) {
 
 func TestStopApplicationWhenStopFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app, StopAppErr: true}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app, StopAppErr: true}
 	args := []string{"my-app"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 	ui := callStop(args, reqFactory, appRepo)
@@ -50,7 +50,7 @@ func TestStopApplicationWhenStopFails(t *testing.T) {
 
 func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "stopped"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 	args := []string{"my-app"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 	ui := callStop(args, reqFactory, appRepo)

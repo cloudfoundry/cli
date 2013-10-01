@@ -70,8 +70,8 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{
-		AppByName: app,
-		SetEnvErr: true,
+		FindByNameApp: app,
+		SetEnvErr:     true,
 	}
 
 	args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
@@ -85,7 +85,7 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 func TestSetEnvFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 
 	args := []string{"my-app", "DATABASE_URL", "..."}
 	ui := callSetEnv(args, reqFactory, appRepo)

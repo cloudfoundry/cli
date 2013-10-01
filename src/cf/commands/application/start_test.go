@@ -22,7 +22,7 @@ func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.Applica
 	config := configuration.Configuration{ApplicationStartTimeout: 2}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
-		AppByName:              app,
+		FindByNameApp:          app,
 		GetInstancesResponses:  instances,
 		GetInstancesErrorCodes: errorCodes,
 	}
@@ -190,7 +190,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 func TestStartApplicationWhenStartFails(t *testing.T) {
 	config := configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app, StartAppErr: true}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app, StartAppErr: true}
 	args := []string{"my-app"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 	ui := callStart(args, config, reqFactory, appRepo)
@@ -204,7 +204,7 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 	config := configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 
 	reqFactory := &testhelpers.FakeReqFactory{Application: app}
 

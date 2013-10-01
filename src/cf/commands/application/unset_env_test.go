@@ -49,8 +49,8 @@ func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testhelpers.FakeApplicationRepository{
-		AppByName: app,
-		SetEnvErr: true,
+		FindByNameApp: app,
+		SetEnvErr:     true,
 	}
 
 	args := []string{"does-not-exist", "DATABASE_URL"}
@@ -79,7 +79,7 @@ func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
 func TestUnsetEnvFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{AppByName: app}
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 
 	args := []string{"my-app", "DATABASE_URL"}
 	ui := callUnsetEnv(args, reqFactory, appRepo)

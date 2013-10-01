@@ -197,7 +197,7 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 
 	existingApp := cf.Application{Name: "existing-app", Guid: "existing-app-guid"}
-	appRepo.AppByName = existingApp
+	appRepo.FindByNameApp = existingApp
 
 	fakeUI := callPush([]string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
