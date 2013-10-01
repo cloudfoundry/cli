@@ -174,11 +174,11 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 		cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
 	spaceRepo.Spaces = spaces
-	spaceRepo.SpaceByName = spaces[0]
+	spaceRepo.FindByNameSpace = spaces[0]
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Equal(t, spaceRepo.SpaceName, "my-space")
+	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
 	assert.Contains(t, ui.Outputs[3], "space:")
 	assert.Contains(t, ui.Outputs[3], "my-space")
 
@@ -196,7 +196,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
 	configRepo.Save(config)
 
-	spaceRepo.SpaceByNameErr = true
+	spaceRepo.FindByNameErr = true
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
@@ -236,7 +236,7 @@ func TestTargetOrganizationAndSpace(t *testing.T) {
 	orgRepo.FindByNameOrganization = org
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
-	spaceRepo.SpaceByName = space
+	spaceRepo.FindByNameSpace = space
 
 	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
@@ -244,7 +244,7 @@ func TestTargetOrganizationAndSpace(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "org:")
 	assert.Contains(t, ui.Outputs[2], "my-organization")
 
-	assert.Equal(t, spaceRepo.SpaceName, "my-space")
+	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
 	assert.Contains(t, ui.Outputs[3], "space:")
 	assert.Contains(t, ui.Outputs[3], "my-space")
 
@@ -262,12 +262,12 @@ func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
 	org := cf.Organization{Name: "my-organization", Guid: "my-organization-guid"}
 	orgRepo.FindByNameOrganization = org
 
-	spaceRepo.SpaceByNameErr = true
+	spaceRepo.FindByNameErr = true
 
 	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
-	assert.Equal(t, spaceRepo.SpaceName, "my-space")
+	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 
 	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)

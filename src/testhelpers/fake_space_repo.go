@@ -10,9 +10,10 @@ type FakeSpaceRepository struct {
 
 	Spaces []cf.Space
 
-	SpaceName string
-	SpaceByName cf.Space
-	SpaceByNameErr bool
+	FindByNameName string
+	FindByNameSpace cf.Space
+	FindByNameErr bool
+	FindByNameNotFound bool
 
 	SummarySpace cf.Space
 
@@ -35,10 +36,10 @@ func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiStatus net.ApiS
 }
 
 func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiStatus net.ApiStatus) {
-	repo.SpaceName = name
-	space = repo.SpaceByName
+	repo.FindByNameName = name
+	space = repo.FindByNameSpace
 
-	if repo.SpaceByNameErr {
+	if repo.FindByNameErr {
 		apiStatus = net.NewApiStatusWithMessage("Error finding space by name.")
 	}
 
