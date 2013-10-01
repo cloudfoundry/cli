@@ -1,8 +1,8 @@
-package commands_test
+package space_test
 
 import (
 	"cf"
-	. "cf/commands"
+	. "cf/commands/space"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"

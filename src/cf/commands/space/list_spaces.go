@@ -1,4 +1,4 @@
-package commands
+package space
 
 import (
 	"cf/api"
@@ -8,20 +8,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type Spaces struct {
+type ListSpaces struct {
 	ui        terminal.UI
 	config    configuration.Configuration
 	spaceRepo api.SpaceRepository
 }
 
-func NewSpaces(ui terminal.UI, config configuration.Configuration, spaceRepo api.SpaceRepository) (cmd Spaces) {
+func NewListSpaces(ui terminal.UI, config configuration.Configuration, spaceRepo api.SpaceRepository) (cmd ListSpaces) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	return
 }
 
-func (cmd Spaces) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListSpaces) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedOrgRequirement(),
@@ -29,7 +29,7 @@ func (cmd Spaces) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 	return
 }
 
-func (cmd Spaces) Run(c *cli.Context) {
+func (cmd ListSpaces) Run(c *cli.Context) {
 	cmd.ui.Say("Getting spaces in %s...", terminal.EntityNameColor(cmd.config.Organization.Name))
 
 	spaces, err := cmd.spaceRepo.FindAll()

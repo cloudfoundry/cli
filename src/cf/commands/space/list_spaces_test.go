@@ -1,9 +1,9 @@
-package commands_test
+package space_test
 
 import (
 	"cf"
 	"cf/api"
-	. "cf/commands"
+	. "cf/commands/space"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
@@ -47,7 +47,7 @@ func callSpaces(args []string, reqFactory *testhelpers.FakeReqFactory, config co
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("spaces", args)
 
-	cmd := NewSpaces(ui, config, spaceRepo)
+	cmd := NewListSpaces(ui, config, spaceRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
