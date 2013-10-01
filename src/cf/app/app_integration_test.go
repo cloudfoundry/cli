@@ -30,22 +30,22 @@ func TestRunningCommands(t *testing.T) {
 
 func runCommand(t *testing.T, params ...string) (stdout, stderr string, err error) {
 	currentDir, err := os.Getwd()
-	projectDir := filepath.Join(currentDir, "../../..")
-	sourceFile := filepath.Join(projectDir, "src", "main", "cf.go")
-	goFile := filepath.Join(projectDir, "bin", "go")
+	assert.NoError(t, err)
+	sourceFile := filepath.Join(currentDir, "..", "..", "..", "src", "main", "cf.go")
 
 	args := append([]string{"run", sourceFile}, params...)
-	goCmd := exec.Command(goFile, args...)
+	cmd := exec.Command("go", args...)
 
 	stdoutWriter := bytes.NewBufferString("")
 	stderrWriter := bytes.NewBufferString("")
-	goCmd.Stdout = stdoutWriter
-	goCmd.Stderr = stderrWriter
+	cmd.Stdout = stdoutWriter
+	cmd.Stderr = stderrWriter
 
-	err = goCmd.Start()
+	err = cmd.Start()
 	assert.NoError(t, err)
 
-	err = goCmd.Wait()
-
-	return string(stdoutWriter.Bytes()), string(stderrWriter.Bytes()), err
+	err = cmd.Wait()
+	stdout = string(stdoutWriter.Bytes())
+	stderr = string(stderrWriter.Bytes())
+	return
 }
