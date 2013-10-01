@@ -21,9 +21,9 @@ type Organization struct {
 	Domains []Domain
 }
 
-func (org Organization) IsFound() bool {
-	return org.Name != "" && org.Guid != ""
-}
+//func (org Organization) IsFound() bool {
+//	return org.Name != "" && org.Guid != ""
+//}
 
 type Space struct {
 	Name             string

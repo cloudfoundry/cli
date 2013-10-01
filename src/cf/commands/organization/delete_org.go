@@ -61,7 +61,7 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		return
 	}
 
-	if !org.IsFound() {
+	if apiStatus.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Organization %s was already deleted.", orgName)
 		return

@@ -132,6 +132,8 @@ func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
 	err = configRepo.Save(config)
 	assert.NoError(t, err)
 
+	orgRepo.FindByNameNotFound = true
+
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")

@@ -14,7 +14,8 @@ type ApiStatus struct {
 	ErrorCode  string
 	StatusCode int
 
-	isError bool
+	isError    bool
+	isNotFound bool
 }
 
 func NewApiStatus(message string, errorCode string, statusCode int) (apiStatus ApiStatus) {
@@ -40,6 +41,16 @@ func NewApiStatusWithError(message string, err error) (apiStatus ApiStatus) {
 	}
 }
 
+func NewNotFoundApiStatus() (apiStatus ApiStatus) {
+	return ApiStatus{
+		isNotFound: true,
+	}
+}
+
 func (apiStatus ApiStatus) IsError() bool {
 	return apiStatus.isError
+}
+
+func (apiStatus ApiStatus) IsNotFound() bool {
+	return apiStatus.isNotFound
 }

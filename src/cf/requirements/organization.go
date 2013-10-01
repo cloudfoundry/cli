@@ -32,8 +32,7 @@ func (req *OrganizationApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.org, apiStatus = req.orgRepo.FindByName(req.name)
 
-	// todo - this seems like a special case; confirm?
-	if !req.org.IsFound() {
+	if apiStatus.IsNotFound() {
 		req.ui.Failed(fmt.Sprintf("Organization %s could not be found.", terminal.EntityNameColor(req.name)))
 		return false
 	}

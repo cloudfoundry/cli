@@ -98,13 +98,12 @@ func (cmd Target) setOrganization(orgName string) (config configuration.Configur
 	}
 
 	org, apiStatus := cmd.orgRepo.FindByName(orgName)
-	// todo - confirm the behavior here; should happen after isFound
 	if apiStatus.IsError() {
 		cmd.ui.Failed("Could not set organization.")
 		return
 	}
 
-	if !org.IsFound() {
+	if apiStatus.IsNotFound() {
 		cmd.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
 		return
 	}

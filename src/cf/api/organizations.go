@@ -67,6 +67,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	}
 
 	if len(response.Resources) == 0 {
+		apiStatus = net.NewNotFoundApiStatus()
 		return
 	}
 
