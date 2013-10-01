@@ -1,4 +1,4 @@
-package commands
+package route
 
 import (
 	"cf/api"
@@ -7,23 +7,23 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type Routes struct {
+type ListRoutes struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
 }
 
-func NewRoutes(ui terminal.UI, routeRepo api.RouteRepository) (cmd *Routes) {
-	cmd = new(Routes)
+func NewListRoutes(ui terminal.UI, routeRepo api.RouteRepository) (cmd *ListRoutes) {
+	cmd = new(ListRoutes)
 	cmd.ui = ui
 	cmd.routeRepo = routeRepo
 	return
 }
 
-func (cmd Routes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd Routes) Run(c *cli.Context) {
+func (cmd ListRoutes) Run(c *cli.Context) {
 	cmd.ui.Say("Getting routes")
 
 	routes, err := cmd.routeRepo.FindAll()

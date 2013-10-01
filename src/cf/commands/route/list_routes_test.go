@@ -1,8 +1,8 @@
-package commands_test
+package route_test
 
 import (
 	"cf"
-	. "cf/commands"
+	. "cf/commands/route"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -23,7 +23,7 @@ func TestListingRoutes(t *testing.T) {
 
 	ui := &testhelpers.FakeUI{}
 
-	cmd := NewRoutes(ui, routeRepo)
+	cmd := NewListRoutes(ui, routeRepo)
 	cmd.Run(testhelpers.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
@@ -38,7 +38,7 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 
 	ui := &testhelpers.FakeUI{}
 
-	cmd := NewRoutes(ui, routeRepo)
+	cmd := NewListRoutes(ui, routeRepo)
 	cmd.Run(testhelpers.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
@@ -51,7 +51,7 @@ func TestListingRoutesWhenFindFails(t *testing.T) {
 
 	ui := &testhelpers.FakeUI{}
 
-	cmd := NewRoutes(ui, routeRepo)
+	cmd := NewListRoutes(ui, routeRepo)
 	cmd.Run(testhelpers.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")

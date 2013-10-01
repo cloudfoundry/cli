@@ -5,6 +5,7 @@ import (
 	"cf/commands/application"
 	"cf/commands/domain"
 	"cf/commands/organization"
+	"cf/commands/route"
 	"cf/commands/service"
 	"cf/commands/space"
 	"cf/terminal"
@@ -48,7 +49,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["rename-org"] = organization.NewRenameOrg(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["rename-service"] = service.NewRenameService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, repoLocator.GetSpaceRepository(), repoLocator.GetConfigurationRepository())
-	factory.cmdsByName["routes"] = NewRoutes(ui, repoLocator.GetRouteRepository())
+	factory.cmdsByName["routes"] = route.NewListRoutes(ui, repoLocator.GetRouteRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, repoLocator.GetConfig())
 	factory.cmdsByName["service"] = service.NewShowService(ui, repoLocator.GetServiceRepository())
