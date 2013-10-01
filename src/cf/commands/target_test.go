@@ -31,6 +31,25 @@ func TestTargetRequirements(t *testing.T) {
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 }
 
+func TestTargetFailsWithUsage(t *testing.T) {
+	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
+
+	fakeUI := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
+	assert.False(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callTarget([]string{"http://api.example.com"}, reqFactory, configRepo, orgRepo, spaceRepo)
+	assert.True(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callTarget([]string{"-o", "myOrg"}, reqFactory, configRepo, orgRepo, spaceRepo)
+	assert.False(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callTarget([]string{"-s", "mySpace"}, reqFactory, configRepo, orgRepo, spaceRepo)
+	assert.False(t, fakeUI.FailedWithUsage)
+
+	fakeUI = callTarget([]string{"-o", "myOrg", "-s", "mySpace"}, reqFactory, configRepo, orgRepo, spaceRepo)
+	assert.False(t, fakeUI.FailedWithUsage)
+}
+
 func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 

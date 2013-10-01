@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -32,6 +33,12 @@ func NewTarget(ui terminal.UI, configRepo configuration.ConfigurationRepository,
 }
 
 func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) > 0 {
+		err = errors.New("incorrect usage")
+		cmd.ui.FailWithUsage(c, "target")
+		return
+	}
+
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 	}
