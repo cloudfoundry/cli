@@ -97,7 +97,7 @@ func TestDeleteOrgCommandFailsWithUsage(t *testing.T) {
 }
 
 func TestDeleteOrgWhenOrgDoesNotExist(t *testing.T) {
-	orgRepo := &testhelpers.FakeOrgRepository{DidNotFindOrganizationByName: true}
+	orgRepo := &testhelpers.FakeOrgRepository{}
 	ui := deleteOrg("y", []string{"org-to-delete"}, orgRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
