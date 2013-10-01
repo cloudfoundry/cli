@@ -2,29 +2,17 @@
 
 result=0
 
-packages=(
-	cf
-);
+echo -e "\n Formatting packages"
+$(dirname $0)/go fmt cf/...
+let "result+=$?"
 
-sub_packages=`find src/cf -maxdepth 1 -mindepth 1 -type d -exec basename '{}' \;`
+echo -e "\n Installing package dependencies"
+$(dirname $0)/go test -i cf/...
+let "result+=$?"
 
-for sub_package in $sub_packages
-do
-    packages+=("cf/$sub_package")
-done
-
-for package in "${packages[@]}"
-do
-    echo -e "\n Testing package $package"
-    $(dirname $0)/go fmt $package
-# Don't need race testing yet but may need it
-# in the future. 
-#   $(dirname $0)/go test -i --race $package
-#   $(dirname $0)/go test -v --race $package
-	$(dirname $0)/go test -i $package
-    $(dirname $0)/go test -v $package
-    let "result+=$?" 
-done
+echo -e "\n Testing packages"
+$(dirname $0)/go test -v cf/...
+let "result+=$?"
 
 echo -e "\n Running build script to confirm main compiles"
 $(dirname $0)/build
