@@ -94,7 +94,7 @@ func (ui TerminalUI) ShowConfiguration(config configuration.Configuration) {
 	}
 
 	if config.HasSpace() {
-		ui.Say("app space:       %s", EntityNameColor(config.Space.Name))
+		ui.Say("space:           %s", EntityNameColor(config.Space.Name))
 	}
 }
 

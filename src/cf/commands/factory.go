@@ -29,7 +29,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["delete"] = NewDelete(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, repoLocator.GetOrganizationRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["delete-service"] = NewDeleteService(ui, repoLocator.GetServiceRepository())
-	factory.cmdsByName["delete-space"] = NewDeleteSpace(ui, repoLocator.GetSpaceRepository())
+	factory.cmdsByName["delete-space"] = NewDeleteSpace(ui, repoLocator.GetSpaceRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["env"] = NewEnv(ui)
 	factory.cmdsByName["files"] = NewFiles(ui, repoLocator.GetAppFilesRepository())
 	factory.cmdsByName["login"] = NewLogin(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetAuthenticator())

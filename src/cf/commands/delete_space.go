@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,15 +12,17 @@ import (
 )
 
 type DeleteSpace struct {
-	ui        terminal.UI
-	spaceRepo api.SpaceRepository
-	spaceReq  requirements.SpaceRequirement
+	ui         terminal.UI
+	spaceRepo  api.SpaceRepository
+	configRepo configuration.ConfigurationRepository
+	spaceReq   requirements.SpaceRequirement
 }
 
-func NewDeleteSpace(ui terminal.UI, sR api.SpaceRepository) (cmd *DeleteSpace) {
+func NewDeleteSpace(ui terminal.UI, sR api.SpaceRepository, cR configuration.ConfigurationRepository) (cmd *DeleteSpace) {
 	cmd = new(DeleteSpace)
 	cmd.ui = ui
 	cmd.spaceRepo = sR
+	cmd.configRepo = cR
 	return
 }
 
@@ -63,12 +67,24 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		return
 	}
 
-	err := cmd.spaceRepo.Delete(space)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	apiErr = cmd.spaceRepo.Delete(space)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	cmd.ui.Ok()
+
+	config, err := cmd.configRepo.Get()
+	if err != nil {
+		cmd.ui.ConfigFailure(err)
+		return
+	}
+
+	if config.Space.Name == spaceName {
+		config.Space = cf.Space{}
+		cmd.configRepo.Save(config)
+	}
+
 	return
 }

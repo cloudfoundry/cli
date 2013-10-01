@@ -111,7 +111,7 @@ func (ui *FakeUI) ShowConfiguration(config configuration.Configuration) {
 	}
 
 	if config.HasSpace() {
-		ui.Say("app space:       %s", config.Space.Name)
+		ui.Say("space:           %s", config.Space.Name)
 	}
 }
 

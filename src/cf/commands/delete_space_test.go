@@ -36,11 +36,12 @@ func TestDeleteSpaceWithForceOption(t *testing.T) {
 	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{SpaceByName: space}
+	configRepo := &testhelpers.FakeConfigRepository{}
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
 
-	cmd := NewDeleteSpace(ui, spaceRepo)
+	cmd := NewDeleteSpace(ui, spaceRepo, configRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, spaceRepo.SpaceName, "space-to-delete")
@@ -54,11 +55,12 @@ func TestDeleteSpaceWithForceOption(t *testing.T) {
 func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
 	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	configRepo := &testhelpers.FakeConfigRepository{}
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
 
-	cmd := NewDeleteSpace(ui, spaceRepo)
+	cmd := NewDeleteSpace(ui, spaceRepo, configRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, len(ui.Outputs), 3)
@@ -68,19 +70,43 @@ func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 }
 
 func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {
+	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{}
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{SpaceByName: space}
+	configRepo := &testhelpers.FakeConfigRepository{}
+
+	config, _ := configRepo.Get()
+	config.Space = space
+	configRepo.Save(config)
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
 
-	cmd := NewDeleteSpace(ui, spaceRepo)
+	cmd := NewDeleteSpace(ui, spaceRepo, configRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "space-to-delete")
-	assert.Contains(t, ui.Outputs[2], "was already deleted.")
+	config, _ = configRepo.Get()
+	assert.Equal(t, config.HasSpace(), false)
+}
+
+func TestDeleteSpaceWhenSpaceNotTargeted(t *testing.T) {
+	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
+	reqFactory := &testhelpers.FakeReqFactory{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{SpaceByName: space}
+	configRepo := &testhelpers.FakeConfigRepository{}
+
+	config, _ := configRepo.Get()
+	config.Space = cf.Space{Name: "do-not-delete", Guid: "do-not-delete-guid"}
+	configRepo.Save(config)
+
+	ui := &testhelpers.FakeUI{}
+	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
+
+	cmd := NewDeleteSpace(ui, spaceRepo, configRepo)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+
+	config, _ = configRepo.Get()
+	assert.Equal(t, config.HasSpace(), true)
 }
 
 func TestDeleteSpaceCommandWith(t *testing.T) {
@@ -103,11 +129,13 @@ func deleteSpace(confirmation string, args []string) (ui *testhelpers.FakeUI, sp
 	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
 	reqFactory := &testhelpers.FakeReqFactory{}
 	spaceRepo = &testhelpers.FakeSpaceRepository{SpaceByName: space}
+	configRepo := &testhelpers.FakeConfigRepository{}
+
 	ui = &testhelpers.FakeUI{
 		Inputs: []string{confirmation},
 	}
 	ctxt := testhelpers.NewContext("delete-space", args)
-	cmd := NewDeleteSpace(ui, spaceRepo)
+	cmd := NewDeleteSpace(ui, spaceRepo, configRepo)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
