@@ -51,7 +51,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	if !space.IsFound() {
 		cmd.ui.Ok()
-		cmd.ui.Say("Space %s was already deleted.", terminal.EntityNameColor(spaceName))
+		cmd.ui.Warn("Space %s was already deleted.", spaceName)
 		return
 	}
 
