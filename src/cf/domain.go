@@ -44,10 +44,6 @@ type Application struct {
 	EnvironmentVars  map[string]string
 }
 
-func (app Application) IsFound() bool {
-	return app.Name != "" && app.Guid != ""
-}
-
 func (app Application) Health() string {
 	if app.State != "started" {
 		return app.State

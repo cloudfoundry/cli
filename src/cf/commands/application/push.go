@@ -58,13 +58,12 @@ func (cmd Push) Run(c *cli.Context) {
 	appName := c.Args()[0]
 
 	app, apiStatus := cmd.appRepo.FindByName(appName)
-	// todo - confirm the behavior here; should happen after isFound
 	if apiStatus.IsError() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
-	if !app.IsFound() {
+	if apiStatus.IsNotFound() {
 		app, apiStatus = cmd.createApp(appName, c)
 
 		if apiStatus.IsError() {

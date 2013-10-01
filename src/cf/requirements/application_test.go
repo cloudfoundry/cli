@@ -20,3 +20,13 @@ func TestApplicationReqExecute(t *testing.T) {
 	assert.Equal(t, appRepo.FindByNameName, "foo")
 	assert.Equal(t, appReq.GetApplication(), app)
 }
+
+func TestApplicationReqExecuteWhenApplicationNotFound(t *testing.T) {
+	appRepo := &testhelpers.FakeApplicationRepository{FindByNameNotFound: true}
+	ui := new(testhelpers.FakeUI)
+
+	appReq := NewApplicationRequirement("foo", ui, appRepo)
+	success := appReq.Execute()
+
+	assert.False(t, success)
+}

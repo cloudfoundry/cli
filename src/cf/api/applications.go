@@ -50,6 +50,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	if len(findResponse.Resources) == 0 {
+		apiStatus = net.NewNotFoundApiStatus()
 		return
 	}
 

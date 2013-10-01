@@ -36,7 +36,7 @@ func (req *ApplicationApiRequirement) Execute() (success bool) {
 		return false
 	}
 
-	return req.application.IsFound()
+	return !apiStatus.IsNotFound()
 }
 
 func (req *ApplicationApiRequirement) GetApplication() cf.Application {

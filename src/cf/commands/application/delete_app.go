@@ -51,13 +51,12 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	app, apiStatus := cmd.appRepo.FindByName(appName)
 
-	// todo - confirm the behavior here; should happen after isFound
 	if apiStatus.IsError() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
-	if !app.IsFound() {
+	if apiStatus.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return
