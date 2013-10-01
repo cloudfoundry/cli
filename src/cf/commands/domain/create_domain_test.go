@@ -1,8 +1,8 @@
-package commands_test
+package domain_test
 
 import (
 	"cf"
-	. "cf/commands"
+	. "cf/commands/domain"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
