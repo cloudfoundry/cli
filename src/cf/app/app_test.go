@@ -87,14 +87,3 @@ func TestCommands(t *testing.T) {
 		assert.True(t, cmdFactory.CmdCompleted)
 	}
 }
-
-func TestLogsRecent(t *testing.T) {
-
-	cmdFactory := &FakeCmdFactory{}
-	reqFactory := &testhelpers.FakeReqFactory{}
-	app, _ := app.NewApp(cmdFactory, reqFactory)
-	app.Run([]string{"", "logs", "--recent"})
-
-	assert.Equal(t, cmdFactory.CmdName, "logs-recent")
-	assert.True(t, cmdFactory.CmdCompleted)
-}

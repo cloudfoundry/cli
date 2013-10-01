@@ -201,13 +201,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				cli.BoolFlag{"recent", "dump recent logs instead of tailing"},
 			},
 			Action: func(c *cli.Context) {
-				var cmd commands.Command
-				cmd, _ = cmdFactory.GetByCmdName("logs")
-
-				if c.Bool("recent") {
-					cmd, _ = cmdFactory.GetByCmdName("logs-recent")
-				}
-
+				cmd, _ := cmdFactory.GetByCmdName("logs")
 				cmdRunner.Run(cmd, c)
 			},
 		},

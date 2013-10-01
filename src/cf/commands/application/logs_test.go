@@ -34,10 +34,50 @@ func TestLogsRequirements(t *testing.T) {
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
+func TestLogsOutputsRecentLogs(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+
+	currentTime := time.Now()
+	messageType := logmessage.LogMessage_ERR
+	sourceType := logmessage.LogMessage_DEA
+	logMessage1 := logmessage.LogMessage{
+		Message:     []byte("Log Line 1"),
+		AppId:       proto.String("my-app"),
+		MessageType: &messageType,
+		SourceType:  &sourceType,
+		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	}
+
+	logMessage2 := logmessage.LogMessage{
+		Message:     []byte("Log Line 2"),
+		AppId:       proto.String("my-app"),
+		MessageType: &messageType,
+		SourceType:  &sourceType,
+		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	}
+
+	recentLogs := []logmessage.LogMessage{
+		logMessage1,
+		logMessage2,
+	}
+
+	reqFactory, logsRepo := getLogsDependencies()
+	reqFactory.Application = app
+	logsRepo.RecentLogs = recentLogs
+
+	ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
+
+	assert.Equal(t, reqFactory.ApplicationName, "my-app")
+	assert.Equal(t, app, logsRepo.AppLogged)
+	assert.Equal(t, len(ui.Outputs), 3)
+	assert.Contains(t, ui.Outputs[0], "Connected, dumping recent logs...")
+	assert.Contains(t, ui.Outputs[1], "Log Line 1")
+	assert.Contains(t, ui.Outputs[2], "Log Line 2")
+}
+
 func TestLogsTailsTheAppLogs(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 
-	///////////////
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
 	deaSourceType := logmessage.LogMessage_DEA
@@ -51,7 +91,6 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 		Timestamp:   proto.Int64(currentTime.UnixNano()),
 	}
 
-	/////////////////
 	logs := []logmessage.LogMessage{deaLogMessage}
 
 	reqFactory, logsRepo := getLogsDependencies()

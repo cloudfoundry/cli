@@ -42,15 +42,26 @@ func (cmd *Logs) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 func (cmd *Logs) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
-	onConnect := func() {
-		cmd.ui.Say("Connected, tailing...")
-	}
-
 	onMessage := func(msg logmessage.LogMessage) {
 		cmd.ui.Say(logMessageOutput(app.Name, msg))
 	}
 
-	err := cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2)
+	var err error
+
+	if c.Bool("recent") {
+		onConnect := func() {
+			cmd.ui.Say("Connected, dumping recent logs...")
+		}
+
+		err = cmd.logsRepo.RecentLogsFor(app, onConnect, onMessage)
+	} else {
+		onConnect := func() {
+			cmd.ui.Say("Connected, tailing...")
+		}
+
+		err = cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2)
+	}
+
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
