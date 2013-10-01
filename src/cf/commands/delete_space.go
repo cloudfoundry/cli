@@ -38,24 +38,12 @@ func (cmd *DeleteSpace) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd *DeleteSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
-
 	force := c.Bool("f")
-	if !force {
-		response := strings.ToLower(cmd.ui.Ask(
-			"Really delete space %s and everything associated with it?%s",
-			terminal.EntityNameColor(spaceName),
-			terminal.PromptColor(">"),
-		))
-		if response != "y" && response != "yes" {
-			return
-		}
-	}
 
 	cmd.ui.Warn("Deleting space %s...", spaceName)
 
 	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 
-	// todo - confirm the behavior here; should happen after isFound
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 		return
@@ -65,6 +53,17 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		cmd.ui.Ok()
 		cmd.ui.Say("Space %s was already deleted.", terminal.EntityNameColor(spaceName))
 		return
+	}
+
+	if !force {
+		response := strings.ToLower(cmd.ui.Ask(
+			"Really delete space %s and everything associated with it?%s",
+			terminal.EntityNameColor(spaceName),
+			terminal.PromptColor(">"),
+		))
+		if response != "y" && response != "yes" {
+			return
+		}
 	}
 
 	apiErr = cmd.spaceRepo.Delete(space)
@@ -84,6 +83,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	if config.Space.Name == spaceName {
 		config.Space = cf.Space{}
 		cmd.configRepo.Save(config)
+		cmd.ui.Say("TIP: No space targeted. Use '%s target -s' to target a space.", cf.Name)
 	}
 
 	return
