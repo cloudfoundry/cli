@@ -182,9 +182,9 @@ func (repo LoggregatorLogsRepository) getLocationFromRedirector(requestPathAndQu
 	}
 
 	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + LOGGREGATOR_REDIRECTOR_PORT
-	request, apiErr := repo.gateway.NewRequest("GET", host+requestPathAndQueryParams, repo.config.AccessToken, nil)
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
+	request, apiStatus := repo.gateway.NewRequest("GET", host+requestPathAndQueryParams, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
+		err = errors.New(apiStatus.Message)
 		return
 	}
 

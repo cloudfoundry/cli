@@ -10,12 +10,12 @@ import (
 
 type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
-	FindAll() (spaces []cf.Space, apiErr *net.ApiError)
-	FindByName(name string) (space cf.Space, apiErr *net.ApiError)
-	GetSummary() (space cf.Space, apiErr *net.ApiError)
-	Create(name string) (apiErr *net.ApiError)
-	Rename(space cf.Space, newName string) (apiErr *net.ApiError)
-	Delete(space cf.Space) (apiErr *net.ApiError)
+	FindAll() (spaces []cf.Space, apiStatus net.ApiStatus)
+	FindByName(name string) (space cf.Space, apiStatus net.ApiStatus)
+	GetSummary() (space cf.Space, apiStatus net.ApiStatus)
+	Create(name string) (apiStatus net.ApiStatus)
+	Rename(space cf.Space, newName string) (apiStatus net.ApiStatus)
+	Delete(space cf.Space) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -33,18 +33,18 @@ func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.config.Space
 }
 
-func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", repo.config.Target, repo.config.Organization.Guid)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(ApiResponse)
 
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -55,19 +55,19 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiErr 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
 
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(SpaceApiResponse)
 
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -104,17 +104,17 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 	return
 }
 
-func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -126,41 +126,41 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiErr 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string) (apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) Create(name string) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
 
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiErr *net.ApiError) {
+func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, space.Guid)
 
-	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 

@@ -9,11 +9,11 @@ import (
 )
 
 type OrganizationRepository interface {
-	FindAll() (orgs []cf.Organization, apiErr *net.ApiError)
-	FindByName(name string) (org cf.Organization, apiErr *net.ApiError)
-	Create(name string) (apiErr *net.ApiError)
-	Rename(org cf.Organization, name string) (apiErr *net.ApiError)
-	Delete(org cf.Organization) (apiErr *net.ApiError)
+	FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus)
+	FindByName(name string) (org cf.Organization, apiStatus net.ApiStatus)
+	Create(name string) (apiStatus net.ApiStatus)
+	Rename(org cf.Organization, name string) (apiStatus net.ApiStatus)
+	Delete(org cf.Organization) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -27,17 +27,17 @@ func NewCloudControllerOrganizationRepository(config configuration.Configuration
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiErr *net.ApiError) {
+func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus) {
 	path := repo.config.Target + "/v2/organizations"
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 	response := new(OrganizationsApiResponse)
 
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -52,17 +52,17 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiErr *net.ApiError) {
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 	response := new(OrganizationsApiResponse)
 
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -93,39 +93,39 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Create(name string) (apiErr *net.ApiError) {
+func (repo CloudControllerOrganizationRepository) Create(name string) (apiStatus net.ApiStatus) {
 	path := repo.config.Target + "/v2/organizations"
 	data := fmt.Sprintf(
 		`{"name":"%s"}`, name,
 	)
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiErr *net.ApiError) {
+func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiErr *net.ApiError) {
+func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
-	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }

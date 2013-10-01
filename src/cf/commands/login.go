@@ -52,9 +52,9 @@ func (cmd Login) Run(c *cli.Context) {
 		password = c.Args()[1]
 		cmd.ui.Say("Authenticating...")
 
-		apiErr := cmd.doLogin(username, password)
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
+		apiStatus := cmd.doLogin(username, password)
+		if apiStatus.IsError() {
+			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
 
@@ -63,9 +63,9 @@ func (cmd Login) Run(c *cli.Context) {
 			password = cmd.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
 			cmd.ui.Say("Authenticating...")
 
-			apiErr := cmd.doLogin(username, password)
-			if apiErr != nil {
-				cmd.ui.Failed(apiErr.Error())
+			apiStatus := cmd.doLogin(username, password)
+			if apiStatus.IsError() {
+				cmd.ui.Failed(apiStatus.Message)
 				continue
 			}
 
@@ -75,9 +75,9 @@ func (cmd Login) Run(c *cli.Context) {
 	return
 }
 
-func (cmd Login) doLogin(username, password string) (apiErr *net.ApiError) {
-	apiErr = cmd.authenticator.Authenticate(username, password)
-	if apiErr == nil {
+func (cmd Login) doLogin(username, password string) (apiStatus net.ApiStatus) {
+	apiStatus = cmd.authenticator.Authenticate(username, password)
+	if !apiStatus.IsError() {
 		cmd.ui.Ok()
 		cmd.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor(cf.Name+" target"))
 	}

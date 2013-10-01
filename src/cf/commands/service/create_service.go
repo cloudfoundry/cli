@@ -58,9 +58,9 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 	}
 
 	cmd.ui.Say("Creating service...")
-	err := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	apiStatus := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
@@ -69,9 +69,9 @@ func (cmd CreateService) createUserProvidedService(name string, params string) {
 }
 
 func (cmd CreateService) createService(name string, offeringName string, planName string) {
-	offerings, apiErr := cmd.serviceRepo.GetServiceOfferings()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	offerings, apiStatus := cmd.serviceRepo.GetServiceOfferings()
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
@@ -90,9 +90,9 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 	cmd.ui.Say("Creating service %s", terminal.EntityNameColor(name))
 
 	var alreadyExists bool
-	alreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	alreadyExists, apiStatus = cmd.serviceRepo.CreateServiceInstance(name, plan)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

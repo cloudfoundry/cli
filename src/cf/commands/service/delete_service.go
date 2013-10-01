@@ -42,11 +42,11 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting service %s...", terminal.EntityNameColor(serviceName))
 
-	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
+	instance, apiStatus := cmd.serviceRepo.FindInstanceByName(serviceName)
 
 	// todo - confirm the behavior here; should happen after isFound
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 	}
 
 	if !instance.IsFound() {
@@ -55,9 +55,9 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 		return
 	}
 
-	err := cmd.serviceRepo.DeleteService(instance)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	apiStatus = cmd.serviceRepo.DeleteService(instance)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

@@ -60,25 +60,25 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
 
-	updatedApp, apiErr := cmd.appRepo.Start(app)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	updatedApp, apiStatus := cmd.appRepo.Start(app)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
 	cmd.ui.Ok()
 
-	instances, apiErr := cmd.appRepo.GetInstances(app)
+	instances, apiStatus := cmd.appRepo.GetInstances(app)
 
-	for apiErr != nil {
-		if apiErr.ErrorCode != net.APP_NOT_STAGED {
+	for apiStatus.IsError() {
+		if apiStatus.ErrorCode != net.APP_NOT_STAGED {
 			cmd.ui.Say("")
-			cmd.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
 
 		cmd.ui.Wait(1 * time.Second)
-		instances, apiErr = cmd.appRepo.GetInstances(app)
+		instances, apiStatus = cmd.appRepo.GetInstances(app)
 		cmd.ui.LoadingIndication()
 	}
 

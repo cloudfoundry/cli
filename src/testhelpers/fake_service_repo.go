@@ -33,12 +33,12 @@ type FakeServiceRepo struct {
 	RenameServiceNewName string
 }
 
-func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOffering, apiStatus net.ApiStatus) {
 	offerings = repo.ServiceOfferings
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiStatus net.ApiStatus) {
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlan = plan
 	alreadyExists = repo.CreateServiceAlreadyExists
@@ -46,43 +46,43 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServiceP
 	return
 }
 
-func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiStatus net.ApiStatus) {
 	repo.CreateUserProvidedServiceInstanceName = name
 	repo.CreateUserProvidedServiceInstanceParameters = params
 	return
 }
 
-func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiStatus net.ApiStatus) {
 	repo.FindInstanceByNameName = name
 	instance = repo.FindInstanceByNameServiceInstance
 
 	return
 }
 
-func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.Application) (apiStatus net.ApiStatus) {
 	repo.BindServiceServiceInstance = instance
 	repo.BindServiceApplication = app
 
 	if repo.BindServiceErrorCode != "" {
-		apiErr = net.NewApiError("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
+		apiStatus = net.NewApiStatus("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
 	}
 
 	return
 }
 
-func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiStatus net.ApiStatus) {
 	repo.UnbindServiceServiceInstance = instance
 	repo.UnbindServiceApplication = app
 	found = !repo.UnbindServiceBindingNotFound
 	return
 }
 
-func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError) {
+func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (apiStatus net.ApiStatus) {
 	repo.DeleteServiceServiceInstance = instance
 	return
 }
 
-func (repo *FakeServiceRepo) RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError){
+func (repo *FakeServiceRepo) RenameService(instance cf.ServiceInstance, newName string) (apiStatus net.ApiStatus){
 	repo.RenameServiceServiceInstance = instance
 	repo.RenameServiceNewName = newName
 	return

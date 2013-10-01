@@ -12,7 +12,7 @@ type FakeAppFilesRepo struct{
 }
 
 
-func (repo *FakeAppFilesRepo)ListFiles(app cf.Application, path string) (files string, apiErr *net.ApiError) {
+func (repo *FakeAppFilesRepo)ListFiles(app cf.Application, path string) (files string, apiStatus net.ApiStatus) {
 	repo.Application = app
 	repo.Path = path
 

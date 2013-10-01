@@ -38,15 +38,15 @@ func (cmd ShowService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Getting service instance %s...", terminal.EntityNameColor(serviceName))
 
-	serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceName)
+	serviceInstance, apiStatus := cmd.serviceRepo.FindInstanceByName(serviceName)
 
 	if !serviceInstance.IsFound() {
 		cmd.ui.Failed("Service instance %s does not exist.", serviceName)
 		return
 	}
 
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

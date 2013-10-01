@@ -13,17 +13,18 @@ type FakePasswordRepo struct {
 
 
 
-func (repo *FakePasswordRepo) GetScore(password string) (string, *net.ApiError){
+func (repo *FakePasswordRepo) GetScore(password string) (score string, apiStatus net.ApiStatus){
 	repo.ScoredPassword = password
-	return repo.Score, nil
+	score = repo.Score
+	return
 }
 
-func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr *net.ApiError) {
+func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiStatus net.ApiStatus) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
 
 	if repo.UpdateUnauthorized {
-		apiErr = net.NewApiError("Authorization Failed", "unauthorized", 401)
+		apiStatus = net.NewApiStatus("Authorization Failed", "unauthorized", 401)
 	}
 
 	return

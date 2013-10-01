@@ -28,11 +28,11 @@ func NewSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (r
 }
 
 func (req *SpaceApiRequirement) Execute() (success bool) {
-	var apiErr *net.ApiError
-	req.space, apiErr = req.spaceRepo.FindByName(req.name)
+	var apiStatus net.ApiStatus
+	req.space, apiStatus = req.spaceRepo.FindByName(req.name)
 
-	if apiErr != nil {
-		req.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		req.ui.Failed(apiStatus.Message)
 		return false
 	}
 

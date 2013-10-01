@@ -9,9 +9,9 @@ import (
 )
 
 type DomainRepository interface {
-	FindAll() (domains []cf.Domain, apiErr *net.ApiError)
-	FindByName(name string) (domain cf.Domain, apiErr *net.ApiError)
-	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiErr *net.ApiError)
+	FindAll() (domains []cf.Domain, apiStatus net.ApiStatus)
+	FindByName(name string) (domain cf.Domain, apiStatus net.ApiStatus)
+	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus)
 }
 
 type CloudControllerDomainRepository struct {
@@ -25,16 +25,16 @@ func NewCloudControllerDomainRepository(config configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, apiErr *net.ApiError) {
+func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains", repo.config.Target, repo.config.Space.Guid)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(ApiResponse)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -45,22 +45,22 @@ func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, apiE
 	return
 }
 
-func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.Domain, apiErr *net.ApiError) {
-	domains, apiErr := repo.FindAll()
+func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.Domain, apiStatus net.ApiStatus) {
+	domains, apiStatus := repo.FindAll()
 
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		return
 	}
 
 	if name == "" {
 		domain = domains[0]
 	} else {
-		apiErr = net.NewApiErrorWithMessage("Could not find domain with name %s", name)
+		apiStatus = net.NewApiStatusWithMessage("Could not find domain with name %s", name)
 
 		for _, d := range domains {
 			if d.Name == strings.ToLower(name) {
 				domain = d
-				apiErr = nil
+				apiStatus = net.ApiStatus{}
 			}
 		}
 	}
@@ -68,20 +68,20 @@ func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.D
 	return
 }
 
-func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiErr *net.ApiError) {
+func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus) {
 	path := repo.config.Target + "/v2/domains"
 	data := fmt.Sprintf(
 		`{"name":"%s","wildcard":true,"owning_organization_guid":"%s"}`, domainToCreate.Name, owningOrg.Guid,
 	)
 
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiStatus.IsError() {
 		return
 	}
 
 	resource := new(Resource)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	if apiStatus.IsError() {
 		return
 	}
 

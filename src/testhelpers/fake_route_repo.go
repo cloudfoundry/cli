@@ -20,27 +20,27 @@ type FakeRouteRepository struct {
 	FindAllRoutes []cf.Route
 }
 
-func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, apiErr *net.ApiError) {
+func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, apiStatus net.ApiStatus) {
 	if repo.FindAllErr {
-		apiErr = net.NewApiErrorWithMessage("Error finding all routes")
+		apiStatus = net.NewApiStatusWithMessage("Error finding all routes")
 	}
 
 	routes = repo.FindAllRoutes
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiErr *net.ApiError) {
+func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus) {
 	repo.FindByHostHost = host
 
 	if repo.FindByHostErr {
-		apiErr = net.NewApiErrorWithMessage("Route not found")
+		apiStatus = net.NewApiStatusWithMessage("Route not found")
 	}
 
 	route = repo.FindByHostRoute
 	return
 }
 
-func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiErr *net.ApiError) {
+func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus) {
 	repo.CreatedRoute = newRoute
 	repo.CreatedRouteDomain = domain
 
@@ -51,7 +51,7 @@ func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (cr
 	return
 }
 
-func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (apiErr *net.ApiError) {
+func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
 	repo.BoundRoute = route
 	repo.BoundApp = app
 	return

@@ -31,8 +31,8 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, config configura
 }
 
 func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
-	var apiErr *net.ApiError
-	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
+	var apiStatus net.ApiStatus
+	req.serviceInstance, apiStatus = req.serviceRepo.FindInstanceByName(req.name)
 
 	// todo - this seems like a special case; confirm?
 	if !req.serviceInstance.IsFound() {
@@ -40,8 +40,8 @@ func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
 		return false
 	}
 
-	if apiErr != nil {
-		req.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		req.ui.Failed(apiStatus.Message)
 		return false
 	}
 

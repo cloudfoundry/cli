@@ -17,7 +17,7 @@ type FakeAuthenticator struct {
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiErr *net.ApiError) {
+func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiStatus net.ApiStatus) {
 	auth.Config, _ = auth.ConfigRepo.Get()
 	auth.Email = email
 	auth.Password = password
@@ -31,11 +31,11 @@ func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiE
 	auth.ConfigRepo.Save(auth.Config)
 
 	if auth.AuthError {
-		apiErr =  &net.ApiError{Message: "Error authenticating."}
+		apiStatus =  net.NewApiStatusWithMessage("Error authenticating.")
 	}
 	return
 }
 
-func (auth *FakeAuthenticator) RefreshAuthToken() (updatedToken string, apiErr *net.ApiError) {
+func (auth *FakeAuthenticator) RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus) {
 	return
 }

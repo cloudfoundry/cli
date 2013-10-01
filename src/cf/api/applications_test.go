@@ -108,8 +108,8 @@ func TestFindByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	app, err := repo.FindByName("App1")
-	assert.NoError(t, err)
+	app, apiStatus := repo.FindByName("App1")
+	assert.False(t, apiStatus.IsError())
 	assert.True(t, app.IsFound())
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
@@ -145,8 +145,8 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	app, err := repo.FindByName("App1")
-	assert.NoError(t, err)
+	app, apiStatus := repo.FindByName("App1")
+	assert.False(t, apiStatus.IsError())
 	assert.False(t, app.IsFound())
 }
 
@@ -170,9 +170,9 @@ func TestSetEnv(t *testing.T) {
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
 
-	err := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
+	apiStatus := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
-	assert.NoError(t, err)
+	assert.False(t, apiStatus.IsError())
 }
 
 var createApplicationResponse = `
@@ -216,8 +216,8 @@ func TestCreateApplication(t *testing.T) {
 		Stack:        cf.Stack{Guid: "some-stack-guid"},
 	}
 
-	createdApp, err := repo.Create(newApp)
-	assert.NoError(t, err)
+	createdApp, apiStatus := repo.Create(newApp)
+	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
 }
@@ -249,8 +249,8 @@ func TestCreateApplicationWithoutBuildpackOrStack(t *testing.T) {
 		Stack:        cf.Stack{},
 	}
 
-	_, err := repo.Create(newApp)
-	assert.NoError(t, err)
+	_, apiStatus := repo.Create(newApp)
+	assert.False(t, apiStatus.IsError())
 }
 
 func TestCreateRejectsInproperNames(t *testing.T) {
@@ -261,18 +261,18 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	createdApp, err := repo.Create(cf.Application{Name: "name with space"})
+	createdApp, apiStatus := repo.Create(cf.Application{Name: "name with space"})
 	assert.Equal(t, createdApp, cf.Application{})
-	assert.Contains(t, err.Error(), "Application name is invalid")
+	assert.Contains(t, apiStatus.Message, "Application name is invalid")
 
-	_, err = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
-	assert.Error(t, err)
+	_, apiStatus = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
+	assert.True(t, apiStatus.IsError())
 
-	_, err = repo.Create(cf.Application{Name: "Valid-Name"})
-	assert.NoError(t, err)
+	_, apiStatus = repo.Create(cf.Application{Name: "Valid-Name"})
+	assert.False(t, apiStatus.IsError())
 
-	_, err = repo.Create(cf.Application{Name: "name_with_numbers_2"})
-	assert.NoError(t, err)
+	_, apiStatus = repo.Create(cf.Application{Name: "name_with_numbers_2"})
+	assert.False(t, apiStatus.IsError())
 }
 
 var deleteApplicationEndpoint = testhelpers.CreateEndpoint(
@@ -295,8 +295,8 @@ func TestDeleteApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	err := repo.Delete(app)
-	assert.NoError(t, err)
+	apiStatus := repo.Delete(app)
+	assert.False(t, apiStatus.IsError())
 }
 
 var renameAppEndpoint = testhelpers.CreateEndpoint(
@@ -315,8 +315,8 @@ func TestRename(t *testing.T) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	org := cf.Application{Guid: "my-app-guid"}
-	err := repo.Rename(org, "my-new-app")
-	assert.NoError(t, err)
+	apiStatus := repo.Rename(org, "my-new-app")
+	assert.False(t, apiStatus.IsError())
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
@@ -334,8 +334,8 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	err := repo.Scale(app)
-	assert.NoError(t, err)
+	apiStatus := repo.Scale(app)
+	assert.False(t, apiStatus.IsError())
 }
 
 func TestScaleAll(t *testing.T) {
@@ -401,8 +401,8 @@ func TestStartApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	updatedApp, err := repo.Start(app)
-	assert.NoError(t, err)
+	updatedApp, apiStatus := repo.Start(app)
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "started", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
@@ -437,8 +437,8 @@ func TestStopApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	updatedApp, err := repo.Stop(app)
-	assert.NoError(t, err)
+	updatedApp, apiStatus := repo.Stop(app)
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "stopped", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
@@ -472,8 +472,8 @@ func TestGetInstances(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	instances, err := repo.GetInstances(app)
-	assert.NoError(t, err)
+	instances, apiStatus := repo.GetInstances(app)
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")

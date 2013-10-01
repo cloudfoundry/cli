@@ -15,16 +15,18 @@ type FakeDomainRepository struct {
 	CreateDomainOwningOrg cf.Organization
 }
 
-func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiErr *net.ApiError){
-	return repo.FindAllDomains, nil
+func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiStatus net.ApiStatus){
+	domains = repo.FindAllDomains
+	return
 }
 
-func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiErr *net.ApiError){
+func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiStatus net.ApiStatus){
 	repo.FindByNameName = name
-	return repo.FindByNameDomain, nil
+	domain = repo.FindByNameDomain
+	return
 }
 
-func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiErr *net.ApiError){
+func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus){
 	repo.CreateDomainDomainToCreate = domainToCreate
 	repo.CreateDomainOwningOrg = owningOrg
 	return

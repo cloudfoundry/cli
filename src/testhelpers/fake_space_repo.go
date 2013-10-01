@@ -29,42 +29,43 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiErr *net.ApiError) {
-	return repo.Spaces, nil
+func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiStatus net.ApiStatus) {
+	spaces = repo.Spaces
+	return
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiErr *net.ApiError) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiStatus net.ApiStatus) {
 	repo.SpaceName = name
 	space = repo.SpaceByName
 
 	if repo.SpaceByNameErr {
-		apiErr = net.NewApiErrorWithMessage("Error finding space by name.")
+		apiStatus = net.NewApiStatusWithMessage("Error finding space by name.")
 	}
 
 	return
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiErr *net.ApiError) {
+func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiStatus net.ApiStatus) {
 	space = repo.SummarySpace
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string) (apiErr *net.ApiError) {
+func (repo *FakeSpaceRepository) Create(name string) (apiStatus net.ApiStatus) {
 	if repo.CreateSpaceExists {
-		apiErr = &net.ApiError{ErrorCode: net.SPACE_EXISTS}
+		apiStatus = net.NewApiStatus("Space already exists", net.SPACE_EXISTS, 400)
 		return
 	}
 	repo.CreateSpaceName = name
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiErr *net.ApiError) {
+func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiStatus net.ApiStatus) {
 	repo.RenameSpace = space
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiErr *net.ApiError) {
+func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiStatus net.ApiStatus) {
 	repo.DeletedSpace = space
 	return
 }

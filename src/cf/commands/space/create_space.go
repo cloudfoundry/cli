@@ -39,14 +39,14 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
 	cmd.ui.Say("Creating space %s...", terminal.EntityNameColor(spaceName))
 
-	err := cmd.spaceRepo.Create(spaceName)
-	if err != nil {
-		if err.ErrorCode == net.SPACE_EXISTS {
+	apiStatus := cmd.spaceRepo.Create(spaceName)
+	if apiStatus.IsError() {
+		if apiStatus.ErrorCode == net.SPACE_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Say("Space %s already exists.", spaceName)
 			return
 		}
-		cmd.ui.Failed(err.Error())
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

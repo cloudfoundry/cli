@@ -38,21 +38,21 @@ func (cmd Password) Run(c *cli.Context) {
 		return
 	}
 
-	score, err := cmd.pwdRepo.GetScore(newPassword)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	score, apiStatus := cmd.pwdRepo.GetScore(newPassword)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 	cmd.ui.Say("Your password strength is: %s", score)
 
 	cmd.ui.Say("Changing password...")
-	err = cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
+	apiStatus = cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
-	if err != nil {
-		if err.StatusCode == 401 {
+	if apiStatus.IsError() {
+		if apiStatus.StatusCode == 401 {
 			cmd.ui.Failed("Current password did not match")
 		} else {
-			cmd.ui.Failed(err.Error())
+			cmd.ui.Failed(apiStatus.Message)
 		}
 		return
 	}

@@ -57,8 +57,8 @@ func TestFindAll(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domains, err := repo.FindAll()
-	assert.NoError(t, err)
+	domains, apiStatus := repo.FindAll()
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, 2, len(domains))
 
 	first := domains[0]
@@ -81,8 +81,8 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domain, err := repo.FindByName("domain2.cf-app.com")
-	assert.NoError(t, err)
+	domain, apiStatus := repo.FindByName("domain2.cf-app.com")
+	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, domain.Name, "domain2.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain2-guid")
@@ -100,8 +100,8 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domain, err := repo.FindByName("")
-	assert.NoError(t, err)
+	domain, apiStatus := repo.FindByName("")
+	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, domain.Name, "domain1.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain1-guid")
@@ -139,7 +139,7 @@ func TestCreateDomain(t *testing.T) {
 
 	domainToCreate := cf.Domain{Name: "example.com"}
 	owningOrg := cf.Organization{Guid: "domain1-guid"}
-	createdDomain, err := repo.Create(domainToCreate, owningOrg)
-	assert.NoError(t, err)
+	createdDomain, apiStatus := repo.Create(domainToCreate, owningOrg)
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, createdDomain.Guid, "abc-123")
 }

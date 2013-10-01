@@ -11,7 +11,7 @@ type FakeAppSummaryRepo struct{
 }
 
 
-func (repo *FakeAppSummaryRepo)GetSummary(app cf.Application) (summary cf.AppSummary, apiErr *net.ApiError) {
+func (repo *FakeAppSummaryRepo)GetSummary(app cf.Application) (summary cf.AppSummary, apiStatus net.ApiStatus) {
 	repo.GetSummaryApp= app
 	summary = repo.GetSummarySummary
 

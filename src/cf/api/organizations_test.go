@@ -53,8 +53,8 @@ func TestOrganizationsFindAll(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	organizations, err := repo.FindAll()
-	assert.NoError(t, err)
+	organizations, apiStatus := repo.FindAll()
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, 2, len(organizations))
 
 	firstOrg := organizations[0]
@@ -76,16 +76,16 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 
 	var (
 		organizations []cf.Organization
-		err           error
+		apiStatus     net.ApiStatus
 	)
 
 	// Capture output so debugging info does not show up in test
 	// output
 	testhelpers.CaptureOutput(func() {
-		organizations, err = repo.FindAll()
+		organizations, apiStatus = repo.FindAll()
 	})
 
-	assert.Error(t, err)
+	assert.True(t, apiStatus.IsError())
 	assert.Equal(t, 0, len(organizations))
 }
 
@@ -144,8 +144,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
-	org, err := repo.FindByName("Org1")
-	assert.NoError(t, err)
+	org, apiStatus := repo.FindByName("Org1")
+	assert.False(t, apiStatus.IsError())
 	assert.True(t, org.IsFound())
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
@@ -156,8 +156,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.Equal(t, org.Domains[0].Name, "cfapps.io")
 	assert.Equal(t, org.Domains[0].Guid, "domain1-guid")
 
-	org, err = repo.FindByName("org1")
-	assert.NoError(t, err)
+	org, apiStatus = repo.FindByName("org1")
+	assert.False(t, apiStatus.IsError())
 	assert.True(t, org.IsFound())
 }
 
@@ -187,8 +187,8 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	org, err := repo.FindByName("org1")
-	assert.NoError(t, err)
+	org, apiStatus := repo.FindByName("org1")
+	assert.False(t, apiStatus.IsError())
 	assert.False(t, org.IsFound())
 }
 
@@ -207,8 +207,8 @@ func TestCreateOrganization(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	err := repo.Create("my-org")
-	assert.NoError(t, err)
+	apiStatus := repo.Create("my-org")
+	assert.False(t, apiStatus.IsError())
 }
 
 var renameOrgEndpoint = testhelpers.CreateEndpoint(
@@ -227,8 +227,8 @@ func TestRenameOrganization(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
-	err := repo.Rename(org, "my-new-org")
-	assert.NoError(t, err)
+	apiStatus := repo.Rename(org, "my-new-org")
+	assert.False(t, apiStatus.IsError())
 }
 
 var deleteOrgEndpoint = testhelpers.CreateEndpoint(
@@ -247,6 +247,6 @@ func TestDeleteOrganization(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
-	err := repo.Delete(org)
-	assert.NoError(t, err)
+	apiStatus := repo.Delete(org)
+	assert.False(t, apiStatus.IsError())
 }

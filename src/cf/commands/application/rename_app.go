@@ -40,9 +40,9 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 	new_name := c.Args()[1]
 	cmd.ui.Say("Renaming %s to %s...", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(new_name))
 
-	err := cmd.appRepo.Rename(app, new_name)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	apiStatus := cmd.appRepo.Rename(app, new_name)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 	cmd.ui.Ok()

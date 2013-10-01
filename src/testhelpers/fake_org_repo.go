@@ -21,37 +21,38 @@ type FakeOrgRepository struct {
 	DeletedOrganization cf.Organization
 }
 
-func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiErr *net.ApiError) {
-	return repo.Organizations, nil
+func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus) {
+	orgs = repo.Organizations
+	return
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiErr *net.ApiError) {
+func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiStatus net.ApiStatus) {
 	repo.FindByNameName = name
 	org = repo.FindByNameOrganization
 
 	if repo.FindByNameErr {
-		apiErr = net.NewApiErrorWithMessage("Error finding organization by name.")
+		apiStatus = net.NewApiStatusWithMessage("Error finding organization by name.")
 	}
 
 	return
 }
 
-func (repo *FakeOrgRepository) Create(name string) (apiErr *net.ApiError) {
+func (repo *FakeOrgRepository) Create(name string) (apiStatus net.ApiStatus) {
 	if repo.CreateOrgExists {
-		apiErr = &net.ApiError{ErrorCode: net.ORG_EXISTS}
+		apiStatus = net.NewApiStatus("Space already exists", net.ORG_EXISTS, 400)
 		return
 	}
 	repo.CreateName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiErr *net.ApiError) {
+func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiStatus net.ApiStatus) {
 	repo.RenameOrganization = org
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiErr *net.ApiError) {
+func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiStatus net.ApiStatus) {
 	repo.DeletedOrganization = org
 	return
 }

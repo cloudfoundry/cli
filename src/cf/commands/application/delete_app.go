@@ -49,11 +49,11 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
 
-	app, apiErr := cmd.appRepo.FindByName(appName)
+	app, apiStatus := cmd.appRepo.FindByName(appName)
 
 	// todo - confirm the behavior here; should happen after isFound
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Message)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
@@ -63,9 +63,9 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 		return
 	}
 
-	apiErr = cmd.appRepo.Delete(app)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	apiStatus = cmd.appRepo.Delete(app)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

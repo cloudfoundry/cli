@@ -47,8 +47,8 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerPasswordRepository(config, gateway)
 
-	score, err := repo.GetScore("new-password")
-	assert.NoError(t, err)
+	score, apiStatus := repo.GetScore("new-password")
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, score, expectedScore)
 }
 
@@ -87,8 +87,8 @@ func TestUpdatePassword(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerPasswordRepository(config, gateway)
 
-	err := repo.UpdatePassword("old-password", "new-password")
-	assert.NoError(t, err)
+	apiStatus := repo.UpdatePassword("old-password", "new-password")
+	assert.False(t, apiStatus.IsError())
 	assert.True(t, passwordWasUpdated)
 }
 

@@ -46,12 +46,12 @@ func (cmd *RenameService) Run(c *cli.Context) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
 	cmd.ui.Say("Renaming service %s...", serviceInstance.Name)
-	err := cmd.serviceRepo.RenameService(serviceInstance, newName)
-	if err != nil {
-		if err.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
-			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", err.Error(), cf.Name)
+	apiStatus := cmd.serviceRepo.RenameService(serviceInstance, newName)
+	if apiStatus.IsError() {
+		if apiStatus.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
+			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiStatus.Message, cf.Name)
 		} else {
-			cmd.ui.Failed(err.Error())
+			cmd.ui.Failed(apiStatus.Message)
 		}
 		return
 	}

@@ -38,15 +38,15 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 	name := c.Args()[0]
 
 	cmd.ui.Say("Creating organization %s...", terminal.EntityNameColor(name))
-	apiErr := cmd.orgRepo.Create(name)
-	if apiErr != nil {
-		if apiErr.ErrorCode == net.ORG_EXISTS {
+	apiStatus := cmd.orgRepo.Create(name)
+	if apiStatus.IsError() {
+		if apiStatus.ErrorCode == net.ORG_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Org %s already exists.", name)
 			return
 		}
 
-		cmd.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

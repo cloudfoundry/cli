@@ -49,10 +49,10 @@ func (cmd Api) showApiEndpoint() {
 func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
-	request, apiErr := cmd.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
+	request, apiStatus := cmd.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
@@ -63,10 +63,10 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	}
 
 	serverResponse := new(InfoResponse)
-	_, apiErr = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
+	_, apiStatus = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

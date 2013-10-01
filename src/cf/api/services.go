@@ -11,14 +11,14 @@ import (
 )
 
 type ServiceRepository interface {
-	GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError)
-	CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError)
-	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError)
-	FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError)
-	BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError)
-	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError)
-	DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError)
-	RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError)
+	GetServiceOfferings() (offerings []cf.ServiceOffering, apiStatus net.ApiStatus)
+	CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiStatus net.ApiStatus)
+	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiStatus net.ApiStatus)
+	FindInstanceByName(name string) (instance cf.ServiceInstance, apiStatus net.ApiStatus)
+	BindService(instance cf.ServiceInstance, app cf.Application) (apiStatus net.ApiStatus)
+	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiStatus net.ApiStatus)
+	DeleteService(instance cf.ServiceInstance) (apiStatus net.ApiStatus)
+	RenameService(instance cf.ServiceInstance, newName string) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerServiceRepository struct {
@@ -32,17 +32,17 @@ func NewCloudControllerServiceRepository(config configuration.Configuration, gat
 	return
 }
 
-func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []cf.ServiceOffering, apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []cf.ServiceOffering, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.Target)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(ServiceOfferingsApiResponse)
 
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -64,29 +64,29 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
 
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
 		name, plan.Guid, repo.config.Space.Guid,
 	)
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 
-	if apiErr != nil && apiErr.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
+	if apiStatus.IsError() && apiStatus.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
 
-		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
+		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
 
-		if findInstanceErr == nil && serviceInstance.IsFound() &&
+		if !findInstanceApiStatus.IsError() && serviceInstance.IsFound() &&
 			serviceInstance.ServicePlan.Name == plan.Name &&
 			serviceInstance.ServicePlan.ServiceOffering.Label == plan.ServiceOffering.Label {
 
-			apiErr = nil
+			apiStatus = net.ApiStatus{}
 			alreadyExists = true
 			return
 		}
@@ -95,7 +95,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.Target)
 
 	type RequestBody struct {
@@ -107,29 +107,29 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 	reqBody := RequestBody{name, params, repo.config.Space.Guid}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		apiErr = net.NewApiErrorWithError("Error parsing response", err)
+		apiStatus = net.NewApiStatusWithError("Error parsing response", err)
 		return
 	}
 
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(ServiceInstancesApiResponse)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -162,22 +162,22 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	return
 }
 
-func (repo CloudControllerServiceRepository) BindService(instance cf.ServiceInstance, app cf.Application) (apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) BindService(instance cf.ServiceInstance, app cf.Application) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/service_bindings", repo.config.Target)
 	body := fmt.Sprintf(
 		`{"app_guid":"%s","service_instance_guid":"%s"}`,
 		app.Guid, instance.Guid,
 	)
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiStatus net.ApiStatus) {
 	var path string
 
 	for _, binding := range instance.ServiceBindings {
@@ -193,38 +193,38 @@ func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceIn
 		found = true
 	}
 
-	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceInstance) (apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceInstance) (apiStatus net.ApiStatus) {
 	if len(instance.ServiceBindings) > 0 {
-		return net.NewApiErrorWithMessage("Cannot delete service instance, apps are still bound to it")
+		return net.NewApiStatusWithMessage("Cannot delete service instance, apps are still bound to it")
 	}
 
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
-	request, apiErr := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiErr *net.ApiError) {
+func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiStatus net.ApiStatus) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 	return
 }

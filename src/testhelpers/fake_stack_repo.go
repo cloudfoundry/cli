@@ -12,14 +12,15 @@ type FakeStackRepository struct {
 	FindAllStacks []cf.Stack
 }
 
-func (repo *FakeStackRepository) FindByName(name string) (stack cf.Stack, apiErr *net.ApiError) {
+func (repo *FakeStackRepository) FindByName(name string) (stack cf.Stack, apiStatus net.ApiStatus) {
 	repo.FindByNameName = name
 	stack = repo.FindByNameStack
 
 	return
 }
 
-func (repo *FakeStackRepository) FindAll() (stacks []cf.Stack, apiErr *net.ApiError) {
-	return repo.FindAllStacks, nil
+func (repo *FakeStackRepository) FindAll() (stacks []cf.Stack, apiStatus net.ApiStatus) {
+	stacks = repo.FindAllStacks
+	return
 }
 

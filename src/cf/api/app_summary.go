@@ -9,7 +9,7 @@ import (
 )
 
 type AppSummaryRepository interface {
-	GetSummary(app cf.Application) (summary cf.AppSummary, apiErr *net.ApiError)
+	GetSummary(app cf.Application) (summary cf.AppSummary, apiStatus net.ApiStatus)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -25,16 +25,16 @@ func NewCloudControllerAppSummaryRepository(config configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (summary cf.AppSummary, apiErr *net.ApiError) {
+func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (summary cf.AppSummary, apiStatus net.ApiStatus) {
 	summary.App = app
 
-	instances, apiErr := repo.appRepo.GetInstances(app)
-	if apiErr != nil {
+	instances, apiStatus := repo.appRepo.GetInstances(app)
+	if apiStatus.IsError() {
 		return
 	}
 
-	instances, apiErr = repo.updateInstancesWithStats(app, instances)
-	if apiErr != nil {
+	instances, apiStatus = repo.updateInstancesWithStats(app, instances)
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -57,17 +57,17 @@ type InstanceStatsApiResponse struct {
 	}
 }
 
-func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.Application, instances []cf.ApplicationInstance) (updatedInst []cf.ApplicationInstance, apiErr *net.ApiError) {
+func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.Application, instances []cf.ApplicationInstance) (updatedInst []cf.ApplicationInstance, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.Target, app.Guid)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	apiResponse := StatsApiResponse{}
 
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
+	if apiStatus.IsError() {
 		return
 	}
 

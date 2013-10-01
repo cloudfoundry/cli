@@ -54,10 +54,10 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(orgName))
 
-	org, apiErr := cmd.orgRepo.FindByName(orgName)
+	org, apiStatus := cmd.orgRepo.FindByName(orgName)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
@@ -67,9 +67,9 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		return
 	}
 
-	apiErr = cmd.orgRepo.Delete(org)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	apiStatus = cmd.orgRepo.Delete(org)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 	config, err := cmd.configRepo.Get()

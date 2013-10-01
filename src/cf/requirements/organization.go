@@ -29,8 +29,8 @@ func NewOrganizationRequirement(name string, ui terminal.UI, sR api.Organization
 }
 
 func (req *OrganizationApiRequirement) Execute() (success bool) {
-	var apiErr *net.ApiError
-	req.org, apiErr = req.orgRepo.FindByName(req.name)
+	var apiStatus net.ApiStatus
+	req.org, apiStatus = req.orgRepo.FindByName(req.name)
 
 	// todo - this seems like a special case; confirm?
 	if !req.org.IsFound() {
@@ -38,8 +38,8 @@ func (req *OrganizationApiRequirement) Execute() (success bool) {
 		return false
 	}
 
-	if apiErr != nil {
-		req.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		req.ui.Failed(apiStatus.Message)
 		return false
 	}
 

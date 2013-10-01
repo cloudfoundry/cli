@@ -31,10 +31,10 @@ func (cmd ListApps) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Say("Getting applications in %s...", cmd.spaceRepo.GetCurrentSpace().Name)
 
-	space, err := cmd.spaceRepo.GetSummary()
+	space, apiStatus := cmd.spaceRepo.GetSummary()
 
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

@@ -72,8 +72,8 @@ func TestRoutesFindAll(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerRouteRepository(config, gateway)
 
-	routes, err := repo.FindAll()
-	assert.NoError(t, err)
+	routes, apiStatus := repo.FindAll()
+	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, len(routes), 2)
 
@@ -117,8 +117,8 @@ func TestFindByHost(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerRouteRepository(config, gateway)
 
-	route, err := repo.FindByHost("my-cool-app")
-	assert.NoError(t, err)
+	route, apiStatus := repo.FindByHost("my-cool-app")
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
 
@@ -144,8 +144,8 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerRouteRepository(config, gateway)
 
-	_, err := repo.FindByHost("my-cool-app")
-	assert.Error(t, err)
+	_, apiStatus := repo.FindByHost("my-cool-app")
+	assert.True(t, apiStatus.IsError())
 }
 
 var createRouteResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
@@ -180,8 +180,8 @@ func TestCreateRoute(t *testing.T) {
 	domain := cf.Domain{Guid: "my-domain-guid"}
 	newRoute := cf.Route{Host: "my-cool-app"}
 
-	createdRoute, err := repo.Create(newRoute, domain)
-	assert.NoError(t, err)
+	createdRoute, apiStatus := repo.Create(newRoute, domain)
+	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
@@ -207,6 +207,6 @@ func TestBind(t *testing.T) {
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
-	err := repo.Bind(route, app)
-	assert.NoError(t, err)
+	apiStatus := repo.Bind(route, app)
+	assert.False(t, apiStatus.IsError())
 }

@@ -45,15 +45,15 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Binding service %s to %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
-	apiErr := cmd.serviceRepo.BindService(instance, app)
-	if apiErr != nil && apiErr.ErrorCode != "90003" {
-		cmd.ui.Failed(apiErr.Error())
+	apiStatus := cmd.serviceRepo.BindService(instance, app)
+	if apiStatus.IsError() && apiStatus.ErrorCode != "90003" {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
 	cmd.ui.Ok()
 
-	if apiErr != nil && apiErr.ErrorCode == "90003" {
+	if apiStatus.IsError() && apiStatus.ErrorCode == "90003" {
 		cmd.ui.Warn("App %s is already bound to %s.", app.Name, instance.Name)
 	}
 }

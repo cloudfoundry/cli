@@ -26,10 +26,10 @@ func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 func (cmd ListRoutes) Run(c *cli.Context) {
 	cmd.ui.Say("Getting routes")
 
-	routes, err := cmd.routeRepo.FindAll()
+	routes, apiStatus := cmd.routeRepo.FindAll()
 
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

@@ -21,12 +21,12 @@ func TestUAAGatewayErrorHandling(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
 	defer ts.Close()
 
-	request, err := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.NoError(t, err)
+	request, apiStatus := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+	assert.False(t, apiStatus.IsError())
 
-	err = gateway.PerformRequest(request)
+	apiStatus = gateway.PerformRequest(request)
 
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "The foo is wrong")
-	assert.Contains(t, err.ErrorCode, "foo")
+	assert.True(t, apiStatus.IsError())
+	assert.Contains(t, apiStatus.Message, "The foo is wrong")
+	assert.Contains(t, apiStatus.ErrorCode, "foo")
 }

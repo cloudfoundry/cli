@@ -9,10 +9,10 @@ import (
 )
 
 type RouteRepository interface {
-	FindAll() (routes []cf.Route, apiErr *net.ApiError)
-	FindByHost(host string) (route cf.Route, apiErr *net.ApiError)
-	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiErr *net.ApiError)
-	Bind(route cf.Route, app cf.Application) (apiErr *net.ApiError)
+	FindAll() (routes []cf.Route, apiStatus net.ApiStatus)
+	FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus)
+	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus)
+	Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerRouteRepository struct {
@@ -26,17 +26,17 @@ func NewCloudControllerRouteRepository(config configuration.Configuration, gatew
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiErr *net.ApiError) {
+func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
 
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(RoutesResponse)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -55,22 +55,22 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiErr 
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiErr *net.ApiError) {
+func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
 
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	response := new(ApiResponse)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiErr = net.NewApiErrorWithMessage("Route not found")
+		apiStatus = net.NewApiStatusWithMessage("Route not found")
 		return
 	}
 
@@ -81,20 +81,20 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	return
 }
 
-func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiErr *net.ApiError) {
+func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/routes", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`,
 		newRoute.Host, domain.Guid, repo.config.Space.Guid,
 	)
-	request, apiErr := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiStatus.IsError() {
 		return
 	}
 
 	resource := new(Resource)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, resource)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	if apiStatus.IsError() {
 		return
 	}
 
@@ -103,14 +103,14 @@ func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.D
 	return
 }
 
-func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiErr *net.ApiError) {
+func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
-	request, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
-	apiErr = repo.gateway.PerformRequest(request)
+	apiStatus = repo.gateway.PerformRequest(request)
 
 	return
 }

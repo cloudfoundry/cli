@@ -97,9 +97,9 @@ func (cmd Target) setOrganization(orgName string) (config configuration.Configur
 		return
 	}
 
-	org, apiErr := cmd.orgRepo.FindByName(orgName)
+	org, apiStatus := cmd.orgRepo.FindByName(orgName)
 	// todo - confirm the behavior here; should happen after isFound
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		cmd.ui.Failed("Could not set organization.")
 		return
 	}
@@ -132,9 +132,9 @@ func (cmd Target) setSpace(spaceName string) (config configuration.Configuration
 		return
 	}
 
-	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
+	space, apiStatus := cmd.spaceRepo.FindByName(spaceName)
 	// todo - confirm the behavior here; should happen after isFound
-	if apiErr != nil {
+	if apiStatus.IsError() {
 		cmd.ui.Failed("You do not have access to that space.")
 		return
 	}

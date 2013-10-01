@@ -54,10 +54,10 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 
 	delete(envVars, varName)
 
-	err := cmd.appRepo.SetEnv(app, envVars)
+	apiStatus := cmd.appRepo.SetEnv(app, envVars)
 
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

@@ -8,8 +8,8 @@ import (
 )
 
 type StackRepository interface {
-	FindByName(name string) (stack cf.Stack, apiErr *net.ApiError)
-	FindAll() (stacks []cf.Stack, apiErr *net.ApiError)
+	FindByName(name string) (stack cf.Stack, apiStatus net.ApiStatus)
+	FindAll() (stacks []cf.Stack, apiStatus net.ApiStatus)
 }
 
 type CloudControllerStackRepository struct {
@@ -23,21 +23,21 @@ func NewCloudControllerStackRepository(config configuration.Configuration, gatew
 	return
 }
 
-func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiErr *net.ApiError) {
+func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	findResponse := new(ApiResponse)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
+	if apiStatus.IsError() {
 		return
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiErr = net.NewApiErrorWithMessage("Stack %s not found", name)
+		apiStatus = net.NewApiStatusWithMessage("Stack %s not found", name)
 		return
 	}
 
@@ -48,16 +48,16 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	return
 }
 
-func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiErr *net.ApiError) {
+func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiErr != nil {
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
 		return
 	}
 
 	listResponse := new(StackApiResponse)
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
-	if apiErr != nil {
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
+	if apiStatus.IsError() {
 		return
 	}
 

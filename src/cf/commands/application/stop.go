@@ -49,10 +49,10 @@ func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application,
 
 	cmd.ui.Say("Stopping %s...", terminal.EntityNameColor(app.Name))
 
-	updatedApp, apiErr := cmd.appRepo.Stop(app)
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
-		cmd.ui.Failed(apiErr.Error())
+	updatedApp, apiStatus := cmd.appRepo.Stop(app)
+	if apiStatus.IsError() {
+		err = errors.New(apiStatus.Message)
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 

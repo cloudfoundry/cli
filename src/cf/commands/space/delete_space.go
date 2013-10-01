@@ -42,10 +42,10 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	cmd.ui.Warn("Deleting space %s...", spaceName)
 
-	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
+	space, apiStatus := cmd.spaceRepo.FindByName(spaceName)
 
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
@@ -66,9 +66,9 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		}
 	}
 
-	apiErr = cmd.spaceRepo.Delete(space)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	apiStatus = cmd.spaceRepo.Delete(space)
+	if apiStatus.IsError() {
+		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 
