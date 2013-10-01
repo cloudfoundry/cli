@@ -1,4 +1,4 @@
-package commands
+package service
 
 import (
 	"cf/api"
@@ -8,22 +8,22 @@ import (
 	"strings"
 )
 
-type Services struct {
+type ListServices struct {
 	ui        terminal.UI
 	spaceRepo api.SpaceRepository
 }
 
-func NewServices(ui terminal.UI, spaceRepo api.SpaceRepository) (cmd Services) {
+func NewListServices(ui terminal.UI, spaceRepo api.SpaceRepository) (cmd ListServices) {
 	cmd.ui = ui
 	cmd.spaceRepo = spaceRepo
 	return
 }
 
-func (cmd Services) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListServices) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
 
-func (cmd Services) Run(c *cli.Context) {
+func (cmd ListServices) Run(c *cli.Context) {
 	cmd.ui.Say("Getting services in %s", cmd.spaceRepo.GetCurrentSpace().Name)
 
 	space, err := cmd.spaceRepo.GetSummary()

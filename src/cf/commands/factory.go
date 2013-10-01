@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/commands/organization"
+	"cf/commands/service"
 	"cf/commands/space"
 	"cf/terminal"
 	"errors"
@@ -22,14 +23,14 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["api"] = NewApi(ui, repoLocator.GetCloudControllerGateway(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["app"] = NewApp(ui, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["apps"] = NewApps(ui, repoLocator.GetSpaceRepository())
-	factory.cmdsByName["bind-service"] = NewBindService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["bind-service"] = service.NewBindService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["create-domain"] = NewCreateDomain(ui, repoLocator.GetDomainRepository(), repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["create-org"] = organization.NewCreateOrg(ui, repoLocator.GetOrganizationRepository())
-	factory.cmdsByName["create-service"] = NewCreateService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["create-service"] = service.NewCreateService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["delete"] = NewDelete(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, repoLocator.GetOrganizationRepository(), repoLocator.GetConfigurationRepository())
-	factory.cmdsByName["delete-service"] = NewDeleteService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["delete-service"] = service.NewDeleteService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["delete-space"] = space.NewDeleteSpace(ui, repoLocator.GetSpaceRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["env"] = NewEnv(ui)
 	factory.cmdsByName["files"] = NewFiles(ui, repoLocator.GetAppFilesRepository())
@@ -37,23 +38,23 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["logout"] = NewLogout(ui, repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["logs"] = NewLogs(ui, repoLocator.GetLogsRepository())
 	factory.cmdsByName["logs-recent"] = NewRecentLogs(ui, repoLocator.GetApplicationRepository(), repoLocator.GetLogsRepository())
-	factory.cmdsByName["marketplace"] = NewMarketplaceServices(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui)
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["password"] = NewPassword(ui, repoLocator.GetPasswordRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["rename"] = NewRename(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["rename-org"] = organization.NewRenameOrg(ui, repoLocator.GetOrganizationRepository())
-	factory.cmdsByName["rename-service"] = NewRenameService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["rename-service"] = service.NewRenameService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, repoLocator.GetSpaceRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["routes"] = NewRoutes(ui, repoLocator.GetRouteRepository())
 	factory.cmdsByName["set-env"] = NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, repoLocator.GetConfig())
-	factory.cmdsByName["service"] = NewShowService(ui, repoLocator.GetServiceRepository())
-	factory.cmdsByName["services"] = NewServices(ui, repoLocator.GetSpaceRepository())
+	factory.cmdsByName["service"] = service.NewShowService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, repoLocator.GetConfig(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["stacks"] = NewStacks(ui, repoLocator.GetStackRepository())
 	factory.cmdsByName["target"] = NewTarget(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
-	factory.cmdsByName["unbind-service"] = NewUnbindService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["unset-env"] = NewUnsetEnv(ui, repoLocator.GetApplicationRepository())
 
 	start := NewStart(ui, repoLocator.GetConfig(), repoLocator.GetApplicationRepository())

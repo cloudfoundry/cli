@@ -1,9 +1,9 @@
-package commands_test
+package service_test
 
 import (
 	"cf"
 	"cf/api"
-	. "cf/commands"
+	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"

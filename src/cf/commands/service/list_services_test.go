@@ -1,8 +1,8 @@
-package commands_test
+package service_test
 
 import (
 	"cf"
-	. "cf/commands"
+	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -37,7 +37,7 @@ func TestServices(t *testing.T) {
 	}
 	ui := &testhelpers.FakeUI{}
 
-	cmd := NewServices(ui, spaceRepo)
+	cmd := NewListServices(ui, spaceRepo)
 	cmd.Run(testhelpers.NewContext("services", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting services in development")
