@@ -131,10 +131,6 @@ type ServiceInstance struct {
 	ServiceOffering  ServiceOffering
 }
 
-func (serviceInstance ServiceInstance) IsFound() bool {
-	return serviceInstance.Name != "" && serviceInstance.Guid != ""
-}
-
 type ServiceBinding struct {
 	Url     string
 	Guid    string

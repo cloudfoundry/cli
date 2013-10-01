@@ -51,7 +51,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["routes"] = route.NewListRoutes(ui, repoLocator.GetRouteRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, repoLocator.GetConfig())
-	factory.cmdsByName["service"] = service.NewShowService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, repoLocator.GetConfig(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["stacks"] = NewStacks(ui, repoLocator.GetStackRepository())

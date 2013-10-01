@@ -18,6 +18,8 @@ type FakeServiceRepo struct {
 
 	FindInstanceByNameName string
 	FindInstanceByNameServiceInstance cf.ServiceInstance
+	FindInstanceByNameErr bool
+	FindInstanceByNameNotFound bool
 
 	BindServiceServiceInstance cf.ServiceInstance
 	BindServiceApplication cf.Application
@@ -55,6 +57,14 @@ func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, para
 func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiStatus net.ApiStatus) {
 	repo.FindInstanceByNameName = name
 	instance = repo.FindInstanceByNameServiceInstance
+
+	if repo.FindInstanceByNameErr {
+		apiStatus = net.NewApiStatusWithMessage("Error finding instance")
+	}
+
+	if repo.FindInstanceByNameNotFound {
+		apiStatus = net.NewNotFoundApiStatus()
+	}
 
 	return
 }

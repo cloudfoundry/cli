@@ -41,7 +41,6 @@ func (f ApiRequirementFactory) NewServiceInstanceRequirement(name string) Servic
 	return NewServiceInstanceRequirement(
 		name,
 		f.ui,
-		f.repoLocator.GetConfig(),
 		f.repoLocator.GetServiceRepository(),
 	)
 }

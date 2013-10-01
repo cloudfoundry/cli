@@ -82,7 +82,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 
 		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
 
-		if !findInstanceApiStatus.IsError() && serviceInstance.IsFound() &&
+		if !findInstanceApiStatus.IsError() && !findInstanceApiStatus.IsNotFound() &&
 			serviceInstance.ServicePlan.Name == plan.Name &&
 			serviceInstance.ServicePlan.ServiceOffering.Label == plan.ServiceOffering.Label {
 
@@ -134,6 +134,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	if len(response.Resources) == 0 {
+		apiStatus = net.NewNotFoundApiStatus()
 		return
 	}
 

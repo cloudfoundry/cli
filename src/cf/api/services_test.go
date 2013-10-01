@@ -250,7 +250,7 @@ func TestFindInstanceByName(t *testing.T) {
 
 	instance, apiStatus := repo.FindInstanceByName("my-service")
 	assert.False(t, apiStatus.IsError())
-	assert.True(t, instance.IsFound())
+	assert.False(t, apiStatus.IsNotFound())
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
 	assert.Equal(t, instance.ServiceOffering.Label, "mysql")
@@ -288,9 +288,9 @@ func TestFindInstanceByNameForNonExistentService(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	instance, apiStatus := repo.FindInstanceByName("my-service")
+	_, apiStatus := repo.FindInstanceByName("my-service")
 	assert.False(t, apiStatus.IsError())
-	assert.False(t, instance.IsFound())
+	assert.True(t, apiStatus.IsNotFound())
 }
 
 var bindServiceEndpoint = testhelpers.CreateEndpoint(

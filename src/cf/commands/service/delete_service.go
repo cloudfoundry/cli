@@ -44,12 +44,11 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	instance, apiStatus := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-	// todo - confirm the behavior here; should happen after isFound
 	if apiStatus.IsError() {
 		cmd.ui.Failed(apiStatus.Message)
 	}
 
-	if !instance.IsFound() {
+	if apiStatus.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service %s does not exist.", serviceName)
 		return

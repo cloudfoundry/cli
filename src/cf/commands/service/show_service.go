@@ -1,7 +1,6 @@
 package service
 
 import (
-	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -9,48 +8,36 @@ import (
 )
 
 type ShowService struct {
-	ui          terminal.UI
-	serviceRepo api.ServiceRepository
+	ui                 terminal.UI
+	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewShowService(ui terminal.UI, sR api.ServiceRepository) (cmd ShowService) {
+func NewShowService(ui terminal.UI) (cmd *ShowService) {
+	cmd = new(ShowService)
 	cmd.ui = ui
-	cmd.serviceRepo = sR
 	return
 }
 
-func (cmd ShowService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) < 1 {
+func (cmd *ShowService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "service")
 		return
 	}
 
+	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(c.Args()[0])
+
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedSpaceRequirement(),
+		cmd.serviceInstanceReq,
 	}
 	return
 }
 
-func (cmd ShowService) Run(c *cli.Context) {
-	serviceName := c.Args()[0]
+func (cmd *ShowService) Run(c *cli.Context) {
+	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Getting service instance %s...", terminal.EntityNameColor(serviceName))
-
-	serviceInstance, apiStatus := cmd.serviceRepo.FindInstanceByName(serviceName)
-
-	if !serviceInstance.IsFound() {
-		cmd.ui.Failed("Service instance %s does not exist.", serviceName)
-		return
-	}
-
-	if apiStatus.IsError() {
-		cmd.ui.Failed(apiStatus.Message)
-		return
-	}
-
-	cmd.ui.Ok()
 	cmd.ui.Say("")
 	cmd.ui.Say("service instance: %s", terminal.EntityNameColor(serviceInstance.Name))
 	cmd.ui.Say("service: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Label))
