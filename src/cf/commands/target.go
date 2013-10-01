@@ -132,13 +132,13 @@ func (cmd Target) setSpace(spaceName string) (config configuration.Configuration
 	}
 
 	space, apiStatus := cmd.spaceRepo.FindByName(spaceName)
-	// todo - confirm the behavior here; should happen after isFound
+
 	if apiStatus.IsError() {
 		cmd.ui.Failed("You do not have access to that space.")
 		return
 	}
 
-	if !space.IsFound() {
+	if apiStatus.IsNotFound() {
 		cmd.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
 		return
 	}

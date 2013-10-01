@@ -216,6 +216,8 @@ func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
 	config.Organization = cf.Organization{Name: "my-org", Guid: "my-org-guid"}
 	configRepo.Save(config)
 
+	spaceRepo.FindByNameNotFound = true
+
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")

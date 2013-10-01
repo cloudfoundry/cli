@@ -190,8 +190,7 @@ func TestSpacesFindByName(t *testing.T) {
 
 	space, apiStatus := repo.FindByName("Space1")
 	assert.False(t, apiStatus.IsError())
-
-	assert.True(t, space.IsFound())
+	assert.False(t, apiStatus.IsNotFound())
 	assert.Equal(t, space.Name, "Space1")
 	assert.Equal(t, space.Guid, "space1-guid")
 
@@ -202,7 +201,7 @@ func TestSpacesFindByName(t *testing.T) {
 
 	space, apiStatus = repo.FindByName("space1")
 	assert.False(t, apiStatus.IsError())
-	assert.True(t, space.IsFound())
+	assert.False(t, apiStatus.IsNotFound())
 }
 
 var didNotFindSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -235,9 +234,9 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
-	space, apiStatus := repo.FindByName("space1")
+	_, apiStatus := repo.FindByName("space1")
 	assert.False(t, apiStatus.IsError())
-	assert.False(t, space.IsFound())
+	assert.True(t, apiStatus.IsNotFound())
 }
 
 var spaceSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `

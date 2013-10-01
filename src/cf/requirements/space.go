@@ -36,7 +36,7 @@ func (req *SpaceApiRequirement) Execute() (success bool) {
 		return false
 	}
 
-	return req.space.IsFound()
+	return !apiStatus.IsNotFound()
 }
 
 func (req *SpaceApiRequirement) GetSpace() cf.Space {

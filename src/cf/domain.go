@@ -21,10 +21,6 @@ type Organization struct {
 	Domains []Domain
 }
 
-//func (org Organization) IsFound() bool {
-//	return org.Name != "" && org.Guid != ""
-//}
-
 type Space struct {
 	Name             string
 	Guid             string
@@ -32,10 +28,6 @@ type Space struct {
 	ServiceInstances []ServiceInstance
 	Organization     Organization
 	Domains          []Domain
-}
-
-func (space Space) IsFound() bool {
-	return space.Name != "" && space.Guid != ""
 }
 
 type Application struct {

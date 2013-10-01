@@ -54,7 +54,7 @@ func TestDeleteSpaceWithForceOption(t *testing.T) {
 
 func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	spaceRepo := &testhelpers.FakeSpaceRepository{FindByNameNotFound: true}
 	configRepo := &testhelpers.FakeConfigRepository{}
 
 	ui := &testhelpers.FakeUI{}

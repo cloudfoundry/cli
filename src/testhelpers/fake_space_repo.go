@@ -43,6 +43,10 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiSta
 		apiStatus = net.NewApiStatusWithMessage("Error finding space by name.")
 	}
 
+	if repo.FindByNameNotFound {
+		apiStatus = net.NewNotFoundApiStatus()
+	}
+
 	return
 }
 
