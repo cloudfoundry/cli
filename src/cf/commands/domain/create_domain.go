@@ -9,23 +9,23 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type CreateDomain struct {
+type ParkDomain struct {
 	ui         terminal.UI
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewCreateDomain(ui terminal.UI, domainRepo api.DomainRepository) (cmd *CreateDomain) {
-	cmd = new(CreateDomain)
+func NewParkDomain(ui terminal.UI, domainRepo api.DomainRepository) (cmd *ParkDomain) {
+	cmd = new(ParkDomain)
 	cmd.ui = ui
 	cmd.domainRepo = domainRepo
 	return
 }
 
-func (cmd *CreateDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ParkDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "create-domain")
+		cmd.ui.FailWithUsage(c, "park-domain")
 		return
 	}
 
@@ -37,7 +37,7 @@ func (cmd *CreateDomain) GetRequirements(reqFactory requirements.Factory, c *cli
 	return
 }
 
-func (cmd *CreateDomain) Run(c *cli.Context) {
+func (cmd *ParkDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 	owningOrg := cmd.orgReq.GetOrganization()
 

@@ -27,7 +27,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["app"] = application.NewShowApp(ui, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["bind-service"] = service.NewBindService(ui, repoLocator.GetServiceRepository())
-	factory.cmdsByName["create-domain"] = domain.NewCreateDomain(ui, repoLocator.GetDomainRepository())
+	factory.cmdsByName["park-domain"] = domain.NewParkDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["create-org"] = organization.NewCreateOrg(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["create-service"] = service.NewCreateService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, repoLocator.GetSpaceRepository())

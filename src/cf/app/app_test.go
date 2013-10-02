@@ -39,7 +39,7 @@ func TestCommands(t *testing.T) {
 		"app",
 		"apps",
 		"bind-service",
-		"create-domain",
+		"park-domain",
 		"create-org",
 		"create-service",
 		"create-space",

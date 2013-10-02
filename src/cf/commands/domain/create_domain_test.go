@@ -8,49 +8,49 @@ import (
 	"testing"
 )
 
-func TestCreateDomainRequirements(t *testing.T) {
+func TestParkDomainRequirements(t *testing.T) {
 	domainRepo := &testhelpers.FakeDomainRepository{}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 
-	callCreateDomain([]string{"example.com", "my-org"}, reqFactory, domainRepo)
+	callParkDomain([]string{"example.com", "my-org"}, reqFactory, domainRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.OrganizationName, "my-org")
 
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
 
-	callCreateDomain([]string{"example.com", "my-org"}, reqFactory, domainRepo)
+	callParkDomain([]string{"example.com", "my-org"}, reqFactory, domainRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
-func TestCreateDomainFailsWithUsage(t *testing.T) {
+func TestParkDomainFailsWithUsage(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 	domainRepo := &testhelpers.FakeDomainRepository{}
-	ui := callCreateDomain([]string{""}, reqFactory, domainRepo)
+	ui := callParkDomain([]string{""}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callCreateDomain([]string{"example.com"}, reqFactory, domainRepo)
+	ui = callParkDomain([]string{"example.com"}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callCreateDomain([]string{"example.com", "org1"}, reqFactory, domainRepo)
+	ui = callParkDomain([]string{"example.com", "org1"}, reqFactory, domainRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
-func TestCreateDomain(t *testing.T) {
+func TestParkDomain(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, Organization: cf.Organization{Name: "myOrg", Guid: "myOrg-guid"}}
 	domainRepo := &testhelpers.FakeDomainRepository{}
-	fakeUI := callCreateDomain([]string{"example.com", "myOrg"}, reqFactory, domainRepo)
+	fakeUI := callParkDomain([]string{"example.com", "myOrg"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.CreateDomainDomainToCreate.Name, "example.com")
-	assert.Equal(t, domainRepo.CreateDomainOwningOrg.Name, "myOrg")
+	assert.Equal(t, domainRepo.ParkDomainDomainToCreate.Name, "example.com")
+	assert.Equal(t, domainRepo.ParkDomainOwningOrg.Name, "myOrg")
 	assert.Contains(t, fakeUI.Outputs[0], "example.com")
 	assert.Contains(t, fakeUI.Outputs[0], "myOrg")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func callCreateDomain(args []string, reqFactory *testhelpers.FakeReqFactory, domainRepo *testhelpers.FakeDomainRepository) (fakeUI *testhelpers.FakeUI) {
+func callParkDomain(args []string, reqFactory *testhelpers.FakeReqFactory, domainRepo *testhelpers.FakeDomainRepository) (fakeUI *testhelpers.FakeUI) {
 	fakeUI = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("create-domain", args)
-	cmd := NewCreateDomain(fakeUI, domainRepo)
+	ctxt := testhelpers.NewContext("park-domain", args)
+	cmd := NewParkDomain(fakeUI, domainRepo)
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return

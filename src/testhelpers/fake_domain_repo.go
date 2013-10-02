@@ -14,8 +14,8 @@ type FakeDomainRepository struct {
 	FindByNameName string
 	FindByNameDomain cf.Domain
 
-	CreateDomainDomainToCreate cf.Domain
-	CreateDomainOwningOrg cf.Organization
+	ParkDomainDomainToCreate cf.Domain
+	ParkDomainOwningOrg cf.Organization
 }
 
 func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiStatus net.ApiStatus){
@@ -37,7 +37,7 @@ func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, api
 }
 
 func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus){
-	repo.CreateDomainDomainToCreate = domainToCreate
-	repo.CreateDomainOwningOrg = owningOrg
+	repo.ParkDomainDomainToCreate = domainToCreate
+	repo.ParkDomainOwningOrg = owningOrg
 	return
 }

@@ -57,15 +57,6 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
-			Name:        "create-domain",
-			Description: "Add a domain to an org",
-			Usage:       fmt.Sprintf("%s create-domain DOMAIN ORG", cf.Name),
-			Action: func(c *cli.Context) {
-				cmd, _ := cmdFactory.GetByCmdName("create-domain")
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create organization",
@@ -240,6 +231,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Usage:       fmt.Sprintf("%s orgs", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("orgs")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "park-domain",
+			Description: "Add a domain to an org",
+			Usage:       fmt.Sprintf("%s park-domain DOMAIN ORG", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("park-domain")
 				cmdRunner.Run(cmd, c)
 			},
 		},
