@@ -36,11 +36,9 @@ NOTE: Currently only development on OSX 10.8 is supported
 Releasing
 =========
 
-On linux:
-1. Run ```bin/build-all```
+On linux: run ```bin/build-all```
 
-On mac:
-1. Run ```bin/build-all-osx```
+On mac: run ```bin/build-all-osx```
 
 This will create tgz files in the release folder.
 
