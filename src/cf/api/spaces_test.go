@@ -160,7 +160,7 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
 
 var findSpaceByNameEndpoint = testhelpers.CreateEndpoint(
 	"GET",
-	"/v2/spaces?q=name%3Aspace1&inline-relations-depth=1",
+	"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
 	nil,
 	findSpaceByNameResponse,
 )
@@ -172,7 +172,7 @@ func TestSpacesFindByName(t *testing.T) {
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "some-org-guid"},
+		Organization: cf.Organization{Guid: "org-guid"},
 	}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
@@ -217,7 +217,7 @@ var didNotFindSpaceByNameResponse = testhelpers.TestResponse{Status: http.Status
 
 var didNotFindSpaceByNameEndpoint = testhelpers.CreateEndpoint(
 	"GET",
-	"/v2/spaces?q=name%3Aspace1&inline-relations-depth=1",
+	"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
 	nil,
 	didNotFindSpaceByNameResponse,
 )
@@ -229,7 +229,7 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "some-org-guid"},
+		Organization: cf.Organization{Guid: "org-guid"},
 	}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)

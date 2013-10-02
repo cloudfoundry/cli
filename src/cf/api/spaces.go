@@ -56,7 +56,8 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiStat
 }
 
 func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiStatus net.ApiStatus) {
-	path := fmt.Sprintf("%s/v2/spaces?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
+	path := fmt.Sprintf("%s/v2/organizations/%s/spaces?q=name%s&inline-relations-depth=1",
+		repo.config.Target, repo.config.Organization.Guid, "%3A"+strings.ToLower(name))
 
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiStatus.IsError() {
