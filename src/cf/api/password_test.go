@@ -40,7 +40,7 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 	targetServer := createInfoServer(scoreServer.URL)
 	defer targetServer.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      targetServer.URL,
 	}
@@ -80,7 +80,7 @@ func TestUpdatePassword(t *testing.T) {
 	tokenInfo := `{"user_id":"my-user-guid"}`
 	encodedTokenInfo := base64.StdEncoding.EncodeToString([]byte(tokenInfo))
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: fmt.Sprintf("BEARER my_access_token.%s.baz", encodedTokenInfo),
 		Target:      targetServer.URL,
 	}

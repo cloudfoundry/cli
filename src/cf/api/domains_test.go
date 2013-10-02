@@ -49,7 +49,7 @@ func TestFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -128,7 +128,7 @@ func TestFindAllByOrg(t *testing.T) {
 	defer ts.Close()
 
 	org := cf.Organization{Guid: "my-org-guid"}
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: org,
@@ -155,7 +155,7 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -174,7 +174,7 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -210,7 +210,7 @@ func TestParkDomain(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createDomainEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},

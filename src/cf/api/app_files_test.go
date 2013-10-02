@@ -50,7 +50,7 @@ func TestListFiles(t *testing.T) {
 	listFilesRedirectServer := httptest.NewTLSServer(http.HandlerFunc(listFilesRedirectEndpoint))
 	defer listFilesRedirectServer.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		Target:      listFilesRedirectServer.URL,
 		AccessToken: "BEARER my_access_token",
 	}

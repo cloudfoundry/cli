@@ -16,7 +16,7 @@ import (
 
 type Start struct {
 	ui        terminal.UI
-	config    configuration.Configuration
+	config    *configuration.Configuration
 	appRepo   api.ApplicationRepository
 	startTime time.Time
 	appReq    requirements.ApplicationRequirement
@@ -26,7 +26,7 @@ type ApplicationStarter interface {
 	ApplicationStart(cf.Application) (startedApp cf.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config

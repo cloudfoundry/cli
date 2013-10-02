@@ -223,7 +223,7 @@ func TestBind(t *testing.T) {
 }
 
 func getRepo(targetURL string) (repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      targetURL,
 		Space:       cf.Space{Guid: "my-space-guid"},

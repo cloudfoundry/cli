@@ -19,11 +19,11 @@ type SpaceRepository interface {
 }
 
 type CloudControllerSpaceRepository struct {
-	config  configuration.Configuration
+	config  *configuration.Configuration
 	gateway net.Gateway
 }
 
-func NewCloudControllerSpaceRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerSpaceRepository) {
+func NewCloudControllerSpaceRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerSpaceRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

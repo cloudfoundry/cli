@@ -82,7 +82,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	if config.Space.Name == spaceName {
 		config.Space = cf.Space{}
-		cmd.configRepo.Save(config)
+		cmd.configRepo.Save()
 		cmd.ui.Say("TIP: No space targeted. Use '%s target -s' to target a space.", cf.Name)
 	}
 

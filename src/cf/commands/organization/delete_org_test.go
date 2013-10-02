@@ -41,7 +41,7 @@ func TestDeleteTargetedOrganizationClearsConfig(t *testing.T) {
 	config, _ := configRepo.Get()
 	config.Organization = cf.Organization{Name: "org-to-delete", Guid: "org-to-delete-guid"}
 	config.Space = cf.Space{Name: "space-to-delete"}
-	configRepo.Save(config)
+	configRepo.Save()
 
 	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
 	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
@@ -62,7 +62,7 @@ func TestDeleteUntargetedOrganizationDoesNotClearConfig(t *testing.T) {
 	config, _ := configRepo.Get()
 	config.Organization = cf.Organization{Name: "some-other-org", Guid: "some-other-org-guid"}
 	config.Space = cf.Space{Name: "some-other-space"}
-	configRepo.Save(config)
+	configRepo.Save()
 
 	deleteOrg("Yes", []string{"org-to-delete"}, orgRepo)
 

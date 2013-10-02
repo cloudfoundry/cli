@@ -45,7 +45,7 @@ func TestSpacesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
@@ -70,7 +70,7 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken:  "BEARER incorrect_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
@@ -169,7 +169,7 @@ func TestSpacesFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findSpaceByNameEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
@@ -226,7 +226,7 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(didNotFindSpaceByNameEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
@@ -318,7 +318,7 @@ func TestSpacesGetSummary(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(spaceSummaryEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -378,7 +378,7 @@ func TestCreateSpace(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createSpaceEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "org-guid"},
@@ -401,7 +401,7 @@ func TestRenameSpace(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(renameSpaceEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -424,7 +424,7 @@ func TestDeleteSpace(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(deleteSpaceEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}

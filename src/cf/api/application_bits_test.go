@@ -148,7 +148,7 @@ func testUploadApp(t *testing.T, dir string) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(uploadEndpoints))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}

@@ -10,7 +10,7 @@ import (
 
 func TestLoginRequirement(t *testing.T) {
 	ui := new(testhelpers.FakeUI)
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "foo bar token",
 	}
 
@@ -18,7 +18,7 @@ func TestLoginRequirement(t *testing.T) {
 	success := req.Execute()
 	assert.True(t, success)
 
-	config = configuration.Configuration{
+	config = &configuration.Configuration{
 		AccessToken: "",
 	}
 

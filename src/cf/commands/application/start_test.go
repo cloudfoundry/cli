@@ -19,7 +19,7 @@ var defaultAppForStart = cf.Application{
 }
 
 func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []string) (ui *testhelpers.FakeUI, appRepo *testhelpers.FakeApplicationRepository, reqFactory *testhelpers.FakeReqFactory) {
-	config := configuration.Configuration{ApplicationStartTimeout: 2}
+	config := &configuration.Configuration{ApplicationStartTimeout: 2}
 
 	appRepo = &testhelpers.FakeApplicationRepository{
 		FindByNameApp:          app,
@@ -33,7 +33,7 @@ func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.Applica
 }
 
 func TestStartCommandFailsWithUsage(t *testing.T) {
-	config := configuration.Configuration{}
+	config := &configuration.Configuration{}
 	appRepo := &testhelpers.FakeApplicationRepository{
 		GetInstancesResponses: [][]cf.ApplicationInstance{
 			[]cf.ApplicationInstance{},
@@ -188,7 +188,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 }
 
 func TestStartApplicationWhenStartFails(t *testing.T) {
-	config := configuration.Configuration{}
+	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app, StartAppErr: true}
 	args := []string{"my-app"}
@@ -202,7 +202,7 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 }
 
 func TestStartApplicationIsAlreadyStarted(t *testing.T) {
-	config := configuration.Configuration{}
+	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
 	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
 
@@ -216,7 +216,7 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "")
 }
 
-func callStart(args []string, config configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
+func callStart(args []string, config *configuration.Configuration, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("start", args)
 

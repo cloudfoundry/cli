@@ -10,7 +10,7 @@ import (
 )
 
 func TestShowSpaceRequirements(t *testing.T) {
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		Space:        cf.Space{},
 		Organization: cf.Organization{},
 	}
@@ -40,7 +40,7 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 		cf.ServiceInstance{Name: "service1", Guid: "service1-guid"},
 	}
 	space := cf.Space{Name: "space1", Organization: org, Applications: apps, Domains: domains, ServiceInstances: services}
-	config := configuration.Configuration{Space: space}
+	config := &configuration.Configuration{Space: space}
 
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	ui := callShowSpace([]string{}, reqFactory, config)
@@ -58,7 +58,7 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[6], "service1")
 }
 
-func callShowSpace(args []string, reqFactory *testhelpers.FakeReqFactory, config configuration.Configuration) (ui *testhelpers.FakeUI) {
+func callShowSpace(args []string, reqFactory *testhelpers.FakeReqFactory, config *configuration.Configuration) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
 	ctxt := testhelpers.NewContext("space", args)
 

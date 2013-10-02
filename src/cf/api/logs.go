@@ -25,12 +25,12 @@ type LogsRepository interface {
 }
 
 type LoggregatorLogsRepository struct {
-	config                  configuration.Configuration
+	config                  *configuration.Configuration
 	gateway                 net.Gateway
 	loggregatorHostResolver func(string) string
 }
 
-func NewLoggregatorLogsRepository(config configuration.Configuration, gateway net.Gateway, loggregatorHostResolver func(string) string) (repo LoggregatorLogsRepository) {
+func NewLoggregatorLogsRepository(config *configuration.Configuration, gateway net.Gateway, loggregatorHostResolver func(string) string) (repo LoggregatorLogsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.loggregatorHostResolver = loggregatorHostResolver

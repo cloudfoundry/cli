@@ -18,7 +18,7 @@ type Authenticator interface {
 
 type UAAAuthenticator struct {
 	configRepo configuration.ConfigurationRepository
-	config     configuration.Configuration
+	config     *configuration.Configuration
 	gateway    net.Gateway
 }
 
@@ -85,8 +85,7 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiStatus net.ApiStat
 
 	uaa.config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
 	uaa.config.RefreshToken = response.RefreshToken
-
-	err := uaa.configRepo.Save(uaa.config)
+	err := uaa.configRepo.Save()
 	if err != nil {
 		apiStatus = net.NewApiStatusWithError("Error setting configuration", err)
 	}

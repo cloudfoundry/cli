@@ -7,10 +7,10 @@ import (
 
 type LoginRequirement struct {
 	ui     terminal.UI
-	config configuration.Configuration
+	config *configuration.Configuration
 }
 
-func NewLoginRequirement(ui terminal.UI, config configuration.Configuration) LoginRequirement {
+func NewLoginRequirement(ui terminal.UI, config *configuration.Configuration) LoginRequirement {
 	return LoginRequirement{ui, config}
 }
 

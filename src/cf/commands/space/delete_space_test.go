@@ -77,7 +77,7 @@ func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {
 
 	config, _ := configRepo.Get()
 	config.Space = space
-	configRepo.Save(config)
+	configRepo.Save()
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})
@@ -97,7 +97,7 @@ func TestDeleteSpaceWhenSpaceNotTargeted(t *testing.T) {
 
 	config, _ := configRepo.Get()
 	config.Space = cf.Space{Name: "do-not-delete", Guid: "do-not-delete-guid"}
-	configRepo.Save(config)
+	configRepo.Save()
 
 	ui := &testhelpers.FakeUI{}
 	ctxt := testhelpers.NewContext("delete", []string{"-f", "space-to-delete"})

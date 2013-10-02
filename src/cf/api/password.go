@@ -14,13 +14,13 @@ type PasswordRepository interface {
 }
 
 type CloudControllerPasswordRepository struct {
-	config  configuration.Configuration
+	config  *configuration.Configuration
 	gateway net.Gateway
 
 	infoResponse InfoResponse
 }
 
-func NewCloudControllerPasswordRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerPasswordRepository) {
+func NewCloudControllerPasswordRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerPasswordRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return

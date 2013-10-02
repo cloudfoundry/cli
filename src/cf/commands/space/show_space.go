@@ -10,10 +10,10 @@ import (
 
 type ShowSpace struct {
 	ui     terminal.UI
-	config configuration.Configuration
+	config *configuration.Configuration
 }
 
-func NewShowSpace(ui terminal.UI, config configuration.Configuration) (cmd *ShowSpace) {
+func NewShowSpace(ui terminal.UI, config *configuration.Configuration) (cmd *ShowSpace) {
 	cmd = new(ShowSpace)
 	cmd.ui = ui
 	cmd.config = config

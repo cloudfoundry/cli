@@ -107,8 +107,6 @@ func createAuthenticator(t *testing.T, apiServer *httptest.Server, authServer *h
 	config.AccessToken = "bearer initial-access-token"
 	config.RefreshToken = "initial-refresh-token"
 
-	configRepo.Save(config)
-
 	authGateway := NewUAAAuthGateway()
 	authenticator := api.NewUAAAuthenticator(authGateway, configRepo)
 
@@ -125,7 +123,7 @@ func testRefreshToken(t *testing.T, configRepo configuration.ConfigurationReposi
 	apiStatus = gateway.PerformRequest(request)
 	assert.False(t, apiStatus.IsError())
 
-	savedConfig, _ := configRepo.Get()
+	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
 	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
 }

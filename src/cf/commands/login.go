@@ -14,6 +14,7 @@ const maxLoginTries = 3
 
 type Login struct {
 	ui            terminal.UI
+	config        *configuration.Configuration
 	configRepo    configuration.ConfigurationRepository
 	authenticator api.Authenticator
 }
@@ -21,6 +22,7 @@ type Login struct {
 func NewLogin(ui terminal.UI, configRepo configuration.ConfigurationRepository, authenticator api.Authenticator) (cmd Login) {
 	cmd.ui = ui
 	cmd.configRepo = configRepo
+	cmd.config, _ = configRepo.Get()
 	cmd.authenticator = authenticator
 	return
 }
@@ -30,12 +32,7 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd Login) Run(c *cli.Context) {
-	config, err := cmd.configRepo.Get()
-	if err != nil {
-		cmd.ui.ConfigFailure(err)
-	}
-
-	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(config.Target))
+	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.Target))
 
 	var (
 		username string

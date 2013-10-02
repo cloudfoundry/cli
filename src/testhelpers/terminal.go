@@ -94,7 +94,7 @@ func (ui *FakeUI) ClearOutputs() {
 	ui.Outputs = []string{}
 }
 
-func (ui *FakeUI) ShowConfiguration(config configuration.Configuration) {
+func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
 	ui.Say("API endpoint: %s (API version: %s)",
 		config.Target,
 		config.ApiVersion)
@@ -122,7 +122,7 @@ func (c FakeUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui *FakeUI) showBaseConfig(config configuration.Configuration) {
+func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
 
 }
 

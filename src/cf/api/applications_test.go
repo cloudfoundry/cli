@@ -100,7 +100,7 @@ func TestFindByName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(singleAppEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
@@ -137,7 +137,7 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(appNotFoundEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
@@ -161,7 +161,7 @@ func TestSetEnv(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(setEnvEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -200,7 +200,7 @@ func TestCreateApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -233,7 +233,7 @@ func TestCreateApplicationWithoutBuildpackOrStack(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationWithoutBuildpackOrStackEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
@@ -257,7 +257,7 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(alwaysSuccessfulEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{Target: ts.URL}
+	config := &configuration.Configuration{Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
@@ -286,7 +286,7 @@ func TestDeleteApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(deleteApplicationEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -310,7 +310,7 @@ func TestRename(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(renameAppEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
@@ -330,7 +330,7 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(scaleEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
@@ -392,7 +392,7 @@ func TestStartApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(startApplicationEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -428,7 +428,7 @@ func TestStopApplication(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(stopApplicationEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
@@ -463,7 +463,7 @@ func TestGetInstances(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(successfulGetInstancesEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
+	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}

@@ -14,10 +14,12 @@ const (
 	dirPermissions  = 0700
 )
 
+var singleton *Configuration
+
 type ConfigurationRepository interface {
-	Get() (config Configuration, err error)
+	Get() (config *Configuration, err error)
 	Delete()
-	Save(config Configuration) (err error)
+	Save() (err error)
 	ClearSession() (err error)
 }
 
@@ -28,21 +30,16 @@ func NewConfigurationDiskRepository() (repo ConfigurationDiskRepository) {
 	return ConfigurationDiskRepository{}
 }
 
-func (repo ConfigurationDiskRepository) Get() (c Configuration, err error) {
-	data, err := repo.readConfigFileContents()
-	if err != nil {
-		return
+func (repo ConfigurationDiskRepository) Get() (c *Configuration, err error) {
+	if singleton == nil {
+		singleton, err = load()
+
+		if err != nil {
+			return
+		}
 	}
 
-	c = Configuration{}
-
-	err = json.Unmarshal(data, &c)
-	if err != nil {
-		repo.InitializeConfigFile()
-		return
-	}
-
-	return
+	return singleton, nil
 }
 
 func (repo ConfigurationDiskRepository) Delete() {
@@ -53,21 +50,15 @@ func (repo ConfigurationDiskRepository) Delete() {
 	}
 
 	os.Remove(file)
+	singleton = nil
 }
 
-func (repo ConfigurationDiskRepository) Save(c Configuration) (err error) {
-	bytes, err := json.Marshal(c)
+func (repo ConfigurationDiskRepository) Save() (err error) {
+	c, err := repo.Get()
 	if err != nil {
 		return
 	}
-
-	file, err := ConfigFile()
-	if err != nil {
-		return
-	}
-
-	err = ioutil.WriteFile(file, bytes, filePermissions)
-	return
+	return saveConfiguration(c)
 }
 
 func (repo ConfigurationDiskRepository) ClearSession() (err error) {
@@ -79,12 +70,7 @@ func (repo ConfigurationDiskRepository) ClearSession() (err error) {
 	c.Organization = cf.Organization{}
 	c.Space = cf.Space{}
 
-	return repo.Save(c)
-}
-
-func (repo ConfigurationDiskRepository) InitializeConfigFile() (err error) {
-	err = repo.Save(defaultConfig())
-	return err
+	return saveConfiguration(c)
 }
 
 // Keep this one public for configtest/configuration.go
@@ -93,28 +79,12 @@ func ConfigFile() (file string, err error) {
 	configDir := filepath.Join(userHomeDir(), ".cf")
 
 	err = os.MkdirAll(configDir, dirPermissions)
+
 	if err != nil {
 		return
 	}
 
 	file = filepath.Join(configDir, "config.json")
-	return
-}
-
-func (repo ConfigurationDiskRepository) readConfigFileContents() (data []byte, err error) {
-	file, err := ConfigFile()
-	if err != nil {
-		return
-	}
-	data, err = ioutil.ReadFile(file)
-	if err != nil {
-		err = repo.InitializeConfigFile()
-		if err != nil {
-			return
-		}
-		data, err = ioutil.ReadFile(file)
-		return
-	}
 	return
 }
 
@@ -132,8 +102,49 @@ func userHomeDir() string {
 	return os.Getenv("HOME")
 }
 
-func defaultConfig() (c Configuration) {
-	c = Configuration{}
+func defaultConfig() (c *Configuration) {
+	c = new(Configuration)
+	c.Target = "https://api.run.pivotal.io"
+	c.ApiVersion = "2"
+	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
 	c.ApplicationStartTimeout = 30 // seconds
+
+	return
+}
+
+func load() (c *Configuration, parseError error) {
+	file, readError := ConfigFile()
+	c = new(Configuration)
+
+	if readError != nil {
+		c := defaultConfig()
+		return c, saveConfiguration(c)
+	}
+
+	data, readError := ioutil.ReadFile(file)
+
+	if readError != nil {
+		c := defaultConfig()
+		return c, saveConfiguration(c)
+	}
+
+	parseError = json.Unmarshal(data, c)
+
+	return
+}
+
+func saveConfiguration(config *Configuration) (err error) {
+	bytes, err := json.Marshal(config)
+	if err != nil {
+		return
+	}
+
+	file, err := ConfigFile()
+
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile(file, bytes, filePermissions)
+
 	return
 }

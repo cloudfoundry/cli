@@ -14,10 +14,10 @@ type TargetedOrgRequirement interface {
 
 type TargetedOrgApiRequirement struct {
 	ui     terminal.UI
-	config configuration.Configuration
+	config *configuration.Configuration
 }
 
-func NewTargetedOrgRequirement(ui terminal.UI, config configuration.Configuration) TargetedOrgRequirement {
+func NewTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
 	return TargetedOrgApiRequirement{ui, config}
 }
 

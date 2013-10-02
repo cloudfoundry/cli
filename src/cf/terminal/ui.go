@@ -25,7 +25,7 @@ type UI interface {
 	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
 	ConfigFailure(err error)
-	ShowConfiguration(configuration.Configuration)
+	ShowConfiguration(*configuration.Configuration)
 	LoadingIndication()
 	Wait(duration time.Duration)
 	DisplayTable(table [][]string, coloringFunc ColoringFunction)
@@ -78,7 +78,7 @@ func (c TerminalUI) ConfigFailure(err error) {
 		err.Error())
 }
 
-func (ui TerminalUI) ShowConfiguration(config configuration.Configuration) {
+func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
 	ui.Say("API endpoint: %s (API version: %s)",
 		EntityNameColor(config.Target),
 		EntityNameColor(config.ApiVersion))

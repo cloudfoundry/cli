@@ -14,6 +14,7 @@ type RenameSpace struct {
 	spaceRepo  api.SpaceRepository
 	spaceReq   requirements.SpaceRequirement
 	configRepo configuration.ConfigurationRepository
+	config     *configuration.Configuration
 }
 
 func NewRenameSpace(ui terminal.UI, spaceRepo api.SpaceRepository, configRepo configuration.ConfigurationRepository) (cmd *RenameSpace) {
@@ -21,6 +22,7 @@ func NewRenameSpace(ui terminal.UI, spaceRepo api.SpaceRepository, configRepo co
 	cmd.ui = ui
 	cmd.spaceRepo = spaceRepo
 	cmd.configRepo = configRepo
+	cmd.config, _ = cmd.configRepo.Get()
 	return
 }
 
@@ -49,15 +51,9 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 		return
 	}
 
-	config, err := cmd.configRepo.Get()
-	if err != nil {
-		cmd.ui.ConfigFailure(err)
-		return
-	}
-
-	if config.Space.Guid == space.Guid {
-		config.Space.Name = newName
-		cmd.configRepo.Save(config)
+	if cmd.config.Space.Guid == space.Guid {
+		cmd.config.Space.Name = newName
+		cmd.configRepo.Save()
 	}
 
 	cmd.ui.Ok()
