@@ -40,7 +40,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
 	force := c.Bool("f")
 
-	cmd.ui.Warn("Deleting space %s...", spaceName)
+	cmd.ui.Say("Deleting space %s...", terminal.EntityNameColor(spaceName))
 
 	space, apiStatus := cmd.spaceRepo.FindByName(spaceName)
 
