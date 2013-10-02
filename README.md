@@ -10,6 +10,13 @@ out the [RubyGem](https://github.com/cloudfoundry/cf).
 
 For a view on the current status of the project, check [cftracker](http://cftracker.cfapps.io/cfcli).
 
+Cloning the repository
+======================
+
+1. Install Go ```brew install go --cross-compile-common```
+1. Clone (Fork before hand for development).
+1. Run ```git submodule update --init --recursive```
+
 Building
 ========
 
@@ -21,9 +28,6 @@ Development
 
 NOTE: Currently only development on OSX 10.8 is supported
 
-1. Install Go ```brew install go --cross-compile-common```
-1. Fork and clone.
-1. Run ```git submodule update --init --recursive```
 1. Write a test.
 1. Run ``` bin/test ``` and watch test fail.
 1. Make test pass.
@@ -43,7 +47,7 @@ Rough overview of the architecture
 The app (in ```src/cf/app/app.go```) declares the list of available commands. Help and flags are defined there.
 It will instantiate a command, and run it using the runner (in ```src/cf/commands/runner.go```).
 
-A command has requirements, and a run function. Requirements are use as filters before running the command.
+A command has requirements, and a run function. Requirements are used as filters before running the command.
 If any of them fails, the command will not run (see ```src/cf/requirements``` for examples of requirements).
 
 When the command is run, it communicates with api using repositories (they are in ```src/cf/api```).
@@ -63,4 +67,25 @@ Example command
 ---------------
 
 Create Space is a good example of command. Its tests include checking arguments, having requirements, and the actual command itself.
-You will find it in ```src/cf/commands/create_space.go```.
+You will find it in ```src/cf/commands/space/create_space.go```.
+
+Current Conventions
+===================
+
+Creating Commands
+-----------------
+
+Resources that include several commands have been broken out into their own sub-package using the Resource name. An example of this convention is the
+Space resource and package.
+
+In addition, command file and methods naming follows a CRUD like convention. For example, the Space resource includes commands such a CreateSpace, ListSpaces, etc.
+
+Creating Repositories
+---------------------
+
+Although not ideal, we used the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid collision with the actual
+Service Resource (i.e. creating Services and Service Instances within Cloud Foundry).
+
+Operations on Repository structs typically return resource struct and an ApiStatus struct. The ApiStatus is used to communicate application errors,
+runtime errors, and wether or not a resource is found. We chose this over method signatures with multiple return values as it provides
+a consistent method signature across repositories. In addition, we didn't necessarily want to propagate golang errors to commands under "normal" application behavior.
