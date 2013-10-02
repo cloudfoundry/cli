@@ -36,7 +36,13 @@ NOTE: Currently only development on OSX 10.8 is supported
 Releasing
 =========
 
-1. Run ```bin/build-all```. This will create tgz files in the release folder.
+On linux:
+1. Run ```bin/build-all```
+
+On mac:
+1. Run ```bin/build-all-osx```
+
+This will create tgz files in the release folder.
 
 Contributing
 ============
@@ -51,14 +57,22 @@ A command has requirements, and a run function. Requirements are used as filters
 If any of them fails, the command will not run (see ```src/cf/requirements``` for examples of requirements).
 
 When the command is run, it communicates with api using repositories (they are in ```src/cf/api```).
-Repositories should be injected into the command, so that your tests can inject a fake.
 
-Repositories communicate with the network layer, usually through a Gateway (see ```src/cf/net```).
+Repositories are injected into the command, so tests can inject a fake.
+
+Repositories communicate with the api endpoints through a Gateway (see ```src/cf/net```).
+
+Repositories return a Domain Object and an ApiStatus object.
+
+Domain objects are data structures related to Cloud Foundry (see ```src/cf/domain```).
+
+ApiStatus objects convey a variety of important error conditions (see ```src/cf/net/api_status```).
+
 
 Managing dependencies
 ---------------------
 
-Commands dependencies are managed by the commands factory. The app uses the command factory (in ```src/cf/commands/factory.go```)
+Command dependencies are managed by the commands factory. The app uses the command factory (in ```src/cf/commands/factory.go```)
 to instantiate them, this allows not sharing the knowledge of their dependencies with the app itself.
 
 As for repositories, we use the repository locator to handle their dependencies. You can find it in ```src/cf/api/repository_locator.go```.
@@ -83,9 +97,7 @@ In addition, command file and methods naming follows a CRUD like convention. For
 Creating Repositories
 ---------------------
 
-Although not ideal, we used the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid collision with the actual
-Service Resource (i.e. creating Services and Service Instances within Cloud Foundry).
+Although not ideal, we use the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid confusion with Service domain objects (i.e. creating Services and Service Instances within Cloud Foundry).
 
-Operations on Repository structs typically return resource struct and an ApiStatus struct. The ApiStatus is used to communicate application errors,
-runtime errors, and wether or not a resource is found. We chose this over method signatures with multiple return values as it provides
-a consistent method signature across repositories. In addition, we didn't necessarily want to propagate golang errors to commands under "normal" application behavior.
+By convention, Repository methods return a Domain object and an ApiStatus. Domain objects are used in both Commands and Repositories to model Cloud Foundry data.  ApiStatus objects are used to communicate application errors, runtime errors, whether the resource was found, etc.
+This convention provides a consistent method signature across repositories.
