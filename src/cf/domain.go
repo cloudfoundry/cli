@@ -89,6 +89,9 @@ type Route struct {
 }
 
 func (r Route) URL() string {
+	if r.Host == "" {
+		return r.Domain.Name
+	}
 	return fmt.Sprintf("%s.%s", r.Host, r.Domain.Name)
 }
 

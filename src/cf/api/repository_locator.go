@@ -45,7 +45,7 @@ func NewRepositoryLocator(config configuration.Configuration) (loc RepositoryLoc
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, loc.cloudControllerGateway, loc.appRepo)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, loc.cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, loc.cloudControllerGateway)
-	loc.routeRepo = NewCloudControllerRouteRepository(config, loc.cloudControllerGateway)
+	loc.routeRepo = NewCloudControllerRouteRepository(config, loc.cloudControllerGateway, loc.domainRepo)
 	loc.stackRepo = NewCloudControllerStackRepository(config, loc.cloudControllerGateway)
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, loc.cloudControllerGateway)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, loc.uaaGateway)

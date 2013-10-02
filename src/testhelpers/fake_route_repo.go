@@ -10,6 +10,12 @@ type FakeRouteRepository struct {
 	FindByHostErr        bool
 	FindByHostRoute      cf.Route
 
+	FindByHostAndDomainHost     string
+	FindByHostAndDomainDomain   string
+	FindByHostAndDomainRoute    cf.Route
+	FindByHostAndDomainErr      bool
+	FindByHostAndDomainNotFound bool
+
 	CreatedRoute       cf.Route
 	CreatedRouteDomain cf.Domain
 
@@ -37,6 +43,22 @@ func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiSta
 	}
 
 	route = repo.FindByHostRoute
+	return
+}
+
+func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route cf.Route, apiStatus net.ApiStatus) {
+	repo.FindByHostAndDomainHost = host
+	repo.FindByHostAndDomainDomain = domain
+
+	if repo.FindByHostAndDomainErr {
+		apiStatus = net.NewApiStatusWithMessage("Error finding Route")
+	}
+
+	if repo.FindByHostAndDomainNotFound {
+		apiStatus = net.NewNotFoundApiStatus()
+	}
+
+	route = repo.FindByHostAndDomainRoute
 	return
 }
 

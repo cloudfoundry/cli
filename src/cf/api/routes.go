@@ -11,18 +11,21 @@ import (
 type RouteRepository interface {
 	FindAll() (routes []cf.Route, apiStatus net.ApiStatus)
 	FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus)
+	FindByHostAndDomain(host, domain string) (route cf.Route, apiStatus net.ApiStatus)
 	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus)
 	Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerRouteRepository struct {
-	config  configuration.Configuration
-	gateway net.Gateway
+	config     configuration.Configuration
+	gateway    net.Gateway
+	domainRepo DomainRepository
 }
 
-func NewCloudControllerRouteRepository(config configuration.Configuration, gateway net.Gateway) (repo CloudControllerRouteRepository) {
+func NewCloudControllerRouteRepository(config configuration.Configuration, gateway net.Gateway, domainRepo DomainRepository) (repo CloudControllerRouteRepository) {
 	repo.config = config
 	repo.gateway = gateway
+	repo.domainRepo = domainRepo
 	return
 }
 
@@ -77,6 +80,37 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	resource := response.Resources[0]
 	route.Guid = resource.Metadata.Guid
 	route.Host = resource.Entity.Host
+
+	return
+}
+
+func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiStatus net.ApiStatus) {
+	domain, apiStatus := repo.domainRepo.FindByName(domainName)
+	if apiStatus.IsError() || apiStatus.IsNotFound() {
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/routes?q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
+		return
+	}
+
+	response := new(ApiResponse)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
+		return
+	}
+
+	if len(response.Resources) == 0 {
+		apiStatus = net.NewNotFoundApiStatus()
+		return
+	}
+
+	resource := response.Resources[0]
+	route.Guid = resource.Metadata.Guid
+	route.Host = resource.Entity.Host
+	route.Domain = domain
 
 	return
 }

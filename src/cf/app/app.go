@@ -216,6 +216,18 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "map-route",
+			Description: "Add a url route to an app",
+			Usage:       fmt.Sprintf("%s map-route APP DOMAIN [-n HOSTNAME]", cf.Name),
+			Flags: []cli.Flag{
+				cli.StringFlag{"n", "", "Hostname"},
+			},
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("map-route")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "org",
 			Description: "Show org info",
 			Usage:       fmt.Sprintf("%s org ORG", cf.Name),

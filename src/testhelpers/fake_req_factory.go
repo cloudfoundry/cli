@@ -22,6 +22,10 @@ type FakeReqFactory struct {
 
 	OrganizationName string
 	Organization cf.Organization
+
+	RouteHost string
+	RouteDomain string
+	Route cf.Route
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -60,6 +64,12 @@ func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.Or
 	return FakeRequirement{ f, true }
 }
 
+func (f *FakeReqFactory) NewRouteRequirement(host, domain string) requirements.RouteRequirement {
+	f.RouteHost = host
+	f.RouteDomain = domain
+	return FakeRequirement{ f, true }
+}
+
 
 
 type FakeRequirement struct {
@@ -85,4 +95,8 @@ func (r FakeRequirement) GetSpace() cf.Space {
 
 func (r FakeRequirement) GetOrganization() cf.Organization {
 	return r.factory.Organization
+}
+
+func (r FakeRequirement) GetRoute() cf.Route {
+	return r.factory.Route
 }

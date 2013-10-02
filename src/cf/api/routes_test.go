@@ -65,16 +65,10 @@ func TestRoutesFindAll(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findAllEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, gateway)
-
+	repo, _ := getRepo(ts.URL)
 	routes, apiStatus := repo.FindAll()
-	assert.False(t, apiStatus.IsError())
 
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, len(routes), 2)
 
 	route := routes[0]
@@ -110,14 +104,9 @@ func TestFindByHost(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, gateway)
-
+	repo, _ := getRepo(ts.URL)
 	route, apiStatus := repo.FindByHost("my-cool-app")
+
 	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
@@ -137,15 +126,50 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostNotFoundEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, gateway)
-
+	repo, _ := getRepo(ts.URL)
 	_, apiStatus := repo.FindByHost("my-cool-app")
+
 	assert.True(t, apiStatus.IsError())
+}
+
+var findRouteByHostAndDomainEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
+	nil,
+	findRouteByHostResponse,
+)
+
+func TestFindByHostAndDomain(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostAndDomainEndpoint))
+	defer ts.Close()
+
+	repo, domainRepo := getRepo(ts.URL)
+	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
+	route, apiStatus := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+
+	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.IsNotFound())
+	assert.Equal(t, domainRepo.FindByNameName, "my-domain.com")
+	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domainRepo.FindByNameDomain})
+}
+
+var findRouteByHostAndDomainNotFoundEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
+	nil,
+	findRouteByHostNotFoundResponse,
+)
+
+func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findRouteByHostAndDomainNotFoundEndpoint))
+	defer ts.Close()
+
+	repo, domainRepo := getRepo(ts.URL)
+	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
+	_, apiStatus := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+
+	assert.False(t, apiStatus.IsError())
+	assert.True(t, apiStatus.IsNotFound())
 }
 
 var createRouteResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
@@ -169,14 +193,7 @@ func TestCreateRoute(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createRouteEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, gateway)
-
+	repo, _ := getRepo(ts.URL)
 	domain := cf.Domain{Guid: "my-domain-guid"}
 	newRoute := cf.Route{Host: "my-cool-app"}
 
@@ -197,16 +214,24 @@ func TestBind(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(bindRouteEndpoint))
 	defer ts.Close()
 
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
-	repo := NewCloudControllerRouteRepository(config, gateway)
-
+	repo, _ := getRepo(ts.URL)
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
 	apiStatus := repo.Bind(route, app)
 	assert.False(t, apiStatus.IsError())
+}
+
+func getRepo(targetURL string) (repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      targetURL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	domainRepo = &testhelpers.FakeDomainRepository{}
+
+	repo = NewCloudControllerRouteRepository(config, gateway, domainRepo)
+	return
 }
