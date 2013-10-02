@@ -22,8 +22,8 @@ func TestRunningCommands(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, stdout, "FAILED")
 
-	stdout, _, err = runCommand(t, "h", "target")
-	assert.NoError(t, err)
+	stdout, _, err = runCommand(t, "target", "http://api.example.com")
+	assert.Error(t, err)
 	assert.Contains(t, stdout, "TIP:")
 	assert.Contains(t, stdout, "Use 'cf api' to set or view the target api url.")
 }

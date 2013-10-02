@@ -438,9 +438,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Name:        "target",
 			ShortName:   "t",
 			Description: "Set or view the targeted org or space",
-			Usage: fmt.Sprintf("%s target [-o ORG] [-s SPACE]\n\n", cf.Name) +
-				"TIP:\n" +
-				"  Use 'cf api' to set or view the target api url.",
+			Usage:       fmt.Sprintf("%s target [-o ORG] [-s SPACE]", cf.Name),
 			Flags: []cli.Flag{
 				cli.StringFlag{"o", "", "organization"},
 				cli.StringFlag{"s", "", "space"},

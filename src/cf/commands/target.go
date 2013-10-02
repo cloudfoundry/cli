@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"os"
 )
 
 type InfoResponse struct {
@@ -37,7 +38,13 @@ func NewTarget(ui terminal.UI, configRepo configuration.ConfigurationRepository,
 func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) > 0 {
 		err = errors.New("incorrect usage")
-		cmd.ui.FailWithUsage(c, "target")
+		cmd.ui.Say(terminal.FailureColor("FAILED"))
+		cmd.ui.Say("Incorrect Usage.\n")
+		cli.ShowCommandHelp(c, "target")
+		cmd.ui.Say("")
+		cmd.ui.Say("TIP:\n  Use 'cf api' to set or view the target api url.\n")
+		os.Exit(1)
+
 		return
 	}
 
