@@ -7,16 +7,21 @@ import (
 	"fmt"
 )
 
-type TargetedOrgRequirement struct {
+type TargetedOrgRequirement interface {
+	Requirement
+	GetOrganization() cf.Organization
+}
+
+type TargetedOrgApiRequirement struct {
 	ui     terminal.UI
 	config configuration.Configuration
 }
 
 func NewTargetedOrgRequirement(ui terminal.UI, config configuration.Configuration) TargetedOrgRequirement {
-	return TargetedOrgRequirement{ui, config}
+	return TargetedOrgApiRequirement{ui, config}
 }
 
-func (req TargetedOrgRequirement) Execute() (success bool) {
+func (req TargetedOrgApiRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org targeted. See '%s' to target an org.",
 			terminal.CommandColor(cf.Name+" target -o ORGNAME"))
@@ -25,4 +30,8 @@ func (req TargetedOrgRequirement) Execute() (success bool) {
 	}
 
 	return true
+}
+
+func (req TargetedOrgApiRequirement) GetOrganization() (org cf.Organization) {
+	return req.config.Organization
 }

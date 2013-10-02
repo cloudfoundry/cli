@@ -16,7 +16,7 @@ type Factory interface {
 	NewValidAccessTokenRequirement() Requirement
 	NewSpaceRequirement(name string) SpaceRequirement
 	NewTargetedSpaceRequirement() Requirement
-	NewTargetedOrgRequirement() Requirement
+	NewTargetedOrgRequirement() TargetedOrgRequirement
 	NewOrganizationRequirement(name string) OrganizationRequirement
 }
 
@@ -73,7 +73,7 @@ func (f ApiRequirementFactory) NewTargetedSpaceRequirement() Requirement {
 	)
 }
 
-func (f ApiRequirementFactory) NewTargetedOrgRequirement() Requirement {
+func (f ApiRequirementFactory) NewTargetedOrgRequirement() TargetedOrgRequirement {
 	return NewTargetedOrgRequirement(
 		f.ui,
 		f.repoLocator.GetConfig(),

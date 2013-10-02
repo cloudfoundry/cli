@@ -149,6 +149,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "domains",
+			Description: "List domains in the currently targeted org",
+			Usage:       fmt.Sprintf("%s domains", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("domains")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "env",
 			ShortName:   "e",
 			Description: "Show all env variables for an app",

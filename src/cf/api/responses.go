@@ -90,6 +90,21 @@ type RouteSummary struct {
 	Domain DomainSummary
 }
 
+type DomainApiResponse struct {
+	Resources []DomainResource
+}
+
+type DomainResource struct {
+	Metadata Metadata
+	Entity   DomainEntity
+}
+
+type DomainEntity struct {
+	Name                   string
+	OwningOrganizationGuid string `json:"owning_organization_guid"`
+	Spaces                 []SpaceResource
+}
+
 type DomainSummary struct {
 	Guid string
 	Name string

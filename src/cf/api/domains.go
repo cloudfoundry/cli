@@ -10,6 +10,7 @@ import (
 
 type DomainRepository interface {
 	FindAll() (domains []cf.Domain, apiStatus net.ApiStatus)
+	FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiStatus net.ApiStatus)
 	FindByName(name string) (domain cf.Domain, apiStatus net.ApiStatus)
 	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus)
 }
@@ -39,7 +40,41 @@ func (repo CloudControllerDomainRepository) FindAll() (domains []cf.Domain, apiS
 	}
 
 	for _, r := range response.Resources {
-		domains = append(domains, cf.Domain{r.Entity.Name, r.Metadata.Guid})
+		domains = append(domains, cf.Domain{Name: r.Entity.Name, Guid: r.Metadata.Guid})
+	}
+
+	return
+}
+
+func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiStatus net.ApiStatus) {
+	orgGuid := org.Guid
+
+	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, orgGuid)
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
+		return
+	}
+
+	response := new(DomainApiResponse)
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
+		return
+	}
+
+	for _, r := range response.Resources {
+		domain := cf.Domain{
+			Name: r.Entity.Name,
+			Guid: r.Metadata.Guid,
+		}
+		domain.Shared = r.Entity.OwningOrganizationGuid == ""
+
+		for _, space := range r.Entity.Spaces {
+			domain.Spaces = append(domain.Spaces, cf.Space{
+				Name: space.Entity.Name,
+				Guid: space.Metadata.Guid,
+			})
+		}
+		domains = append(domains, domain)
 	}
 
 	return

@@ -8,6 +8,9 @@ import (
 type FakeDomainRepository struct {
 	FindAllDomains []cf.Domain
 
+	FindAllByOrgOrg cf.Organization
+	FindAllByOrgDomains []cf.Domain
+
 	FindByNameName string
 	FindByNameDomain cf.Domain
 
@@ -17,6 +20,13 @@ type FakeDomainRepository struct {
 
 func (repo *FakeDomainRepository) FindAll() (domains []cf.Domain, apiStatus net.ApiStatus){
 	domains = repo.FindAllDomains
+	return
+}
+
+func (repo *FakeDomainRepository) FindAllByOrg(org cf.Organization)(domains []cf.Domain, apiStatus net.ApiStatus){
+	repo.FindAllByOrgOrg = org
+	domains = repo.FindAllByOrgDomains
+
 	return
 }
 

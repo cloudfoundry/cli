@@ -69,6 +69,88 @@ func TestFindAll(t *testing.T) {
 	assert.Equal(t, second.Guid, "domain2-guid")
 }
 
+var orgDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": [
+    {
+      "metadata": {
+        "guid": "shared-domain-guid"
+      },
+      "entity": {
+        "name": "shared-example.com",
+        "owning_organization_guid": null,
+        "wildcard": true,
+        "spaces": [
+          {
+            "metadata": {
+              "guid": "my-space-guid"
+            },
+            "entity": {
+              "name": "my-space"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "guid": "my-domain-guid"
+      },
+      "entity": {
+        "name": "example.com",
+        "owning_organization_guid": "my-org-guid",
+        "wildcard": true,
+        "spaces": [
+          {
+            "metadata": {
+              "guid": "my-space-guid"
+            },
+            "entity": {
+              "name": "my-space"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+`}
+
+var orgDomainsEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/organizations/my-org-guid/domains?inline-relations-depth=1",
+	nil,
+	orgDomainsResponse,
+)
+
+func TestFindAllByOrg(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(orgDomainsEndpoint))
+	defer ts.Close()
+
+	org := cf.Organization{Guid: "my-org-guid"}
+	config := configuration.Configuration{
+		AccessToken:  "BEARER my_access_token",
+		Target:       ts.URL,
+		Organization: org,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
+
+	domains, apiStatus := repo.FindAllByOrg(org)
+
+	assert.False(t, apiStatus.IsError())
+	assert.Equal(t, 2, len(domains))
+
+	domain := domains[0]
+	assert.True(t, domain.Shared)
+
+	domain = domains[1]
+	assert.Equal(t, domain.Name, "example.com")
+	assert.Equal(t, domain.Guid, "my-domain-guid")
+	assert.False(t, domain.Shared)
+	assert.Equal(t, domain.Spaces[0].Name, "my-space")
+}
+
 func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()

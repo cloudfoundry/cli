@@ -35,6 +35,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, repoLocator.GetOrganizationRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["delete-service"] = service.NewDeleteService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["delete-space"] = space.NewDeleteSpace(ui, repoLocator.GetSpaceRepository(), repoLocator.GetConfigurationRepository())
+	factory.cmdsByName["domains"] = domain.NewListDomains(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["env"] = application.NewEnv(ui)
 	factory.cmdsByName["files"] = application.NewFiles(ui, repoLocator.GetAppFilesRepository())
 	factory.cmdsByName["login"] = NewLogin(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetAuthenticator())

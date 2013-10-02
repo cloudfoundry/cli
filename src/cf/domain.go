@@ -30,6 +30,10 @@ type Space struct {
 	Domains          []Domain
 }
 
+func (space Space) String() string {
+	return space.Name
+}
+
 type Application struct {
 	Name             string
 	Guid             string
@@ -72,8 +76,10 @@ type AppFile struct {
 }
 
 type Domain struct {
-	Name string
-	Guid string
+	Name   string
+	Guid   string
+	Shared bool
+	Spaces []Space
 }
 
 type Route struct {

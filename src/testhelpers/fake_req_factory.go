@@ -46,7 +46,7 @@ func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement 
 	return FakeRequirement{ f, f.TargetedSpaceSuccess }
 }
 
-func (f *FakeReqFactory) NewTargetedOrgRequirement() requirements.Requirement {
+func (f *FakeReqFactory) NewTargetedOrgRequirement() requirements.TargetedOrgRequirement {
 	return FakeRequirement{ f, f.TargetedOrgSuccess }
 }
 
