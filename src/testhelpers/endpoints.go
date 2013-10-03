@@ -26,6 +26,19 @@ func RemoveWhiteSpaceFromBody(body string) string {
 	return body
 }
 
+type RequestStatus struct {
+	Called bool
+}
+
+func EndpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher){
+	status.Called = false
+	matcher = func(*http.Request) bool {
+		status.Called = true
+		return true
+	}
+	return
+}
+
 var RequestBodyMatcher = func(expectedBody string) RequestMatcher {
 	return func(request *http.Request) bool {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
@@ -47,6 +60,7 @@ var RequestBodyMatcher = func(expectedBody string) RequestMatcher {
 
 var CreateEndpoint = func(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
+
 		if customMatcher == nil {
 			customMatcher = successMatcher
 		}

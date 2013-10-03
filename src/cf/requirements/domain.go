@@ -29,7 +29,7 @@ func NewDomainRequirement(name string, ui terminal.UI, domainRepo api.DomainRepo
 
 func (req *DomainApiRequirement) Execute() bool {
 	var apiStatus net.ApiStatus
-	req.domain, apiStatus = req.domainRepo.FindByName(req.name)
+	req.domain, apiStatus = req.domainRepo.FindByNameInCurrentSpace(req.name)
 
 	if apiStatus.IsError() {
 		req.ui.Failed(apiStatus.Message)

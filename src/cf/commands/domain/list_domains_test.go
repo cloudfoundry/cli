@@ -30,9 +30,6 @@ func TestListDomainsFailsWithUsage(t *testing.T) {
 
 	ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
-
-	ui = callListDomains([]string{"--all"}, reqFactory, domainRepo)
-	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestListDomains(t *testing.T) {

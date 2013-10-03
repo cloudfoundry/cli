@@ -125,7 +125,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	}
 	cmd.ui.Ok()
 
-	domain, apiStatus := cmd.domainRepo.FindByName(c.String("d"))
+	domain, apiStatus := cmd.domainRepo.FindByNameInCurrentSpace(c.String("d"))
 
 	if apiStatus.IsError() {
 		cmd.ui.Failed(apiStatus.Message)

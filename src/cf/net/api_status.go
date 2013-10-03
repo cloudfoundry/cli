@@ -54,3 +54,7 @@ func (apiStatus ApiStatus) IsError() bool {
 func (apiStatus ApiStatus) IsNotFound() bool {
 	return apiStatus.isNotFound
 }
+
+func (apiStatus ApiStatus) IsSuccess() bool {
+	return !apiStatus.IsError() && !apiStatus.IsNotFound()
+}

@@ -42,6 +42,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["logout"] = NewLogout(ui, repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["logs"] = application.NewLogs(ui, repoLocator.GetLogsRepository())
 	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["map-domain"] = domain.NewMapDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), true)
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui)
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, repoLocator.GetOrganizationRepository())

@@ -45,7 +45,7 @@ var multipleDomainsEndpoint = testhelpers.CreateEndpoint(
 	multipleDomainsResponse,
 )
 
-func TestFindAll(t *testing.T) {
+func TestFindAllInCurrentSpace(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
@@ -57,7 +57,7 @@ func TestFindAll(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domains, apiStatus := repo.FindAll()
+	domains, apiStatus := repo.FindAllInCurrentSpace()
 	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, 2, len(domains))
 
@@ -151,7 +151,7 @@ func TestFindAllByOrg(t *testing.T) {
 	assert.Equal(t, domain.Spaces[0].Name, "my-space")
 }
 
-func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
+func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
@@ -163,14 +163,14 @@ func TestFindByNameReturnsTheDomainMatchingTheName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domain, apiStatus := repo.FindByName("domain2.cf-app.com")
+	domain, apiStatus := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
 	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, domain.Name, "domain2.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain2-guid")
 }
 
-func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
+func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
@@ -182,14 +182,14 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domain, apiStatus := repo.FindByName("")
+	domain, apiStatus := repo.FindByNameInCurrentSpace("")
 	assert.False(t, apiStatus.IsError())
 
 	assert.Equal(t, domain.Name, "domain1.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain1-guid")
 }
 
-func TestFindByNameWhenTheDomainIsNotFound(t *testing.T) {
+func TestFindByNameInCurrentSpaceWhenTheDomainIsNotFound(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
 
@@ -201,7 +201,7 @@ func TestFindByNameWhenTheDomainIsNotFound(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	_, apiStatus := repo.FindByName("domain3.cf-app.com")
+	_, apiStatus := repo.FindByNameInCurrentSpace("domain3.cf-app.com")
 	assert.False(t, apiStatus.IsError())
 	assert.True(t, apiStatus.IsNotFound())
 }
@@ -241,4 +241,81 @@ func TestReserveDomain(t *testing.T) {
 	createdDomain, apiStatus := repo.Create(domainToCreate, owningOrg)
 	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, createdDomain.Guid, "abc-123")
+}
+
+func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(orgDomainsEndpoint))
+	defer ts.Close()
+
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+
+	repo := NewCloudControllerDomainRepository(&config, gateway)
+
+	domainName := "example.com"
+	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	domain, apiStatus := repo.FindByNameInOrg(domainName, org)
+
+	assert.Equal(t, domain.Name, domainName)
+	assert.Equal(t, domain.Guid, "my-domain-guid")
+	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.IsNotFound())
+}
+
+func mapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
+	status = &testhelpers.RequestStatus{}
+	hf = testhelpers.CreateEndpoint(
+		"PUT",
+		"/v2/spaces/my-space-guid/domains/my-domain-guid",
+		testhelpers.EndpointCalledMatcher(status),
+		testhelpers.TestResponse{Status: statusCode},
+	)
+	return
+}
+
+func TestMapDomainSuccess(t *testing.T) {
+	hf, responseStatus := mapDomainEndpoint(http.StatusOK)
+	ts := httptest.NewTLSServer(hf)
+	defer ts.Close()
+
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+
+	repo := NewCloudControllerDomainRepository(&config, gateway)
+
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
+
+	apiStatus := repo.MapDomain(domain, space)
+
+	assert.True(t, responseStatus.Called)
+	assert.True(t, apiStatus.IsSuccess())
+}
+
+func TestMapDomainWhenServerError(t *testing.T) {
+	hf, responseStatus := mapDomainEndpoint(http.StatusBadRequest)
+	ts := httptest.NewTLSServer(hf)
+	defer ts.Close()
+
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+
+	repo := NewCloudControllerDomainRepository(&config, gateway)
+
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
+
+	apiStatus := repo.MapDomain(domain, space)
+
+	assert.True(t, responseStatus.Called)
+	assert.False(t, apiStatus.IsSuccess())
 }
