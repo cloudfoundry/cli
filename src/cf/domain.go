@@ -143,3 +143,8 @@ type ServiceBinding struct {
 	Guid    string
 	AppGuid string
 }
+
+type Quota struct {
+	Name string
+	Guid string
+}

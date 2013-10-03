@@ -250,3 +250,57 @@ func TestDeleteOrganization(t *testing.T) {
 	apiStatus := repo.Delete(org)
 	assert.False(t, apiStatus.IsError())
 }
+
+var findQuotaByNameEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/quota_definitions?q=name%3Amy-quota",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusOK, Body:`{
+  "resources": [
+    {
+      "metadata": {
+        "guid": "my-quota-guid"
+      },
+      "entity": {
+        "name": "my-remote-quota"
+      }
+    }
+  ]
+}`},
+)
+
+func TestFindQuotaByName(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(findQuotaByNameEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
+
+	quota, apiStatus := repo.FindQuotaByName("my-quota")
+	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.IsNotFound())
+	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota"})
+}
+
+var updateQuotaEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/organizations/my-org-guid",
+	testhelpers.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestUpdateQuota(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(updateQuotaEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerOrganizationRepository(config, gateway)
+
+	quota := cf.Quota{Guid: "my-quota-guid"}
+	org := cf.Organization{Guid: "my-org-guid"}
+	apiStatus := repo.UpdateQuota(org, quota)
+	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.IsNotFound())
+}

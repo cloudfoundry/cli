@@ -20,6 +20,14 @@ type FakeOrgRepository struct {
 	RenameNewName      string
 
 	DeletedOrganization cf.Organization
+
+	FindQuotaByNameName string
+	FindQuotaByNameQuota cf.Quota
+	FindQuotaByNameNotFound bool
+	FindQuotaByNameErr bool
+
+	UpdateQuotaOrg cf.Organization
+	UpdateQuotaQuota cf.Quota
 }
 
 func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus) {
@@ -59,5 +67,25 @@ func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiS
 
 func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiStatus net.ApiStatus) {
 	repo.DeletedOrganization = org
+	return
+}
+
+func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, apiStatus net.ApiStatus) {
+	repo.FindQuotaByNameName = name
+	quota = repo.FindQuotaByNameQuota
+
+	if repo.FindQuotaByNameNotFound {
+		apiStatus = net.NewNotFoundApiStatus()
+	}
+	if repo.FindQuotaByNameErr {
+		apiStatus = net.NewApiStatusWithMessage("Error finding quota")
+	}
+
+	return
+}
+
+func (repo *FakeOrgRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiStatus net.ApiStatus) {
+	repo.UpdateQuotaOrg = org
+	repo.UpdateQuotaQuota = quota
 	return
 }

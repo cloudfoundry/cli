@@ -71,6 +71,7 @@ func TestCommands(t *testing.T) {
 		"service",
 		"services",
 		"set-env",
+		"set-quota",
 		"space",
 		"spaces",
 		"stacks",

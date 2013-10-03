@@ -419,6 +419,17 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "set-quota",
+			Description: "Define the quota for an org",
+		Usage:       fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name) +
+				"TIP:\n" +
+				"   Allowable quotas are 'free,' 'paid,' 'runaway,' and 'trial'",
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("set-quota")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "space",
 			Description: "Show currently targeted space's info",
 			Usage:       fmt.Sprintf("%s space", cf.Name),

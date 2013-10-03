@@ -14,6 +14,8 @@ type OrganizationRepository interface {
 	Create(name string) (apiStatus net.ApiStatus)
 	Rename(org cf.Organization, name string) (apiStatus net.ApiStatus)
 	Delete(org cf.Organization) (apiStatus net.ApiStatus)
+	FindQuotaByName(name string) (quota cf.Quota, apiStatus net.ApiStatus)
+	UpdateQuota(org cf.Organization, quota cf.Quota) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -123,6 +125,46 @@ func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, na
 func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
 	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
+		return
+	}
+
+	apiStatus = repo.gateway.PerformRequest(request)
+	return
+}
+
+
+func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (quota cf.Quota, apiStatus net.ApiStatus) {
+	path := fmt.Sprintf("%s/v2/quota_definitions?q=name%%3A%s", repo.config.Target, name)
+
+	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiStatus.IsError() {
+		return
+	}
+
+	response := new(ApiResponse)
+
+	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiStatus.IsError() {
+		return
+	}
+
+	if len(response.Resources) == 0 {
+		apiStatus = net.NewNotFoundApiStatus()
+		return
+	}
+
+	res := response.Resources[0]
+	quota.Guid = res.Metadata.Guid
+	quota.Name = res.Entity.Name
+
+	return
+}
+
+func (repo CloudControllerOrganizationRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiStatus net.ApiStatus) {
+	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
+	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quota.Guid)
+	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiStatus.IsError() {
 		return
 	}

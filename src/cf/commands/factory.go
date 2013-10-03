@@ -55,6 +55,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["reserve-route"] = route.NewReserveRoute(ui, repoLocator.GetRouteRepository())
 	factory.cmdsByName["routes"] = route.NewListRoutes(ui, repoLocator.GetConfig(), repoLocator.GetRouteRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
+	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, repoLocator.GetConfig())
 	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
