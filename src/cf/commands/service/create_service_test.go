@@ -18,7 +18,7 @@ func TestCreateService(t *testing.T) {
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 	fakeUI := callCreateService(
-		[]string{"--offering", "cleardb", "--plan", "spark", "--name", "my-cleardb-service"},
+		[]string{"cleardb", "spark", "my-cleardb-service"},
 		[]string{},
 		serviceRepo,
 	)
@@ -39,7 +39,7 @@ func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
 	}
 	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
 	fakeUI := callCreateService(
-		[]string{"--offering", "cleardb", "--plan", "spark", "--name", "my-cleardb-service"},
+		[]string{"cleardb", "spark", "my-cleardb-service"},
 		[]string{},
 		serviceRepo,
 	)
@@ -51,40 +51,6 @@ func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-cleardb-service")
 	assert.Contains(t, fakeUI.Outputs[2], "already exists")
-}
-
-func TestCreateUserProvidedService(t *testing.T) {
-	serviceRepo := &testhelpers.FakeServiceRepo{}
-	fakeUI := callCreateService(
-		[]string{"--offering", "user-provided", "--name", "my-custom-service", "--parameters", `"foo, bar, baz"`},
-		[]string{"foo value", "bar value", "baz value"},
-		serviceRepo,
-	)
-
-	assert.Contains(t, fakeUI.Prompts[0], "foo")
-	assert.Contains(t, fakeUI.Prompts[1], "bar")
-	assert.Contains(t, fakeUI.Prompts[2], "baz")
-
-	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceName, "my-custom-service")
-	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceParameters, map[string]string{
-		"foo": "foo value",
-		"bar": "bar value",
-		"baz": "baz value",
-	})
-
-	assert.Contains(t, fakeUI.Outputs[0], "Creating service")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-}
-
-func TestCreateUserProvidedServiceWithNoParameterList(t *testing.T) {
-	serviceRepo := &testhelpers.FakeServiceRepo{}
-	fakeUI := callCreateService(
-		[]string{"--offering", "user-provided", "--name", "my-custom-service"},
-		[]string{},
-		serviceRepo,
-	)
-
-	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
 }
 
 func callCreateService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {

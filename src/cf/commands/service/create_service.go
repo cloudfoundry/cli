@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type CreateService struct {
@@ -23,10 +22,7 @@ func NewCreateService(ui terminal.UI, sR api.ServiceRepository) (cmd CreateServi
 }
 
 func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	offeringName := c.String("offering")
-	parameterList := c.String("parameters")
-
-	if offeringName == "user-provided" && parameterList == "" {
+	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-service")
 		return
@@ -36,39 +32,10 @@ func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli
 }
 
 func (cmd CreateService) Run(c *cli.Context) {
-	name := c.String("name")
-	offeringName := c.String("offering")
+	offeringName := c.Args()[0]
+	planName := c.Args()[1]
+	name := c.Args()[2]
 
-	if offeringName == "user-provided" {
-		params := c.String("parameters")
-		cmd.createUserProvidedService(name, params)
-	} else {
-		planName := c.String("plan")
-		cmd.createService(name, offeringName, planName)
-	}
-}
-
-func (cmd CreateService) createUserProvidedService(name string, params string) {
-	paramsMap := make(map[string]string)
-	params = strings.Trim(params, `"`)
-
-	for _, param := range strings.Split(params, ",") {
-		param = strings.Trim(param, " ")
-		paramsMap[param] = cmd.ui.Ask("%s%s", param, terminal.PromptColor(">"))
-	}
-
-	cmd.ui.Say("Creating service...")
-	apiStatus := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
-	if apiStatus.IsError() {
-		cmd.ui.Failed(apiStatus.Message)
-		return
-	}
-
-	cmd.ui.Ok()
-	return
-}
-
-func (cmd CreateService) createService(name string, offeringName string, planName string) {
 	offerings, apiStatus := cmd.serviceRepo.GetServiceOfferings()
 	if apiStatus.IsError() {
 		cmd.ui.Failed(apiStatus.Message)
@@ -101,7 +68,6 @@ func (cmd CreateService) createService(name string, offeringName string, planNam
 	if alreadyExists {
 		cmd.ui.Warn("Service %s already exists", name)
 	}
-	return
 }
 
 func findOffering(offerings []cf.ServiceOffering, name string) (offering cf.ServiceOffering, err error) {

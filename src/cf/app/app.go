@@ -70,14 +70,11 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Name:        "create-service",
 			ShortName:   "cs",
 			Description: "Create service instance",
-			Usage: fmt.Sprintf("%s create-service --offering [OFFERING] --plan [PLAN] --name SERVICE\n", cf.Name) +
-				fmt.Sprintf("   %s create-service --offering user-provided --name SERVICE --parameters \"<comma separated parameter names>\"", cf.Name),
-			Flags: []cli.Flag{
-				cli.StringFlag{"name", "", "name of the service instance"},
-				cli.StringFlag{"offering", "", "name of the service offering to use"},
-				cli.StringFlag{"plan", "", "name of the service plan to use"},
-				cli.StringFlag{"parameters", "", "list of comma separated parameter names to use for user-provided services (eg. \"n1,n2\")"},
-			},
+			Usage: fmt.Sprintf("%s create-service SERVICE PLAN SERVICE_INSTANCE\n\n", cf.Name) +
+				"EXAMPLE:\n" +
+				fmt.Sprintf("   %s create-service clear-db spark clear-db-mine\n\n", cf.Name) +
+				"TIP:\n" +
+				"   Use 'cf create-user-provided-service' to make user-provided services available to cf apps",
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("create-service")
 				cmdRunner.Run(cmd, c)
@@ -89,6 +86,17 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Usage:       fmt.Sprintf("%s create-space SPACE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("create-space")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "create-user-provided-service",
+			Description: "Make a user-provided service available to cf apps",
+			Usage: fmt.Sprintf("%s create-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n\n", cf.Name) +
+				"EXAMPLE:\n" +
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("create-user-provided-service")
 				cmdRunner.Run(cmd, c)
 			},
 		},

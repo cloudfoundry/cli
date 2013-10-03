@@ -43,6 +43,7 @@ func TestCommands(t *testing.T) {
 		"create-org",
 		"create-service",
 		"create-space",
+		"create-user-provided-service",
 		"delete",
 		"delete-org",
 		"delete-service",
