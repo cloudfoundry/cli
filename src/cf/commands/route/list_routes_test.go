@@ -25,7 +25,6 @@ func TestListingRoutes(t *testing.T) {
 	routeRepo := &testhelpers.FakeRouteRepository{FindAllRoutes: routes}
 	config := &configuration.Configuration{
 		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
 	}
 	ui := &testhelpers.FakeUI{}
 
@@ -34,7 +33,6 @@ func TestListingRoutes(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes in space")
 	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "host")
