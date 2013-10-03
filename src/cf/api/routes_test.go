@@ -32,7 +32,17 @@ var findAllRoutesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body
           "entity": {
             "name": "cfapps.io"
           }
-        }
+        },
+        "apps": [
+       	  {
+       	    "metadata": {
+              "guid": "app-1-guid"
+            },
+            "entity": {
+              "name": "app-1"
+       	    }
+       	  }
+        ]
       }
     },
     {
@@ -48,7 +58,25 @@ var findAllRoutesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body
           "entity": {
             "name": "example.com"
           }
-        }
+        },
+        "apps": [
+       	  {
+       	    "metadata": {
+              "guid": "app-2-guid"
+            },
+            "entity": {
+              "name": "app-2"
+       	    }
+       	  },
+       	  {
+       	    "metadata": {
+              "guid": "app-3-guid"
+            },
+            "entity": {
+              "name": "app-3"
+       	    }
+       	  }
+        ]
       }
     }
   ]
@@ -76,9 +104,11 @@ func TestRoutesFindAll(t *testing.T) {
 	assert.Equal(t, route.Guid, "route-1-guid")
 	assert.Equal(t, route.Domain.Name, "cfapps.io")
 	assert.Equal(t, route.Domain.Guid, "domain-1-guid")
+	assert.Equal(t, route.AppNames, []string{"app-1"})
 
 	route = routes[1]
 	assert.Equal(t, route.Guid, "route-2-guid")
+	assert.Equal(t, route.AppNames, []string{"app-2", "app-3"})
 }
 
 var findRouteByHostResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `

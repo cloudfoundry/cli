@@ -55,6 +55,7 @@ type RouteResource struct {
 type RouteEntity struct {
 	Host   string
 	Domain Resource
+	Apps   []Resource
 }
 
 type OrganizationsApiResponse struct {

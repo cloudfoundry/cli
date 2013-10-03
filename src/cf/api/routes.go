@@ -45,14 +45,22 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiStat
 	}
 
 	for _, routeResponse := range response.Routes {
+		domainResource := routeResponse.Entity.Domain
+		appNames := []string{}
+
+		for _, appResource := range routeResponse.Entity.Apps {
+			appNames = append(appNames, appResource.Entity.Name)
+		}
+
 		routes = append(routes,
 			cf.Route{
 				Host: routeResponse.Entity.Host,
 				Guid: routeResponse.Metadata.Guid,
 				Domain: cf.Domain{
-					Name: routeResponse.Entity.Domain.Entity.Name,
-					Guid: routeResponse.Entity.Domain.Metadata.Guid,
+					Name: domainResource.Entity.Name,
+					Guid: domainResource.Metadata.Guid,
 				},
+				AppNames: appNames,
 			},
 		)
 	}

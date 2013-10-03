@@ -83,9 +83,10 @@ type Domain struct {
 }
 
 type Route struct {
-	Host   string
-	Guid   string
-	Domain Domain
+	Host     string
+	Guid     string
+	Domain   Domain
+	AppNames []string
 }
 
 func (r Route) URL() string {
