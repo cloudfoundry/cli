@@ -36,8 +36,6 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 	paramsMap := make(map[string]string)
 	params = strings.Trim(params, `"`)
 
-	println("PARAMS", params)
-
 	for _, param := range strings.Split(params, ",") {
 		param = strings.Trim(param, " ")
 		paramsMap[param] = cmd.ui.Ask("%s%s", param, terminal.PromptColor(">"))

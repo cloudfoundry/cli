@@ -124,11 +124,12 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 
 	buildpackUrl := stringOrNull(newApp.BuildpackUrl)
 	stackGuid := stringOrNull(newApp.Stack.Guid)
+	command := stringOrNull(newApp.Command)
 
 	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
 	data := fmt.Sprintf(
-		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s}`,
-		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid,
+		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s,"command":%s}`,
+		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid, command,
 	)
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiStatus.IsError() {

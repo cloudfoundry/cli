@@ -271,7 +271,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Push an app",
 			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name) +
 				"               [-m MEMORY] [-b URL] [--no-[re]start] [-p PATH]\n" +
-				"               [-s STACK]",
+				"               [-s STACK] [-c COMMAND]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"d", "", "domain (for example: example.com)"},
 				cli.StringFlag{"n", "", "hostname (for example: my-subdomain)"},
@@ -282,6 +282,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				cli.BoolFlag{"no-restart", "do not restart an application after pushing"},
 				cli.StringFlag{"p", "", "path of application directory or zip file"},
 				cli.StringFlag{"s", "", "stack to use"},
+				cli.StringFlag{"c", "", "startup command"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("push")

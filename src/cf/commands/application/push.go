@@ -101,6 +101,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		Instances:    c.Int("i"),
 		Memory:       getMemoryLimit(c.String("m")),
 		BuildpackUrl: c.String("b"),
+		Command:      c.String("c"),
 	}
 
 	stackName := c.String("s")

@@ -112,6 +112,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	appRepo.FindByNameNotFound = true
 
 	fakeUI := callPush([]string{
+		"-c", "unicorn -c config/unicorn.rb -D",
 		"-d", "bar.cf-app.com",
 		"-n", "my-hostname",
 		"-i", "3",
@@ -128,6 +129,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[1], "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Equal(t, appRepo.CreatedApp.Command, "unicorn -c config/unicorn.rb -D")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 3)
 	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(2048))
 	assert.Equal(t, appRepo.CreatedApp.Stack.Guid, "custom-linux-guid")

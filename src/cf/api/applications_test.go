@@ -188,7 +188,7 @@ var createApplicationResponse = `
 var createApplicationEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid"}`),
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 )
 
@@ -214,6 +214,7 @@ func TestCreateApplication(t *testing.T) {
 		Memory:       2048,
 		BuildpackUrl: "buildpack-url",
 		Stack:        cf.Stack{Guid: "some-stack-guid"},
+		Command:      "some-command",
 	}
 
 	createdApp, apiStatus := repo.Create(newApp)
@@ -225,11 +226,11 @@ func TestCreateApplication(t *testing.T) {
 var createApplicationWithoutBuildpackOrStackEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null}`),
+	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 )
 
-func TestCreateApplicationWithoutBuildpackOrStack(t *testing.T) {
+func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationWithoutBuildpackOrStackEndpoint))
 	defer ts.Close()
 
