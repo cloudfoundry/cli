@@ -72,7 +72,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	apiStatus := auth.Authenticate("foo@example.com", "oops wrong pass")
 	savedConfig := testhelpers.SavedConfiguration
 
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Equal(t, apiStatus.Message, "Password is incorrect, please try again.")
 	assert.Empty(t, savedConfig.AccessToken)
 }

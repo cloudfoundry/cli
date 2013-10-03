@@ -49,7 +49,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 
 	request, apiStatus := cmd.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -63,7 +63,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	serverResponse := new(InfoResponse)
 	_, apiStatus = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

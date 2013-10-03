@@ -68,7 +68,7 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	}
 
 	apiStatus = cmd.orgRepo.Delete(org)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

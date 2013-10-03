@@ -175,7 +175,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "You do not have access to that space.")
+	assert.Contains(t, ui.Outputs[1], "my-space")
 
 	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 

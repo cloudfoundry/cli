@@ -44,7 +44,7 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiSta
 	}
 
 	if repo.FindByNameNotFound {
-		apiStatus = net.NewNotFoundApiStatus()
+		apiStatus = net.NewNotFoundApiStatus("Space", name)
 	}
 
 	return

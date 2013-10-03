@@ -33,13 +33,8 @@ func (req *RouteApiRequirement) Execute() bool {
 	var apiStatus net.ApiStatus
 	req.route, apiStatus = req.routeRepo.FindByHostAndDomain(req.host, req.domain)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
-		return false
-	}
-
-	if apiStatus.IsNotFound() {
-		req.ui.Failed("Route not found")
 		return false
 	}
 

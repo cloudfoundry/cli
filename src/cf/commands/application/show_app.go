@@ -45,7 +45,7 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	cmd.ui.Say("Showing health and status for app %s...", terminal.EntityNameColor(app.Name))
 
 	summary, apiStatus := cmd.appSummaryRepo.GetSummary(app)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

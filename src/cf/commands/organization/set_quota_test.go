@@ -1,11 +1,11 @@
 package organization_test
 
 import (
-	"testing"
-	"testhelpers"
-	"github.com/stretchr/testify/assert"
-	. "cf/commands/organization"
 	"cf"
+	. "cf/commands/organization"
+	"github.com/stretchr/testify/assert"
+	"testhelpers"
+	"testing"
 )
 
 func TestSetQuotaFailsWithUsage(t *testing.T) {

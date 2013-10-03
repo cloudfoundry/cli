@@ -49,7 +49,7 @@ func (cmd *Files) Run(c *cli.Context) {
 	}
 
 	list, apiStatus := cmd.appFilesRepo.ListFiles(app, path)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

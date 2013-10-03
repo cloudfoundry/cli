@@ -50,7 +50,7 @@ func (cmd Login) Run(c *cli.Context) {
 		cmd.ui.Say("Authenticating...")
 
 		apiStatus := cmd.doLogin(username, password)
-		if apiStatus.IsError() {
+		if apiStatus.NotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -61,7 +61,7 @@ func (cmd Login) Run(c *cli.Context) {
 			cmd.ui.Say("Authenticating...")
 
 			apiStatus := cmd.doLogin(username, password)
-			if apiStatus.IsError() {
+			if apiStatus.NotSuccessful() {
 				cmd.ui.Failed(apiStatus.Message)
 				continue
 			}
@@ -74,7 +74,7 @@ func (cmd Login) Run(c *cli.Context) {
 
 func (cmd Login) doLogin(username, password string) (apiStatus net.ApiStatus) {
 	apiStatus = cmd.authenticator.Authenticate(username, password)
-	if !apiStatus.IsError() {
+	if !apiStatus.NotSuccessful() {
 		cmd.ui.Ok()
 		cmd.ui.Say("Use '%s' to view or set your target organization and space", terminal.CommandColor(cf.Name+" target"))
 	}

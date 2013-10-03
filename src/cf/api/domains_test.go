@@ -58,7 +58,7 @@ func TestFindAllInCurrentSpace(t *testing.T) {
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domains, apiStatus := repo.FindAllInCurrentSpace()
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, 2, len(domains))
 
 	first := domains[0]
@@ -138,7 +138,7 @@ func TestFindAllByOrg(t *testing.T) {
 
 	domains, apiStatus := repo.FindAllByOrg(org)
 
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, 2, len(domains))
 
 	domain := domains[0]
@@ -164,12 +164,11 @@ func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domain, apiStatus := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 
 	assert.Equal(t, domain.Name, "domain2.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain2-guid")
 }
-
 
 var noDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
@@ -197,7 +196,7 @@ func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) 
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiStatus := repo.FindByNameInCurrentSpace("")
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testing.T) {
@@ -267,7 +266,7 @@ func TestReserveDomain(t *testing.T) {
 	domainToCreate := cf.Domain{Name: "example.com"}
 	owningOrg := cf.Organization{Guid: "domain1-guid"}
 	createdDomain, apiStatus := repo.Create(domainToCreate, owningOrg)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, createdDomain.Guid, "abc-123")
 }
 
@@ -289,8 +288,7 @@ func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
 
 	assert.Equal(t, domain.Name, domainName)
 	assert.Equal(t, domain.Guid, "my-domain-guid")
-	assert.False(t, apiStatus.IsError())
-	assert.False(t, apiStatus.IsNotFound())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func mapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
@@ -323,7 +321,7 @@ func TestMapDomainSuccess(t *testing.T) {
 	apiStatus := repo.MapDomain(domain, space)
 
 	assert.True(t, responseStatus.Called)
-	assert.True(t, apiStatus.IsSuccess())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func TestMapDomainWhenServerError(t *testing.T) {
@@ -345,5 +343,5 @@ func TestMapDomainWhenServerError(t *testing.T) {
 	apiStatus := repo.MapDomain(domain, space)
 
 	assert.True(t, responseStatus.Called)
-	assert.False(t, apiStatus.IsSuccess())
+	assert.True(t, apiStatus.NotSuccessful())
 }

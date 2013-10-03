@@ -31,13 +31,13 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 func (repo CloudControllerDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains", repo.config.Target, repo.config.Space.Guid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -53,13 +53,13 @@ func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (d
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, orgGuid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	response := new(DomainApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -85,7 +85,7 @@ func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (d
 func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string) (domain cf.Domain, apiStatus net.ApiStatus) {
 	domains, apiStatus := repo.FindAllInCurrentSpace()
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -94,7 +94,7 @@ func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string
 	if domainIndex >= 0 {
 		domain = domains[domainIndex]
 	} else {
-		apiStatus = net.NewNotFoundApiStatus()
+		apiStatus = net.NewNotFoundApiStatus("Domain", name)
 	}
 
 	return
@@ -107,13 +107,13 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 	)
 
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	resource := new(Resource)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, resource)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -126,7 +126,7 @@ func (repo CloudControllerDomainRepository) MapDomain(domain cf.Domain, space cf
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
 
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -136,7 +136,7 @@ func (repo CloudControllerDomainRepository) MapDomain(domain cf.Domain, space cf
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiStatus net.ApiStatus) {
 	domains, apiStatus := repo.FindAllByOrg(owningOrg)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -144,7 +144,7 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, owningO
 	if domainIndex >= 0 {
 		domain = domains[domainIndex]
 	} else {
-		apiStatus = net.NewNotFoundApiStatus()
+		apiStatus = net.NewNotFoundApiStatus("Domain", name)
 	}
 
 	return

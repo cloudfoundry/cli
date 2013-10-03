@@ -25,7 +25,7 @@ func NewCloudControllerAppFilesRepository(config *configuration.Configuration, g
 func (repo CloudControllerAppFilesRepository) ListFiles(app cf.Application, path string) (files string, apiStatus net.ApiStatus) {
 	url := fmt.Sprintf("%s/v2/apps/%s/instances/0/files/%s", repo.config.Target, app.Guid, path)
 	request, apiStatus := repo.gateway.NewRequest("GET", url, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 

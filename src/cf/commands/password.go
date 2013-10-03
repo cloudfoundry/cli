@@ -39,7 +39,7 @@ func (cmd Password) Run(c *cli.Context) {
 	}
 
 	score, apiStatus := cmd.pwdRepo.GetScore(newPassword)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -48,7 +48,7 @@ func (cmd Password) Run(c *cli.Context) {
 	cmd.ui.Say("Changing password...")
 	apiStatus = cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		if apiStatus.StatusCode == 401 {
 			cmd.ui.Failed("Current password did not match")
 		} else {

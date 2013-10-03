@@ -22,11 +22,11 @@ func TestUAAGatewayErrorHandling(t *testing.T) {
 	defer ts.Close()
 
 	request, apiStatus := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 
 	apiStatus = gateway.PerformRequest(request)
 
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Contains(t, apiStatus.Message, "The foo is wrong")
 	assert.Contains(t, apiStatus.ErrorCode, "foo")
 }

@@ -26,13 +26,13 @@ func NewCloudControllerStackRepository(config *configuration.Configuration, gate
 func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	findResponse := new(ApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -51,13 +51,13 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	listResponse := new(StackApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 

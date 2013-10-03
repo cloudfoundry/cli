@@ -41,7 +41,7 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming %s to %s...", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(new_name))
 
 	apiStatus := cmd.appRepo.Rename(app, new_name)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

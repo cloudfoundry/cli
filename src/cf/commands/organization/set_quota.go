@@ -1,17 +1,17 @@
 package organization
 
 import (
-	"cf/terminal"
 	"cf/api"
-	"github.com/codegangsta/cli"
 	"cf/requirements"
+	"cf/terminal"
 	"errors"
+	"github.com/codegangsta/cli"
 )
 
 type SetQuota struct {
-	ui terminal.UI
+	ui      terminal.UI
 	orgRepo api.OrganizationRepository
-	orgReq requirements.OrganizationRequirement
+	orgReq  requirements.OrganizationRequirement
 }
 
 func NewSetQuota(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd *SetQuota) {
@@ -42,12 +42,8 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 	quotaName := c.Args()[1]
 	quota, apiStatus := cmd.orgRepo.FindQuotaByName(quotaName)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
-		return
-	}
-	if apiStatus.IsNotFound() {
-		cmd.ui.Failed("Could not find quota %s", quotaName)
 		return
 	}
 
@@ -56,7 +52,7 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 		terminal.EntityNameColor(org.Name))
 
 	apiStatus = cmd.orgRepo.UpdateQuota(org, quota)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

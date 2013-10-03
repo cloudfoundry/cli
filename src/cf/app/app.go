@@ -421,7 +421,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "set-quota",
 			Description: "Define the quota for an org",
-		Usage:       fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name) +
 				"TIP:\n" +
 				"   Allowable quotas are 'free,' 'paid,' 'runaway,' and 'trial'",
 			Action: func(c *cli.Context) {

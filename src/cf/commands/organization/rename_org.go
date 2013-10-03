@@ -40,7 +40,7 @@ func (cmd *RenameOrg) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming org %s...", terminal.EntityNameColor(org.Name))
 
 	apiStatus := cmd.orgRepo.Rename(org, c.Args()[1])
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

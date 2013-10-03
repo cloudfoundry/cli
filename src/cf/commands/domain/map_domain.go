@@ -53,17 +53,13 @@ func (cmd *MapDomain) Run(c *cli.Context) {
 
 	org := cmd.orgReq.GetOrganization()
 	domain, apiStatus := cmd.domainRepo.FindByNameInOrg(domainName, org)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiStatus.Message)
-		return
-	}
-	if apiStatus.IsNotFound() {
-		cmd.ui.Failed("Domain %s does not exist", domainName)
 		return
 	}
 
 	apiStatus = cmd.domainRepo.MapDomain(domain, space)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed("%s", apiStatus.Message)
 		return
 	}

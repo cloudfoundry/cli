@@ -27,7 +27,7 @@ func (cmd *Stacks) Run(c *cli.Context) {
 	cmd.ui.Say("Getting stacks")
 
 	stacks, apiStatus := cmd.stacksRepo.FindAll()
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

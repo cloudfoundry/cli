@@ -31,12 +31,7 @@ func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.serviceInstance, apiStatus = req.serviceRepo.FindInstanceByName(req.name)
 
-	if apiStatus.IsNotFound() {
-		req.ui.Failed("Service %s does not exist.", req.name)
-		return false
-	}
-
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
 		return false
 	}

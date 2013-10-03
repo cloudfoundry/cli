@@ -31,13 +31,8 @@ func (req *DomainApiRequirement) Execute() bool {
 	var apiStatus net.ApiStatus
 	req.domain, apiStatus = req.domainRepo.FindByNameInCurrentSpace(req.name)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
-		return false
-	}
-
-	if apiStatus.IsNotFound() {
-		req.ui.Failed("Domain not found")
 		return false
 	}
 

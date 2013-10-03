@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	"cf/net"
 	"cf/terminal"
-	"fmt"
 )
 
 type OrganizationRequirement interface {
@@ -32,12 +31,7 @@ func (req *OrganizationApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.org, apiStatus = req.orgRepo.FindByName(req.name)
 
-	if apiStatus.IsNotFound() {
-		req.ui.Failed(fmt.Sprintf("Organization %s could not be found.", terminal.EntityNameColor(req.name)))
-		return false
-	}
-
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
 		return false
 	}

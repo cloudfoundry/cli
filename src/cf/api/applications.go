@@ -39,31 +39,31 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	findResponse := new(ApplicationsApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiStatus = net.NewNotFoundApiStatus()
+		apiStatus = net.NewNotFoundApiStatus("App", name)
 		return
 	}
 
 	res := findResponse.Resources[0]
 	path = fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, res.Metadata.Guid)
 	request, apiStatus = repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	summaryResponse := new(ApplicationSummary)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, summaryResponse)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -108,7 +108,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envV
 	}
 
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -118,7 +118,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envV
 
 func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, apiStatus net.ApiStatus) {
 	apiStatus = validateApplication(newApp)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -132,13 +132,13 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid, command,
 	)
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	resource := new(Resource)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, resource)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -158,7 +158,7 @@ func stringOrNull(s string) string {
 func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, app.Guid)
 	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -170,7 +170,7 @@ func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newN
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, newName)
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -198,7 +198,7 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiS
 	}
 
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(bodyBytes))
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -228,14 +228,14 @@ type InstanceApiResponse struct {
 func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.Target, app.Guid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	apiResponse := InstancesApiResponse{}
 
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -267,7 +267,7 @@ func (repo CloudControllerApplicationRepository) updateApplication(app cf.Applic
 
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(body))
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 

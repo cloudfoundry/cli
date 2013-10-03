@@ -109,8 +109,7 @@ func TestFindByName(t *testing.T) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app, apiStatus := repo.FindByName("App1")
-	assert.False(t, apiStatus.IsError())
-	assert.False(t, apiStatus.IsNotFound())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
 	assert.Equal(t, app.Memory, uint64(128))
@@ -172,7 +171,7 @@ func TestSetEnv(t *testing.T) {
 
 	apiStatus := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var createApplicationResponse = `
@@ -218,7 +217,7 @@ func TestCreateApplication(t *testing.T) {
 	}
 
 	createdApp, apiStatus := repo.Create(newApp)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
 }
@@ -251,7 +250,7 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	}
 
 	_, apiStatus := repo.Create(newApp)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func TestCreateRejectsInproperNames(t *testing.T) {
@@ -267,13 +266,13 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	assert.Contains(t, apiStatus.Message, "Application name is invalid")
 
 	_, apiStatus = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 
 	_, apiStatus = repo.Create(cf.Application{Name: "Valid-Name"})
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 
 	_, apiStatus = repo.Create(cf.Application{Name: "name_with_numbers_2"})
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var deleteApplicationEndpoint = testhelpers.CreateEndpoint(
@@ -297,7 +296,7 @@ func TestDeleteApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	apiStatus := repo.Delete(app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var renameAppEndpoint = testhelpers.CreateEndpoint(
@@ -317,7 +316,7 @@ func TestRename(t *testing.T) {
 
 	org := cf.Application{Guid: "my-app-guid"}
 	apiStatus := repo.Rename(org, "my-new-app")
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
@@ -336,7 +335,7 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	apiStatus := repo.Scale(app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func TestScaleAll(t *testing.T) {
@@ -403,7 +402,7 @@ func TestStartApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	updatedApp, apiStatus := repo.Start(app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "started", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
@@ -439,7 +438,7 @@ func TestStopApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	updatedApp, apiStatus := repo.Stop(app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "stopped", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
@@ -474,7 +473,7 @@ func TestGetInstances(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	instances, apiStatus := repo.GetInstances(app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")

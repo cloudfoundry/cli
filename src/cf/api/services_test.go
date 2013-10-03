@@ -5,6 +5,7 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -76,7 +77,7 @@ func TestGetServiceOfferings(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 	offerings, apiStatus := repo.GetServiceOfferings()
 
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, 2, len(offerings))
 
 	firstOffering := offerings[0]
@@ -117,7 +118,7 @@ func TestCreateServiceInstance(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	alreadyExists, apiStatus := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, alreadyExists, false)
 }
 
@@ -151,8 +152,11 @@ func TestCreateServiceInstanceWhenServiceAlreadyExists(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	alreadyExists, apiStatus := repo.CreateServiceInstance("my-service", cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"})
-	assert.False(t, apiStatus.IsError())
+	servicePlan := cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"}
+	servicePlan.ServiceOffering.Guid = "service-guid"
+	alreadyExists, apiStatus := repo.CreateServiceInstance("my-service", servicePlan)
+	fmt.Printf("%v", apiStatus)
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, alreadyExists, true)
 }
 
@@ -181,7 +185,7 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 		"password": "secret",
 	}
 	apiStatus := repo.CreateUserProvidedServiceInstance("my-custom-service", params)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
@@ -213,9 +217,15 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
           }
         ],
         "service_plan": {
+          "metadata": {
+            "guid": "plan-guid"
+          },
    		  "entity": {
             "name": "plan-name",
             "service": {
+			  "metadata": {
+				"guid": "service-guid"
+			  },
               "entity": {
                 "label": "mysql",
                 "description": "MySQL database",
@@ -249,8 +259,7 @@ func TestFindInstanceByName(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	instance, apiStatus := repo.FindInstanceByName("my-service")
-	assert.False(t, apiStatus.IsError())
-	assert.False(t, apiStatus.IsNotFound())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
 	assert.Equal(t, instance.ServiceOffering.Label, "mysql")
@@ -314,7 +323,7 @@ func TestBindService(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
 	apiStatus := repo.BindService(serviceInstance, app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var bindServiceErrorEndpoint = testhelpers.CreateEndpoint(
@@ -342,7 +351,7 @@ func TestBindServiceIfError(t *testing.T) {
 	app := cf.Application{Guid: "my-app-guid"}
 	apiStatus := repo.BindService(serviceInstance, app)
 
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Equal(t, apiStatus.ErrorCode, "90003")
 }
 
@@ -375,7 +384,7 @@ func TestUnbindService(t *testing.T) {
 	}
 	app := cf.Application{Guid: "app-2-guid"}
 	found, apiStatus := repo.UnbindService(serviceInstance, app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.True(t, found)
 }
 
@@ -398,7 +407,7 @@ func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
 	}
 	app := cf.Application{Guid: "app-2-guid"}
 	found, apiStatus := repo.UnbindService(serviceInstance, app)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.False(t, found)
 }
 
@@ -422,7 +431,7 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiStatus := repo.DeleteService(serviceInstance)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 func TestDeleteServiceWithServiceBindings(t *testing.T) {
@@ -443,7 +452,7 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 	}
 
 	apiStatus := repo.DeleteService(serviceInstance)
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Equal(t, apiStatus.Message, "Cannot delete service instance, apps are still bound to it")
 }
 
@@ -468,5 +477,5 @@ func TestRenameService(t *testing.T) {
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiStatus := repo.RenameService(serviceInstance, "new-name")
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }

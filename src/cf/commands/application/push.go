@@ -66,7 +66,7 @@ func (cmd Push) Run(c *cli.Context) {
 	if apiStatus.IsNotFound() {
 		app, apiStatus = cmd.createApp(appName, c)
 
-		if apiStatus.IsError() {
+		if apiStatus.NotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -96,6 +96,7 @@ func (cmd Push) Run(c *cli.Context) {
 }
 
 func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiStatus net.ApiStatus) {
+	domainName := c.String("d")
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("i"),
@@ -109,7 +110,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		var stack cf.Stack
 		stack, apiStatus = cmd.stackRepo.FindByName(stackName)
 
-		if apiStatus.IsError() {
+		if apiStatus.NotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -119,15 +120,15 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	cmd.ui.Say("Creating %s...", terminal.EntityNameColor(appName))
 	app, apiStatus = cmd.appRepo.Create(newApp)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
 	cmd.ui.Ok()
 
-	domain, apiStatus := cmd.domainRepo.FindByNameInCurrentSpace(c.String("d"))
+	domain, apiStatus := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -139,13 +140,13 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	route, apiStatus := cmd.routeRepo.FindByHost(hostName)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		newRoute := cf.Route{Host: hostName}
 
 		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
 		route, apiStatus = cmd.routeRepo.Create(newRoute, domain)
-		if apiStatus.IsError() {
+		if apiStatus.NotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -158,7 +159,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	finalUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
 	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
 	apiStatus = cmd.routeRepo.Bind(route, app)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

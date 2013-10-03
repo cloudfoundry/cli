@@ -31,12 +31,12 @@ func (req *ApplicationApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.application, apiStatus = req.appRepo.FindByName(req.name)
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
 		return false
 	}
 
-	return !apiStatus.IsNotFound()
+	return true
 }
 
 func (req *ApplicationApiRequirement) GetApplication() cf.Application {

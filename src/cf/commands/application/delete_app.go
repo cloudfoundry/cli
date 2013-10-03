@@ -63,7 +63,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	}
 
 	apiStatus = cmd.appRepo.Delete(app)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

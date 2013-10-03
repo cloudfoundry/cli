@@ -29,7 +29,7 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("Getting organizations...")
 
 	orgs, apiStatus := cmd.orgRepo.FindAll()
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

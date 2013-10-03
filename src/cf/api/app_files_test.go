@@ -60,6 +60,6 @@ func TestListFiles(t *testing.T) {
 
 	list, err := repo.ListFiles(cf.Application{Guid: "my-app-guid"}, "some/path")
 
-	assert.False(t, err.IsError())
+	assert.False(t, err.NotSuccessful())
 	assert.Equal(t, list, expectedResponse)
 }

@@ -46,7 +46,7 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming space %s...", terminal.EntityNameColor(space.Name))
 
 	apiStatus := cmd.spaceRepo.Rename(space, newName)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

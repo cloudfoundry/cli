@@ -1,6 +1,8 @@
 package net
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	ORG_EXISTS                  = "30002"
@@ -41,8 +43,9 @@ func NewApiStatusWithError(message string, err error) (apiStatus ApiStatus) {
 	}
 }
 
-func NewNotFoundApiStatus() (apiStatus ApiStatus) {
+func NewNotFoundApiStatus(objectType string, objectId string) (apiStatus ApiStatus) {
 	return ApiStatus{
+		Message:    fmt.Sprintf("%s %s not found", objectType, objectId),
 		isNotFound: true,
 	}
 }
@@ -55,6 +58,6 @@ func (apiStatus ApiStatus) IsNotFound() bool {
 	return apiStatus.isNotFound
 }
 
-func (apiStatus ApiStatus) IsSuccess() bool {
-	return !apiStatus.IsError() && !apiStatus.IsNotFound()
+func (apiStatus ApiStatus) NotSuccessful() bool {
+	return apiStatus.IsError() || apiStatus.IsNotFound()
 }

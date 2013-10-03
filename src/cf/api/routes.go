@@ -35,13 +35,13 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiStat
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
 
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	response := new(RoutesResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -72,13 +72,13 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
 
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -96,24 +96,24 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 
 func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiStatus net.ApiStatus) {
 	domain, apiStatus := repo.domainRepo.FindByNameInCurrentSpace(domainName)
-	if apiStatus.IsError() || apiStatus.IsNotFound() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/routes?q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiStatus = net.NewNotFoundApiStatus()
+		apiStatus = net.NewNotFoundApiStatus("Route", fmt.Sprintf("%s.%s", host, domainName))
 		return
 	}
 
@@ -136,13 +136,13 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 		newRoute.Host, domain.Guid, space.Guid,
 	)
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
 	resource := new(Resource)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, resource)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 
@@ -162,7 +162,7 @@ func (repo CloudControllerRouteRepository) Unbind(route cf.Route, app cf.Applica
 func (repo CloudControllerRouteRepository) change(verb string, route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
 	request, apiStatus := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		return
 	}
 

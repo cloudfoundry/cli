@@ -68,7 +68,7 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 	ctxt := testhelpers.NewContext("map-domain", []string{"foo.com", "my-space"})
 	ui := &testhelpers.FakeUI{}
 	domainRepo := &testhelpers.FakeDomainRepository{
-		FindByNameInOrgApiStatus: net.NewNotFoundApiStatus(),
+		FindByNameInOrgApiStatus: net.NewNotFoundApiStatus("Domain", "foo.com"),
 	}
 
 	reqFactory := &testhelpers.FakeReqFactory{
@@ -88,7 +88,6 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
 	assert.Contains(t, ui.Outputs[2], "foo.com")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
 }
 
 func TestMapDomainMappingFails(t *testing.T) {

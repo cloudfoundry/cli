@@ -7,7 +7,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
-	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
 )
@@ -102,14 +101,9 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 	}
 
 	org, apiStatus := cmd.orgRepo.FindByName(orgName)
-	if apiStatus.IsError() {
-		cmd.ui.Failed("Could not set organization.")
+	if apiStatus.NotSuccessful() {
+		cmd.ui.Failed("Could not set organization.\n%s", apiStatus.Message)
 		return
-	}
-
-	if apiStatus.IsNotFound() {
-		cmd.ui.Failed(fmt.Sprintf("Organization %s not found.", orgName))
-		return errors.New("Org not found")
 	}
 
 	cmd.config.Organization = org
@@ -131,14 +125,9 @@ func (cmd Target) setSpace(spaceName string) (err error) {
 
 	space, apiStatus := cmd.spaceRepo.FindByName(spaceName)
 
-	if apiStatus.IsError() {
-		cmd.ui.Failed("You do not have access to that space.")
+	if apiStatus.NotSuccessful() {
+		cmd.ui.Failed("Unable to access space %s.\n%s", spaceName, apiStatus.Message)
 		return
-	}
-
-	if apiStatus.IsNotFound() {
-		cmd.ui.Failed(fmt.Sprintf("Space %s not found.", spaceName))
-		return errors.New("Space not found")
 	}
 
 	cmd.config.Space = space

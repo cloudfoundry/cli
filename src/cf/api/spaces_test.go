@@ -54,7 +54,7 @@ func TestSpacesFindAll(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 	spaces, apiStatus := repo.FindAll()
 
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, 2, len(spaces))
 
 	firstSpace := spaces[0]
@@ -89,7 +89,7 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 		spaces, apiStatus = repo.FindAll()
 	})
 
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Equal(t, 0, len(spaces))
 }
 
@@ -189,8 +189,7 @@ func TestSpacesFindByName(t *testing.T) {
 	}
 
 	space, apiStatus := repo.FindByName("Space1")
-	assert.False(t, apiStatus.IsError())
-	assert.False(t, apiStatus.IsNotFound())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, space.Name, "Space1")
 	assert.Equal(t, space.Guid, "space1-guid")
 
@@ -200,8 +199,7 @@ func TestSpacesFindByName(t *testing.T) {
 	assert.Equal(t, space.ServiceInstances, services)
 
 	space, apiStatus = repo.FindByName("space1")
-	assert.False(t, apiStatus.IsError())
-	assert.False(t, apiStatus.IsNotFound())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var didNotFindSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -327,7 +325,7 @@ func TestSpacesGetSummary(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space, apiStatus := repo.GetSummary()
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 	assert.Equal(t, "my-space-guid", space.Guid)
 	assert.Equal(t, "development", space.Name)
 	assert.Equal(t, 2, len(space.Applications))
@@ -387,7 +385,7 @@ func TestCreateSpace(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	apiStatus := repo.Create("space-name")
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var renameSpaceEndpoint = testhelpers.CreateEndpoint(
@@ -410,7 +408,7 @@ func TestRenameSpace(t *testing.T) {
 
 	space := cf.Space{Guid: "my-space-guid"}
 	apiStatus := repo.Rename(space, "new-space-name")
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }
 
 var deleteSpaceEndpoint = testhelpers.CreateEndpoint(
@@ -433,5 +431,5 @@ func TestDeleteSpace(t *testing.T) {
 
 	space := cf.Space{Guid: "my-space-guid"}
 	apiStatus := repo.Delete(space)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 }

@@ -28,7 +28,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 
 	space, apiStatus := cmd.spaceRepo.GetSummary()
 
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

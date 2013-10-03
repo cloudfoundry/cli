@@ -22,11 +22,11 @@ func TestCloudControllerGatewayErrorHandling(t *testing.T) {
 	defer ts.Close()
 
 	request, apiStatus := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 
 	apiStatus = gateway.PerformRequest(request)
 
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Contains(t, apiStatus.Message, "The host is taken: test1")
 	assert.Contains(t, apiStatus.ErrorCode, "210003")
 }
@@ -44,11 +44,11 @@ func TestCloudControllerGatewayInvalidTokenHandling(t *testing.T) {
 	defer ts.Close()
 
 	request, apiStatus := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiStatus.NotSuccessful())
 
 	apiStatus = gateway.PerformRequest(request)
 
-	assert.True(t, apiStatus.IsError())
+	assert.True(t, apiStatus.NotSuccessful())
 	assert.Contains(t, apiStatus.Message, "The token is invalid")
 	assert.Contains(t, apiStatus.ErrorCode, INVALID_TOKEN_CODE)
 }

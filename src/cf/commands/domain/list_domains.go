@@ -44,7 +44,7 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	cmd.ui.Say("Getting domains in org %s...", org.Name)
 
 	domains, apiStatus := cmd.domainRepo.FindAllByOrg(org)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

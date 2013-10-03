@@ -63,7 +63,7 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.Servic
 	}
 
 	if repo.FindInstanceByNameNotFound {
-		apiStatus = net.NewNotFoundApiStatus()
+		apiStatus = net.NewNotFoundApiStatus("Service instance", name)
 	}
 
 	return

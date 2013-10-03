@@ -46,7 +46,7 @@ func (cmd *ReserveDomain) Run(c *cli.Context) {
 	domain := cf.Domain{Name: domainName}
 
 	_, apiStatus := cmd.domainRepo.Create(domain, owningOrg)
-	if apiStatus.IsError() {
+	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
