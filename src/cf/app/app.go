@@ -91,6 +91,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "create-user-provided-service",
+			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",
 			Usage: fmt.Sprintf("%s create-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n\n", cf.Name) +
 				"EXAMPLE:\n" +
