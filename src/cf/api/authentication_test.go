@@ -93,6 +93,27 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
+var errorMaskedAsSuccessEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+	jsonResponse := `
+{"error":{"error":"rest_client_error","error_description":"I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"}}
+`
+
+	writer.WriteHeader(http.StatusOK)
+	fmt.Fprintln(writer, jsonResponse)
+}
+
+func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
+	ts, auth := setupAuthWithEndpoint(t, errorMaskedAsSuccessEndpoint)
+	defer ts.Close()
+
+	apiStatus := auth.Authenticate("foo@example.com", "bar")
+	savedConfig := testhelpers.SavedConfiguration
+
+	assert.True(t, apiStatus.IsError())
+	assert.Equal(t, apiStatus.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
+	assert.Empty(t, savedConfig.AccessToken)
+}
+
 func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (ts *httptest.Server, auth UAAAuthenticator)  {
 	ts = httptest.NewTLSServer(http.HandlerFunc(handler))
 

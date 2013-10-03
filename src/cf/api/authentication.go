@@ -54,7 +54,7 @@ func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiStatus n
 	apiStatus = uaa.getAuthToken(data)
 	updatedToken = uaa.config.AccessToken
 
-	if apiStatus.IsError() && apiStatus.StatusCode == 401 {
+	if apiStatus.IsError() {
 		fmt.Printf("%s\n\n", terminal.NotLoggedInText())
 		os.Exit(1)
 	}
@@ -63,10 +63,16 @@ func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiStatus n
 }
 
 func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiStatus net.ApiStatus) {
+	type uaaErrorResponse struct {
+		Code        string `json:"error"`
+		Description string `json:"error_description"`
+	}
+
 	type AuthenticationResponse struct {
 		AccessToken  string `json:"access_token"`
 		TokenType    string `json:"token_type"`
 		RefreshToken string `json:"refresh_token"`
+		Error        uaaErrorResponse `json:"error"`
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)
@@ -80,6 +86,11 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiStatus net.ApiStat
 	_, apiStatus = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
 	if apiStatus.IsError() {
+		return
+	}
+
+	if response.Error.Code != "" {
+		apiStatus = net.NewApiStatusWithMessage("Authentication Server error: %s", response.Error.Description)
 		return
 	}
 
