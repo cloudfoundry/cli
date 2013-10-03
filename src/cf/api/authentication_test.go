@@ -49,22 +49,13 @@ var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Req
 }
 
 func TestSuccessfullyLoggingIn(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(successfulLoginEndpoint))
+	ts, auth := setupAuthWithEndpoint(t, successfulLoginEndpoint)
 	defer ts.Close()
 
-	configRepo := testhelpers.FakeConfigRepository{}
-	configRepo.Delete()
-	config, err := configRepo.Get()
-	assert.NoError(t, err)
-	config.AuthorizationEndpoint = ts.URL
-	config.AccessToken = ""
-	gateway := net.NewUAAAuthGateway()
-
-	auth := NewUAAAuthenticator(gateway, configRepo)
 	apiStatus := auth.Authenticate("foo@example.com", "bar")
-	assert.False(t, apiStatus.IsError())
-
 	savedConfig := testhelpers.SavedConfiguration
+
+	assert.False(t, apiStatus.IsError())
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, ts.URL)
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
@@ -75,22 +66,14 @@ var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.R
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(unsuccessfulLoginEndpoint))
+	ts, auth := setupAuthWithEndpoint(t, unsuccessfulLoginEndpoint)
 	defer ts.Close()
 
-	configRepo := testhelpers.FakeConfigRepository{}
-	configRepo.Delete()
-	config, err := configRepo.Get()
-	assert.NoError(t, err)
-	config.AuthorizationEndpoint = ts.URL
-	config.AccessToken = ""
-	gateway := net.NewUAAAuthGateway()
-
-	auth := NewUAAAuthenticator(gateway, configRepo)
 	apiStatus := auth.Authenticate("foo@example.com", "oops wrong pass")
+	savedConfig := testhelpers.SavedConfiguration
+
 	assert.True(t, apiStatus.IsError())
 	assert.Equal(t, apiStatus.Message, "Password is incorrect, please try again.")
-	savedConfig := testhelpers.SavedConfiguration
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
@@ -99,8 +82,19 @@ var errorLoginEndpoint = func(writer http.ResponseWriter, request *http.Request)
 }
 
 func TestServerErrorLoggingIn(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(errorLoginEndpoint))
+	ts, auth := setupAuthWithEndpoint(t, errorLoginEndpoint)
 	defer ts.Close()
+
+	apiStatus := auth.Authenticate("foo@example.com", "bar")
+	savedConfig := testhelpers.SavedConfiguration
+
+	assert.True(t, apiStatus.IsError())
+	assert.Equal(t, apiStatus.Message, "Server error, status code: 500, error code: , message: ")
+	assert.Empty(t, savedConfig.AccessToken)
+}
+
+func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (ts *httptest.Server, auth UAAAuthenticator)  {
+	ts = httptest.NewTLSServer(http.HandlerFunc(handler))
 
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
@@ -108,12 +102,9 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	assert.NoError(t, err)
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
+
 	gateway := net.NewUAAAuthGateway()
 
-	auth := NewUAAAuthenticator(gateway, configRepo)
-	apiStatus := auth.Authenticate("foo@example.com", "bar")
-	assert.True(t, apiStatus.IsError())
-	assert.Equal(t, apiStatus.Message, "Server error, status code: 500, error code: , message: ")
-	savedConfig := testhelpers.SavedConfiguration
-	assert.Empty(t, savedConfig.AccessToken)
+	auth = NewUAAAuthenticator(gateway, configRepo)
+	return
 }
