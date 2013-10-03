@@ -265,18 +265,6 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
-			Name:        "park-route",
-			Description: "Reserve a url route on a space for later use",
-			Usage:       fmt.Sprintf("%s park-route SPACE DOMAIN [-n HOSTNAME]", cf.Name),
-			Flags: []cli.Flag{
-				cli.StringFlag{"n", "", "Hostname"},
-			},
-			Action: func(c *cli.Context) {
-				cmd, _ := cmdFactory.GetByCmdName("park-route")
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
 			Name:        "passwd",
 			ShortName:   "pw",
 			Description: "Change user password",
@@ -342,6 +330,18 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("rename-space")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "reserve-route",
+			Description: "Reserve a url route on a space for later use",
+			Usage:       fmt.Sprintf("%s reserve-route SPACE DOMAIN [-n HOSTNAME]", cf.Name),
+			Flags: []cli.Flag{
+				cli.StringFlag{"n", "", "Hostname"},
+			},
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("reserve-route")
 				cmdRunner.Run(cmd, c)
 			},
 		},

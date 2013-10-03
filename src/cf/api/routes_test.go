@@ -84,7 +84,7 @@ var findAllRoutesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body
 
 var findAllEndpoint = testhelpers.CreateEndpoint(
 	"GET",
-	"/v2/routes?inline-relations-depth=1",
+	"/v2/spaces/my-space-guid/routes?inline-relations-depth=1",
 	nil,
 	findAllRoutesResponse,
 )

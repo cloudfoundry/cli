@@ -9,25 +9,25 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type ParkRoute struct {
+type ReserveRoute struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
 	spaceReq  requirements.SpaceRequirement
 	domainReq requirements.DomainRequirement
 }
 
-func NewParkRoute(ui terminal.UI, routeRepo api.RouteRepository) (cmd *ParkRoute) {
-	cmd = new(ParkRoute)
+func NewReserveRoute(ui terminal.UI, routeRepo api.RouteRepository) (cmd *ReserveRoute) {
+	cmd = new(ReserveRoute)
 	cmd.ui = ui
 	cmd.routeRepo = routeRepo
 	return
 }
 
-func (cmd *ParkRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *ReserveRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "park-route")
+		cmd.ui.FailWithUsage(c, "reserve-route")
 		return
 	}
 
@@ -41,7 +41,7 @@ func (cmd *ParkRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 	return
 }
 
-func (cmd *ParkRoute) Run(c *cli.Context) {
+func (cmd *ReserveRoute) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
 	route := cf.Route{Host: c.String("n"), Domain: domain}
