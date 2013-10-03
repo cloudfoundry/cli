@@ -471,6 +471,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "unmap-route",
+			Description: "Remove a url route from an app",
+			Usage:       fmt.Sprintf("%s unmap-route APP DOMAIN [-n HOSTNAME]", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("unmap-route")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "unset-env",
 			Description: "Remove an env variable",
 			Usage:       fmt.Sprintf("%s unset-env cf.Name", cf.Name),

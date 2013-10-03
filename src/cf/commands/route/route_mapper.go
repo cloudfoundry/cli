@@ -2,27 +2,30 @@ package route
 
 import (
 	"cf/api"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
-type MapRoute struct {
+type RouteMapper struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
 	appReq    requirements.ApplicationRequirement
 	routeReq  requirements.RouteRequirement
+	bind      bool
 }
 
-func NewMapRoute(ui terminal.UI, routeRepo api.RouteRepository) (cmd *MapRoute) {
-	cmd = new(MapRoute)
+func NewRouteMapper(ui terminal.UI, routeRepo api.RouteRepository, bind bool) (cmd *RouteMapper) {
+	cmd = new(RouteMapper)
 	cmd.ui = ui
 	cmd.routeRepo = routeRepo
+	cmd.bind = bind
 	return
 }
 
-func (cmd *MapRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *RouteMapper) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "map-route")
@@ -44,17 +47,29 @@ func (cmd *MapRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 	return
 }
 
-func (cmd *MapRoute) Run(c *cli.Context) {
+func (cmd *RouteMapper) Run(c *cli.Context) {
 	route := cmd.routeReq.GetRoute()
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Adding url route %s to app %s",
-		terminal.EntityNameColor(route.URL()),
-		terminal.EntityNameColor(app.Name))
+	var apiStatus net.ApiStatus
 
-	apiStatus := cmd.routeRepo.Bind(route, app)
+	if cmd.bind {
+		cmd.ui.Say("Adding url route %s to app %s",
+			terminal.EntityNameColor(route.URL()),
+			terminal.EntityNameColor(app.Name))
+
+		apiStatus = cmd.routeRepo.Bind(route, app)
+	} else {
+		cmd.ui.Say("Removing url route %s from app %s",
+			terminal.EntityNameColor(route.URL()),
+			terminal.EntityNameColor(app.Name))
+
+		apiStatus = cmd.routeRepo.Unbind(route, app)
+	}
+
 	if apiStatus.IsError() {
 		cmd.ui.Failed(apiStatus.Message)
+		return
 	}
 
 	cmd.ui.Ok()

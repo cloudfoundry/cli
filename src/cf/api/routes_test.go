@@ -252,6 +252,25 @@ func TestBind(t *testing.T) {
 	assert.False(t, apiStatus.IsError())
 }
 
+var unbindRouteEndpoint = testhelpers.CreateEndpoint(
+	"DELETE",
+	"/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
+	nil,
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: ""},
+)
+
+func TestUnbind(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(unbindRouteEndpoint))
+	defer ts.Close()
+
+	repo, _ := getRepo(ts.URL)
+	route := cf.Route{Guid: "my-cool-route-guid"}
+	app := cf.Application{Guid: "my-cool-app-guid"}
+
+	apiStatus := repo.Unbind(route, app)
+	assert.False(t, apiStatus.IsError())
+}
+
 func getRepo(targetURL string) (repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",

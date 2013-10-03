@@ -27,6 +27,9 @@ type FakeRouteRepository struct {
 	BoundRoute cf.Route
 	BoundApp   cf.Application
 
+	UnboundRoute cf.Route
+	UnboundApp   cf.Application
+
 	FindAllErr    bool
 	FindAllRoutes []cf.Route
 }
@@ -90,6 +93,12 @@ func (repo *FakeRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Doma
 func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
 	repo.BoundRoute = route
 	repo.BoundApp = app
+	return
+}
+
+func (repo *FakeRouteRepository) Unbind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
+	repo.UnboundRoute = route
+	repo.UnboundApp = app
 	return
 }
 

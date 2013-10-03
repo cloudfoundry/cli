@@ -15,6 +15,7 @@ type RouteRepository interface {
 	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus)
 	CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiStatus net.ApiStatus)
 	Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
+	Unbind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerRouteRepository struct {
@@ -151,8 +152,16 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 }
 
 func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
+	return repo.change("PUT", route, app)
+}
+
+func (repo CloudControllerRouteRepository) Unbind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
+	return repo.change("DELETE", route, app)
+}
+
+func (repo CloudControllerRouteRepository) change(verb string, route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
-	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
+	request, apiStatus := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
 	if apiStatus.IsError() {
 		return
 	}

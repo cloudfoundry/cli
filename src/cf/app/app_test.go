@@ -76,6 +76,7 @@ func TestCommands(t *testing.T) {
 		"stop",
 		"target",
 		"unbind-service",
+		"unmap-route",
 		"unset-env",
 	}
 
