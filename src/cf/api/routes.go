@@ -32,7 +32,7 @@ func NewCloudControllerRouteRepository(config *configuration.Configuration, gate
 }
 
 func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiStatus net.ApiStatus) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid)
+	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
 
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiStatus.IsError() {
