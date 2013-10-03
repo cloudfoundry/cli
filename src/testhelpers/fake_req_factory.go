@@ -26,6 +26,9 @@ type FakeReqFactory struct {
 	RouteHost string
 	RouteDomain string
 	Route cf.Route
+
+	DomainName string
+	Domain cf.Domain
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -70,6 +73,11 @@ func (f *FakeReqFactory) NewRouteRequirement(host, domain string) requirements.R
 	return FakeRequirement{ f, true }
 }
 
+func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRequirement {
+	f.DomainName = name
+	return FakeRequirement{ f, true }
+}
+
 
 
 type FakeRequirement struct {
@@ -99,4 +107,8 @@ func (r FakeRequirement) GetOrganization() cf.Organization {
 
 func (r FakeRequirement) GetRoute() cf.Route {
 	return r.factory.Route
+}
+
+func (r FakeRequirement) GetDomain() cf.Domain {
+	return r.factory.Domain
 }

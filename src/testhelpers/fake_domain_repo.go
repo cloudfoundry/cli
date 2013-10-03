@@ -13,6 +13,8 @@ type FakeDomainRepository struct {
 
 	FindByNameName string
 	FindByNameDomain cf.Domain
+	FindByNameNotFound bool
+	FindByNameErr bool
 
 	ParkDomainDomainToCreate cf.Domain
 	ParkDomainOwningOrg cf.Organization
@@ -33,6 +35,14 @@ func (repo *FakeDomainRepository) FindAllByOrg(org cf.Organization)(domains []cf
 func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiStatus net.ApiStatus){
 	repo.FindByNameName = name
 	domain = repo.FindByNameDomain
+
+	if repo.FindByNameNotFound {
+		apiStatus = net.NewNotFoundApiStatus()
+	}
+	if repo.FindByNameErr {
+		apiStatus = net.NewApiStatusWithMessage("Error finding domain")
+	}
+
 	return
 }
 

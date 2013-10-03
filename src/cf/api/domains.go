@@ -89,16 +89,16 @@ func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.D
 
 	if name == "" {
 		domain = domains[0]
-	} else {
-		apiStatus = net.NewApiStatusWithMessage("Could not find domain with name %s", name)
+		return
+	}
 
-		for _, d := range domains {
-			if d.Name == strings.ToLower(name) {
-				domain = d
-				apiStatus = net.ApiStatus{}
-			}
+	for _, d := range domains {
+		if d.Name == strings.ToLower(name) {
+			domain = d
+			return
 		}
 	}
+	apiStatus = net.NewNotFoundApiStatus()
 
 	return
 }

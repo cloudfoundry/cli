@@ -56,6 +56,7 @@ func TestCommands(t *testing.T) {
 		"marketplace",
 		"org",
 		"orgs",
+		"park-route",
 		"passwd",
 		"push",
 		"rename",

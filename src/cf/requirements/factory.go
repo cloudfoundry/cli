@@ -19,6 +19,7 @@ type Factory interface {
 	NewTargetedOrgRequirement() TargetedOrgRequirement
 	NewOrganizationRequirement(name string) OrganizationRequirement
 	NewRouteRequirement(host, domain string) RouteRequirement
+	NewDomainRequirement(name string) DomainRequirement
 }
 
 type ApiRequirementFactory struct {
@@ -95,5 +96,13 @@ func (f ApiRequirementFactory) NewRouteRequirement(host, domain string) RouteReq
 		domain,
 		f.ui,
 		f.repoLocator.GetRouteRepository(),
+	)
+}
+
+func (f ApiRequirementFactory) NewDomainRequirement(name string) DomainRequirement {
+	return NewDomainRequirement(
+		name,
+		f.ui,
+		f.repoLocator.GetDomainRepository(),
 	)
 }

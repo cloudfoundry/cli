@@ -13,6 +13,7 @@ type RouteRepository interface {
 	FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus)
 	FindByHostAndDomain(host, domain string) (route cf.Route, apiStatus net.ApiStatus)
 	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus)
+	CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiStatus net.ApiStatus)
 	Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
 }
 
@@ -116,10 +117,14 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 }
 
 func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus) {
+	return repo.CreateInSpace(newRoute, domain, repo.config.Space)
+}
+
+func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/routes", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`,
-		newRoute.Host, domain.Guid, repo.config.Space.Guid,
+		newRoute.Host, domain.Guid, space.Guid,
 	)
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiStatus.IsError() {

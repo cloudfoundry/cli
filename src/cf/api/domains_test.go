@@ -189,6 +189,23 @@ func TestFindByNameReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	assert.Equal(t, domain.Guid, "domain1-guid")
 }
 
+func TestFindByNameWhenTheDomainIsNotFound(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
+
+	_, apiStatus := repo.FindByName("domain3.cf-app.com")
+	assert.False(t, apiStatus.IsError())
+	assert.True(t, apiStatus.IsNotFound())
+}
+
 var createDomainResponse = `
 {
     "metadata": {

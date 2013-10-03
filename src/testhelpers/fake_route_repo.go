@@ -19,6 +19,11 @@ type FakeRouteRepository struct {
 	CreatedRoute       cf.Route
 	CreatedRouteDomain cf.Domain
 
+	CreateInSpaceRoute cf.Route
+	CreateInSpaceDomain cf.Domain
+	CreateInSpaceSpace cf.Space
+	CreateInSpaceCreatedRoute cf.Route
+
 	BoundRoute cf.Route
 	BoundApp   cf.Application
 
@@ -70,6 +75,15 @@ func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (cr
 		Host: newRoute.Host,
 		Guid: newRoute.Host + "-guid",
 	}
+	return
+}
+
+func (repo *FakeRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiStatus net.ApiStatus) {
+	repo.CreateInSpaceRoute = newRoute
+	repo.CreateInSpaceDomain = domain
+	repo.CreateInSpaceSpace = space
+
+	createdRoute = repo.CreateInSpaceCreatedRoute
 	return
 }
 
