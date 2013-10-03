@@ -223,7 +223,7 @@ var createDomainEndpoint = testhelpers.CreateEndpoint(
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
 )
 
-func TestParkDomain(t *testing.T) {
+func TestReserveDomain(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createDomainEndpoint))
 	defer ts.Close()
 

@@ -256,15 +256,6 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
-			Name:        "park-domain",
-			Description: "Add a domain to an org",
-			Usage:       fmt.Sprintf("%s park-domain DOMAIN ORG", cf.Name),
-			Action: func(c *cli.Context) {
-				cmd, _ := cmdFactory.GetByCmdName("park-domain")
-				cmdRunner.Run(cmd, c)
-			},
-		},
-		{
 			Name:        "passwd",
 			ShortName:   "pw",
 			Description: "Change user password",
@@ -330,6 +321,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("rename-space")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
+			Name:        "reserve-domain",
+			Description: "Add a domain to an org",
+			Usage:       fmt.Sprintf("%s reserve-domain DOMAIN ORG", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("reserve-domain")
 				cmdRunner.Run(cmd, c)
 			},
 		},
