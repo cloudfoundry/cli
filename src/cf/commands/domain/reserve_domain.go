@@ -29,7 +29,7 @@ func (cmd *ReserveDomain) GetRequirements(reqFactory requirements.Factory, c *cl
 		return
 	}
 
-	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[1])
+	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		cmd.orgReq,
@@ -38,7 +38,7 @@ func (cmd *ReserveDomain) GetRequirements(reqFactory requirements.Factory, c *cl
 }
 
 func (cmd *ReserveDomain) Run(c *cli.Context) {
-	domainName := c.Args()[0]
+	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 
 	cmd.ui.Say("Creating domain %s on %s...", domainName, owningOrg.Name)

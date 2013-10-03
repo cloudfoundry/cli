@@ -337,7 +337,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "reserve-domain",
 			Description: "Add a domain to an org",
-			Usage:       fmt.Sprintf("%s reserve-domain DOMAIN ORG", cf.Name),
+			Usage:       fmt.Sprintf("%s reserve-domain ORG DOMAIN", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("reserve-domain")
 				cmdRunner.Run(cmd, c)

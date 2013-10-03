@@ -12,13 +12,13 @@ func TestReserveDomainRequirements(t *testing.T) {
 	domainRepo := &testhelpers.FakeDomainRepository{}
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
 
-	callReserveDomain([]string{"example.com", "my-org"}, reqFactory, domainRepo)
+	callReserveDomain([]string{"my-org", "example.com"}, reqFactory, domainRepo)
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.OrganizationName, "my-org")
 
 	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
 
-	callReserveDomain([]string{"example.com", "my-org"}, reqFactory, domainRepo)
+	callReserveDomain([]string{"my-org", "example.com"}, reqFactory, domainRepo)
 	assert.False(t, testhelpers.CommandDidPassRequirements)
 }
 
@@ -28,17 +28,17 @@ func TestReserveDomainFailsWithUsage(t *testing.T) {
 	ui := callReserveDomain([]string{""}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callReserveDomain([]string{"example.com"}, reqFactory, domainRepo)
+	ui = callReserveDomain([]string{"org1"}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callReserveDomain([]string{"example.com", "org1"}, reqFactory, domainRepo)
+	ui = callReserveDomain([]string{"org1", "example.com"}, reqFactory, domainRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestReserveDomain(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, Organization: cf.Organization{Name: "myOrg", Guid: "myOrg-guid"}}
 	domainRepo := &testhelpers.FakeDomainRepository{}
-	fakeUI := callReserveDomain([]string{"example.com", "myOrg"}, reqFactory, domainRepo)
+	fakeUI := callReserveDomain([]string{"myOrg", "example.com"}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.ReserveDomainDomainToCreate.Name, "example.com")
 	assert.Equal(t, domainRepo.ReserveDomainOwningOrg.Name, "myOrg")
