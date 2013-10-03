@@ -89,19 +89,14 @@ func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string
 		return
 	}
 
-	if name == "" {
-		domain = domains[0]
-		return
+	domainIndex := indexOfDomain(domains, name)
+
+	if domainIndex >= 0 {
+		domain = domains[domainIndex]
+	} else {
+		apiStatus = net.NewNotFoundApiStatus()
 	}
 
-	for _, d := range domains {
-		if d.Name == strings.ToLower(name) {
-			domain = d
-			return
-		}
-	}
-
-	apiStatus = net.NewNotFoundApiStatus()
 	return
 }
 
@@ -140,25 +135,33 @@ func (repo CloudControllerDomainRepository) MapDomain(domain cf.Domain, space cf
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiStatus net.ApiStatus) {
-	name = strings.ToLower(name)
 	domains, apiStatus := repo.FindAllByOrg(owningOrg)
-
 	if apiStatus.IsError() {
 		return
 	}
 
-	if name == "" {
-		domain = domains[0]
-		return
+	domainIndex := indexOfDomain(domains, name)
+	if domainIndex >= 0 {
+		domain = domains[domainIndex]
+	} else {
+		apiStatus = net.NewNotFoundApiStatus()
 	}
 
-	for _, d := range domains {
-		if strings.ToLower(d.Name) == name {
-			domain = d
-			return
+	return
+}
+
+func indexOfDomain(domains []cf.Domain, domainName string) int {
+	domainName = strings.ToLower(domainName)
+
+	if len(domains) > 0 && domainName == "" {
+		return 0
+	}
+
+	for i, d := range domains {
+		if strings.ToLower(d.Name) == domainName {
+			return i
 		}
 	}
 
-	apiStatus = net.NewApiStatusWithMessage("Could not find domain with name %s", name)
-	return
+	return -1
 }

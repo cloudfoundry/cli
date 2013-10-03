@@ -170,6 +170,20 @@ func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
 	assert.Equal(t, domain.Guid, "domain2-guid")
 }
 
+
+var noDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": []
+}
+`}
+
+var noDomainsEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/domains",
+	nil,
+	noDomainsResponse,
+)
+
 func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
 	defer ts.Close()
@@ -182,11 +196,25 @@ func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) 
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
-	domain, apiStatus := repo.FindByNameInCurrentSpace("")
+	_, apiStatus := repo.FindByNameInCurrentSpace("")
 	assert.False(t, apiStatus.IsError())
+}
 
-	assert.Equal(t, domain.Name, "domain1.cf-app.com")
-	assert.Equal(t, domain.Guid, "domain1-guid")
+func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(noDomainsEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerDomainRepository(config, gateway)
+
+	_, apiStatus := repo.FindByNameInCurrentSpace("")
+	assert.False(t, apiStatus.IsError())
+	assert.True(t, apiStatus.IsNotFound())
 }
 
 func TestFindByNameInCurrentSpaceWhenTheDomainIsNotFound(t *testing.T) {
