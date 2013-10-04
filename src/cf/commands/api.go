@@ -1,25 +1,24 @@
 package commands
 
 import (
+	"cf/api"
 	"cf/configuration"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
+	"strings"
 )
 
 type Api struct {
-	ui         terminal.UI
-	gateway    net.Gateway
-	configRepo configuration.ConfigurationRepository
-	config     *configuration.Configuration
+	ui           terminal.UI
+	endpointRepo api.EndpointRepository
+	config       *configuration.Configuration
 }
 
-func NewApi(ui terminal.UI, gateway net.Gateway, configRepo configuration.ConfigurationRepository) (cmd Api) {
+func NewApi(ui terminal.UI, config *configuration.Configuration, endpointRepo api.EndpointRepository) (cmd Api) {
 	cmd.ui = ui
-	cmd.gateway = gateway
-	cmd.configRepo = configRepo
-	cmd.config, _ = cmd.configRepo.Get()
+	cmd.config = config
+	cmd.endpointRepo = endpointRepo
 	return
 }
 
@@ -47,49 +46,19 @@ func (cmd Api) showApiEndpoint() {
 func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
-	request, apiStatus := cmd.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
-
+	apiStatus := cmd.endpointRepo.UpdateEndpoint(endpoint)
 	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
-		return
-	}
-
-	scheme := request.URL.Scheme
-	if scheme != "http" && scheme != "https" {
-		cmd.ui.Failed("API Endpoints should start with https:// or http://")
-		return
-	}
-
-	serverResponse := new(InfoResponse)
-	_, apiStatus = cmd.gateway.PerformRequestForJSONResponse(request, &serverResponse)
-
-	if apiStatus.NotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
-		return
-	}
-
-	err := cmd.saveEndpoint(endpoint, serverResponse)
-
-	if err != nil {
-		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	cmd.ui.Ok()
 
-	if scheme == "http" {
+	if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
 	}
 
 	cmd.showApiEndpoint()
 
 	cmd.ui.Say(terminal.NotLoggedInText())
-}
-
-func (cmd Api) saveEndpoint(endpoint string, info *InfoResponse) (err error) {
-	cmd.configRepo.ClearSession()
-	cmd.config.Target = endpoint
-	cmd.config.ApiVersion = info.ApiVersion
-	cmd.config.AuthorizationEndpoint = info.AuthorizationEndpoint
-	return cmd.configRepo.Save()
 }

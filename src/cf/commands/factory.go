@@ -24,7 +24,7 @@ type ConcreteFactory struct {
 func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
 	factory.cmdsByName = make(map[string]Command)
 
-	factory.cmdsByName["api"] = NewApi(ui, repoLocator.GetCloudControllerGateway(), repoLocator.GetConfigurationRepository())
+	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
 	factory.cmdsByName["app"] = application.NewShowApp(ui, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["bind-service"] = service.NewBindService(ui, repoLocator.GetServiceRepository())

@@ -11,11 +11,6 @@ import (
 	"os"
 )
 
-type InfoResponse struct {
-	ApiVersion            string `json:"api_version"`
-	AuthorizationEndpoint string `json:"authorization_endpoint"`
-}
-
 type Target struct {
 	ui         terminal.UI
 	config     *configuration.Configuration
