@@ -66,11 +66,6 @@ func TestDisplayingAppSummary(t *testing.T) {
 		cf.ApplicationInstance{
 			State:     cf.InstanceDown,
 			Since:     time2,
-			CpuUsage:  1.5,
-			DiskQuota: 1 * TERABYTE,
-			DiskUsage: 16 * MEGABYTE,
-			MemQuota:  64 * MEGABYTE,
-			MemUsage:  13 * KILOBYTE,
 		},
 	}
 	appSummary := cf.AppSummary{App: app, Instances: instances}
@@ -103,9 +98,9 @@ func TestDisplayingAppSummary(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "#1")
 	assert.Contains(t, ui.Outputs[7], "down")
 	assert.Contains(t, ui.Outputs[7], "2012-04-01 03:04:05 PM")
-	assert.Contains(t, ui.Outputs[7], "1.5%")
-	assert.Contains(t, ui.Outputs[7], "13K of 64M")
-	assert.Contains(t, ui.Outputs[7], "16M of 1T")
+	assert.Contains(t, ui.Outputs[7], "0%")
+	assert.Contains(t, ui.Outputs[7], "0 of 0")
+	assert.Contains(t, ui.Outputs[7], "0 of 0")
 }
 
 func callApp(args []string, reqFactory *testhelpers.FakeReqFactory, appSummaryRepo *testhelpers.FakeAppSummaryRepo) (ui *testhelpers.FakeUI) {

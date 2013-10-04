@@ -36,6 +36,8 @@ func byteSize(bytes uint64) string {
 	case bytes >= KILOBYTE:
 		unit = "K"
 		value = value / KILOBYTE
+	case bytes == 0:
+		return "0"
 	}
 
 	stringValue := fmt.Sprintf("%.1f", value)
@@ -52,8 +54,6 @@ func bytesFromString(s string) (bytes uint64, err error) {
 		return
 	}
 
-	//	var byteValue uint64
-
 	switch unit {
 	case "T":
 		bytes = value * TERABYTE
@@ -69,7 +69,6 @@ func bytesFromString(s string) (bytes uint64, err error) {
 		err = errors.New("Could not parse byte string")
 	}
 
-	//	bytes = int(byteValue)
 	return
 }
 
@@ -116,9 +115,9 @@ func logMessageOutput(appName string, lm logmessage.LogMessage) string {
 
 	if lm.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
 		return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msg)
-	} else {
-		return fmt.Sprintf("%s %s %s %s%s", timeString, appName, sourceType, channel, msg)
 	}
+
+	return fmt.Sprintf("%s %s %s %s%s", timeString, appName, sourceType, channel, msg)
 }
 
 func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {
