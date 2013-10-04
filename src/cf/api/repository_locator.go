@@ -7,8 +7,6 @@ import (
 )
 
 type RepositoryLocator struct {
-	config *configuration.Configuration
-
 	authenticator          Authenticator
 	cloudControllerGateway net.Gateway
 	uaaGateway             net.Gateway
@@ -29,7 +27,6 @@ type RepositoryLocator struct {
 }
 
 func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLocator) {
-	loc.config = config
 	loc.configurationRepo = configuration.NewConfigurationDiskRepository()
 
 	authGateway := net.NewUAAAuthGateway()
@@ -52,10 +49,6 @@ func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLo
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.cloudControllerGateway, LoggregatorHost)
 
 	return
-}
-
-func (locator RepositoryLocator) GetConfig() *configuration.Configuration {
-	return locator.config
 }
 
 func (locator RepositoryLocator) GetConfigurationRepository() configuration.ConfigurationRepository {

@@ -2,6 +2,7 @@ package requirements
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/terminal"
 )
 
@@ -24,11 +25,12 @@ type Factory interface {
 
 type ApiRequirementFactory struct {
 	ui          terminal.UI
+	config      *configuration.Configuration
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory ApiRequirementFactory) {
-	return ApiRequirementFactory{ui, repoLocator}
+func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator api.RepositoryLocator) (factory ApiRequirementFactory) {
+	return ApiRequirementFactory{ui, config, repoLocator}
 }
 
 func (f ApiRequirementFactory) NewApplicationRequirement(name string) ApplicationRequirement {
@@ -50,7 +52,7 @@ func (f ApiRequirementFactory) NewServiceInstanceRequirement(name string) Servic
 func (f ApiRequirementFactory) NewLoginRequirement() Requirement {
 	return NewLoginRequirement(
 		f.ui,
-		f.repoLocator.GetConfig(),
+		f.config,
 	)
 }
 func (f ApiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
@@ -71,14 +73,14 @@ func (f ApiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement
 func (f ApiRequirementFactory) NewTargetedSpaceRequirement() Requirement {
 	return NewTargetedSpaceRequirement(
 		f.ui,
-		f.repoLocator.GetConfig(),
+		f.config,
 	)
 }
 
 func (f ApiRequirementFactory) NewTargetedOrgRequirement() TargetedOrgRequirement {
 	return NewTargetedOrgRequirement(
 		f.ui,
-		f.repoLocator.GetConfig(),
+		f.config,
 	)
 }
 

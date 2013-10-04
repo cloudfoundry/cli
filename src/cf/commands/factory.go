@@ -8,6 +8,7 @@ import (
 	"cf/commands/route"
 	"cf/commands/service"
 	"cf/commands/space"
+	"cf/configuration"
 	"cf/terminal"
 	"errors"
 )
@@ -20,7 +21,7 @@ type ConcreteFactory struct {
 	cmdsByName map[string]Command
 }
 
-func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
+func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
 	factory.cmdsByName = make(map[string]Command)
 
 	factory.cmdsByName["api"] = NewApi(ui, repoLocator.GetCloudControllerGateway(), repoLocator.GetConfigurationRepository())
@@ -53,13 +54,13 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, repoLocator.GetSpaceRepository(), repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["reserve-domain"] = domain.NewReserveDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["reserve-route"] = route.NewReserveRoute(ui, repoLocator.GetRouteRepository())
-	factory.cmdsByName["routes"] = route.NewListRoutes(ui, repoLocator.GetConfig(), repoLocator.GetRouteRepository())
+	factory.cmdsByName["routes"] = route.NewListRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, repoLocator.GetOrganizationRepository())
-	factory.cmdsByName["space"] = space.NewShowSpace(ui, repoLocator.GetConfig())
+	factory.cmdsByName["space"] = space.NewShowSpace(ui, config)
 	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
-	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, repoLocator.GetConfig(), repoLocator.GetSpaceRepository())
+	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, config, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["stacks"] = NewStacks(ui, repoLocator.GetStackRepository())
 	factory.cmdsByName["target"] = NewTarget(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, repoLocator.GetServiceRepository())
@@ -67,7 +68,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), false)
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, repoLocator.GetApplicationRepository())
 
-	start := application.NewStart(ui, repoLocator.GetConfig(), repoLocator.GetApplicationRepository())
+	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())
 	stop := application.NewStop(ui, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, start, stop)
 

@@ -18,8 +18,9 @@ func main() {
 	assignTemplates()
 	config := loadConfig(termUI)
 	repoLocator := api.NewRepositoryLocator(config)
-	cmdFactory := commands.NewFactory(termUI, repoLocator)
-	reqFactory := requirements.NewFactory(termUI, repoLocator)
+
+	cmdFactory := commands.NewFactory(termUI, config, repoLocator)
+	reqFactory := requirements.NewFactory(termUI, config, repoLocator)
 
 	app, err := app.NewApp(cmdFactory, reqFactory)
 	if err != nil {
