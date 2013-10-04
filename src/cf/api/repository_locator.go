@@ -30,6 +30,11 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	uaaGateway := gatewaysByName["uaa"]
 
 	loc.authRepo = NewUAAAuthenticationRepository(authGateway, configRepo)
+
+	// ensure gateway refreshers are set before passing them by value to repositories
+	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
+	uaaGateway.SetTokenRefresher(loc.authRepo)
+
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, configRepo)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, cloudControllerGateway)
@@ -43,9 +48,6 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, cloudControllerGateway, LoggregatorHost)
-
-	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
-	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	return
 }
