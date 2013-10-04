@@ -40,10 +40,10 @@ func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOfferi
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiStatus net.ApiStatus) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiStatus net.ApiStatus) {
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlan = plan
-	alreadyExists = repo.CreateServiceAlreadyExists
+	identicalAlreadyExists = repo.CreateServiceAlreadyExists
 
 	return
 }

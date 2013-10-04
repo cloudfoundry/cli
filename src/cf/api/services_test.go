@@ -117,12 +117,12 @@ func TestCreateServiceInstance(t *testing.T) {
 	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
-	alreadyExists, apiStatus := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
+	identicalAlreadyExists, apiStatus := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
 	assert.False(t, apiStatus.NotSuccessful())
-	assert.Equal(t, alreadyExists, false)
+	assert.Equal(t, identicalAlreadyExists, false)
 }
 
-var serviceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
+var identicalServiceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/service_instances",
 	testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
@@ -132,16 +132,16 @@ var serviceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
 	},
 )
 
-var instanceAlreadyExistsEndpoints = func(res http.ResponseWriter, req *http.Request) {
+var identicalInstanceAlreadyExistsEndpoints = func(res http.ResponseWriter, req *http.Request) {
 	if strings.Contains(req.RequestURI, "/v2/service_instances") {
-		serviceInstanceAlreadyExistsEndpoint(res, req)
+		identicalServiceInstanceAlreadyExistsEndpoint(res, req)
 	} else {
 		findServiceInstanceEndpoint(res, req)
 	}
 }
 
-func TestCreateServiceInstanceWhenServiceAlreadyExists(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(instanceAlreadyExistsEndpoints))
+func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(identicalInstanceAlreadyExistsEndpoints))
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -153,11 +153,47 @@ func TestCreateServiceInstanceWhenServiceAlreadyExists(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	servicePlan := cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"}
-	servicePlan.ServiceOffering.Guid = "service-guid"
-	alreadyExists, apiStatus := repo.CreateServiceInstance("my-service", servicePlan)
-	fmt.Printf("%v", apiStatus)
+	identicalAlreadyExists, apiStatus := repo.CreateServiceInstance("my-service", servicePlan)
+
 	assert.False(t, apiStatus.NotSuccessful())
-	assert.Equal(t, alreadyExists, true)
+	assert.Equal(t, identicalAlreadyExists, true)
+}
+
+var differentServiceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/service_instances",
+	testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
+	testhelpers.TestResponse{
+		Status: http.StatusBadRequest,
+		Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+	},
+)
+
+var differentInstanceAlreadyExistsEndpoints = func(res http.ResponseWriter, req *http.Request) {
+	if strings.Contains(req.RequestURI, "/v2/service_instances") {
+		differentServiceInstanceAlreadyExistsEndpoint(res, req)
+	} else {
+		findServiceInstanceEndpoint(res, req)
+	}
+}
+
+func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(differentInstanceAlreadyExistsEndpoints))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	repo := NewCloudControllerServiceRepository(config, gateway)
+
+	servicePlan := cf.ServicePlan{Guid: "different-plan-guid", Name: "plan-name"}
+	identicalAlreadyExists, apiStatus := repo.CreateServiceInstance("my-service", servicePlan)
+
+	assert.True(t, apiStatus.NotSuccessful())
+	assert.Equal(t, identicalAlreadyExists, false)
 }
 
 var createUserProvidedServiceInstanceEndpoint = testhelpers.CreateEndpoint(

@@ -12,7 +12,7 @@ import (
 
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiStatus net.ApiStatus)
-	CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiStatus net.ApiStatus)
+	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiStatus net.ApiStatus)
 	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiStatus net.ApiStatus)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiStatus net.ApiStatus)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiStatus net.ApiStatus)
@@ -64,7 +64,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (alreadyExists bool, apiStatus net.ApiStatus) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
 
 	data := fmt.Sprintf(
@@ -80,17 +80,14 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 
 	if apiStatus.NotSuccessful() && apiStatus.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
 
-		//		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
-		//		fmt.Printf("ERROR: %v \n",findInstanceApiStatus)
-		//		fmt.Printf("Plans: %v\n%v\nOfferings:\n%v\n%v", serviceInstance.ServicePlan, plan, serviceInstance.ServicePlan.ServiceOffering, plan.ServiceOffering)
-		//		if findInstanceApiStatus.IsOk() &&
-		//			serviceInstance.ServicePlan.Guid == plan.Guid &&
-		//			serviceInstance.ServicePlan.ServiceOffering.Guid == plan.ServiceOffering.Guid {
+		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
 
-		apiStatus = net.ApiStatus{}
-		alreadyExists = true
-		return
-		//		}
+		if !findInstanceApiStatus.NotSuccessful() &&
+			serviceInstance.ServicePlan.Guid == plan.Guid {
+			apiStatus = net.ApiStatus{}
+			identicalAlreadyExists = true
+			return
+		}
 	}
 
 	return
@@ -148,9 +145,11 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	instance.ServiceOffering.DocumentationUrl = serviceOfferingEntity.DocumentationUrl
 	instance.ServiceOffering.Description = serviceOfferingEntity.Description
 
-	instance.ServicePlan.Name = resource.Entity.ServicePlan.Entity.Name
+	instance.ServicePlan = cf.ServicePlan{
+		Name: resource.Entity.ServicePlan.Entity.Name,
+		Guid: resource.Entity.ServicePlan.Metadata.Guid,
+	}
 	instance.ServiceBindings = []cf.ServiceBinding{}
-	instance.ServicePlan = cf.ServicePlan{Name: resource.Entity.ServicePlan.Entity.Name}
 
 	for _, bindingResource := range resource.Entity.ServiceBindings {
 		newBinding := cf.ServiceBinding{

@@ -69,9 +69,9 @@ func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiStatus net.ApiStat
 	}
 
 	type AuthenticationResponse struct {
-		AccessToken  string `json:"access_token"`
-		TokenType    string `json:"token_type"`
-		RefreshToken string `json:"refresh_token"`
+		AccessToken  string           `json:"access_token"`
+		TokenType    string           `json:"token_type"`
+		RefreshToken string           `json:"refresh_token"`
 		Error        uaaErrorResponse `json:"error"`
 	}
 

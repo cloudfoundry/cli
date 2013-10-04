@@ -114,7 +114,7 @@ func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
-func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (ts *httptest.Server, auth UAAAuthenticator)  {
+func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (ts *httptest.Server, auth UAAAuthenticator) {
 	ts = httptest.NewTLSServer(http.HandlerFunc(handler))
 
 	configRepo := testhelpers.FakeConfigRepository{}

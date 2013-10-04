@@ -24,7 +24,7 @@ func TestListingRoutes(t *testing.T) {
 	}
 	routeRepo := &testhelpers.FakeRouteRepository{FindAllRoutes: routes}
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
+		Space: cf.Space{Name: "my-space"},
 	}
 	ui := &testhelpers.FakeUI{}
 

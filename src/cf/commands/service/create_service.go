@@ -56,8 +56,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating service %s", terminal.EntityNameColor(name))
 
-	var alreadyExists bool
-	alreadyExists, apiStatus = cmd.serviceRepo.CreateServiceInstance(name, plan)
+	var identicalAlreadyExists bool
+	identicalAlreadyExists, apiStatus = cmd.serviceRepo.CreateServiceInstance(name, plan)
 	if apiStatus.NotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
@@ -65,7 +65,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	if alreadyExists {
+	if identicalAlreadyExists {
 		cmd.ui.Warn("Service %s already exists", name)
 	}
 }
