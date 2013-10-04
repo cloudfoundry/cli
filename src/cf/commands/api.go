@@ -55,7 +55,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Ok()
 
 	if !strings.HasPrefix(endpoint, "https://") {
-		cmd.ui.Say(terminal.WarningColor("\nWarning: Insecure http API Endpoint detected. Secure https API Endpoints are recommended.\n"))
+		cmd.ui.Say(terminal.WarningColor("\nWarning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}
 
 	cmd.showApiEndpoint()

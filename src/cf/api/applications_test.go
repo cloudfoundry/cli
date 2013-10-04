@@ -263,7 +263,7 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 
 	createdApp, apiStatus := repo.Create(cf.Application{Name: "name with space"})
 	assert.Equal(t, createdApp, cf.Application{})
-	assert.Contains(t, apiStatus.Message, "Application name is invalid")
+	assert.Contains(t, apiStatus.Message, "App name is invalid")
 
 	_, apiStatus = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
 	assert.True(t, apiStatus.NotSuccessful())

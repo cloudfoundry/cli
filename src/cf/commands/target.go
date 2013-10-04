@@ -36,7 +36,7 @@ func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 		cmd.ui.Say("Incorrect Usage.\n")
 		cli.ShowCommandHelp(c, "target")
 		cmd.ui.Say("")
-		cmd.ui.Say("TIP:\n  Use 'cf api' to set or view the target api url.\n")
+		cmd.ui.Say("TIP:\n  Use 'cf api' to set or view the target api url\n")
 		os.Exit(1)
 
 		return

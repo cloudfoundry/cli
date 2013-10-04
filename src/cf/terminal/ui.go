@@ -84,17 +84,17 @@ func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
 		EntityNameColor(config.ApiVersion))
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out. Use '%s' to login.", CommandColor(cf.Name+" login USERNAME"))
+		ui.Say("Logged out, use '%s' to login", CommandColor(cf.Name+" login USERNAME"))
 	} else {
-		ui.Say("user:            %s", EntityNameColor(config.UserEmail()))
+		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
 	}
 
 	if config.HasOrganization() {
-		ui.Say("org:             %s", EntityNameColor(config.Organization.Name))
+		ui.Say("Org:          %s", EntityNameColor(config.Organization.Name))
 	}
 
 	if config.HasSpace() {
-		ui.Say("space:           %s", EntityNameColor(config.Space.Name))
+		ui.Say("Space:        %s", EntityNameColor(config.Space.Name))
 	}
 }
 

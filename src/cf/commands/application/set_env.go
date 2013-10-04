@@ -69,5 +69,5 @@ func (se *SetEnv) Run(c *cli.Context) {
 	}
 
 	se.ui.Ok()
-	se.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect.", cf.Name)
+	se.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name)
 }

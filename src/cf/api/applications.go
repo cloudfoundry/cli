@@ -286,7 +286,7 @@ func (repo CloudControllerApplicationRepository) updateApplication(app cf.Applic
 func validateApplication(app cf.Application) (apiStatus net.ApiStatus) {
 	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
 	if !reg.MatchString(app.Name) {
-		apiStatus = net.NewApiStatusWithMessage("Application name is invalid. Name can only contain letters, numbers, underscores and hyphens.")
+		apiStatus = net.NewApiStatusWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
 	}
 
 	return

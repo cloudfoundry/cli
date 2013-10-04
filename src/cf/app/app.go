@@ -182,7 +182,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			ShortName:   "l",
 			Description: "Log user in",
 			Usage: fmt.Sprintf("%s login [USERNAME] [PASSWORD]\n\n", cf.Name) +
-				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged.\n   Your password may be visible to others and may be recorded in your shell history.\n\n") +
+				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s login (omit username and password to login interactively -- %s will prompt for both)\n", cf.Name, cf.Name) +
 				fmt.Sprintf("   %s login name@example.com pa55woRD (specify username and password to login non-interactively)\n", cf.Name) +

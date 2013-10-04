@@ -54,7 +54,7 @@ func (cmd *Start) Run(c *cli.Context) {
 
 func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
 	if app.State == "started" {
-		cmd.ui.Say(terminal.WarningColor("Application " + app.Name + " is already started."))
+		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already started"))
 		return
 	}
 

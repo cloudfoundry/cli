@@ -100,7 +100,7 @@ func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
 		config.ApiVersion)
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out. Use '%s login USERNAME' to login.", cf.Name)
+		ui.Say("Logged out, use '%s login USERNAME' to login", cf.Name)
 		return
 	} else {
 		ui.Say("user:            %s", config.UserEmail())
