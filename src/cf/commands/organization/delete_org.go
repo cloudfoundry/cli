@@ -8,7 +8,6 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type DeleteOrg struct {
@@ -42,12 +41,13 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	force := c.Bool("f")
 
 	if !force {
-		response := strings.ToLower(cmd.ui.Ask(
+		response := cmd.ui.Confirm(
 			"Really delete org %s and everything associated with it?%s",
 			terminal.EntityNameColor(orgName),
 			terminal.PromptColor(">"),
-		))
-		if response != "y" && response != "yes" {
+		)
+
+		if !response {
 			return
 		}
 	}

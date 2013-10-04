@@ -8,7 +8,6 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type DeleteSpace struct {
@@ -56,12 +55,12 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	}
 
 	if !force {
-		response := strings.ToLower(cmd.ui.Ask(
+		response := cmd.ui.Confirm(
 			"Really delete space %s and everything associated with it?%s",
 			terminal.EntityNameColor(spaceName),
 			terminal.PromptColor(">"),
-		))
-		if response != "y" && response != "yes" {
+		)
+		if !response {
 			return
 		}
 	}

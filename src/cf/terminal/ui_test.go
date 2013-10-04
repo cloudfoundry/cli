@@ -1,14 +1,16 @@
 package terminal_test
 
 import (
-	. "cf/terminal"
+	"cf/terminal"
 	"github.com/stretchr/testify/assert"
+	"io"
+	"os"
 	"testhelpers"
 	"testing"
 )
 
 func TestSayWithStringOnly(t *testing.T) {
-	ui := new(TerminalUI)
+	ui := new(terminal.TerminalUI)
 	out := testhelpers.CaptureOutput(func() {
 		ui.Say("Hello")
 	})
@@ -17,10 +19,54 @@ func TestSayWithStringOnly(t *testing.T) {
 }
 
 func TestSayWithStringWithFormat(t *testing.T) {
-	ui := new(TerminalUI)
+	ui := new(terminal.TerminalUI)
 	out := testhelpers.CaptureOutput(func() {
 		ui.Say("Hello %s", "World!")
 	})
 
 	assert.Equal(t, "Hello World!\n", out)
+}
+
+func TestConfirmYes(t *testing.T) {
+	simulateStdin("y\n", func() {
+		ui := new(terminal.TerminalUI)
+
+		var result bool
+		out := testhelpers.CaptureOutput(func() {
+			result = ui.Confirm("Hello %s", "World?")
+		})
+
+		assert.True(t, result)
+		assert.Contains(t, out, "Hello World?")
+	})
+}
+
+func TestConfirmNo(t *testing.T) {
+	simulateStdin("wat\n", func() {
+		ui := new(terminal.TerminalUI)
+
+		var result bool
+		out := testhelpers.CaptureOutput(func() {
+			result = ui.Confirm("Hello %s", "World?")
+		})
+
+		assert.False(t, result)
+		assert.Contains(t, out, "Hello World?")
+	})
+}
+
+func simulateStdin(input string, block func()) {
+	defer func() {
+		terminal.Stdin = os.Stdin
+	}()
+
+	stdinReader, stdinWriter := io.Pipe()
+	terminal.Stdin = stdinReader
+
+	go func() {
+		stdinWriter.Write([]byte(input))
+		defer stdinWriter.Close()
+	}()
+
+	block()
 }

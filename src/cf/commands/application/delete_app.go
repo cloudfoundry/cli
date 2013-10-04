@@ -6,7 +6,6 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type DeleteApp struct {
@@ -37,12 +36,12 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	force := c.Bool("f")
 
 	if !force {
-		response := strings.ToLower(cmd.ui.Ask(
+		response := cmd.ui.Confirm(
 			"Really delete %s?%s",
 			terminal.EntityNameColor(appName),
 			terminal.PromptColor(">"),
-		))
-		if response != "y" && response != "yes" {
+		)
+		if !response {
 			return
 		}
 	}

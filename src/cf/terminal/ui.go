@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ type UI interface {
 	Warn(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
+	Confirm(message string, args ...interface{}) bool
 	Ok()
 	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
@@ -34,6 +36,8 @@ type UI interface {
 type TerminalUI struct {
 }
 
+var Stdin io.Reader = os.Stdin
+
 func (c TerminalUI) Say(message string, args ...interface{}) {
 	fmt.Printf(message+"\n", args...)
 	return
@@ -45,10 +49,19 @@ func (c TerminalUI) Warn(message string, args ...interface{}) {
 	return
 }
 
+func (c TerminalUI) Confirm(message string, args ...interface{}) bool {
+	response := c.Ask(message, args...)
+	switch strings.ToLower(response) {
+	case "y", "yes":
+		return true
+	}
+	return false
+}
+
 func (c TerminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Println("")
 	fmt.Printf(prompt+" ", args...)
-	fmt.Scanln(&answer)
+	fmt.Fscanln(Stdin, &answer)
 	return
 }
 
