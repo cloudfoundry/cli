@@ -55,7 +55,7 @@ func TestListFiles(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 	}
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerAppFilesRepository(config, gateway)
 
 	list, err := repo.ListFiles(cf.Application{Guid: "my-app-guid"}, "some/path")

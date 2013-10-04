@@ -73,7 +73,7 @@ func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
 	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
 	defer authServer.Close()
 
-	configRepo, auth := createAuthenticator(t, uaaServer, authServer)
+	configRepo, auth := createAuthenticationRepository(t, uaaServer, authServer)
 
 	gateway := NewUAAGateway(auth)
 
@@ -89,14 +89,14 @@ func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
 	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
 	defer authServer.Close()
 
-	configRepo, auth := createAuthenticator(t, ccServer, authServer)
+	configRepo, auth := createAuthenticationRepository(t, ccServer, authServer)
 
 	gateway := NewCloudControllerGateway(auth)
 
 	testRefreshToken(t, configRepo, gateway)
 }
 
-func createAuthenticator(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) (configuration.ConfigurationRepository, api.Authenticator) {
+func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) (configuration.ConfigurationRepository, api.AuthenticationRepository) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Delete()
 	config, err := configRepo.Get()
@@ -108,7 +108,7 @@ func createAuthenticator(t *testing.T, apiServer *httptest.Server, authServer *h
 	config.RefreshToken = "initial-refresh-token"
 
 	authGateway := NewUAAAuthGateway()
-	authenticator := api.NewUAAAuthenticator(authGateway, configRepo)
+	authenticator := api.NewUAAAuthenticationRepository(authGateway, configRepo)
 
 	return configRepo, authenticator
 }

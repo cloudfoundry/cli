@@ -16,10 +16,10 @@ type Login struct {
 	ui            terminal.UI
 	config        *configuration.Configuration
 	configRepo    configuration.ConfigurationRepository
-	authenticator api.Authenticator
+	authenticator api.AuthenticationRepository
 }
 
-func NewLogin(ui terminal.UI, configRepo configuration.ConfigurationRepository, authenticator api.Authenticator) (cmd Login) {
+func NewLogin(ui terminal.UI, configRepo configuration.ConfigurationRepository, authenticator api.AuthenticationRepository) (cmd Login) {
 	cmd.ui = ui
 	cmd.configRepo = configRepo
 	cmd.config, _ = configRepo.Get()

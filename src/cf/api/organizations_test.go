@@ -50,7 +50,7 @@ func TestOrganizationsFindAll(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	organizations, apiStatus := repo.FindAll()
@@ -71,7 +71,7 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	var (
@@ -139,7 +139,7 @@ func TestOrganizationsFindByName(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
@@ -182,7 +182,7 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	_, apiStatus := repo.FindByName("org1")
@@ -202,7 +202,7 @@ func TestCreateOrganization(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	apiStatus := repo.Create("my-org")
@@ -221,7 +221,7 @@ func TestRenameOrganization(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
@@ -241,7 +241,7 @@ func TestDeleteOrganization(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
@@ -272,7 +272,7 @@ func TestFindQuotaByName(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	quota, apiStatus := repo.FindQuotaByName("my-quota")
@@ -292,7 +292,7 @@ func TestUpdateQuota(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	quota := cf.Quota{Guid: "my-quota-guid"}

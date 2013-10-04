@@ -50,7 +50,7 @@ func TestSpacesFindAll(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 	spaces, apiStatus := repo.FindAll()
 
@@ -75,7 +75,7 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	var (
@@ -174,7 +174,7 @@ func TestSpacesFindByName(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "org-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 	apps := []cf.Application{
@@ -229,7 +229,7 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "org-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	_, apiStatus := repo.FindByName("space1")
@@ -321,7 +321,7 @@ func TestSpacesGetSummary(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space, apiStatus := repo.GetSummary()
@@ -381,7 +381,7 @@ func TestCreateSpace(t *testing.T) {
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "org-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	apiStatus := repo.Create("space-name")
@@ -403,7 +403,7 @@ func TestRenameSpace(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space := cf.Space{Guid: "my-space-guid"}
@@ -426,7 +426,7 @@ func TestDeleteSpace(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space := cf.Space{Guid: "my-space-guid"}

@@ -82,7 +82,7 @@ func TestRecentLogsFor(t *testing.T) {
 	http.HandleFunc("/dump/", logRedirectEndpoint)
 	go http.ListenAndServe(":"+LOGGREGATOR_REDIRECTOR_PORT, nil)
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
 	loggregatorHostResolver := func(hostname string) string { return hostname }
@@ -140,7 +140,7 @@ func TestTailsLogsFor(t *testing.T) {
 	http.HandleFunc("/tail/", logRedirectEndpoint)
 	go http.ListenAndServe(":"+LOGGREGATOR_REDIRECTOR_PORT, nil)
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "http://localhost"}
 	loggregatorHostResolver := func(hostname string) string { return hostname }

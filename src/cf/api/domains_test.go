@@ -54,7 +54,7 @@ func TestFindAllInCurrentSpace(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domains, apiStatus := repo.FindAllInCurrentSpace()
@@ -133,7 +133,7 @@ func TestFindAllByOrg(t *testing.T) {
 		Target:       ts.URL,
 		Organization: org,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domains, apiStatus := repo.FindAllByOrg(org)
@@ -160,7 +160,7 @@ func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domain, apiStatus := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
@@ -192,7 +192,7 @@ func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) 
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiStatus := repo.FindByNameInCurrentSpace("")
@@ -208,7 +208,7 @@ func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testi
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiStatus := repo.FindByNameInCurrentSpace("")
@@ -225,7 +225,7 @@ func TestFindByNameInCurrentSpaceWhenTheDomainIsNotFound(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiStatus := repo.FindByNameInCurrentSpace("domain3.cf-app.com")
@@ -260,7 +260,7 @@ func TestReserveDomain(t *testing.T) {
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domainToCreate := cf.Domain{Name: "example.com"}
@@ -278,7 +278,7 @@ func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 
 	repo := NewCloudControllerDomainRepository(&config, gateway)
 
@@ -311,7 +311,7 @@ func TestMapDomainSuccess(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 
 	repo := NewCloudControllerDomainRepository(&config, gateway)
 
@@ -333,7 +333,7 @@ func TestMapDomainWhenServerError(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 
 	repo := NewCloudControllerDomainRepository(&config, gateway)
 
@@ -366,7 +366,7 @@ func TestUnmapDomainSuccess(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 
 	repo := NewCloudControllerDomainRepository(&config, gateway)
 

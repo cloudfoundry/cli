@@ -5,7 +5,7 @@ import (
 	"cf/net"
 )
 
-type FakeAuthenticator struct {
+type FakeAuthenticationRepository struct {
 	ConfigRepo FakeConfigRepository
 
 	Config *configuration.Configuration
@@ -17,7 +17,7 @@ type FakeAuthenticator struct {
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiStatus net.ApiStatus) {
+func (auth *FakeAuthenticationRepository) Authenticate(email string, password string) (apiStatus net.ApiStatus) {
 	auth.Config, _ = auth.ConfigRepo.Get()
 	auth.Email = email
 	auth.Password = password
@@ -36,6 +36,6 @@ func (auth *FakeAuthenticator) Authenticate(email string, password string) (apiS
 	return
 }
 
-func (auth *FakeAuthenticator) RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus) {
+func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus) {
 	return
 }

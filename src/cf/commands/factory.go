@@ -39,7 +39,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator
 	factory.cmdsByName["domains"] = domain.NewListDomains(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["env"] = application.NewEnv(ui)
 	factory.cmdsByName["files"] = application.NewFiles(ui, repoLocator.GetAppFilesRepository())
-	factory.cmdsByName["login"] = NewLogin(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetAuthenticator())
+	factory.cmdsByName["login"] = NewLogin(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["logout"] = NewLogout(ui, repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["logs"] = application.NewLogs(ui, repoLocator.GetLogsRepository())
 	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, repoLocator.GetServiceRepository())

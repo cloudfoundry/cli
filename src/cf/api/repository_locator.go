@@ -7,7 +7,7 @@ import (
 )
 
 type RepositoryLocator struct {
-	authenticator          Authenticator
+	authRepo               AuthenticationRepository
 	cloudControllerGateway net.Gateway
 	uaaGateway             net.Gateway
 
@@ -27,13 +27,13 @@ type RepositoryLocator struct {
 }
 
 func NewRepositoryLocator(config *configuration.Configuration) (loc RepositoryLocator) {
-	loc.configurationRepo = configuration.NewConfigurationDiskRepository()
-
 	authGateway := net.NewUAAAuthGateway()
-	loc.authenticator = NewUAAAuthenticator(authGateway, loc.configurationRepo)
 
-	loc.cloudControllerGateway = net.NewCloudControllerGateway(loc.authenticator)
-	loc.uaaGateway = net.NewUAAGateway(loc.authenticator)
+	loc.configurationRepo = configuration.NewConfigurationDiskRepository()
+	loc.authRepo = NewUAAAuthenticationRepository(authGateway, loc.configurationRepo)
+
+	loc.cloudControllerGateway = net.NewCloudControllerGateway(loc.authRepo)
+	loc.uaaGateway = net.NewUAAGateway(loc.authRepo)
 
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, loc.cloudControllerGateway)
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, loc.cloudControllerGateway)
@@ -55,8 +55,8 @@ func (locator RepositoryLocator) GetConfigurationRepository() configuration.Conf
 	return locator.configurationRepo
 }
 
-func (locator RepositoryLocator) GetAuthenticator() Authenticator {
-	return locator.authenticator
+func (locator RepositoryLocator) GetAuthenticationRepository() AuthenticationRepository {
+	return locator.authRepo
 }
 
 func (locator RepositoryLocator) GetCloudControllerGateway() net.Gateway {

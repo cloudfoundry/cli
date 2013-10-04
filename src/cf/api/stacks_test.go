@@ -40,7 +40,7 @@ func TestStacksFindByName(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stack, apiStatus := repo.FindByName("linux")
@@ -101,7 +101,7 @@ func TestStacksFindAll(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
 	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stacks, apiStatus := repo.FindAll()

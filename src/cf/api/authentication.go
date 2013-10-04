@@ -11,25 +11,25 @@ import (
 	"strings"
 )
 
-type Authenticator interface {
+type AuthenticationRepository interface {
 	Authenticate(email string, password string) (apiStatus net.ApiStatus)
 	RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus)
 }
 
-type UAAAuthenticator struct {
+type UAAAuthenticationRepository struct {
 	configRepo configuration.ConfigurationRepository
 	config     *configuration.Configuration
 	gateway    net.Gateway
 }
 
-func NewUAAAuthenticator(gateway net.Gateway, configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticator) {
+func NewUAAAuthenticationRepository(gateway net.Gateway, configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticationRepository) {
 	uaa.gateway = gateway
 	uaa.configRepo = configRepo
 	uaa.config, _ = configRepo.Get()
 	return
 }
 
-func (uaa UAAAuthenticator) Authenticate(email string, password string) (apiStatus net.ApiStatus) {
+func (uaa UAAAuthenticationRepository) Authenticate(email string, password string) (apiStatus net.ApiStatus) {
 	data := url.Values{
 		"username":   {email},
 		"password":   {password},
@@ -44,7 +44,7 @@ func (uaa UAAAuthenticator) Authenticate(email string, password string) (apiStat
 	return
 }
 
-func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus) {
+func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken},
 		"grant_type":    {"refresh_token"},
@@ -62,7 +62,7 @@ func (uaa UAAAuthenticator) RefreshAuthToken() (updatedToken string, apiStatus n
 	return
 }
 
-func (uaa UAAAuthenticator) getAuthToken(data url.Values) (apiStatus net.ApiStatus) {
+func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiStatus net.ApiStatus) {
 	type uaaErrorResponse struct {
 		Code        string `json:"error"`
 		Description string `json:"error_description"`
