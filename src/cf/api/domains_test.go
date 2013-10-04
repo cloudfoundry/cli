@@ -399,7 +399,7 @@ func TestDeleteDomainSuccess(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 
 	repo := NewCloudControllerDomainRepository(&config, gateway)
 
@@ -420,7 +420,7 @@ func TestDeleteDomainFailure(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 
 	repo := NewCloudControllerDomainRepository(&config, gateway)
 
