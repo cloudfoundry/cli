@@ -57,7 +57,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	defer ts.Close()
 
 	config, _ := configRepo.Get()
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewEndpointRepository(config, gateway, configRepo)
 	repo.UpdateEndpoint(ts.URL)
 
@@ -73,7 +73,7 @@ func TestApiWhenUrlIsMissingScheme(t *testing.T) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Login()
 	config, _ := configRepo.Get()
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewEndpointRepository(config, gateway, configRepo)
 
 	apiStatus := repo.UpdateEndpoint("example.com")
@@ -117,7 +117,7 @@ func createRepo(configRepo testhelpers.FakeConfigRepository, endpoint func(w htt
 	ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
 
 	config, _ := configRepo.Get()
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo = NewEndpointRepository(config, gateway, configRepo)
 	return
 }

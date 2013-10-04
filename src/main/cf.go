@@ -11,13 +11,19 @@ import (
 	"cf/terminal"
 	"cf/configuration"
 	"github.com/codegangsta/cli"
+	"cf/net"
 )
 
 func main() {
 	termUI := new(terminal.TerminalUI)
 	assignTemplates()
 	config := loadConfig(termUI)
-	repoLocator := api.NewRepositoryLocator(config)
+
+	repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
+		"auth": net.NewUAAGateway(),
+		"cloud-controller": net.NewCloudControllerGateway(),
+		"uaa": net.NewUAAGateway(),
+	})
 
 	cmdFactory := commands.NewFactory(termUI, config, repoLocator)
 	reqFactory := requirements.NewFactory(termUI, config, repoLocator)

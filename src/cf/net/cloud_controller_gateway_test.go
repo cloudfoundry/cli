@@ -16,7 +16,7 @@ var failingCloudControllerRequest = func(writer http.ResponseWriter, request *ht
 }
 
 func TestCloudControllerGatewayErrorHandling(t *testing.T) {
-	gateway := NewCloudControllerGateway(nil)
+	gateway := NewCloudControllerGateway()
 
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingCloudControllerRequest))
 	defer ts.Close()
@@ -38,7 +38,7 @@ var invalidTokenCloudControllerRequest = func(writer http.ResponseWriter, reques
 }
 
 func TestCloudControllerGatewayInvalidTokenHandling(t *testing.T) {
-	gateway := NewCloudControllerGateway(nil)
+	gateway := NewCloudControllerGateway()
 
 	ts := httptest.NewTLSServer(http.HandlerFunc(invalidTokenCloudControllerRequest))
 	defer ts.Close()

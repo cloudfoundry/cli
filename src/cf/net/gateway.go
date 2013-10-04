@@ -33,10 +33,13 @@ type Gateway struct {
 	errHandler    errorHandler
 }
 
-func newGateway(auth tokenRefresher, errHandler errorHandler) (gateway Gateway) {
-	gateway.authenticator = auth
+func newGateway(errHandler errorHandler) (gateway Gateway) {
 	gateway.errHandler = errHandler
 	return
+}
+
+func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
+	gateway.authenticator = auth
 }
 
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Reader) (req *Request, apiStatus ApiStatus) {

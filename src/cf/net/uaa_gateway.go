@@ -28,10 +28,6 @@ var uaaErrorHandler = func(response *http.Response) errorResponse {
 	return errorResponse{Code: code, Description: uaaResp.Description}
 }
 
-func NewUAAAuthGateway() Gateway {
-	return newGateway(nil, uaaErrorHandler)
-}
-
-func NewUAAGateway(auth tokenRefresher) Gateway {
-	return newGateway(auth, uaaErrorHandler)
+func NewUAAGateway() Gateway {
+	return newGateway(uaaErrorHandler)
 }

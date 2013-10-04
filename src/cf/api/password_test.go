@@ -44,7 +44,7 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 		AccessToken: "BEARER my_access_token",
 		Target:      targetServer.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerPasswordRepository(config, gateway)
 
 	score, apiStatus := repo.GetScore("new-password")
@@ -84,7 +84,7 @@ func TestUpdatePassword(t *testing.T) {
 		AccessToken: fmt.Sprintf("BEARER my_access_token.%s.baz", encodedTokenInfo),
 		Target:      targetServer.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerPasswordRepository(config, gateway)
 
 	apiStatus := repo.UpdatePassword("old-password", "new-password")

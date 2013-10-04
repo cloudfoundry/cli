@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func NewCloudControllerGateway(auth tokenRefresher) Gateway {
+func NewCloudControllerGateway() Gateway {
 	invalidTokenCode := "1000"
 
 	type ccErrorResponse struct {
@@ -30,5 +30,5 @@ func NewCloudControllerGateway(auth tokenRefresher) Gateway {
 		return errorResponse{Code: code, Description: ccResp.Description}
 	}
 
-	return newGateway(auth, errorHandler)
+	return newGateway(errorHandler)
 }

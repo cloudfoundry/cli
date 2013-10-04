@@ -124,7 +124,7 @@ func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http
 	config.AuthorizationEndpoint = ts.URL
 	config.AccessToken = ""
 
-	gateway := net.NewUAAAuthGateway()
+	gateway := net.NewUAAGateway()
 
 	auth = NewUAAAuthenticationRepository(gateway, configRepo)
 	return

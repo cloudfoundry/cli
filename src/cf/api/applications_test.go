@@ -105,7 +105,7 @@ func TestFindByName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app, apiStatus := repo.FindByName("App1")
@@ -141,7 +141,7 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	_, apiStatus := repo.FindByName("App1")
@@ -164,7 +164,7 @@ func TestSetEnv(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
@@ -204,7 +204,7 @@ func TestCreateApplication(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	newApp := cf.Application{
@@ -238,7 +238,7 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	newApp := cf.Application{
@@ -258,7 +258,7 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	createdApp, apiStatus := repo.Create(cf.Application{Name: "name with space"})
@@ -290,7 +290,7 @@ func TestDeleteApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
@@ -311,7 +311,7 @@ func TestRename(t *testing.T) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	org := cf.Application{Guid: "my-app-guid"}
@@ -331,7 +331,7 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	apiStatus := repo.Scale(app)
@@ -396,7 +396,7 @@ func TestStartApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
@@ -432,7 +432,7 @@ func TestStopApplication(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
@@ -467,7 +467,7 @@ func TestGetInstances(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}

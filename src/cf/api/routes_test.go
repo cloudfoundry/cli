@@ -277,7 +277,7 @@ func getRepo(targetURL string) (repo CloudControllerRouteRepository, domainRepo 
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	domainRepo = &testhelpers.FakeDomainRepository{}
 
 	repo = NewCloudControllerRouteRepository(config, gateway, domainRepo)

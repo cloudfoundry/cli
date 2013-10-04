@@ -18,7 +18,7 @@ import (
 
 func TestNewRequest(t *testing.T) {
 	// arbitrarily picking cloud controller to test
-	gateway := NewCloudControllerGateway(nil)
+	gateway := NewCloudControllerGateway()
 
 	request, apiStatus := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
@@ -75,7 +75,8 @@ func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
 
 	configRepo, auth := createAuthenticationRepository(t, uaaServer, authServer)
 
-	gateway := NewUAAGateway(auth)
+	gateway := NewUAAGateway()
+	gateway.SetTokenRefresher(auth)
 
 	testRefreshToken(t, configRepo, gateway)
 }
@@ -91,7 +92,8 @@ func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
 
 	configRepo, auth := createAuthenticationRepository(t, ccServer, authServer)
 
-	gateway := NewCloudControllerGateway(auth)
+	gateway := NewCloudControllerGateway()
+	gateway.SetTokenRefresher(auth)
 
 	testRefreshToken(t, configRepo, gateway)
 }
@@ -107,7 +109,7 @@ func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, au
 	config.AccessToken = "bearer initial-access-token"
 	config.RefreshToken = "initial-refresh-token"
 
-	authGateway := NewUAAAuthGateway()
+	authGateway := NewUAAGateway()
 	authenticator := api.NewUAAAuthenticationRepository(authGateway, configRepo)
 
 	return configRepo, authenticator

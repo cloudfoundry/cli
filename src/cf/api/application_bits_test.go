@@ -152,7 +152,7 @@ func testUploadApp(t *testing.T, dir string) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	zipper := &testhelpers.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 

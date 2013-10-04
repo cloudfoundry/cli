@@ -72,7 +72,7 @@ func TestGetServiceOfferings(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 	offerings, apiStatus := repo.GetServiceOfferings()
 
@@ -113,7 +113,7 @@ func TestCreateServiceInstance(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	identicalAlreadyExists, apiStatus := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
@@ -148,7 +148,7 @@ func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	servicePlan := cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"}
@@ -185,7 +185,7 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	servicePlan := cf.ServicePlan{Guid: "different-plan-guid", Name: "plan-name"}
@@ -211,7 +211,7 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "some-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	params := map[string]string{
@@ -290,7 +290,7 @@ func TestFindInstanceByName(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	instance, apiStatus := repo.FindInstanceByName("my-service")
@@ -329,7 +329,7 @@ func TestFindInstanceByNameForNonExistentService(t *testing.T) {
 		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	_, apiStatus := repo.FindInstanceByName("my-service")
@@ -352,7 +352,7 @@ func TestBindService(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
@@ -379,7 +379,7 @@ func TestBindServiceIfError(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
@@ -405,7 +405,7 @@ func TestUnbindService(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceBindings := []cf.ServiceBinding{
@@ -431,7 +431,7 @@ func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceBindings := []cf.ServiceBinding{}
@@ -461,7 +461,7 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
@@ -473,7 +473,7 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceBindings := []cf.ServiceBinding{
@@ -507,7 +507,7 @@ func TestRenameService(t *testing.T) {
 		Target:      ts.URL,
 	}
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}

@@ -81,7 +81,7 @@ func TestAppSummaryGetSummary(t *testing.T) {
 		Target:      ts.URL,
 	}
 
-	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+	gateway := net.NewCloudControllerGateway()
 
 	appRepo := NewCloudControllerApplicationRepository(config, gateway)
 	summaryRepo := NewCloudControllerAppSummaryRepository(config, gateway, appRepo)

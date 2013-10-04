@@ -16,7 +16,7 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 }
 
 func TestUAAGatewayErrorHandling(t *testing.T) {
-	gateway := NewUAAGateway(nil)
+	gateway := NewUAAGateway()
 
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
 	defer ts.Close()
