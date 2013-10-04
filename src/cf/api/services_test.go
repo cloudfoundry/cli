@@ -5,7 +5,6 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
