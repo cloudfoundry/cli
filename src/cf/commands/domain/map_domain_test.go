@@ -40,7 +40,7 @@ func TestMapDomainRequirements(t *testing.T) {
 }
 
 func TestMapDomainSuccess(t *testing.T) {
-	ctxt := testhelpers.NewContext("map-domain", []string{"foo.com", "my-space"})
+	ctxt := testhelpers.NewContext("map-domain", []string{"my-space", "foo.com"})
 	ui := &testhelpers.FakeUI{}
 	domainRepo := &testhelpers.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
@@ -65,7 +65,7 @@ func TestMapDomainSuccess(t *testing.T) {
 }
 
 func TestMapDomainDomainNotFound(t *testing.T) {
-	ctxt := testhelpers.NewContext("map-domain", []string{"foo.com", "my-space"})
+	ctxt := testhelpers.NewContext("map-domain", []string{"my-space", "foo.com"})
 	ui := &testhelpers.FakeUI{}
 	domainRepo := &testhelpers.FakeDomainRepository{
 		FindByNameInOrgApiStatus: net.NewNotFoundApiStatus("Domain", "foo.com"),
@@ -91,7 +91,7 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 }
 
 func TestMapDomainMappingFails(t *testing.T) {
-	ctxt := testhelpers.NewContext("map-domain", []string{"foo.com", "my-space"})
+	ctxt := testhelpers.NewContext("map-domain", []string{"my-space", "foo.com"})
 	ui := &testhelpers.FakeUI{}
 	domainRepo := &testhelpers.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},

@@ -227,7 +227,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "map-domain",
 			Description: "Map a domain to a space",
-			Usage:       fmt.Sprintf("%s map-domain DOMAIN SPACE", cf.Name),
+			Usage:       fmt.Sprintf("%s map-domain SPACE DOMAIN", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("map-domain")
 				cmdRunner.Run(cmd, c)

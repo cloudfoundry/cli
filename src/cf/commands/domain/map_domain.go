@@ -30,7 +30,7 @@ func (cmd *MapDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 		return
 	}
 
-	spaceName := c.Args()[1]
+	spaceName := c.Args()[0]
 	cmd.spaceReq = reqFactory.NewSpaceRequirement(spaceName)
 
 	loginReq := reqFactory.NewLoginRequirement()
@@ -46,7 +46,7 @@ func (cmd *MapDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 }
 
 func (cmd *MapDomain) Run(c *cli.Context) {
-	domainName := c.Args()[0]
+	domainName := c.Args()[1]
 	space := cmd.spaceReq.GetSpace()
 
 	cmd.ui.Say("Mapping domain %s to space %s...", domainName, space.Name)
