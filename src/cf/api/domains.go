@@ -15,6 +15,7 @@ type DomainRepository interface {
 	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiStatus net.ApiStatus)
 	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus)
 	MapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus)
+	UnmapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerDomainRepository struct {
@@ -123,9 +124,17 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 }
 
 func (repo CloudControllerDomainRepository) MapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus) {
+	return repo.changeDomain("PUT", domain, space)
+}
+
+func (repo CloudControllerDomainRepository) UnmapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus) {
+	return repo.changeDomain("DELETE", domain, space)
+}
+
+func (repo CloudControllerDomainRepository) changeDomain(verb string, domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
 
-	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
+	request, apiStatus := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
 	if apiStatus.NotSuccessful() {
 		return
 	}

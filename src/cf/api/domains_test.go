@@ -345,3 +345,36 @@ func TestMapDomainWhenServerError(t *testing.T) {
 	assert.True(t, responseStatus.Called)
 	assert.True(t, apiStatus.NotSuccessful())
 }
+
+func unmapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
+	status = &testhelpers.RequestStatus{}
+	hf = testhelpers.CreateEndpoint(
+		"DELETE",
+		"/v2/spaces/my-space-guid/domains/my-domain-guid",
+		testhelpers.EndpointCalledMatcher(status),
+		testhelpers.TestResponse{Status: statusCode},
+	)
+	return
+}
+
+func TestUnmapDomainSuccess(t *testing.T) {
+	hf, responseStatus := unmapDomainEndpoint(http.StatusOK)
+	ts := httptest.NewTLSServer(hf)
+	defer ts.Close()
+
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticator{})
+
+	repo := NewCloudControllerDomainRepository(&config, gateway)
+
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
+
+	apiStatus := repo.UnmapDomain(domain, space)
+
+	assert.True(t, responseStatus.Called)
+	assert.False(t, apiStatus.NotSuccessful())
+}

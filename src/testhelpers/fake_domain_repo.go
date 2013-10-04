@@ -25,6 +25,10 @@ type FakeDomainRepository struct {
 	MapDomainDomain cf.Domain
 	MapDomainSpace cf.Space
 	MapDomainApiStatus net.ApiStatus
+
+	UnmapDomainDomain cf.Domain
+	UnmapDomainSpace cf.Space
+	UnmapDomainApiStatus net.ApiStatus
 }
 
 func (repo *FakeDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiStatus net.ApiStatus){
@@ -63,6 +67,13 @@ func (repo *FakeDomainRepository) MapDomain(domain cf.Domain, space cf.Space) (a
 	repo.MapDomainDomain = domain
 	repo.MapDomainSpace = space
 	apiStatus = repo.MapDomainApiStatus
+	return
+}
+
+func (repo *FakeDomainRepository) UnmapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus) {
+	repo.UnmapDomainDomain = domain
+	repo.UnmapDomainSpace = space
+	apiStatus = repo.UnmapDomainApiStatus
 	return
 }
 

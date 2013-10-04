@@ -13,7 +13,7 @@ import (
 func TestMapDomainRequirements(t *testing.T) {
 	ui := &testhelpers.FakeUI{}
 	domainRepo := &testhelpers.FakeDomainRepository{}
-	cmd := NewMapDomain(ui, domainRepo)
+	cmd := NewDomainMapper(ui, domainRepo, true)
 
 	ctxt := testhelpers.NewContext("map-domain", []string{"foo.com", "my-space"})
 	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
@@ -53,7 +53,7 @@ func TestMapDomainSuccess(t *testing.T) {
 		Space:              cf.Space{Name: "my-space"},
 	}
 
-	cmd := NewMapDomain(ui, domainRepo)
+	cmd := NewDomainMapper(ui, domainRepo, true)
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	assert.Equal(t, domainRepo.MapDomainDomain.Name, "foo.com")
@@ -78,7 +78,7 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 		Space:              cf.Space{Name: "my-space"},
 	}
 
-	cmd := NewMapDomain(ui, domainRepo)
+	cmd := NewDomainMapper(ui, domainRepo, true)
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
@@ -105,7 +105,7 @@ func TestMapDomainMappingFails(t *testing.T) {
 		Space:              cf.Space{Name: "my-space"},
 	}
 
-	cmd := NewMapDomain(ui, domainRepo)
+	cmd := NewDomainMapper(ui, domainRepo, true)
 
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
@@ -116,4 +116,29 @@ func TestMapDomainMappingFails(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "FAILED")
 	assert.Contains(t, ui.Outputs[2], "Did not work")
 	assert.Contains(t, ui.Outputs[2], "bummer")
+}
+
+func TestUnmapDomainSuccess(t *testing.T) {
+	ctxt := testhelpers.NewContext("unmap-domain", []string{"my-space", "foo.com"})
+	ui := &testhelpers.FakeUI{}
+	domainRepo := &testhelpers.FakeDomainRepository{
+		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
+	}
+
+	reqFactory := &testhelpers.FakeReqFactory{
+		LoginSuccess:       true,
+		TargetedOrgSuccess: true,
+		Organization:       cf.Organization{Name: "my-org", Guid: "my-org-guid"},
+		Space:              cf.Space{Name: "my-space"},
+	}
+
+	cmd := NewDomainMapper(ui, domainRepo, false)
+	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+
+	assert.Equal(t, domainRepo.UnmapDomainDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.UnmapDomainSpace.Name, "my-space")
+	assert.Contains(t, ui.Outputs[0], "Unmapping domain")
+	assert.Contains(t, ui.Outputs[0], "foo.com")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[1], "OK")
 }

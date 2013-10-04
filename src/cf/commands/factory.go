@@ -42,7 +42,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["logout"] = NewLogout(ui, repoLocator.GetConfigurationRepository())
 	factory.cmdsByName["logs"] = application.NewLogs(ui, repoLocator.GetLogsRepository())
 	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, repoLocator.GetServiceRepository())
-	factory.cmdsByName["map-domain"] = domain.NewMapDomain(ui, repoLocator.GetDomainRepository())
+	factory.cmdsByName["map-domain"] = domain.NewDomainMapper(ui, repoLocator.GetDomainRepository(), true)
 	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), true)
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui)
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, repoLocator.GetOrganizationRepository())
@@ -63,6 +63,7 @@ func NewFactory(ui terminal.UI, repoLocator api.RepositoryLocator) (factory Conc
 	factory.cmdsByName["stacks"] = NewStacks(ui, repoLocator.GetStackRepository())
 	factory.cmdsByName["target"] = NewTarget(ui, repoLocator.GetConfigurationRepository(), repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["unmap-domain"] = domain.NewDomainMapper(ui, repoLocator.GetDomainRepository(), false)
 	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), false)
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, repoLocator.GetApplicationRepository())
 

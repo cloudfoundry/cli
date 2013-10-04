@@ -28,7 +28,11 @@ func NewRouteMapper(ui terminal.UI, routeRepo api.RouteRepository, bind bool) (c
 func (cmd *RouteMapper) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "map-route")
+		if cmd.bind {
+			cmd.ui.FailWithUsage(c, "map-route")
+		} else {
+			cmd.ui.FailWithUsage(c, "unmap-route")
+		}
 		return
 	}
 
