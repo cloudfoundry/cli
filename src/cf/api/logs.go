@@ -7,21 +7,18 @@ import (
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"net/http"
 	"regexp"
 	"sort"
-	"strings"
 	"time"
 )
 
 const LOGGREGATOR_REDIRECTOR_PORT = "4443"
 
 type LogsRepository interface {
-	RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error)
-	TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration) (err error)
+	RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), port string) (err error)
+	TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration, port string) (err error)
 }
 
 type LoggregatorLogsRepository struct {
@@ -37,19 +34,18 @@ func NewLoggregatorLogsRepository(config *configuration.Configuration, gateway n
 	return
 }
 
-func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error) {
-	location, err := repo.getLocationFromRedirector(fmt.Sprintf("/dump/?app=%s", app.Guid))
+func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), port string) (err error) {
+	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + port
+	location := host + fmt.Sprintf("/dump/?app=%s", app.Guid)
 	if err != nil {
 		return
 	}
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, nil)
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration) (err error) {
-	location, err := repo.getLocationFromRedirector(fmt.Sprintf("/tail/?app=%s", app.Guid))
-	if err != nil {
-		return
-	}
+func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration, port string) error {
+	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + port
+	location := host + fmt.Sprintf("/tail/?app=%s", app.Guid)
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, time.Tick(printInterval*time.Second))
 }
 
@@ -163,41 +159,6 @@ func (sort *sortableLogMessages) Swap(i, j int) {
 }
 
 func LoggregatorHost(apiHost string) string {
-	re := regexp.MustCompile(`^(https?://)[^\.]+\.(.+)\/?`)
-	return re.ReplaceAllString(apiHost, "${1}loggregator.${2}")
-}
-
-func (repo LoggregatorLogsRepository) getLocationFromRedirector(requestPathAndQueryParams string) (loc string, err error) {
-	const REDIRECT_ERROR = "REDIRECTED"
-
-	tlsConfig := &tls.Config{InsecureSkipVerify: true}
-
-	tr := &http.Transport{TLSClientConfig: tlsConfig, Proxy: http.ProxyFromEnvironment}
-
-	client := http.Client{
-		Transport: tr,
-		CheckRedirect: func(*http.Request, []*http.Request) error {
-			return errors.New(REDIRECT_ERROR)
-		},
-	}
-
-	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + LOGGREGATOR_REDIRECTOR_PORT
-	request, apiStatus := repo.gateway.NewRequest("GET", host+requestPathAndQueryParams, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
-		err = errors.New(apiStatus.Message)
-		return
-	}
-
-	resp, err := client.Do(request.Request)
-
-	if strings.Contains(err.Error(), REDIRECT_ERROR) {
-		err = nil
-	}
-
-	if err != nil {
-		return
-	}
-
-	loc = resp.Header.Get("Location")
-	return
+	re := regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
+	return re.ReplaceAllString(apiHost, "ws${1}://loggregator.${2}")
 }

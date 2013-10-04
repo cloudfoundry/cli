@@ -12,7 +12,7 @@ type FakeLogsRepository struct {
 	TailLogMessages []logmessage.LogMessage
 }
 
-func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage)) (err error){
+func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), port string) (err error){
 	l.AppLogged = app
 	onConnect()
 	for _, message := range l.RecentLogs{
@@ -23,7 +23,7 @@ func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(),
 }
 
 
-func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage),  printInterval time.Duration) (err error){
+func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage),  printInterval time.Duration, port string) (err error){
 	l.AppLogged = app
 	onConnect()
 	for _, message := range l.TailLogMessages{

@@ -64,8 +64,8 @@ func TestDisplayingAppSummary(t *testing.T) {
 			MemUsage:  13 * BYTE,
 		},
 		cf.ApplicationInstance{
-			State:     cf.InstanceDown,
-			Since:     time2,
+			State: cf.InstanceDown,
+			Since: time2,
 		},
 	}
 	appSummary := cf.AppSummary{App: app, Instances: instances}
