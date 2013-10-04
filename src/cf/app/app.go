@@ -115,6 +115,18 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "delete-domain",
+			Description: "Delete a domain",
+			Usage:       fmt.Sprintf("%s delete-domain DOMAIN", cf.Name),
+			Flags: []cli.Flag{
+				cli.BoolFlag{"f", "force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("delete-domain")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "delete-org",
 			Description: "Delete an org",
 			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name),

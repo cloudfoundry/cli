@@ -29,6 +29,9 @@ type FakeDomainRepository struct {
 	UnmapDomainDomain cf.Domain
 	UnmapDomainSpace cf.Space
 	UnmapDomainApiStatus net.ApiStatus
+
+	DeleteDomainDomain cf.Domain
+	DeleteDomainApiStatus net.ApiStatus
 }
 
 func (repo *FakeDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiStatus net.ApiStatus){
@@ -84,4 +87,8 @@ func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrg cf.Orga
 	return
 }
 
-
+func (repo *FakeDomainRepository) DeleteDomain(domain cf.Domain) (apiStatus net.ApiStatus) {
+	repo.DeleteDomainDomain = domain
+	apiStatus = repo.DeleteDomainApiStatus
+	return
+}

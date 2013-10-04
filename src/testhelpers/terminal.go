@@ -43,7 +43,8 @@ type FakeUI struct {
 }
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
-	ui.Outputs = append(ui.Outputs, fmt.Sprintf(message, args...))
+	message =  fmt.Sprintf(message, args...)
+	ui.Outputs = append(ui.Outputs,message)
 	return
 }
 
@@ -57,6 +58,15 @@ func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	answer = ui.Inputs[0]
 	ui.Inputs = ui.Inputs[1:]
 	return
+}
+
+func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
+	response := ui.Ask(prompt, args...)
+	switch strings.ToLower(response) {
+	case "y", "yes":
+		return true
+	}
+	return false
 }
 
 func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {

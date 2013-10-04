@@ -16,6 +16,7 @@ type DomainRepository interface {
 	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiStatus net.ApiStatus)
 	MapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus)
 	UnmapDomain(domain cf.Domain, space cf.Space) (apiStatus net.ApiStatus)
+	DeleteDomain(domain cf.Domain) (apiStatus net.ApiStatus)
 }
 
 type CloudControllerDomainRepository struct {
@@ -159,6 +160,16 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, owningO
 	return
 }
 
+func (repo CloudControllerDomainRepository) DeleteDomain(domain cf.Domain) (apiStatus net.ApiStatus) {
+	path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domain.Guid)
+	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiStatus.NotSuccessful() {
+		return
+	}
+
+	apiStatus = repo.gateway.PerformRequest(request)
+	return
+}
 func indexOfDomain(domains []cf.Domain, domainName string) int {
 	domainName = strings.ToLower(domainName)
 

@@ -378,3 +378,56 @@ func TestUnmapDomainSuccess(t *testing.T) {
 	assert.True(t, responseStatus.Called)
 	assert.False(t, apiStatus.NotSuccessful())
 }
+
+func deleteDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
+	status = &testhelpers.RequestStatus{}
+	hf = testhelpers.CreateEndpoint(
+		"DELETE",
+		"/v2/domains/my-domain-guid?recursive=true",
+		testhelpers.EndpointCalledMatcher(status),
+		testhelpers.TestResponse{Status: statusCode},
+	)
+	return
+}
+
+func TestDeleteDomainSuccess(t *testing.T) {
+	hf, responseStatus := deleteDomainEndpoint(http.StatusOK)
+	ts := httptest.NewTLSServer(hf)
+	defer ts.Close()
+
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+
+	repo := NewCloudControllerDomainRepository(&config, gateway)
+
+	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
+
+	apiStatus := repo.DeleteDomain(domain)
+
+	assert.True(t, responseStatus.Called)
+	assert.False(t, apiStatus.NotSuccessful())
+}
+
+func TestDeleteDomainFailure(t *testing.T) {
+	hf, responseStatus := deleteDomainEndpoint(http.StatusBadRequest)
+	ts := httptest.NewTLSServer(hf)
+	defer ts.Close()
+
+	config := configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway(&testhelpers.FakeAuthenticationRepository{})
+
+	repo := NewCloudControllerDomainRepository(&config, gateway)
+
+	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
+
+	apiStatus := repo.DeleteDomain(domain)
+
+	assert.True(t, responseStatus.Called)
+	assert.True(t, apiStatus.NotSuccessful())
+}
