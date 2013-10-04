@@ -9,31 +9,28 @@ import (
 type RepositoryLocator struct {
 	authRepo AuthenticationRepository
 
-	configurationRepo configuration.ConfigurationDiskRepository
-	endpointRepo      RemoteEndpointRepository
-	organizationRepo  CloudControllerOrganizationRepository
-	spaceRepo         CloudControllerSpaceRepository
-	appRepo           CloudControllerApplicationRepository
-	appBitsRepo       CloudControllerApplicationBitsRepository
-	appSummaryRepo    CloudControllerAppSummaryRepository
-	appFilesRepo      CloudControllerAppFilesRepository
-	domainRepo        CloudControllerDomainRepository
-	routeRepo         CloudControllerRouteRepository
-	stackRepo         CloudControllerStackRepository
-	serviceRepo       CloudControllerServiceRepository
-	passwordRepo      CloudControllerPasswordRepository
-	logsRepo          LoggregatorLogsRepository
+	endpointRepo     RemoteEndpointRepository
+	organizationRepo CloudControllerOrganizationRepository
+	spaceRepo        CloudControllerSpaceRepository
+	appRepo          CloudControllerApplicationRepository
+	appBitsRepo      CloudControllerApplicationBitsRepository
+	appSummaryRepo   CloudControllerAppSummaryRepository
+	appFilesRepo     CloudControllerAppFilesRepository
+	domainRepo       CloudControllerDomainRepository
+	routeRepo        CloudControllerRouteRepository
+	stackRepo        CloudControllerStackRepository
+	serviceRepo      CloudControllerServiceRepository
+	passwordRepo     CloudControllerPasswordRepository
+	logsRepo         LoggregatorLogsRepository
 }
 
-func NewRepositoryLocator(config *configuration.Configuration, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
-	loc.configurationRepo = configuration.NewConfigurationDiskRepository()
-
+func NewRepositoryLocator(config *configuration.Configuration, configRepo configuration.ConfigurationRepository, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
 	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	uaaGateway := gatewaysByName["uaa"]
 
-	loc.authRepo = NewUAAAuthenticationRepository(authGateway, loc.configurationRepo)
-	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, loc.configurationRepo)
+	loc.authRepo = NewUAAAuthenticationRepository(authGateway, configRepo)
+	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, configRepo)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
@@ -51,10 +48,6 @@ func NewRepositoryLocator(config *configuration.Configuration, gatewaysByName ma
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	return
-}
-
-func (locator RepositoryLocator) GetConfigurationRepository() configuration.ConfigurationRepository {
-	return locator.configurationRepo
 }
 
 func (locator RepositoryLocator) GetAuthenticationRepository() AuthenticationRepository {

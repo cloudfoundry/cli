@@ -17,15 +17,16 @@ import (
 func main() {
 	termUI := new(terminal.TerminalUI)
 	assignTemplates()
-	config := loadConfig(termUI)
+	configRepo := configuration.NewConfigurationDiskRepository()
+	config := loadConfig(termUI, configRepo)
 
-	repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
+	repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
 		"auth": net.NewUAAGateway(),
 		"cloud-controller": net.NewCloudControllerGateway(),
 		"uaa": net.NewUAAGateway(),
 	})
 
-	cmdFactory := commands.NewFactory(termUI, config, repoLocator)
+	cmdFactory := commands.NewFactory(termUI, config, configRepo, repoLocator)
 	reqFactory := requirements.NewFactory(termUI, config, repoLocator)
 
 	app, err := app.NewApp(cmdFactory, reqFactory)
@@ -72,8 +73,7 @@ OPTIONS:
 
 }
 
-func loadConfig(termUI terminal.UI) (config *configuration.Configuration) {
-	configRepo := configuration.NewConfigurationDiskRepository()
+func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationRepository) (config *configuration.Configuration) {
 	config, err := configRepo.Get()
 	if err != nil {
 		termUI.Failed(fmt.Sprintf(
