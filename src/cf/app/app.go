@@ -521,7 +521,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "unset-env",
 			Description: "Remove an env variable",
-			Usage:       fmt.Sprintf("%s unset-env cf.Name", cf.Name),
+			Usage:       fmt.Sprintf("%s unset-env APP NAME", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("unset-env")
 				cmdRunner.Run(cmd, c)
