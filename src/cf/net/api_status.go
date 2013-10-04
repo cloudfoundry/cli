@@ -58,6 +58,10 @@ func (apiStatus ApiStatus) IsNotFound() bool {
 	return apiStatus.isNotFound
 }
 
+func (apiStatus ApiStatus) Successful() bool {
+	return !apiStatus.NotSuccessful()
+}
+
 func (apiStatus ApiStatus) NotSuccessful() bool {
 	return apiStatus.IsError() || apiStatus.IsNotFound()
 }

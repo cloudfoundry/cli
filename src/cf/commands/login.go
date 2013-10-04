@@ -74,7 +74,7 @@ func (cmd Login) Run(c *cli.Context) {
 
 func (cmd Login) doLogin(username, password string) (apiStatus net.ApiStatus) {
 	apiStatus = cmd.authenticator.Authenticate(username, password)
-	if !apiStatus.NotSuccessful() {
+	if apiStatus.Successful() {
 		cmd.ui.Ok()
 		cmd.ui.Say("Use '%s' to view or set your target org and space", terminal.CommandColor(cf.Name+" target"))
 	}
