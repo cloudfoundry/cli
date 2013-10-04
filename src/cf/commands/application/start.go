@@ -120,9 +120,9 @@ func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.Appli
 
 	if anyInstanceRunning {
 		if len(app.Urls) == 0 {
-			cmd.ui.Say("Start successful!")
+			cmd.ui.Say("Started")
 		} else {
-			cmd.ui.Say("Start successful! App %s available at %s", app.Name, app.Urls[0])
+			cmd.ui.Say("Started: app %s available at %s", app.Name, app.Urls[0])
 		}
 		return false
 	} else {

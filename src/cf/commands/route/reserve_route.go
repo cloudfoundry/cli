@@ -46,7 +46,7 @@ func (cmd *ReserveRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 	route := cf.Route{Host: c.String("n"), Domain: domain}
 
-	cmd.ui.Say("Adding url route %s to space %s...",
+	cmd.ui.Say("Reserving url route %s for space %s...",
 		terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(space.Name))
 
 	_, apiStatus := cmd.routeRepo.CreateInSpace(route, domain, space)

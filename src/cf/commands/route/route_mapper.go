@@ -58,13 +58,13 @@ func (cmd *RouteMapper) Run(c *cli.Context) {
 	var apiStatus net.ApiStatus
 
 	if cmd.bind {
-		cmd.ui.Say("Adding url route %s to app %s",
+		cmd.ui.Say("Adding url route %s to app %s...",
 			terminal.EntityNameColor(route.URL()),
 			terminal.EntityNameColor(app.Name))
 
 		apiStatus = cmd.routeRepo.Bind(route, app)
 	} else {
-		cmd.ui.Say("Removing url route %s from app %s",
+		cmd.ui.Say("Removing url route %s from app %s...",
 			terminal.EntityNameColor(route.URL()),
 			terminal.EntityNameColor(app.Name))
 

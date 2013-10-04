@@ -43,7 +43,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	if apiStatus.NotSuccessful() {
 		if apiStatus.ErrorCode == net.SPACE_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Say("Space %s already exists.", spaceName)
+			cmd.ui.Say("Space %s already exists", spaceName)
 			return
 		}
 		cmd.ui.Failed(apiStatus.Message)
@@ -51,5 +51,5 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new space.", terminal.CommandColor(cf.Name+" target -s "+spaceName))
+	cmd.ui.Say("\nTIP: Use '%s' to target new space", terminal.CommandColor(cf.Name+" target -s "+spaceName))
 }

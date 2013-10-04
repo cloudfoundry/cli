@@ -57,7 +57,7 @@ func TestCreateSpaceWhenItAlreadyExists(t *testing.T) {
 	assert.Equal(t, len(fakeUI.Outputs), 3)
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-space")
-	assert.Contains(t, fakeUI.Outputs[2], "already exists.")
+	assert.Contains(t, fakeUI.Outputs[2], "already exists")
 }
 
 func callCreateSpace(args []string, reqFactory *testhelpers.FakeReqFactory, spaceRepo *testhelpers.FakeSpaceRepository) (ui *testhelpers.FakeUI) {

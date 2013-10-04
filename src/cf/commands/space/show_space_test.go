@@ -48,13 +48,13 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "space1")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "space1")
-	assert.Contains(t, ui.Outputs[3], "organization")
+	assert.Contains(t, ui.Outputs[3], "Org")
 	assert.Contains(t, ui.Outputs[3], "org1")
-	assert.Contains(t, ui.Outputs[4], "apps")
+	assert.Contains(t, ui.Outputs[4], "Apps")
 	assert.Contains(t, ui.Outputs[4], "app1")
-	assert.Contains(t, ui.Outputs[5], "domains")
+	assert.Contains(t, ui.Outputs[5], "Domains")
 	assert.Contains(t, ui.Outputs[5], "domain1")
-	assert.Contains(t, ui.Outputs[6], "services")
+	assert.Contains(t, ui.Outputs[6], "Services")
 	assert.Contains(t, ui.Outputs[6], "service1")
 }
 

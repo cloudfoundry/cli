@@ -67,7 +67,7 @@ func TestStartApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
-	assert.Contains(t, ui.Outputs[4], "Start successful! App my-app available at http://my-app.example.com")
+	assert.Contains(t, ui.Outputs[4], "Started: app my-app available at http://my-app.example.com")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
@@ -88,7 +88,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "Start successful!")
+	assert.Contains(t, ui.Outputs[3], "Started")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
@@ -120,7 +120,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (1 starting, 1 down)")
 	assert.Contains(t, ui.Outputs[4], "0 of 2 instances running (2 starting)")
-	assert.Contains(t, ui.Outputs[5], "Start successful! App my-app available at http://my-app.example.com")
+	assert.Contains(t, ui.Outputs[5], "Started: app my-app available at http://my-app.example.com")
 }
 
 func TestStartApplicationWhenStagingFails(t *testing.T) {

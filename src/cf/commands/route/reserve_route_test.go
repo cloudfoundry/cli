@@ -50,7 +50,7 @@ func TestReserveRoute(t *testing.T) {
 
 	ui := callReserveRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Adding url route")
+	assert.Contains(t, ui.Outputs[0], "Reserving url route")
 	assert.Contains(t, ui.Outputs[0], "host.example.com")
 	assert.Contains(t, ui.Outputs[0], "my-space")
 

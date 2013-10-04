@@ -39,9 +39,9 @@ func (cmd *ShowService) Run(c *cli.Context) {
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
 	cmd.ui.Say("")
-	cmd.ui.Say("service instance: %s", terminal.EntityNameColor(serviceInstance.Name))
-	cmd.ui.Say("service: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Label))
-	cmd.ui.Say("plan: %s", terminal.EntityNameColor(serviceInstance.ServicePlan.Name))
-	cmd.ui.Say("description: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Description))
-	cmd.ui.Say("documentation url: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationUrl))
+	cmd.ui.Say("Service instance: %s", terminal.EntityNameColor(serviceInstance.Name))
+	cmd.ui.Say("Service: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Label))
+	cmd.ui.Say("Plan: %s", terminal.EntityNameColor(serviceInstance.ServicePlan.Name))
+	cmd.ui.Say("Description: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Description))
+	cmd.ui.Say("Documentation url: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationUrl))
 }

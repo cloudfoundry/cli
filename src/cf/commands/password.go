@@ -60,5 +60,5 @@ func (cmd Password) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	cmd.configRepo.ClearSession()
-	cmd.ui.Say("Please log back in.")
+	cmd.ui.Say("Please log in again")
 }

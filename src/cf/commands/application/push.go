@@ -115,7 +115,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 			return
 		}
 		newApp.Stack = stack
-		cmd.ui.Say("Using stack %s.", terminal.EntityNameColor(stack.Name))
+		cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stack.Name))
 	}
 
 	cmd.ui.Say("Creating %s...", terminal.EntityNameColor(appName))

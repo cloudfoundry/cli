@@ -37,12 +37,12 @@ func (cmd CreateOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 func (cmd CreateOrg) Run(c *cli.Context) {
 	name := c.Args()[0]
 
-	cmd.ui.Say("Creating organization %s...", terminal.EntityNameColor(name))
+	cmd.ui.Say("Creating org %s...", terminal.EntityNameColor(name))
 	apiStatus := cmd.orgRepo.Create(name)
 	if apiStatus.NotSuccessful() {
 		if apiStatus.ErrorCode == net.ORG_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Warn("Org %s already exists.", name)
+			cmd.ui.Warn("Org %s already exists", name)
 			return
 		}
 
@@ -51,5 +51,5 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new org.", terminal.CommandColor(cf.Name+" target -o "+name))
+	cmd.ui.Say("\nTIP: Use '%s' to target new org", terminal.CommandColor(cf.Name+" target -o "+name))
 }

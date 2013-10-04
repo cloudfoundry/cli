@@ -56,10 +56,10 @@ func (cmd Target) Run(c *cli.Context) {
 		cmd.ui.ShowConfiguration(cmd.config)
 
 		if !cmd.config.HasOrganization() {
-			cmd.ui.Say("No org targeted. Use '%s target -o' to target an org.", cf.Name)
+			cmd.ui.Say("No org targeted, use '%s target -o' to target an org", cf.Name)
 		}
 		if !cmd.config.HasSpace() {
-			cmd.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
+			cmd.ui.Say("No space targeted, use '%s target -s' to target a space", cf.Name)
 		}
 		return
 	}
@@ -69,7 +69,7 @@ func (cmd Target) Run(c *cli.Context) {
 
 		if spaceName == "" && cmd.config.IsLoggedIn() {
 			cmd.showConfig()
-			cmd.ui.Say("No space targeted. Use '%s target -s' to target a space.", cf.Name)
+			cmd.ui.Say("No space targeted, use '%s target -s' to target a space", cf.Name)
 			return
 		}
 
@@ -91,13 +91,13 @@ func (cmd Target) Run(c *cli.Context) {
 
 func (cmd Target) setOrganization(orgName string) (err error) {
 	if !cmd.config.IsLoggedIn() {
-		cmd.ui.Failed("You must be logged in to set an organization. Use '%s login'.", cf.Name)
+		cmd.ui.Failed("You must be logged in to target an org. Use '%s login'.", cf.Name)
 		return
 	}
 
 	org, apiStatus := cmd.orgRepo.FindByName(orgName)
 	if apiStatus.NotSuccessful() {
-		cmd.ui.Failed("Could not set organization.\n%s", apiStatus.Message)
+		cmd.ui.Failed("Could not target org.\n%s", apiStatus.Message)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (cmd Target) setSpace(spaceName string) (err error) {
 	}
 
 	if !cmd.config.HasOrganization() {
-		cmd.ui.Failed("Organization must be set before targeting space.")
+		cmd.ui.Failed("An org must be targeted before targeting a space")
 		return
 	}
 

@@ -41,7 +41,7 @@ func (cmd *ReserveDomain) Run(c *cli.Context) {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Creating domain %s on %s...", domainName, owningOrg.Name)
+	cmd.ui.Say("Reserving domain %s for org %s...", domainName, owningOrg.Name)
 
 	domain := cf.Domain{Name: domainName}
 
@@ -52,5 +52,5 @@ func (cmd *ReserveDomain) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: Use '%s map-domain' to assign it to a space.", cf.Name)
+	cmd.ui.Say("TIP: Use '%s map-domain' to assign it to a space", cf.Name)
 }

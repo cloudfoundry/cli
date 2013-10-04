@@ -37,7 +37,7 @@ func TestPasswordCanBeChanged(t *testing.T) {
 	assert.Equal(t, pwdRepo.UpdateOldPassword, "old-password")
 	assert.Contains(t, ui.Outputs[2], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "Please log back in.")
+	assert.Contains(t, ui.Outputs[3], "Please log in again")
 
 	updatedConfig, err := configRepo.Get()
 	assert.NoError(t, err)

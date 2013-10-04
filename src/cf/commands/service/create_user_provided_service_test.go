@@ -27,7 +27,7 @@ func TestCreateUserProvidedService(t *testing.T) {
 		"baz": "baz value",
 	})
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating service")
+	assert.Contains(t, fakeUI.Outputs[0], "Creating user provided service")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 

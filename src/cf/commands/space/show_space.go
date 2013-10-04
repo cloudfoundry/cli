@@ -34,23 +34,23 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 	cmd.ui.Say("Getting info for space %s...", terminal.EntityNameColor(space.Name))
 	cmd.ui.Ok()
 	cmd.ui.Say("%s:", terminal.EntityNameColor(space.Name))
-	cmd.ui.Say("  organization: %s", terminal.EntityNameColor(space.Organization.Name))
+	cmd.ui.Say("  Org: %s", terminal.EntityNameColor(space.Organization.Name))
 
 	apps := []string{}
 	for _, app := range space.Applications {
 		apps = append(apps, app.Name)
 	}
-	cmd.ui.Say("  apps: %s", terminal.EntityNameColor(strings.Join(apps, ", ")))
+	cmd.ui.Say("  Apps: %s", terminal.EntityNameColor(strings.Join(apps, ", ")))
 
 	domains := []string{}
 	for _, domain := range space.Domains {
 		domains = append(domains, domain.Name)
 	}
-	cmd.ui.Say("  domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
+	cmd.ui.Say("  Domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
 
 	services := []string{}
 	for _, service := range space.ServiceInstances {
 		services = append(services, service.Name)
 	}
-	cmd.ui.Say("  services: %s", terminal.EntityNameColor(strings.Join(services, ", ")))
+	cmd.ui.Say("  Services: %s", terminal.EntityNameColor(strings.Join(services, ", ")))
 }

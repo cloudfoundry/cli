@@ -39,7 +39,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "apps",
 			ShortName:   "a",
-			Description: "List all applications in the currently targeted space",
+			Description: "List all apps in the target space",
 			Usage:       fmt.Sprintf("%s apps", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("apps")
@@ -49,7 +49,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "bind-service",
 			ShortName:   "bs",
-			Description: "Bind a service instance to an application",
+			Description: "Bind a service instance to an app",
 			Usage:       fmt.Sprintf("%s bind-service APP SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("bind-service")
@@ -59,7 +59,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "create-org",
 			ShortName:   "co",
-			Description: "Create organization",
+			Description: "Create an org",
 			Usage:       fmt.Sprintf("%s create-org ORG", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("create-org")
@@ -69,10 +69,10 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "create-service",
 			ShortName:   "cs",
-			Description: "Create service instance",
+			Description: "Create a service instance",
 			Usage: fmt.Sprintf("%s create-service SERVICE PLAN SERVICE_INSTANCE\n\n", cf.Name) +
 				"EXAMPLE:\n" +
-				fmt.Sprintf("   %s create-service clear-db spark clear-db-mine\n\n", cf.Name) +
+				fmt.Sprintf("   %s create-service cleardb spark clear-db-mine\n\n", cf.Name) +
 				"TIP:\n" +
 				"   Use 'cf create-user-provided-service' to make user-provided services available to cf apps",
 			Action: func(c *cli.Context) {
@@ -104,7 +104,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "delete",
 			ShortName:   "d",
-			Description: "Delete an application",
+			Description: "Delete an app",
 			Usage:       fmt.Sprintf("%s delete -f APP", cf.Name),
 			Flags: []cli.Flag{
 				cli.BoolFlag{"f", "Force deletion without confirmation"},
@@ -119,7 +119,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Delete an org",
 			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "force deletion without confirmation"},
+				cli.BoolFlag{"f", "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("delete-org")
@@ -150,7 +150,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "domains",
-			Description: "List domains in the currently targeted org",
+			Description: "List domains in the target org",
 			Usage:       fmt.Sprintf("%s domains", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("domains")
@@ -204,7 +204,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "logs",
-			Description: "Show recent logs for applications",
+			Description: "Tail or show recent logs for an app",
 			Usage:       fmt.Sprintf("%s logs APP", cf.Name),
 			Flags: []cli.Flag{
 				cli.BoolFlag{"recent", "dump recent logs instead of tailing"},
@@ -257,7 +257,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "orgs",
 			ShortName:   "o",
-			Description: "List all organizations",
+			Description: "List all orgs",
 			Usage:       fmt.Sprintf("%s orgs", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("orgs")
@@ -277,21 +277,21 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "push",
 			ShortName:   "p",
-			Description: "Push an app",
+			Description: "Push a new app or sync changes to an existing app",
 			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name) +
 				"               [-m MEMORY] [-b URL] [--no-[re]start] [-p PATH]\n" +
 				"               [-s STACK] [-c COMMAND]",
 			Flags: []cli.Flag{
-				cli.StringFlag{"d", "", "domain (for example: example.com)"},
-				cli.StringFlag{"n", "", "hostname (for example: my-subdomain)"},
-				cli.IntFlag{"i", 1, "number of instances"},
-				cli.StringFlag{"m", "128", "memory limit (for example: 256, 1G, 1024M)"},
-				cli.StringFlag{"b", "", "custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
-				cli.BoolFlag{"no-start", "do not start an application after pushing"},
-				cli.BoolFlag{"no-restart", "do not restart an application after pushing"},
-				cli.StringFlag{"p", "", "path of application directory or zip file"},
-				cli.StringFlag{"s", "", "stack to use"},
-				cli.StringFlag{"c", "", "startup command"},
+				cli.StringFlag{"d", "", "Domain (for example: example.com)"},
+				cli.StringFlag{"n", "", "Hostname (for example: my-subdomain)"},
+				cli.IntFlag{"i", 1, "Number of instances"},
+				cli.StringFlag{"m", "128", "Memory limit (for example: 256, 1G, 1024M)"},
+				cli.StringFlag{"b", "", "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.BoolFlag{"no-start", "Do not start an app after pushing"},
+				cli.BoolFlag{"no-restart", "Do not restart an app after pushing"},
+				cli.StringFlag{"p", "", "Path of app directory or zip file"},
+				cli.StringFlag{"s", "", "Stack to use"},
+				cli.StringFlag{"c", "", "Startup command"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("push")
@@ -300,7 +300,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "rename",
-			Description: "Rename an application",
+			Description: "Rename an app",
 			Usage:       fmt.Sprintf("%s rename APP NEW_APP", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("rename")
@@ -309,7 +309,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "rename-org",
-			Description: "Rename an organization",
+			Description: "Rename an org",
 			Usage:       fmt.Sprintf("%s rename-org ORG NEW_ORG", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("rename-org")
@@ -336,7 +336,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "reserve-domain",
-			Description: "Add a domain to an org",
+			Description: "Reserve a domain on an org for later use",
 			Usage:       fmt.Sprintf("%s reserve-domain ORG DOMAIN", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("reserve-domain")
@@ -358,7 +358,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "restart",
 			ShortName:   "rs",
-			Description: "Restart an application",
+			Description: "Restart an app",
 			Usage:       fmt.Sprintf("%s restart APP", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("restart")
@@ -377,7 +377,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "scale",
-			Description: "Change the disk quota, instance count, and memory limit for an application",
+			Description: "Change the disk quota, instance count, and memory limit for an app",
 			Usage:       fmt.Sprintf("%s scale APP -d DISK -i INSTANCES -m MEMORY", cf.Name),
 			Flags: []cli.Flag{
 				cli.StringFlag{"d", "", "disk quota"},
@@ -401,7 +401,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "services",
 			ShortName:   "s",
-			Description: "List all services in the currently targeted space",
+			Description: "List all services in the target space",
 			Usage:       fmt.Sprintf("%s services", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("services")
@@ -431,7 +431,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		},
 		{
 			Name:        "space",
-			Description: "Show currently targeted space's info",
+			Description: "Show target space's info",
 			Usage:       fmt.Sprintf("%s space", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("space")
@@ -493,7 +493,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "unbind-service",
 			ShortName:   "us",
-			Description: "Unbind a service instance from an application",
+			Description: "Unbind a service instance from an app",
 			Usage:       fmt.Sprintf("%s unbind-service APP SERVICE_INSTANCE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("unbind-service")

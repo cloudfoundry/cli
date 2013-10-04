@@ -33,7 +33,7 @@ func TestListOrgs(t *testing.T) {
 
 	ui := callListOrgs(reqFactory, orgRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting organizations")
+	assert.Contains(t, ui.Outputs[0], "Getting orgs")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "Organization-1")
 	assert.Contains(t, ui.Outputs[3], "Organization-2")

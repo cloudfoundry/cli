@@ -53,15 +53,15 @@ func TestShowServiceOutput(t *testing.T) {
 	ui := callShowService([]string{"service1"}, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "")
-	assert.Contains(t, ui.Outputs[1], "service instance: ")
+	assert.Contains(t, ui.Outputs[1], "Service instance: ")
 	assert.Contains(t, ui.Outputs[1], "service1")
-	assert.Contains(t, ui.Outputs[2], "service: ")
+	assert.Contains(t, ui.Outputs[2], "Service: ")
 	assert.Contains(t, ui.Outputs[2], "mysql")
-	assert.Contains(t, ui.Outputs[3], "plan: ")
+	assert.Contains(t, ui.Outputs[3], "Plan: ")
 	assert.Contains(t, ui.Outputs[3], "plan-name")
-	assert.Contains(t, ui.Outputs[4], "description: ")
+	assert.Contains(t, ui.Outputs[4], "Description: ")
 	assert.Contains(t, ui.Outputs[4], "the-description")
-	assert.Contains(t, ui.Outputs[5], "documentation url: ")
+	assert.Contains(t, ui.Outputs[5], "Documentation url: ")
 	assert.Contains(t, ui.Outputs[5], "http://documentation.url")
 }
 

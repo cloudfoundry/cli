@@ -27,7 +27,7 @@ func TestApps(t *testing.T) {
 
 	assert.True(t, testhelpers.CommandDidPassRequirements)
 
-	assert.Contains(t, ui.Outputs[0], "Getting applications in development")
+	assert.Contains(t, ui.Outputs[0], "Getting apps in development")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "Application-1")
 	assert.Contains(t, ui.Outputs[3], "running")

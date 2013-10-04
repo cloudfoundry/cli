@@ -54,7 +54,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Creating service %s", terminal.EntityNameColor(name))
+	cmd.ui.Say("Creating service %s...", terminal.EntityNameColor(name))
 
 	var identicalAlreadyExists bool
 	identicalAlreadyExists, apiStatus = cmd.serviceRepo.CreateServiceInstance(name, plan)

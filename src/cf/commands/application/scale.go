@@ -52,7 +52,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 
 	diskQuota, err := extractMegaBytes(c.String("d"))
 	if err != nil {
-		cmd.ui.Say("Invalid value for disk quota.")
+		cmd.ui.Say("Invalid value for disk quota")
 		cmd.ui.FailWithUsage(c, "scale")
 		return
 	}
@@ -60,7 +60,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 
 	memory, err := extractMegaBytes(c.String("m"))
 	if err != nil {
-		cmd.ui.Say("Invalid value for memory.")
+		cmd.ui.Say("Invalid value for memory")
 		cmd.ui.FailWithUsage(c, "scale")
 		return
 	}
