@@ -3,6 +3,7 @@ package route_test
 import (
 	"cf"
 	. "cf/commands/route"
+	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
@@ -81,7 +82,13 @@ func TestRouteMapperWhenUnbinding(t *testing.T) {
 
 func callRouteMapper(args []string, reqFactory *testhelpers.FakeReqFactory, routeRepo *testhelpers.FakeRouteRepository, bind bool) (ui *testhelpers.FakeUI) {
 	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("map-route", args)
+	var ctxt *cli.Context
+	if bind {
+		ctxt = testhelpers.NewContext("map-route", args)
+	} else {
+		ctxt = testhelpers.NewContext("unmap-route", args)
+	}
+
 	cmd := NewRouteMapper(ui, routeRepo, bind)
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 	return

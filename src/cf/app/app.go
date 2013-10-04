@@ -513,6 +513,9 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Name:        "unmap-route",
 			Description: "Remove a url route from an app",
 			Usage:       fmt.Sprintf("%s unmap-route APP DOMAIN [-n HOSTNAME]", cf.Name),
+			Flags: []cli.Flag{
+				cli.StringFlag{"n", "", "Hostname"},
+			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("unmap-route")
 				cmdRunner.Run(cmd, c)
