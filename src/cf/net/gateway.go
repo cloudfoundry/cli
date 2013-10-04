@@ -104,8 +104,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 	}
 
 	response, err := doRequest(request.Request)
-
-	if err != nil && response == nil {
+	if err != nil {
 		apiStatus = NewApiStatusWithError("Error performing request", err)
 		return
 	}
@@ -121,25 +120,30 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 		apiStatus = NewApiStatus(message, errorResponse.Code, response.StatusCode)
 	}
 
-	if !apiStatus.NotSuccessful() || gateway.authenticator == nil {
+	if apiStatus.Successful() || gateway.authenticator == nil {
 		return
 	}
 
-	if apiStatus.ErrorCode == INVALID_TOKEN_CODE {
-		newToken, apiStatus := gateway.authenticator.RefreshAuthToken()
-		if !apiStatus.NotSuccessful() {
-			request.Header.Set("Authorization", newToken)
-			if len(bodyBytes) > 0 {
-				request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
-			}
-
-			response, err = doRequest(request.Request)
-			if err != nil {
-				apiStatus = NewApiStatusWithError("Error performing request", err)
-			}
-			return response, apiStatus
-		}
+	if apiStatus.ErrorCode != INVALID_TOKEN_CODE {
+		return
 	}
 
+	// refresh the auth token
+	newToken, apiStatus := gateway.authenticator.RefreshAuthToken()
+	if apiStatus.NotSuccessful() {
+		return
+	}
+
+	// reset the auth token and request body
+	request.Header.Set("Authorization", newToken)
+	if len(bodyBytes) > 0 {
+		request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
+	}
+
+	// make the request again
+	response, err = doRequest(request.Request)
+	if err != nil {
+		apiStatus = NewApiStatusWithError("Error performing request", err)
+	}
 	return
 }
