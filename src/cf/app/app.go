@@ -198,7 +198,8 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s login (omit username and password to login interactively -- %s will prompt for both)\n", cf.Name, cf.Name) +
 				fmt.Sprintf("   %s login name@example.com pa55woRD (specify username and password to login non-interactively)\n", cf.Name) +
-				fmt.Sprintf("   %s login name@example.com \"my password\" (use quotes for passwords with a space)", cf.Name),
+				fmt.Sprintf("   %s login name@example.com \"my password\" (use quotes for passwords with a space)\n", cf.Name) +
+				fmt.Sprintf("   %s login name@example.com \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("login")
 				cmdRunner.Run(cmd, c)
