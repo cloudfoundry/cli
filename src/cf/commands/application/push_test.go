@@ -156,6 +156,28 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, starter.AppToStart.Name, "")
 }
 
+func TestPushingAppWithNoRoute(t *testing.T) {
+	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+
+	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
+	stack := cf.Stack{Name: "customLinux", Guid: "custom-linux-guid"}
+
+	domainRepo.FindByNameDomain = domain
+	routeRepo.FindByHostErr = true
+	stackRepo.FindByNameStack = stack
+	appRepo.FindByNameNotFound = true
+
+	fakeUI := callPush([]string{
+		"--no-route",
+		"my-new-app",
+	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
+	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Equal(t, routeRepo.CreatedRoute.Host, "")
+	assert.Equal(t, routeRepo.CreatedRouteDomain.Guid, "")
+}
+
 func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 

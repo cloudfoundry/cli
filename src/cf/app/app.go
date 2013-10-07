@@ -292,7 +292,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			ShortName:   "p",
 			Description: "Push a new app or sync changes to an existing app",
 			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name) +
-				"               [-m MEMORY] [-b URL] [--no-[re]start] [-p PATH]\n" +
+				"               [-m MEMORY] [-b URL] [--no-[re]start] [--no-route] [-p PATH]\n" +
 				"               [-s STACK] [-c COMMAND]",
 			Flags: []cli.Flag{
 				cli.StringFlag{"d", "", "Domain (for example: example.com)"},
@@ -302,6 +302,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				cli.StringFlag{"b", "", "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
 				cli.BoolFlag{"no-start", "Do not start an app after pushing"},
 				cli.BoolFlag{"no-restart", "Do not restart an app after pushing"},
+				cli.BoolFlag{"no-route", "Do not map a route to this app"},
 				cli.StringFlag{"p", "", "Path of app directory or zip file"},
 				cli.StringFlag{"s", "", "Stack to use"},
 				cli.StringFlag{"c", "", "Startup command"},

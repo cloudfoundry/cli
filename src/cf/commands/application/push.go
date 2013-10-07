@@ -96,7 +96,6 @@ func (cmd Push) Run(c *cli.Context) {
 }
 
 func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
-	domainName := c.String("d")
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("i"),
@@ -126,16 +125,26 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	}
 	cmd.ui.Ok()
 
+	if !c.Bool("no-route") {
+		domainName := c.String("d")
+		hostName := c.String("n")
+		if hostName == "" {
+			hostName = app.Name
+		}
+
+		cmd.bindAppToRoute(app, hostName, domainName)
+	}
+
+	return
+}
+
+func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) {
+
 	domain, apiResponse := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
-	}
-
-	hostName := c.String("n")
-	if hostName == "" {
-		hostName = app.Name
 	}
 
 	route, apiResponse := cmd.routeRepo.FindByHost(hostName)
@@ -163,9 +172,8 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
-	cmd.ui.Ok()
 
-	return
+	cmd.ui.Ok()
 }
 
 func getMemoryLimit(arg string) (memory uint64) {
