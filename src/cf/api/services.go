@@ -78,7 +78,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 
 	apiStatus = repo.gateway.PerformRequest(request)
 
-	if apiStatus.NotSuccessful() && apiStatus.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
+	if apiStatus.NotSuccessful() && apiStatus.ErrorCode == SERVICE_INSTANCE_NAME_TAKEN {
 
 		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
 

@@ -4,7 +4,6 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -71,7 +70,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	instances, apiStatus := cmd.appRepo.GetInstances(app)
 
 	for apiStatus.NotSuccessful() {
-		if apiStatus.ErrorCode != net.APP_NOT_STAGED {
+		if apiStatus.ErrorCode != api.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiStatus.Message)
 			return

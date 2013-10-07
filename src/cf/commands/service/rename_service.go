@@ -3,7 +3,6 @@ package service
 import (
 	"cf"
 	"cf/api"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -48,7 +47,7 @@ func (cmd *RenameService) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming service %s...", serviceInstance.Name)
 	apiStatus := cmd.serviceRepo.RenameService(serviceInstance, newName)
 	if apiStatus.NotSuccessful() {
-		if apiStatus.ErrorCode == net.SERVICE_INSTANCE_NAME_TAKEN {
+		if apiStatus.ErrorCode == api.SERVICE_INSTANCE_NAME_TAKEN {
 			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiStatus.Message, cf.Name)
 		} else {
 			cmd.ui.Failed(apiStatus.Message)

@@ -3,6 +3,7 @@ package testhelpers
 import (
 	"cf"
 	"cf/net"
+	"cf/api"
 )
 
 type FakeOrgRepository struct {
@@ -52,7 +53,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 
 func (repo *FakeOrgRepository) Create(name string) (apiStatus net.ApiStatus) {
 	if repo.CreateOrgExists {
-		apiStatus = net.NewApiStatus("Space already exists", net.ORG_EXISTS, 400)
+		apiStatus = net.NewApiStatus("Space already exists", api.ORG_EXISTS, 400)
 		return
 	}
 	repo.CreateName = name

@@ -3,7 +3,6 @@ package space
 import (
 	"cf"
 	"cf/api"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -41,7 +40,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 
 	apiStatus := cmd.spaceRepo.Create(spaceName)
 	if apiStatus.NotSuccessful() {
-		if apiStatus.ErrorCode == net.SPACE_EXISTS {
+		if apiStatus.ErrorCode == api.SPACE_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Say("Space %s already exists", spaceName)
 			return

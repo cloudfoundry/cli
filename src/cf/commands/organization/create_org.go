@@ -3,7 +3,6 @@ package organization
 import (
 	"cf"
 	"cf/api"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -40,7 +39,7 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 	cmd.ui.Say("Creating org %s...", terminal.EntityNameColor(name))
 	apiStatus := cmd.orgRepo.Create(name)
 	if apiStatus.NotSuccessful() {
-		if apiStatus.ErrorCode == net.ORG_EXISTS {
+		if apiStatus.ErrorCode == api.ORG_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Org %s already exists", name)
 			return
