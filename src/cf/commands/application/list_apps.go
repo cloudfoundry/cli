@@ -33,7 +33,7 @@ func (cmd ListApps) Run(c *cli.Context) {
 
 	space, apiStatus := cmd.spaceRepo.GetSummary()
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

@@ -32,7 +32,7 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 
 	routes, apiStatus := cmd.routeRepo.FindAll()
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

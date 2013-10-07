@@ -22,7 +22,7 @@ func TestNewRequest(t *testing.T) {
 
 	request, apiStatus := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 	assert.Equal(t, request.Header.Get("Authorization"), "BEARER my-access-token")
 	assert.Equal(t, request.Header.Get("accept"), "application/json")
 	assert.Equal(t, request.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
@@ -120,10 +120,10 @@ func testRefreshToken(t *testing.T, configRepo configuration.ConfigurationReposi
 	assert.NoError(t, err)
 
 	request, apiStatus := gateway.NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 
 	apiStatus = gateway.PerformRequest(request)
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")

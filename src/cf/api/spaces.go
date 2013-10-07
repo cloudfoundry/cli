@@ -36,7 +36,7 @@ func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
 func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", repo.config.Target, repo.config.Organization.Guid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -44,7 +44,7 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiStat
 
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -60,7 +60,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		repo.config.Target, repo.config.Organization.Guid, "%3A"+strings.ToLower(name))
 
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -68,7 +68,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -109,14 +109,14 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -133,7 +133,7 @@ func (repo CloudControllerSpaceRepository) Create(name string) (apiStatus net.Ap
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
 
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -146,7 +146,7 @@ func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -158,7 +158,7 @@ func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiStatus net
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, space.Guid)
 
 	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

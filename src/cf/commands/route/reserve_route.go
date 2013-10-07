@@ -50,7 +50,7 @@ func (cmd *ReserveRoute) Run(c *cli.Context) {
 		terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(space.Name))
 
 	_, apiStatus := cmd.routeRepo.CreateInSpace(route, domain, space)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

@@ -29,12 +29,12 @@ func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (
 	summary.App = app
 
 	instances, apiStatus := repo.appRepo.GetInstances(app)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
 	instances, apiStatus = repo.updateInstancesWithStats(app, instances)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -60,14 +60,14 @@ type InstanceStatsApiResponse struct {
 func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.Application, instances []cf.ApplicationInstance) (updatedInst []cf.ApplicationInstance, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.Target, app.Guid)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
 	apiResponse := StatsApiResponse{}
 
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

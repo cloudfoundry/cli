@@ -68,7 +68,7 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 	}
 
 	apiStatus = cmd.domainRepo.DeleteDomain(domain)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiStatus.Message)
 		return
 	}

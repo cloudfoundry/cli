@@ -78,7 +78,7 @@ func TestApiWhenUrlIsMissingScheme(t *testing.T) {
 
 	apiStatus := repo.UpdateEndpoint("example.com")
 
-	assert.True(t, apiStatus.NotSuccessful())
+	assert.True(t, apiStatus.IsNotSuccessful())
 }
 
 var notFoundApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +94,7 @@ func TestApiWhenEndpointReturns404(t *testing.T) {
 
 	apiStatus := repo.UpdateEndpoint(ts.URL)
 
-	assert.True(t, apiStatus.NotSuccessful())
+	assert.True(t, apiStatus.IsNotSuccessful())
 }
 
 var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -110,7 +110,7 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 
 	apiStatus := repo.UpdateEndpoint(ts.URL)
 
-	assert.True(t, apiStatus.NotSuccessful())
+	assert.True(t, apiStatus.IsNotSuccessful())
 }
 
 func createRepo(configRepo testhelpers.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {

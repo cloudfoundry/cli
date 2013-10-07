@@ -37,7 +37,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	name := c.Args()[2]
 
 	offerings, apiStatus := cmd.serviceRepo.GetServiceOfferings()
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -58,7 +58,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	var identicalAlreadyExists bool
 	identicalAlreadyExists, apiStatus = cmd.serviceRepo.CreateServiceInstance(name, plan)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

@@ -38,7 +38,7 @@ func (uaa UAAAuthenticationRepository) Authenticate(email string, password strin
 	}
 
 	apiStatus = uaa.getAuthToken(data)
-	if apiStatus.NotSuccessful() && apiStatus.StatusCode == 401 {
+	if apiStatus.IsNotSuccessful() && apiStatus.StatusCode == 401 {
 		apiStatus.Message = "Password is incorrect, please try again."
 	}
 	return
@@ -77,7 +77,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiStatus 
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)
 	request, apiStatus := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -85,7 +85,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiStatus 
 	response := new(AuthenticationResponse)
 	_, apiStatus = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

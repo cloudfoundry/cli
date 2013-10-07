@@ -28,7 +28,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 
 	serviceOfferings, apiStatus := cmd.serviceRepo.GetServiceOfferings()
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

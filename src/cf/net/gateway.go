@@ -66,7 +66,7 @@ func (gateway Gateway) PerformRequest(request *Request) (apiStatus ApiStatus) {
 
 func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, apiStatus ApiStatus) {
 	rawResponse, apiStatus := gateway.doRequestHandlingAuth(request)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -85,7 +85,7 @@ func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response
 
 func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiStatus ApiStatus) {
 	bytes, headers, apiStatus := gateway.PerformRequestForResponseBytes(request)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -120,7 +120,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 		apiStatus = NewApiStatus(message, errorResponse.Code, response.StatusCode)
 	}
 
-	if apiStatus.Successful() || gateway.authenticator == nil {
+	if apiStatus.IsSuccessful() || gateway.authenticator == nil {
 		return
 	}
 
@@ -130,7 +130,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 
 	// refresh the auth token
 	newToken, apiStatus := gateway.authenticator.RefreshAuthToken()
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

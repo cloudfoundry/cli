@@ -35,7 +35,7 @@ func NewCloudControllerApplicationBitsRepository(config *configuration.Configura
 
 func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiStatus net.ApiStatus) {
 	dir, resourcesJson, apiStatus := repo.createUploadDir(app, dir)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -45,7 +45,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 	}
 
 	apiStatus = repo.uploadBits(app, zipBuffer, resourcesJson)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -64,7 +64,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Applicati
 	request, apiStatus := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 	request.Header.Set("Content-Type", contentType)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -92,7 +92,7 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 	}
 
 	appFilesToUpload, resourcesJson, apiStatus := repo.getFilesToUpload(allAppFiles)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -191,7 +191,7 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 
 	path := fmt.Sprintf("%s/v2/resource_match", repo.config.Target)
 	req, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(resourcesJson))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

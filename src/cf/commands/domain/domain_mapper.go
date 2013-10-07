@@ -70,7 +70,7 @@ func (cmd *DomainMapper) Run(c *cli.Context) {
 	}
 
 	domain, apiStatus = cmd.domainRepo.FindByNameInOrg(domainName, org)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiStatus.Message)
 		return
 	}
@@ -81,7 +81,7 @@ func (cmd *DomainMapper) Run(c *cli.Context) {
 		apiStatus = cmd.domainRepo.UnmapDomain(domain, space)
 	}
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

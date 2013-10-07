@@ -55,7 +55,7 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 	}
 
 	apiStatus = cmd.serviceRepo.DeleteService(instance)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

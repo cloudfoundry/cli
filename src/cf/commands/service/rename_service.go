@@ -46,7 +46,7 @@ func (cmd *RenameService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Renaming service %s...", serviceInstance.Name)
 	apiStatus := cmd.serviceRepo.RenameService(serviceInstance, newName)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		if apiStatus.ErrorCode == api.SERVICE_INSTANCE_NAME_TAKEN {
 			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiStatus.Message, cf.Name)
 		} else {

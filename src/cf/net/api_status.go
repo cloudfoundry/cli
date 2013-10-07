@@ -51,10 +51,10 @@ func (apiStatus ApiStatus) IsNotFound() bool {
 	return apiStatus.isNotFound
 }
 
-func (apiStatus ApiStatus) Successful() bool {
-	return !apiStatus.NotSuccessful()
+func (apiStatus ApiStatus) IsSuccessful() bool {
+	return !apiStatus.IsNotSuccessful()
 }
 
-func (apiStatus ApiStatus) NotSuccessful() bool {
+func (apiStatus ApiStatus) IsNotSuccessful() bool {
 	return apiStatus.IsError() || apiStatus.IsNotFound()
 }

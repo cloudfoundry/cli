@@ -66,7 +66,7 @@ func (cmd Push) Run(c *cli.Context) {
 	if apiStatus.IsNotFound() {
 		app, apiStatus = cmd.createApp(appName, c)
 
-		if apiStatus.NotSuccessful() {
+		if apiStatus.IsNotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -110,7 +110,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		var stack cf.Stack
 		stack, apiStatus = cmd.stackRepo.FindByName(stackName)
 
-		if apiStatus.NotSuccessful() {
+		if apiStatus.IsNotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -120,7 +120,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	cmd.ui.Say("Creating %s...", terminal.EntityNameColor(appName))
 	app, apiStatus = cmd.appRepo.Create(newApp)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -128,7 +128,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	domain, apiStatus := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -140,13 +140,13 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	route, apiStatus := cmd.routeRepo.FindByHost(hostName)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		newRoute := cf.Route{Host: hostName}
 
 		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
 		route, apiStatus = cmd.routeRepo.Create(newRoute, domain)
-		if apiStatus.NotSuccessful() {
+		if apiStatus.IsNotSuccessful() {
 			cmd.ui.Failed(apiStatus.Message)
 			return
 		}
@@ -159,7 +159,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	finalUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
 	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
 	apiStatus = cmd.routeRepo.Bind(route, app)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

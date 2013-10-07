@@ -33,7 +33,7 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 	cmd.ui.Say("Getting spaces in %s...", terminal.EntityNameColor(cmd.config.Organization.Name))
 
 	spaces, apiStatus := cmd.spaceRepo.FindAll()
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

@@ -63,7 +63,7 @@ func (se *SetEnv) Run(c *cli.Context) {
 
 	apiStatus := se.appRepo.SetEnv(app, envVars)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		se.ui.Failed(apiStatus.Message)
 		return
 	}

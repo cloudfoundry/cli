@@ -56,7 +56,7 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 
 	apiStatus := cmd.appRepo.SetEnv(app, envVars)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

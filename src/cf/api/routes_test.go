@@ -96,7 +96,7 @@ func TestRoutesFindAll(t *testing.T) {
 	repo, _ := getRepo(ts.URL)
 	routes, apiStatus := repo.FindAll()
 
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 	assert.Equal(t, len(routes), 2)
 
 	route := routes[0]
@@ -137,7 +137,7 @@ func TestFindByHost(t *testing.T) {
 	repo, _ := getRepo(ts.URL)
 	route, apiStatus := repo.FindByHost("my-cool-app")
 
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
 
@@ -159,7 +159,7 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 	repo, _ := getRepo(ts.URL)
 	_, apiStatus := repo.FindByHost("my-cool-app")
 
-	assert.True(t, apiStatus.NotSuccessful())
+	assert.True(t, apiStatus.IsNotSuccessful())
 }
 
 var findRouteByHostAndDomainEndpoint = testhelpers.CreateEndpoint(
@@ -177,7 +177,7 @@ func TestFindByHostAndDomain(t *testing.T) {
 	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
 	route, apiStatus := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 	assert.Equal(t, domainRepo.FindByNameName, "my-domain.com")
 	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domainRepo.FindByNameDomain})
 }
@@ -227,7 +227,7 @@ func TestCreateRoute(t *testing.T) {
 	newRoute := cf.Route{Host: "my-cool-app"}
 
 	createdRoute, apiStatus := repo.Create(newRoute, domain)
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 
 	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
 }
@@ -248,7 +248,7 @@ func TestBind(t *testing.T) {
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
 	apiStatus := repo.Bind(route, app)
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 }
 
 var unbindRouteEndpoint = testhelpers.CreateEndpoint(
@@ -267,7 +267,7 @@ func TestUnbind(t *testing.T) {
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
 	apiStatus := repo.Unbind(route, app)
-	assert.False(t, apiStatus.NotSuccessful())
+	assert.False(t, apiStatus.IsNotSuccessful())
 }
 
 func getRepo(targetURL string) (repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {

@@ -31,7 +31,7 @@ func (req *ApplicationApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.application, apiStatus = req.appRepo.FindByName(req.name)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
 		return false
 	}

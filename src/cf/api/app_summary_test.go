@@ -89,7 +89,7 @@ func TestAppSummaryGetSummary(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	summary, err := summaryRepo.GetSummary(app)
-	assert.False(t, err.NotSuccessful())
+	assert.False(t, err.IsNotSuccessful())
 
 	assert.Equal(t, summary.App.Name, app.Name)
 

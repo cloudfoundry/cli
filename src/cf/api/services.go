@@ -35,14 +35,14 @@ func NewCloudControllerServiceRepository(config *configuration.Configuration, ga
 func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []cf.ServiceOffering, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.Target)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
 	response := new(ServiceOfferingsApiResponse)
 
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -72,17 +72,17 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 		name, plan.Guid, repo.config.Space.Guid,
 	)
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
 	apiStatus = repo.gateway.PerformRequest(request)
 
-	if apiStatus.NotSuccessful() && apiStatus.ErrorCode == SERVICE_INSTANCE_NAME_TAKEN {
+	if apiStatus.IsNotSuccessful() && apiStatus.ErrorCode == SERVICE_INSTANCE_NAME_TAKEN {
 
 		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
 
-		if !findInstanceApiStatus.NotSuccessful() &&
+		if !findInstanceApiStatus.IsNotSuccessful() &&
 			serviceInstance.ServicePlan.Guid == plan.Guid {
 			apiStatus = net.ApiStatus{}
 			identicalAlreadyExists = true
@@ -110,7 +110,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 	}
 
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -121,13 +121,13 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiStatus net.ApiStatus) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
 	response := new(ServiceInstancesApiResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -170,7 +170,7 @@ func (repo CloudControllerServiceRepository) BindService(instance cf.ServiceInst
 		app.Guid, instance.Guid,
 	)
 	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -195,7 +195,7 @@ func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceIn
 	}
 
 	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -210,7 +210,7 @@ func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceIn
 
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
 	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -222,7 +222,7 @@ func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceIn
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
 	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

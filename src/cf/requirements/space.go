@@ -31,7 +31,7 @@ func (req *SpaceApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.space, apiStatus = req.spaceRepo.FindByName(req.name)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
 		return false
 	}

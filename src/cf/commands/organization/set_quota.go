@@ -42,7 +42,7 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 	quotaName := c.Args()[1]
 	quota, apiStatus := cmd.orgRepo.FindQuotaByName(quotaName)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}
@@ -52,7 +52,7 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 		terminal.EntityNameColor(org.Name))
 
 	apiStatus = cmd.orgRepo.UpdateQuota(org, quota)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

@@ -71,7 +71,7 @@ func (cmd *RouteMapper) Run(c *cli.Context) {
 		apiStatus = cmd.routeRepo.Unbind(route, app)
 	}
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

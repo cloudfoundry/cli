@@ -24,7 +24,7 @@ func NewEndpointRepository(config *configuration.Configuration, gateway net.Gate
 
 func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiStatus net.ApiStatus) {
 	request, apiStatus := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 
@@ -41,7 +41,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiStatus 
 
 	serverResponse := new(infoResponse)
 	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, &serverResponse)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		return
 	}
 

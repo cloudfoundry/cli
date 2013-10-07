@@ -47,7 +47,7 @@ func (cmd Api) setNewApiEndpoint(endpoint string) {
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
 	apiStatus := cmd.endpointRepo.UpdateEndpoint(endpoint)
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed(apiStatus.Message)
 		return
 	}

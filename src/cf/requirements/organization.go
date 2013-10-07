@@ -31,7 +31,7 @@ func (req *OrganizationApiRequirement) Execute() (success bool) {
 	var apiStatus net.ApiStatus
 	req.org, apiStatus = req.orgRepo.FindByName(req.name)
 
-	if apiStatus.NotSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		req.ui.Failed(apiStatus.Message)
 		return false
 	}
