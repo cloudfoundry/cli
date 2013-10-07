@@ -65,5 +65,5 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.DisplayTable(table, nil)
+	cmd.ui.DisplayTable(table)
 }

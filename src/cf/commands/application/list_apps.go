@@ -56,5 +56,5 @@ func (cmd ListApps) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.DisplayTable(table, nil)
+	cmd.ui.DisplayTable(table)
 }

@@ -30,7 +30,7 @@ type UI interface {
 	ShowConfiguration(*configuration.Configuration)
 	LoadingIndication()
 	Wait(duration time.Duration)
-	DisplayTable(table [][]string, coloringFunc ColoringFunction)
+	DisplayTable(table [][]string)
 }
 
 type TerminalUI struct {
@@ -119,10 +119,7 @@ func (c TerminalUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui TerminalUI) DisplayTable(table [][]string, coloringFunc ColoringFunction) {
-	if coloringFunc == nil {
-		coloringFunc = DefaultColoringFunc
-	}
+func (ui TerminalUI) DisplayTable(table [][]string) {
 
 	columnCount := len(table[0])
 	maxSizes := make([]int, columnCount)
@@ -138,14 +135,14 @@ func (ui TerminalUI) DisplayTable(table [][]string, coloringFunc ColoringFunctio
 	for row, line := range table {
 		for col, value := range line {
 			padding := strings.Repeat(" ", maxSizes[col]-len(decolorize(value)))
-			value = coloringFunc(value, row, col)
+			value = tableColoringFunc(value, row, col)
 			fmt.Printf("%s%s   ", value, padding)
 		}
 		fmt.Print("\n")
 	}
 }
 
-func DefaultColoringFunc(value string, row int, col int) string {
+func tableColoringFunc(value string, row int, col int) string {
 	switch {
 	case row == 0:
 		return HeaderColor(value)

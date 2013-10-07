@@ -57,5 +57,5 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.DisplayTable(table, nil)
+	cmd.ui.DisplayTable(table)
 }

@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 	"cf/configuration"
-	"cf/terminal"
 	"time"
 	"github.com/codegangsta/cli"
 	"cf"
@@ -136,15 +135,12 @@ func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
 
 }
 
-func (ui *FakeUI) DisplayTable(table [][]string, coloringFunc terminal.ColoringFunction) {
-	if coloringFunc == nil {
-		coloringFunc = terminal.DefaultColoringFunc
-	}
+func (ui *FakeUI) DisplayTable(table [][]string) {
 
-	for row, line := range table {
+	for _, line := range table {
 		output := ""
-		for col, value := range line {
-			output = output + coloringFunc(value, row, col) + "  "
+		for _, value := range line {
+			output = output + value + "  "
 		}
 		ui.Say("%s",output)
 	}
