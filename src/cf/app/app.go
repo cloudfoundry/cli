@@ -93,7 +93,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Name:        "create-user-provided-service",
 			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",
-			Usage: fmt.Sprintf("%s create-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n\n", cf.Name) +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"", cf.Name),
 			Action: func(c *cli.Context) {
