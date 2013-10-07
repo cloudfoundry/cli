@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"fmt"
+	"regexp"
 	"runtime"
 )
 
@@ -31,6 +32,14 @@ func colorize(message string, color Color, bold bool) string {
 	return fmt.Sprintf("\033[%d;%dm%s\033[0m", attr, color, message)
 }
 
+func decolorize(message string) string {
+	reg, err := regexp.Compile(`\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`)
+	if err != nil {
+		panic(err)
+	}
+	return string(reg.ReplaceAll([]byte(message), []byte("")))
+}
+
 func HeaderColor(message string) string {
 	return colorize(message, white, true)
 }
@@ -43,12 +52,20 @@ func CommandColor(message string) string {
 	return colorize(message, yellow, true)
 }
 
+func StartedColor(message string) string {
+	return colorize(message, grey, true)
+}
+
 func StoppedColor(message string) string {
-	return colorize(message, yellow, true)
+	return colorize(message, grey, true)
 }
 
 func AdvisoryColor(message string) string {
 	return colorize(message, yellow, true)
+}
+
+func CrashedColor(message string) string {
+	return colorize(message, red, true)
 }
 
 func FailureColor(message string) string {

@@ -1,7 +1,8 @@
 package application
 
 import (
-	term "cf/terminal"
+	"cf"
+	"cf/terminal"
 	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -72,23 +73,6 @@ func bytesFromString(s string) (bytes uint64, err error) {
 	return
 }
 
-func coloredState(state string) (colored string) {
-	switch state {
-	case "started", "running":
-		colored = term.SuccessColor("running")
-	case "stopped":
-		colored = term.StoppedColor("stopped")
-	case "flapping":
-		colored = term.WarningColor("flapping")
-	case "starting":
-		colored = term.AdvisoryColor("starting")
-	default:
-		colored = term.FailureColor(state)
-	}
-
-	return
-}
-
 func logMessageOutput(appName string, lm logmessage.LogMessage) string {
 	sourceTypeNames := map[logmessage.LogMessage_SourceType]string{
 		logmessage.LogMessage_CLOUD_CONTROLLER: "API",
@@ -138,4 +122,58 @@ func MapStr(args interface{}) []string {
 	}
 	return rval
 
+}
+
+func coloredAppState(app cf.Application) string {
+	appState := strings.ToLower(app.State)
+
+	if app.RunningInstances == 0 {
+		if appState == "stopped" {
+			return appState
+		} else {
+			return terminal.CrashedColor(appState)
+		}
+	}
+
+	if app.RunningInstances < app.Instances {
+		return terminal.WarningColor(appState)
+	}
+
+	return appState
+}
+
+func coloredAppInstaces(app cf.Application) string {
+	healthString := fmt.Sprintf("%d/%d", app.RunningInstances, app.Instances)
+
+	if app.RunningInstances == 0 {
+		if strings.ToLower(app.State) == "stopped" {
+			return healthString
+		} else {
+			return terminal.CrashedColor(healthString)
+		}
+	}
+
+	if app.RunningInstances < app.Instances {
+		return terminal.WarningColor(healthString)
+	}
+
+	return healthString
+}
+
+func coloredInstanceState(instance cf.ApplicationInstance) (colored string) {
+	state := string(instance.State)
+	switch state {
+	case "started", "running":
+		colored = terminal.StartedColor("running")
+	case "stopped":
+		colored = terminal.StoppedColor("stopped")
+	case "flapping":
+		colored = terminal.WarningColor("flapping")
+	case "starting":
+		colored = terminal.AdvisoryColor("starting")
+	default:
+		colored = terminal.FailureColor(state)
+	}
+
+	return
 }

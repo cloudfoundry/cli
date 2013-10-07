@@ -51,7 +51,8 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor("health:"), coloredState(summary.App.Health()))
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor("state:"), coloredAppState(summary.App))
+	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstaces(summary.App))
 	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), byteSize(summary.App.Memory*MEGABYTE), summary.App.Instances)
 	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
 
@@ -62,7 +63,7 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	for index, instance := range summary.Instances {
 		table = append(table, []string{
 			fmt.Sprintf("#%d", index),
-			string(instance.State),
+			coloredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage),
 			fmt.Sprintf("%s of %s", byteSize(instance.MemUsage), byteSize(instance.MemQuota)),
@@ -70,13 +71,5 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.DisplayTable(table, cmd.coloringFunc)
-}
-
-func (cmd *ShowApp) coloringFunc(value string, row int, col int) string {
-	if row > 0 && col == 1 {
-		return coloredState(value)
-	}
-
-	return terminal.DefaultColoringFunc(value, row, col)
+	cmd.ui.DisplayTable(table, nil)
 }

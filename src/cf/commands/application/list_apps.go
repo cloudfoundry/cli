@@ -4,7 +4,6 @@ import (
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
-	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -43,25 +42,19 @@ func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	table := [][]string{
-		[]string{"name", "status", "usage", "urls"},
+		[]string{"name", "state", "instances", "memory", "disk", "urls"},
 	}
 
 	for _, app := range apps {
 		table = append(table, []string{
 			app.Name,
-			app.State,
-			fmt.Sprintf("%d x %s", app.Instances, byteSize(app.Memory*MEGABYTE)),
+			coloredAppState(app),
+			coloredAppInstaces(app),
+			byteSize(app.Memory * MEGABYTE),
+			byteSize(app.DiskQuota * MEGABYTE),
 			strings.Join(app.Urls, ", "),
 		})
 	}
 
-	cmd.ui.DisplayTable(table, cmd.coloringFunc)
-}
-
-func (cmd ListApps) coloringFunc(value string, row int, col int) string {
-	if row > 0 && col == 1 {
-		return coloredState(value)
-	}
-
-	return terminal.DefaultColoringFunc(value, row, col)
+	cmd.ui.DisplayTable(table, nil)
 }

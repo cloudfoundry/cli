@@ -80,6 +80,7 @@ type ApplicationSummary struct {
 	RunningInstances int `json:"running_instances"`
 	Memory           uint64
 	Instances        int
+	DiskQuota        uint64 `json:"disk_quota"`
 	Urls             []string
 	State            string
 	ServiceNames     []string `json:"service_names"`

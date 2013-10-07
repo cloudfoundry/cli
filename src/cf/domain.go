@@ -49,22 +49,6 @@ type Application struct {
 	Command          string
 }
 
-func (app Application) Health() string {
-	if app.State != "started" {
-		return app.State
-	}
-
-	if app.Instances > 0 {
-		ratio := float32(app.RunningInstances) / float32(app.Instances)
-		if ratio == 1 {
-			return "running"
-		}
-		return fmt.Sprintf("%.0f%%", ratio*100)
-	}
-
-	return "N/A"
-}
-
 type AppSummary struct {
 	App       Application
 	Instances []ApplicationInstance

@@ -79,28 +79,31 @@ func TestDisplayingAppSummary(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Showing health and status")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 
-	assert.Contains(t, ui.Outputs[2], "health")
-	assert.Contains(t, ui.Outputs[2], "running")
+	assert.Contains(t, ui.Outputs[2], "state")
+	assert.Contains(t, ui.Outputs[2], "started")
 
-	assert.Contains(t, ui.Outputs[3], "usage")
-	assert.Contains(t, ui.Outputs[3], "256M x 2 instances")
+	assert.Contains(t, ui.Outputs[3], "instances")
+	assert.Contains(t, ui.Outputs[3], "2/2")
 
-	assert.Contains(t, ui.Outputs[4], "urls")
-	assert.Contains(t, ui.Outputs[4], "my-app.example.com, foo.example.com")
+	assert.Contains(t, ui.Outputs[4], "usage")
+	assert.Contains(t, ui.Outputs[4], "256M x 2 instances")
 
-	assert.Contains(t, ui.Outputs[6], "#0")
-	assert.Contains(t, ui.Outputs[6], "running")
-	assert.Contains(t, ui.Outputs[6], "2012-01-02 03:04:05 PM")
-	assert.Contains(t, ui.Outputs[6], "1.0%")
-	assert.Contains(t, ui.Outputs[6], "13 of 64M")
-	assert.Contains(t, ui.Outputs[6], "32M of 1G")
+	assert.Contains(t, ui.Outputs[5], "urls")
+	assert.Contains(t, ui.Outputs[5], "my-app.example.com, foo.example.com")
 
-	assert.Contains(t, ui.Outputs[7], "#1")
-	assert.Contains(t, ui.Outputs[7], "down")
-	assert.Contains(t, ui.Outputs[7], "2012-04-01 03:04:05 PM")
-	assert.Contains(t, ui.Outputs[7], "0%")
-	assert.Contains(t, ui.Outputs[7], "0 of 0")
-	assert.Contains(t, ui.Outputs[7], "0 of 0")
+	assert.Contains(t, ui.Outputs[7], "#0")
+	assert.Contains(t, ui.Outputs[7], "running")
+	assert.Contains(t, ui.Outputs[7], "2012-01-02 03:04:05 PM")
+	assert.Contains(t, ui.Outputs[7], "1.0%")
+	assert.Contains(t, ui.Outputs[7], "13 of 64M")
+	assert.Contains(t, ui.Outputs[7], "32M of 1G")
+
+	assert.Contains(t, ui.Outputs[8], "#1")
+	assert.Contains(t, ui.Outputs[8], "down")
+	assert.Contains(t, ui.Outputs[8], "2012-04-01 03:04:05 PM")
+	assert.Contains(t, ui.Outputs[8], "0%")
+	assert.Contains(t, ui.Outputs[8], "0 of 0")
+	assert.Contains(t, ui.Outputs[8], "0 of 0")
 }
 
 func callApp(args []string, reqFactory *testhelpers.FakeReqFactory, appSummaryRepo *testhelpers.FakeAppSummaryRepo) (ui *testhelpers.FakeUI) {

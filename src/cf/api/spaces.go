@@ -174,6 +174,7 @@ func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applicat
 			Urls:             appSummary.Urls,
 			State:            strings.ToLower(appSummary.State),
 			Instances:        appSummary.Instances,
+			DiskQuota:        appSummary.DiskQuota,
 			RunningInstances: appSummary.RunningInstances,
 			Memory:           appSummary.Memory,
 		}

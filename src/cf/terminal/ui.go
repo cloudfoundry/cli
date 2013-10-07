@@ -137,7 +137,7 @@ func (ui TerminalUI) DisplayTable(table [][]string, coloringFunc ColoringFunctio
 
 	for row, line := range table {
 		for col, value := range line {
-			padding := strings.Repeat(" ", maxSizes[col]-len(value))
+			padding := strings.Repeat(" ", maxSizes[col]-len(decolorize(value)))
 			value = coloringFunc(value, row, col)
 			fmt.Printf("%s%s   ", value, padding)
 		}
