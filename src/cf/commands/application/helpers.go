@@ -73,35 +73,29 @@ func bytesFromString(s string) (bytes uint64, err error) {
 	return
 }
 
-func logMessageOutput(appName string, lm logmessage.LogMessage) string {
-	sourceTypeNames := map[logmessage.LogMessage_SourceType]string{
-		logmessage.LogMessage_CLOUD_CONTROLLER: "API",
-		logmessage.LogMessage_ROUTER:           "Router",
-		logmessage.LogMessage_UAA:              "UAA",
-		logmessage.LogMessage_DEA:              "Executor",
-		logmessage.LogMessage_WARDEN_CONTAINER: "App",
-	}
+func logMessageOutput(appName string, msg *logmessage.Message) string {
+	lm := msg.GetLogMessage()
 
-	sourceType, _ := sourceTypeNames[*lm.SourceType]
-	sourceId := "?"
-	if lm.SourceId != nil {
-		sourceId = *lm.SourceId
+	sourceType := msg.GetShortSourceTypeName()
+	sourceId := lm.GetSourceId()
+	if sourceId == "" {
+		sourceId = "?"
 	}
-	msg := lm.GetMessage()
+	msgText := lm.GetMessage()
 
-	t := time.Unix(0, *lm.Timestamp)
+	t := time.Unix(0, lm.GetTimestamp())
 	timeString := t.Format("Jan 2 15:04:05")
 
 	channel := ""
-	if lm.MessageType != nil && *lm.MessageType == logmessage.LogMessage_ERR {
+	if lm.GetMessageType() == logmessage.LogMessage_ERR {
 		channel = "STDERR "
 	}
 
 	if lm.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
-		return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msg)
+		return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msgText)
 	}
 
-	return fmt.Sprintf("%s %s %s %s%s", timeString, appName, sourceType, channel, msg)
+	return fmt.Sprintf("%s %s %s %s%s", timeString, appName, sourceType, channel, msgText)
 }
 
 func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {

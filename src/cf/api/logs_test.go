@@ -59,8 +59,8 @@ func TestRecentLogsFor(t *testing.T) {
 	}
 
 	// ordered messages we expect to receive
-	dumpedMessages := []logmessage.LogMessage{}
-	onMessage := func(message logmessage.LogMessage) {
+	dumpedMessages := []*logmessage.Message{}
+	onMessage := func(message *logmessage.Message) {
 		dumpedMessages = append(dumpedMessages, message)
 	}
 
@@ -69,8 +69,9 @@ func TestRecentLogsFor(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(dumpedMessages), 1)
-	assert.Equal(t, dumpedMessages[0].GetMessage(), expectedMessage.GetLogMessage().GetMessage())
-	assert.Equal(t, dumpedMessages[0].GetMessageType(), expectedMessage.GetLogMessage().GetMessageType())
+	assert.Equal(t, dumpedMessages[0].GetShortSourceTypeName(), expectedMessage.GetShortSourceTypeName())
+	assert.Equal(t, dumpedMessages[0].GetLogMessage().GetMessage(), expectedMessage.GetLogMessage().GetMessage())
+	assert.Equal(t, dumpedMessages[0].GetLogMessage().GetMessageType(), expectedMessage.GetLogMessage().GetMessageType())
 }
 
 func TestTailsLogsFor(t *testing.T) {
@@ -114,8 +115,8 @@ func TestTailsLogsFor(t *testing.T) {
 	}
 
 	// ordered messages we expect to receive
-	tailedMessages := []logmessage.LogMessage{}
-	onMessage := func(message logmessage.LogMessage) {
+	tailedMessages := []*logmessage.Message{}
+	onMessage := func(message *logmessage.Message) {
 		tailedMessages = append(tailedMessages, message)
 	}
 
@@ -126,15 +127,18 @@ func TestTailsLogsFor(t *testing.T) {
 
 	assert.Equal(t, len(tailedMessages), 3)
 
-	actualMessage, err := proto.Marshal(&tailedMessages[0])
+	tailedMessage := tailedMessages[0]
+	actualMessage, err := proto.Marshal(tailedMessage.GetLogMessage())
 	assert.NoError(t, err)
 	assert.Equal(t, actualMessage, messagesSent[1])
 
-	actualMessage, err = proto.Marshal(&tailedMessages[1])
+	tailedMessage = tailedMessages[1]
+	actualMessage, err = proto.Marshal(tailedMessage.GetLogMessage())
 	assert.NoError(t, err)
 	assert.Equal(t, actualMessage, messagesSent[2])
 
-	actualMessage, err = proto.Marshal(&tailedMessages[2])
+	tailedMessage = tailedMessages[2]
+	actualMessage, err = proto.Marshal(tailedMessage.GetLogMessage())
 	assert.NoError(t, err)
 	assert.Equal(t, actualMessage, messagesSent[0])
 }

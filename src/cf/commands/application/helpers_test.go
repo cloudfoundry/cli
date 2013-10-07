@@ -1,6 +1,7 @@
 package application
 
 import (
+	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
@@ -27,43 +28,54 @@ func TestLogMessageOutput(t *testing.T) {
 
 	sourceId := "0"
 
-	msg := logmessage.LogMessage{
+	protoMessage := &logmessage.LogMessage{
 		Message:     []byte("Hello World!"),
+		AppId:       proto.String("my-app-guid"),
 		MessageType: &stdout,
 		SourceId:    &sourceId,
 		Timestamp:   &timestamp,
 	}
 
-	msg.SourceType = &cloud_controller
+	msg := createMessage(t, protoMessage, &cloud_controller, &stdout)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API Hello World!")
-	msg.MessageType = &stderr
+
+	msg = createMessage(t, protoMessage, &cloud_controller, &stderr)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API STDERR Hello World!")
 
 	sourceId = "1"
-	msg.SourceType = &router
-	msg.MessageType = &stdout
+	msg = createMessage(t, protoMessage, &router, &stdout)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router Hello World!")
-	msg.MessageType = &stderr
+	msg = createMessage(t, protoMessage, &router, &stderr)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router STDERR Hello World!")
 
 	sourceId = "2"
-	msg.SourceType = &uaa
-	msg.MessageType = &stdout
+	msg = createMessage(t, protoMessage, &uaa, &stdout)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA Hello World!")
-	msg.MessageType = &stderr
+	msg = createMessage(t, protoMessage, &uaa, &stderr)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA STDERR Hello World!")
 
 	sourceId = "3"
-	msg.SourceType = &dea
-	msg.MessageType = &stdout
+	msg = createMessage(t, protoMessage, &dea, &stdout)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor Hello World!")
-	msg.MessageType = &stderr
+	msg = createMessage(t, protoMessage, &dea, &stderr)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor STDERR Hello World!")
 
 	sourceId = "4"
-	msg.SourceType = &wardenContainer
-	msg.MessageType = &stdout
+	msg = createMessage(t, protoMessage, &wardenContainer, &stdout)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app App/4 Hello World!")
-	msg.MessageType = &stderr
+	msg = createMessage(t, protoMessage, &wardenContainer, &stderr)
 	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app App/4 STDERR Hello World!")
+}
+
+func createMessage(t *testing.T, protoMsg *logmessage.LogMessage, sourceType *logmessage.LogMessage_SourceType, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
+	protoMsg.SourceType = sourceType
+	protoMsg.MessageType = msgType
+
+	data, err := proto.Marshal(protoMsg)
+	assert.NoError(t, err)
+
+	msg, err = logmessage.ParseMessage(data)
+	assert.NoError(t, err)
+
+	return
 }

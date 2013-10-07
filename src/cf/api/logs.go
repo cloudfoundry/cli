@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"code.google.com/p/go.net/websocket"
-	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -17,8 +16,8 @@ import (
 const LOGGREGATOR_REDIRECTOR_PORT = "4443"
 
 type LogsRepository interface {
-	RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), port string) (err error)
-	TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration, port string) (err error)
+	RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), port string) (err error)
+	TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), printInterval time.Duration, port string) (err error)
 }
 
 type LoggregatorLogsRepository struct {
@@ -34,7 +33,7 @@ func NewLoggregatorLogsRepository(config *configuration.Configuration, gateway n
 	return
 }
 
-func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), port string) (err error) {
+func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), port string) (err error) {
 	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + port
 	location := host + fmt.Sprintf("/dump/?app=%s", app.Guid)
 	if err != nil {
@@ -43,13 +42,13 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnec
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, nil)
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), printInterval time.Duration, port string) error {
+func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), printInterval time.Duration, port string) error {
 	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + port
 	location := host + fmt.Sprintf("/tail/?app=%s", app.Guid)
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, time.Tick(printInterval*time.Second))
 }
 
-func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf.Application, onConnect func(), onMessage func(logmessage.LogMessage), tickerChan <-chan time.Time) (err error) {
+func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf.Application, onConnect func(), onMessage func(*logmessage.Message), tickerChan <-chan time.Time) (err error) {
 	const EOF_ERROR = "EOF"
 
 	config, err := websocket.NewConfig(location, "http://localhost")
@@ -67,7 +66,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf
 
 	onConnect()
 
-	msgChan := make(chan logmessage.LogMessage, 1000)
+	msgChan := make(chan *logmessage.Message, 1000)
 	errChan := make(chan error, 0)
 
 	go repo.listenForMessages(ws, msgChan, errChan)
@@ -87,7 +86,7 @@ Loop:
 			sortableMsg.Messages = append(sortableMsg.Messages, msg)
 		case <-tickerChan:
 			invokeCallbackWithSortedMessages(sortableMsg, onMessage)
-			sortableMsg.Messages = []logmessage.LogMessage{}
+			sortableMsg.Messages = []*logmessage.Message{}
 		}
 		if err != nil {
 			break
@@ -105,7 +104,7 @@ Loop:
 	return
 }
 
-func invokeCallbackWithSortedMessages(messages *sortableLogMessages, callback func(logmessage.LogMessage)) {
+func invokeCallbackWithSortedMessages(messages *sortableLogMessages, callback func(*logmessage.Message)) {
 	sort.Sort(messages)
 	for _, msg := range messages.Messages {
 		callback(msg)
@@ -119,7 +118,7 @@ func (repo LoggregatorLogsRepository) sendKeepAlive(ws *websocket.Conn) {
 	}
 }
 
-func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgChan chan<- logmessage.LogMessage, errChan chan<- error) {
+func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgChan chan<- *logmessage.Message, errChan chan<- error) {
 	var err error
 	defer close(msgChan)
 	for {
@@ -130,18 +129,16 @@ func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgC
 			break
 		}
 
-		logMessage := logmessage.LogMessage{}
-
-		msgErr := proto.Unmarshal(data, &logMessage)
+		msg, msgErr := logmessage.ParseMessage(data)
 		if msgErr != nil {
 			continue
 		}
-		msgChan <- logMessage
+		msgChan <- msg
 	}
 }
 
 type sortableLogMessages struct {
-	Messages []logmessage.LogMessage
+	Messages []*logmessage.Message
 }
 
 func (sort *sortableLogMessages) Len() int {
@@ -151,7 +148,7 @@ func (sort *sortableLogMessages) Len() int {
 func (sort *sortableLogMessages) Less(i, j int) bool {
 	msgI := sort.Messages[i]
 	msgJ := sort.Messages[j]
-	return *msgI.Timestamp < *msgJ.Timestamp
+	return *msgI.GetLogMessage().Timestamp < *msgJ.GetLogMessage().Timestamp
 }
 
 func (sort *sortableLogMessages) Swap(i, j int) {
