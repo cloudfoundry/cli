@@ -9,7 +9,7 @@ import (
 )
 
 type AppSummaryRepository interface {
-	GetSummary(app cf.Application) (summary cf.AppSummary, apiStatus net.ApiStatus)
+	GetSummary(app cf.Application) (summary cf.AppSummary, apiResponse net.ApiResponse)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -25,16 +25,16 @@ func NewCloudControllerAppSummaryRepository(config *configuration.Configuration,
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (summary cf.AppSummary, apiStatus net.ApiStatus) {
+func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (summary cf.AppSummary, apiResponse net.ApiResponse) {
 	summary.App = app
 
-	instances, apiStatus := repo.appRepo.GetInstances(app)
-	if apiStatus.IsNotSuccessful() {
+	instances, apiResponse := repo.appRepo.GetInstances(app)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	instances, apiStatus = repo.updateInstancesWithStats(app, instances)
-	if apiStatus.IsNotSuccessful() {
+	instances, apiResponse = repo.updateInstancesWithStats(app, instances)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -57,22 +57,22 @@ type InstanceStatsApiResponse struct {
 	}
 }
 
-func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.Application, instances []cf.ApplicationInstance) (updatedInst []cf.ApplicationInstance, apiStatus net.ApiStatus) {
+func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.Application, instances []cf.ApplicationInstance) (updatedInst []cf.ApplicationInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.Target, app.Guid)
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiResponse := StatsApiResponse{}
+	statsResponse := StatsApiResponse{}
 
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, &apiResponse)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &statsResponse)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	updatedInst = make([]cf.ApplicationInstance, len(apiResponse), len(apiResponse))
-	for k, v := range apiResponse {
+	updatedInst = make([]cf.ApplicationInstance, len(statsResponse), len(statsResponse))
+	for k, v := range statsResponse {
 		index, err := strconv.Atoi(k)
 		if err != nil {
 			continue

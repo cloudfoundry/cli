@@ -26,10 +26,10 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	cmd.ui.Say("Getting services from marketplace...")
 
-	serviceOfferings, apiStatus := cmd.serviceRepo.GetServiceOfferings()
+	serviceOfferings, apiResponse := cmd.serviceRepo.GetServiceOfferings()
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

@@ -52,10 +52,10 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	ts, auth := setupAuthWithEndpoint(t, successfulLoginEndpoint)
 	defer ts.Close()
 
-	apiStatus := auth.Authenticate("foo@example.com", "bar")
+	apiResponse := auth.Authenticate("foo@example.com", "bar")
 	savedConfig := testhelpers.SavedConfiguration
 
-	assert.False(t, apiStatus.IsError())
+	assert.False(t, apiResponse.IsError())
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, ts.URL)
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
@@ -69,11 +69,11 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	ts, auth := setupAuthWithEndpoint(t, unsuccessfulLoginEndpoint)
 	defer ts.Close()
 
-	apiStatus := auth.Authenticate("foo@example.com", "oops wrong pass")
+	apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
 	savedConfig := testhelpers.SavedConfiguration
 
-	assert.True(t, apiStatus.IsNotSuccessful())
-	assert.Equal(t, apiStatus.Message, "Password is incorrect, please try again.")
+	assert.True(t, apiResponse.IsNotSuccessful())
+	assert.Equal(t, apiResponse.Message, "Password is incorrect, please try again.")
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
@@ -85,11 +85,11 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	ts, auth := setupAuthWithEndpoint(t, errorLoginEndpoint)
 	defer ts.Close()
 
-	apiStatus := auth.Authenticate("foo@example.com", "bar")
+	apiResponse := auth.Authenticate("foo@example.com", "bar")
 	savedConfig := testhelpers.SavedConfiguration
 
-	assert.True(t, apiStatus.IsError())
-	assert.Equal(t, apiStatus.Message, "Server error, status code: 500, error code: , message: ")
+	assert.True(t, apiResponse.IsError())
+	assert.Equal(t, apiResponse.Message, "Server error, status code: 500, error code: , message: ")
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
@@ -106,11 +106,11 @@ func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
 	ts, auth := setupAuthWithEndpoint(t, errorMaskedAsSuccessEndpoint)
 	defer ts.Close()
 
-	apiStatus := auth.Authenticate("foo@example.com", "bar")
+	apiResponse := auth.Authenticate("foo@example.com", "bar")
 	savedConfig := testhelpers.SavedConfiguration
 
-	assert.True(t, apiStatus.IsError())
-	assert.Equal(t, apiStatus.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
+	assert.True(t, apiResponse.IsError())
+	assert.Equal(t, apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
 	assert.Empty(t, savedConfig.AccessToken)
 }
 

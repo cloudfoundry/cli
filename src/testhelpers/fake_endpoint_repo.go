@@ -8,7 +8,7 @@ type FakeEndpointRepo struct {
 	UpdateEndpointEndpoint string
 }
 
-func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (apiStatus net.ApiStatus) {
+func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (apiResponse net.ApiResponse) {
 	repo.UpdateEndpointEndpoint = endpoint
 	return
 }

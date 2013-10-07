@@ -21,7 +21,7 @@ type errorResponse struct {
 type errorHandler func(*http.Response) errorResponse
 
 type tokenRefresher interface {
-	RefreshAuthToken() (string, ApiStatus)
+	RefreshAuthToken() (string, ApiResponse)
 }
 
 type Request struct {
@@ -42,10 +42,10 @@ func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
 	gateway.authenticator = auth
 }
 
-func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Reader) (req *Request, apiStatus ApiStatus) {
+func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Reader) (req *Request, apiResponse ApiResponse) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
-		apiStatus = NewApiStatusWithError("Error building request", err)
+		apiResponse = NewApiStatusWithError("Error building request", err)
 		return
 	}
 
@@ -59,44 +59,44 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 	return
 }
 
-func (gateway Gateway) PerformRequest(request *Request) (apiStatus ApiStatus) {
-	_, apiStatus = gateway.doRequestHandlingAuth(request)
+func (gateway Gateway) PerformRequest(request *Request) (apiResponse ApiResponse) {
+	_, apiResponse = gateway.doRequestHandlingAuth(request)
 	return
 }
 
-func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, apiStatus ApiStatus) {
-	rawResponse, apiStatus := gateway.doRequestHandlingAuth(request)
-	if apiStatus.IsNotSuccessful() {
+func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, apiResponse ApiResponse) {
+	rawResponse, apiResponse := gateway.doRequestHandlingAuth(request)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	bytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		apiStatus = NewApiStatusWithError("Error reading response", err)
+		apiResponse = NewApiStatusWithError("Error reading response", err)
 	}
 	return
 }
 
-func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response string, headers http.Header, apiStatus ApiStatus) {
-	bytes, headers, apiStatus := gateway.PerformRequestForResponseBytes(request)
+func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response string, headers http.Header, apiResponse ApiResponse) {
+	bytes, headers, apiResponse := gateway.PerformRequestForResponseBytes(request)
 	response = string(bytes)
 	return
 }
 
-func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiStatus ApiStatus) {
-	bytes, headers, apiStatus := gateway.PerformRequestForResponseBytes(request)
-	if apiStatus.IsNotSuccessful() {
+func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiResponse ApiResponse) {
+	bytes, headers, apiResponse := gateway.PerformRequestForResponseBytes(request)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
-		apiStatus = NewApiStatusWithError("Invalid JSON response from server", err)
+		apiResponse = NewApiStatusWithError("Invalid JSON response from server", err)
 	}
 	return
 }
 
-func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.Response, apiStatus ApiStatus) {
+func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.Response, apiResponse ApiResponse) {
 	var bodyBytes []byte
 	if request.Body != nil {
 		bodyBytes, _ = ioutil.ReadAll(request.Body)
@@ -105,7 +105,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 
 	response, err := doRequest(request.Request)
 	if err != nil {
-		apiStatus = NewApiStatusWithError("Error performing request", err)
+		apiResponse = NewApiStatusWithError("Error performing request", err)
 		return
 	}
 
@@ -117,20 +117,20 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 			errorResponse.Code,
 			errorResponse.Description,
 		)
-		apiStatus = NewApiStatus(message, errorResponse.Code, response.StatusCode)
+		apiResponse = NewApiStatus(message, errorResponse.Code, response.StatusCode)
 	}
 
-	if apiStatus.IsSuccessful() || gateway.authenticator == nil {
+	if apiResponse.IsSuccessful() || gateway.authenticator == nil {
 		return
 	}
 
-	if apiStatus.ErrorCode != INVALID_TOKEN_CODE {
+	if apiResponse.ErrorCode != INVALID_TOKEN_CODE {
 		return
 	}
 
 	// refresh the auth token
-	newToken, apiStatus := gateway.authenticator.RefreshAuthToken()
-	if apiStatus.IsNotSuccessful() {
+	newToken, apiResponse := gateway.authenticator.RefreshAuthToken()
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -143,7 +143,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 	// make the request again
 	response, err = doRequest(request.Request)
 	if err != nil {
-		apiStatus = NewApiStatusWithError("Error performing request", err)
+		apiResponse = NewApiStatusWithError("Error performing request", err)
 	}
 	return
 }

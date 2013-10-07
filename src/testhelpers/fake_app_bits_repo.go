@@ -10,7 +10,7 @@ type FakeApplicationBitsRepository struct {
 	UploadedDir string
 }
 
-func (repo *FakeApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiStatus net.ApiStatus) {
+func (repo *FakeApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse) {
 	repo.UploadedDir = dir
 	repo.UploadedApp = app
 

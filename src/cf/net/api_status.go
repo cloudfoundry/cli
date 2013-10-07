@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type ApiStatus struct {
+type ApiResponse struct {
 	Message    string
 	ErrorCode  string
 	StatusCode int
@@ -13,8 +13,8 @@ type ApiStatus struct {
 	isNotFound bool
 }
 
-func NewApiStatus(message string, errorCode string, statusCode int) (apiStatus ApiStatus) {
-	return ApiStatus{
+func NewApiStatus(message string, errorCode string, statusCode int) (apiResponse ApiResponse) {
+	return ApiResponse{
 		Message:    message,
 		ErrorCode:  errorCode,
 		StatusCode: statusCode,
@@ -22,39 +22,39 @@ func NewApiStatus(message string, errorCode string, statusCode int) (apiStatus A
 	}
 }
 
-func NewApiStatusWithMessage(message string, a ...interface{}) (apiStatus ApiStatus) {
-	return ApiStatus{
+func NewApiStatusWithMessage(message string, a ...interface{}) (apiResponse ApiResponse) {
+	return ApiResponse{
 		Message: fmt.Sprintf(message, a...),
 		isError: true,
 	}
 }
 
-func NewApiStatusWithError(message string, err error) (apiStatus ApiStatus) {
-	return ApiStatus{
+func NewApiStatusWithError(message string, err error) (apiResponse ApiResponse) {
+	return ApiResponse{
 		Message: fmt.Sprintf("%s: %s", message, err.Error()),
 		isError: true,
 	}
 }
 
-func NewNotFoundApiStatus(objectType string, objectId string) (apiStatus ApiStatus) {
-	return ApiStatus{
+func NewNotFoundApiStatus(objectType string, objectId string) (apiResponse ApiResponse) {
+	return ApiResponse{
 		Message:    fmt.Sprintf("%s %s not found", objectType, objectId),
 		isNotFound: true,
 	}
 }
 
-func (apiStatus ApiStatus) IsError() bool {
-	return apiStatus.isError
+func (apiResponse ApiResponse) IsError() bool {
+	return apiResponse.isError
 }
 
-func (apiStatus ApiStatus) IsNotFound() bool {
-	return apiStatus.isNotFound
+func (apiResponse ApiResponse) IsNotFound() bool {
+	return apiResponse.isNotFound
 }
 
-func (apiStatus ApiStatus) IsSuccessful() bool {
-	return !apiStatus.IsNotSuccessful()
+func (apiResponse ApiResponse) IsSuccessful() bool {
+	return !apiResponse.IsNotSuccessful()
 }
 
-func (apiStatus ApiStatus) IsNotSuccessful() bool {
-	return apiStatus.IsError() || apiStatus.IsNotFound()
+func (apiResponse ApiResponse) IsNotSuccessful() bool {
+	return apiResponse.IsError() || apiResponse.IsNotFound()
 }

@@ -53,8 +53,8 @@ func TestOrganizationsFindAll(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	organizations, apiStatus := repo.FindAll()
-	assert.False(t, apiStatus.IsNotSuccessful())
+	organizations, apiResponse := repo.FindAll()
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(organizations))
 
 	firstOrg := organizations[0]
@@ -76,16 +76,16 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 
 	var (
 		organizations []cf.Organization
-		apiStatus     net.ApiStatus
+		apiResponse   net.ApiResponse
 	)
 
 	// Capture output so debugging info does not show up in test
 	// output
 	testhelpers.CaptureOutput(func() {
-		organizations, apiStatus = repo.FindAll()
+		organizations, apiResponse = repo.FindAll()
 	})
 
-	assert.True(t, apiStatus.IsNotSuccessful())
+	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 0, len(organizations))
 }
 
@@ -144,8 +144,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
-	org, apiStatus := repo.FindByName("Org1")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	org, apiResponse := repo.FindByName("Org1")
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
 	assert.Equal(t, len(org.Spaces), 1)
@@ -155,8 +155,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.Equal(t, org.Domains[0].Name, "cfapps.io")
 	assert.Equal(t, org.Domains[0].Guid, "domain1-guid")
 
-	org, apiStatus = repo.FindByName("org1")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	org, apiResponse = repo.FindByName("org1")
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var findOrgByNameDoesNotExistResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -185,9 +185,9 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	_, apiStatus := repo.FindByName("org1")
-	assert.False(t, apiStatus.IsError())
-	assert.True(t, apiStatus.IsNotFound())
+	_, apiResponse := repo.FindByName("org1")
+	assert.False(t, apiResponse.IsError())
+	assert.True(t, apiResponse.IsNotFound())
 }
 
 var createOrgEndpoint = testhelpers.CreateEndpoint(
@@ -205,8 +205,8 @@ func TestCreateOrganization(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	apiStatus := repo.Create("my-org")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.Create("my-org")
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var renameOrgEndpoint = testhelpers.CreateEndpoint(
@@ -225,8 +225,8 @@ func TestRenameOrganization(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
-	apiStatus := repo.Rename(org, "my-new-org")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.Rename(org, "my-new-org")
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var deleteOrgEndpoint = testhelpers.CreateEndpoint(
@@ -245,8 +245,8 @@ func TestDeleteOrganization(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
-	apiStatus := repo.Delete(org)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.Delete(org)
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var findQuotaByNameEndpoint = testhelpers.CreateEndpoint(
@@ -275,8 +275,8 @@ func TestFindQuotaByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
-	quota, apiStatus := repo.FindQuotaByName("my-quota")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	quota, apiResponse := repo.FindQuotaByName("my-quota")
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota"})
 }
 
@@ -297,6 +297,6 @@ func TestUpdateQuota(t *testing.T) {
 
 	quota := cf.Quota{Guid: "my-quota-guid"}
 	org := cf.Organization{Guid: "my-org-guid"}
-	apiStatus := repo.UpdateQuota(org, quota)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.UpdateQuota(org, quota)
+	assert.False(t, apiResponse.IsNotSuccessful())
 }

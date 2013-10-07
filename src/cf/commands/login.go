@@ -49,9 +49,9 @@ func (cmd Login) Run(c *cli.Context) {
 		password = c.Args()[1]
 		cmd.ui.Say("Authenticating...")
 
-		apiStatus := cmd.doLogin(username, password)
-		if apiStatus.IsNotSuccessful() {
-			cmd.ui.Failed(apiStatus.Message)
+		apiResponse := cmd.doLogin(username, password)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
 
@@ -60,9 +60,9 @@ func (cmd Login) Run(c *cli.Context) {
 			password = cmd.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
 			cmd.ui.Say("Authenticating...")
 
-			apiStatus := cmd.doLogin(username, password)
-			if apiStatus.IsNotSuccessful() {
-				cmd.ui.Failed(apiStatus.Message)
+			apiResponse := cmd.doLogin(username, password)
+			if apiResponse.IsNotSuccessful() {
+				cmd.ui.Failed(apiResponse.Message)
 				continue
 			}
 
@@ -72,9 +72,9 @@ func (cmd Login) Run(c *cli.Context) {
 	return
 }
 
-func (cmd Login) doLogin(username, password string) (apiStatus net.ApiStatus) {
-	apiStatus = cmd.authenticator.Authenticate(username, password)
-	if apiStatus.IsSuccessful() {
+func (cmd Login) doLogin(username, password string) (apiResponse net.ApiResponse) {
+	apiResponse = cmd.authenticator.Authenticate(username, password)
+	if apiResponse.IsSuccessful() {
 		cmd.ui.Ok()
 		cmd.ui.Say("Use '%s' to view or set your target org and space", terminal.CommandColor(cf.Name+" target"))
 	}

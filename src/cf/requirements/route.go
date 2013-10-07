@@ -30,11 +30,11 @@ func NewRouteRequirement(host, domain string, ui terminal.UI, routeRepo api.Rout
 }
 
 func (req *RouteApiRequirement) Execute() bool {
-	var apiStatus net.ApiStatus
-	req.route, apiStatus = req.routeRepo.FindByHostAndDomain(req.host, req.domain)
+	var apiResponse net.ApiResponse
+	req.route, apiResponse = req.routeRepo.FindByHostAndDomain(req.host, req.domain)
 
-	if apiStatus.IsNotSuccessful() {
-		req.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		req.ui.Failed(apiResponse.Message)
 		return false
 	}
 

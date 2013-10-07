@@ -41,14 +41,14 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting space %s...", terminal.EntityNameColor(spaceName))
 
-	space, apiStatus := cmd.spaceRepo.FindByName(spaceName)
+	space, apiResponse := cmd.spaceRepo.FindByName(spaceName)
 
-	if apiStatus.IsError() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsError() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	if apiStatus.IsNotFound() {
+	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Space %s was already deleted.", spaceName)
 		return
@@ -65,9 +65,9 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		}
 	}
 
-	apiStatus = cmd.spaceRepo.Delete(space)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	apiResponse = cmd.spaceRepo.Delete(space)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

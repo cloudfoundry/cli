@@ -43,13 +43,13 @@ func TestStacksFindByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerStackRepository(config, gateway)
 
-	stack, apiStatus := repo.FindByName("linux")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	stack, apiResponse := repo.FindByName("linux")
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, stack.Name, "custom-linux")
 	assert.Equal(t, stack.Guid, "custom-linux-guid")
 
-	stack, apiStatus = repo.FindByName("stack that does not exist")
-	assert.True(t, apiStatus.IsNotSuccessful())
+	stack, apiResponse = repo.FindByName("stack that does not exist")
+	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
 var allStacksResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -104,8 +104,8 @@ func TestStacksFindAll(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerStackRepository(config, gateway)
 
-	stacks, apiStatus := repo.FindAll()
-	assert.False(t, apiStatus.IsNotSuccessful())
+	stacks, apiResponse := repo.FindAll()
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, len(stacks), 2)
 	assert.Equal(t, stacks[0].Name, "lucid64")
 	assert.Equal(t, stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")

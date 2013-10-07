@@ -36,9 +36,9 @@ func (cmd CreateService) Run(c *cli.Context) {
 	planName := c.Args()[1]
 	name := c.Args()[2]
 
-	offerings, apiStatus := cmd.serviceRepo.GetServiceOfferings()
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	offerings, apiResponse := cmd.serviceRepo.GetServiceOfferings()
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
@@ -57,9 +57,9 @@ func (cmd CreateService) Run(c *cli.Context) {
 	cmd.ui.Say("Creating service %s...", terminal.EntityNameColor(name))
 
 	var identicalAlreadyExists bool
-	identicalAlreadyExists, apiStatus = cmd.serviceRepo.CreateServiceInstance(name, plan)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

@@ -49,9 +49,9 @@ func (cmd *ReserveRoute) Run(c *cli.Context) {
 	cmd.ui.Say("Reserving url route %s for space %s...",
 		terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(space.Name))
 
-	_, apiStatus := cmd.routeRepo.CreateInSpace(route, domain, space)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	_, apiResponse := cmd.routeRepo.CreateInSpace(route, domain, space)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

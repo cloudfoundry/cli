@@ -30,10 +30,10 @@ func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 func (cmd ListRoutes) Run(c *cli.Context) {
 	cmd.ui.Say("Getting routes in space %s...", terminal.EntityNameColor(cmd.config.Space.Name))
 
-	routes, apiStatus := cmd.routeRepo.FindAll()
+	routes, apiResponse := cmd.routeRepo.FindAll()
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

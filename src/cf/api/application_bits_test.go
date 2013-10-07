@@ -158,8 +158,8 @@ func testUploadApp(t *testing.T, dir string) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	apiStatus := repo.UploadApp(app, dir)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.UploadApp(app, dir)
+	assert.False(t, apiResponse.IsNotSuccessful())
 
 	uploadDir := cf.TempDirForApp(app)
 	files, err := filepath.Glob(filepath.Join(uploadDir, "*"))

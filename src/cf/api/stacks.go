@@ -8,8 +8,8 @@ import (
 )
 
 type StackRepository interface {
-	FindByName(name string) (stack cf.Stack, apiStatus net.ApiStatus)
-	FindAll() (stacks []cf.Stack, apiStatus net.ApiStatus)
+	FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse)
+	FindAll() (stacks []cf.Stack, apiResponse net.ApiResponse)
 }
 
 type CloudControllerStackRepository struct {
@@ -23,21 +23,21 @@ func NewCloudControllerStackRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiStatus net.ApiStatus) {
+func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	findResponse := new(ApiResponse)
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiStatus = net.NewApiStatusWithMessage("Stack %s not found", name)
+		apiResponse = net.NewApiStatusWithMessage("Stack %s not found", name)
 		return
 	}
 
@@ -48,16 +48,16 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	return
 }
 
-func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiStatus net.ApiStatus) {
+func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	listResponse := new(StackApiResponse)
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 

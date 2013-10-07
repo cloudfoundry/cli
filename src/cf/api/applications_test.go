@@ -108,8 +108,8 @@ func TestFindByName(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	app, apiStatus := repo.FindByName("App1")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	app, apiResponse := repo.FindByName("App1")
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
 	assert.Equal(t, app.Memory, uint64(128))
@@ -144,9 +144,9 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	_, apiStatus := repo.FindByName("App1")
-	assert.False(t, apiStatus.IsError())
-	assert.True(t, apiStatus.IsNotFound())
+	_, apiResponse := repo.FindByName("App1")
+	assert.False(t, apiResponse.IsError())
+	assert.True(t, apiResponse.IsNotFound())
 }
 
 var setEnvEndpoint = testhelpers.CreateEndpoint(
@@ -169,9 +169,9 @@ func TestSetEnv(t *testing.T) {
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
 
-	apiStatus := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
+	apiResponse := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
-	assert.False(t, apiStatus.IsNotSuccessful())
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var createApplicationResponse = `
@@ -216,8 +216,8 @@ func TestCreateApplication(t *testing.T) {
 		Command:      "some-command",
 	}
 
-	createdApp, apiStatus := repo.Create(newApp)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	createdApp, apiResponse := repo.Create(newApp)
+	assert.False(t, apiResponse.IsNotSuccessful())
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
 }
@@ -249,8 +249,8 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 		Stack:        cf.Stack{},
 	}
 
-	_, apiStatus := repo.Create(newApp)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	_, apiResponse := repo.Create(newApp)
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestCreateRejectsInproperNames(t *testing.T) {
@@ -261,18 +261,18 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	createdApp, apiStatus := repo.Create(cf.Application{Name: "name with space"})
+	createdApp, apiResponse := repo.Create(cf.Application{Name: "name with space"})
 	assert.Equal(t, createdApp, cf.Application{})
-	assert.Contains(t, apiStatus.Message, "App name is invalid")
+	assert.Contains(t, apiResponse.Message, "App name is invalid")
 
-	_, apiStatus = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
-	assert.True(t, apiStatus.IsNotSuccessful())
+	_, apiResponse = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
+	assert.True(t, apiResponse.IsNotSuccessful())
 
-	_, apiStatus = repo.Create(cf.Application{Name: "Valid-Name"})
-	assert.False(t, apiStatus.IsNotSuccessful())
+	_, apiResponse = repo.Create(cf.Application{Name: "Valid-Name"})
+	assert.False(t, apiResponse.IsNotSuccessful())
 
-	_, apiStatus = repo.Create(cf.Application{Name: "name_with_numbers_2"})
-	assert.False(t, apiStatus.IsNotSuccessful())
+	_, apiResponse = repo.Create(cf.Application{Name: "name_with_numbers_2"})
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var deleteApplicationEndpoint = testhelpers.CreateEndpoint(
@@ -295,8 +295,8 @@ func TestDeleteApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	apiStatus := repo.Delete(app)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.Delete(app)
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 var renameAppEndpoint = testhelpers.CreateEndpoint(
@@ -315,8 +315,8 @@ func TestRename(t *testing.T) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	org := cf.Application{Guid: "my-app-guid"}
-	apiStatus := repo.Rename(org, "my-new-app")
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.Rename(org, "my-new-app")
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
@@ -334,8 +334,8 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
-	apiStatus := repo.Scale(app)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse := repo.Scale(app)
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestScaleAll(t *testing.T) {
@@ -401,8 +401,8 @@ func TestStartApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	updatedApp, apiStatus := repo.Start(app)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	updatedApp, apiResponse := repo.Start(app)
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "started", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
@@ -437,8 +437,8 @@ func TestStopApplication(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	updatedApp, apiStatus := repo.Stop(app)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	updatedApp, apiResponse := repo.Stop(app)
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "stopped", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
@@ -472,8 +472,8 @@ func TestGetInstances(t *testing.T) {
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	instances, apiStatus := repo.GetInstances(app)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	instances, apiResponse := repo.GetInstances(app)
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")

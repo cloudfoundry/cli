@@ -21,14 +21,14 @@ func TestCloudControllerGatewayErrorHandling(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(failingCloudControllerRequest))
 	defer ts.Close()
 
-	request, apiStatus := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+	assert.False(t, apiResponse.IsNotSuccessful())
 
-	apiStatus = gateway.PerformRequest(request)
+	apiResponse = gateway.PerformRequest(request)
 
-	assert.True(t, apiStatus.IsNotSuccessful())
-	assert.Contains(t, apiStatus.Message, "The host is taken: test1")
-	assert.Contains(t, apiStatus.ErrorCode, "210003")
+	assert.True(t, apiResponse.IsNotSuccessful())
+	assert.Contains(t, apiResponse.Message, "The host is taken: test1")
+	assert.Contains(t, apiResponse.ErrorCode, "210003")
 }
 
 var invalidTokenCloudControllerRequest = func(writer http.ResponseWriter, request *http.Request) {
@@ -43,12 +43,12 @@ func TestCloudControllerGatewayInvalidTokenHandling(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(invalidTokenCloudControllerRequest))
 	defer ts.Close()
 
-	request, apiStatus := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+	assert.False(t, apiResponse.IsNotSuccessful())
 
-	apiStatus = gateway.PerformRequest(request)
+	apiResponse = gateway.PerformRequest(request)
 
-	assert.True(t, apiStatus.IsNotSuccessful())
-	assert.Contains(t, apiStatus.Message, "The token is invalid")
-	assert.Contains(t, apiStatus.ErrorCode, INVALID_TOKEN_CODE)
+	assert.True(t, apiResponse.IsNotSuccessful())
+	assert.Contains(t, apiResponse.Message, "The token is invalid")
+	assert.Contains(t, apiResponse.ErrorCode, INVALID_TOKEN_CODE)
 }

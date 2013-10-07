@@ -28,11 +28,11 @@ func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRe
 }
 
 func (req *ApplicationApiRequirement) Execute() (success bool) {
-	var apiStatus net.ApiStatus
-	req.application, apiStatus = req.appRepo.FindByName(req.name)
+	var apiResponse net.ApiResponse
+	req.application, apiResponse = req.appRepo.FindByName(req.name)
 
-	if apiStatus.IsNotSuccessful() {
-		req.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		req.ui.Failed(apiResponse.Message)
 		return false
 	}
 

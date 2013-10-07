@@ -9,13 +9,13 @@ import (
 )
 
 type RouteRepository interface {
-	FindAll() (routes []cf.Route, apiStatus net.ApiStatus)
-	FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus)
-	FindByHostAndDomain(host, domain string) (route cf.Route, apiStatus net.ApiStatus)
-	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus)
-	CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiStatus net.ApiStatus)
-	Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
-	Unbind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus)
+	FindAll() (routes []cf.Route, apiResponse net.ApiResponse)
+	FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse)
+	FindByHostAndDomain(host, domain string) (route cf.Route, apiResponse net.ApiResponse)
+	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiResponse net.ApiResponse)
+	CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiResponse net.ApiResponse)
+	Bind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse)
+	Unbind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerRouteRepository struct {
@@ -31,17 +31,17 @@ func NewCloudControllerRouteRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
 
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(RoutesResponse)
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -68,22 +68,22 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiStat
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
 
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiStatus = net.NewApiStatusWithMessage("Route not found")
+		apiResponse = net.NewApiStatusWithMessage("Route not found")
 		return
 	}
 
@@ -94,26 +94,26 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiStatus net.ApiStatus) {
-	domain, apiStatus := repo.domainRepo.FindByNameInCurrentSpace(domainName)
-	if apiStatus.IsNotSuccessful() {
+func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiResponse net.ApiResponse) {
+	domain, apiResponse := repo.domainRepo.FindByNameInCurrentSpace(domainName)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/routes?q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiStatus = net.NewNotFoundApiStatus("Route", fmt.Sprintf("%s.%s", host, domainName))
+		apiResponse = net.NewNotFoundApiStatus("Route", fmt.Sprintf("%s.%s", host, domainName))
 		return
 	}
 
@@ -125,24 +125,24 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 	return
 }
 
-func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiResponse net.ApiResponse) {
 	return repo.CreateInSpace(newRoute, domain, repo.config.Space)
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/routes", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`,
 		newRoute.Host, domain.Guid, space.Guid,
 	)
-	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	resource := new(Resource)
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, resource)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -151,22 +151,22 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 	return
 }
 
-func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
 	return repo.change("PUT", route, app)
 }
 
-func (repo CloudControllerRouteRepository) Unbind(route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) Unbind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
 	return repo.change("DELETE", route, app)
 }
 
-func (repo CloudControllerRouteRepository) change(verb string, route cf.Route, app cf.Application) (apiStatus net.ApiStatus) {
+func (repo CloudControllerRouteRepository) change(verb string, route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
-	request, apiStatus := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 
 	return
 }

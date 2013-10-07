@@ -31,61 +31,61 @@ type FakeOrgRepository struct {
 	UpdateQuotaQuota cf.Quota
 }
 
-func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus) {
+func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse) {
 	orgs = repo.Organizations
 	return
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiStatus net.ApiStatus) {
+func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	org = repo.FindByNameOrganization
 
 	if repo.FindByNameErr {
-		apiStatus = net.NewApiStatusWithMessage("Error finding organization by name.")
+		apiResponse = net.NewApiStatusWithMessage("Error finding organization by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiStatus = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiStatus("Org", name)
 	}
 
 	return
 }
 
-func (repo *FakeOrgRepository) Create(name string) (apiStatus net.ApiStatus) {
+func (repo *FakeOrgRepository) Create(name string) (apiResponse net.ApiResponse) {
 	if repo.CreateOrgExists {
-		apiStatus = net.NewApiStatus("Space already exists", api.ORG_EXISTS, 400)
+		apiResponse = net.NewApiStatus("Space already exists", api.ORG_EXISTS, 400)
 		return
 	}
 	repo.CreateName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiStatus net.ApiStatus) {
+func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiResponse net.ApiResponse) {
 	repo.RenameOrganization = org
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiStatus net.ApiStatus) {
+func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
 	repo.DeletedOrganization = org
 	return
 }
 
-func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, apiStatus net.ApiStatus) {
+func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, apiResponse net.ApiResponse) {
 	repo.FindQuotaByNameName = name
 	quota = repo.FindQuotaByNameQuota
 
 	if repo.FindQuotaByNameNotFound {
-		apiStatus = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiStatus("Org", name)
 	}
 	if repo.FindQuotaByNameErr {
-		apiStatus = net.NewApiStatusWithMessage("Error finding quota")
+		apiResponse = net.NewApiStatusWithMessage("Error finding quota")
 	}
 
 	return
 }
 
-func (repo *FakeOrgRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiStatus net.ApiStatus) {
+func (repo *FakeOrgRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse) {
 	repo.UpdateQuotaOrg = org
 	repo.UpdateQuotaQuota = quota
 	return

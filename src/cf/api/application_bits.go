@@ -17,7 +17,7 @@ import (
 )
 
 type ApplicationBitsRepository interface {
-	UploadApp(app cf.Application, dir string) (apiStatus net.ApiStatus)
+	UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -33,9 +33,9 @@ func NewCloudControllerApplicationBitsRepository(config *configuration.Configura
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiStatus net.ApiStatus) {
-	dir, resourcesJson, apiStatus := repo.createUploadDir(app, dir)
-	if apiStatus.IsNotSuccessful() {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse) {
+	dir, resourcesJson, apiResponse := repo.createUploadDir(app, dir)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -44,42 +44,42 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 		return
 	}
 
-	apiStatus = repo.uploadBits(app, zipBuffer, resourcesJson)
-	if apiStatus.IsNotSuccessful() {
+	apiResponse = repo.uploadBits(app, zipBuffer, resourcesJson)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipBuffer *bytes.Buffer, resourcesJson []byte) (apiStatus net.ApiStatus) {
+func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipBuffer *bytes.Buffer, resourcesJson []byte) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, app.Guid)
 
 	body, boundary, err := createApplicationUploadBody(zipBuffer, resourcesJson)
 	if err != nil {
-		apiStatus = net.NewApiStatusWithError("Error creating upload", err)
+		apiResponse = net.NewApiStatusWithError("Error creating upload", err)
 		return
 	}
 
-	request, apiStatus := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
+	request, apiResponse := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 	request.Header.Set("Content-Type", contentType)
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Application, appDir string) (uploadDir string, resourcesJson []byte, apiStatus net.ApiStatus) {
+func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Application, appDir string) (uploadDir string, resourcesJson []byte, apiResponse net.ApiResponse) {
 	var err error
 
 	// If appDir is a zip, first extract it to a temporary directory
 	if fileIsZip(appDir) {
 		appDir, err = extractZip(app, appDir)
 		if err != nil {
-			apiStatus = net.NewApiStatusWithError("Error extracting archive", err)
+			apiResponse = net.NewApiStatusWithError("Error extracting archive", err)
 			return
 		}
 	}
@@ -87,12 +87,12 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 	// Find which files need to be uploaded
 	allAppFiles, err := cf.AppFilesInDir(appDir)
 	if err != nil {
-		apiStatus = net.NewApiStatusWithError("Error listing app files", err)
+		apiResponse = net.NewApiStatusWithError("Error listing app files", err)
 		return
 	}
 
-	appFilesToUpload, resourcesJson, apiStatus := repo.getFilesToUpload(allAppFiles)
-	if apiStatus.IsNotSuccessful() {
+	appFilesToUpload, resourcesJson, apiResponse := repo.getFilesToUpload(allAppFiles)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -101,13 +101,13 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 
 	err = cf.InitializeDir(uploadDir)
 	if err != nil {
-		apiStatus = net.NewApiStatusWithError("Error creating upload directory", err)
+		apiResponse = net.NewApiStatusWithError("Error creating upload directory", err)
 		return
 	}
 
 	err = cf.CopyFiles(appFilesToUpload, appDir, uploadDir)
 	if err != nil {
-		apiStatus = net.NewApiStatusWithError("Error copying files to temp directory", err)
+		apiResponse = net.NewApiStatusWithError("Error copying files to temp directory", err)
 		return
 	}
 
@@ -173,7 +173,7 @@ func extractZip(app cf.Application, zipFile string) (destDir string, err error) 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []cf.AppFile) (appFilesToUpload []cf.AppFile, resourcesJson []byte, apiStatus net.ApiStatus) {
+func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []cf.AppFile) (appFilesToUpload []cf.AppFile, resourcesJson []byte, apiResponse net.ApiResponse) {
 	appFilesRequest := []AppFile{}
 	for _, file := range allAppFiles {
 		appFilesRequest = append(appFilesRequest, AppFile{
@@ -185,18 +185,18 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 
 	resourcesJson, err := json.Marshal(appFilesRequest)
 	if err != nil {
-		apiStatus = net.NewApiStatusWithError("Failed to create json for resource_match request", err)
+		apiResponse = net.NewApiStatusWithError("Failed to create json for resource_match request", err)
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/resource_match", repo.config.Target)
-	req, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(resourcesJson))
-	if apiStatus.IsNotSuccessful() {
+	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(resourcesJson))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	res := []AppFile{}
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(req, &res)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, &res)
 
 	appFilesToUpload = make([]cf.AppFile, len(allAppFiles))
 	copy(appFilesToUpload, allAppFiles)

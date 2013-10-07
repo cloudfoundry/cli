@@ -42,21 +42,21 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting service %s...", terminal.EntityNameColor(serviceName))
 
-	instance, apiStatus := cmd.serviceRepo.FindInstanceByName(serviceName)
+	instance, apiResponse := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-	if apiStatus.IsError() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsError() {
+		cmd.ui.Failed(apiResponse.Message)
 	}
 
-	if apiStatus.IsNotFound() {
+	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service %s does not exist.", serviceName)
 		return
 	}
 
-	apiStatus = cmd.serviceRepo.DeleteService(instance)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	apiResponse = cmd.serviceRepo.DeleteService(instance)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

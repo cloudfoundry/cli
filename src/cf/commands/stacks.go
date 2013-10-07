@@ -26,9 +26,9 @@ func (cmd *Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 func (cmd *Stacks) Run(c *cli.Context) {
 	cmd.ui.Say("Getting stacks...")
 
-	stacks, apiStatus := cmd.stacksRepo.FindAll()
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	stacks, apiResponse := cmd.stacksRepo.FindAll()
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

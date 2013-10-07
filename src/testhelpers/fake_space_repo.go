@@ -31,47 +31,47 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiStatus net.ApiStatus) {
+func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiResponse net.ApiResponse) {
 	spaces = repo.Spaces
 	return
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiStatus net.ApiStatus) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	space = repo.FindByNameSpace
 
 	if repo.FindByNameErr {
-		apiStatus = net.NewApiStatusWithMessage("Error finding space by name.")
+		apiResponse = net.NewApiStatusWithMessage("Error finding space by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiStatus = net.NewNotFoundApiStatus("Space", name)
+		apiResponse = net.NewNotFoundApiStatus("Space", name)
 	}
 
 	return
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiStatus net.ApiStatus) {
+func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiResponse net.ApiResponse) {
 	space = repo.SummarySpace
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string) (apiStatus net.ApiStatus) {
+func (repo *FakeSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
 	if repo.CreateSpaceExists {
-		apiStatus = net.NewApiStatus("Space already exists", api.SPACE_EXISTS, 400)
+		apiResponse = net.NewApiStatus("Space already exists", api.SPACE_EXISTS, 400)
 		return
 	}
 	repo.CreateSpaceName = name
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiStatus net.ApiStatus) {
+func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiResponse net.ApiResponse) {
 	repo.RenameSpace = space
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiStatus net.ApiStatus) {
+func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiResponse net.ApiResponse) {
 	repo.DeletedSpace = space
 	return
 }

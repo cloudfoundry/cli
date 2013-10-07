@@ -9,13 +9,13 @@ import (
 )
 
 type OrganizationRepository interface {
-	FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus)
-	FindByName(name string) (org cf.Organization, apiStatus net.ApiStatus)
-	Create(name string) (apiStatus net.ApiStatus)
-	Rename(org cf.Organization, name string) (apiStatus net.ApiStatus)
-	Delete(org cf.Organization) (apiStatus net.ApiStatus)
-	FindQuotaByName(name string) (quota cf.Quota, apiStatus net.ApiStatus)
-	UpdateQuota(org cf.Organization, quota cf.Quota) (apiStatus net.ApiStatus)
+	FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse)
+	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
+	Create(name string) (apiResponse net.ApiResponse)
+	Rename(org cf.Organization, name string) (apiResponse net.ApiResponse)
+	Delete(org cf.Organization) (apiResponse net.ApiResponse)
+	FindQuotaByName(name string) (quota cf.Quota, apiResponse net.ApiResponse)
+	UpdateQuota(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -29,17 +29,17 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/organizations"
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 	response := new(OrganizationsApiResponse)
 
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -54,22 +54,22 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 	response := new(OrganizationsApiResponse)
 
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiStatus = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiStatus("Org", name)
 		return
 	}
 
@@ -96,60 +96,60 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Create(name string) (apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) Create(name string) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/organizations"
 	data := fmt.Sprintf(
 		`{"name":"%s"}`, name,
 	)
-	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
-	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (quota cf.Quota, apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (quota cf.Quota, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/quota_definitions?q=name%%3A%s", repo.config.Target, name)
 
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
 
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiStatus.IsNotSuccessful() {
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiStatus = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiStatus("Org", name)
 		return
 	}
 
@@ -160,14 +160,14 @@ func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiStatus net.ApiStatus) {
+func (repo CloudControllerOrganizationRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quota.Guid)
-	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }

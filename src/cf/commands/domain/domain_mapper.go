@@ -55,8 +55,8 @@ func (cmd *DomainMapper) GetRequirements(reqFactory requirements.Factory, c *cli
 
 func (cmd *DomainMapper) Run(c *cli.Context) {
 	var (
-		apiStatus net.ApiStatus
-		domain    cf.Domain
+		apiResponse net.ApiResponse
+		domain      cf.Domain
 	)
 
 	domainName := c.Args()[1]
@@ -69,20 +69,20 @@ func (cmd *DomainMapper) Run(c *cli.Context) {
 		cmd.ui.Say("Unmapping domain %s from space %s...", domainName, space.Name)
 	}
 
-	domain, apiStatus = cmd.domainRepo.FindByNameInOrg(domainName, org)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiStatus.Message)
+	domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, org)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Message)
 		return
 	}
 
 	if cmd.bind {
-		apiStatus = cmd.domainRepo.MapDomain(domain, space)
+		apiResponse = cmd.domainRepo.MapDomain(domain, space)
 	} else {
-		apiStatus = cmd.domainRepo.UnmapDomain(domain, space)
+		apiResponse = cmd.domainRepo.UnmapDomain(domain, space)
 	}
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

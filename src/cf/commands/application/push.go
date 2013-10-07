@@ -57,17 +57,17 @@ func (cmd Push) Run(c *cli.Context) {
 
 	appName := c.Args()[0]
 
-	app, apiStatus := cmd.appRepo.FindByName(appName)
-	if apiStatus.IsError() {
-		cmd.ui.Failed(apiStatus.Message)
+	app, apiResponse := cmd.appRepo.FindByName(appName)
+	if apiResponse.IsError() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	if apiStatus.IsNotFound() {
-		app, apiStatus = cmd.createApp(appName, c)
+	if apiResponse.IsNotFound() {
+		app, apiResponse = cmd.createApp(appName, c)
 
-		if apiStatus.IsNotSuccessful() {
-			cmd.ui.Failed(apiStatus.Message)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
 	}
@@ -83,7 +83,7 @@ func (cmd Push) Run(c *cli.Context) {
 		}
 	}
 
-	apiStatus = cmd.appBitsRepo.UploadApp(app, dir)
+	apiResponse = cmd.appBitsRepo.UploadApp(app, dir)
 
 	cmd.ui.Ok()
 	updatedApp, _ := cmd.stopper.ApplicationStop(app)
@@ -95,7 +95,7 @@ func (cmd Push) Run(c *cli.Context) {
 	}
 }
 
-func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiStatus net.ApiStatus) {
+func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
 	domainName := c.String("d")
 	newApp := cf.Application{
 		Name:         appName,
@@ -108,10 +108,10 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	stackName := c.String("s")
 	if stackName != "" {
 		var stack cf.Stack
-		stack, apiStatus = cmd.stackRepo.FindByName(stackName)
+		stack, apiResponse = cmd.stackRepo.FindByName(stackName)
 
-		if apiStatus.IsNotSuccessful() {
-			cmd.ui.Failed(apiStatus.Message)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
 		newApp.Stack = stack
@@ -119,17 +119,17 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	}
 
 	cmd.ui.Say("Creating %s...", terminal.EntityNameColor(appName))
-	app, apiStatus = cmd.appRepo.Create(newApp)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	app, apiResponse = cmd.appRepo.Create(newApp)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 	cmd.ui.Ok()
 
-	domain, apiStatus := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
+	domain, apiResponse := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
@@ -138,16 +138,16 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		hostName = app.Name
 	}
 
-	route, apiStatus := cmd.routeRepo.FindByHost(hostName)
+	route, apiResponse := cmd.routeRepo.FindByHost(hostName)
 
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		newRoute := cf.Route{Host: hostName}
 
 		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
-		route, apiStatus = cmd.routeRepo.Create(newRoute, domain)
-		if apiStatus.IsNotSuccessful() {
-			cmd.ui.Failed(apiStatus.Message)
+		route, apiResponse = cmd.routeRepo.Create(newRoute, domain)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
 		cmd.ui.Ok()
@@ -158,9 +158,9 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	finalUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
 	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
-	apiStatus = cmd.routeRepo.Bind(route, app)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	apiResponse = cmd.routeRepo.Bind(route, app)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 	cmd.ui.Ok()

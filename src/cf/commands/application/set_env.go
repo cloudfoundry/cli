@@ -61,10 +61,10 @@ func (se *SetEnv) Run(c *cli.Context) {
 
 	envVars[varName] = varValue
 
-	apiStatus := se.appRepo.SetEnv(app, envVars)
+	apiResponse := se.appRepo.SetEnv(app, envVars)
 
-	if apiStatus.IsNotSuccessful() {
-		se.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		se.ui.Failed(apiResponse.Message)
 		return
 	}
 

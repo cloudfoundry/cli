@@ -28,11 +28,11 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRe
 }
 
 func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
-	var apiStatus net.ApiStatus
-	req.serviceInstance, apiStatus = req.serviceRepo.FindInstanceByName(req.name)
+	var apiResponse net.ApiResponse
+	req.serviceInstance, apiResponse = req.serviceRepo.FindInstanceByName(req.name)
 
-	if apiStatus.IsNotSuccessful() {
-		req.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		req.ui.Failed(apiResponse.Message)
 		return false
 	}
 

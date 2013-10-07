@@ -48,22 +48,22 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
 
-	app, apiStatus := cmd.appRepo.FindByName(appName)
+	app, apiResponse := cmd.appRepo.FindByName(appName)
 
-	if apiStatus.IsError() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsError() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	if apiStatus.IsNotFound() {
+	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return
 	}
 
-	apiStatus = cmd.appRepo.Delete(app)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	apiResponse = cmd.appRepo.Delete(app)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

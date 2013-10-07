@@ -55,24 +55,24 @@ func (cmd *RouteMapper) Run(c *cli.Context) {
 	route := cmd.routeReq.GetRoute()
 	app := cmd.appReq.GetApplication()
 
-	var apiStatus net.ApiStatus
+	var apiResponse net.ApiResponse
 
 	if cmd.bind {
 		cmd.ui.Say("Adding url route %s to app %s...",
 			terminal.EntityNameColor(route.URL()),
 			terminal.EntityNameColor(app.Name))
 
-		apiStatus = cmd.routeRepo.Bind(route, app)
+		apiResponse = cmd.routeRepo.Bind(route, app)
 	} else {
 		cmd.ui.Say("Removing url route %s from app %s...",
 			terminal.EntityNameColor(route.URL()),
 			terminal.EntityNameColor(app.Name))
 
-		apiStatus = cmd.routeRepo.Unbind(route, app)
+		apiResponse = cmd.routeRepo.Unbind(route, app)
 	}
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

@@ -20,9 +20,9 @@ func TestNewRequest(t *testing.T) {
 	// arbitrarily picking cloud controller to test
 	gateway := NewCloudControllerGateway()
 
-	request, apiStatus := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
-	assert.False(t, apiStatus.IsNotSuccessful())
+	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, request.Header.Get("Authorization"), "BEARER my-access-token")
 	assert.Equal(t, request.Header.Get("accept"), "application/json")
 	assert.Equal(t, request.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
@@ -119,11 +119,11 @@ func testRefreshToken(t *testing.T, configRepo configuration.ConfigurationReposi
 	config, err := configRepo.Get()
 	assert.NoError(t, err)
 
-	request, apiStatus := gateway.NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
-	assert.False(t, apiStatus.IsNotSuccessful())
+	request, apiResponse := gateway.NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
+	assert.False(t, apiResponse.IsNotSuccessful())
 
-	apiStatus = gateway.PerformRequest(request)
-	assert.False(t, apiStatus.IsNotSuccessful())
+	apiResponse = gateway.PerformRequest(request)
+	assert.False(t, apiResponse.IsNotSuccessful())
 
 	savedConfig := testhelpers.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")

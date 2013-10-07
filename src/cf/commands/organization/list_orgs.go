@@ -28,9 +28,9 @@ func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("Getting orgs...")
 
-	orgs, apiStatus := cmd.orgRepo.FindAll()
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	orgs, apiResponse := cmd.orgRepo.FindAll()
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

@@ -59,25 +59,25 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
 
-	updatedApp, apiStatus := cmd.appRepo.Start(app)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	updatedApp, apiResponse := cmd.appRepo.Start(app)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
 	cmd.ui.Ok()
 
-	instances, apiStatus := cmd.appRepo.GetInstances(app)
+	instances, apiResponse := cmd.appRepo.GetInstances(app)
 
-	for apiStatus.IsNotSuccessful() {
-		if apiStatus.ErrorCode != api.APP_NOT_STAGED {
+	for apiResponse.IsNotSuccessful() {
+		if apiResponse.ErrorCode != api.APP_NOT_STAGED {
 			cmd.ui.Say("")
-			cmd.ui.Failed(apiStatus.Message)
+			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
 
 		cmd.ui.Wait(1 * time.Second)
-		instances, apiStatus = cmd.appRepo.GetInstances(app)
+		instances, apiResponse = cmd.appRepo.GetInstances(app)
 		cmd.ui.LoadingIndication()
 	}
 

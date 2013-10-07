@@ -17,7 +17,7 @@ type FakeAuthenticationRepository struct {
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticationRepository) Authenticate(email string, password string) (apiStatus net.ApiStatus) {
+func (auth *FakeAuthenticationRepository) Authenticate(email string, password string) (apiResponse net.ApiResponse) {
 	auth.Config, _ = auth.ConfigRepo.Get()
 	auth.Email = email
 	auth.Password = password
@@ -31,11 +31,11 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 	auth.ConfigRepo.Save()
 
 	if auth.AuthError {
-		apiStatus =  net.NewApiStatusWithMessage("Error authenticating.")
+		apiResponse =  net.NewApiStatusWithMessage("Error authenticating.")
 	}
 	return
 }
 
-func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiStatus net.ApiStatus) {
+func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse) {
 	return
 }

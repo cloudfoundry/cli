@@ -43,9 +43,9 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating user provided service...")
 
-	apiStatus := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	apiResponse := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

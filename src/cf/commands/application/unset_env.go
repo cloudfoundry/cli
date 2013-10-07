@@ -54,10 +54,10 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 
 	delete(envVars, varName)
 
-	apiStatus := cmd.appRepo.SetEnv(app, envVars)
+	apiResponse := cmd.appRepo.SetEnv(app, envVars)
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

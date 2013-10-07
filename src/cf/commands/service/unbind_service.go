@@ -45,9 +45,9 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Unbinding service %s from %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
-	found, apiStatus := cmd.serviceRepo.UnbindService(instance, app)
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed(apiStatus.Message)
+	found, apiResponse := cmd.serviceRepo.UnbindService(instance, app)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

@@ -76,9 +76,9 @@ func TestApiWhenUrlIsMissingScheme(t *testing.T) {
 	gateway := net.NewCloudControllerGateway()
 	repo := NewEndpointRepository(config, gateway, configRepo)
 
-	apiStatus := repo.UpdateEndpoint("example.com")
+	apiResponse := repo.UpdateEndpoint("example.com")
 
-	assert.True(t, apiStatus.IsNotSuccessful())
+	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
 var notFoundApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -92,9 +92,9 @@ func TestApiWhenEndpointReturns404(t *testing.T) {
 	ts, repo := createRepo(configRepo, notFoundApiEndpoint)
 	defer ts.Close()
 
-	apiStatus := repo.UpdateEndpoint(ts.URL)
+	apiResponse := repo.UpdateEndpoint(ts.URL)
 
-	assert.True(t, apiStatus.IsNotSuccessful())
+	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
 var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -108,9 +108,9 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 	ts, repo := createRepo(configRepo, invalidJsonResponseApiEndpoint)
 	defer ts.Close()
 
-	apiStatus := repo.UpdateEndpoint(ts.URL)
+	apiResponse := repo.UpdateEndpoint(ts.URL)
 
-	assert.True(t, apiStatus.IsNotSuccessful())
+	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
 func createRepo(configRepo testhelpers.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {

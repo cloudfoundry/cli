@@ -10,12 +10,12 @@ import (
 
 type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
-	FindAll() (spaces []cf.Space, apiStatus net.ApiStatus)
-	FindByName(name string) (space cf.Space, apiStatus net.ApiStatus)
-	GetSummary() (space cf.Space, apiStatus net.ApiStatus)
-	Create(name string) (apiStatus net.ApiStatus)
-	Rename(space cf.Space, newName string) (apiStatus net.ApiStatus)
-	Delete(space cf.Space) (apiStatus net.ApiStatus)
+	FindAll() (spaces []cf.Space, apiResponse net.ApiResponse)
+	FindByName(name string) (space cf.Space, apiResponse net.ApiResponse)
+	GetSummary() (space cf.Space, apiResponse net.ApiResponse)
+	Create(name string) (apiResponse net.ApiResponse)
+	Rename(space cf.Space, newName string) (apiResponse net.ApiResponse)
+	Delete(space cf.Space) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -33,18 +33,18 @@ func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.config.Space
 }
 
-func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiStatus net.ApiStatus) {
+func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces", repo.config.Target, repo.config.Organization.Guid)
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(ApiResponse)
 
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -55,25 +55,25 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiStat
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiStatus net.ApiStatus) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces?q=name%s&inline-relations-depth=1",
 		repo.config.Target, repo.config.Organization.Guid, "%3A"+strings.ToLower(name))
 
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(SpaceApiResponse)
 
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(response.Resources) == 0 {
-		apiStatus = net.NewNotFoundApiStatus("Space", name)
+		apiResponse = net.NewNotFoundApiStatus("Space", name)
 		return
 	}
 
@@ -106,17 +106,17 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 	return
 }
 
-func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiStatus net.ApiStatus) {
+func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, apiStatus := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	response := new(SpaceSummary) // but not an ApiResponse
-	_, apiStatus = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
-	if apiStatus.IsNotSuccessful() {
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -128,41 +128,41 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiStat
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string) (apiStatus net.ApiStatus) {
+func (repo CloudControllerSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
 
-	request, apiStatus := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiStatus net.ApiStatus) {
+func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 
-	request, apiStatus := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiStatus net.ApiStatus) {
+func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, space.Guid)
 
-	request, apiStatus := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiStatus.IsNotSuccessful() {
+	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiStatus = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
