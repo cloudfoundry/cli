@@ -21,7 +21,7 @@ func NewCreateServiceAuthToken(ui terminal.UI, authTokenRepo api.ServiceAuthToke
 }
 
 func (cmd CreateServiceAuthToken) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
+	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c, "create-service-auth-token")
 		return
@@ -38,8 +38,8 @@ func (cmd CreateServiceAuthToken) Run(c *cli.Context) {
 
 	serviceAuthTokenRepo := cf.ServiceAuthToken{
 		Label:    c.Args()[0],
-		Token:    c.Args()[1],
-		Provider: c.String("p"),
+		Provider: c.Args()[1],
+		Token:    c.Args()[2],
 	}
 
 	apiResponse := cmd.authTokenRepo.Create(serviceAuthTokenRepo)
