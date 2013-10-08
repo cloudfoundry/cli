@@ -86,7 +86,7 @@ func extractLogHeader(appName string, msg *logmessage.Message) (logHeader, color
 	sourceType := msg.GetShortSourceTypeName()
 	sourceId := logMsg.GetSourceId()
 	t := time.Unix(0, logMsg.GetTimestamp())
-	timeFormat := "2006-01-02T15:04:05.00Z07:00"
+	timeFormat := "2006-01-02T15:04:05.00-0700"
 	timeString := t.Format(timeFormat)
 
 	logHeader = fmt.Sprintf("%s %s [%s]", timeString, appName, sourceType)

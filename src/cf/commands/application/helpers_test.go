@@ -22,7 +22,9 @@ func TestLogMessageOutput(t *testing.T) {
 	zone, _ := time.Now().Zone()
 	date := fmt.Sprintf("2013 Sep 20 09:33:30 %s", zone)
 	logTime, err := time.Parse("2006 Jan 2 15:04:05 MST", date)
+
 	assert.NoError(t, err)
+	expectedTZ := logTime.Format("-0700")
 
 	timestamp := logTime.UnixNano()
 
@@ -37,43 +39,43 @@ func TestLogMessageOutput(t *testing.T) {
 	}
 
 	msg := createMessage(t, protoMessage, &cloud_controller, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [API]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [API]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 
 	msg = createMessage(t, protoMessage, &cloud_controller, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [API]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [API]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "1"
 	msg = createMessage(t, protoMessage, &router, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Router]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [Router]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &router, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Router]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [Router]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "2"
 	msg = createMessage(t, protoMessage, &uaa, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [UAA]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [UAA]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &uaa, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [UAA]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [UAA]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "3"
 	msg = createMessage(t, protoMessage, &dea, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Executor]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [Executor]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &dea, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Executor]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [Executor]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "4"
 	msg = createMessage(t, protoMessage, &wardenContainer, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [App/4]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [App/4]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &wardenContainer, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [App/4]")
+	assert.Contains(t, logMessageOutput("my-app", msg), fmt.Sprintf("2013-09-20T09:33:30.00%s my-app [App/4]", expectedTZ))
 	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 }
 
