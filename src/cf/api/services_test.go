@@ -57,21 +57,12 @@ var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, 
   ]
 }`}
 
-var multipleOfferingsEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/services?inline-relations-depth=1",
-	nil,
-	multipleOfferingsResponse,
-)
-
-func TestGetServiceOfferings(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOfferingsEndpoint))
+func testGetServiceOfferings(t *testing.T, endpoint func(writer http.ResponseWriter, request *http.Request), config *configuration.Configuration) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	defer ts.Close()
 
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
+	config.Target = ts.URL
+
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerServiceRepository(config, gateway)
 	offerings, apiResponse := repo.GetServiceOfferings()
@@ -95,6 +86,35 @@ func TestGetServiceOfferings(t *testing.T) {
 	assert.Equal(t, secondOffering.Label, "Offering 2")
 	assert.Equal(t, secondOffering.Guid, "offering-2-guid")
 	assert.Equal(t, len(secondOffering.Plans), 1)
+}
+
+var multipleOfferingsEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/services?inline-relations-depth=1",
+	nil,
+	multipleOfferingsResponse,
+)
+
+func TestGetServiceOfferingsWhenNotTargetingASpace(t *testing.T) {
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+	}
+	testGetServiceOfferings(t, multipleOfferingsEndpoint, config)
+}
+
+var multipleOfferingsInSpaceEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+	nil,
+	multipleOfferingsResponse,
+)
+
+func TestGetServiceOfferingsWhenTargetingASpace(t *testing.T) {
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	testGetServiceOfferings(t, multipleOfferingsInSpaceEndpoint, config)
 }
 
 var createServiceInstanceEndpoint = testhelpers.CreateEndpoint(
