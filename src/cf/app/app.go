@@ -81,6 +81,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "create-service-auth-token",
+			Description: "Create a service auth token",
+			Usage:       fmt.Sprintf("%s create-service-auth-token LABEL PROVIDER VALUE", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("create-service-auth-token")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "create-space",
 			Description: "Create a space",
 			Usage:       fmt.Sprintf("%s create-space SPACE", cf.Name),
