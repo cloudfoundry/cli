@@ -97,7 +97,7 @@ func LogStdoutColor(message string) string {
 }
 
 func LogStderrColor(message string) string {
-	return colorize(message, magenta, false)
+	return colorize(message, red, false)
 }
 
 func LogAppHeaderColor(message string) string {
