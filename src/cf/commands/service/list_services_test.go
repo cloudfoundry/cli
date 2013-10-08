@@ -30,6 +30,9 @@ func TestServices(t *testing.T) {
 			},
 			ApplicationNames: []string{"cli1"},
 		},
+		cf.ServiceInstance{
+			Name: "my-service-provided-by-user",
+		},
 	}
 	spaceRepo := &testhelpers.FakeSpaceRepository{
 		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
@@ -52,4 +55,7 @@ func TestServices(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "cleardb")
 	assert.Contains(t, ui.Outputs[4], "spark")
 	assert.Contains(t, ui.Outputs[4], "cli1")
+
+	assert.Contains(t, ui.Outputs[5], "my-service-provided-by-user")
+	assert.Contains(t, ui.Outputs[5], "user-provided")
 }
