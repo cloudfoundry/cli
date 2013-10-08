@@ -27,6 +27,10 @@ func (repo CloudControllerServiceAuthTokenRepository) Create(authToken cf.Servic
 	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
 	body := fmt.Sprintf(`{"label":"%s","provider":"%s","token":"%s"}`, authToken.Label, authToken.Provider, authToken.Value)
 
+	if authToken.Provider == "" {
+		body = fmt.Sprintf(`{"label":"%s","token":"%s"}`, authToken.Label, authToken.Value)
+	}
+
 	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiResponse.IsNotSuccessful() {
 		return

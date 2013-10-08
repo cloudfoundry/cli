@@ -83,7 +83,10 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "create-service-auth-token",
 			Description: "Create a service auth token",
-			Usage:       fmt.Sprintf("%s create-service-auth-token LABEL PROVIDER VALUE", cf.Name),
+			Usage:       fmt.Sprintf("%s create-service-auth-token LABEL VALUE [-p PROVIDER]", cf.Name),
+			Flags: []cli.Flag{
+				cli.StringFlag{"p", "", "Provider"},
+			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("create-service-auth-token")
 				cmdRunner.Run(cmd, c)
