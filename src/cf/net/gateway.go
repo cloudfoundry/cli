@@ -74,6 +74,8 @@ func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes [
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Error reading response", err)
 	}
+
+	headers = rawResponse.Header
 	return
 }
 

@@ -16,6 +16,7 @@ var successMatcher = func(*http.Request) bool {
 type TestResponse struct {
 	Body string
 	Status int
+	Header http.Header
 }
 
 func RemoveWhiteSpaceFromBody(body string) string {
@@ -75,6 +76,14 @@ var CreateEndpoint = func(method string, path string, customMatcher RequestMatch
 		if len(paths) > 1 {
 			queryStringMatches := strings.Contains(request.RequestURI, paths[1])
 			pathMatches = pathMatches && queryStringMatches
+		}
+
+		header := writer.Header()
+		for name, values := range response.Header {
+			if (len(values) < 1){
+				continue
+			}
+			header.Set(name,values[0])
 		}
 
 		if !(acceptHeaderMatches && authMatches && methodMatches && pathMatches && customMatcherMatches) {
