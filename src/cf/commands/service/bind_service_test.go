@@ -30,6 +30,8 @@ func TestBindCommand(t *testing.T) {
 	assert.Equal(t, serviceRepo.BindServiceApplication, app)
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[2], "App my-app needs to be restarted to recognize new credentials")
+	assert.Equal(t, len(fakeUI.Outputs), 3)
 }
 
 func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
@@ -42,6 +44,7 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 	serviceRepo := &testhelpers.FakeServiceRepo{BindServiceErrorCode: "90003"}
 	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 
+	assert.Equal(t, len(fakeUI.Outputs), 3)
 	assert.Contains(t, fakeUI.Outputs[0], "Binding service")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-app")

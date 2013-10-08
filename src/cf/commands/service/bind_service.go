@@ -53,7 +53,10 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == "90003" {
+	if apiResponse.ErrorCode == "90003" {
 		cmd.ui.Warn("App %s is already bound to %s.", app.Name, instance.Name)
+		return
 	}
+
+	cmd.ui.Warn("App %s needs to be restarted to recognize new credentials", app.Name)
 }
