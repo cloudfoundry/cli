@@ -42,6 +42,7 @@ func TestDeleteWithForceOption(t *testing.T) {
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
+	assert.Equal(t, appRepo.DeletedApp, app)
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Outputs[0], "Deleting")
