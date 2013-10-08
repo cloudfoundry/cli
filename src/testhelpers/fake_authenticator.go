@@ -31,7 +31,7 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 	auth.ConfigRepo.Save()
 
 	if auth.AuthError {
-		apiResponse =  net.NewApiStatusWithMessage("Error authenticating.")
+		apiResponse =  net.NewApiResponseWithMessage("Error authenticating.")
 	}
 	return
 }

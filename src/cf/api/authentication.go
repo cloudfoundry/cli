@@ -90,7 +90,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 	}
 
 	if response.Error.Code != "" {
-		apiResponse = net.NewApiStatusWithMessage("Authentication Server error: %s", response.Error.Description)
+		apiResponse = net.NewApiResponseWithMessage("Authentication Server error: %s", response.Error.Description)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 	uaa.config.RefreshToken = response.RefreshToken
 	err := uaa.configRepo.Save()
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error setting configuration", err)
+		apiResponse = net.NewApiResponseWithError("Error setting configuration", err)
 	}
 
 	return

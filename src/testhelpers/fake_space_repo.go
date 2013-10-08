@@ -41,11 +41,11 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiRes
 	space = repo.FindByNameSpace
 
 	if repo.FindByNameErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding space by name.")
+		apiResponse = net.NewApiResponseWithMessage("Error finding space by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiStatus("Space", name)
+		apiResponse = net.NewNotFoundApiResponse("Space", name)
 	}
 
 	return
@@ -58,7 +58,7 @@ func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiResponse net.A
 
 func (repo *FakeSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
 	if repo.CreateSpaceExists {
-		apiResponse = net.NewApiStatus("Space already exists", api.SPACE_EXISTS, 400)
+		apiResponse = net.NewApiResponse("Space already exists", api.SPACE_EXISTS, 400)
 		return
 	}
 	repo.CreateSpaceName = name

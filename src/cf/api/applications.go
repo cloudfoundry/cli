@@ -50,7 +50,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiStatus("App", name)
+		apiResponse = net.NewNotFoundApiResponse("App", name)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envV
 
 	jsonBytes, err := json.Marshal(body)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error creating json", err)
+		apiResponse = net.NewApiResponseWithError("Error creating json", err)
 		return
 	}
 
@@ -194,7 +194,7 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiR
 
 	bodyBytes, err := json.Marshal(values)
 	if err != nil {
-		return net.NewApiStatusWithError("Error generating body", err)
+		return net.NewApiResponseWithError("Error generating body", err)
 	}
 
 	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(bodyBytes))
@@ -261,7 +261,7 @@ func (repo CloudControllerApplicationRepository) updateApplication(app cf.Applic
 
 	body, err := json.Marshal(updates)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Could not serialize app updates.", err)
+		apiResponse = net.NewApiResponseWithError("Could not serialize app updates.", err)
 		return
 	}
 
@@ -286,7 +286,7 @@ func (repo CloudControllerApplicationRepository) updateApplication(app cf.Applic
 func validateApplication(app cf.Application) (apiResponse net.ApiResponse) {
 	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
 	if !reg.MatchString(app.Name) {
-		apiResponse = net.NewApiStatusWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
+		apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
 	}
 
 	return

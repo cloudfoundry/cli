@@ -96,7 +96,7 @@ func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string
 	if domainIndex >= 0 {
 		domain = domains[domainIndex]
 	} else {
-		apiResponse = net.NewNotFoundApiStatus("Domain", name)
+		apiResponse = net.NewNotFoundApiResponse("Domain", name)
 	}
 
 	return
@@ -154,7 +154,7 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, owningO
 	if domainIndex >= 0 {
 		domain = domains[domainIndex]
 	} else {
-		apiResponse = net.NewNotFoundApiStatus("Domain", name)
+		apiResponse = net.NewNotFoundApiResponse("Domain", name)
 	}
 
 	return

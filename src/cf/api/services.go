@@ -80,9 +80,9 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 
 	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == SERVICE_INSTANCE_NAME_TAKEN {
 
-		serviceInstance, findInstanceApiStatus := repo.FindInstanceByName(name)
+		serviceInstance, findInstanceApiResponse := repo.FindInstanceByName(name)
 
-		if !findInstanceApiStatus.IsNotSuccessful() &&
+		if !findInstanceApiResponse.IsNotSuccessful() &&
 			serviceInstance.ServicePlan.Guid == plan.Guid {
 			apiResponse = net.ApiResponse{}
 			identicalAlreadyExists = true
@@ -105,7 +105,7 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 	reqBody := RequestBody{name, params, repo.config.Space.Guid}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error parsing response", err)
+		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
 		return
 	}
 
@@ -132,7 +132,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiStatus("Service instance", name)
+		apiResponse = net.NewNotFoundApiResponse("Service instance", name)
 		return
 	}
 
@@ -205,7 +205,7 @@ func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceIn
 
 func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse) {
 	if len(instance.ServiceBindings) > 0 {
-		return net.NewApiStatusWithMessage("Cannot delete service instance, apps are still bound to it")
+		return net.NewApiResponseWithMessage("Cannot delete service instance, apps are still bound to it")
 	}
 
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)

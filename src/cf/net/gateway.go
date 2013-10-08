@@ -45,7 +45,7 @@ func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Reader) (req *Request, apiResponse ApiResponse) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
-		apiResponse = NewApiStatusWithError("Error building request", err)
+		apiResponse = NewApiResponseWithError("Error building request", err)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes [
 
 	bytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		apiResponse = NewApiStatusWithError("Error reading response", err)
+		apiResponse = NewApiResponseWithError("Error reading response", err)
 	}
 	return
 }
@@ -91,7 +91,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
-		apiResponse = NewApiStatusWithError("Invalid JSON response from server", err)
+		apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)
 	}
 	return
 }
@@ -105,7 +105,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 
 	response, err := doRequest(request.Request)
 	if err != nil {
-		apiResponse = NewApiStatusWithError("Error performing request", err)
+		apiResponse = NewApiResponseWithError("Error performing request", err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 			errorResponse.Code,
 			errorResponse.Description,
 		)
-		apiResponse = NewApiStatus(message, errorResponse.Code, response.StatusCode)
+		apiResponse = NewApiResponse(message, errorResponse.Code, response.StatusCode)
 	}
 
 	if apiResponse.IsSuccessful() || gateway.authenticator == nil {
@@ -143,7 +143,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 	// make the request again
 	response, err = doRequest(request.Request)
 	if err != nil {
-		apiResponse = NewApiStatusWithError("Error performing request", err)
+		apiResponse = NewApiResponseWithError("Error performing request", err)
 	}
 	return
 }

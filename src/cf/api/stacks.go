@@ -37,7 +37,7 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiResponse = net.NewApiStatusWithMessage("Stack %s not found", name)
+		apiResponse = net.NewApiResponseWithMessage("Stack %s not found", name)
 		return
 	}
 

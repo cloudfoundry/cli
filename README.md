@@ -60,11 +60,11 @@ Repositories are injected into the command, so tests can inject a fake.
 
 Repositories communicate with the api endpoints through a Gateway (see ```src/cf/net```).
 
-Repositories return a Domain Object and an ApiStatus object.
+Repositories return a Domain Object and an ApiResponse object.
 
 Domain objects are data structures related to Cloud Foundry (see ```src/cf/domain```).
 
-ApiStatus objects convey a variety of important error conditions (see ```src/cf/net/api_status```).
+ApiResponse objects convey a variety of important error conditions (see ```src/cf/net/api_status```).
 
 
 Managing dependencies
@@ -97,5 +97,5 @@ Creating Repositories
 
 Although not ideal, we use the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid confusion with Service domain objects (i.e. creating Services and Service Instances within Cloud Foundry).
 
-By convention, Repository methods return a Domain object and an ApiStatus. Domain objects are used in both Commands and Repositories to model Cloud Foundry data.  ApiStatus objects are used to communicate application errors, runtime errors, whether the resource was found, etc.
+By convention, Repository methods return a Domain object and an ApiResponse. Domain objects are used in both Commands and Repositories to model Cloud Foundry data.  ApiResponse objects are used to communicate application errors, runtime errors, whether the resource was found, etc.
 This convention provides a consistent method signature across repositories.

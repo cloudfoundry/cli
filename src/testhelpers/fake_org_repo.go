@@ -41,11 +41,11 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 	org = repo.FindByNameOrganization
 
 	if repo.FindByNameErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding organization by name.")
+		apiResponse = net.NewApiResponseWithMessage("Error finding organization by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiResponse("Org", name)
 	}
 
 	return
@@ -53,7 +53,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 
 func (repo *FakeOrgRepository) Create(name string) (apiResponse net.ApiResponse) {
 	if repo.CreateOrgExists {
-		apiResponse = net.NewApiStatus("Space already exists", api.ORG_EXISTS, 400)
+		apiResponse = net.NewApiResponse("Space already exists", api.ORG_EXISTS, 400)
 		return
 	}
 	repo.CreateName = name
@@ -76,10 +76,10 @@ func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, api
 	quota = repo.FindQuotaByNameQuota
 
 	if repo.FindQuotaByNameNotFound {
-		apiResponse = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiResponse("Org", name)
 	}
 	if repo.FindQuotaByNameErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding quota")
+		apiResponse = net.NewApiResponseWithMessage("Error finding quota")
 	}
 
 	return

@@ -12,7 +12,7 @@ type FakeDomainRepository struct {
 	FindAllByOrgDomains []cf.Domain
 
 	FindByNameInOrgDomain cf.Domain
-	FindByNameInOrgApiStatus net.ApiResponse
+	FindByNameInOrgApiResponse net.ApiResponse
 
 	FindByNameName string
 	FindByNameDomain cf.Domain
@@ -24,14 +24,14 @@ type FakeDomainRepository struct {
 
 	MapDomainDomain cf.Domain
 	MapDomainSpace cf.Space
-	MapDomainApiStatus net.ApiResponse
+	MapDomainApiResponse net.ApiResponse
 
 	UnmapDomainDomain cf.Domain
 	UnmapDomainSpace cf.Space
-	UnmapDomainApiStatus net.ApiResponse
+	UnmapDomainApiResponse net.ApiResponse
 
 	DeleteDomainDomain cf.Domain
-	DeleteDomainApiStatus net.ApiResponse
+	DeleteDomainApiResponse net.ApiResponse
 }
 
 func (repo *FakeDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse){
@@ -51,10 +51,10 @@ func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain 
 	domain = repo.FindByNameDomain
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiStatus("Domain", name)
+		apiResponse = net.NewNotFoundApiResponse("Domain", name)
 	}
 	if repo.FindByNameErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding domain")
+		apiResponse = net.NewApiResponseWithMessage("Error finding domain")
 	}
 
 	return
@@ -69,26 +69,26 @@ func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.
 func (repo *FakeDomainRepository) MapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
 	repo.MapDomainDomain = domain
 	repo.MapDomainSpace = space
-	apiResponse = repo.MapDomainApiStatus
+	apiResponse = repo.MapDomainApiResponse
 	return
 }
 
 func (repo *FakeDomainRepository) UnmapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
 	repo.UnmapDomainDomain = domain
 	repo.UnmapDomainSpace = space
-	apiResponse = repo.UnmapDomainApiStatus
+	apiResponse = repo.UnmapDomainApiResponse
 	return
 }
 
 func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
 
 	domain = repo.FindByNameInOrgDomain
-	apiResponse = repo.FindByNameInOrgApiStatus
+	apiResponse = repo.FindByNameInOrgApiResponse
 	return
 }
 
 func (repo *FakeDomainRepository) DeleteDomain(domain cf.Domain) (apiResponse net.ApiResponse) {
 	repo.DeleteDomainDomain = domain
-	apiResponse = repo.DeleteDomainApiStatus
+	apiResponse = repo.DeleteDomainApiResponse
 	return
 }

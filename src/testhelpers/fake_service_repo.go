@@ -59,11 +59,11 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.Servic
 	instance = repo.FindInstanceByNameServiceInstance
 
 	if repo.FindInstanceByNameErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding instance")
+		apiResponse = net.NewApiResponseWithMessage("Error finding instance")
 	}
 
 	if repo.FindInstanceByNameNotFound {
-		apiResponse = net.NewNotFoundApiStatus("Service instance", name)
+		apiResponse = net.NewNotFoundApiResponse("Service instance", name)
 	}
 
 	return
@@ -74,7 +74,7 @@ func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.App
 	repo.BindServiceApplication = app
 
 	if repo.BindServiceErrorCode != "" {
-		apiResponse = net.NewApiStatus("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
+		apiResponse = net.NewApiResponse("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
 	}
 
 	return

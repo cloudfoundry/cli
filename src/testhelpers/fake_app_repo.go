@@ -48,13 +48,13 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 	app = repo.FindByNameApp
 
 	if repo.FindByNameErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding app by name.")
+		apiResponse = net.NewApiResponseWithMessage("Error finding app by name.")
 	}
 	if repo.FindByNameAuthErr {
-		apiResponse = net.NewApiStatus("Authentication failed.", "1000", 401)
+		apiResponse = net.NewApiResponse("Authentication failed.", "1000", 401)
 	}
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiStatus("App", name)
+		apiResponse = net.NewNotFoundApiResponse("App", name)
 	}
 
 	return
@@ -65,7 +65,7 @@ func (repo *FakeApplicationRepository) SetEnv(app cf.Application, envVars map[st
 	repo.SetEnvVars = envVars
 
 	if repo.SetEnvErr {
-		apiResponse = net.NewApiStatusWithMessage("Failed setting env")
+		apiResponse = net.NewApiResponseWithMessage("Failed setting env")
 	}
 	return
 }
@@ -100,7 +100,7 @@ func (repo *FakeApplicationRepository) Scale(app cf.Application) (apiResponse ne
 func (repo *FakeApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse) {
 	repo.StartAppToStart = app
 	if repo.StartAppErr {
-		apiResponse = net.NewApiStatusWithMessage("Error starting application")
+		apiResponse = net.NewApiResponseWithMessage("Error starting application")
 	}
 	updatedApp = repo.StartUpdatedApp
 	return
@@ -109,7 +109,7 @@ func (repo *FakeApplicationRepository) Start(app cf.Application) (updatedApp cf.
 func (repo *FakeApplicationRepository) Stop(appToStop cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse) {
 	repo.StopAppToStop = appToStop
 	if repo.StopAppErr {
-		apiResponse = net.NewApiStatusWithMessage("Error stopping application")
+		apiResponse = net.NewApiResponseWithMessage("Error stopping application")
 	}
 	updatedApp = repo.StopUpdatedApp
 	return
@@ -124,7 +124,7 @@ func (repo *FakeApplicationRepository) GetInstances(app cf.Application) (instanc
 	repo.GetInstancesResponses = repo.GetInstancesResponses[1:]
 
 	if errorCode != "" {
-		apiResponse = net.NewApiStatus("Error staging app", errorCode, http.StatusBadRequest)
+		apiResponse = net.NewApiResponse("Error staging app", errorCode, http.StatusBadRequest)
 		return
 	}
 

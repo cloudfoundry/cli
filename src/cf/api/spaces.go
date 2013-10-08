@@ -73,7 +73,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiStatus("Space", name)
+		apiResponse = net.NewNotFoundApiResponse("Space", name)
 		return
 	}
 

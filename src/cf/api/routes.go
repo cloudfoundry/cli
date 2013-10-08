@@ -83,7 +83,7 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewApiStatusWithMessage("Route not found")
+		apiResponse = net.NewApiResponseWithMessage("Route not found")
 		return
 	}
 
@@ -113,7 +113,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiStatus("Route", fmt.Sprintf("%s.%s", host, domainName))
+		apiResponse = net.NewNotFoundApiResponse("Route", fmt.Sprintf("%s.%s", host, domainName))
 		return
 	}
 

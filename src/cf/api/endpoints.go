@@ -30,7 +30,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiRespons
 
 	scheme := request.URL.Scheme
 	if scheme != "http" && scheme != "https" {
-		apiResponse = net.NewApiStatusWithMessage("API endpoints should start with https:// or http://")
+		apiResponse = net.NewApiResponseWithMessage("API endpoints should start with https:// or http://")
 		return
 	}
 
@@ -52,7 +52,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiRespons
 
 	err := repo.configRepo.Save()
 	if err != nil {
-		apiResponse = net.NewApiStatusWithMessage(err.Error())
+		apiResponse = net.NewApiResponseWithMessage(err.Error())
 	}
 
 	return

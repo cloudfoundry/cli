@@ -57,7 +57,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Applicati
 
 	body, boundary, err := createApplicationUploadBody(zipBuffer, resourcesJson)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error creating upload", err)
+		apiResponse = net.NewApiResponseWithError("Error creating upload", err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 	if fileIsZip(appDir) {
 		appDir, err = extractZip(app, appDir)
 		if err != nil {
-			apiResponse = net.NewApiStatusWithError("Error extracting archive", err)
+			apiResponse = net.NewApiResponseWithError("Error extracting archive", err)
 			return
 		}
 	}
@@ -87,7 +87,7 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 	// Find which files need to be uploaded
 	allAppFiles, err := cf.AppFilesInDir(appDir)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error listing app files", err)
+		apiResponse = net.NewApiResponseWithError("Error listing app files", err)
 		return
 	}
 
@@ -101,13 +101,13 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 
 	err = cf.InitializeDir(uploadDir)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error creating upload directory", err)
+		apiResponse = net.NewApiResponseWithError("Error creating upload directory", err)
 		return
 	}
 
 	err = cf.CopyFiles(appFilesToUpload, appDir, uploadDir)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Error copying files to temp directory", err)
+		apiResponse = net.NewApiResponseWithError("Error copying files to temp directory", err)
 		return
 	}
 
@@ -185,7 +185,7 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 
 	resourcesJson, err := json.Marshal(appFilesRequest)
 	if err != nil {
-		apiResponse = net.NewApiStatusWithError("Failed to create json for resource_match request", err)
+		apiResponse = net.NewApiResponseWithError("Failed to create json for resource_match request", err)
 		return
 	}
 

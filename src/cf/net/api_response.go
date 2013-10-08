@@ -13,7 +13,7 @@ type ApiResponse struct {
 	isNotFound bool
 }
 
-func NewApiStatus(message string, errorCode string, statusCode int) (apiResponse ApiResponse) {
+func NewApiResponse(message string, errorCode string, statusCode int) (apiResponse ApiResponse) {
 	return ApiResponse{
 		Message:    message,
 		ErrorCode:  errorCode,
@@ -22,21 +22,21 @@ func NewApiStatus(message string, errorCode string, statusCode int) (apiResponse
 	}
 }
 
-func NewApiStatusWithMessage(message string, a ...interface{}) (apiResponse ApiResponse) {
+func NewApiResponseWithMessage(message string, a ...interface{}) (apiResponse ApiResponse) {
 	return ApiResponse{
 		Message: fmt.Sprintf(message, a...),
 		isError: true,
 	}
 }
 
-func NewApiStatusWithError(message string, err error) (apiResponse ApiResponse) {
+func NewApiResponseWithError(message string, err error) (apiResponse ApiResponse) {
 	return ApiResponse{
 		Message: fmt.Sprintf("%s: %s", message, err.Error()),
 		isError: true,
 	}
 }
 
-func NewNotFoundApiStatus(objectType string, objectId string) (apiResponse ApiResponse) {
+func NewNotFoundApiResponse(objectType string, objectId string) (apiResponse ApiResponse) {
 	return ApiResponse{
 		Message:    fmt.Sprintf("%s %s not found", objectType, objectId),
 		isNotFound: true,

@@ -88,7 +88,7 @@ func TestDeleteDomainNoConfirmation(t *testing.T) {
 func TestDeleteDomainNotFound(t *testing.T) {
 	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
 	domainRepo := &testhelpers.FakeDomainRepository{
-		FindByNameInOrgApiStatus: net.NewNotFoundApiStatus("Domain", "foo.com"),
+		FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("Domain", "foo.com"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
@@ -110,7 +110,7 @@ func TestDeleteDomainNotFound(t *testing.T) {
 func TestDeleteDomainFindError(t *testing.T) {
 	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
 	domainRepo := &testhelpers.FakeDomainRepository{
-		FindByNameInOrgApiStatus: net.NewApiStatusWithMessage("failed badly"),
+		FindByNameInOrgApiResponse: net.NewApiResponseWithMessage("failed badly"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
@@ -132,8 +132,8 @@ func TestDeleteDomainFindError(t *testing.T) {
 func TestDeleteDomainDeleteError(t *testing.T) {
 	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
 	domainRepo := &testhelpers.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
-		DeleteDomainApiStatus: net.NewApiStatusWithMessage("failed badly"),
+		FindByNameInOrgDomain:   cf.Domain{Name: "foo.com"},
+		DeleteDomainApiResponse: net.NewApiResponseWithMessage("failed badly"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)

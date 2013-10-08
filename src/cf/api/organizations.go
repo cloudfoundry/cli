@@ -69,7 +69,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiResponse("Org", name)
 		return
 	}
 
@@ -149,7 +149,7 @@ func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiStatus("Org", name)
+		apiResponse = net.NewNotFoundApiResponse("Org", name)
 		return
 	}
 

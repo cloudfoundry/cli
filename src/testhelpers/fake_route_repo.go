@@ -37,7 +37,7 @@ type FakeRouteRepository struct {
 
 func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, apiResponse net.ApiResponse) {
 	if repo.FindAllErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding all routes")
+		apiResponse = net.NewApiResponseWithMessage("Error finding all routes")
 	}
 
 	routes = repo.FindAllRoutes
@@ -48,7 +48,7 @@ func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiRes
 	repo.FindByHostHost = host
 
 	if repo.FindByHostErr {
-		apiResponse = net.NewApiStatusWithMessage("Route not found")
+		apiResponse = net.NewApiResponseWithMessage("Route not found")
 	}
 
 	route = repo.FindByHostRoute
@@ -60,11 +60,11 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	repo.FindByHostAndDomainDomain = domain
 
 	if repo.FindByHostAndDomainErr {
-		apiResponse = net.NewApiStatusWithMessage("Error finding Route")
+		apiResponse = net.NewApiResponseWithMessage("Error finding Route")
 	}
 
 	if repo.FindByHostAndDomainNotFound {
-		apiResponse = net.NewNotFoundApiStatus("Org", fmt.Sprintf("%s.%s", host, domain))
+		apiResponse = net.NewNotFoundApiResponse("Org", fmt.Sprintf("%s.%s", host, domain))
 	}
 
 	route = repo.FindByHostAndDomainRoute
