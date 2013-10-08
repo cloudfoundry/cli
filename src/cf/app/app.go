@@ -93,9 +93,11 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Name:        "create-user-provided-service",
 			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",
-			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{\"name\":\"value\",\"name\":\"value\"}'\n\n", cf.Name) +
 				"EXAMPLE:\n" +
-				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"", cf.Name),
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("create-user-provided-service")
 				cmdRunner.Run(cmd, c)

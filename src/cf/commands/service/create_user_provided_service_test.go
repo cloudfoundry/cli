@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestCreateUserProvidedService(t *testing.T) {
+func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 	serviceRepo := &testhelpers.FakeServiceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service", `"foo, bar, baz"`},
@@ -31,7 +31,28 @@ func TestCreateUserProvidedService(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func TestCreateUserProvidedServiceWithNoParameterList(t *testing.T) {
+func TestCreateUserProvidedServiceWithJson(t *testing.T) {
+	serviceRepo := &testhelpers.FakeServiceRepo{}
+	fakeUI := callCreateUserProvidedService(
+		[]string{"my-custom-service", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`},
+		[]string{},
+		serviceRepo,
+	)
+
+	assert.Empty(t, fakeUI.Prompts)
+
+	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceName, "my-custom-service")
+	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceParameters, map[string]string{
+		"foo": "foo value",
+		"bar": "bar value",
+		"baz": "baz value",
+	})
+
+	assert.Contains(t, fakeUI.Outputs[0], "Creating user provided service")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+}
+
+func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
 	serviceRepo := &testhelpers.FakeServiceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service"},
