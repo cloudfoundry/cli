@@ -12,6 +12,7 @@ func TestDeleteConfirmingWithY(t *testing.T) {
 	ui, _, appRepo := deleteApp("y", []string{"app-to-delete"})
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
+	assert.Equal(t, appRepo.DeletedApp.Name, "app-to-delete")
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Prompts[0], "Really delete")
 	assert.Contains(t, ui.Outputs[0], "app-to-delete")
@@ -23,6 +24,7 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 	ui, _, appRepo := deleteApp("Yes", []string{"app-to-delete"})
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
+	assert.Equal(t, appRepo.DeletedApp.Name, "app-to-delete")
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Prompts[0], "Really delete")
 	assert.Contains(t, ui.Outputs[0], "app-to-delete")
@@ -61,6 +63,7 @@ func TestDeleteAppThatDoesNotExist(t *testing.T) {
 	testhelpers.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
+	assert.Equal(t, appRepo.DeletedApp.Name, "")
 	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Contains(t, ui.Outputs[0], "app-to-delete")
 	assert.Contains(t, ui.Outputs[1], "OK")
