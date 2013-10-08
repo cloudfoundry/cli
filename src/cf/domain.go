@@ -148,6 +148,7 @@ type Quota struct {
 }
 
 type ServiceAuthToken struct {
+	Guid	 string
 	Label    string
 	Provider string
 	Token    string

@@ -10,6 +10,7 @@ import (
 
 type ServiceAuthTokenRepository interface {
 	Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
+	Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse)
 }
 
@@ -60,4 +61,8 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf
 	}
 
 	return
+}
+
+func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
+	panic("NOT IMPLEMENTED")
 }

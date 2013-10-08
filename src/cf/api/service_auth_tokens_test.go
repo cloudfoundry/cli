@@ -89,3 +89,31 @@ func createServiceAuthTokenRepo(endpoint http.HandlerFunc) (ts *httptest.Server,
 	repo = NewCloudControllerServiceAuthTokenRepository(config, gateway)
 	return
 }
+
+var updateServiceAuthTokenEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/service_auth_tokens/my-auth-token-guid",
+	testhelpers.RequestBodyMatcher(`{"token":"a value"}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestUpdate(t *testing.T) {
+	ts := httptest.NewTLSServer(updateServiceAuthTokenEndpoint)
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		Target:      ts.URL,
+		AccessToken: "BEARER my_access_token",
+	}
+	gateway := net.NewCloudControllerGateway()
+
+	repo := NewCloudControllerServiceAuthTokenRepository(config, gateway)
+	apiResponse := repo.Update(cf.ServiceAuthToken{
+		Guid: "my-auth-token-guid",
+		Label: "a label",
+		Provider: "a provider",
+		Value: "a value",
+	})
+
+	assert.True(t, apiResponse.IsSuccessful())
+}
