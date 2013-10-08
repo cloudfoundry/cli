@@ -14,6 +14,7 @@ type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
 	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiResponse net.ApiResponse)
+	UpdateUserProvidedServiceInstance(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiResponse net.ApiResponse)
 	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse)
@@ -124,6 +125,29 @@ func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(n
 	return
 }
 
+func (repo CloudControllerServiceRepository) UpdateUserProvidedServiceInstance(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstance.Guid)
+
+	type RequestBody struct {
+		Credentials map[string]string `json:"credentials"`
+	}
+
+	reqBody := RequestBody{params}
+	jsonBytes, err := json.Marshal(reqBody)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
+		return
+	}
+
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(request)
+	return
+}
+
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
@@ -146,6 +170,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	serviceOfferingEntity := resource.Entity.ServicePlan.Entity.ServiceOffering.Entity
 	instance.Guid = resource.Metadata.Guid
 	instance.Name = resource.Entity.Name
+	instance.Type = resource.Entity.Type
 
 	instance.ServiceOffering.Label = serviceOfferingEntity.Label
 	instance.ServiceOffering.DocumentationUrl = serviceOfferingEntity.DocumentationUrl

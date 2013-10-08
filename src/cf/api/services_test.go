@@ -243,6 +243,33 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
+var updateUserProvidedServiceInstanceEndpoint = testhelpers.CreateEndpoint(
+	"PUT",
+	"/v2/user_provided_service_instances/my-instance-guid",
+	testhelpers.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
+	testhelpers.TestResponse{Status: http.StatusCreated},
+)
+
+func TestUpdateUserProvidedServiceInstance(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(updateUserProvidedServiceInstanceEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway()
+	repo := NewCloudControllerServiceRepository(config, gateway)
+
+	params := map[string]string{
+		"host":     "example.com",
+		"user":     "me",
+		"password": "secret",
+	}
+	apiResponse := repo.UpdateUserProvidedServiceInstance(cf.ServiceInstance{Guid: "my-instance-guid"}, params)
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
 var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {
@@ -251,6 +278,7 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
       },
       "entity": {
         "name": "my-service",
+        "type": "my service type",
         "service_bindings": [
           {
             "metadata": {
@@ -317,6 +345,7 @@ func TestFindInstanceByName(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
+	assert.Equal(t, instance.Type, "my service type")
 	assert.Equal(t, instance.ServiceOffering.Label, "mysql")
 	assert.Equal(t, instance.ServiceOffering.DocumentationUrl, "http://info.example.com")
 	assert.Equal(t, instance.ServiceOffering.Description, "MySQL database")

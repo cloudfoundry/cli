@@ -83,6 +83,7 @@ func TestCommands(t *testing.T) {
 		"unmap-domain",
 		"unmap-route",
 		"unset-env",
+		"update-user-provided-service",
 	}
 
 	for _, cmdName := range availableCmds {

@@ -116,10 +116,15 @@ type ServiceOffering struct {
 type ServiceInstance struct {
 	Name             string
 	Guid             string
+	Type             string
 	ServiceBindings  []ServiceBinding
 	ServicePlan      ServicePlan
 	ApplicationNames []string
 	ServiceOffering  ServiceOffering
+}
+
+func (inst ServiceInstance) IsUserProvided() bool {
+	return inst.Type == "user_provided_service_instance"
 }
 
 type ServiceBinding struct {

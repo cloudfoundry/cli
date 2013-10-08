@@ -546,6 +546,18 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		{
+			Name:        "update-user-provided-service",
+			ShortName:   "uups",
+			Description: "Update user-provided service name value pairs",
+			Usage: fmt.Sprintf("   %s update-user-provided-service SERVICE_INSTANCE '{\"name\":\"value\",\"name\":\"value\"}'\n\n", cf.Name) +
+				"EXAMPLE:\n" +
+				fmt.Sprintf("   %s update-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("update-user-provided-service")
+				cmdRunner.Run(cmd, c)
+			},
+		},
 	}
 	return
 }

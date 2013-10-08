@@ -16,6 +16,9 @@ type FakeServiceRepo struct {
 	CreateUserProvidedServiceInstanceName string
 	CreateUserProvidedServiceInstanceParameters map[string]string
 
+	UpdateUserProvidedServiceInstanceServiceInstance cf.ServiceInstance
+	UpdateUserProvidedServiceInstanceParameters map[string]string
+
 	FindInstanceByNameName string
 	FindInstanceByNameServiceInstance cf.ServiceInstance
 	FindInstanceByNameErr bool
@@ -51,6 +54,12 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServiceP
 func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiResponse net.ApiResponse) {
 	repo.CreateUserProvidedServiceInstanceName = name
 	repo.CreateUserProvidedServiceInstanceParameters = params
+	return
+}
+
+func (repo *FakeServiceRepo) UpdateUserProvidedServiceInstance(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
+	repo.UpdateUserProvidedServiceInstanceServiceInstance = serviceInstance
+	repo.UpdateUserProvidedServiceInstanceParameters = params
 	return
 }
 

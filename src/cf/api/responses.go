@@ -174,6 +174,7 @@ type ServiceInstanceResource struct {
 
 type ServiceInstanceEntity struct {
 	Name            string
+	Type            string
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
 	ServicePlan     ServicePlanResource      `json:"service_plan"`
 }
