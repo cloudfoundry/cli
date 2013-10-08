@@ -15,24 +15,24 @@ import (
 var createServiceAuthTokenWithProviderEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/service_auth_tokens",
-	testhelpers.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a value"}`),
+	testhelpers.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
 	testhelpers.TestResponse{Status: http.StatusCreated},
 )
 
 func TestCreateWithProvider(t *testing.T) {
-	authToken := cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Value: "a value"}
+	authToken := cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Token: "a token"}
 	testCreate(t, createServiceAuthTokenWithProviderEndpoint, authToken)
 }
 
 var createServiceAuthTokenWithoutProviderEndpoint = testhelpers.CreateEndpoint(
 	"POST",
 	"/v2/service_auth_tokens",
-	testhelpers.RequestBodyMatcher(`{"label":"a label","token":"a value"}`),
+	testhelpers.RequestBodyMatcher(`{"label":"a label","token":"a token"}`),
 	testhelpers.TestResponse{Status: http.StatusCreated},
 )
 
 func TestCreateWithoutProvider(t *testing.T) {
-	authToken := cf.ServiceAuthToken{Label: "a label", Provider: "", Value: "a value"}
+	authToken := cf.ServiceAuthToken{Label: "a label", Provider: "", Token: "a token"}
 	testCreate(t, createServiceAuthTokenWithoutProviderEndpoint, authToken)
 }
 

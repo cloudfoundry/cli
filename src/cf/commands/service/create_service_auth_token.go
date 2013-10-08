@@ -38,7 +38,7 @@ func (cmd CreateServiceAuthToken) Run(c *cli.Context) {
 
 	serviceAuthTokenRepo := cf.ServiceAuthToken{
 		Label:    c.Args()[0],
-		Value:    c.Args()[1],
+		Token:    c.Args()[1],
 		Provider: c.String("p"),
 	}
 

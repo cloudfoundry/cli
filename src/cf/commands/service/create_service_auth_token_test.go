@@ -53,7 +53,7 @@ func TestCreateServiceAuthToken(t *testing.T) {
 	assert.Equal(t, authTokenRepo.CreatedServiceAuthToken, cf.ServiceAuthToken{
 		Label:    "a label",
 		Provider: "a provider",
-		Value:    "a value",
+		Token:    "a value",
 	})
 
 	assert.Contains(t, ui.Outputs[1], "OK")
