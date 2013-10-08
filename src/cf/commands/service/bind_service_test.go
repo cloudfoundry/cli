@@ -30,7 +30,7 @@ func TestBindCommand(t *testing.T) {
 	assert.Equal(t, serviceRepo.BindServiceApplication, app)
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "App my-app needs to be restarted to recognize new credentials")
+	assert.Contains(t, fakeUI.Outputs[2], "TIP")
 	assert.Equal(t, len(fakeUI.Outputs), 3)
 }
 

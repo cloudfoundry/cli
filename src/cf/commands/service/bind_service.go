@@ -58,5 +58,5 @@ func (cmd *BindService) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Warn("App %s needs to be restarted to recognize new credentials", app.Name)
+	cmd.ui.Say("TIP: Use 'cf push' to ensure your env variable changes take effect")
 }
