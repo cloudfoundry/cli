@@ -39,6 +39,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["delete-space"] = space.NewDeleteSpace(ui, repoLocator.GetSpaceRepository(), configRepo)
 	factory.cmdsByName["domains"] = domain.NewListDomains(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["env"] = application.NewEnv(ui)
+	factory.cmdsByName["events"] = application.NewEvents(ui, repoLocator.GetAppEventsRepository())
 	factory.cmdsByName["files"] = application.NewFiles(ui, repoLocator.GetAppFilesRepository())
 	factory.cmdsByName["login"] = NewLogin(ui, configRepo, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["logout"] = NewLogout(ui, configRepo)

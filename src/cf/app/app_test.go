@@ -49,6 +49,7 @@ func TestCommands(t *testing.T) {
 		"delete-service",
 		"delete-space",
 		"env",
+		"events",
 		"files",
 		"login",
 		"logout",

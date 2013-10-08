@@ -67,6 +67,13 @@ type Domain struct {
 	Spaces []Space
 }
 
+type Event struct {
+	InstanceIndex   int
+	Timestamp       time.Time
+	ExitDescription string
+	ExitStatus      int
+}
+
 type Route struct {
 	Host     string
 	Guid     string

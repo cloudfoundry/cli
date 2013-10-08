@@ -15,6 +15,7 @@ type RepositoryLocator struct {
 	appRepo          CloudControllerApplicationRepository
 	appBitsRepo      CloudControllerApplicationBitsRepository
 	appSummaryRepo   CloudControllerAppSummaryRepository
+	appEventsRepo    CloudControllerAppEventsRepository
 	appFilesRepo     CloudControllerAppFilesRepository
 	domainRepo       CloudControllerDomainRepository
 	routeRepo        CloudControllerRouteRepository
@@ -41,6 +42,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, cf.ApplicationZipper{})
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway, loc.appRepo)
+	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway, loc.domainRepo)
@@ -78,6 +80,10 @@ func (locator RepositoryLocator) GetApplicationBitsRepository() ApplicationBitsR
 
 func (locator RepositoryLocator) GetAppSummaryRepository() AppSummaryRepository {
 	return locator.appSummaryRepo
+}
+
+func (locator RepositoryLocator) GetAppEventsRepository() AppEventsRepository {
+	return locator.appEventsRepo
 }
 
 func (locator RepositoryLocator) GetAppFilesRepository() AppFilesRepository {

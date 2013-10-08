@@ -1,5 +1,7 @@
 package api
 
+import "time"
+
 type Metadata struct {
 	Guid string
 	Url  string
@@ -41,6 +43,22 @@ type AppFile struct {
 	Path string `json:"fn"`
 	Sha1 string `json:"sha1"`
 	Size int64  `json:"size"`
+}
+
+type EventsApiResponse struct {
+	Resources []EventResource
+}
+
+type EventResource struct {
+	Metadata Metadata
+	Entity   EventEntity
+}
+
+type EventEntity struct {
+	Timestamp       time.Time
+	ExitDescription string `json:"exit_description"`
+	ExitStatus      int    `json:"exit_status"`
+	InstanceIndex   int    `json:"instance_index"`
 }
 
 type RoutesResponse struct {

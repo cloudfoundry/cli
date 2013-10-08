@@ -18,6 +18,8 @@ const (
 	MEGABYTE = 1024 * KILOBYTE
 	GIGABYTE = 1024 * MEGABYTE
 	TERABYTE = 1024 * GIGABYTE
+
+	TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 )
 
 func byteSize(bytes uint64) string {
@@ -86,7 +88,7 @@ func extractLogHeader(appName string, msg *logmessage.Message) (logHeader, color
 	sourceType := msg.GetShortSourceTypeName()
 	sourceId := logMsg.GetSourceId()
 	t := time.Unix(0, logMsg.GetTimestamp())
-	timeFormat := "2006-01-02T15:04:05.00-0700"
+	timeFormat := TIMESTAMP_FORMAT
 	timeString := t.Format(timeFormat)
 
 	logHeader = fmt.Sprintf("%s %s [%s]", timeString, appName, sourceType)

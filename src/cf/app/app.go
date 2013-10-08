@@ -182,6 +182,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "events",
+			Description: "Show recent application events",
+			Usage:       fmt.Sprintf("%s events APP", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("events")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "files",
 			ShortName:   "f",
 			Description: "Print out a list of files in a directory or the contents of a specific file",
