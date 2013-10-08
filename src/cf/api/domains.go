@@ -14,6 +14,7 @@ type DomainRepository interface {
 	FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse)
 	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse)
+	Share(domainToShare cf.Domain) (apiResponse net.ApiResponse)
 	MapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
 	UnmapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
 	DeleteDomain(domain cf.Domain) (apiResponse net.ApiResponse)
@@ -121,6 +122,20 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 
 	createdDomain.Guid = resource.Metadata.Guid
 	createdDomain.Name = resource.Entity.Name
+	return
+}
+
+func (repo CloudControllerDomainRepository) Share(domainToShare cf.Domain) (apiResponse net.ApiResponse) {
+	path := repo.config.Target + "/v2/domains"
+	data := fmt.Sprintf(`{"name":"%s","wildcard":true,"shared":true}`, domainToShare.Name)
+
+	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(request)
+
 	return
 }
 

@@ -59,6 +59,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["routes"] = route.NewListRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, repoLocator.GetOrganizationRepository())
+	factory.cmdsByName["share-domain"] = domain.NewShareDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, config)
 	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())

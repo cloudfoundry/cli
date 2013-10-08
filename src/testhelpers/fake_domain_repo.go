@@ -22,6 +22,8 @@ type FakeDomainRepository struct {
 	ReserveDomainDomainToCreate cf.Domain
 	ReserveDomainOwningOrg cf.Organization
 
+	ShareDomainDomainToCreate cf.Domain
+
 	MapDomainDomain cf.Domain
 	MapDomainSpace cf.Space
 	MapDomainApiResponse net.ApiResponse
@@ -63,6 +65,11 @@ func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain 
 func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse){
 	repo.ReserveDomainDomainToCreate = domainToCreate
 	repo.ReserveDomainOwningOrg = owningOrg
+	return
+}
+
+func (repo *FakeDomainRepository) Share(domainToShare cf.Domain) (apiResponse net.ApiResponse){
+	repo.ShareDomainDomainToCreate = domainToShare
 	return
 }
 

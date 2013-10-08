@@ -250,7 +250,7 @@ var createDomainEndpoint = testhelpers.CreateEndpoint(
 	testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
 )
 
-func TestReserveDomain(t *testing.T) {
+func TestCreateDomain(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(createDomainEndpoint))
 	defer ts.Close()
 
@@ -268,6 +268,40 @@ func TestReserveDomain(t *testing.T) {
 	createdDomain, apiResponse := repo.Create(domainToCreate, owningOrg)
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, createdDomain.Guid, "abc-123")
+}
+
+var shareDomainResponse = `
+{
+    "metadata": {
+        "guid": "abc-123"
+    },
+    "entity": {
+        "name": "example.com"
+    }
+}`
+
+var shareDomainEndpoint = testhelpers.CreateEndpoint(
+	"POST",
+	"/v2/domains",
+	testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"shared":true}`),
+	testhelpers.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
+)
+
+func TestShareDomain(t *testing.T) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(shareDomainEndpoint))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+
+	gateway := net.NewCloudControllerGateway()
+	repo := NewCloudControllerDomainRepository(config, gateway)
+
+	domainToShare := cf.Domain{Name: "example.com"}
+	apiResponse := repo.Share(domainToShare)
+	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestFindByNameInOrgWhenDomainExists(t *testing.T) {

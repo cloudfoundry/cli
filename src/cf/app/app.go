@@ -454,6 +454,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				cmdRunner.Run(cmd, c)
 			},
 		},
+		//		{
+		//			Name:        "share-domain",
+		//			Description: "Share a domain with all orgs",
+		//			Usage:       fmt.Sprintf("%s share-domain DOMAIN", cf.Name),
+		//			Action: func(c *cli.Context) {
+		//				cmd, _ := cmdFactory.GetByCmdName("share-domain")
+		//				cmdRunner.Run(cmd, c)
+		//			},
+		//		},
 		{
 			Name:        "space",
 			Description: "Show target space's info",
