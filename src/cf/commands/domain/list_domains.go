@@ -50,16 +50,21 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	}
 
 	table := [][]string{
-		[]string{"name", "shared", "spaces"},
+		[]string{"name", "status", "spaces"},
 	}
 	for _, domain := range domains {
-		var isShared string
+		var status string
 		if domain.Shared {
-			isShared = "true"
+			status = "shared"
+		} else if len(domain.Spaces) == 0 {
+			status = "reserved"
+		} else {
+			status = "owned"
 		}
+
 		table = append(table, []string{
 			domain.Name,
-			isShared,
+			status,
 			strings.Join(application.MapStr(domain.Spaces), ", "),
 		})
 	}

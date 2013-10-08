@@ -39,11 +39,9 @@ func TestListDomains(t *testing.T) {
 			{Name: "Domain1", Shared: true, Spaces: []cf.Space{}},
 			{Name: "Domain2", Shared: false, Spaces: []cf.Space{
 				{Name: "my-space"},
-			}},
-			{Name: "Domain3", Shared: true, Spaces: []cf.Space{
-				{Name: "my-space"},
 				{Name: "my-other-space"},
 			}},
+			{Name: "Domain3", Shared: false, Spaces: []cf.Space{}},
 		},
 	}
 	fakeUI := callListDomains([]string{}, reqFactory, domainRepo)
@@ -53,14 +51,14 @@ func TestListDomains(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[3], "Domain1")
-	assert.Contains(t, fakeUI.Outputs[3], "true")
+	assert.Contains(t, fakeUI.Outputs[3], "shared")
 
 	assert.Contains(t, fakeUI.Outputs[4], "Domain2")
-	assert.Contains(t, fakeUI.Outputs[4], "my-space")
+	assert.Contains(t, fakeUI.Outputs[4], "owned")
+	assert.Contains(t, fakeUI.Outputs[4], "my-space, my-other-space")
 
 	assert.Contains(t, fakeUI.Outputs[5], "Domain3")
-	assert.Contains(t, fakeUI.Outputs[5], "true")
-	assert.Contains(t, fakeUI.Outputs[5], "my-space, my-other-space")
+	assert.Contains(t, fakeUI.Outputs[5], "reserved")
 }
 
 func callListDomains(args []string, reqFactory *testhelpers.FakeReqFactory, domainRepo *testhelpers.FakeDomainRepository) (fakeUI *testhelpers.FakeUI) {
