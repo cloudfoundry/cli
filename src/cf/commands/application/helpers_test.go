@@ -37,34 +37,44 @@ func TestLogMessageOutput(t *testing.T) {
 	}
 
 	msg := createMessage(t, protoMessage, &cloud_controller, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [API]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 
 	msg = createMessage(t, protoMessage, &cloud_controller, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app API STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [API]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "1"
 	msg = createMessage(t, protoMessage, &router, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Router]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &router, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Router STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Router]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "2"
 	msg = createMessage(t, protoMessage, &uaa, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [UAA]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &uaa, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app UAA STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [UAA]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "3"
 	msg = createMessage(t, protoMessage, &dea, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Executor]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &dea, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app Executor STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [Executor]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 
 	sourceId = "4"
 	msg = createMessage(t, protoMessage, &wardenContainer, &stdout)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app App/4 Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [App/4]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "Hello World!")
 	msg = createMessage(t, protoMessage, &wardenContainer, &stderr)
-	assert.Contains(t, logMessageOutput("my-app", msg), "Sep 20 09:33:30 my-app App/4 STDERR Hello World!")
+	assert.Contains(t, logMessageOutput("my-app", msg), "2013-09-20T09:33:30.00-06:00 my-app [App/4]")
+	assert.Contains(t, logMessageOutput("my-app", msg), "STDERR Hello World!")
 }
 
 func createMessage(t *testing.T, protoMsg *logmessage.LogMessage, sourceType *logmessage.LogMessage_SourceType, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {

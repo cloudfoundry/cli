@@ -74,28 +74,59 @@ func bytesFromString(s string) (bytes uint64, err error) {
 }
 
 func logMessageOutput(appName string, msg *logmessage.Message) string {
-	lm := msg.GetLogMessage()
+	logHeader, coloredLogHeader := extractLogHeader(appName, msg)
+	logMsg := msg.GetLogMessage()
+	logContent := extractLogContent(logMsg, logHeader)
 
+	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
+}
+
+func extractLogHeader(appName string, msg *logmessage.Message) (logHeader, coloredLogHeader string) {
+	logMsg := msg.GetLogMessage()
 	sourceType := msg.GetShortSourceTypeName()
-	sourceId := lm.GetSourceId()
-	if sourceId == "" {
-		sourceId = "?"
-	}
-	msgText := lm.GetMessage()
+	sourceId := logMsg.GetSourceId()
+	t := time.Unix(0, logMsg.GetTimestamp())
+	timeFormat := "2006-01-02T15:04:05.00Z07:00"
+	timeString := t.Format(timeFormat)
 
-	t := time.Unix(0, lm.GetTimestamp())
-	timeString := t.Format("Jan 2 15:04:05")
+	logHeader = fmt.Sprintf("%s %s [%s]", timeString, appName, sourceType)
+	coloredLogHeader = terminal.LogSysHeaderColor(logHeader)
 
-	channel := ""
-	if lm.GetMessageType() == logmessage.LogMessage_ERR {
-		channel = "STDERR "
-	}
-
-	if lm.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
-		return fmt.Sprintf("%s %s %s/%s %s%s", timeString, appName, sourceType, sourceId, channel, msgText)
+	if logMsg.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
+		logHeader = fmt.Sprintf("%s %s [%s/%s]", timeString, appName, sourceType, sourceId)
+		coloredLogHeader = terminal.LogAppHeaderColor(logHeader)
 	}
 
-	return fmt.Sprintf("%s %s %s %s%s", timeString, appName, sourceType, channel, msgText)
+	// Calculate padding
+	longestHeader := fmt.Sprintf("%s %s [Executor] ", timeFormat, appName)
+	expectedHeaderLength := len(longestHeader)
+	padding := strings.Repeat(" ", expectedHeaderLength-len(logHeader))
+
+	logHeader = logHeader + padding
+	coloredLogHeader = coloredLogHeader + padding
+
+	return
+}
+
+func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logContent string) {
+	msgText := logMsg.GetMessage()
+	msgLines := strings.Split(string(msgText), "\n")
+	padding := strings.Repeat(" ", len(logHeader))
+	coloringFunc := terminal.LogStdoutColor
+	logType := "STDOUT"
+
+	if logMsg.GetMessageType() == logmessage.LogMessage_ERR {
+		coloringFunc = terminal.LogStderrColor
+		logType = "STDERR"
+	}
+
+	logContent = fmt.Sprintf("%s %s", logType, msgLines[0])
+	for _, msgLine := range msgLines[1:] {
+		logContent = fmt.Sprintf("%s\n%s%s", logContent, padding, msgLine)
+	}
+	logContent = coloringFunc(logContent)
+
+	return
 }
 
 func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {

@@ -9,14 +9,14 @@ import (
 type Color uint
 
 const (
-	red    Color = 31
-	green        = 32
-	yellow       = 33
-	//	blue          = 34
-	magenta = 35
-	cyan    = 36
-	grey    = 37
-	white   = 38
+	red     Color = 31
+	green         = 32
+	yellow        = 33
+	blue          = 34
+	magenta       = 35
+	cyan          = 36
+	grey          = 37
+	white         = 38
 )
 
 func colorize(message string, color Color, bold bool) string {
@@ -90,4 +90,20 @@ func TableContentHeaderColor(message string) string {
 
 func WarningColor(message string) string {
 	return colorize(message, magenta, true)
+}
+
+func LogStdoutColor(message string) string {
+	return colorize(message, white, false)
+}
+
+func LogStderrColor(message string) string {
+	return colorize(message, magenta, false)
+}
+
+func LogAppHeaderColor(message string) string {
+	return colorize(message, yellow, true)
+}
+
+func LogSysHeaderColor(message string) string {
+	return colorize(message, blue, true)
 }
