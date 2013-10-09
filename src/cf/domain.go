@@ -153,3 +153,10 @@ type ServiceAuthToken struct {
 	Token    string
 	Guid     string
 }
+
+type ServiceBroker struct {
+	Name     string
+	Username string
+	Password string
+	Url      string
+}

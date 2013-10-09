@@ -90,6 +90,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "create-service-broker",
+			Description: "Create a service broker",
+			Usage:       fmt.Sprintf("%s create-service-broker SERVICE_BROKER USERNAME PASSWORD URL", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("create-service-broker")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "create-space",
 			Description: "Create a space",
 			Usage:       fmt.Sprintf("%s create-space SPACE", cf.Name),

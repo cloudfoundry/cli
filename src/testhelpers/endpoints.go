@@ -40,7 +40,7 @@ func EndpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher){
 	return
 }
 
-var RequestBodyMatcher = func(expectedBody string) RequestMatcher {
+func RequestBodyMatcher(expectedBody string) RequestMatcher {
 	return func(request *http.Request) bool {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 
@@ -59,7 +59,7 @@ var RequestBodyMatcher = func(expectedBody string) RequestMatcher {
 	}
 }
 
-var CreateEndpoint = func(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
+func CreateEndpoint(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		if customMatcher == nil {
