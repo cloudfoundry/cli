@@ -71,7 +71,7 @@ func TestEventsSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "time")
-	assert.Contains(t, ui.Outputs[2], "instance #")
+	assert.Contains(t, ui.Outputs[2], "instance")
 	assert.Contains(t, ui.Outputs[2], "description")
 	assert.Contains(t, ui.Outputs[2], "exit status")
 	assert.Contains(t, ui.Outputs[3], timestamp.Local().Format(TIMESTAMP_FORMAT))

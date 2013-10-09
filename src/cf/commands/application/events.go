@@ -58,7 +58,7 @@ func (cmd *Events) Run(c *cli.Context) {
 	}
 
 	table := [][]string{
-		[]string{"time", "instance #", "description", "exit status"},
+		[]string{"time", "instance", "description", "exit status"},
 	}
 
 	for _, event := range appEvents {
