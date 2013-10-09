@@ -2,4 +2,4 @@
 
 set -e
 
-$(dirname $0)/go build -o out/go-cf -v main
+$(dirname $0)/go build -o out/go-cf main
