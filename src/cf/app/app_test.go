@@ -88,6 +88,7 @@ func TestCommands(t *testing.T) {
 		"unmap-domain",
 		"unmap-route",
 		"unset-env",
+		"update-service-broker",
 		"update-user-provided-service",
 	}
 

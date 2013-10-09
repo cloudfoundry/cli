@@ -592,6 +592,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "update-service-broker",
+			Description: "Update a service broker",
+			Usage:       fmt.Sprintf("%s update-service-broker SERVICE_BROKER NEW_SERVICE_BROKER USERNAME PASSWORD URL", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("update-service-broker")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "update-user-provided-service",
 			ShortName:   "uups",
 			Description: "Update user-provided service name value pairs",

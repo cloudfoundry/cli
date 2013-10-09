@@ -12,6 +12,9 @@ type Entity struct {
 	Host     string
 	Label    string
 	Provider string
+	Password string `json:"auth_password"`
+	Username string `json:"auth_username"`
+	Url      string `json:"broker_url"`
 }
 
 type Resource struct {
