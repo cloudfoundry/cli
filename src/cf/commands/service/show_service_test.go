@@ -40,13 +40,16 @@ func TestShowServiceOutput(t *testing.T) {
 		LoginSuccess:         true,
 		TargetedSpaceSuccess: true,
 		ServiceInstance: cf.ServiceInstance{
-			Name:        "service1",
-			Guid:        "service1-guid",
-			ServicePlan: cf.ServicePlan{Name: "plan-name"},
-			ServiceOffering: cf.ServiceOffering{
-				Label:            "mysql",
-				DocumentationUrl: "http://documentation.url",
-				Description:      "the-description",
+			Name: "service1",
+			Guid: "service1-guid",
+			ServicePlan: cf.ServicePlan{
+				Guid: "plan-guid",
+				Name: "plan-name",
+				ServiceOffering: cf.ServiceOffering{
+					Label:            "mysql",
+					DocumentationUrl: "http://documentation.url",
+					Description:      "the-description",
+				},
 			},
 		},
 	}
@@ -63,6 +66,25 @@ func TestShowServiceOutput(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "the-description")
 	assert.Contains(t, ui.Outputs[5], "Documentation url: ")
 	assert.Contains(t, ui.Outputs[5], "http://documentation.url")
+}
+
+func TestShowUserProvidedServiceOutput(t *testing.T) {
+	reqFactory := &testhelpers.FakeReqFactory{
+		LoginSuccess:         true,
+		TargetedSpaceSuccess: true,
+		ServiceInstance: cf.ServiceInstance{
+			Name: "service1",
+			Guid: "service1-guid",
+		},
+	}
+	ui := callShowService([]string{"service1"}, reqFactory)
+
+	assert.Equal(t, len(ui.Outputs), 3)
+	assert.Contains(t, ui.Outputs[0], "")
+	assert.Contains(t, ui.Outputs[1], "Service instance: ")
+	assert.Contains(t, ui.Outputs[1], "service1")
+	assert.Contains(t, ui.Outputs[2], "Service: ")
+	assert.Contains(t, ui.Outputs[2], "user-provided")
 }
 
 func callShowService(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {

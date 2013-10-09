@@ -41,7 +41,7 @@ func TestUpdateUserProvidedServiceRequirements(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 	args := []string{"service-name", `{"foo":"bar"}`}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name", Type: "user_provided_service_instance"}
+	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
 	reqFactory := &testhelpers.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -62,7 +62,7 @@ func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
 	args := []string{"service-name", `{"foo":"ba`}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name", Type: "user_provided_service_instance"}
+	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
 	reqFactory := &testhelpers.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -79,7 +79,12 @@ func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided(t *testing.T) {
 	args := []string{"service-name", `{"foo":"bar"}`}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name", Type: "not user provided"}
+	serviceInstance := cf.ServiceInstance{
+		Name: "found-service-name",
+		ServicePlan: cf.ServicePlan{
+			Guid: "my-plan-guid",
+		},
+	}
 	reqFactory := &testhelpers.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,

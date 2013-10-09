@@ -170,16 +170,16 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	serviceOfferingEntity := resource.Entity.ServicePlan.Entity.ServiceOffering.Entity
 	instance.Guid = resource.Metadata.Guid
 	instance.Name = resource.Entity.Name
-	instance.Type = resource.Entity.Type
-
-	instance.ServiceOffering.Label = serviceOfferingEntity.Label
-	instance.ServiceOffering.DocumentationUrl = serviceOfferingEntity.DocumentationUrl
-	instance.ServiceOffering.Description = serviceOfferingEntity.Description
 
 	instance.ServicePlan = cf.ServicePlan{
 		Name: resource.Entity.ServicePlan.Entity.Name,
 		Guid: resource.Entity.ServicePlan.Metadata.Guid,
 	}
+
+	instance.ServicePlan.ServiceOffering.Label = serviceOfferingEntity.Label
+	instance.ServicePlan.ServiceOffering.DocumentationUrl = serviceOfferingEntity.DocumentationUrl
+	instance.ServicePlan.ServiceOffering.Description = serviceOfferingEntity.Description
+
 	instance.ServiceBindings = []cf.ServiceBinding{}
 
 	for _, bindingResource := range resource.Entity.ServiceBindings {

@@ -199,6 +199,7 @@ func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSumma
 
 		servicePlan := cf.ServicePlan{
 			Name:            planSummary.Name,
+			Guid:            planSummary.Guid,
 			ServiceOffering: serviceOffering,
 		}
 

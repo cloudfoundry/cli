@@ -146,6 +146,7 @@ type ServiceInstanceSummary struct {
 
 type ServicePlanSummary struct {
 	Name            string
+	Guid            string
 	ServiceOffering ServiceOfferingSummary `json:"service"`
 }
 
@@ -194,7 +195,6 @@ type ServiceInstanceResource struct {
 
 type ServiceInstanceEntity struct {
 	Name            string
-	Type            string
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
 	ServicePlan     ServicePlanResource      `json:"service_plan"`
 }

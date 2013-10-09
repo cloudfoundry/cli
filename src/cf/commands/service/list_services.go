@@ -40,9 +40,12 @@ func (cmd ListServices) Run(c *cli.Context) {
 	}
 
 	for _, instance := range space.ServiceInstances {
-		serviceColumn := instance.ServicePlan.ServiceOffering.Label
-		if serviceColumn == "" {
+		var serviceColumn string
+
+		if instance.IsUserProvided() {
 			serviceColumn = "user-provided"
+		} else {
+			serviceColumn = instance.ServiceOffering().Label
 		}
 
 		table = append(table, []string{

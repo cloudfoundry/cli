@@ -357,6 +357,7 @@ func TestSpacesGetSummary(t *testing.T) {
 	instance1 := space.ServiceInstances[0]
 	assert.Equal(t, instance1.Name, "my-service-instance")
 	assert.Equal(t, instance1.ServicePlan.Name, "spark")
+	assert.Equal(t, instance1.ServiceOffering().Label, "cleardb")
 	assert.Equal(t, instance1.ServicePlan.ServiceOffering.Label, "cleardb")
 	assert.Equal(t, instance1.ServicePlan.ServiceOffering.Provider, "cleardb-provider")
 	assert.Equal(t, instance1.ServicePlan.ServiceOffering.Version, "n/a")

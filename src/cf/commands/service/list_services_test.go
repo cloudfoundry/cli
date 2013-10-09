@@ -13,6 +13,7 @@ func TestServices(t *testing.T) {
 		cf.ServiceInstance{
 			Name: "my-service-1",
 			ServicePlan: cf.ServicePlan{
+				Guid: "spark-guid",
 				Name: "spark",
 				ServiceOffering: cf.ServiceOffering{
 					Label: "cleardb",
@@ -23,6 +24,7 @@ func TestServices(t *testing.T) {
 		cf.ServiceInstance{
 			Name: "my-service-2",
 			ServicePlan: cf.ServicePlan{
+				Guid: "spark-guid",
 				Name: "spark",
 				ServiceOffering: cf.ServiceOffering{
 					Label: "cleardb",
