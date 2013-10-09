@@ -1,8 +1,8 @@
-package service_test
+package serviceauthtoken_test
 
 import (
 	"cf"
-	. "cf/commands/service"
+	. "cf/commands/serviceauthtoken"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
