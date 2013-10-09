@@ -14,9 +14,9 @@ echo -e "\n Testing packages:"
 $(dirname $0)/go test cf/... $@
 let "result+=$?"
 
-#echo -e "\n Vetting packages for potential issues..."
-#$(dirname $0)/go vet cf/...
-#let "result+=$?"
+echo -e "\n Vetting packages for potential issues..."
+$(dirname $0)/go vet cf/...
+let "result+=$?"
 
 echo -e "\n Running build script to confirm everything compiles..."
 $(dirname $0)/build
