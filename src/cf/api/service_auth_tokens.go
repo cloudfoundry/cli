@@ -10,6 +10,7 @@ import (
 
 type ServiceAuthTokenRepository interface {
 	Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
+	FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceAuthTokenRepository struct {
@@ -33,5 +34,30 @@ func (repo CloudControllerServiceAuthTokenRepository) Create(authToken cf.Servic
 	}
 
 	apiResponse = repo.gateway.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
+
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	response := &ApiResponse{}
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, resource := range response.Resources {
+		authTokens = append(authTokens, cf.ServiceAuthToken{
+			Guid:     resource.Metadata.Guid,
+			Label:    resource.Entity.Label,
+			Provider: resource.Entity.Provider,
+		})
+	}
+
 	return
 }

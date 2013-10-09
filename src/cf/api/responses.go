@@ -8,8 +8,10 @@ type Metadata struct {
 }
 
 type Entity struct {
-	Name string
-	Host string
+	Name     string
+	Host     string
+	Label    string
+	Provider string
 }
 
 type Resource struct {

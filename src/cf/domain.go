@@ -149,4 +149,5 @@ type ServiceAuthToken struct {
 	Label    string
 	Provider string
 	Token    string
+	Guid     string
 }

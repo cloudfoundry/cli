@@ -64,6 +64,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["share-domain"] = domain.NewShareDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, config)
 	factory.cmdsByName["service"] = service.NewShowService(ui)
+	factory.cmdsByName["service-auth-tokens"] = serviceauthtoken.NewListServiceAuthTokens(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, config, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["stacks"] = NewStacks(ui, repoLocator.GetStackRepository())

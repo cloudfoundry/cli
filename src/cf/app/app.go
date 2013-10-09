@@ -433,6 +433,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "service-auth-tokens",
+			Description: "List service auth tokens",
+			Usage:       fmt.Sprintf("%s service-auth-tokens", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("service-auth-tokens")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "services",
 			ShortName:   "s",
 			Description: "List all services in the target space",
