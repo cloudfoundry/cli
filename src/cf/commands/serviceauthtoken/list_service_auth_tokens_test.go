@@ -26,25 +26,22 @@ func TestListServiceAuthTokens(t *testing.T) {
 	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
 
 	authTokenRepo.FindAllAuthTokens = []cf.ServiceAuthToken{
-		cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Guid: "a guid"},
-		cf.ServiceAuthToken{Label: "a second label", Provider: "a second provider", Guid: "a second guid"},
+		cf.ServiceAuthToken{Label: "a label", Provider: "a provider"},
+		cf.ServiceAuthToken{Label: "a second label", Provider: "a second provider"},
 	}
 
 	ui := callListServiceAuthTokens(reqFactory, authTokenRepo)
 	assert.Contains(t, ui.Outputs[0], "Getting service auth tokens")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "Label")
-	assert.Contains(t, ui.Outputs[3], "Provider")
-	assert.Contains(t, ui.Outputs[3], "Guid")
+	assert.Contains(t, ui.Outputs[3], "label")
+	assert.Contains(t, ui.Outputs[3], "provider")
 
 	assert.Contains(t, ui.Outputs[4], "a label")
 	assert.Contains(t, ui.Outputs[4], "a provider")
-	assert.Contains(t, ui.Outputs[4], "a guid")
 
 	assert.Contains(t, ui.Outputs[5], "a second label")
 	assert.Contains(t, ui.Outputs[5], "a second provider")
-	assert.Contains(t, ui.Outputs[5], "a second guid")
 }
 
 func callListServiceAuthTokens(reqFactory *testhelpers.FakeReqFactory, authTokenRepo *testhelpers.FakeAuthTokenRepo) (ui *testhelpers.FakeUI) {
