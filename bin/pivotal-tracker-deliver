@@ -3,13 +3,10 @@
 # gem 'pivotal-tracker'
 require 'pivotal-tracker'
 
-TRACKER_TOKEN = "fbd148e0300f96e50b978013bd5c1646"
-TRACKER_PROJECT_ID = "892938"
-
-PivotalTracker::Client.token = TRACKER_TOKEN
+PivotalTracker::Client.token = ENV["PIVOTAL_TRACKER_TOKEN"]
 PivotalTracker::Client.use_ssl = true
 
-unpakt_project = PivotalTracker::Project.find(TRACKER_PROJECT_ID)
+unpakt_project = PivotalTracker::Project.find(ENV["PIVOTAL_TRACKER_PROJECT_ID"])
 stories = unpakt_project.stories.all(:state => "finished", :story_type => ['bug', 'feature'])
 
 staging_deploy_tag = `git tag | grep staging | tail -n1`
@@ -22,6 +19,6 @@ stories.each do | story |
     story.notes.create(:text => "Delivered by jenkins.")
     story.update({"current_state" => "delivered"})
   else
-    puts "Coult not find #{story.id} in git repo."
+    puts "Could not find #{story.id} in git repo."
   end
 end
