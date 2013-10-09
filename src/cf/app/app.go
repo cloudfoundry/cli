@@ -118,7 +118,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Delete an app",
 			Usage:       fmt.Sprintf("%s delete -f APP", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "Force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("delete")
@@ -130,7 +130,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Delete a domain",
 			Usage:       fmt.Sprintf("%s delete-domain DOMAIN", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("delete-domain")
@@ -142,7 +142,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Delete an org",
 			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "Force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("delete-org")
@@ -164,7 +164,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Delete a space",
 			Usage:       fmt.Sprintf("%s delete-space SPACE", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{"f", "Force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("delete-space")
@@ -240,7 +240,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Tail or show recent logs for an app",
 			Usage:       fmt.Sprintf("%s logs APP", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{"recent", "dump recent logs instead of tailing"},
+				cli.BoolFlag{Name: "recent", Usage: "dump recent logs instead of tailing"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("logs")
@@ -271,7 +271,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Add a url route to an app",
 			Usage:       fmt.Sprintf("%s map-route APP DOMAIN [-n HOSTNAME]", cf.Name),
 			Flags: []cli.Flag{
-				cli.StringFlag{"n", "", "Hostname"},
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("map-route")
@@ -315,17 +315,17 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 				"               [-m MEMORY] [-b URL] [--no-[re]start] [--no-route] [-p PATH]\n" +
 				"               [-s STACK] [-c COMMAND]",
 			Flags: []cli.Flag{
-				cli.StringFlag{"d", "", "Domain (for example: example.com)"},
-				cli.StringFlag{"n", "", "Hostname (for example: my-subdomain)"},
-				cli.IntFlag{"i", 1, "Number of instances"},
-				cli.StringFlag{"m", "128", "Memory limit (for example: 256, 1G, 1024M)"},
-				cli.StringFlag{"b", "", "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
-				cli.BoolFlag{"no-start", "Do not start an app after pushing"},
-				cli.BoolFlag{"no-restart", "Do not restart an app after pushing"},
-				cli.BoolFlag{"no-route", "Do not map a route to this app"},
-				cli.StringFlag{"p", "", "Path of app directory or zip file"},
-				cli.StringFlag{"s", "", "Stack to use"},
-				cli.StringFlag{"c", "", "Startup command"},
+				cli.StringFlag{Name: "d", Value: "", Usage: "Domain (for example: example.com)"},
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname (for example: my-subdomain)"},
+				cli.IntFlag{Name: "i", Value: 1, Usage: "Number of instances"},
+				cli.StringFlag{Name: "m", Value: "128", Usage: "Memory limit (for example: 256, 1G, 1024M)"},
+				cli.StringFlag{Name: "b", Value: "", Usage: "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
+				cli.BoolFlag{Name: "no-restart", Usage: "Do not restart an app after pushing"},
+				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
+				cli.StringFlag{Name: "p", Value: "", Usage: "Path of app directory or zip file"},
+				cli.StringFlag{Name: "s", Value: "", Usage: "Stack to use"},
+				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("push")
@@ -382,7 +382,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Reserve a url route on a space for later use",
 			Usage:       fmt.Sprintf("%s reserve-route SPACE DOMAIN [-n HOSTNAME]", cf.Name),
 			Flags: []cli.Flag{
-				cli.StringFlag{"n", "", "Hostname"},
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("reserve-route")
@@ -414,9 +414,9 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Change the disk quota, instance count, and memory limit for an app",
 			Usage:       fmt.Sprintf("%s scale APP -d DISK -i INSTANCES -m MEMORY", cf.Name),
 			Flags: []cli.Flag{
-				cli.StringFlag{"d", "", "disk quota"},
-				cli.IntFlag{"i", 0, "number of instances"},
-				cli.StringFlag{"m", "", "memory limit"},
+				cli.StringFlag{Name: "d", Value: "", Usage: "disk quota"},
+				cli.IntFlag{Name: "i", Value: 0, Usage: "number of instances"},
+				cli.StringFlag{Name: "m", Value: "", Usage: "memory limit"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("scale")
@@ -534,8 +534,8 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Set or view the targeted org or space",
 			Usage:       fmt.Sprintf("%s target [-o ORG] [-s SPACE]", cf.Name),
 			Flags: []cli.Flag{
-				cli.StringFlag{"o", "", "organization"},
-				cli.StringFlag{"s", "", "space"},
+				cli.StringFlag{Name: "o", Value: "", Usage: "organization"},
+				cli.StringFlag{Name: "s", Value: "", Usage: "space"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("target")
@@ -566,7 +566,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Description: "Remove a url route from an app",
 			Usage:       fmt.Sprintf("%s unmap-route APP DOMAIN [-n HOSTNAME]", cf.Name),
 			Flags: []cli.Flag{
-				cli.StringFlag{"n", "", "Hostname"},
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("unmap-route")
