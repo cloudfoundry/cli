@@ -211,7 +211,7 @@ type ServiceBindingEntity struct {
 	AppGuid string `json:"app_guid"`
 }
 
-type SpaceApiResponse struct {
+type PaginatedSpaceResources struct {
 	Resources []SpaceResource
 }
 

@@ -64,20 +64,20 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		return
 	}
 
-	response := new(SpaceApiResponse)
+	resources := new(PaginatedSpaceResources)
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Space", name)
 		return
 	}
 
-	r := response.Resources[0]
+	r := resources.Resources[0]
 	apps := []cf.Application{}
 	for _, app := range r.Entity.Applications {
 		apps = append(apps, cf.Application{Name: app.Entity.Name, Guid: app.Metadata.Guid})
