@@ -3,13 +3,13 @@ package serviceauthtoken_test
 import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
-	"cf/net"
 )
 
 func TestDeleteServiceAuthTokenFailsWithUsage(t *testing.T) {
