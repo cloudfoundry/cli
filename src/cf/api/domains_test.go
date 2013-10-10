@@ -46,17 +46,10 @@ var multipleDomainsEndpoint, multipleDomainsEndpointStatus = testhelpers.CreateC
 )
 
 func TestFindAllInCurrentSpace(t *testing.T) {
-	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
-	defer ts.Close()
-	defer multipleDomainsEndpointStatus.Reset()
+	multipleDomainsEndpointStatus.Reset()
 
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
+	ts, repo := createDomainRepo(multipleDomainsEndpoint)
+	defer ts.Close()
 
 	domains, apiResponse := repo.FindAllInCurrentSpace()
 	assert.True(t, multipleDomainsEndpointStatus.Called())
@@ -126,19 +119,12 @@ var orgDomainsEndpoint, orgDomainsEndpointStatus = testhelpers.CreateCheckableEn
 )
 
 func TestFindAllByOrg(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(orgDomainsEndpoint))
+	orgDomainsEndpointStatus.Reset()
+
+	ts, repo := createDomainRepo(orgDomainsEndpoint)
 	defer ts.Close()
-	defer orgDomainsEndpointStatus.Reset()
 
 	org := cf.Organization{Guid: "my-org-guid"}
-	config := &configuration.Configuration{
-		AccessToken:  "BEARER my_access_token",
-		Target:       ts.URL,
-		Organization: org,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
-
 	domains, apiResponse := repo.FindAllByOrg(org)
 
 	assert.True(t, orgDomainsEndpointStatus.Called())
@@ -156,17 +142,10 @@ func TestFindAllByOrg(t *testing.T) {
 }
 
 func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
-	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
-	defer ts.Close()
-	defer multipleDomainsEndpointStatus.Reset()
+	multipleDomainsEndpointStatus.Reset()
 
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
+	ts, repo := createDomainRepo(multipleDomainsEndpoint)
+	defer ts.Close()
 
 	domain, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
 	assert.True(t, multipleDomainsEndpointStatus.Called())
@@ -177,17 +156,10 @@ func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
 }
 
 func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
-	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
-	defer ts.Close()
-	defer multipleDomainsEndpointStatus.Reset()
+	multipleDomainsEndpointStatus.Reset()
 
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
+	ts, repo := createDomainRepo(multipleDomainsEndpoint)
+	defer ts.Close()
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("")
 	assert.True(t, multipleDomainsEndpointStatus.Called())
@@ -206,16 +178,8 @@ func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testi
 `},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("")
 	assert.True(t, status.Called())
@@ -224,17 +188,10 @@ func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testi
 }
 
 func TestFindByNameInCurrentSpaceWhenTheDomainIsNotFound(t *testing.T) {
-	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
-	defer ts.Close()
-	defer multipleDomainsEndpointStatus.Reset()
+	multipleDomainsEndpointStatus.Reset()
 
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
+	ts, repo := createDomainRepo(multipleDomainsEndpoint)
+	defer ts.Close()
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("domain3.cf-app.com")
 	assert.True(t, multipleDomainsEndpointStatus.Called())
@@ -260,17 +217,8 @@ func TestCreateDomain(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domainToCreate := cf.Domain{Name: "example.com"}
 	owningOrg := cf.Organization{Guid: "domain1-guid"}
@@ -298,16 +246,8 @@ func TestShareDomain(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domainToShare := cf.Domain{Name: "example.com"}
 	apiResponse := repo.Share(domainToShare)
@@ -316,17 +256,10 @@ func TestShareDomain(t *testing.T) {
 }
 
 func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
-	ts := httptest.NewTLSServer(orgDomainsEndpoint)
+	orgDomainsEndpointStatus.Reset()
+
+	ts, repo := createDomainRepo(orgDomainsEndpoint)
 	defer ts.Close()
-	defer orgDomainsEndpointStatus.Reset()
-
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerDomainRepository(&config, gateway)
 
 	domainName := "example.com"
 	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
@@ -349,17 +282,10 @@ func mapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers
 }
 
 func TestMapDomainSuccess(t *testing.T) {
-	hf, reqStatus := mapDomainEndpoint(http.StatusOK)
-	ts := httptest.NewTLSServer(hf)
+	endpoint, reqStatus := mapDomainEndpoint(http.StatusOK)
+
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerDomainRepository(&config, gateway)
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
@@ -371,17 +297,10 @@ func TestMapDomainSuccess(t *testing.T) {
 }
 
 func TestMapDomainWhenServerError(t *testing.T) {
-	hf, reqStatus := mapDomainEndpoint(http.StatusBadRequest)
-	ts := httptest.NewTLSServer(hf)
+	endpoint, reqStatus := mapDomainEndpoint(http.StatusBadRequest)
+
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerDomainRepository(&config, gateway)
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
@@ -403,17 +322,10 @@ func unmapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpe
 }
 
 func TestUnmapDomainSuccess(t *testing.T) {
-	hf, reqStatus := unmapDomainEndpoint(http.StatusOK)
-	ts := httptest.NewTLSServer(hf)
+	endpoint, reqStatus := unmapDomainEndpoint(http.StatusOK)
+
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerDomainRepository(&config, gateway)
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
@@ -435,17 +347,10 @@ func deleteDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelp
 }
 
 func TestDeleteDomainSuccess(t *testing.T) {
-	hf, reqStatus := deleteDomainEndpoint(http.StatusOK)
-	ts := httptest.NewTLSServer(hf)
+	endpoint, reqStatus := deleteDomainEndpoint(http.StatusOK)
+
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerDomainRepository(&config, gateway)
 
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
 
@@ -456,17 +361,10 @@ func TestDeleteDomainSuccess(t *testing.T) {
 }
 
 func TestDeleteDomainFailure(t *testing.T) {
-	hf, reqStatus := deleteDomainEndpoint(http.StatusBadRequest)
-	ts := httptest.NewTLSServer(hf)
+	endpoint, reqStatus := deleteDomainEndpoint(http.StatusBadRequest)
+
+	ts, repo := createDomainRepo(endpoint)
 	defer ts.Close()
-
-	config := configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerDomainRepository(&config, gateway)
 
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
 
@@ -474,4 +372,18 @@ func TestDeleteDomainFailure(t *testing.T) {
 
 	assert.True(t, reqStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
+}
+
+func createDomainRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo DomainRepository) {
+	ts = httptest.NewTLSServer(endpoint)
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Guid: "my-space-guid"},
+		Organization:  cf.Organization{Guid: "my-org-guid"},
+	}
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerDomainRepository(config, gateway)
+	return
 }
