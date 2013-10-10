@@ -29,15 +29,8 @@ func TestStacksFindByName(t *testing.T) {
 		response,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createStackRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stack, apiResponse := repo.FindByName("linux")
 	assert.True(t, status.Called())
@@ -87,15 +80,8 @@ func TestStacksFindAll(t *testing.T) {
 		allStacksResponse,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createStackRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stacks, apiResponse := repo.FindAll()
 	assert.True(t, status.Called())
@@ -103,4 +89,16 @@ func TestStacksFindAll(t *testing.T) {
 	assert.Equal(t, len(stacks), 2)
 	assert.Equal(t, stacks[0].Name, "lucid64")
 	assert.Equal(t, stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")
+}
+
+func createStackRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo StackRepository) {
+	ts = httptest.NewTLSServer(endpoint)
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerStackRepository(config, gateway)
+	return
 }
