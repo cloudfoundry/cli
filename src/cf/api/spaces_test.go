@@ -43,16 +43,9 @@ var multipleSpacesEndpoint, multipleSpacesEndpointStatus = testhelpers.CreateChe
 
 func TestSpacesFindAll(t *testing.T) {
 	multipleSpacesEndpointStatus.Reset()
-	ts := httptest.NewTLSServer(multipleSpacesEndpoint)
+	ts, repo := createSpacesRepo(multipleSpacesEndpoint)
 	defer ts.Close()
 
-	config := &configuration.Configuration{
-		AccessToken:  "BEARER my_access_token",
-		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "some-org-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 	spaces, apiResponse := repo.FindAll()
 
 	assert.True(t, multipleSpacesEndpointStatus.Called())
@@ -66,35 +59,6 @@ func TestSpacesFindAll(t *testing.T) {
 	secondSpace := spaces[1]
 	assert.Equal(t, secondSpace.Name, "staging")
 	assert.Equal(t, secondSpace.Guid, "staging-space-guid")
-}
-
-func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
-	multipleSpacesEndpointStatus.Reset()
-	ts := httptest.NewTLSServer(multipleSpacesEndpoint)
-	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken:  "BEARER incorrect_access_token",
-		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "some-org-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
-
-	var (
-		spaces      []cf.Space
-		apiResponse net.ApiResponse
-	)
-
-	// Capture output so debugging info does not show up in test
-	// output
-	testhelpers.CaptureOutput(func() {
-		spaces, apiResponse = repo.FindAll()
-	})
-
-	assert.True(t, multipleSpacesEndpointStatus.Called())
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 0, len(spaces))
 }
 
 var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
@@ -161,21 +125,14 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
 func TestSpacesFindByName(t *testing.T) {
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"GET",
-		"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
+		"/v2/organizations/some-org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
 		nil,
 		findSpaceByNameResponse,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
 
-	config := &configuration.Configuration{
-		AccessToken:  "BEARER my_access_token",
-		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "org-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 	apps := []cf.Application{
 		cf.Application{Name: "app1", Guid: "app1-guid"},
@@ -206,21 +163,13 @@ func TestSpacesFindByName(t *testing.T) {
 func TestSpacesDidNotFindByName(t *testing.T) {
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"GET",
-		"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
+		"/v2/organizations/some-org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
 		nil,
 		testhelpers.TestResponse{Status: http.StatusOK, Body: ` { "resources": [ ] }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken:  "BEARER my_access_token",
-		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "org-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	_, apiResponse := repo.FindByName("space1")
 	assert.True(t, status.Called())
@@ -304,16 +253,8 @@ func TestSpacesGetSummary(t *testing.T) {
 		spaceSummaryResponse,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space, apiResponse := repo.GetSummary()
 	assert.True(t, status.Called())
@@ -363,20 +304,12 @@ func TestCreateSpace(t *testing.T) {
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"POST",
 		"/v2/spaces",
-		testhelpers.RequestBodyMatcher(`{"name":"space-name","organization_guid":"org-guid"}`),
+		testhelpers.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken:  "BEARER my_access_token",
-		Target:       ts.URL,
-		Organization: cf.Organization{Guid: "org-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	apiResponse := repo.Create("space-name")
 	assert.True(t, status.Called())
@@ -391,15 +324,8 @@ func TestRenameSpace(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space := cf.Space{Guid: "my-space-guid"}
 	apiResponse := repo.Rename(space, "new-space-name")
@@ -415,18 +341,25 @@ func TestDeleteSpace(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space := cf.Space{Guid: "my-space-guid"}
 	apiResponse := repo.Delete(space)
 	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func createSpacesRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo SpaceRepository) {
+	ts = httptest.NewTLSServer(endpoint)
+
+	config := &configuration.Configuration{
+		AccessToken:  "BEARER my_access_token",
+		Target:       ts.URL,
+		Organization: cf.Organization{Guid: "some-org-guid"},
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerSpaceRepository(config, gateway)
+	return
 }
