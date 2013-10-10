@@ -38,7 +38,7 @@ func (cmd UpdateServiceBroker) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Updating service broker %s", terminal.EntityNameColor(serviceBroker.Name))
+	cmd.ui.Say("Updating service broker %s...", terminal.EntityNameColor(serviceBroker.Name))
 
 	serviceBroker.Name = c.Args()[1]
 	serviceBroker.Username = c.Args()[2]

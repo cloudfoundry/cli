@@ -12,6 +12,7 @@ type FakeServiceBrokerRepo struct {
 
 	CreatedServiceBroker cf.ServiceBroker
 	UpdatedServiceBroker cf.ServiceBroker
+	RenamedServiceBroker cf.ServiceBroker
 	DeletedServiceBroker cf.ServiceBroker
 }
 
@@ -33,6 +34,11 @@ func (repo *FakeServiceBrokerRepo) Create(serviceBroker cf.ServiceBroker) (apiRe
 
 func (repo *FakeServiceBrokerRepo) Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
 	repo.UpdatedServiceBroker = serviceBroker
+	return
+}
+
+func (repo *FakeServiceBrokerRepo) Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+	repo.RenamedServiceBroker = serviceBroker
 	return
 }
 

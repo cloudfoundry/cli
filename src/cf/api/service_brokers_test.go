@@ -122,6 +122,29 @@ func TestUpdateServiceBroker(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestRenameServiceBroker(t *testing.T) {
+	expectedReqBody := `{"name":"update-foobroker"}`
+
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/service_brokers/my-guid",
+		testhelpers.RequestBodyMatcher(expectedReqBody),
+		testhelpers.TestResponse{Status: http.StatusOK},
+	)
+
+	repo, ts := createServiceBrokerRepo(endpoint)
+	defer ts.Close()
+
+	serviceBroker := cf.ServiceBroker{
+		Guid: "my-guid",
+		Name: "update-foobroker",
+	}
+	apiResponse := repo.Rename(serviceBroker)
+
+	assert.True(t, status.Called())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 func TestDeleteServiceBroker(t *testing.T) {
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"DELETE",

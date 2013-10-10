@@ -58,6 +58,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["rename"] = application.NewRenameApp(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["rename-org"] = organization.NewRenameOrg(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["rename-service"] = service.NewRenameService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["rename-service-broker"] = servicebroker.NewRenameServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, repoLocator.GetSpaceRepository(), configRepo)
 	factory.cmdsByName["reserve-domain"] = domain.NewReserveDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["reserve-route"] = route.NewReserveRoute(ui, repoLocator.GetRouteRepository())

@@ -67,6 +67,7 @@ func TestCommands(t *testing.T) {
 		"rename",
 		"rename-org",
 		"rename-service",
+		"rename-service-broker",
 		"rename-space",
 		"reserve-domain",
 		"reserve-route",

@@ -12,6 +12,7 @@ type ServiceBrokerRepository interface {
 	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
 	Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 	Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
+	Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 	Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 }
 
@@ -60,6 +61,19 @@ func (repo CloudControllerServiceBrokerRepository) Create(serviceBroker cf.Servi
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
 	return repo.createOrUpdate(serviceBroker)
+}
+
+func (repo CloudControllerServiceBrokerRepository) Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
+	body := fmt.Sprintf(`{"name":"%s"}`, serviceBroker.Name)
+
+	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(req)
+	return
 }
 
 func (repo CloudControllerServiceBrokerRepository) createOrUpdate(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {

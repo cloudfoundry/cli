@@ -381,6 +381,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "rename-service-broker",
+			Description: "Rename a service broker",
+			Usage:       fmt.Sprintf("%s rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("rename-service-broker")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "rename-space",
 			Description: "Rename a space",
 			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name),
