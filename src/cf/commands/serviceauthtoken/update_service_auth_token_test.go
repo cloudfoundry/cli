@@ -1,11 +1,11 @@
-package service_test
+package serviceauthtoken_test
 
 import (
-	. "cf/commands/service"
+	"cf"
+	. "cf/commands/serviceauthtoken"
 	"github.com/stretchr/testify/assert"
 	"testhelpers"
 	"testing"
-	"cf"
 )
 
 func TestUpdateServiceAuthTokenFailsWithUsage(t *testing.T) {
@@ -48,7 +48,7 @@ func TestUpdateServiceAuthToken(t *testing.T) {
 	expectedAuthToken := cf.ServiceAuthToken{
 		Label:    "a label",
 		Provider: "a provider",
-		Value:    "a value",
+		Token:    "a value",
 	}
 	assert.Equal(t, ui.Outputs[0], "Updating service auth token...")
 	assert.Contains(t, ui.Outputs[1], "OK")

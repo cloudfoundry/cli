@@ -64,5 +64,39 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	panic("NOT IMPLEMENTED")
+	tokens, apiResponse := repo.FindAll()
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	i := indexOfToken(tokens, authToken)
+	if i == -1 {
+		apiResponse = net.NewNotFoundApiResponse("Service Token", authToken.Label)
+		return
+	}
+
+	tokenGuid := tokens[i].Guid
+
+	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, tokenGuid)
+	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
+	println(path)
+	println(body)
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(request)
+	return
+}
+
+func indexOfToken(tokens []cf.ServiceAuthToken, matcher cf.ServiceAuthToken) int {
+	key := matcher.FindByNameKey()
+	for i, token := range tokens {
+		if token.FindByNameKey() == key {
+			return i
+		}
+	}
+
+	return -1
 }

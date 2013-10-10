@@ -1,12 +1,12 @@
-package service
+package serviceauthtoken
 
 import (
+	"cf"
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
-	"github.com/codegangsta/cli"
 	"errors"
-	"cf"
+	"github.com/codegangsta/cli"
 )
 
 type UpdateServiceAuthToken struct {
@@ -36,10 +36,10 @@ func (cmd UpdateServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 func (cmd UpdateServiceAuthToken) Run(c *cli.Context) {
 	cmd.ui.Say("Updating service auth token...")
 
-	serviceAuthToken:= cf.ServiceAuthToken{
+	serviceAuthToken := cf.ServiceAuthToken{
 		Label:    c.Args()[0],
 		Provider: c.Args()[1],
-		Value:    c.Args()[2],
+		Token:    c.Args()[2],
 	}
 
 	apiResponse := cmd.authTokenRepo.Update(serviceAuthToken)

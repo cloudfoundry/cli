@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testhelpers"
 	"testing"
 )
@@ -28,14 +29,13 @@ func TestCreate(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
-func TestFindAll(t *testing.T) {
-	reqStatus := &testhelpers.RequestStatus{}
+var findAllStatus = &testhelpers.RequestStatus{}
 
-	findAllServiceAuthTokensEndpoint := testhelpers.CreateEndpoint(
-		"GET",
-		"/v2/service_auth_tokens",
-		testhelpers.EndpointCalledMatcher(reqStatus),
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var findAllServiceAuthTokensEndpoint = testhelpers.CreateEndpoint(
+	"GET",
+	"/v2/service_auth_tokens",
+	testhelpers.EndpointCalledMatcher(findAllStatus),
+	testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -44,7 +44,8 @@ func TestFindAll(t *testing.T) {
       },
       "entity": {
         "label": "mysql",
-        "provider": "mysql-core"
+        "provider": "mysql-core",
+        "token": "mysql-token-guid"
       }
     },
     {
@@ -57,13 +58,16 @@ func TestFindAll(t *testing.T) {
       }
     }
   ]
-}`})
+}`},
+)
 
+func TestFindAll(t *testing.T) {
+	findAllStatus.Reset()
 	ts, repo := createServiceAuthTokenRepo(findAllServiceAuthTokensEndpoint)
 	defer ts.Close()
 
 	authTokens, apiResponse := repo.FindAll()
-	assert.True(t, reqStatus.Called)
+	assert.True(t, findAllStatus.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 
 	assert.Equal(t, len(authTokens), 2)
@@ -90,15 +94,26 @@ func createServiceAuthTokenRepo(endpoint http.HandlerFunc) (ts *httptest.Server,
 	return
 }
 
-var updateServiceAuthTokenEndpoint = testhelpers.CreateEndpoint(
+var updateServiceAuthTokenEndpoint, updateStatus = testhelpers.CreateCheckableEndpoint(
 	"PUT",
-	"/v2/service_auth_tokens/my-auth-token-guid",
+	"/v2/service_auth_tokens/mysql-core-guid",
 	testhelpers.RequestBodyMatcher(`{"token":"a value"}`),
 	testhelpers.TestResponse{Status: http.StatusCreated},
 )
 
-func TestUpdate(t *testing.T) {
-	ts := httptest.NewTLSServer(updateServiceAuthTokenEndpoint)
+var servicesEndpoints = http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+	if strings.Contains(request.Method, "PUT") {
+		updateServiceAuthTokenEndpoint(writer, request)
+	} else {
+		findAllServiceAuthTokensEndpoint(writer, request)
+	}
+})
+
+func TestServiceAuthUpdate(t *testing.T) {
+	updateStatus.Reset()
+	findAllStatus.Reset()
+
+	ts := httptest.NewTLSServer(servicesEndpoints)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -109,11 +124,12 @@ func TestUpdate(t *testing.T) {
 
 	repo := NewCloudControllerServiceAuthTokenRepository(config, gateway)
 	apiResponse := repo.Update(cf.ServiceAuthToken{
-		Guid: "my-auth-token-guid",
-		Label: "a label",
-		Provider: "a provider",
-		Value: "a value",
+		Label:    "mysql",
+		Provider: "mysql-core",
+		Token:    "a value",
 	})
 
+	assert.True(t, findAllStatus.Called())
+	assert.True(t, updateStatus.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 }

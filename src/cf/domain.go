@@ -148,11 +148,14 @@ type Quota struct {
 }
 
 type ServiceAuthToken struct {
-	Guid	 string
+	Guid     string
 	Label    string
 	Provider string
 	Token    string
-	Guid     string
+}
+
+func (token ServiceAuthToken) FindByNameKey() string {
+	return token.Label + token.Provider
 }
 
 type ServiceBroker struct {
