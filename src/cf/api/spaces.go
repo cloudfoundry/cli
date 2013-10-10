@@ -40,15 +40,15 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiResp
 		return
 	}
 
-	response := new(ApiResponse)
+	resources := new(PaginatedResources)
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, r := range response.Resources {
+	for _, r := range resources.Resources {
 		spaces = append(spaces, cf.Space{Name: r.Entity.Name, Guid: r.Metadata.Guid})
 	}
 

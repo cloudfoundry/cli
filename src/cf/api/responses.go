@@ -22,11 +22,11 @@ type Resource struct {
 	Entity   Entity
 }
 
-type ApiResponse struct {
+type PaginatedResources struct {
 	Resources []Resource
 }
 
-type ApplicationsApiResponse struct {
+type PaginatedApplicationResources struct {
 	Resources []ApplicationResource
 }
 
@@ -50,7 +50,7 @@ type AppFile struct {
 	Size int64  `json:"size"`
 }
 
-type EventsApiResponse struct {
+type PaginatedEventResources struct {
 	Resources []EventResource
 }
 
@@ -66,7 +66,7 @@ type EventEntity struct {
 	InstanceIndex   int    `json:"instance_index"`
 }
 
-type RoutesResponse struct {
+type PaginatedRouteResources struct {
 	Routes []RouteResource `json:"resources"`
 }
 
@@ -81,7 +81,7 @@ type RouteEntity struct {
 	Apps   []Resource
 }
 
-type OrganizationsApiResponse struct {
+type PaginatedOrganizationResources struct {
 	Resources []OrganizationResource
 }
 
@@ -115,7 +115,7 @@ type RouteSummary struct {
 	Domain DomainSummary
 }
 
-type DomainApiResponse struct {
+type PaginatedDomainResources struct {
 	Resources []DomainResource
 }
 
@@ -159,7 +159,7 @@ type ServiceOfferingSummary struct {
 	Version  string
 }
 
-type ServiceOfferingsApiResponse struct {
+type PaginatedServiceOfferingResources struct {
 	Resources []ServiceOfferingResource
 }
 
@@ -187,7 +187,7 @@ type ServicePlanEntity struct {
 	ServiceOffering ServiceOfferingResource `json:"service"`
 }
 
-type ServiceInstancesApiResponse struct {
+type PaginatedServiceInstanceResources struct {
 	Resources []ServiceInstanceResource
 }
 
@@ -228,7 +228,7 @@ type SpaceEntity struct {
 	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
 }
 
-type StackApiResponse struct {
+type PaginatedStackResources struct {
 	Resources []StackResource
 }
 

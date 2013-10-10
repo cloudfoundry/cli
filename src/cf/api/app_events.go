@@ -31,10 +31,10 @@ func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (e
 		return
 	}
 
-	eventResponse := &EventsApiResponse{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, eventResponse)
+	eventResources := &PaginatedEventResources{}
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, eventResources)
 
-	for _, resource := range eventResponse.Resources {
+	for _, resource := range eventResources.Resources {
 		events = append(events, cf.Event{
 			Timestamp:       resource.Entity.Timestamp,
 			ExitDescription: resource.Entity.ExitDescription,

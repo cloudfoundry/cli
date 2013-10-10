@@ -30,18 +30,18 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 		return
 	}
 
-	findResponse := new(ApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(findResponse.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewApiResponseWithMessage("Stack %s not found", name)
 		return
 	}
 
-	res := findResponse.Resources[0]
+	res := resources.Resources[0]
 	stack.Guid = res.Metadata.Guid
 	stack.Name = res.Entity.Name
 
@@ -55,13 +55,13 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiResp
 		return
 	}
 
-	listResponse := new(StackApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, listResponse)
+	resources := new(PaginatedStackResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, r := range listResponse.Resources {
+	for _, r := range resources.Resources {
 		stacks = append(stacks, cf.Stack{Guid: r.Metadata.Guid, Name: r.Entity.Name, Description: r.Entity.Description})
 	}
 

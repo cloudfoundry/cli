@@ -43,18 +43,18 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 		return
 	}
 
-	findResponse := new(ApplicationsApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, findResponse)
+	appResources := new(PaginatedApplicationResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, appResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(findResponse.Resources) == 0 {
+	if len(appResources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "App", name)
 		return
 	}
 
-	res := findResponse.Resources[0]
+	res := appResources.Resources[0]
 	path = fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, res.Metadata.Guid)
 	request, apiResponse = repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {

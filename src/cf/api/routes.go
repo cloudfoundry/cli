@@ -39,13 +39,13 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResp
 		return
 	}
 
-	response := new(RoutesResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	routesResources := new(PaginatedRouteResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, routesResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, routeResponse := range response.Routes {
+	for _, routeResponse := range routesResources.Routes {
 		domainResource := routeResponse.Entity.Domain
 		appNames := []string{}
 
@@ -76,18 +76,18 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 		return
 	}
 
-	response := new(ApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewApiResponseWithMessage("Route not found")
 		return
 	}
 
-	resource := response.Resources[0]
+	resource := resources.Resources[0]
 	route.Guid = resource.Metadata.Guid
 	route.Host = resource.Entity.Host
 
@@ -106,18 +106,18 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		return
 	}
 
-	response := new(ApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Route", fmt.Sprintf("%s.%s", host, domainName))
 		return
 	}
 
-	resource := response.Resources[0]
+	resource := resources.Resources[0]
 	route.Guid = resource.Metadata.Guid
 	route.Host = resource.Entity.Host
 	route.Domain = domain

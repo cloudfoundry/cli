@@ -46,14 +46,14 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 		return
 	}
 
-	response := new(ServiceOfferingsApiResponse)
+	resources := new(PaginatedServiceOfferingResources)
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, r := range response.Resources {
+	for _, r := range resources.Resources {
 		plans := []cf.ServicePlan{}
 		for _, p := range r.Entity.ServicePlans {
 			plans = append(plans, cf.ServicePlan{Name: p.Entity.Name, Guid: p.Metadata.Guid})
@@ -155,18 +155,18 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 		return
 	}
 
-	response := new(ServiceInstancesApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	resources := new(PaginatedServiceInstanceResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service instance", name)
 		return
 	}
 
-	resource := response.Resources[0]
+	resource := resources.Resources[0]
 	serviceOfferingEntity := resource.Entity.ServicePlan.Entity.ServiceOffering.Entity
 	instance.Guid = resource.Metadata.Guid
 	instance.Name = resource.Entity.Name

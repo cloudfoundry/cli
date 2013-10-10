@@ -35,7 +35,7 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
-	response := new(OrganizationsApiResponse)
+	response := new(PaginatedOrganizationResources)
 
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
@@ -60,20 +60,20 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
-	response := new(OrganizationsApiResponse)
+	orgResources := new(PaginatedOrganizationResources)
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, orgResources)
 
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(orgResources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
 		return
 	}
 
-	r := response.Resources[0]
+	r := orgResources.Resources[0]
 	spaces := []cf.Space{}
 
 	for _, s := range r.Entity.Spaces {
@@ -141,19 +141,19 @@ func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (
 		return
 	}
 
-	response := new(ApiResponse)
+	resources := new(PaginatedResources)
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
 		return
 	}
 
-	res := response.Resources[0]
+	res := resources.Resources[0]
 	quota.Guid = res.Metadata.Guid
 	quota.Name = res.Entity.Name
 

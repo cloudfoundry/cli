@@ -34,18 +34,18 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 		return
 	}
 
-	response := &ApiResponse{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, response)
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(response.Resources) == 0 {
+	if len(resources.Resources) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service Broker", name)
 		return
 	}
 
-	resource := response.Resources[0]
+	resource := resources.Resources[0]
 	serviceBroker.Name = resource.Entity.Name
 	serviceBroker.Username = resource.Entity.Username
 	serviceBroker.Password = resource.Entity.Password

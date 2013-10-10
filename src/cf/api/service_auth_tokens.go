@@ -48,13 +48,13 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf
 		return
 	}
 
-	response := &ApiResponse{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, resource := range response.Resources {
+	for _, resource := range resources.Resources {
 		authTokens = append(authTokens, cf.ServiceAuthToken{
 			Guid:     resource.Metadata.Guid,
 			Label:    resource.Entity.Label,

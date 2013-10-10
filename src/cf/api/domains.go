@@ -38,13 +38,13 @@ func (repo CloudControllerDomainRepository) FindAllInCurrentSpace() (domains []c
 		return
 	}
 
-	response := new(ApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, r := range response.Resources {
+	for _, r := range resources.Resources {
 		domains = append(domains, cf.Domain{Name: r.Entity.Name, Guid: r.Metadata.Guid})
 	}
 
@@ -60,13 +60,13 @@ func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (d
 		return
 	}
 
-	response := new(DomainApiResponse)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	domainResources := new(PaginatedDomainResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, domainResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, r := range response.Resources {
+	for _, r := range domainResources.Resources {
 		domain := cf.Domain{
 			Name: r.Entity.Name,
 			Guid: r.Metadata.Guid,
