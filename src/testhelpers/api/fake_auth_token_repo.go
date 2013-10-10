@@ -12,6 +12,7 @@ type FakeAuthTokenRepo struct {
 
 	FindByNameServiceAuthToken cf.ServiceAuthToken
 	FindByNameTokenNameKey cf.ServiceAuthTokenNameKey
+	FindByNameServiceApiResponse net.ApiResponse
 
 	UpdatedServiceAuthToken cf.ServiceAuthToken
 
@@ -30,6 +31,7 @@ func (repo *FakeAuthTokenRepo) FindAll() (authTokens []cf.ServiceAuthToken, apiR
 func (repo *FakeAuthTokenRepo) FindByName(tokenName cf.ServiceAuthTokenNameKey) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
 	repo.FindByNameTokenNameKey = tokenName
 	authToken = repo.FindByNameServiceAuthToken
+	apiResponse = repo.FindByNameServiceApiResponse
 	return
 }
 

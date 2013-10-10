@@ -172,6 +172,9 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			Name:        "delete-service-auth-token",
 			Description: "Delete a service auth token",
 			Usage:       fmt.Sprintf("%s delete-service-auth-token LABEL PROVIDER", cf.Name),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			},
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("delete-service-auth-token")
 				cmdRunner.Run(cmd, c)

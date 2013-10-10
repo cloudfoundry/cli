@@ -6,6 +6,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -32,7 +33,6 @@ func (cmd DeleteServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 }
 
 func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
-	cmd.ui.Say("Deleting service auth token...")
 
 	tokenLabel := c.Args()[0]
 	tokenProvider := c.Args()[1]
@@ -41,8 +41,26 @@ func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
 		Provider: tokenProvider,
 	}
 
+	if c.Bool("f") == false {
+		response := cmd.ui.Confirm(
+			"Are you sure you want to delete %s?%s",
+			terminal.EntityNameColor(fmt.Sprintf("%s %s", tokenLabel, tokenProvider)),
+			terminal.PromptColor(">"),
+		)
+		if response == false {
+			return
+		}
+	}
+
+	cmd.ui.Say("Deleting service auth token...")
 	token, apiResponse := cmd.authTokenRepo.FindByName(token.FindByNameKey())
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse.IsError() {
+		cmd.ui.Failed("Error deleting service auth token.\n%s",apiResponse.Message)
+		return
+	}
+	if apiResponse.IsNotFound() {
+		cmd.ui.Ok()
+		cmd.ui.Warn("Service Auth Token %s %s does not exist.", tokenLabel, tokenProvider)
 		return
 	}
 
