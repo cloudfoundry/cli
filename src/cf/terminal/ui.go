@@ -126,8 +126,9 @@ func (ui TerminalUI) DisplayTable(table [][]string) {
 
 	for _, line := range table {
 		for index, value := range line {
-			if maxSizes[index] < len(value) {
-				maxSizes[index] = len(value)
+			cellLength := len(decolorize(value))
+			if maxSizes[index] < cellLength {
+				maxSizes[index] = cellLength
 			}
 		}
 	}
