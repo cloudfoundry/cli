@@ -99,16 +99,9 @@ var singleAppEndpoint = func(writer http.ResponseWriter, request *http.Request) 
 func TestFindByName(t *testing.T) {
 	findAppEndpointStatus.Reset()
 	appSummaryEndpointStatus.Reset()
-	ts := httptest.NewTLSServer(http.HandlerFunc(singleAppEndpoint))
-	defer ts.Close()
 
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
+	ts, repo := createAppRepo(http.HandlerFunc(singleAppEndpoint))
+	defer ts.Close()
 
 	app, apiResponse := repo.FindByName("App1")
 	assert.True(t, findAppEndpointStatus.Called())
@@ -134,16 +127,8 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 		response,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	_, apiResponse := repo.FindByName("App1")
 	assert.True(t, status.Called())
@@ -159,15 +144,8 @@ func TestSetEnv(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
 
@@ -195,16 +173,8 @@ func TestCreateApplication(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	newApp := cf.Application{
 		Name:         "my-cool-app",
@@ -230,16 +200,8 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	newApp := cf.Application{
 		Name:         "my-cool-app",
@@ -259,12 +221,8 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 		fmt.Fprintln(writer, "{}")
 	}
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(endpoint))
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	createdApp, apiResponse := repo.Create(cf.Application{Name: "name with space"})
 	assert.Equal(t, createdApp, cf.Application{})
@@ -288,15 +246,8 @@ func TestDeleteApplication(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK, Body: ""},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -313,12 +264,8 @@ func TestRename(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	org := cf.Application{Guid: "my-app-guid"}
 	apiResponse := repo.Rename(org, "my-new-app")
@@ -327,19 +274,15 @@ func TestRename(t *testing.T) {
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
-	scaleEndpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-app-guid",
 		testhelpers.RequestBodyMatcher(expectedBody),
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(scaleEndpoint))
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	apiResponse := repo.Scale(app)
 	assert.True(t, status.Called())
@@ -397,15 +340,8 @@ func TestStartApplication(t *testing.T) {
 }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -434,15 +370,8 @@ func TestStopApplication(t *testing.T) {
 }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -470,15 +399,8 @@ func TestGetInstances(t *testing.T) {
 }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createAppRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
@@ -488,4 +410,17 @@ func TestGetInstances(t *testing.T) {
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")
+}
+
+func createAppRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo ApplicationRepository) {
+	ts = httptest.NewTLSServer(endpoint)
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
+	}
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerApplicationRepository(config, gateway)
+	return
 }
