@@ -52,7 +52,7 @@ grant_type=password&password=[PRIVATE DATA HIDDEN]&scope=&username=mgehard%2Bcli
 	assert.Equal(t, Sanitize(request), expected)
 }
 
-func TestSanitizeRemovesTokensFromBody(t *testing.T) {
+func TestSanitizeRemovesOauthTokensFromBody(t *testing.T) {
 	response := `
 HTTP/1.1 200 OK
 Content-Length: 2132
@@ -85,6 +85,44 @@ Pragma: no-cache
 Server: Apache-Coyote/1.1
 
 {"access_token":"[PRIVATE DATA HIDDEN]","token_type":"bearer","refresh_token":"[PRIVATE DATA HIDDEN]","expires_in":43199,"scope":"cloud_controller.read cloud_controller.write openid password.write","jti":"c6a7c136-6497-4faf-8799-4c42e1f3c6f5"}
+`
+
+	assert.Equal(t, Sanitize(response), expected)
+}
+
+func TestSanitizeRemovesServiceAuthTokensFromBody(t *testing.T) {
+	response := `
+HTTP/1.1 200 OK
+Content-Length: 2132
+Cache-Control: no-cache
+Cache-Control: no-store
+Cache-Control: no-store
+Connection: keep-alive
+Content-Type: application/json;charset=UTF-8
+Date: Thu, 05 Sep 2013 16:31:43 GMT
+Expires: Thu, 01 Jan 1970 00:00:00 GMT
+Pragma: no-cache
+Pragma: no-cache
+Server: Apache-Coyote/1.1
+
+{"label":"some label","provider":"some provider","token":"some-token-with-stuff-in-it"}
+`
+
+	expected := `
+HTTP/1.1 200 OK
+Content-Length: 2132
+Cache-Control: no-cache
+Cache-Control: no-store
+Cache-Control: no-store
+Connection: keep-alive
+Content-Type: application/json;charset=UTF-8
+Date: Thu, 05 Sep 2013 16:31:43 GMT
+Expires: Thu, 01 Jan 1970 00:00:00 GMT
+Pragma: no-cache
+Pragma: no-cache
+Server: Apache-Coyote/1.1
+
+{"label":"some label","provider":"some provider","token":"[PRIVATE DATA HIDDEN]"}
 `
 
 	assert.Equal(t, Sanitize(response), expected)
