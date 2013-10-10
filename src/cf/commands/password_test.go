@@ -4,25 +4,29 @@ import (
 	"cf"
 	. "cf/commands"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestPasswordRequiresValidAccessToken(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{ValidAccessTokenSuccess: false}
-	configRepo := &testhelpers.FakeConfigRepository{}
-	callPassword([]string{}, reqFactory, &testhelpers.FakePasswordRepo{}, configRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: false}
+	configRepo := &testconfig.FakeConfigRepository{}
+	callPassword([]string{}, reqFactory, &testapi.FakePasswordRepo{}, configRepo)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{ValidAccessTokenSuccess: true}
-	callPassword([]string{"", "", ""}, reqFactory, &testhelpers.FakePasswordRepo{}, configRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	reqFactory = &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
+	callPassword([]string{"", "", ""}, reqFactory, &testapi.FakePasswordRepo{}, configRepo)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestPasswordCanBeChanged(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testhelpers.FakePasswordRepo{Score: "meh"}
-	configRepo := &testhelpers.FakeConfigRepository{}
+	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
+	pwdRepo := &testapi.FakePasswordRepo{Score: "meh"}
+	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
 	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
@@ -47,9 +51,9 @@ func TestPasswordCanBeChanged(t *testing.T) {
 }
 
 func TestPasswordVerification(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testhelpers.FakePasswordRepo{Score: "meh"}
-	configRepo := &testhelpers.FakeConfigRepository{}
+	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
+	pwdRepo := &testapi.FakePasswordRepo{Score: "meh"}
+	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, reqFactory, pwdRepo, configRepo)
 
 	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
@@ -63,9 +67,9 @@ func TestPasswordVerification(t *testing.T) {
 }
 
 func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testhelpers.FakePasswordRepo{UpdateUnauthorized: true, Score: "meh"}
-	configRepo := &testhelpers.FakeConfigRepository{}
+	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
+	pwdRepo := &testapi.FakePasswordRepo{UpdateUnauthorized: true, Score: "meh"}
+	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
 	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
@@ -82,12 +86,12 @@ func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "Current password did not match")
 }
 
-func callPassword(inputs []string, reqFactory *testhelpers.FakeReqFactory, pwdRepo *testhelpers.FakePasswordRepo, configRepo *testhelpers.FakeConfigRepository) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{Inputs: inputs}
+func callPassword(inputs []string, reqFactory *testreq.FakeReqFactory, pwdRepo *testapi.FakePasswordRepo, configRepo *testconfig.FakeConfigRepository) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{Inputs: inputs}
 
-	ctxt := testhelpers.NewContext("passwd", []string{})
+	ctxt := testcmd.NewContext("passwd", []string{})
 	cmd := NewPassword(ui, pwdRepo, configRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

@@ -4,36 +4,39 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 	"time"
 )
 
 func TestAppRequirements(t *testing.T) {
 	args := []string{"my-app", "/foo"}
-	appSummaryRepo := &testhelpers.FakeAppSummaryRepo{}
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: cf.Application{}}
 	callApp(args, reqFactory, appSummaryRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: cf.Application{}}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: cf.Application{}}
 	callApp(args, reqFactory, appSummaryRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
 	callApp(args, reqFactory, appSummaryRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
 
 func TestAppFailsWithUsage(t *testing.T) {
-	appSummaryRepo := &testhelpers.FakeAppSummaryRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
 	ui := callApp([]string{}, reqFactory, appSummaryRepo)
 
 	assert.True(t, ui.FailedWithUsage)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestDisplayingAppSummary(t *testing.T) {
@@ -70,8 +73,8 @@ func TestDisplayingAppSummary(t *testing.T) {
 	}
 	appSummary := cf.AppSummary{App: app, Instances: instances}
 
-	appSummaryRepo := &testhelpers.FakeAppSummaryRepo{GetSummarySummary: appSummary}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
 	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo)
 
 	assert.Equal(t, appSummaryRepo.GetSummaryApp.Name, "my-app")
@@ -106,11 +109,11 @@ func TestDisplayingAppSummary(t *testing.T) {
 	assert.Contains(t, ui.Outputs[8], "0 of 0")
 }
 
-func callApp(args []string, reqFactory *testhelpers.FakeReqFactory, appSummaryRepo *testhelpers.FakeAppSummaryRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("app", args)
+func callApp(args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("app", args)
 	cmd := NewShowApp(ui, appSummaryRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

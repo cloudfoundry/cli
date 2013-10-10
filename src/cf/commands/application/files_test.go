@@ -4,41 +4,44 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestFilesRequirements(t *testing.T) {
 	args := []string{"my-app", "/foo"}
-	appFilesRepo := &testhelpers.FakeAppFilesRepo{}
+	appFilesRepo := &testapi.FakeAppFilesRepo{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: cf.Application{}}
 	callFiles(args, reqFactory, appFilesRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: cf.Application{}}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: cf.Application{}}
 	callFiles(args, reqFactory, appFilesRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
 	callFiles(args, reqFactory, appFilesRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
 
 func TestFilesFailsWithUsage(t *testing.T) {
-	appFilesRepo := &testhelpers.FakeAppFilesRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	appFilesRepo := &testapi.FakeAppFilesRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
 	ui := callFiles([]string{}, reqFactory, appFilesRepo)
 
 	assert.True(t, ui.FailedWithUsage)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestListingDirectoryEntries(t *testing.T) {
 	app := cf.Application{Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
-	appFilesRepo := &testhelpers.FakeAppFilesRepo{FileList: "file 1\nfile 2"}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
+	appFilesRepo := &testapi.FakeAppFilesRepo{FileList: "file 1\nfile 2"}
 
 	ui := callFiles([]string{"my-app", "/foo"}, reqFactory, appFilesRepo)
 
@@ -50,11 +53,11 @@ func TestListingDirectoryEntries(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "file 1\nfile 2")
 }
 
-func callFiles(args []string, reqFactory *testhelpers.FakeReqFactory, appFilesRepo *testhelpers.FakeAppFilesRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("files", args)
+func callFiles(args []string, reqFactory *testreq.FakeReqFactory, appFilesRepo *testapi.FakeAppFilesRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("files", args)
 	cmd := NewFiles(ui, appFilesRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

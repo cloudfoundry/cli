@@ -5,51 +5,54 @@ import (
 	. "cf/commands/domain"
 	"cf/net"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestGetRequirements(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
-	domainRepo := &testhelpers.FakeDomainRepository{}
+	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	domainRepo := &testapi.FakeDomainRepository{}
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	ctxt = testhelpers.NewContext("map-domain", []string{})
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	ctxt = testcmd.NewContext("map-domain", []string{})
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestDeleteDomainSuccess(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
 
@@ -62,17 +65,17 @@ func TestDeleteDomainSuccess(t *testing.T) {
 }
 
 func TestDeleteDomainNoConfirmation(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"no"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{Inputs: []string{"no"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "")
 
@@ -86,17 +89,17 @@ func TestDeleteDomainNoConfirmation(t *testing.T) {
 }
 
 func TestDeleteDomainNotFound(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "")
 
@@ -108,17 +111,17 @@ func TestDeleteDomainNotFound(t *testing.T) {
 }
 
 func TestDeleteDomainFindError(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgApiResponse: net.NewApiResponseWithMessage("failed badly"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "")
 
@@ -130,18 +133,18 @@ func TestDeleteDomainFindError(t *testing.T) {
 }
 
 func TestDeleteDomainDeleteError(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain:   cf.Domain{Name: "foo.com"},
 		DeleteDomainApiResponse: net.NewApiResponseWithMessage("failed badly"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
 
@@ -153,17 +156,17 @@ func TestDeleteDomainDeleteError(t *testing.T) {
 }
 
 func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
-	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com", Shared: true},
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
 
@@ -176,17 +179,17 @@ func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
 }
 
 func TestDeleteDomainForceFlagSkipsConfirmation(t *testing.T) {
-	ui := &testhelpers.FakeUI{}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	ui := &testterm.FakeUI{}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com", Shared: true},
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
 
-	ctxt := testhelpers.NewContext("delete-domain", []string{"-f", "foo.com"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	ctxt := testcmd.NewContext("delete-domain", []string{"-f", "foo.com"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
 

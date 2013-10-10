@@ -4,37 +4,40 @@ import (
 	"cf"
 	. "cf/commands/domain"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestListDomainsRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-	domainRepo := &testhelpers.FakeDomainRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	domainRepo := &testapi.FakeDomainRepository{}
 
 	callListDomains([]string{}, reqFactory, domainRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 	callListDomains([]string{}, reqFactory, domainRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
 	callListDomains([]string{}, reqFactory, domainRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestListDomainsFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-	domainRepo := &testhelpers.FakeDomainRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	domainRepo := &testapi.FakeDomainRepository{}
 
 	ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
 }
 
 func TestListDomains(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"}}
-	domainRepo := &testhelpers.FakeDomainRepository{
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"}}
+	domainRepo := &testapi.FakeDomainRepository{
 		FindAllByOrgDomains: []cf.Domain{
 			{Name: "Domain1", Shared: true, Spaces: []cf.Space{}},
 			{Name: "Domain2", Shared: false, Spaces: []cf.Space{
@@ -61,11 +64,11 @@ func TestListDomains(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[5], "reserved")
 }
 
-func callListDomains(args []string, reqFactory *testhelpers.FakeReqFactory, domainRepo *testhelpers.FakeDomainRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("domains", args)
+func callListDomains(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("domains", args)
 	cmd := NewListDomains(fakeUI, domainRepo)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

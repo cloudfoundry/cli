@@ -4,12 +4,15 @@ import (
 	"cf"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestRenameServiceFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
+	reqFactory := &testreq.FakeReqFactory{}
 
 	fakeUI, _ := callRenameService([]string{}, reqFactory)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -22,20 +25,20 @@ func TestRenameServiceFailsWithUsage(t *testing.T) {
 }
 
 func TestRenameServiceRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 	callRenameService([]string{"my-service", "new-name"}, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 	callRenameService([]string{"my-service", "new-name"}, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
 }
 
 func TestRenameService(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Name: "different-name", Guid: "different-name-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
 	fakeUI, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, reqFactory)
 
 	assert.Equal(t, fakeUI.Outputs[0], "Renaming service different-name...")
@@ -45,13 +48,13 @@ func TestRenameService(t *testing.T) {
 	assert.Equal(t, fakeServiceRepo.RenameServiceNewName, "new-name")
 }
 
-func callRenameService(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI, serviceRepo *testhelpers.FakeServiceRepo) {
-	ui = &testhelpers.FakeUI{}
-	serviceRepo = &testhelpers.FakeServiceRepo{}
+func callRenameService(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
+	ui = &testterm.FakeUI{}
+	serviceRepo = &testapi.FakeServiceRepo{}
 	cmd := NewRenameService(ui, serviceRepo)
-	ctxt := testhelpers.NewContext("rename-service", args)
+	ctxt := testcmd.NewContext("rename-service", args)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

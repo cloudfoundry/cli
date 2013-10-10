@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestCreateServiceAuthTokenFailsWithUsage(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 
 	ui := callCreateServiceAuthToken([]string{}, reqFactory, authTokenRepo)
 	assert.True(t, ui.FailedWithUsage)
@@ -26,22 +29,22 @@ func TestCreateServiceAuthTokenFailsWithUsage(t *testing.T) {
 }
 
 func TestCreateServiceAuthTokenRequirements(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 	args := []string{"arg1", "arg2", "arg3"}
 
 	reqFactory.LoginSuccess = true
 	callCreateServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = false
 	callCreateServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestCreateServiceAuthToken(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider", "a value"}
 
 	ui := callCreateServiceAuthToken(args, reqFactory, authTokenRepo)
@@ -56,11 +59,11 @@ func TestCreateServiceAuthToken(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callCreateServiceAuthToken(args []string, reqFactory *testhelpers.FakeReqFactory, authTokenRepo *testhelpers.FakeAuthTokenRepo) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
+func callCreateServiceAuthToken(args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
 	cmd := NewCreateServiceAuthToken(ui, authTokenRepo)
-	ctxt := testhelpers.NewContext("create-service-auth-token", args)
+	ctxt := testcmd.NewContext("create-service-auth-token", args)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

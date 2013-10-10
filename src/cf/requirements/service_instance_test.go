@@ -4,14 +4,15 @@ import (
 	"cf"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestServiceInstanceReqExecute(t *testing.T) {
 	instance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
-	repo := &testhelpers.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
-	ui := new(testhelpers.FakeUI)
+	repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
+	ui := new(testterm.FakeUI)
 
 	req := NewServiceInstanceRequirement("foo", ui, repo)
 	success := req.Execute()
@@ -22,8 +23,8 @@ func TestServiceInstanceReqExecute(t *testing.T) {
 }
 
 func TestServiceInstanceReqExecuteWhenServiceInstanceNotFound(t *testing.T) {
-	repo := &testhelpers.FakeServiceRepo{FindInstanceByNameNotFound: true}
-	ui := new(testhelpers.FakeUI)
+	repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
+	ui := new(testterm.FakeUI)
 
 	req := NewServiceInstanceRequirement("foo", ui, repo)
 	success := req.Execute()

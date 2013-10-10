@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var multipleOfferingsResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -57,7 +57,7 @@ var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, 
   ]
 }`}
 
-func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *testhelpers.RequestStatus, config *configuration.Configuration) {
+func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *testapi.RequestStatus, config *configuration.Configuration) {
 	ts, repo := createServiceRepoWithConfig(endpoint, config)
 	defer ts.Close()
 
@@ -86,7 +86,7 @@ func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *te
 }
 
 func TestGetServiceOfferingsWhenNotTargetingASpace(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/services?inline-relations-depth=1",
 		nil,
@@ -100,7 +100,7 @@ func TestGetServiceOfferingsWhenNotTargetingASpace(t *testing.T) {
 }
 
 func TestGetServiceOfferingsWhenTargetingASpace(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/spaces/my-space-guid/services?inline-relations-depth=1",
 		nil,
@@ -115,11 +115,11 @@ func TestGetServiceOfferingsWhenTargetingASpace(t *testing.T) {
 }
 
 func TestCreateServiceInstance(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_instances",
-		testhelpers.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceRepo(endpoint)
@@ -134,11 +134,11 @@ func TestCreateServiceInstance(t *testing.T) {
 func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 	findServiceInstanceEndpointStatus.Reset()
 
-	errorEndpoint, errorEndpointStatus := testhelpers.CreateCheckableEndpoint(
+	errorEndpoint, errorEndpointStatus := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_instances",
-		testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
-		testhelpers.TestResponse{
+		testapi.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		testapi.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
 		},
@@ -167,11 +167,11 @@ func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 	findServiceInstanceEndpointStatus.Reset()
 
-	errorEndpoint, errorEndpointStatus := testhelpers.CreateCheckableEndpoint(
+	errorEndpoint, errorEndpointStatus := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_instances",
-		testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
-		testhelpers.TestResponse{
+		testapi.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
+		testapi.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
 		},
@@ -198,11 +198,11 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceInstance(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/user_provided_service_instances",
-		testhelpers.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceRepo(endpoint)
@@ -219,11 +219,11 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 }
 
 func TestUpdateUserProvidedServiceInstance(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/user_provided_service_instances/my-instance-guid",
-		testhelpers.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceRepo(endpoint)
@@ -239,7 +239,7 @@ func TestUpdateUserProvidedServiceInstance(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
+var singleServiceInstanceResponse = testapi.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {
       "metadata": {
@@ -290,7 +290,7 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
   ]
 }`}
 
-var findServiceInstanceEndpoint, findServiceInstanceEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var findServiceInstanceEndpoint, findServiceInstanceEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 	nil,
@@ -321,11 +321,11 @@ func TestFindInstanceByName(t *testing.T) {
 }
 
 func TestFindInstanceByNameForNonExistentService(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
 	)
 
 	ts, repo := createServiceRepo(endpoint)
@@ -338,11 +338,11 @@ func TestFindInstanceByNameForNonExistentService(t *testing.T) {
 }
 
 func TestBindService(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_bindings",
-		testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceRepo(endpoint)
@@ -356,11 +356,11 @@ func TestBindService(t *testing.T) {
 }
 
 func TestBindServiceIfError(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_bindings",
-		testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
-		testhelpers.TestResponse{
+		testapi.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
+		testapi.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
 		},
@@ -378,11 +378,11 @@ func TestBindServiceIfError(t *testing.T) {
 	assert.Equal(t, apiResponse.ErrorCode, "90003")
 }
 
-var deleteBindingEndpoint, deleteBindingEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var deleteBindingEndpoint, deleteBindingEndpointStatus = testapi.CreateCheckableEndpoint(
 	"DELETE",
 	"/v2/service_bindings/service-binding-2-guid",
 	nil,
-	testhelpers.TestResponse{Status: http.StatusOK},
+	testapi.TestResponse{Status: http.StatusOK},
 )
 
 func TestUnbindService(t *testing.T) {
@@ -423,11 +423,11 @@ func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
 }
 
 func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/service_instances/my-service-instance-guid",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK},
+		testapi.TestResponse{Status: http.StatusOK},
 	)
 
 	ts, repo := createServiceRepo(endpoint)
@@ -458,11 +458,11 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 }
 
 func TestRenameService(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/service_instances/my-service-instance-guid",
-		testhelpers.RequestBodyMatcher(`{"name":"new-name"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"new-name"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceRepo(endpoint)

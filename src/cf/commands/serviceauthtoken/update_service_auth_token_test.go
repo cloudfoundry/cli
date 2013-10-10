@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestUpdateServiceAuthTokenFailsWithUsage(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 
 	ui := callUpdateServiceAuthToken([]string{}, reqFactory, authTokenRepo)
 	assert.True(t, ui.FailedWithUsage)
@@ -26,22 +29,22 @@ func TestUpdateServiceAuthTokenFailsWithUsage(t *testing.T) {
 }
 
 func TestUpdateServiceAuthTokenRequirements(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 	args := []string{"MY-TOKEN-LABLE", "my-provider", "my-token-abc123"}
 
 	reqFactory.LoginSuccess = true
 	callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = false
 	callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestUpdateServiceAuthToken(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider", "a value"}
 
 	ui := callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
@@ -55,11 +58,11 @@ func TestUpdateServiceAuthToken(t *testing.T) {
 	assert.Equal(t, authTokenRepo.UpdatedServiceAuthToken, expectedAuthToken)
 }
 
-func callUpdateServiceAuthToken(args []string, reqFactory *testhelpers.FakeReqFactory, authTokenRepo *testhelpers.FakeAuthTokenRepo) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
+func callUpdateServiceAuthToken(args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
 	cmd := NewUpdateServiceAuthToken(ui, authTokenRepo)
-	ctxt := testhelpers.NewContext("update-service-auth-token", args)
+	ctxt := testcmd.NewContext("update-service-auth-token", args)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -5,7 +5,7 @@ import (
 	"cf/requirements"
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testcmd "testhelpers/commands"
 	"testing"
 )
 
@@ -48,7 +48,7 @@ func TestRun(t *testing.T) {
 		Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
 	}
 
-	ctxt := testhelpers.NewContext("login", []string{})
+	ctxt := testcmd.NewContext("login", []string{})
 	err := runner.Run(&cmd, ctxt)
 
 	assert.True(t, passingReq.WasExecuted, ctxt)

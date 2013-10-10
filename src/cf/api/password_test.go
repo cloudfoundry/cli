@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
@@ -20,13 +20,13 @@ func TestGetScore(t *testing.T) {
 }
 
 func testScore(t *testing.T, scoreBody string, expectedScore string) {
-	passwordScoreResponse := testhelpers.TestResponse{Status: http.StatusOK, Body: scoreBody}
+	passwordScoreResponse := testapi.TestResponse{Status: http.StatusOK, Body: scoreBody}
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/password/score",
 		func(req *http.Request) bool {
-			bodyMatcher := testhelpers.RequestBodyMatcher("password=new-password")
+			bodyMatcher := testapi.RequestBodyMatcher("password=new-password")
 			contentTypeMatches := req.Header.Get("Content-Type") == "application/x-www-form-urlencoded"
 
 			return contentTypeMatches && bodyMatcher(req)
@@ -46,13 +46,13 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 }
 
 func TestUpdatePassword(t *testing.T) {
-	passwordUpdateResponse := testhelpers.TestResponse{Status: http.StatusOK}
+	passwordUpdateResponse := testapi.TestResponse{Status: http.StatusOK}
 
-	passwordUpdateEndpoint, passwordUpdateEndpointStatus := testhelpers.CreateCheckableEndpoint(
+	passwordUpdateEndpoint, passwordUpdateEndpointStatus := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/Users/my-user-guid/password",
 		func(req *http.Request) bool {
-			bodyMatcher := testhelpers.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`)
+			bodyMatcher := testapi.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`)
 			contentTypeMatches := req.Header.Get("Content-Type") == "application/json"
 
 			return contentTypeMatches && bodyMatcher(req)
@@ -86,12 +86,12 @@ func createPasswordRepo(passwordEndpoint http.HandlerFunc, accessToken string) (
 	return
 }
 
-func createInfoServer(tokenEndpoint string) (ts *httptest.Server, status *testhelpers.RequestStatus) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+func createInfoServer(tokenEndpoint string) (ts *httptest.Server, status *testapi.RequestStatus) {
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/info",
 		nil,
-		testhelpers.TestResponse{
+		testapi.TestResponse{
 			Status: http.StatusOK,
 			Body:   fmt.Sprintf(`{"token_endpoint": "%s"}`, tokenEndpoint),
 		},

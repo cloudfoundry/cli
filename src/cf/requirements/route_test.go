@@ -4,7 +4,8 @@ import (
 	"cf"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -14,8 +15,8 @@ func TestRouteReqExecute(t *testing.T) {
 		Domain: cf.Domain{Name: "example.com", Guid: "my-domain-guid"},
 		Guid:   "my-route-guid",
 	}
-	routeRepo := &testhelpers.FakeRouteRepository{FindByHostAndDomainRoute: route}
-	ui := new(testhelpers.FakeUI)
+	routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainRoute: route}
+	ui := new(testterm.FakeUI)
 
 	routeReq := NewRouteRequirement("host", "example.com", ui, routeRepo)
 	success := routeReq.Execute()
@@ -27,8 +28,8 @@ func TestRouteReqExecute(t *testing.T) {
 }
 
 func TestRouteReqWhenRouteDoesNotExist(t *testing.T) {
-	routeRepo := &testhelpers.FakeRouteRepository{FindByHostAndDomainNotFound: true}
-	ui := new(testhelpers.FakeUI)
+	routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainNotFound: true}
+	ui := new(testterm.FakeUI)
 
 	routeReq := NewRouteRequirement("host", "example.com", ui, routeRepo)
 	success := routeReq.Execute()
@@ -37,8 +38,8 @@ func TestRouteReqWhenRouteDoesNotExist(t *testing.T) {
 }
 
 func TestRouteReqOnError(t *testing.T) {
-	routeRepo := &testhelpers.FakeRouteRepository{FindByHostAndDomainErr: true}
-	ui := new(testhelpers.FakeUI)
+	routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainErr: true}
+	ui := new(testterm.FakeUI)
 
 	routeReq := NewRouteRequirement("host", "example.com", ui, routeRepo)
 	success := routeReq.Execute()

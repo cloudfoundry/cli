@@ -4,7 +4,10 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -34,14 +37,14 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 
 func TestDeleteWithForceOption(t *testing.T) {
 	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
+	reqFactory := &testreq.FakeReqFactory{}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 
-	ui := &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("delete", []string{"-f", "app-to-delete"})
+	ui := &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("delete", []string{"-f", "app-to-delete"})
 
 	cmd := NewDeleteApp(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
 	assert.Equal(t, appRepo.DeletedApp, app)
@@ -53,14 +56,14 @@ func TestDeleteWithForceOption(t *testing.T) {
 }
 
 func TestDeleteAppThatDoesNotExist(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameNotFound: true}
+	reqFactory := &testreq.FakeReqFactory{}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameNotFound: true}
 
-	ui := &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("delete", []string{"-f", "app-to-delete"})
+	ui := &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("delete", []string{"-f", "app-to-delete"})
 
 	cmd := NewDeleteApp(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
 	assert.Equal(t, appRepo.DeletedApp.Name, "")
@@ -79,15 +82,15 @@ func TestDeleteCommandFailsWithUsage(t *testing.T) {
 	assert.False(t, ui.FailedWithUsage)
 }
 
-func deleteApp(confirmation string, args []string) (ui *testhelpers.FakeUI, reqFactory *testhelpers.FakeReqFactory, appRepo *testhelpers.FakeApplicationRepository) {
+func deleteApp(confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) {
 	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
-	reqFactory = &testhelpers.FakeReqFactory{}
-	appRepo = &testhelpers.FakeApplicationRepository{FindByNameApp: app}
-	ui = &testhelpers.FakeUI{
+	reqFactory = &testreq.FakeReqFactory{}
+	appRepo = &testapi.FakeApplicationRepository{FindByNameApp: app}
+	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
-	ctxt := testhelpers.NewContext("delete", args)
+	ctxt := testcmd.NewContext("delete", args)
 	cmd := NewDeleteApp(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

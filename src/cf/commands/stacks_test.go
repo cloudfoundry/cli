@@ -4,7 +4,9 @@ import (
 	"cf"
 	. "cf/commands"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -13,7 +15,7 @@ func TestStacks(t *testing.T) {
 		cf.Stack{Name: "Stack-1", Description: "Stack 1 Description"},
 		cf.Stack{Name: "Stack-2", Description: "Stack 2 Description"},
 	}
-	stackRepo := &testhelpers.FakeStackRepository{
+	stackRepo := &testapi.FakeStackRepository{
 		FindAllStacks: stacks,
 	}
 
@@ -28,12 +30,12 @@ func TestStacks(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "Stack 2 Description")
 }
 
-func callStacks(stackRepo *testhelpers.FakeStackRepository) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
+func callStacks(stackRepo *testapi.FakeStackRepository) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
 
-	ctxt := testhelpers.NewContext("stacks", []string{})
+	ctxt := testcmd.NewContext("stacks", []string{})
 	cmd := NewStacks(ui, stackRepo)
-	testhelpers.RunCommand(cmd, ctxt, nil)
+	testcmd.RunCommand(cmd, ctxt, nil)
 
 	return
 }

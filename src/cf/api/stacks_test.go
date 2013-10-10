@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
 func TestStacksFindByName(t *testing.T) {
-	response := testhelpers.TestResponse{Status: http.StatusOK, Body: `
+	response := testapi.TestResponse{Status: http.StatusOK, Body: `
 {
 "resources": [
     {
@@ -22,7 +22,7 @@ func TestStacksFindByName(t *testing.T) {
   ]
 }`}
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/stacks?q=name%3Alinux",
 		nil,
@@ -42,7 +42,7 @@ func TestStacksFindByName(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-var allStacksResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var allStacksResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -73,7 +73,7 @@ var allStacksResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 }`}
 
 func TestStacksFindAll(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/stacks",
 		nil,

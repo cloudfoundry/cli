@@ -6,29 +6,32 @@ import (
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
 	"os"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestPushingRequirements(t *testing.T) {
 	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
-	fakeUI := new(testhelpers.FakeUI)
+	fakeUI := new(testterm.FakeUI)
 	cmd := NewPush(fakeUI, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
-	ctxt := testhelpers.NewContext("push", []string{})
+	ctxt := testcmd.NewContext("push", []string{})
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	testhelpers.CommandDidPassRequirements = true
+	testcmd.CommandDidPassRequirements = true
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
@@ -237,21 +240,21 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func getPushDependencies() (starter *testhelpers.FakeAppStarter,
-	stopper *testhelpers.FakeAppStopper,
-	appRepo *testhelpers.FakeApplicationRepository,
-	domainRepo *testhelpers.FakeDomainRepository,
-	routeRepo *testhelpers.FakeRouteRepository,
-	stackRepo *testhelpers.FakeStackRepository,
-	appBitsRepo *testhelpers.FakeApplicationBitsRepository) {
+func getPushDependencies() (starter *testcmd.FakeAppStarter,
+	stopper *testcmd.FakeAppStopper,
+	appRepo *testapi.FakeApplicationRepository,
+	domainRepo *testapi.FakeDomainRepository,
+	routeRepo *testapi.FakeRouteRepository,
+	stackRepo *testapi.FakeStackRepository,
+	appBitsRepo *testapi.FakeApplicationBitsRepository) {
 
-	starter = &testhelpers.FakeAppStarter{}
-	stopper = &testhelpers.FakeAppStopper{}
-	appRepo = &testhelpers.FakeApplicationRepository{}
-	domainRepo = &testhelpers.FakeDomainRepository{}
-	routeRepo = &testhelpers.FakeRouteRepository{}
-	stackRepo = &testhelpers.FakeStackRepository{}
-	appBitsRepo = &testhelpers.FakeApplicationBitsRepository{}
+	starter = &testcmd.FakeAppStarter{}
+	stopper = &testcmd.FakeAppStopper{}
+	appRepo = &testapi.FakeApplicationRepository{}
+	domainRepo = &testapi.FakeDomainRepository{}
+	routeRepo = &testapi.FakeRouteRepository{}
+	stackRepo = &testapi.FakeStackRepository{}
+	appBitsRepo = &testapi.FakeApplicationBitsRepository{}
 
 	return
 }
@@ -263,13 +266,13 @@ func callPush(args []string,
 	domainRepo api.DomainRepository,
 	routeRepo api.RouteRepository,
 	stackRepo api.StackRepository,
-	appBitsRepo *testhelpers.FakeApplicationBitsRepository) (fakeUI *testhelpers.FakeUI) {
+	appBitsRepo *testapi.FakeApplicationBitsRepository) (fakeUI *testterm.FakeUI) {
 
-	fakeUI = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("push", args)
+	fakeUI = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("push", args)
 	cmd := NewPush(fakeUI, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

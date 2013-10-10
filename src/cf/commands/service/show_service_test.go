@@ -4,29 +4,31 @@ import (
 	"cf"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestShowServiceRequirements(t *testing.T) {
 	args := []string{"service1"}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	callShowService(args, reqFactory)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 	callShowService(args, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 	callShowService(args, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, reqFactory.ServiceInstanceName, "service1")
 }
 
 func TestShowServiceFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 	ui := callShowService([]string{}, reqFactory)
 	assert.True(t, ui.FailedWithUsage)
@@ -36,7 +38,7 @@ func TestShowServiceFailsWithUsage(t *testing.T) {
 }
 
 func TestShowServiceOutput(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{
+	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:         true,
 		TargetedSpaceSuccess: true,
 		ServiceInstance: cf.ServiceInstance{
@@ -69,7 +71,7 @@ func TestShowServiceOutput(t *testing.T) {
 }
 
 func TestShowUserProvidedServiceOutput(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{
+	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:         true,
 		TargetedSpaceSuccess: true,
 		ServiceInstance: cf.ServiceInstance{
@@ -87,10 +89,10 @@ func TestShowUserProvidedServiceOutput(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "user-provided")
 }
 
-func callShowService(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("service", args)
+func callShowService(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("service", args)
 	cmd := NewShowService(ui)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

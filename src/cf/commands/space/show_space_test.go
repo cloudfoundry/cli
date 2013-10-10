@@ -5,7 +5,9 @@ import (
 	. "cf/commands/space"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -15,17 +17,17 @@ func TestShowSpaceRequirements(t *testing.T) {
 		Organization: cf.Organization{},
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	callShowSpace([]string{}, reqFactory, config)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 	callShowSpace([]string{}, reqFactory, config)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 	callShowSpace([]string{}, reqFactory, config)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestShowSpaceInfoSuccess(t *testing.T) {
@@ -42,7 +44,7 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	space := cf.Space{Name: "space1", Organization: org, Applications: apps, Domains: domains, ServiceInstances: services}
 	config := &configuration.Configuration{Space: space}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	ui := callShowSpace([]string{}, reqFactory, config)
 	assert.Contains(t, ui.Outputs[0], "Getting info for space")
 	assert.Contains(t, ui.Outputs[0], "space1")
@@ -58,11 +60,11 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[6], "service1")
 }
 
-func callShowSpace(args []string, reqFactory *testhelpers.FakeReqFactory, config *configuration.Configuration) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("space", args)
+func callShowSpace(args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("space", args)
 
 	cmd := NewShowSpace(ui, config)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

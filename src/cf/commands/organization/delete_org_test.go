@@ -4,13 +4,17 @@ import (
 	"cf"
 	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestDeleteOrgConfirmingWithY(t *testing.T) {
 	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
 	ui := deleteOrg("y", []string{"org-to-delete"}, orgRepo)
 
@@ -24,7 +28,7 @@ func TestDeleteOrgConfirmingWithY(t *testing.T) {
 
 func TestDeleteOrgConfirmingWithYes(t *testing.T) {
 	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
 	ui := deleteOrg("Yes", []string{"org-to-delete"}, orgRepo)
 
@@ -37,14 +41,14 @@ func TestDeleteOrgConfirmingWithYes(t *testing.T) {
 }
 
 func TestDeleteTargetedOrganizationClearsConfig(t *testing.T) {
-	configRepo := &testhelpers.FakeConfigRepository{}
+	configRepo := &testconfig.FakeConfigRepository{}
 	config, _ := configRepo.Get()
 	config.Organization = cf.Organization{Name: "org-to-delete", Guid: "org-to-delete-guid"}
 	config.Space = cf.Space{Name: "space-to-delete"}
 	configRepo.Save()
 
 	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 	deleteOrg("Yes", []string{"org-to-delete"}, orgRepo)
 
 	updatedConfig, err := configRepo.Get()
@@ -56,9 +60,9 @@ func TestDeleteTargetedOrganizationClearsConfig(t *testing.T) {
 
 func TestDeleteUntargetedOrganizationDoesNotClearConfig(t *testing.T) {
 	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
-	configRepo := &testhelpers.FakeConfigRepository{}
+	configRepo := &testconfig.FakeConfigRepository{}
 	config, _ := configRepo.Get()
 	config.Organization = cf.Organization{Name: "some-other-org", Guid: "some-other-org-guid"}
 	config.Space = cf.Space{Name: "some-other-space"}
@@ -75,7 +79,7 @@ func TestDeleteUntargetedOrganizationDoesNotClearConfig(t *testing.T) {
 
 func TestDeleteOrgWithForceOption(t *testing.T) {
 	org := cf.Organization{Name: "org-to-delete", Guid: "org-to-delete-guid"}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
 	ui := deleteOrg("Yes", []string{"-f", "org-to-delete"}, orgRepo)
 
@@ -88,7 +92,7 @@ func TestDeleteOrgWithForceOption(t *testing.T) {
 }
 
 func TestDeleteOrgCommandFailsWithUsage(t *testing.T) {
-	orgRepo := &testhelpers.FakeOrgRepository{}
+	orgRepo := &testapi.FakeOrgRepository{}
 	ui := deleteOrg("Yes", []string{}, orgRepo)
 	assert.True(t, ui.FailedWithUsage)
 
@@ -97,7 +101,7 @@ func TestDeleteOrgCommandFailsWithUsage(t *testing.T) {
 }
 
 func TestDeleteOrgWhenOrgDoesNotExist(t *testing.T) {
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameNotFound: true}
+	orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
 	ui := deleteOrg("y", []string{"org-to-delete"}, orgRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
@@ -109,15 +113,15 @@ func TestDeleteOrgWhenOrgDoesNotExist(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "was already deleted.")
 }
 
-func deleteOrg(confirmation string, args []string, orgRepo *testhelpers.FakeOrgRepository) (ui *testhelpers.FakeUI) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	configRepo := &testhelpers.FakeConfigRepository{}
+func deleteOrg(confirmation string, args []string, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
+	reqFactory := &testreq.FakeReqFactory{}
+	configRepo := &testconfig.FakeConfigRepository{}
 
-	ui = &testhelpers.FakeUI{
+	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
-	ctxt := testhelpers.NewContext("delete-org", args)
+	ctxt := testcmd.NewContext("delete-org", args)
 	cmd := NewDeleteOrg(ui, orgRepo, configRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

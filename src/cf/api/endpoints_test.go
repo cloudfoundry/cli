@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testconfig "testhelpers/configuration"
 	"testing"
 )
 
@@ -31,7 +31,7 @@ var validApiInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	configRepo.Login()
 
@@ -40,7 +40,7 @@ func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 
 	repo.UpdateEndpoint(ts.URL)
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
@@ -49,7 +49,7 @@ func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 }
 
 func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	configRepo.Login()
 
@@ -58,7 +58,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 
 	repo.UpdateEndpoint(ts.URL)
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
@@ -67,7 +67,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 }
 
 func TestApiWhenUrlIsMissingScheme(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 	_, repo := createEndpointRepo(configRepo, nil)
 
@@ -81,7 +81,7 @@ var notFoundApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestApiWhenEndpointReturns404(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
 	ts, repo := createEndpointRepo(configRepo, notFoundApiEndpoint)
@@ -97,7 +97,7 @@ var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request
 }
 
 func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
 	ts, repo := createEndpointRepo(configRepo, invalidJsonResponseApiEndpoint)
@@ -108,7 +108,7 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-func createEndpointRepo(configRepo testhelpers.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+func createEndpointRepo(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
 	if endpoint != nil {
 		ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	}

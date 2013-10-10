@@ -4,14 +4,15 @@ import (
 	"cf"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestDomainReqExecute(t *testing.T) {
 	domain := cf.Domain{Name: "example.com", Guid: "domain-guid"}
-	domainRepo := &testhelpers.FakeDomainRepository{FindByNameDomain: domain}
-	ui := new(testhelpers.FakeUI)
+	domainRepo := &testapi.FakeDomainRepository{FindByNameDomain: domain}
+	ui := new(testterm.FakeUI)
 
 	domainReq := NewDomainRequirement("example.com", ui, domainRepo)
 	success := domainReq.Execute()
@@ -22,8 +23,8 @@ func TestDomainReqExecute(t *testing.T) {
 }
 
 func TestDomainReqWhenDomainDoesNotExist(t *testing.T) {
-	domainRepo := &testhelpers.FakeDomainRepository{FindByNameNotFound: true}
-	ui := new(testhelpers.FakeUI)
+	domainRepo := &testapi.FakeDomainRepository{FindByNameNotFound: true}
+	ui := new(testterm.FakeUI)
 
 	domainReq := NewDomainRequirement("example.com", ui, domainRepo)
 	success := domainReq.Execute()
@@ -32,8 +33,8 @@ func TestDomainReqWhenDomainDoesNotExist(t *testing.T) {
 }
 
 func TestDomainReqOnError(t *testing.T) {
-	domainRepo := &testhelpers.FakeDomainRepository{FindByNameErr: true}
-	ui := new(testhelpers.FakeUI)
+	domainRepo := &testapi.FakeDomainRepository{FindByNameErr: true}
+	ui := new(testterm.FakeUI)
 
 	domainReq := NewDomainRequirement("example.com", ui, domainRepo)
 	success := domainReq.Execute()

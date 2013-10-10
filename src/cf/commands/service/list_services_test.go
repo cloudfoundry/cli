@@ -4,7 +4,9 @@ import (
 	"cf"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -36,14 +38,14 @@ func TestServices(t *testing.T) {
 			Name: "my-service-provided-by-user",
 		},
 	}
-	spaceRepo := &testhelpers.FakeSpaceRepository{
+	spaceRepo := &testapi.FakeSpaceRepository{
 		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
 		SummarySpace: cf.Space{ServiceInstances: serviceInstances},
 	}
-	ui := &testhelpers.FakeUI{}
+	ui := &testterm.FakeUI{}
 
 	cmd := NewListServices(ui, spaceRepo)
-	cmd.Run(testhelpers.NewContext("services", []string{}))
+	cmd.Run(testcmd.NewContext("services", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting services in development")
 	assert.Contains(t, ui.Outputs[1], "OK")

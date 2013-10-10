@@ -4,7 +4,10 @@ import (
 	. "cf/commands"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -13,7 +16,7 @@ func TestApiWithoutArgument(t *testing.T) {
 		Target:     "https://api.run.pivotal.io",
 		ApiVersion: "2.0",
 	}
-	endpointRepo := &testhelpers.FakeEndpointRepo{}
+	endpointRepo := &testapi.FakeEndpointRepo{}
 
 	ui := callApi([]string{}, config, endpointRepo)
 
@@ -23,7 +26,7 @@ func TestApiWithoutArgument(t *testing.T) {
 }
 
 func TestApiWhenChangingTheEndpoint(t *testing.T) {
-	endpointRepo := &testhelpers.FakeEndpointRepo{}
+	endpointRepo := &testapi.FakeEndpointRepo{}
 	config := &configuration.Configuration{}
 
 	ui := callApi([]string{"http://example.com"}, config, endpointRepo)
@@ -33,12 +36,12 @@ func TestApiWhenChangingTheEndpoint(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callApi(args []string, config *configuration.Configuration, endpointRepo *testhelpers.FakeEndpointRepo) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
+func callApi(args []string, config *configuration.Configuration, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
 
 	cmd := NewApi(ui, config, endpointRepo)
-	ctxt := testhelpers.NewContext("api", args)
-	reqFactory := &testhelpers.FakeReqFactory{}
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	ctxt := testcmd.NewContext("api", args)
+	reqFactory := &testreq.FakeReqFactory{}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

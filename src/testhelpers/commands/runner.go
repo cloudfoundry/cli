@@ -1,13 +1,14 @@
-package testhelpers
+package commands
 
 import (
 	"cf/commands"
 	"github.com/codegangsta/cli"
+	testreq "testhelpers/requirements"
 )
 
 var CommandDidPassRequirements bool
 
-func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *FakeReqFactory) {
+func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *testreq.FakeReqFactory) {
 	CommandDidPassRequirements = false
 
 	reqs, err := cmd.GetRequirements(reqFactory, ctxt)

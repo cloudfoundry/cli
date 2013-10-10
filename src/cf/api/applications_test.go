@@ -10,11 +10,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var singleAppResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var singleAppResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -53,14 +53,14 @@ var singleAppResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-var findAppEndpoint, findAppEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var findAppEndpoint, findAppEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
 	nil,
 	singleAppResponse,
 )
 
-var appSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var appSummaryResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "guid": "app1-guid",
   "name": "App1",
@@ -79,7 +79,7 @@ var appSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
   "instances": 1
 }`}
 
-var appSummaryEndpoint, appSummaryEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var appSummaryEndpoint, appSummaryEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/apps/app1-guid/summary",
 	nil,
@@ -118,9 +118,9 @@ func TestFindByName(t *testing.T) {
 }
 
 func TestFindByNameWhenAppIsNotFound(t *testing.T) {
-	response := testhelpers.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
+	response := testapi.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
 		nil,
@@ -137,11 +137,11 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 }
 
 func TestSetEnv(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/app1-guid",
-		testhelpers.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createAppRepo(endpoint)
@@ -166,11 +166,11 @@ var createApplicationResponse = `
 }`
 
 func TestCreateApplication(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/apps",
-		testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+		testapi.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	)
 
 	ts, repo := createAppRepo(endpoint)
@@ -193,11 +193,11 @@ func TestCreateApplication(t *testing.T) {
 }
 
 func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/apps",
-		testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+		testapi.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	)
 
 	ts, repo := createAppRepo(endpoint)
@@ -239,11 +239,11 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 }
 
 func TestDeleteApplication(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/apps/my-cool-app-guid?recursive=true",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: ""},
+		testapi.TestResponse{Status: http.StatusOK, Body: ""},
 	)
 
 	ts, repo := createAppRepo(endpoint)
@@ -257,11 +257,11 @@ func TestDeleteApplication(t *testing.T) {
 }
 
 func TestRename(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-app-guid",
-		testhelpers.RequestBodyMatcher(`{"name":"my-new-app"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"my-new-app"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createAppRepo(endpoint)
@@ -274,11 +274,11 @@ func TestRename(t *testing.T) {
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-app-guid",
-		testhelpers.RequestBodyMatcher(expectedBody),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(expectedBody),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createAppRepo(endpoint)
@@ -324,11 +324,11 @@ func TestScaleApplicationMemory(t *testing.T) {
 }
 
 func TestStartApplication(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-cool-app-guid",
-		testhelpers.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+		testapi.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
     "guid": "my-updated-app-guid"
@@ -354,11 +354,11 @@ func TestStartApplication(t *testing.T) {
 }
 
 func TestStopApplication(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-cool-app-guid",
-		testhelpers.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+		testapi.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
     "guid": "my-updated-app-guid"
@@ -384,11 +384,11 @@ func TestStopApplication(t *testing.T) {
 }
 
 func TestGetInstances(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/apps/my-cool-app-guid/instances",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+		testapi.TestResponse{Status: http.StatusCreated, Body: `
 {
   "1": {
     "state": "STARTING"

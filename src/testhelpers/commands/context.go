@@ -1,4 +1,4 @@
-package testhelpers
+package commands
 
 import (
 	"cf/app"
@@ -6,6 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 	"strings"
 	"cf/commands"
+	testreq "testhelpers/requirements"
 )
 
 func NewContext(cmdName string, args []string) (*cli.Context) {
@@ -39,7 +40,7 @@ func NewContext(cmdName string, args []string) (*cli.Context) {
 
 func findCommand(cmdName string) (cmd cli.Command) {
 	cmdFactory := commands.ConcreteFactory{}
-	reqFactory := &FakeReqFactory{}
+	reqFactory := &testreq.FakeReqFactory{}
 	myApp, _ := app.NewApp(cmdFactory, reqFactory)
 
 	for _, cmd := range myApp.Commands {

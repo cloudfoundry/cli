@@ -1,4 +1,4 @@
-package testhelpers
+package requirements
 
 import (
 	"cf/requirements"

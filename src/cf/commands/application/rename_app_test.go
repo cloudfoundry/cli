@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestRenameAppFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	reqFactory := &testreq.FakeReqFactory{}
+	appRepo := &testapi.FakeApplicationRepository{}
 
 	fakeUI := callRename([]string{}, reqFactory, appRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -20,19 +23,19 @@ func TestRenameAppFailsWithUsage(t *testing.T) {
 }
 
 func TestRenameRequirements(t *testing.T) {
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	appRepo := &testapi.FakeApplicationRepository{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	callRename([]string{"my-app", "my-new-app"}, reqFactory, appRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
 
 func TestRenameRun(t *testing.T) {
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	appRepo := &testapi.FakeApplicationRepository{}
 
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, Application: app}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	ui := callRename([]string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Renaming ")
@@ -41,10 +44,10 @@ func TestRenameRun(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callRename(args []string, reqFactory *testhelpers.FakeReqFactory, appRepo *testhelpers.FakeApplicationRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("rename", args)
+func callRename(args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("rename", args)
 	cmd := NewRenameApp(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

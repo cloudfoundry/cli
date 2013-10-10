@@ -1,4 +1,4 @@
-package testhelpers
+package configuration
 
 import (
 	"cf/configuration"

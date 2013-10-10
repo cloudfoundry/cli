@@ -4,7 +4,10 @@ import (
 	"cf"
 	. "cf/commands/servicebroker"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -17,16 +20,16 @@ func TestDeleteServiceBrokerFailsWithUsage(t *testing.T) {
 }
 
 func TestDeleteServiceBrokerRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	repo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	repo := &testapi.FakeServiceBrokerRepo{}
 
 	reqFactory.LoginSuccess = false
 	callDeleteServiceBroker([]string{"-f", "my-broker"}, reqFactory, repo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	callDeleteServiceBroker([]string{"-f", "my-broker"}, reqFactory, repo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestDeleteConfirmingWithY(t *testing.T) {
@@ -59,8 +62,8 @@ func TestDeleteWithForceOption(t *testing.T) {
 		Guid: "service-broker-to-delete-guid",
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	repo := &testhelpers.FakeServiceBrokerRepo{FindByNameServiceBroker: serviceBroker}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo := &testapi.FakeServiceBrokerRepo{FindByNameServiceBroker: serviceBroker}
 	ui := callDeleteServiceBroker([]string{"-f", "service-broker-to-delete"}, reqFactory, repo)
 
 	assert.Equal(t, repo.FindByNameName, "service-broker-to-delete")
@@ -73,8 +76,8 @@ func TestDeleteWithForceOption(t *testing.T) {
 }
 
 func TestDeleteAppThatDoesNotExist(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	repo := &testhelpers.FakeServiceBrokerRepo{FindByNameNotFound: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo := &testapi.FakeServiceBrokerRepo{FindByNameNotFound: true}
 	ui := callDeleteServiceBroker([]string{"-f", "service-broker-to-delete"}, reqFactory, repo)
 
 	assert.Equal(t, repo.FindByNameName, "service-broker-to-delete")
@@ -86,28 +89,28 @@ func TestDeleteAppThatDoesNotExist(t *testing.T) {
 	assert.Contains(t, ui.Outputs[2], "does not exist")
 }
 
-func callDeleteServiceBroker(args []string, reqFactory *testhelpers.FakeReqFactory, repo *testhelpers.FakeServiceBrokerRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("delete-service-broker", args)
+func callDeleteServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("delete-service-broker", args)
 
 	cmd := NewDeleteServiceBroker(ui, repo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
 
-func deleteServiceBroker(confirmation string, args []string) (ui *testhelpers.FakeUI, reqFactory *testhelpers.FakeReqFactory, repo *testhelpers.FakeServiceBrokerRepo) {
+func deleteServiceBroker(confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) {
 	serviceBroker := cf.ServiceBroker{
 		Name: "service-broker-to-delete",
 		Guid: "service-broker-to-delete-guid",
 	}
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true}
-	repo = &testhelpers.FakeServiceBrokerRepo{FindByNameServiceBroker: serviceBroker}
-	ui = &testhelpers.FakeUI{
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+	repo = &testapi.FakeServiceBrokerRepo{FindByNameServiceBroker: serviceBroker}
+	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
-	ctxt := testhelpers.NewContext("delete-service-broker", args)
+	ctxt := testcmd.NewContext("delete-service-broker", args)
 	cmd := NewDeleteServiceBroker(ui, repo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

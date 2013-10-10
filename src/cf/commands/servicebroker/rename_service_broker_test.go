@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/servicebroker"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestRenameServiceBrokerFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	repo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	repo := &testapi.FakeServiceBrokerRepo{}
 
 	ui := callRenameServiceBroker([]string{}, reqFactory, repo)
 	assert.True(t, ui.FailedWithUsage)
@@ -23,22 +26,22 @@ func TestRenameServiceBrokerFailsWithUsage(t *testing.T) {
 }
 
 func TestRenameServiceBrokerRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	repo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	repo := &testapi.FakeServiceBrokerRepo{}
 	args := []string{"arg1", "arg2"}
 
 	reqFactory.LoginSuccess = false
 	callRenameServiceBroker(args, reqFactory, repo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	callRenameServiceBroker(args, reqFactory, repo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestRenameServiceBroker(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	repo := &testhelpers.FakeServiceBrokerRepo{
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo := &testapi.FakeServiceBrokerRepo{
 		FindByNameServiceBroker: cf.ServiceBroker{Name: "my-found-broker", Guid: "my-found-broker-guid"},
 	}
 	args := []string{"my-broker", "my-new-broker"}
@@ -60,12 +63,12 @@ func TestRenameServiceBroker(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callRenameServiceBroker(args []string, reqFactory *testhelpers.FakeReqFactory, repo *testhelpers.FakeServiceBrokerRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
+func callRenameServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
 
 	cmd := NewRenameServiceBroker(ui, repo)
-	ctxt := testhelpers.NewContext("rename-service-broker", args)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	ctxt := testcmd.NewContext("rename-service-broker", args)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

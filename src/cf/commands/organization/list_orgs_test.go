@@ -4,20 +4,23 @@ import (
 	"cf"
 	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestListOrgsRequirements(t *testing.T) {
-	orgRepo := &testhelpers.FakeOrgRepository{}
+	orgRepo := &testapi.FakeOrgRepository{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	callListOrgs(reqFactory, orgRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 	callListOrgs(reqFactory, orgRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestListOrgs(t *testing.T) {
@@ -25,11 +28,11 @@ func TestListOrgs(t *testing.T) {
 		cf.Organization{Name: "Organization-1"},
 		cf.Organization{Name: "Organization-2"},
 	}
-	orgRepo := &testhelpers.FakeOrgRepository{
+	orgRepo := &testapi.FakeOrgRepository{
 		Organizations: orgs,
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 	ui := callListOrgs(reqFactory, orgRepo)
 
@@ -39,10 +42,10 @@ func TestListOrgs(t *testing.T) {
 	assert.Contains(t, ui.Outputs[3], "Organization-2")
 }
 
-func callListOrgs(reqFactory *testhelpers.FakeReqFactory, orgRepo *testhelpers.FakeOrgRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("orgs", []string{})
+func callListOrgs(reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("orgs", []string{})
 	cmd := NewListOrgs(fakeUI, orgRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

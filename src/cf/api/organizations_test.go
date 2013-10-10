@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var multipleOrgResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "total_results": 2,
   "total_pages": 1,
@@ -38,7 +38,7 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
   ]
 }`}
 
-var multipleOrgEndpoint, multipleOrgEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var multipleOrgEndpoint, multipleOrgEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/organizations",
 	nil,
@@ -65,7 +65,7 @@ func TestOrganizationsFindAll(t *testing.T) {
 }
 
 func TestOrganizationsFindByName(t *testing.T) {
-	response := testhelpers.TestResponse{Status: http.StatusOK, Body: `
+	response := testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -99,7 +99,7 @@ func TestOrganizationsFindByName(t *testing.T) {
   ]
 }`}
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
 		nil,
@@ -129,11 +129,11 @@ func TestOrganizationsFindByName(t *testing.T) {
 }
 
 func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 	)
 
 	ts, repo := createOrganizationRepo(endpoint)
@@ -146,11 +146,11 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 }
 
 func TestCreateOrganization(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/organizations",
-		testhelpers.RequestBodyMatcher(`{"name":"my-org"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"my-org"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createOrganizationRepo(endpoint)
@@ -162,11 +162,11 @@ func TestCreateOrganization(t *testing.T) {
 }
 
 func TestRenameOrganization(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/organizations/my-org-guid",
-		testhelpers.RequestBodyMatcher(`{"name":"my-new-org"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"my-new-org"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createOrganizationRepo(endpoint)
@@ -179,11 +179,11 @@ func TestRenameOrganization(t *testing.T) {
 }
 
 func TestDeleteOrganization(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/organizations/my-org-guid?recursive=true",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK},
+		testapi.TestResponse{Status: http.StatusOK},
 	)
 
 	ts, repo := createOrganizationRepo(endpoint)
@@ -196,11 +196,11 @@ func TestDeleteOrganization(t *testing.T) {
 }
 
 func TestFindQuotaByName(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/quota_definitions?q=name%3Amy-quota",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `{
+		testapi.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {
       "metadata": {
@@ -224,11 +224,11 @@ func TestFindQuotaByName(t *testing.T) {
 }
 
 func TestUpdateQuota(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/organizations/my-org-guid",
-		testhelpers.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createOrganizationRepo(endpoint)

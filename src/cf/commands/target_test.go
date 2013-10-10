@@ -6,15 +6,19 @@ import (
 	. "cf/commands"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
-func getTargetDependencies() (orgRepo *testhelpers.FakeOrgRepository, spaceRepo *testhelpers.FakeSpaceRepository, configRepo *testhelpers.FakeConfigRepository, reqFactory *testhelpers.FakeReqFactory) {
-	orgRepo = &testhelpers.FakeOrgRepository{}
-	spaceRepo = &testhelpers.FakeSpaceRepository{}
-	configRepo = &testhelpers.FakeConfigRepository{}
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true}
+func getTargetDependencies() (orgRepo *testapi.FakeOrgRepository, spaceRepo *testapi.FakeSpaceRepository, configRepo *testconfig.FakeConfigRepository, reqFactory *testreq.FakeReqFactory) {
+	orgRepo = &testapi.FakeOrgRepository{}
+	spaceRepo = &testapi.FakeSpaceRepository{}
+	configRepo = &testconfig.FakeConfigRepository{}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	return
 }
 
@@ -23,12 +27,12 @@ func TestTargetRequirements(t *testing.T) {
 	reqFactory.LoginSuccess = false
 
 	callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 
 	callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
@@ -253,14 +257,14 @@ func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
 
 // End test with org and space options
 
-func callTarget(args []string, reqFactory *testhelpers.FakeReqFactory,
+func callTarget(args []string, reqFactory *testreq.FakeReqFactory,
 	configRepo configuration.ConfigurationRepository, orgRepo api.OrganizationRepository,
-	spaceRepo api.SpaceRepository) (ui *testhelpers.FakeUI) {
+	spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
 
-	ui = new(testhelpers.FakeUI)
+	ui = new(testterm.FakeUI)
 	cmd := NewTarget(ui, configRepo, orgRepo, spaceRepo)
-	ctxt := testhelpers.NewContext("target", args)
+	ctxt := testcmd.NewContext("target", args)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

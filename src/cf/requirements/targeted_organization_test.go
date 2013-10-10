@@ -5,12 +5,12 @@ import (
 	"cf/configuration"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestTargetedOrgRequirement(t *testing.T) {
-	ui := new(testhelpers.FakeUI)
+	ui := new(testterm.FakeUI)
 	config := &configuration.Configuration{
 		Organization: cf.Organization{
 			Name: "my-org",

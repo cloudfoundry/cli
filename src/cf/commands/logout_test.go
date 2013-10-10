@@ -4,18 +4,19 @@ import (
 	"cf"
 	. "cf/commands"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testconfig "testhelpers/configuration"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
-	configRepo := &testhelpers.FakeConfigRepository{}
+	configRepo := &testconfig.FakeConfigRepository{}
 	config, _ := configRepo.Get()
 	config.AccessToken = "MyAccessToken"
 	config.Organization = cf.Organization{Name: "MyOrg"}
 	config.Space = cf.Space{Name: "MySpace"}
 
-	ui := new(testhelpers.FakeUI)
+	ui := new(testterm.FakeUI)
 
 	l := NewLogout(ui, configRepo)
 	l.Run(nil)

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
@@ -35,11 +35,11 @@ func TestListFiles(t *testing.T) {
 	listFilesServer := httptest.NewTLSServer(http.HandlerFunc(listFilesEndpoint))
 	defer listFilesServer.Close()
 
-	baseEndpoint, status := testhelpers.CreateCheckableEndpoint(
+	baseEndpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/apps/my-app-guid/instances/0/files/some/path",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusTemporaryRedirect},
+		testapi.TestResponse{Status: http.StatusTemporaryRedirect},
 	)
 
 	listFilesRedirectEndpoint := func(writer http.ResponseWriter, req *http.Request) {

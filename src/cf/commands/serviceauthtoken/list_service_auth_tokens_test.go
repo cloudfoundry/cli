@@ -4,26 +4,29 @@ import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestListServiceAuthTokensRequirements(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 
 	reqFactory.LoginSuccess = false
 	callListServiceAuthTokens(reqFactory, authTokenRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	callListServiceAuthTokens(reqFactory, authTokenRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestListServiceAuthTokens(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
 
 	authTokenRepo.FindAllAuthTokens = []cf.ServiceAuthToken{
 		cf.ServiceAuthToken{Label: "a label", Provider: "a provider"},
@@ -44,11 +47,11 @@ func TestListServiceAuthTokens(t *testing.T) {
 	assert.Contains(t, ui.Outputs[5], "a second provider")
 }
 
-func callListServiceAuthTokens(reqFactory *testhelpers.FakeReqFactory, authTokenRepo *testhelpers.FakeAuthTokenRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
+func callListServiceAuthTokens(reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
 	cmd := NewListServiceAuthTokens(ui, authTokenRepo)
-	ctxt := testhelpers.NewContext("service-auth-tokens", []string{})
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	ctxt := testcmd.NewContext("service-auth-tokens", []string{})
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

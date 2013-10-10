@@ -4,34 +4,37 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 	"time"
 )
 
 func TestEventsRequirements(t *testing.T) {
-	ui := new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("events", []string{"my-app"})
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
-	eventsRepo := &testhelpers.FakeAppEventsRepo{}
+	ui := new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("events", []string{"my-app"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	eventsRepo := &testapi.FakeAppEventsRepo{}
 
 	cmd := NewEvents(ui, eventsRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestEventsFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
-	eventsRepo := &testhelpers.FakeAppEventsRepo{}
-	ui := new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("events", []string{})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+	eventsRepo := &testapi.FakeAppEventsRepo{}
+	ui := new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("events", []string{})
 
 	cmd := NewEvents(ui, eventsRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.True(t, ui.FailedWithUsage)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestEventsSuccess(t *testing.T) {
@@ -44,13 +47,13 @@ func TestEventsSuccess(t *testing.T) {
 		Guid: "my-app-guid",
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{
+	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:         true,
 		TargetedSpaceSuccess: true,
 		Application:          app,
 	}
 
-	eventsRepo := &testhelpers.FakeAppEventsRepo{
+	eventsRepo := &testapi.FakeAppEventsRepo{
 		Events: []cf.Event{
 			{
 				InstanceIndex:   9,
@@ -61,11 +64,11 @@ func TestEventsSuccess(t *testing.T) {
 		},
 	}
 
-	ui := new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("events", []string{"my-app"})
+	ui := new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("events", []string{"my-app"})
 
 	cmd := NewEvents(ui, eventsRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -86,13 +89,13 @@ func TestEventsWhenNoEventsAvailable(t *testing.T) {
 		Name: "my-app",
 		Guid: "my-app-guid",
 	}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
-	eventsRepo := &testhelpers.FakeAppEventsRepo{}
-	ui := new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("events", []string{"my-app"})
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
+	eventsRepo := &testapi.FakeAppEventsRepo{}
+	ui := new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("events", []string{"my-app"})
 
 	cmd := NewEvents(ui, eventsRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")

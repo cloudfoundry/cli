@@ -4,14 +4,15 @@ import (
 	"cf"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestOrgReqExecute(t *testing.T) {
 	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameOrganization: org}
-	ui := new(testhelpers.FakeUI)
+	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
+	ui := new(testterm.FakeUI)
 
 	orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
 	success := orgReq.Execute()
@@ -22,8 +23,8 @@ func TestOrgReqExecute(t *testing.T) {
 }
 
 func TestOrgReqWhenOrgDoesNotExist(t *testing.T) {
-	orgRepo := &testhelpers.FakeOrgRepository{FindByNameNotFound: true}
-	ui := new(testhelpers.FakeUI)
+	orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
+	ui := new(testterm.FakeUI)
 
 	orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
 	success := orgReq.Execute()

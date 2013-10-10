@@ -6,7 +6,10 @@ import (
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 	"time"
 )
@@ -26,12 +29,12 @@ func TestLogsRequirements(t *testing.T) {
 
 	reqFactory.LoginSuccess = true
 	callLogs([]string{"my-app"}, reqFactory, logsRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 
 	reqFactory.LoginSuccess = false
 	callLogs([]string{"my-app"}, reqFactory, logsRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestLogsOutputsRecentLogs(t *testing.T) {
@@ -106,16 +109,16 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "Log Line 1")
 }
 
-func getLogsDependencies() (reqFactory *testhelpers.FakeReqFactory, logsRepo *testhelpers.FakeLogsRepository) {
-	logsRepo = &testhelpers.FakeLogsRepository{}
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true}
+func getLogsDependencies() (reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) {
+	logsRepo = &testapi.FakeLogsRepository{}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	return
 }
 
-func callLogs(args []string, reqFactory *testhelpers.FakeReqFactory, logsRepo *testhelpers.FakeLogsRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("logs", args)
+func callLogs(args []string, reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("logs", args)
 	cmd := NewLogs(ui, logsRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

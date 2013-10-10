@@ -4,14 +4,16 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestRestartCommandFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	starter := &testhelpers.FakeAppStarter{}
-	stopper := &testhelpers.FakeAppStopper{}
+	reqFactory := &testreq.FakeReqFactory{}
+	starter := &testcmd.FakeAppStarter{}
+	stopper := &testcmd.FakeAppStopper{}
 	ui := callRestart([]string{}, reqFactory, starter, stopper)
 	assert.True(t, ui.FailedWithUsage)
 
@@ -21,39 +23,39 @@ func TestRestartCommandFailsWithUsage(t *testing.T) {
 
 func TestRestartRequirements(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	starter := &testhelpers.FakeAppStarter{}
-	stopper := &testhelpers.FakeAppStopper{}
+	starter := &testcmd.FakeAppStarter{}
+	stopper := &testcmd.FakeAppStopper{}
 
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
 	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
 	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestRestartApplication(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	stoppedApp := cf.Application{Name: "my-stopped-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	starter := &testhelpers.FakeAppStarter{}
-	stopper := &testhelpers.FakeAppStopper{StoppedApp: stoppedApp}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	starter := &testcmd.FakeAppStarter{}
+	stopper := &testcmd.FakeAppStopper{StoppedApp: stoppedApp}
 	callRestart([]string{"my-app"}, reqFactory, starter, stopper)
 
 	assert.Equal(t, stopper.AppToStop, app)
 	assert.Equal(t, starter.AppToStart, stoppedApp)
 }
 
-func callRestart(args []string, reqFactory *testhelpers.FakeReqFactory, starter ApplicationStarter, stopper ApplicationStopper) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("restart", args)
+func callRestart(args []string, reqFactory *testreq.FakeReqFactory, starter ApplicationStarter, stopper ApplicationStopper) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("restart", args)
 
 	cmd := NewRestart(ui, starter, stopper)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

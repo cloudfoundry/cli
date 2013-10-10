@@ -5,13 +5,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
-	"testhelpers"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestSayWithStringOnly(t *testing.T) {
 	ui := new(terminal.TerminalUI)
-	out := testhelpers.CaptureOutput(func() {
+	out := testterm.CaptureOutput(func() {
 		ui.Say("Hello")
 	})
 
@@ -20,7 +20,7 @@ func TestSayWithStringOnly(t *testing.T) {
 
 func TestSayWithStringWithFormat(t *testing.T) {
 	ui := new(terminal.TerminalUI)
-	out := testhelpers.CaptureOutput(func() {
+	out := testterm.CaptureOutput(func() {
 		ui.Say("Hello %s", "World!")
 	})
 
@@ -32,7 +32,7 @@ func TestConfirmYes(t *testing.T) {
 		ui := new(terminal.TerminalUI)
 
 		var result bool
-		out := testhelpers.CaptureOutput(func() {
+		out := testterm.CaptureOutput(func() {
 			result = ui.Confirm("Hello %s", "World?")
 		})
 
@@ -46,7 +46,7 @@ func TestConfirmNo(t *testing.T) {
 		ui := new(terminal.TerminalUI)
 
 		var result bool
-		out := testhelpers.CaptureOutput(func() {
+		out := testterm.CaptureOutput(func() {
 			result = ui.Confirm("Hello %s", "World?")
 		})
 

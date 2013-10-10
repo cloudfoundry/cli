@@ -5,7 +5,10 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -16,17 +19,17 @@ func TestScaleRequirements(t *testing.T) {
 	reqFactory.LoginSuccess = false
 	reqFactory.TargetedSpaceSuccess = true
 	callScale(args, reqFactory, restarter, appRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = false
 	callScale(args, reqFactory, restarter, appRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = true
 	callScale(args, reqFactory, restarter, appRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
 
@@ -36,7 +39,7 @@ func TestScaleFailsWithUsage(t *testing.T) {
 	ui := callScale([]string{}, reqFactory, restarter, appRepo)
 
 	assert.True(t, ui.FailedWithUsage)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestScaleAll(t *testing.T) {
@@ -97,17 +100,17 @@ func TestScaleOnlyMemory(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.Instances, 0)
 }
 
-func getScaleDependencies() (reqFactory *testhelpers.FakeReqFactory, restarter *testhelpers.FakeAppRestarter, appRepo *testhelpers.FakeApplicationRepository) {
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	restarter = &testhelpers.FakeAppRestarter{}
-	appRepo = &testhelpers.FakeApplicationRepository{}
+func getScaleDependencies() (reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo *testapi.FakeApplicationRepository) {
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	restarter = &testcmd.FakeAppRestarter{}
+	appRepo = &testapi.FakeApplicationRepository{}
 	return
 }
 
-func callScale(args []string, reqFactory *testhelpers.FakeReqFactory, restarter *testhelpers.FakeAppRestarter, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("scale", args)
+func callScale(args []string, reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("scale", args)
 	cmd := NewScale(ui, restarter, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

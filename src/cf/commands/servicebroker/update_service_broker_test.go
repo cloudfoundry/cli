@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/servicebroker"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestUpdateServiceBrokerFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	repo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	repo := &testapi.FakeServiceBrokerRepo{}
 
 	ui := callUpdateServiceBroker([]string{}, reqFactory, repo)
 	assert.True(t, ui.FailedWithUsage)
@@ -29,22 +32,22 @@ func TestUpdateServiceBrokerFailsWithUsage(t *testing.T) {
 }
 
 func TestUpdateServiceBrokerRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	repo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	repo := &testapi.FakeServiceBrokerRepo{}
 	args := []string{"arg1", "arg2", "arg3", "arg4"}
 
 	reqFactory.LoginSuccess = false
 	callUpdateServiceBroker(args, reqFactory, repo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	callUpdateServiceBroker(args, reqFactory, repo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestUpdateServiceBroker(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	repo := &testhelpers.FakeServiceBrokerRepo{
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo := &testapi.FakeServiceBrokerRepo{
 		FindByNameServiceBroker: cf.ServiceBroker{Name: "my-found-broker", Guid: "my-found-broker-guid"},
 	}
 	args := []string{"my-broker", "new-username", "new-password", "new-url"}
@@ -69,12 +72,12 @@ func TestUpdateServiceBroker(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callUpdateServiceBroker(args []string, reqFactory *testhelpers.FakeReqFactory, repo *testhelpers.FakeServiceBrokerRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
+func callUpdateServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
 
 	cmd := NewUpdateServiceBroker(ui, repo)
-	ctxt := testhelpers.NewContext("update-service-broker", args)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	ctxt := testcmd.NewContext("update-service-broker", args)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

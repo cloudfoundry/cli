@@ -4,14 +4,15 @@ import (
 	"cf"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestApplicationReqExecute(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
-	ui := new(testhelpers.FakeUI)
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	ui := new(testterm.FakeUI)
 
 	appReq := NewApplicationRequirement("foo", ui, appRepo)
 	success := appReq.Execute()
@@ -22,8 +23,8 @@ func TestApplicationReqExecute(t *testing.T) {
 }
 
 func TestApplicationReqExecuteWhenApplicationNotFound(t *testing.T) {
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameNotFound: true}
-	ui := new(testhelpers.FakeUI)
+	appRepo := &testapi.FakeApplicationRepository{FindByNameNotFound: true}
+	ui := new(testterm.FakeUI)
 
 	appReq := NewApplicationRequirement("foo", ui, appRepo)
 	success := appReq.Execute()

@@ -4,13 +4,17 @@ import (
 	"cf"
 	. "cf/commands/space"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestRenameSpaceFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	reqFactory := &testreq.FakeReqFactory{}
+	spaceRepo := &testapi.FakeSpaceRepository{}
 
 	fakeUI := callRenameSpace([]string{}, reqFactory, spaceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -20,19 +24,19 @@ func TestRenameSpaceFailsWithUsage(t *testing.T) {
 }
 
 func TestRenameSpaceRequirements(t *testing.T) {
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	spaceRepo := &testapi.FakeSpaceRepository{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	callRenameSpace([]string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.SpaceName, "my-space")
 }
 
 func TestRenameSpaceRun(t *testing.T) {
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
+	spaceRepo := &testapi.FakeSpaceRepository{}
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, Space: space}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Space: space}
 	ui := callRenameSpace([]string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Renaming space")
@@ -41,10 +45,10 @@ func TestRenameSpaceRun(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callRenameSpace(args []string, reqFactory *testhelpers.FakeReqFactory, spaceRepo *testhelpers.FakeSpaceRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("create-space", args)
-	cmd := NewRenameSpace(ui, spaceRepo, testhelpers.FakeConfigRepository{})
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+func callRenameSpace(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("create-space", args)
+	cmd := NewRenameSpace(ui, spaceRepo, testconfig.FakeConfigRepository{})
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -14,10 +14,11 @@ import (
 	"path/filepath"
 	"strings"
 	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var expectedResources = testhelpers.RemoveWhiteSpaceFromBody(`[
+var expectedResources = testapi.RemoveWhiteSpaceFromBody(`[
     {
         "fn": "Gemfile",
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
@@ -92,18 +93,18 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 		resourcesPresent
 }
 
-var uploadApplicationEndpoint, uploadApplicationEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var uploadApplicationEndpoint, uploadApplicationEndpointStatus = testapi.CreateCheckableEndpoint(
 	"PUT",
 	"/v2/apps/my-cool-app-guid/bits",
 	uploadBodyMatcher,
-	testhelpers.TestResponse{Status: http.StatusCreated},
+	testapi.TestResponse{Status: http.StatusCreated},
 )
 
-var matchResourcesEndpoint, matchResourcesEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var matchResourcesEndpoint, matchResourcesEndpointStatus = testapi.CreateCheckableEndpoint(
 	"PUT",
 	"/v2/resource_match",
-	testhelpers.RequestBodyMatcher(expectedResources),
-	testhelpers.TestResponse{
+	testapi.RequestBodyMatcher(expectedResources),
+	testapi.TestResponse{
 		Status: http.StatusOK,
 		Body: `[
     {

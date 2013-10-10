@@ -7,7 +7,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"strings"
-	"testhelpers"
+	testreq "testhelpers/requirements"
 	"testing"
 )
 
@@ -97,7 +97,7 @@ func TestCommands(t *testing.T) {
 
 	for _, cmdName := range availableCmds {
 		cmdFactory := &FakeCmdFactory{}
-		reqFactory := &testhelpers.FakeReqFactory{}
+		reqFactory := &testreq.FakeReqFactory{}
 		app, _ := app.NewApp(cmdFactory, reqFactory)
 		app.Run([]string{"", cmdName})
 
@@ -108,7 +108,7 @@ func TestCommands(t *testing.T) {
 
 func TestUsageIncludesCommandName(t *testing.T) {
 	cmdFactory := &FakeCmdFactory{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	reqFactory := &testreq.FakeReqFactory{}
 	app, _ := app.NewApp(cmdFactory, reqFactory)
 	for _, cmd := range app.Commands {
 		assert.Contains(t, strings.Split(cmd.Usage, "\n")[0], cmd.Name)

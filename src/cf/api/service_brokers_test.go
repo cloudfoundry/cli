@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
@@ -29,11 +29,11 @@ func TestFindServiceBrokerByName(t *testing.T) {
   ]
 }`
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/service_brokers?q=name%3Amy-broker",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: responseBody},
+		testapi.TestResponse{Status: http.StatusOK, Body: responseBody},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)
@@ -54,11 +54,11 @@ func TestFindServiceBrokerByName(t *testing.T) {
 }
 
 func TestFindServiceBrokerByNameWheNotFound(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/service_brokers?q=name%3Amy-broker",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)
@@ -74,11 +74,11 @@ func TestFindServiceBrokerByNameWheNotFound(t *testing.T) {
 func TestCreateServiceBroker(t *testing.T) {
 	expectedReqBody := `{"name":"foobroker","broker_url":"http://example.com","auth_username":"foouser","auth_password":"password"}`
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_brokers",
-		testhelpers.RequestBodyMatcher(expectedReqBody),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(expectedReqBody),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)
@@ -99,11 +99,11 @@ func TestCreateServiceBroker(t *testing.T) {
 func TestUpdateServiceBroker(t *testing.T) {
 	expectedReqBody := `{"broker_url":"http://update.example.com","auth_username":"update-foouser","auth_password":"update-password"}`
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/service_brokers/my-guid",
-		testhelpers.RequestBodyMatcher(expectedReqBody),
-		testhelpers.TestResponse{Status: http.StatusOK},
+		testapi.RequestBodyMatcher(expectedReqBody),
+		testapi.TestResponse{Status: http.StatusOK},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)
@@ -125,11 +125,11 @@ func TestUpdateServiceBroker(t *testing.T) {
 func TestRenameServiceBroker(t *testing.T) {
 	expectedReqBody := `{"name":"update-foobroker"}`
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/service_brokers/my-guid",
-		testhelpers.RequestBodyMatcher(expectedReqBody),
-		testhelpers.TestResponse{Status: http.StatusOK},
+		testapi.RequestBodyMatcher(expectedReqBody),
+		testapi.TestResponse{Status: http.StatusOK},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)
@@ -146,11 +146,11 @@ func TestRenameServiceBroker(t *testing.T) {
 }
 
 func TestDeleteServiceBroker(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/service_brokers/my-guid",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusNoContent},
+		testapi.TestResponse{Status: http.StatusNoContent},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)

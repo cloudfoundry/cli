@@ -4,14 +4,15 @@ import (
 	"cf"
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestSpaceReqExecute(t *testing.T) {
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
-	spaceRepo := &testhelpers.FakeSpaceRepository{FindByNameSpace: space}
-	ui := new(testhelpers.FakeUI)
+	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
+	ui := new(testterm.FakeUI)
 
 	spaceReq := NewSpaceRequirement("foo", ui, spaceRepo)
 	success := spaceReq.Execute()
@@ -22,8 +23,8 @@ func TestSpaceReqExecute(t *testing.T) {
 }
 
 func TestSpaceReqExecuteWhenSpaceNotFound(t *testing.T) {
-	spaceRepo := &testhelpers.FakeSpaceRepository{FindByNameNotFound: true}
-	ui := new(testhelpers.FakeUI)
+	spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
+	ui := new(testterm.FakeUI)
 
 	spaceReq := NewSpaceRequirement("foo", ui, spaceRepo)
 	success := spaceReq.Execute()

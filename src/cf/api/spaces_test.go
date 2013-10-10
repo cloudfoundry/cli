@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var multipleSpacesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var multipleSpacesResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -34,7 +34,7 @@ var multipleSpacesResponse = testhelpers.TestResponse{Status: http.StatusOK, Bod
   ]
 }`}
 
-var multipleSpacesEndpoint, multipleSpacesEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var multipleSpacesEndpoint, multipleSpacesEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/organizations/some-org-guid/spaces",
 	nil,
@@ -61,7 +61,7 @@ func TestSpacesFindAll(t *testing.T) {
 	assert.Equal(t, secondSpace.Guid, "staging-space-guid")
 }
 
-var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var findSpaceByNameResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -123,7 +123,7 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
 }`}
 
 func TestSpacesFindByName(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/organizations/some-org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
 		nil,
@@ -161,11 +161,11 @@ func TestSpacesFindByName(t *testing.T) {
 }
 
 func TestSpacesDidNotFindByName(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/organizations/some-org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: ` { "resources": [ ] }`},
+		testapi.TestResponse{Status: http.StatusOK, Body: ` { "resources": [ ] }`},
 	)
 
 	ts, repo := createSpacesRepo(endpoint)
@@ -177,7 +177,7 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-var spaceSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var spaceSummaryResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "guid": "my-space-guid",
   "name":"development",
@@ -246,7 +246,7 @@ var spaceSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body:
 }`}
 
 func TestSpacesGetSummary(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/spaces/my-space-guid/summary",
 		nil,
@@ -301,11 +301,11 @@ func TestSpacesGetSummary(t *testing.T) {
 }
 
 func TestCreateSpace(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/spaces",
-		testhelpers.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createSpacesRepo(endpoint)
@@ -317,11 +317,11 @@ func TestCreateSpace(t *testing.T) {
 }
 
 func TestRenameSpace(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/spaces/my-space-guid",
-		testhelpers.RequestBodyMatcher(`{"name":"new-space-name"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"name":"new-space-name"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createSpacesRepo(endpoint)
@@ -334,11 +334,11 @@ func TestRenameSpace(t *testing.T) {
 }
 
 func TestDeleteSpace(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/spaces/my-space-guid?recursive=true",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK},
+		testapi.TestResponse{Status: http.StatusOK},
 	)
 
 	ts, repo := createSpacesRepo(endpoint)

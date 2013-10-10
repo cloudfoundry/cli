@@ -5,7 +5,10 @@ import (
 	"cf/api"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -16,7 +19,7 @@ func TestCreateService(t *testing.T) {
 		}},
 		cf.ServiceOffering{Label: "postgres"},
 	}
-	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings}
+	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 	fakeUI := callCreateService(
 		[]string{"cleardb", "spark", "my-cleardb-service"},
 		[]string{},
@@ -37,7 +40,7 @@ func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
 		}},
 		cf.ServiceOffering{Label: "postgres"},
 	}
-	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
+	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
 	fakeUI := callCreateService(
 		[]string{"cleardb", "spark", "my-cleardb-service"},
 		[]string{},
@@ -53,12 +56,12 @@ func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "already exists")
 }
 
-func callCreateService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = &testhelpers.FakeUI{Inputs: inputs}
-	ctxt := testhelpers.NewContext("create-service", args)
+func callCreateService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = &testterm.FakeUI{Inputs: inputs}
+	ctxt := testcmd.NewContext("create-service", args)
 	cmd := NewCreateService(fakeUI, serviceRepo)
-	reqFactory := &testhelpers.FakeReqFactory{}
+	reqFactory := &testreq.FakeReqFactory{}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

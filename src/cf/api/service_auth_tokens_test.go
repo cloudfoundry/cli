@@ -8,15 +8,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var findAllServiceAuthTokensEndpoint, findAllStatus = testhelpers.CreateCheckableEndpoint(
+var findAllServiceAuthTokensEndpoint, findAllStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/service_auth_tokens",
 	nil,
-	testhelpers.TestResponse{Status: http.StatusOK, Body: `
+	testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -42,18 +42,18 @@ var findAllServiceAuthTokensEndpoint, findAllStatus = testhelpers.CreateCheckabl
 }`},
 )
 
-var updateServiceAuthTokenEndpoint, updateStatus = testhelpers.CreateCheckableEndpoint(
+var updateServiceAuthTokenEndpoint, updateStatus = testapi.CreateCheckableEndpoint(
 	"PUT",
 	"/v2/service_auth_tokens/mysql-core-guid",
-	testhelpers.RequestBodyMatcher(`{"token":"a value"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
+	testapi.RequestBodyMatcher(`{"token":"a value"}`),
+	testapi.TestResponse{Status: http.StatusCreated},
 )
 
-var deleteServiceAuthTokenEndpoint, deleteStatus = testhelpers.CreateCheckableEndpoint(
+var deleteServiceAuthTokenEndpoint, deleteStatus = testapi.CreateCheckableEndpoint(
 	"DELETE",
 	"/v2/service_auth_tokens/mysql-core-guid",
 	nil,
-	testhelpers.TestResponse{Status: http.StatusOK},
+	testapi.TestResponse{Status: http.StatusOK},
 )
 
 var servicesEndpoints = http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -81,11 +81,11 @@ func createServiceAuthTokenRepo(endpoint http.HandlerFunc) (ts *httptest.Server,
 }
 
 func TestCreate(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_auth_tokens",
-		testhelpers.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceAuthTokenRepo(endpoint)
@@ -98,11 +98,11 @@ func TestCreate(t *testing.T) {
 }
 
 func TestServiceAuthCreate(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_auth_tokens",
-		testhelpers.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated},
+		testapi.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
+		testapi.TestResponse{Status: http.StatusCreated},
 	)
 
 	ts, repo := createServiceAuthTokenRepo(endpoint)

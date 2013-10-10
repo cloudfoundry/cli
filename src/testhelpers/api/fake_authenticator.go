@@ -1,12 +1,13 @@
-package testhelpers
+package api
 
 import (
 	"cf/configuration"
 	"cf/net"
+	testconfig "testhelpers/configuration"
 )
 
 type FakeAuthenticationRepository struct {
-	ConfigRepo FakeConfigRepository
+	ConfigRepo testconfig.FakeConfigRepository
 
 	Config *configuration.Configuration
 	Email string

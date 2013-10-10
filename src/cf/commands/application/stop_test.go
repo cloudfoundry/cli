@@ -5,14 +5,17 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestStopCommandFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	reqFactory := &testreq.FakeReqFactory{Application: app}
 
 	ui := callStop([]string{}, reqFactory, appRepo)
 	assert.True(t, ui.FailedWithUsage)
@@ -23,9 +26,9 @@ func TestStopCommandFailsWithUsage(t *testing.T) {
 
 func TestStopApplication(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	args := []string{"my-app"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(args, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -37,9 +40,9 @@ func TestStopApplication(t *testing.T) {
 
 func TestStopApplicationWhenStopFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app, StopAppErr: true}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app, StopAppErr: true}
 	args := []string{"my-app"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(args, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -50,9 +53,9 @@ func TestStopApplicationWhenStopFails(t *testing.T) {
 
 func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "stopped"}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	args := []string{"my-app"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app}
+	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(args, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -64,8 +67,8 @@ func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
 	appToStop := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
 	expectedStoppedApp := cf.Application{Name: "my-stopped-app", Guid: "my-stopped-app-guid", State: "stopped"}
 
-	appRepo := &testhelpers.FakeApplicationRepository{StopUpdatedApp: expectedStoppedApp}
-	stopper := NewStop(new(testhelpers.FakeUI), appRepo)
+	appRepo := &testapi.FakeApplicationRepository{StopUpdatedApp: expectedStoppedApp}
+	stopper := NewStop(new(testterm.FakeUI), appRepo)
 	actualStoppedApp, err := stopper.ApplicationStop(appToStop)
 
 	assert.NoError(t, err)
@@ -74,19 +77,19 @@ func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
 
 func TestApplicationStopReturnsUpdatedAppWhenAppIsAlreadyStopped(t *testing.T) {
 	appToStop := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "stopped"}
-	appRepo := &testhelpers.FakeApplicationRepository{}
-	stopper := NewStop(new(testhelpers.FakeUI), appRepo)
+	appRepo := &testapi.FakeApplicationRepository{}
+	stopper := NewStop(new(testterm.FakeUI), appRepo)
 	updatedApp, err := stopper.ApplicationStop(appToStop)
 
 	assert.NoError(t, err)
 	assert.Equal(t, appToStop, updatedApp)
 }
 
-func callStop(args []string, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("stop", args)
+func callStop(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("stop", args)
 
 	cmd := NewStop(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

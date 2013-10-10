@@ -12,7 +12,7 @@ import (
 	"net/http/httptest"
 	"runtime"
 	"strings"
-	"testhelpers"
+	testconfig "testhelpers/configuration"
 	"testing"
 )
 
@@ -99,7 +99,7 @@ func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
 }
 
 func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) (configuration.ConfigurationRepository, api.AuthenticationRepository) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, err := configRepo.Get()
 	assert.NoError(t, err)
@@ -125,7 +125,7 @@ func testRefreshToken(t *testing.T, configRepo configuration.ConfigurationReposi
 	apiResponse = gateway.PerformRequest(request)
 	assert.False(t, apiResponse.IsNotSuccessful())
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
 	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
 }

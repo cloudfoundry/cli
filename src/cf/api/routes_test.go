@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var findAllRoutesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var findAllRoutesResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -79,7 +79,7 @@ var findAllRoutesResponse = testhelpers.TestResponse{Status: http.StatusOK, Body
 }`}
 
 func TestRoutesFindAll(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/routes?inline-relations-depth=1",
 		nil,
@@ -106,7 +106,7 @@ func TestRoutesFindAll(t *testing.T) {
 	assert.Equal(t, route.AppNames, []string{"app-2", "app-3"})
 }
 
-var findRouteByHostResponse = testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+var findRouteByHostResponse = testapi.TestResponse{Status: http.StatusCreated, Body: `
 { "resources": [
     {
     	"metadata": {
@@ -119,7 +119,7 @@ var findRouteByHostResponse = testhelpers.TestResponse{Status: http.StatusCreate
 ]}`}
 
 func TestFindByHost(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/routes?q=host%3Amy-cool-app",
 		nil,
@@ -137,11 +137,11 @@ func TestFindByHost(t *testing.T) {
 }
 
 func TestFindByHostWhenHostIsNotFound(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/routes?q=host%3Amy-cool-app",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: ` { "resources": [ ]}`},
+		testapi.TestResponse{Status: http.StatusCreated, Body: ` { "resources": [ ]}`},
 	)
 
 	ts, repo, _ := createRoutesRepo(endpoint)
@@ -154,7 +154,7 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 }
 
 func TestFindByHostAndDomain(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
 		nil,
@@ -174,11 +174,11 @@ func TestFindByHostAndDomain(t *testing.T) {
 }
 
 func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 	)
 
 	ts, repo, domainRepo := createRoutesRepo(endpoint)
@@ -193,11 +193,11 @@ func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
 }
 
 func TestCreateRoute(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/routes",
-		testhelpers.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+		testapi.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": { "guid": "my-route-guid" },
   "entity": { "host": "my-cool-app" }
@@ -218,11 +218,11 @@ func TestCreateRoute(t *testing.T) {
 }
 
 func TestBind(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: ""},
+		testapi.TestResponse{Status: http.StatusCreated, Body: ""},
 	)
 
 	ts, repo, _ := createRoutesRepo(endpoint)
@@ -237,11 +237,11 @@ func TestBind(t *testing.T) {
 }
 
 func TestUnbind(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: ""},
+		testapi.TestResponse{Status: http.StatusCreated, Body: ""},
 	)
 
 	ts, repo, _ := createRoutesRepo(endpoint)
@@ -255,7 +255,7 @@ func TestUnbind(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createRoutesRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {
+func createRoutesRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo CloudControllerRouteRepository, domainRepo *testapi.FakeDomainRepository) {
 	ts = httptest.NewTLSServer(endpoint)
 
 	config := &configuration.Configuration{
@@ -265,7 +265,7 @@ func createRoutesRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo Clou
 	}
 
 	gateway := net.NewCloudControllerGateway()
-	domainRepo = &testhelpers.FakeDomainRepository{}
+	domainRepo = &testapi.FakeDomainRepository{}
 
 	repo = NewCloudControllerRouteRepository(config, gateway, domainRepo)
 	return

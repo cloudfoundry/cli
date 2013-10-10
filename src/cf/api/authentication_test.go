@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testconfig "testhelpers/configuration"
 	"testing"
 )
 
@@ -53,7 +53,7 @@ func TestSuccessfullyLoggingIn(t *testing.T) {
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "bar")
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.False(t, apiResponse.IsError())
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, ts.URL)
@@ -70,7 +70,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, apiResponse.Message, "Password is incorrect, please try again.")
@@ -86,7 +86,7 @@ func TestServerErrorLoggingIn(t *testing.T) {
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "bar")
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.True(t, apiResponse.IsError())
 	assert.Equal(t, apiResponse.Message, "Server error, status code: 500, error code: , message: ")
@@ -107,7 +107,7 @@ func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "bar")
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.True(t, apiResponse.IsError())
 	assert.Equal(t, apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
@@ -117,7 +117,7 @@ func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
 func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (ts *httptest.Server, auth UAAAuthenticationRepository) {
 	ts = httptest.NewTLSServer(http.HandlerFunc(handler))
 
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, err := configRepo.Get()
 	assert.NoError(t, err)

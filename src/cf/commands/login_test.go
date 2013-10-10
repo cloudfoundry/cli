@@ -6,18 +6,21 @@ import (
 	"cf/configuration"
 	"cf/terminal"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
-func testSuccessfulLogin(t *testing.T, args []string, inputs []string) (ui *testhelpers.FakeUI) {
-	configRepo := testhelpers.FakeConfigRepository{}
+func testSuccessfulLogin(t *testing.T, args []string, inputs []string) (ui *testterm.FakeUI) {
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
-	ui = new(testhelpers.FakeUI)
+	ui = new(testterm.FakeUI)
 	ui.Inputs = inputs
-	auth := &testhelpers.FakeAuthenticationRepository{
+	auth := &testapi.FakeAuthenticationRepository{
 		AccessToken:  "my_access_token",
 		RefreshToken: "my_refresh_token",
 		ConfigRepo:   configRepo,
@@ -29,7 +32,7 @@ func testSuccessfulLogin(t *testing.T, args []string, inputs []string) (ui *test
 		auth,
 	)
 
-	savedConfig := testhelpers.SavedConfiguration
+	savedConfig := testconfig.SavedConfiguration
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
 	assert.Contains(t, ui.Outputs[2], "OK")
@@ -59,11 +62,11 @@ func TestSuccessfullyLoggingInWithUsernameAndPasswordAsArguments(t *testing.T) {
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
-	ui := new(testhelpers.FakeUI)
+	ui := new(testterm.FakeUI)
 	ui.Inputs = []string{
 		"foo@example.com",
 		"bar",
@@ -76,7 +79,7 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 		[]string{},
 		ui,
 		configRepo,
-		&testhelpers.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
+		&testapi.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -89,11 +92,11 @@ func TestUnsuccessfullyLoggingIn(t *testing.T) {
 }
 
 func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
-	configRepo := testhelpers.FakeConfigRepository{}
+	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
-	ui := new(testhelpers.FakeUI)
+	ui := new(testterm.FakeUI)
 
 	callLogin(
 		[]string{
@@ -102,7 +105,7 @@ func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
 		},
 		ui,
 		configRepo,
-		&testhelpers.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
+		&testapi.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
 	)
 
 	assert.Contains(t, ui.Outputs[0], config.Target)
@@ -114,5 +117,5 @@ func TestUnsuccessfullyLoggingInWithoutInteractivity(t *testing.T) {
 
 func callLogin(args []string, ui terminal.UI, configRepo configuration.ConfigurationRepository, auth api.AuthenticationRepository) {
 	l := NewLogin(ui, configRepo, auth)
-	l.Run(testhelpers.NewContext("login", args))
+	l.Run(testcmd.NewContext("login", args))
 }

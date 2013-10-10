@@ -5,14 +5,17 @@ import (
 	"cf/api"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestDeleteServiceCommand(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{}
-	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
+	reqFactory := &testreq.FakeReqFactory{}
+	serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
 	fakeUI := callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
@@ -23,8 +26,8 @@ func TestDeleteServiceCommand(t *testing.T) {
 }
 
 func TestDeleteServiceCommandOnNonExistentService(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	serviceRepo := &testhelpers.FakeServiceRepo{FindInstanceByNameNotFound: true}
+	reqFactory := &testreq.FakeReqFactory{}
+	serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
 	fakeUI := callDeleteService([]string{"my-service"}, reqFactory, serviceRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
@@ -36,8 +39,8 @@ func TestDeleteServiceCommandOnNonExistentService(t *testing.T) {
 }
 
 func TestDeleteServiceCommandFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	serviceRepo := &testhelpers.FakeServiceRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	serviceRepo := &testapi.FakeServiceRepo{}
 
 	fakeUI := callDeleteService([]string{}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -46,10 +49,10 @@ func TestDeleteServiceCommandFailsWithUsage(t *testing.T) {
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func callDeleteService(args []string, reqFactory *testhelpers.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("delete-service", args)
+func callDeleteService(args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("delete-service", args)
 	cmd := NewDeleteService(fakeUI, serviceRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

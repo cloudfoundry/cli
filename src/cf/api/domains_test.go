@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 )
 
-var multipleDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var multipleDomainsResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "total_results": 2,
   "total_pages": 1,
@@ -38,7 +38,7 @@ var multipleDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
   ]
 }`}
 
-var multipleDomainsEndpoint, multipleDomainsEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var multipleDomainsEndpoint, multipleDomainsEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/domains",
 	nil,
@@ -64,7 +64,7 @@ func TestFindAllInCurrentSpace(t *testing.T) {
 	assert.Equal(t, second.Guid, "domain2-guid")
 }
 
-var orgDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+var orgDomainsResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -111,7 +111,7 @@ var orgDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 }
 `}
 
-var orgDomainsEndpoint, orgDomainsEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var orgDomainsEndpoint, orgDomainsEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/organizations/my-org-guid/domains?inline-relations-depth=1",
 	nil,
@@ -167,11 +167,11 @@ func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) 
 }
 
 func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testing.T) {
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
 		"/v2/spaces/my-space-guid/domains",
 		nil,
-		testhelpers.TestResponse{Status: http.StatusOK, Body: `
+		testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": []
 }
@@ -210,11 +210,11 @@ func TestCreateDomain(t *testing.T) {
     }
 }`
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/domains",
-		testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"owning_organization_guid":"domain1-guid"}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
+		testapi.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"owning_organization_guid":"domain1-guid"}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
 	)
 
 	ts, repo := createDomainRepo(endpoint)
@@ -239,11 +239,11 @@ func TestShareDomain(t *testing.T) {
     }
 }`
 
-	endpoint, status := testhelpers.CreateCheckableEndpoint(
+	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/domains",
-		testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"shared":true}`),
-		testhelpers.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
+		testapi.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"shared":true}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
 	)
 
 	ts, repo := createDomainRepo(endpoint)
@@ -271,12 +271,12 @@ func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func mapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
-	hf, status = testhelpers.CreateCheckableEndpoint(
+func mapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testapi.RequestStatus) {
+	hf, status = testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/spaces/my-space-guid/domains/my-domain-guid",
 		nil,
-		testhelpers.TestResponse{Status: statusCode},
+		testapi.TestResponse{Status: statusCode},
 	)
 	return
 }
@@ -311,12 +311,12 @@ func TestMapDomainWhenServerError(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-func unmapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
-	hf, status = testhelpers.CreateCheckableEndpoint(
+func unmapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testapi.RequestStatus) {
+	hf, status = testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/spaces/my-space-guid/domains/my-domain-guid",
 		nil,
-		testhelpers.TestResponse{Status: statusCode},
+		testapi.TestResponse{Status: statusCode},
 	)
 	return
 }
@@ -336,12 +336,12 @@ func TestUnmapDomainSuccess(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func deleteDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
-	hf, status = testhelpers.CreateCheckableEndpoint(
+func deleteDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testapi.RequestStatus) {
+	hf, status = testapi.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/domains/my-domain-guid?recursive=true",
 		nil,
-		testhelpers.TestResponse{Status: statusCode},
+		testapi.TestResponse{Status: statusCode},
 	)
 	return
 }

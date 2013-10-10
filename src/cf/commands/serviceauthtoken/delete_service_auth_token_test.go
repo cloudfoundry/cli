@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestDeleteServiceAuthTokenFailsWithUsage(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 
 	ui := callDeleteServiceAuthToken([]string{}, reqFactory, authTokenRepo)
 	assert.True(t, ui.FailedWithUsage)
@@ -23,17 +26,17 @@ func TestDeleteServiceAuthTokenFailsWithUsage(t *testing.T) {
 }
 
 func TestDeleteServiceAuthTokenRequirements(t *testing.T) {
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{}
-	reqFactory := &testhelpers.FakeReqFactory{}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
 	args := []string{"arg1", "arg2"}
 
 	reqFactory.LoginSuccess = true
 	callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = false
 	callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestDeleteServiceAuthToken(t *testing.T) {
@@ -41,10 +44,10 @@ func TestDeleteServiceAuthToken(t *testing.T) {
 		Label:    "a label",
 		Provider: "a provider",
 	}
-	authTokenRepo := &testhelpers.FakeAuthTokenRepo{
+	authTokenRepo := &testapi.FakeAuthTokenRepo{
 		FindByNameServiceAuthToken: expectedToken,
 	}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
 
 	ui := callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
@@ -55,11 +58,11 @@ func TestDeleteServiceAuthToken(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callDeleteServiceAuthToken(args []string, reqFactory *testhelpers.FakeReqFactory, authTokenRepo *testhelpers.FakeAuthTokenRepo) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
+func callDeleteServiceAuthToken(args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
 	cmd := NewDeleteServiceAuthToken(ui, authTokenRepo)
-	ctxt := testhelpers.NewContext("delete-service-auth-token", args)
+	ctxt := testcmd.NewContext("delete-service-auth-token", args)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

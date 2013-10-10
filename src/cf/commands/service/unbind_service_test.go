@@ -5,18 +5,21 @@ import (
 	"cf/api"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestUnbindCommand(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{
+	reqFactory := &testreq.FakeReqFactory{
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testhelpers.FakeServiceRepo{}
+	serviceRepo := &testapi.FakeServiceRepo{}
 	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
@@ -35,11 +38,11 @@ func TestUnbindCommand(t *testing.T) {
 func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{
+	reqFactory := &testreq.FakeReqFactory{
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testhelpers.FakeServiceRepo{UnbindServiceBindingNotFound: true}
+	serviceRepo := &testapi.FakeServiceRepo{UnbindServiceBindingNotFound: true}
 	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
@@ -59,8 +62,8 @@ func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
 }
 
 func TestUnbindCommandFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	serviceRepo := &testhelpers.FakeServiceRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	serviceRepo := &testapi.FakeServiceRepo{}
 
 	fakeUI := callUnbindService([]string{"my-service"}, reqFactory, serviceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -72,11 +75,11 @@ func TestUnbindCommandFailsWithUsage(t *testing.T) {
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func callUnbindService(args []string, reqFactory *testhelpers.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("unbind-service", args)
+func callUnbindService(args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("unbind-service", args)
 	cmd := NewUnbindService(fakeUI, serviceRepo)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

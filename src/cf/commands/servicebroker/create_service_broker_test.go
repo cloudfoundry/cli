@@ -4,13 +4,16 @@ import (
 	"cf"
 	. "cf/commands/servicebroker"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestCreateServiceBrokerFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	serviceBrokerRepo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	serviceBrokerRepo := &testapi.FakeServiceBrokerRepo{}
 
 	ui := callCreateServiceBroker([]string{}, reqFactory, serviceBrokerRepo)
 	assert.True(t, ui.FailedWithUsage)
@@ -29,22 +32,22 @@ func TestCreateServiceBrokerFailsWithUsage(t *testing.T) {
 
 }
 func TestCreateServiceBrokerRequirements(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	serviceBrokerRepo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{}
+	serviceBrokerRepo := &testapi.FakeServiceBrokerRepo{}
 	args := []string{"1arg", "2arg", "3arg", "4arg"}
 
 	reqFactory.LoginSuccess = false
 	callCreateServiceBroker(args, reqFactory, serviceBrokerRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	callCreateServiceBroker(args, reqFactory, serviceBrokerRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestCreateServiceBroker(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	serviceBrokerRepo := &testhelpers.FakeServiceBrokerRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	serviceBrokerRepo := &testapi.FakeServiceBrokerRepo{}
 	args := []string{"my-broker", "my username", "my password", "http://example.com"}
 	ui := callCreateServiceBroker(args, reqFactory, serviceBrokerRepo)
 
@@ -62,11 +65,11 @@ func TestCreateServiceBroker(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callCreateServiceBroker(args []string, reqFactory *testhelpers.FakeReqFactory, serviceBrokerRepo *testhelpers.FakeServiceBrokerRepo) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
-	ctxt := testhelpers.NewContext("create-service-broker", args)
+func callCreateServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("create-service-broker", args)
 
 	cmd := NewCreateServiceBroker(ui, serviceBrokerRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

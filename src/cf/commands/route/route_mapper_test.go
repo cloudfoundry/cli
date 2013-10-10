@@ -5,13 +5,16 @@ import (
 	. "cf/commands/route"
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestRouteMapperFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{}
-	routeRepo := &testhelpers.FakeRouteRepository{}
+	reqFactory := &testreq.FakeReqFactory{}
+	routeRepo := &testapi.FakeRouteRepository{}
 
 	fakeUI := callRouteMapper([]string{}, reqFactory, routeRepo, true)
 	assert.True(t, fakeUI.FailedWithUsage)
@@ -24,11 +27,11 @@ func TestRouteMapperFailsWithUsage(t *testing.T) {
 }
 
 func TestRouteMapperRequirements(t *testing.T) {
-	routeRepo := &testhelpers.FakeRouteRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	routeRepo := &testapi.FakeRouteRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 	callRouteMapper([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, true)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.RouteHost, "my-host")
 	assert.Equal(t, reqFactory.RouteDomain, "my-domain.com")
@@ -42,8 +45,8 @@ func TestRouteMapperWhenBinding(t *testing.T) {
 	}
 	app := cf.Application{Guid: "my-app-guid", Name: "my-app"}
 
-	routeRepo := &testhelpers.FakeRouteRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, Route: route, Application: app}
+	routeRepo := &testapi.FakeRouteRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Route: route, Application: app}
 
 	ui := callRouteMapper([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, true)
 
@@ -65,8 +68,8 @@ func TestRouteMapperWhenUnbinding(t *testing.T) {
 	}
 	app := cf.Application{Guid: "my-app-guid", Name: "my-app"}
 
-	routeRepo := &testhelpers.FakeRouteRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, Route: route, Application: app}
+	routeRepo := &testapi.FakeRouteRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Route: route, Application: app}
 
 	ui := callRouteMapper([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, false)
 
@@ -80,16 +83,16 @@ func TestRouteMapperWhenUnbinding(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callRouteMapper(args []string, reqFactory *testhelpers.FakeReqFactory, routeRepo *testhelpers.FakeRouteRepository, bind bool) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
+func callRouteMapper(args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, bind bool) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
 	var ctxt *cli.Context
 	if bind {
-		ctxt = testhelpers.NewContext("map-route", args)
+		ctxt = testcmd.NewContext("map-route", args)
 	} else {
-		ctxt = testhelpers.NewContext("unmap-route", args)
+		ctxt = testcmd.NewContext("unmap-route", args)
 	}
 
 	cmd := NewRouteMapper(ui, routeRepo, bind)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

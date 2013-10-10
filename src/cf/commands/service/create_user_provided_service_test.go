@@ -4,12 +4,15 @@ import (
 	"cf/api"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
-	serviceRepo := &testhelpers.FakeServiceRepo{}
+	serviceRepo := &testapi.FakeServiceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service", `"foo, bar, baz"`},
 		[]string{"foo value", "bar value", "baz value"},
@@ -32,7 +35,7 @@ func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceWithJson(t *testing.T) {
-	serviceRepo := &testhelpers.FakeServiceRepo{}
+	serviceRepo := &testapi.FakeServiceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`},
 		[]string{},
@@ -53,7 +56,7 @@ func TestCreateUserProvidedServiceWithJson(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
-	serviceRepo := &testhelpers.FakeServiceRepo{}
+	serviceRepo := &testapi.FakeServiceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service"},
 		[]string{},
@@ -63,12 +66,12 @@ func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
 }
 
-func callCreateUserProvidedService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = &testhelpers.FakeUI{Inputs: inputs}
-	ctxt := testhelpers.NewContext("create-user-provided-service", args)
+func callCreateUserProvidedService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = &testterm.FakeUI{Inputs: inputs}
+	ctxt := testcmd.NewContext("create-user-provided-service", args)
 	cmd := NewCreateUserProvidedService(fakeUI, serviceRepo)
-	reqFactory := &testhelpers.FakeReqFactory{}
+	reqFactory := &testreq.FakeReqFactory{}
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -4,7 +4,10 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -16,16 +19,16 @@ func TestApps(t *testing.T) {
 		cf.Application{Name: "Application-1", State: "started", RunningInstances: 1, Instances: 1, Memory: 512, DiskQuota: 1024, Urls: app1Urls},
 		cf.Application{Name: "Application-2", State: "started", RunningInstances: 1, Instances: 2, Memory: 256, DiskQuota: 1024, Urls: app2Urls},
 	}
-	spaceRepo := &testhelpers.FakeSpaceRepository{
+	spaceRepo := &testapi.FakeSpaceRepository{
 		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
 		SummarySpace: cf.Space{Applications: apps},
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
 	ui := callApps(spaceRepo, reqFactory)
 
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Contains(t, ui.Outputs[0], "Getting apps in development")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -45,29 +48,29 @@ func TestApps(t *testing.T) {
 }
 
 func TestAppsRequiresLogin(t *testing.T) {
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+	spaceRepo := &testapi.FakeSpaceRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 
 	callApps(spaceRepo, reqFactory)
 
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestAppsRequiresASelectedSpaceAndOrg(t *testing.T) {
-	spaceRepo := &testhelpers.FakeSpaceRepository{}
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+	spaceRepo := &testapi.FakeSpaceRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 
 	callApps(spaceRepo, reqFactory)
 
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
-func callApps(spaceRepo *testhelpers.FakeSpaceRepository, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
-	ui = &testhelpers.FakeUI{}
+func callApps(spaceRepo *testapi.FakeSpaceRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
 
-	ctxt := testhelpers.NewContext("apps", []string{})
+	ctxt := testcmd.NewContext("apps", []string{})
 	cmd := NewListApps(ui, spaceRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
 }

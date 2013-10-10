@@ -9,16 +9,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testhelpers"
+	testapi "testhelpers/api"
 	"testing"
 	"time"
 )
 
-var instancesEndpoint, instancesEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var instancesEndpoint, instancesEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/apps/my-cool-app-guid/instances",
 	nil,
-	testhelpers.TestResponse{Status: http.StatusOK, Body: `
+	testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "1": {
     "state": "STARTING",
@@ -31,11 +31,11 @@ var instancesEndpoint, instancesEndpointStatus = testhelpers.CreateCheckableEndp
 }`},
 )
 
-var statsEndpoint, statsEndpointStatus = testhelpers.CreateCheckableEndpoint(
+var statsEndpoint, statsEndpointStatus = testapi.CreateCheckableEndpoint(
 	"GET",
 	"/v2/apps/my-cool-app-guid/stats",
 	nil,
-	testhelpers.TestResponse{Status: http.StatusOK, Body: `
+	testapi.TestResponse{Status: http.StatusOK, Body: `
 {
   "1":{
     "stats": {

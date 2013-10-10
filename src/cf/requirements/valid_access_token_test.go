@@ -3,13 +3,14 @@ package requirements_test
 import (
 	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestValidAccessRequirement(t *testing.T) {
-	ui := new(testhelpers.FakeUI)
-	appRepo := &testhelpers.FakeApplicationRepository{
+	ui := new(testterm.FakeUI)
+	appRepo := &testapi.FakeApplicationRepository{
 		FindByNameAuthErr: true,
 	}
 

@@ -4,7 +4,10 @@ import (
 	"cf"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -27,14 +30,14 @@ func TestMarketplaceServices(t *testing.T) {
 			},
 		},
 	}
-	serviceRepo := &testhelpers.FakeServiceRepo{ServiceOfferings: serviceOfferings}
-	ui := &testhelpers.FakeUI{}
+	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
+	ui := &testterm.FakeUI{}
 
-	ctxt := testhelpers.NewContext("marketplace", []string{})
-	reqFactory := &testhelpers.FakeReqFactory{}
+	ctxt := testcmd.NewContext("marketplace", []string{})
+	reqFactory := &testreq.FakeReqFactory{}
 
 	cmd := NewMarketplaceServices(ui, serviceRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "Getting services from marketplace...")
 	assert.Contains(t, ui.Outputs[1], "OK")

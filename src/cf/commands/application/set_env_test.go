@@ -5,34 +5,37 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestSetEnvRequirements(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	appRepo := &testapi.FakeApplicationRepository{}
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	callSetEnv(args, reqFactory, appRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
 	callSetEnv(args, reqFactory, appRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	testhelpers.CommandDidPassRequirements = true
+	testcmd.CommandDidPassRequirements = true
 
-	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
 	callSetEnv(args, reqFactory, appRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestRunWhenApplicationExists(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"foo": "bar"}}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{}
 
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 	ui := callSetEnv(args, reqFactory, appRepo)
@@ -51,8 +54,8 @@ func TestRunWhenApplicationExists(t *testing.T) {
 
 func TestSetEnvWhenItAlreadyExists(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{}
 
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 	ui := callSetEnv(args, reqFactory, appRepo)
@@ -68,8 +71,8 @@ func TestSetEnvWhenItAlreadyExists(t *testing.T) {
 
 func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{
 		FindByNameApp: app,
 		SetEnvErr:     true,
 	}
@@ -84,8 +87,8 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 
 func TestSetEnvFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 
 	args := []string{"my-app", "DATABASE_URL", "..."}
 	ui := callSetEnv(args, reqFactory, appRepo)
@@ -104,11 +107,11 @@ func TestSetEnvFailsWithUsage(t *testing.T) {
 	assert.True(t, ui.FailedWithUsage)
 }
 
-func callSetEnv(args []string, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("set-env", args)
+func callSetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("set-env", args)
 
 	cmd := NewSetEnv(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

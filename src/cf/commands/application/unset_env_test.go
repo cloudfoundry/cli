@@ -5,32 +5,35 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestUnsetEnvRequirements(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	appRepo := &testapi.FakeApplicationRepository{}
 	args := []string{"my-app", "DATABASE_URL"}
 
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	callUnsetEnv(args, reqFactory, appRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+	reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
 	callUnsetEnv(args, reqFactory, appRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
 	callUnsetEnv(args, reqFactory, appRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestUnsetEnvWhenApplicationExists(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"foo": "bar", "DATABASE_URL": "mysql://example.com/my-db"}}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{}
 
 	args := []string{"my-app", "DATABASE_URL"}
 	ui := callUnsetEnv(args, reqFactory, appRepo)
@@ -47,8 +50,8 @@ func TestUnsetEnvWhenApplicationExists(t *testing.T) {
 
 func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{
 		FindByNameApp: app,
 		SetEnvErr:     true,
 	}
@@ -63,8 +66,8 @@ func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 
 func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{}
 
 	args := []string{"my-app", "DATABASE_URL"}
 	ui := callUnsetEnv(args, reqFactory, appRepo)
@@ -78,8 +81,8 @@ func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
 
 func TestUnsetEnvFailsWithUsage(t *testing.T) {
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testhelpers.FakeApplicationRepository{FindByNameApp: app}
+	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 
 	args := []string{"my-app", "DATABASE_URL"}
 	ui := callUnsetEnv(args, reqFactory, appRepo)
@@ -94,11 +97,11 @@ func TestUnsetEnvFailsWithUsage(t *testing.T) {
 	assert.True(t, ui.FailedWithUsage)
 }
 
-func callUnsetEnv(args []string, reqFactory *testhelpers.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("unset-env", args)
+func callUnsetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("unset-env", args)
 
 	cmd := NewUnsetEnv(ui, appRepo)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

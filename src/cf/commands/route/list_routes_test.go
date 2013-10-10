@@ -5,7 +5,9 @@ import (
 	. "cf/commands/route"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
@@ -22,14 +24,14 @@ func TestListingRoutes(t *testing.T) {
 			AppNames: []string{"my-app", "my-app2"},
 		},
 	}
-	routeRepo := &testhelpers.FakeRouteRepository{FindAllRoutes: routes}
+	routeRepo := &testapi.FakeRouteRepository{FindAllRoutes: routes}
 	config := &configuration.Configuration{
 		Space: cf.Space{Name: "my-space"},
 	}
-	ui := &testhelpers.FakeUI{}
+	ui := &testterm.FakeUI{}
 
 	cmd := NewListRoutes(ui, config, routeRepo)
-	cmd.Run(testhelpers.NewContext("routes", []string{}))
+	cmd.Run(testcmd.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes in space")
 	assert.Contains(t, ui.Outputs[0], "my-space")
@@ -50,12 +52,12 @@ func TestListingRoutes(t *testing.T) {
 
 func TestListingRoutesWhenNoneExist(t *testing.T) {
 	routes := []cf.Route{}
-	routeRepo := &testhelpers.FakeRouteRepository{FindAllRoutes: routes}
+	routeRepo := &testapi.FakeRouteRepository{FindAllRoutes: routes}
 	config := &configuration.Configuration{}
-	ui := &testhelpers.FakeUI{}
+	ui := &testterm.FakeUI{}
 
 	cmd := NewListRoutes(ui, config, routeRepo)
-	cmd.Run(testhelpers.NewContext("routes", []string{}))
+	cmd.Run(testcmd.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -63,12 +65,12 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 }
 
 func TestListingRoutesWhenFindFails(t *testing.T) {
-	routeRepo := &testhelpers.FakeRouteRepository{FindAllErr: true}
+	routeRepo := &testapi.FakeRouteRepository{FindAllErr: true}
 	config := &configuration.Configuration{}
-	ui := &testhelpers.FakeUI{}
+	ui := &testterm.FakeUI{}
 
 	cmd := NewListRoutes(ui, config, routeRepo)
-	cmd.Run(testhelpers.NewContext("routes", []string{}))
+	cmd.Run(testcmd.NewContext("routes", []string{}))
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
 	assert.Contains(t, ui.Outputs[1], "FAILED")

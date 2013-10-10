@@ -3,25 +3,28 @@ package domain_test
 import (
 	. "cf/commands/domain"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testapi "testhelpers/api"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestShareDomainRequirements(t *testing.T) {
-	domainRepo := &testhelpers.FakeDomainRepository{}
+	domainRepo := &testapi.FakeDomainRepository{}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 	callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestShareDomainFailsWithUsage(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	domainRepo := &testhelpers.FakeDomainRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	domainRepo := &testapi.FakeDomainRepository{}
 	ui := callShareDomain([]string{}, reqFactory, domainRepo)
 	assert.True(t, ui.FailedWithUsage)
 
@@ -30,8 +33,8 @@ func TestShareDomainFailsWithUsage(t *testing.T) {
 }
 
 func TestShareDomain(t *testing.T) {
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
-	domainRepo := &testhelpers.FakeDomainRepository{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	domainRepo := &testapi.FakeDomainRepository{}
 	fakeUI := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.ShareDomainDomainToCreate.Name, "example.com")
@@ -39,11 +42,11 @@ func TestShareDomain(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func callShareDomain(args []string, reqFactory *testhelpers.FakeReqFactory, domainRepo *testhelpers.FakeDomainRepository) (fakeUI *testhelpers.FakeUI) {
-	fakeUI = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("share-domain", args)
+func callShareDomain(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("share-domain", args)
 	cmd := NewShareDomain(fakeUI, domainRepo)
 
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

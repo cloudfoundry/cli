@@ -4,25 +4,27 @@ import (
 	"cf"
 	. "cf/commands/organization"
 	"github.com/stretchr/testify/assert"
-	"testhelpers"
+	testcmd "testhelpers/commands"
+	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestShowOrgRequirements(t *testing.T) {
 	args := []string{"my-org"}
 
-	reqFactory := &testhelpers.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	callShowOrg(args, reqFactory)
-	assert.True(t, testhelpers.CommandDidPassRequirements)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testhelpers.FakeReqFactory{LoginSuccess: false}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 	callShowOrg(args, reqFactory)
-	assert.False(t, testhelpers.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestShowOrgFailsWithUsage(t *testing.T) {
 	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
-	reqFactory := &testhelpers.FakeReqFactory{Organization: org, LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 	args := []string{"my-org"}
 	ui := callShowOrg(args, reqFactory)
@@ -45,7 +47,7 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 		Domains: []cf.Domain{domain, cfAppDomain},
 	}
 
-	reqFactory := &testhelpers.FakeReqFactory{Organization: org, LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 	args := []string{"my-org"}
 	ui := callShowOrg(args, reqFactory)
@@ -63,11 +65,11 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 	assert.Contains(t, ui.Outputs[4], "development, staging")
 }
 
-func callShowOrg(args []string, reqFactory *testhelpers.FakeReqFactory) (ui *testhelpers.FakeUI) {
-	ui = new(testhelpers.FakeUI)
-	ctxt := testhelpers.NewContext("org", args)
+func callShowOrg(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("org", args)
 
 	cmd := NewShowOrg(ui)
-	testhelpers.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
