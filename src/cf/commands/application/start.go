@@ -70,7 +70,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	instances, apiResponse := cmd.appRepo.GetInstances(app)
 
 	for apiResponse.IsNotSuccessful() {
-		if apiResponse.ErrorCode != api.APP_NOT_STAGED {
+		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiResponse.Message)
 			return

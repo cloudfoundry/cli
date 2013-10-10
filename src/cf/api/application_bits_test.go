@@ -1,9 +1,8 @@
-package api_test
+package api
 
 import (
 	"bytes"
 	"cf"
-	. "cf/api"
 	"cf/configuration"
 	"cf/net"
 	"github.com/stretchr/testify/assert"

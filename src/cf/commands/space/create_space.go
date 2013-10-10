@@ -40,7 +40,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 
 	apiResponse := cmd.spaceRepo.Create(spaceName)
 	if apiResponse.IsNotSuccessful() {
-		if apiResponse.ErrorCode == api.SPACE_EXISTS {
+		if apiResponse.ErrorCode == cf.SPACE_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Say("Space %s already exists", spaceName)
 			return

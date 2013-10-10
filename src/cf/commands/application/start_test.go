@@ -114,7 +114,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 		},
 	}
 
-	errorCodes := []string{api.APP_NOT_STAGED, api.APP_NOT_STAGED, "", "", ""}
+	errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, "", "", ""}
 
 	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
 

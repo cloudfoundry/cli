@@ -1,8 +1,7 @@
-package api_test
+package api
 
 import (
 	"cf"
-	. "cf/api"
 	"cf/configuration"
 	cfnet "cf/net"
 	"code.google.com/p/go.net/websocket"

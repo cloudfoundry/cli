@@ -3,7 +3,6 @@ package api
 import (
 	"cf"
 	"cf/net"
-	"cf/api"
 )
 
 type FakeSpaceRepository struct {
@@ -58,7 +57,7 @@ func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiResponse net.A
 
 func (repo *FakeSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
 	if repo.CreateSpaceExists {
-		apiResponse = net.NewApiResponse("Space already exists", api.SPACE_EXISTS, 400)
+		apiResponse = net.NewApiResponse("Space already exists", cf.SPACE_EXISTS, 400)
 		return
 	}
 	repo.CreateSpaceName = name

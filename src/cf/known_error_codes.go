@@ -1,4 +1,4 @@
-package api
+package cf
 
 const (
 	ORG_EXISTS                  = "30002"
