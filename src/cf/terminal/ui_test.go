@@ -1,17 +1,16 @@
-package terminal_test
+package terminal
 
 import (
-	"cf/terminal"
+	"bytes"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
-	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestSayWithStringOnly(t *testing.T) {
-	ui := new(terminal.TerminalUI)
-	out := testterm.CaptureOutput(func() {
+	ui := new(TerminalUI)
+	out := captureOutput(func() {
 		ui.Say("Hello")
 	})
 
@@ -19,8 +18,8 @@ func TestSayWithStringOnly(t *testing.T) {
 }
 
 func TestSayWithStringWithFormat(t *testing.T) {
-	ui := new(terminal.TerminalUI)
-	out := testterm.CaptureOutput(func() {
+	ui := new(TerminalUI)
+	out := captureOutput(func() {
 		ui.Say("Hello %s", "World!")
 	})
 
@@ -29,10 +28,10 @@ func TestSayWithStringWithFormat(t *testing.T) {
 
 func TestConfirmYes(t *testing.T) {
 	simulateStdin("y\n", func() {
-		ui := new(terminal.TerminalUI)
+		ui := new(TerminalUI)
 
 		var result bool
-		out := testterm.CaptureOutput(func() {
+		out := captureOutput(func() {
 			result = ui.Confirm("Hello %s", "World?")
 		})
 
@@ -43,10 +42,10 @@ func TestConfirmYes(t *testing.T) {
 
 func TestConfirmNo(t *testing.T) {
 	simulateStdin("wat\n", func() {
-		ui := new(terminal.TerminalUI)
+		ui := new(TerminalUI)
 
 		var result bool
-		out := testterm.CaptureOutput(func() {
+		out := captureOutput(func() {
 			result = ui.Confirm("Hello %s", "World?")
 		})
 
@@ -57,11 +56,11 @@ func TestConfirmNo(t *testing.T) {
 
 func simulateStdin(input string, block func()) {
 	defer func() {
-		terminal.Stdin = os.Stdin
+		Stdin = os.Stdin
 	}()
 
 	stdinReader, stdinWriter := io.Pipe()
-	terminal.Stdin = stdinReader
+	Stdin = stdinReader
 
 	go func() {
 		stdinWriter.Write([]byte(input))
@@ -69,4 +68,25 @@ func simulateStdin(input string, block func()) {
 	}()
 
 	block()
+}
+
+func captureOutput(f func()) string {
+	old := os.Stdout // keep backup of the real stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	f()
+
+	outC := make(chan string)
+	// copy the output in a separate goroutine so printing can't block indefinitely
+	go func() {
+		var buf bytes.Buffer
+		io.Copy(&buf, r)
+		outC <- buf.String()
+	}()
+
+	// back to normal state
+	w.Close()
+	os.Stdout = old // restoring the real stdout
+	return <-outC
 }
