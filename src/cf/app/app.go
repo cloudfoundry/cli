@@ -633,7 +633,7 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 		{
 			Name:        "update-service-auth-token",
 			Description: "Update a service auth token",
-			Usage:       fmt.Sprintf("%s update-service-auth-token LABEL TOKEN", cf.Name),
+			Usage:       fmt.Sprintf("%s update-service-auth-token LABEL PROVIDER TOKEN", cf.Name),
 			Action: func(c *cli.Context) {
 				cmd, _ := cmdFactory.GetByCmdName("update-service-auth-token")
 				cmdRunner.Run(cmd, c)
