@@ -49,6 +49,7 @@ func TestCommands(t *testing.T) {
 		"delete",
 		"delete-org",
 		"delete-service",
+		"delete-service-auth-token",
 		"delete-service-broker",
 		"delete-space",
 		"env",

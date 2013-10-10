@@ -40,6 +40,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, repoLocator.GetOrganizationRepository(), configRepo)
 	factory.cmdsByName["delete-service"] = service.NewDeleteService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["delete-service-auth-token"] = serviceauthtoken.NewDeleteServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["delete-service-broker"] = servicebroker.NewDeleteServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["delete-space"] = space.NewDeleteSpace(ui, repoLocator.GetSpaceRepository(), configRepo)
 	factory.cmdsByName["domains"] = domain.NewListDomains(ui, repoLocator.GetDomainRepository())

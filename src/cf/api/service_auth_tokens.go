@@ -11,7 +11,9 @@ import (
 type ServiceAuthTokenRepository interface {
 	Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
+	Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse)
+	FindByName(tokenName cf.ServiceAuthTokenNameKey) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceAuthTokenRepository struct {
@@ -63,24 +65,36 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf
 	return
 }
 
-func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	tokens, apiResponse := repo.FindAll()
+func (repo CloudControllerServiceAuthTokenRepository) FindByName(tokenName cf.ServiceAuthTokenNameKey) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
+	authTokens, apiResponse := repo.FindAll()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	i := indexOfToken(tokens, authToken)
-	if i == -1 {
-		apiResponse = net.NewNotFoundApiResponse("Service Token", authToken.Label)
+	tokenIndex := indexOfToken(authTokens, tokenName)
+	if tokenIndex == -1 {
+		apiResponse = net.NewNotFoundApiResponse("Service Auth Token not found")
+		return
+	}
+	authToken = authTokens[tokenIndex]
+	return
+}
+
+func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
+
+	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	tokenGuid := tokens[i].Guid
+	apiResponse = repo.gateway.PerformRequest(request)
+	return
+}
 
-	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, tokenGuid)
+func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
 	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
-	println(path)
-	println(body)
 	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -90,8 +104,7 @@ func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.Servic
 	return
 }
 
-func indexOfToken(tokens []cf.ServiceAuthToken, matcher cf.ServiceAuthToken) int {
-	key := matcher.FindByNameKey()
+func indexOfToken(tokens []cf.ServiceAuthToken, key cf.ServiceAuthTokenNameKey) int {
 	for i, token := range tokens {
 		if token.FindByNameKey() == key {
 			return i
