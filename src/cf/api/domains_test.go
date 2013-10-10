@@ -354,7 +354,7 @@ func TestMapDomainSuccess(t *testing.T) {
 
 	apiResponse := repo.MapDomain(domain, space)
 
-	assert.True(t, responseStatus.Called)
+	assert.True(t, responseStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -376,7 +376,7 @@ func TestMapDomainWhenServerError(t *testing.T) {
 
 	apiResponse := repo.MapDomain(domain, space)
 
-	assert.True(t, responseStatus.Called)
+	assert.True(t, responseStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
@@ -409,7 +409,7 @@ func TestUnmapDomainSuccess(t *testing.T) {
 
 	apiResponse := repo.UnmapDomain(domain, space)
 
-	assert.True(t, responseStatus.Called)
+	assert.True(t, responseStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -441,7 +441,7 @@ func TestDeleteDomainSuccess(t *testing.T) {
 
 	apiResponse := repo.DeleteDomain(domain)
 
-	assert.True(t, responseStatus.Called)
+	assert.True(t, responseStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -462,6 +462,6 @@ func TestDeleteDomainFailure(t *testing.T) {
 
 	apiResponse := repo.DeleteDomain(domain)
 
-	assert.True(t, responseStatus.Called)
+	assert.True(t, responseStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 }

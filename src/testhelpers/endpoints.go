@@ -7,14 +7,14 @@ import (
 	"io/ioutil"
 )
 
-type RequestMatcher func(*http.Request) bool
+type RequestMatcher func (*http.Request) bool
 
 var successMatcher = func(*http.Request) bool {
 	return true
 }
 
 type TestResponse struct {
-	Body string
+	Body   string
 	Status int
 	Header http.Header
 }
@@ -28,13 +28,36 @@ func RemoveWhiteSpaceFromBody(body string) string {
 }
 
 type RequestStatus struct {
-	Called bool
+	called bool
 }
 
-func EndpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher){
-	status.Called = false
+func (status *RequestStatus) Reset() {
+	status.called = false
+}
+
+func (status *RequestStatus) Called() bool {
+	return status.called
+}
+
+func (status *RequestStatus) call() {
+	status.called = true
+}
+
+func MatcherSequence(matchers []RequestMatcher) RequestMatcher {
+	return func(request *http.Request) bool {
+		for _, matcher := range matchers {
+			if !matcher(request) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+func EndpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher) {
+	status.Reset()
 	matcher = func(*http.Request) bool {
-		status.Called = true
+		status.call()
 		return true
 	}
 	return
@@ -59,6 +82,16 @@ func RequestBodyMatcher(expectedBody string) RequestMatcher {
 	}
 }
 
+func CreateCheckableEndpoint(method string, path string, customMatcher RequestMatcher, response TestResponse) (hf http.HandlerFunc, status *RequestStatus) {
+	status = &RequestStatus{}
+	matchers := MatcherSequence([]RequestMatcher{
+		EndpointCalledMatcher(status),
+		customMatcher,
+	})
+	hf = CreateEndpoint(method, path , matchers, response)
+	return
+}
+
 func CreateEndpoint(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
@@ -80,15 +113,15 @@ func CreateEndpoint(method string, path string, customMatcher RequestMatcher, re
 
 		header := writer.Header()
 		for name, values := range response.Header {
-			if (len(values) < 1){
+			if (len(values) < 1) {
 				continue
 			}
-			header.Set(name,values[0])
+			header.Set(name, values[0])
 		}
 
 		if !(acceptHeaderMatches && authMatches && methodMatches && pathMatches && customMatcherMatches) {
 			fmt.Printf("One of the matchers did not match. AcceptHeader [%t] Auth [%t] Method [%t] Path [%t] Custom Matcher [%t]",
-			acceptHeaderMatches, authMatches, methodMatches, pathMatches, customMatcherMatches)
+				acceptHeaderMatches, authMatches, methodMatches, pathMatches, customMatcherMatches)
 
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
