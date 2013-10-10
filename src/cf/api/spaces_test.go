@@ -357,7 +357,7 @@ func createSpacesRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo Spac
 		AccessToken:  "BEARER my_access_token",
 		Target:       ts.URL,
 		Organization: cf.Organization{Guid: "some-org-guid"},
-		Space:       cf.Space{Guid: "my-space-guid"},
+		Space:        cf.Space{Guid: "my-space-guid"},
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerSpaceRepository(config, gateway)
