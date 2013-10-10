@@ -88,7 +88,7 @@ func TestDeleteDomainNoConfirmation(t *testing.T) {
 func TestDeleteDomainNotFound(t *testing.T) {
 	ui := &testhelpers.FakeUI{Inputs: []string{"y"}}
 	domainRepo := &testhelpers.FakeDomainRepository{
-		FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("Domain", "foo.com"),
+		FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)

@@ -21,7 +21,7 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.Ser
 	serviceBroker = repo.FindByNameServiceBroker
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("Service Broker", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Service Broker", name)
 	}
 
 	return

@@ -45,7 +45,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("Org", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Org", name)
 	}
 
 	return
@@ -76,7 +76,7 @@ func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, api
 	quota = repo.FindQuotaByNameQuota
 
 	if repo.FindQuotaByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("Org", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Org", name)
 	}
 	if repo.FindQuotaByNameErr {
 		apiResponse = net.NewApiResponseWithMessage("Error finding quota")

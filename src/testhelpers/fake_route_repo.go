@@ -3,7 +3,6 @@ package testhelpers
 import (
 	"cf"
 	"cf/net"
-	"fmt"
 )
 
 type FakeRouteRepository struct {
@@ -64,7 +63,7 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	}
 
 	if repo.FindByHostAndDomainNotFound {
-		apiResponse = net.NewNotFoundApiResponse("Org", fmt.Sprintf("%s.%s", host, domain))
+		apiResponse = net.NewNotFoundApiResponse("%s %s.%s not found","Org",host, domain)
 	}
 
 	route = repo.FindByHostAndDomainRoute

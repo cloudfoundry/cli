@@ -41,7 +41,7 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Service Broker", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service Broker", name)
 		return
 	}
 

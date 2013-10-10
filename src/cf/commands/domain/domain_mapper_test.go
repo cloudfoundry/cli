@@ -68,7 +68,7 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 	ctxt := testhelpers.NewContext("map-domain", []string{"my-space", "foo.com"})
 	ui := &testhelpers.FakeUI{}
 	domainRepo := &testhelpers.FakeDomainRepository{
-		FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("Domain", "foo.com"),
+		FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com"),
 	}
 
 	reqFactory := &testhelpers.FakeReqFactory{

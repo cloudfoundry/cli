@@ -54,7 +54,7 @@ func (repo *FakeApplicationRepository) FindByName(name string) (app cf.Applicati
 		apiResponse = net.NewApiResponse("Authentication failed.", "1000", 401)
 	}
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("App", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found","App", name)
 	}
 
 	return

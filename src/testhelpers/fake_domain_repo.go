@@ -53,7 +53,7 @@ func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain 
 	domain = repo.FindByNameDomain
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("Domain", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Domain", name)
 	}
 	if repo.FindByNameErr {
 		apiResponse = net.NewApiResponseWithMessage("Error finding domain")

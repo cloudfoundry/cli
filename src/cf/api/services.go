@@ -162,7 +162,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	if len(response.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Service instance", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service instance", name)
 		return
 	}
 

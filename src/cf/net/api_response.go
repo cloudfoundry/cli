@@ -36,9 +36,9 @@ func NewApiResponseWithError(message string, err error) (apiResponse ApiResponse
 	}
 }
 
-func NewNotFoundApiResponse(objectType string, objectId string) (apiResponse ApiResponse) {
+func NewNotFoundApiResponse(message string, a ...interface{}) (apiResponse ApiResponse) {
 	return ApiResponse{
-		Message:    fmt.Sprintf("%s %s not found", objectType, objectId),
+		Message:    fmt.Sprintf(message, a...),
 		isNotFound: true,
 	}
 }

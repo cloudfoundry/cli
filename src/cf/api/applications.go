@@ -50,7 +50,7 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	if len(findResponse.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("App", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "App", name)
 		return
 	}
 
