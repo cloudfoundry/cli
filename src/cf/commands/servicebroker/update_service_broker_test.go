@@ -25,16 +25,13 @@ func TestUpdateServiceBrokerFailsWithUsage(t *testing.T) {
 	assert.True(t, ui.FailedWithUsage)
 
 	ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3", "arg4"}, reqFactory, repo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callUpdateServiceBroker([]string{"arg1", "arg2", "arg3", "arg4", "arg5"}, reqFactory, repo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestUpdateServiceBrokerRequirements(t *testing.T) {
 	reqFactory := &testhelpers.FakeReqFactory{}
 	repo := &testhelpers.FakeServiceBrokerRepo{}
-	args := []string{"arg1", "arg2", "arg3", "arg4", "arg5"}
+	args := []string{"arg1", "arg2", "arg3", "arg4"}
 
 	reqFactory.LoginSuccess = false
 	callUpdateServiceBroker(args, reqFactory, repo)
@@ -50,7 +47,7 @@ func TestUpdateServiceBroker(t *testing.T) {
 	repo := &testhelpers.FakeServiceBrokerRepo{
 		FindByNameServiceBroker: cf.ServiceBroker{Name: "my-found-broker", Guid: "my-found-broker-guid"},
 	}
-	args := []string{"my-broker", "my-new-broker", "new-username", "new-password", "new-url"}
+	args := []string{"my-broker", "new-username", "new-password", "new-url"}
 
 	ui := callUpdateServiceBroker(args, reqFactory, repo)
 
@@ -60,7 +57,7 @@ func TestUpdateServiceBroker(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-found-broker")
 
 	expectedServiceBroker := cf.ServiceBroker{
-		Name:     "my-new-broker",
+		Name:     "my-found-broker",
 		Username: "new-username",
 		Password: "new-password",
 		Url:      "new-url",

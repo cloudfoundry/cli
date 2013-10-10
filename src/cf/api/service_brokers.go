@@ -56,27 +56,30 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 }
 
 func (repo CloudControllerServiceBrokerRepository) Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	return repo.createOrUpdate(serviceBroker)
+	body := fmt.Sprintf(
+		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
+		serviceBroker.Name, serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
+	)
+
+	return repo.createOrUpdate(serviceBroker, body)
 }
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	return repo.createOrUpdate(serviceBroker)
+	body := fmt.Sprintf(
+		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
+		serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
+	)
+
+	return repo.createOrUpdate(serviceBroker, body)
 }
 
 func (repo CloudControllerServiceBrokerRepository) Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, serviceBroker.Name)
 
-	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(req)
-	return
+	return repo.createOrUpdate(serviceBroker, body)
 }
 
-func (repo CloudControllerServiceBrokerRepository) createOrUpdate(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBrokerRepository) createOrUpdate(serviceBroker cf.ServiceBroker, body string) (apiResponse net.ApiResponse) {
 	method := "POST"
 	path := fmt.Sprintf("%s/v2/service_brokers", repo.config.Target)
 
@@ -84,11 +87,6 @@ func (repo CloudControllerServiceBrokerRepository) createOrUpdate(serviceBroker 
 		method = "PUT"
 		path = fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
 	}
-
-	body := fmt.Sprintf(
-		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
-		serviceBroker.Name, serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
-	)
 
 	req, apiResponse := repo.gateway.NewRequest(method, path, repo.config.AccessToken, strings.NewReader(body))
 	if apiResponse.IsNotSuccessful() {

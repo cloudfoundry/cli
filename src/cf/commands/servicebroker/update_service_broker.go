@@ -20,7 +20,7 @@ func NewUpdateServiceBroker(ui terminal.UI, repo api.ServiceBrokerRepository) (c
 }
 
 func (cmd UpdateServiceBroker) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 5 {
+	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "update-service-broker")
 		return
@@ -40,10 +40,9 @@ func (cmd UpdateServiceBroker) Run(c *cli.Context) {
 
 	cmd.ui.Say("Updating service broker %s...", terminal.EntityNameColor(serviceBroker.Name))
 
-	serviceBroker.Name = c.Args()[1]
-	serviceBroker.Username = c.Args()[2]
-	serviceBroker.Password = c.Args()[3]
-	serviceBroker.Url = c.Args()[4]
+	serviceBroker.Username = c.Args()[1]
+	serviceBroker.Password = c.Args()[2]
+	serviceBroker.Url = c.Args()[3]
 
 	apiResponse = cmd.repo.Update(serviceBroker)
 

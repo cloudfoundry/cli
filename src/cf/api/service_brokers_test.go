@@ -97,7 +97,7 @@ func TestCreateServiceBroker(t *testing.T) {
 }
 
 func TestUpdateServiceBroker(t *testing.T) {
-	expectedReqBody := `{"name":"update-foobroker","broker_url":"http://update.example.com","auth_username":"update-foouser","auth_password":"update-password"}`
+	expectedReqBody := `{"broker_url":"http://update.example.com","auth_username":"update-foouser","auth_password":"update-password"}`
 
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"PUT",
@@ -111,7 +111,7 @@ func TestUpdateServiceBroker(t *testing.T) {
 
 	serviceBroker := cf.ServiceBroker{
 		Guid:     "my-guid",
-		Name:     "update-foobroker",
+		Name:     "foobroker",
 		Url:      "http://update.example.com",
 		Username: "update-foouser",
 		Password: "update-password",
