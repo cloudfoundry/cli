@@ -154,8 +154,11 @@ type ServiceAuthToken struct {
 	Token    string
 }
 
-func (token ServiceAuthToken) FindByNameKey() string {
-	return token.Label + token.Provider
+type ServiceAuthTokenNameKey string
+
+func (token ServiceAuthToken) FindByNameKey() ServiceAuthTokenNameKey {
+	tokenName := ServiceAuthTokenNameKey(token.Label + token.Provider)
+	return tokenName
 }
 
 type ServiceBroker struct {
