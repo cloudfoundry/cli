@@ -378,10 +378,10 @@ func createDomainRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo Doma
 	ts = httptest.NewTLSServer(endpoint)
 
 	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-		Organization:  cf.Organization{Guid: "my-org-guid"},
+		AccessToken:  "BEARER my_access_token",
+		Target:       ts.URL,
+		Space:        cf.Space{Guid: "my-space-guid"},
+		Organization: cf.Organization{Guid: "my-org-guid"},
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerDomainRepository(config, gateway)

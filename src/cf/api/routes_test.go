@@ -86,10 +86,8 @@ func TestRoutesFindAll(t *testing.T) {
 		findAllRoutesResponse,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, _ := createRoutesRepo(endpoint)
 	defer ts.Close()
-
-	repo, _ := getRepo(ts.URL)
 	routes, apiResponse := repo.FindAll()
 
 	assert.True(t, status.Called())
@@ -128,10 +126,9 @@ func TestFindByHost(t *testing.T) {
 		findRouteByHostResponse,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, _ := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, _ := getRepo(ts.URL)
 	route, apiResponse := repo.FindByHost("my-cool-app")
 
 	assert.True(t, status.Called())
@@ -147,10 +144,9 @@ func TestFindByHostWhenHostIsNotFound(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: ` { "resources": [ ]}`},
 	)
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(endpoint))
+	ts, repo, _ := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, _ := getRepo(ts.URL)
 	_, apiResponse := repo.FindByHost("my-cool-app")
 
 	assert.True(t, status.Called())
@@ -165,10 +161,9 @@ func TestFindByHostAndDomain(t *testing.T) {
 		findRouteByHostResponse,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, domainRepo := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, domainRepo := getRepo(ts.URL)
 	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
 	route, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
@@ -186,10 +181,9 @@ func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, domainRepo := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, domainRepo := getRepo(ts.URL)
 	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
 	_, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
@@ -210,10 +204,9 @@ func TestCreateRoute(t *testing.T) {
 }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, _ := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, _ := getRepo(ts.URL)
 	domain := cf.Domain{Guid: "my-domain-guid"}
 	newRoute := cf.Route{Host: "my-cool-app"}
 
@@ -232,10 +225,9 @@ func TestBind(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: ""},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, _ := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, _ := getRepo(ts.URL)
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
@@ -252,10 +244,9 @@ func TestUnbind(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated, Body: ""},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo, _ := createRoutesRepo(endpoint)
 	defer ts.Close()
 
-	repo, _ := getRepo(ts.URL)
 	route := cf.Route{Guid: "my-cool-route-guid"}
 	app := cf.Application{Guid: "my-cool-app-guid"}
 
@@ -264,10 +255,12 @@ func TestUnbind(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func getRepo(targetURL string) (repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {
+func createRoutesRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo CloudControllerRouteRepository, domainRepo *testhelpers.FakeDomainRepository) {
+	ts = httptest.NewTLSServer(endpoint)
+
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
-		Target:      targetURL,
+		Target:      ts.URL,
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
 

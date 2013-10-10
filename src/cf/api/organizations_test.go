@@ -246,7 +246,7 @@ func createOrganizationRepo(endpoint http.HandlerFunc) (ts *httptest.Server, rep
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
-		Target: ts.URL,
+		Target:      ts.URL,
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerOrganizationRepository(config, gateway)
