@@ -57,8 +57,8 @@ var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, 
   ]
 }`}
 
-func testGetServiceOfferings(t *testing.T, endpoint func(writer http.ResponseWriter, request *http.Request), config *configuration.Configuration) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(endpoint))
+func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *testhelpers.RequestStatus, config *configuration.Configuration) {
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config.Target = ts.URL
@@ -67,6 +67,7 @@ func testGetServiceOfferings(t *testing.T, endpoint func(writer http.ResponseWri
 	repo := NewCloudControllerServiceRepository(config, gateway)
 	offerings, apiResponse := repo.GetServiceOfferings()
 
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(offerings))
 
@@ -88,44 +89,44 @@ func testGetServiceOfferings(t *testing.T, endpoint func(writer http.ResponseWri
 	assert.Equal(t, len(secondOffering.Plans), 1)
 }
 
-var multipleOfferingsEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/services?inline-relations-depth=1",
-	nil,
-	multipleOfferingsResponse,
-)
-
 func TestGetServiceOfferingsWhenNotTargetingASpace(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/services?inline-relations-depth=1",
+		nil,
+		multipleOfferingsResponse,
+	)
+
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
-	testGetServiceOfferings(t, multipleOfferingsEndpoint, config)
+	testGetServiceOfferings(t, endpoint, status, config)
 }
 
-var multipleOfferingsInSpaceEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-	nil,
-	multipleOfferingsResponse,
-)
-
 func TestGetServiceOfferingsWhenTargetingASpace(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+		nil,
+		multipleOfferingsResponse,
+	)
+
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	testGetServiceOfferings(t, multipleOfferingsInSpaceEndpoint, config)
+	testGetServiceOfferings(t, endpoint, status, config)
 }
 
-var createServiceInstanceEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/service_instances",
-	testhelpers.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"space-guid"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestCreateServiceInstance(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createServiceInstanceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/service_instances",
+		testhelpers.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"space-guid"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -137,30 +138,33 @@ func TestCreateServiceInstance(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
 }
 
-var identicalServiceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/service_instances",
-	testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
-	testhelpers.TestResponse{
-		Status: http.StatusBadRequest,
-		Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-	},
-)
-
-var identicalInstanceAlreadyExistsEndpoints = func(res http.ResponseWriter, req *http.Request) {
-	if strings.Contains(req.RequestURI, "/v2/service_instances") {
-		identicalServiceInstanceAlreadyExistsEndpoint(res, req)
-	} else {
-		findServiceInstanceEndpoint(res, req)
-	}
-}
-
 func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(identicalInstanceAlreadyExistsEndpoints))
+	findServiceInstanceEndpointStatus.Reset()
+
+	errorEndpoint, errorEndpointStatus := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/service_instances",
+		testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		testhelpers.TestResponse{
+			Status: http.StatusBadRequest,
+			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+		},
+	)
+
+	endpoints := func(res http.ResponseWriter, req *http.Request) {
+		if strings.Contains(req.RequestURI, "/v2/service_instances") {
+			errorEndpoint(res, req)
+		} else {
+			findServiceInstanceEndpoint(res, req)
+		}
+	}
+
+	ts := httptest.NewTLSServer(http.HandlerFunc(endpoints))
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -174,30 +178,34 @@ func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 	servicePlan := cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"}
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", servicePlan)
 
+	assert.True(t, findServiceInstanceEndpointStatus.Called())
+	assert.True(t, errorEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, true)
 }
 
-var differentServiceInstanceAlreadyExistsEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/service_instances",
-	testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
-	testhelpers.TestResponse{
-		Status: http.StatusBadRequest,
-		Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-	},
-)
-
-var differentInstanceAlreadyExistsEndpoints = func(res http.ResponseWriter, req *http.Request) {
-	if strings.Contains(req.RequestURI, "/v2/service_instances") {
-		differentServiceInstanceAlreadyExistsEndpoint(res, req)
-	} else {
-		findServiceInstanceEndpoint(res, req)
-	}
-}
-
 func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(differentInstanceAlreadyExistsEndpoints))
+	findServiceInstanceEndpointStatus.Reset()
+
+	errorEndpoint, errorEndpointStatus := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/service_instances",
+		testhelpers.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
+		testhelpers.TestResponse{
+			Status: http.StatusBadRequest,
+			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+		},
+	)
+
+	endpoints := func(res http.ResponseWriter, req *http.Request) {
+		if strings.Contains(req.RequestURI, "/v2/service_instances") {
+			errorEndpoint(res, req)
+		} else {
+			findServiceInstanceEndpoint(res, req)
+		}
+	}
+
+	ts := httptest.NewTLSServer(http.HandlerFunc(endpoints))
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -211,19 +219,21 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 	servicePlan := cf.ServicePlan{Guid: "different-plan-guid", Name: "plan-name"}
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", servicePlan)
 
+	assert.True(t, findServiceInstanceEndpointStatus.Called())
+	assert.True(t, errorEndpointStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
 }
 
-var createUserProvidedServiceInstanceEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/user_provided_service_instances",
-	testhelpers.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"some-space-guid"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestCreateUserProvidedServiceInstance(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createUserProvidedServiceInstanceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/user_provided_service_instances",
+		testhelpers.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"some-space-guid"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -240,18 +250,19 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 		"password": "secret",
 	}
 	apiResponse := repo.CreateUserProvidedServiceInstance("my-custom-service", params)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var updateUserProvidedServiceInstanceEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/user_provided_service_instances/my-instance-guid",
-	testhelpers.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestUpdateUserProvidedServiceInstance(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(updateUserProvidedServiceInstanceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/user_provided_service_instances/my-instance-guid",
+		testhelpers.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -267,6 +278,7 @@ func TestUpdateUserProvidedServiceInstance(t *testing.T) {
 		"password": "secret",
 	}
 	apiResponse := repo.UpdateUserProvidedServiceInstance(cf.ServiceInstance{Guid: "my-instance-guid"}, params)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -321,7 +333,7 @@ var singleServiceInstanceResponse = testhelpers.TestResponse{Status: http.Status
   ]
 }`}
 
-var findServiceInstanceEndpoint = testhelpers.CreateEndpoint(
+var findServiceInstanceEndpoint, findServiceInstanceEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 	nil,
@@ -329,7 +341,8 @@ var findServiceInstanceEndpoint = testhelpers.CreateEndpoint(
 )
 
 func TestFindInstanceByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(findServiceInstanceEndpoint))
+	findServiceInstanceEndpointStatus.Reset()
+	ts := httptest.NewTLSServer(findServiceInstanceEndpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -341,6 +354,8 @@ func TestFindInstanceByName(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	instance, apiResponse := repo.FindInstanceByName("my-service")
+
+	assert.True(t, findServiceInstanceEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
@@ -356,19 +371,15 @@ func TestFindInstanceByName(t *testing.T) {
 	assert.Equal(t, binding.AppGuid, "app-1-guid")
 }
 
-var serviceNotFoundResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `{
-  "resources": []
-}`}
-
-var serviceNotFoundEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-	nil,
-	serviceNotFoundResponse,
-)
-
 func TestFindInstanceByNameForNonExistentService(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(serviceNotFoundEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -380,19 +391,20 @@ func TestFindInstanceByNameForNonExistentService(t *testing.T) {
 	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	_, apiResponse := repo.FindInstanceByName("my-service")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-var bindServiceEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/service_bindings",
-	testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestBindService(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(bindServiceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/service_bindings",
+		testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -405,21 +417,22 @@ func TestBindService(t *testing.T) {
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
 	apiResponse := repo.BindService(serviceInstance, app)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var bindServiceErrorEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/service_bindings",
-	testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
-	testhelpers.TestResponse{
-		Status: http.StatusBadRequest,
-		Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
-	},
-)
-
 func TestBindServiceIfError(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(bindServiceErrorEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/service_bindings",
+		testhelpers.RequestBodyMatcher(`{"app_guid":"my-app-guid","service_instance_guid":"my-service-instance-guid"}`),
+		testhelpers.TestResponse{
+			Status: http.StatusBadRequest,
+			Body:   `{"code":90003,"description":"The app space binding to service is taken: 7b959018-110a-4913-ac0a-d663e613cdea 346bf237-7eef-41a7-b892-68fb08068f09"}`,
+		},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -433,11 +446,12 @@ func TestBindServiceIfError(t *testing.T) {
 	app := cf.Application{Guid: "my-app-guid"}
 	apiResponse := repo.BindService(serviceInstance, app)
 
+	assert.True(t, status.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, apiResponse.ErrorCode, "90003")
 }
 
-var deleteBindingEndpoint = testhelpers.CreateEndpoint(
+var deleteBindingEndpoint, deleteBindingEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"DELETE",
 	"/v2/service_bindings/service-binding-2-guid",
 	nil,
@@ -445,7 +459,8 @@ var deleteBindingEndpoint = testhelpers.CreateEndpoint(
 )
 
 func TestUnbindService(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(deleteBindingEndpoint))
+	deleteBindingEndpointStatus.Reset()
+	ts := httptest.NewTLSServer(deleteBindingEndpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -466,12 +481,13 @@ func TestUnbindService(t *testing.T) {
 	}
 	app := cf.Application{Guid: "app-2-guid"}
 	found, apiResponse := repo.UnbindService(serviceInstance, app)
+	assert.True(t, deleteBindingEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.True(t, found)
 }
 
 func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(deleteBindingEndpoint))
+	ts := httptest.NewTLSServer(deleteBindingEndpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -493,15 +509,15 @@ func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
 	assert.False(t, found)
 }
 
-var deleteServiceInstanceEndpoint = testhelpers.CreateEndpoint(
-	"DELETE",
-	"/v2/service_instances/my-service-instance-guid",
-	nil,
-	testhelpers.TestResponse{Status: http.StatusOK},
-)
-
 func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(deleteServiceInstanceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"DELETE",
+		"/v2/service_instances/my-service-instance-guid",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -513,6 +529,7 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.DeleteService(serviceInstance)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -538,15 +555,15 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 	assert.Equal(t, apiResponse.Message, "Cannot delete service instance, apps are still bound to it")
 }
 
-var renameServiceInstanceEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/service_instances/my-service-instance-guid",
-	testhelpers.RequestBodyMatcher(`{"name":"new-name"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestRenameService(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(renameServiceInstanceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/service_instances/my-service-instance-guid",
+		testhelpers.RequestBodyMatcher(`{"name":"new-name"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -559,5 +576,6 @@ func TestRenameService(t *testing.T) {
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

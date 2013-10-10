@@ -43,7 +43,7 @@ func (status *RequestStatus) call() {
 	status.called = true
 }
 
-func MatcherSequence(matchers []RequestMatcher) RequestMatcher {
+func matcherSequence(matchers []RequestMatcher) RequestMatcher {
 	return func(request *http.Request) bool {
 		for _, matcher := range matchers {
 			if matcher != nil && !matcher(request) {
@@ -54,7 +54,7 @@ func MatcherSequence(matchers []RequestMatcher) RequestMatcher {
 	}
 }
 
-func EndpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher) {
+func endpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher) {
 	status.Reset()
 	matcher = func(*http.Request) bool {
 		status.call()
@@ -84,15 +84,15 @@ func RequestBodyMatcher(expectedBody string) RequestMatcher {
 
 func CreateCheckableEndpoint(method string, path string, customMatcher RequestMatcher, response TestResponse) (hf http.HandlerFunc, status *RequestStatus) {
 	status = &RequestStatus{}
-	matchers := MatcherSequence([]RequestMatcher{
-		EndpointCalledMatcher(status),
+	matchers := matcherSequence([]RequestMatcher{
+		endpointCalledMatcher(status),
 		customMatcher,
 	})
-	hf = CreateEndpoint(method, path , matchers, response)
+	hf = createEndpoint(method, path , matchers, response)
 	return
 }
 
-func CreateEndpoint(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
+func createEndpoint(method string, path string, customMatcher RequestMatcher, response TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 
 		if customMatcher == nil {

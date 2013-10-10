@@ -13,7 +13,6 @@ import (
 )
 
 func TestFindServiceBrokerByName(t *testing.T) {
-	requestStatus := testhelpers.RequestStatus{}
 	responseBody := `{
   "resources": [
   	{
@@ -30,10 +29,10 @@ func TestFindServiceBrokerByName(t *testing.T) {
   ]
 }`
 
-	endpoint := testhelpers.CreateEndpoint(
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"GET",
 		"/v2/service_brokers?q=name%3Amy-broker",
-		testhelpers.EndpointCalledMatcher(&requestStatus),
+		nil,
 		testhelpers.TestResponse{Status: http.StatusOK, Body: responseBody},
 	)
 
@@ -49,22 +48,17 @@ func TestFindServiceBrokerByName(t *testing.T) {
 		Guid:     "found-guid",
 	}
 
+	assert.True(t, status.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, foundBroker, expectedBroker)
 }
 
 func TestFindServiceBrokerByNameWheNotFound(t *testing.T) {
-	requestStatus := testhelpers.RequestStatus{}
-	responseBody := `{
-  "resources": [
-  ]
-}`
-
-	endpoint := testhelpers.CreateEndpoint(
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"GET",
 		"/v2/service_brokers?q=name%3Amy-broker",
-		testhelpers.EndpointCalledMatcher(&requestStatus),
-		testhelpers.TestResponse{Status: http.StatusOK, Body: responseBody},
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 	)
 
 	repo, ts := createServiceBrokerRepo(endpoint)
@@ -72,6 +66,7 @@ func TestFindServiceBrokerByNameWheNotFound(t *testing.T) {
 
 	_, apiResponse := repo.FindByName("my-broker")
 
+	assert.True(t, status.Called())
 	assert.True(t, apiResponse.IsNotFound())
 	assert.Equal(t, apiResponse.Message, "Service Broker my-broker not found")
 }
@@ -79,7 +74,7 @@ func TestFindServiceBrokerByNameWheNotFound(t *testing.T) {
 func TestCreateServiceBroker(t *testing.T) {
 	expectedReqBody := `{"name":"foobroker","broker_url":"http://example.com","auth_username":"foouser","auth_password":"password"}`
 
-	endpoint := testhelpers.CreateEndpoint(
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_brokers",
 		testhelpers.RequestBodyMatcher(expectedReqBody),
@@ -97,13 +92,14 @@ func TestCreateServiceBroker(t *testing.T) {
 	}
 	apiResponse := repo.Create(serviceBroker)
 
+	assert.True(t, status.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestUpdateServiceBroker(t *testing.T) {
 	expectedReqBody := `{"name":"update-foobroker","broker_url":"http://update.example.com","auth_username":"update-foouser","auth_password":"update-password"}`
 
-	endpoint := testhelpers.CreateEndpoint(
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/service_brokers/my-guid",
 		testhelpers.RequestBodyMatcher(expectedReqBody),
@@ -122,6 +118,7 @@ func TestUpdateServiceBroker(t *testing.T) {
 	}
 	apiResponse := repo.Update(serviceBroker)
 
+	assert.True(t, status.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 

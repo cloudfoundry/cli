@@ -92,14 +92,14 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 		resourcesPresent
 }
 
-var uploadApplicationEndpoint = testhelpers.CreateEndpoint(
+var uploadApplicationEndpoint, uploadApplicationEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"PUT",
 	"/v2/apps/my-cool-app-guid/bits",
 	uploadBodyMatcher,
 	testhelpers.TestResponse{Status: http.StatusCreated},
 )
 
-var matchResourcesEndpoint = testhelpers.CreateEndpoint(
+var matchResourcesEndpoint, matchResourcesEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"PUT",
 	"/v2/resource_match",
 	testhelpers.RequestBodyMatcher(expectedResources),
@@ -159,6 +159,8 @@ func testUploadApp(t *testing.T, dir string) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	apiResponse := repo.UploadApp(app, dir)
+	assert.True(t, uploadApplicationEndpointStatus.Called())
+	assert.True(t, matchResourcesEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	uploadDir := cf.TempDirForApp(app)

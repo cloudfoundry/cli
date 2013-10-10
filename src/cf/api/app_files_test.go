@@ -35,14 +35,14 @@ func TestListFiles(t *testing.T) {
 	listFilesServer := httptest.NewTLSServer(http.HandlerFunc(listFilesEndpoint))
 	defer listFilesServer.Close()
 
-	listFilesRedirectEndpoint := func(writer http.ResponseWriter, req *http.Request) {
-		baseEndpoint := testhelpers.CreateEndpoint(
-			"GET",
-			"/v2/apps/my-app-guid/instances/0/files/some/path",
-			nil,
-			testhelpers.TestResponse{Status: http.StatusTemporaryRedirect},
-		)
+	baseEndpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/apps/my-app-guid/instances/0/files/some/path",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusTemporaryRedirect},
+	)
 
+	listFilesRedirectEndpoint := func(writer http.ResponseWriter, req *http.Request) {
 		writer.Header().Add("Location", fmt.Sprintf("%s/some/path", listFilesServer.URL))
 		baseEndpoint(writer, req)
 	}
@@ -60,6 +60,7 @@ func TestListFiles(t *testing.T) {
 
 	list, err := repo.ListFiles(cf.Application{Guid: "my-app-guid"}, "some/path")
 
+	assert.True(t, status.Called())
 	assert.False(t, err.IsNotSuccessful())
 	assert.Equal(t, list, expectedResponse)
 }

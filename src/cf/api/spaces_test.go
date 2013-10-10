@@ -34,7 +34,7 @@ var multipleSpacesResponse = testhelpers.TestResponse{Status: http.StatusOK, Bod
   ]
 }`}
 
-var multipleSpacesEndpoint = testhelpers.CreateEndpoint(
+var multipleSpacesEndpoint, multipleSpacesEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/organizations/some-org-guid/spaces",
 	nil,
@@ -42,7 +42,8 @@ var multipleSpacesEndpoint = testhelpers.CreateEndpoint(
 )
 
 func TestSpacesFindAll(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
+	multipleSpacesEndpointStatus.Reset()
+	ts := httptest.NewTLSServer(multipleSpacesEndpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -54,6 +55,7 @@ func TestSpacesFindAll(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 	spaces, apiResponse := repo.FindAll()
 
+	assert.True(t, multipleSpacesEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(spaces))
 
@@ -67,7 +69,8 @@ func TestSpacesFindAll(t *testing.T) {
 }
 
 func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleSpacesEndpoint))
+	multipleSpacesEndpointStatus.Reset()
+	ts := httptest.NewTLSServer(multipleSpacesEndpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -89,16 +92,13 @@ func TestSpacesFindAllWithIncorrectToken(t *testing.T) {
 		spaces, apiResponse = repo.FindAll()
 	})
 
+	assert.True(t, multipleSpacesEndpointStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 0, len(spaces))
 }
 
 var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
-  "total_results": 1,
-  "total_pages": 1,
-  "prev_url": null,
-  "next_url": null,
   "resources": [
     {
       "metadata": {
@@ -158,15 +158,15 @@ var findSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
   ]
 }`}
 
-var findSpaceByNameEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
-	nil,
-	findSpaceByNameResponse,
-)
-
 func TestSpacesFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(findSpaceByNameEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
+		nil,
+		findSpaceByNameResponse,
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -189,6 +189,7 @@ func TestSpacesFindByName(t *testing.T) {
 	}
 
 	space, apiResponse := repo.FindByName("Space1")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, space.Name, "Space1")
 	assert.Equal(t, space.Guid, "space1-guid")
@@ -202,26 +203,15 @@ func TestSpacesFindByName(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var didNotFindSpaceByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
-{
-  "total_results": 0,
-  "total_pages": 0,
-  "prev_url": null,
-  "next_url": null,
-  "resources": [
-
-  ]
-}`}
-
-var didNotFindSpaceByNameEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
-	nil,
-	didNotFindSpaceByNameResponse,
-)
-
 func TestSpacesDidNotFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(didNotFindSpaceByNameEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/organizations/org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: ` { "resources": [ ] }`},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -233,6 +223,7 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	_, apiResponse := repo.FindByName("space1")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
@@ -305,15 +296,15 @@ var spaceSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body:
   ]
 }`}
 
-var spaceSummaryEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/summary",
-	nil,
-	spaceSummaryResponse,
-)
-
 func TestSpacesGetSummary(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(spaceSummaryEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/spaces/my-space-guid/summary",
+		nil,
+		spaceSummaryResponse,
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -325,6 +316,8 @@ func TestSpacesGetSummary(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	space, apiResponse := repo.GetSummary()
+	assert.True(t, status.Called())
+
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "my-space-guid", space.Guid)
 	assert.Equal(t, "development", space.Name)
@@ -366,15 +359,15 @@ func TestSpacesGetSummary(t *testing.T) {
 	assert.Equal(t, instance1.ApplicationNames[1], "app2")
 }
 
-var createSpaceEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/spaces",
-	testhelpers.RequestBodyMatcher(`{"name":"space-name","organization_guid":"org-guid"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestCreateSpace(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createSpaceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/spaces",
+		testhelpers.RequestBodyMatcher(`{"name":"space-name","organization_guid":"org-guid"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -386,18 +379,19 @@ func TestCreateSpace(t *testing.T) {
 	repo := NewCloudControllerSpaceRepository(config, gateway)
 
 	apiResponse := repo.Create("space-name")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var renameSpaceEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/spaces/my-space-guid",
-	testhelpers.RequestBodyMatcher(`{"name":"new-space-name"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestRenameSpace(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(renameSpaceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/spaces/my-space-guid",
+		testhelpers.RequestBodyMatcher(`{"name":"new-space-name"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -409,18 +403,19 @@ func TestRenameSpace(t *testing.T) {
 
 	space := cf.Space{Guid: "my-space-guid"}
 	apiResponse := repo.Rename(space, "new-space-name")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var deleteSpaceEndpoint = testhelpers.CreateEndpoint(
-	"DELETE",
-	"/v2/spaces/my-space-guid?recursive=true",
-	nil,
-	testhelpers.TestResponse{Status: http.StatusOK},
-)
-
 func TestDeleteSpace(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(deleteSpaceEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"DELETE",
+		"/v2/spaces/my-space-guid?recursive=true",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -432,5 +427,6 @@ func TestDeleteSpace(t *testing.T) {
 
 	space := cf.Space{Guid: "my-space-guid"}
 	apiResponse := repo.Delete(space)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

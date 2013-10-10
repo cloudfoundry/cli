@@ -22,7 +22,7 @@ func TestGetScore(t *testing.T) {
 func testScore(t *testing.T, scoreBody string, expectedScore string) {
 	passwordScoreResponse := testhelpers.TestResponse{Status: http.StatusOK, Body: scoreBody}
 
-	passwordScoreEndpoint := testhelpers.CreateEndpoint(
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"POST",
 		"/password/score",
 		func(req *http.Request) bool {
@@ -34,10 +34,10 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 		passwordScoreResponse,
 	)
 
-	scoreServer := httptest.NewTLSServer(http.HandlerFunc(passwordScoreEndpoint))
+	scoreServer := httptest.NewTLSServer(endpoint)
 	defer scoreServer.Close()
 
-	targetServer := createInfoServer(scoreServer.URL)
+	targetServer, targetEndpointStatus := createInfoServer(scoreServer.URL)
 	defer targetServer.Close()
 
 	config := &configuration.Configuration{
@@ -48,21 +48,19 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 	repo := NewCloudControllerPasswordRepository(config, gateway)
 
 	score, apiResponse := repo.GetScore("new-password")
+	assert.True(t, targetEndpointStatus.Called())
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, score, expectedScore)
 }
 
 func TestUpdatePassword(t *testing.T) {
-	var passwordWasUpdated bool
-
 	passwordUpdateResponse := testhelpers.TestResponse{Status: http.StatusOK}
 
-	passwordUpdateEndpoint := testhelpers.CreateEndpoint(
+	passwordUpdateEndpoint, passwordUpdateEndpointStatus := testhelpers.CreateCheckableEndpoint(
 		"PUT",
 		"/Users/my-user-guid/password",
 		func(req *http.Request) bool {
-			passwordWasUpdated = true
-
 			bodyMatcher := testhelpers.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`)
 			contentTypeMatches := req.Header.Get("Content-Type") == "application/json"
 
@@ -71,10 +69,10 @@ func TestUpdatePassword(t *testing.T) {
 		passwordUpdateResponse,
 	)
 
-	passwordUpdateServer := httptest.NewTLSServer(http.HandlerFunc(passwordUpdateEndpoint))
+	passwordUpdateServer := httptest.NewTLSServer(passwordUpdateEndpoint)
 	defer passwordUpdateServer.Close()
 
-	targetServer := createInfoServer(passwordUpdateServer.URL)
+	targetServer, targetEndpointStatus := createInfoServer(passwordUpdateServer.URL)
 	defer targetServer.Close()
 
 	tokenInfo := `{"user_id":"my-user-guid"}`
@@ -88,16 +86,22 @@ func TestUpdatePassword(t *testing.T) {
 	repo := NewCloudControllerPasswordRepository(config, gateway)
 
 	apiResponse := repo.UpdatePassword("old-password", "new-password")
+	assert.True(t, targetEndpointStatus.Called())
+	assert.True(t, passwordUpdateEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.True(t, passwordWasUpdated)
 }
 
-func createInfoServer(tokenEndpoint string) *httptest.Server {
-	targetInfoResponse := testhelpers.TestResponse{
-		Status: http.StatusOK,
-		Body:   fmt.Sprintf(`{"token_endpoint": "%s"}`, tokenEndpoint),
-	}
-	targetInfoEndpoint := testhelpers.CreateEndpoint("GET", "/info", nil, targetInfoResponse)
+func createInfoServer(tokenEndpoint string) (ts *httptest.Server, status *testhelpers.RequestStatus) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/info",
+		nil,
+		testhelpers.TestResponse{
+			Status: http.StatusOK,
+			Body:   fmt.Sprintf(`{"token_endpoint": "%s"}`, tokenEndpoint),
+		},
+	)
 
-	return httptest.NewTLSServer(http.HandlerFunc(targetInfoEndpoint))
+	ts = httptest.NewTLSServer(endpoint)
+	return
 }

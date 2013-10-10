@@ -38,7 +38,7 @@ var multipleDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Bo
   ]
 }`}
 
-var multipleDomainsEndpoint = testhelpers.CreateEndpoint(
+var multipleDomainsEndpoint, multipleDomainsEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/domains",
 	nil,
@@ -46,8 +46,9 @@ var multipleDomainsEndpoint = testhelpers.CreateEndpoint(
 )
 
 func TestFindAllInCurrentSpace(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
 	defer ts.Close()
+	defer multipleDomainsEndpointStatus.Reset()
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -58,6 +59,7 @@ func TestFindAllInCurrentSpace(t *testing.T) {
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domains, apiResponse := repo.FindAllInCurrentSpace()
+	assert.True(t, multipleDomainsEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(domains))
 
@@ -116,7 +118,7 @@ var orgDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 }
 `}
 
-var orgDomainsEndpoint = testhelpers.CreateEndpoint(
+var orgDomainsEndpoint, orgDomainsEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/organizations/my-org-guid/domains?inline-relations-depth=1",
 	nil,
@@ -126,6 +128,7 @@ var orgDomainsEndpoint = testhelpers.CreateEndpoint(
 func TestFindAllByOrg(t *testing.T) {
 	ts := httptest.NewTLSServer(http.HandlerFunc(orgDomainsEndpoint))
 	defer ts.Close()
+	defer orgDomainsEndpointStatus.Reset()
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	config := &configuration.Configuration{
@@ -138,6 +141,7 @@ func TestFindAllByOrg(t *testing.T) {
 
 	domains, apiResponse := repo.FindAllByOrg(org)
 
+	assert.True(t, orgDomainsEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(domains))
 
@@ -152,8 +156,9 @@ func TestFindAllByOrg(t *testing.T) {
 }
 
 func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
 	defer ts.Close()
+	defer multipleDomainsEndpointStatus.Reset()
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -164,28 +169,17 @@ func TestFindByNameInCurrentSpaceReturnsTheDomainMatchingTheName(t *testing.T) {
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	domain, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
+	assert.True(t, multipleDomainsEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	assert.Equal(t, domain.Name, "domain2.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain2-guid")
 }
 
-var noDomainsResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
-{
-  "resources": []
-}
-`}
-
-var noDomainsEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/domains",
-	nil,
-	noDomainsResponse,
-)
-
 func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
 	defer ts.Close()
+	defer multipleDomainsEndpointStatus.Reset()
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -196,11 +190,23 @@ func TestFindByNameInCurrentSpaceReturnsTheFirstDomainIfNameEmpty(t *testing.T) 
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("")
+	assert.True(t, multipleDomainsEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(noDomainsEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/spaces/my-space-guid/domains",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": []
+}
+`},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -212,13 +218,15 @@ func TestFindByNameInCurrentSpaceReturnsNotFoundIfNameEmptyAndNoDomains(t *testi
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
 func TestFindByNameInCurrentSpaceWhenTheDomainIsNotFound(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleDomainsEndpoint))
+	ts := httptest.NewTLSServer(multipleDomainsEndpoint)
 	defer ts.Close()
+	defer multipleDomainsEndpointStatus.Reset()
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -229,11 +237,13 @@ func TestFindByNameInCurrentSpaceWhenTheDomainIsNotFound(t *testing.T) {
 	repo := NewCloudControllerDomainRepository(config, gateway)
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("domain3.cf-app.com")
+	assert.True(t, multipleDomainsEndpointStatus.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-var createDomainResponse = `
+func TestCreateDomain(t *testing.T) {
+	createDomainResponse := `
 {
     "metadata": {
         "guid": "abc-123"
@@ -243,15 +253,14 @@ var createDomainResponse = `
     }
 }`
 
-var createDomainEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/domains",
-	testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"owning_organization_guid":"domain1-guid"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
-)
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/domains",
+		testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"owning_organization_guid":"domain1-guid"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: createDomainResponse},
+	)
 
-func TestCreateDomain(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createDomainEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -266,11 +275,13 @@ func TestCreateDomain(t *testing.T) {
 	domainToCreate := cf.Domain{Name: "example.com"}
 	owningOrg := cf.Organization{Guid: "domain1-guid"}
 	createdDomain, apiResponse := repo.Create(domainToCreate, owningOrg)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, createdDomain.Guid, "abc-123")
 }
 
-var shareDomainResponse = `
+func TestShareDomain(t *testing.T) {
+	shareDomainResponse := `
 {
     "metadata": {
         "guid": "abc-123"
@@ -280,15 +291,14 @@ var shareDomainResponse = `
     }
 }`
 
-var shareDomainEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/domains",
-	testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"shared":true}`),
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
-)
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/domains",
+		testhelpers.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"shared":true}`),
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
+	)
 
-func TestShareDomain(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(shareDomainEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -301,12 +311,14 @@ func TestShareDomain(t *testing.T) {
 
 	domainToShare := cf.Domain{Name: "example.com"}
 	apiResponse := repo.Share(domainToShare)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(orgDomainsEndpoint))
+	ts := httptest.NewTLSServer(orgDomainsEndpoint)
 	defer ts.Close()
+	defer orgDomainsEndpointStatus.Reset()
 
 	config := configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -320,24 +332,24 @@ func TestFindByNameInOrgWhenDomainExists(t *testing.T) {
 	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
 	domain, apiResponse := repo.FindByNameInOrg(domainName, org)
 
+	assert.True(t, orgDomainsEndpointStatus.Called())
 	assert.Equal(t, domain.Name, domainName)
 	assert.Equal(t, domain.Guid, "my-domain-guid")
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func mapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
-	status = &testhelpers.RequestStatus{}
-	hf = testhelpers.CreateEndpoint(
+	hf, status = testhelpers.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/spaces/my-space-guid/domains/my-domain-guid",
-		testhelpers.EndpointCalledMatcher(status),
+		nil,
 		testhelpers.TestResponse{Status: statusCode},
 	)
 	return
 }
 
 func TestMapDomainSuccess(t *testing.T) {
-	hf, responseStatus := mapDomainEndpoint(http.StatusOK)
+	hf, reqStatus := mapDomainEndpoint(http.StatusOK)
 	ts := httptest.NewTLSServer(hf)
 	defer ts.Close()
 
@@ -354,12 +366,12 @@ func TestMapDomainSuccess(t *testing.T) {
 
 	apiResponse := repo.MapDomain(domain, space)
 
-	assert.True(t, responseStatus.Called())
+	assert.True(t, reqStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestMapDomainWhenServerError(t *testing.T) {
-	hf, responseStatus := mapDomainEndpoint(http.StatusBadRequest)
+	hf, reqStatus := mapDomainEndpoint(http.StatusBadRequest)
 	ts := httptest.NewTLSServer(hf)
 	defer ts.Close()
 
@@ -376,23 +388,22 @@ func TestMapDomainWhenServerError(t *testing.T) {
 
 	apiResponse := repo.MapDomain(domain, space)
 
-	assert.True(t, responseStatus.Called())
+	assert.True(t, reqStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
 func unmapDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
-	status = &testhelpers.RequestStatus{}
-	hf = testhelpers.CreateEndpoint(
+	hf, status = testhelpers.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/spaces/my-space-guid/domains/my-domain-guid",
-		testhelpers.EndpointCalledMatcher(status),
+		nil,
 		testhelpers.TestResponse{Status: statusCode},
 	)
 	return
 }
 
 func TestUnmapDomainSuccess(t *testing.T) {
-	hf, responseStatus := unmapDomainEndpoint(http.StatusOK)
+	hf, reqStatus := unmapDomainEndpoint(http.StatusOK)
 	ts := httptest.NewTLSServer(hf)
 	defer ts.Close()
 
@@ -409,23 +420,22 @@ func TestUnmapDomainSuccess(t *testing.T) {
 
 	apiResponse := repo.UnmapDomain(domain, space)
 
-	assert.True(t, responseStatus.Called())
+	assert.True(t, reqStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func deleteDomainEndpoint(statusCode int) (hf http.HandlerFunc, status *testhelpers.RequestStatus) {
-	status = &testhelpers.RequestStatus{}
-	hf = testhelpers.CreateEndpoint(
+	hf, status = testhelpers.CreateCheckableEndpoint(
 		"DELETE",
 		"/v2/domains/my-domain-guid?recursive=true",
-		testhelpers.EndpointCalledMatcher(status),
+		nil,
 		testhelpers.TestResponse{Status: statusCode},
 	)
 	return
 }
 
 func TestDeleteDomainSuccess(t *testing.T) {
-	hf, responseStatus := deleteDomainEndpoint(http.StatusOK)
+	hf, reqStatus := deleteDomainEndpoint(http.StatusOK)
 	ts := httptest.NewTLSServer(hf)
 	defer ts.Close()
 
@@ -441,12 +451,12 @@ func TestDeleteDomainSuccess(t *testing.T) {
 
 	apiResponse := repo.DeleteDomain(domain)
 
-	assert.True(t, responseStatus.Called())
+	assert.True(t, reqStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestDeleteDomainFailure(t *testing.T) {
-	hf, responseStatus := deleteDomainEndpoint(http.StatusBadRequest)
+	hf, reqStatus := deleteDomainEndpoint(http.StatusBadRequest)
 	ts := httptest.NewTLSServer(hf)
 	defer ts.Close()
 
@@ -462,6 +472,6 @@ func TestDeleteDomainFailure(t *testing.T) {
 
 	apiResponse := repo.DeleteDomain(domain)
 
-	assert.True(t, responseStatus.Called())
+	assert.True(t, reqStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 }

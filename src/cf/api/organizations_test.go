@@ -38,7 +38,7 @@ var multipleOrgResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: 
   ]
 }`}
 
-var multipleOrgEndpoint = testhelpers.CreateEndpoint(
+var multipleOrgEndpoint, multipleOrgEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/organizations",
 	nil,
@@ -46,14 +46,16 @@ var multipleOrgEndpoint = testhelpers.CreateEndpoint(
 )
 
 func TestOrganizationsFindAll(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
+	ts := httptest.NewTLSServer(multipleOrgEndpoint)
 	defer ts.Close()
+	defer multipleOrgEndpointStatus.Reset()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	organizations, apiResponse := repo.FindAll()
+	assert.True(t, multipleOrgEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(organizations))
 
@@ -67,8 +69,9 @@ func TestOrganizationsFindAll(t *testing.T) {
 }
 
 func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(multipleOrgEndpoint))
+	ts := httptest.NewTLSServer(multipleOrgEndpoint)
 	defer ts.Close()
+	defer multipleOrgEndpointStatus.Reset()
 
 	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
 	gateway := net.NewCloudControllerGateway()
@@ -85,16 +88,14 @@ func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
 		organizations, apiResponse = repo.FindAll()
 	})
 
+	assert.True(t, multipleOrgEndpointStatus.Called())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 0, len(organizations))
 }
 
-var findOrgByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+func TestOrganizationsFindByName(t *testing.T) {
+	response := testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
-  "total_results": 1,
-  "total_pages": 1,
-  "prev_url": null,
-  "next_url": null,
   "resources": [
     {
       "metadata": {
@@ -127,15 +128,14 @@ var findOrgByNameResponse = testhelpers.TestResponse{Status: http.StatusOK, Body
   ]
 }`}
 
-var findOrgByNameEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
-	nil,
-	findOrgByNameResponse,
-)
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+		nil,
+		response,
+	)
 
-func TestOrganizationsFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(findOrgByNameEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -145,7 +145,9 @@ func TestOrganizationsFindByName(t *testing.T) {
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
 	org, apiResponse := repo.FindByName("Org1")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
+
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
 	assert.Equal(t, len(org.Spaces), 1)
@@ -159,26 +161,15 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var findOrgByNameDoesNotExistResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
-{
-  "total_results": 0,
-  "total_pages": 0,
-  "prev_url": null,
-  "next_url": null,
-  "resources": [
-
-  ]
-}`}
-
-var findOrgByNameDoesNotExistEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
-	nil,
-	findOrgByNameDoesNotExistResponse,
-)
-
 func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(findOrgByNameDoesNotExistEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -186,19 +177,20 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	_, apiResponse := repo.FindByName("org1")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-var createOrgEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/organizations",
-	testhelpers.RequestBodyMatcher(`{"name":"my-org"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestCreateOrganization(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createOrgEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/organizations",
+		testhelpers.RequestBodyMatcher(`{"name":"my-org"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -206,18 +198,19 @@ func TestCreateOrganization(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	apiResponse := repo.Create("my-org")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var renameOrgEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/organizations/my-org-guid",
-	testhelpers.RequestBodyMatcher(`{"name":"my-new-org"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestRenameOrganization(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(renameOrgEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/organizations/my-org-guid",
+		testhelpers.RequestBodyMatcher(`{"name":"my-new-org"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -226,18 +219,19 @@ func TestRenameOrganization(t *testing.T) {
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.Rename(org, "my-new-org")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var deleteOrgEndpoint = testhelpers.CreateEndpoint(
-	"DELETE",
-	"/v2/organizations/my-org-guid?recursive=true",
-	nil,
-	testhelpers.TestResponse{Status: http.StatusOK},
-)
-
 func TestDeleteOrganization(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(deleteOrgEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"DELETE",
+		"/v2/organizations/my-org-guid?recursive=true",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -246,14 +240,16 @@ func TestDeleteOrganization(t *testing.T) {
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.Delete(org)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var findQuotaByNameEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/quota_definitions?q=name%3Amy-quota",
-	nil,
-	testhelpers.TestResponse{Status: http.StatusOK, Body: `{
+func TestFindQuotaByName(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/quota_definitions?q=name%3Amy-quota",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {
       "metadata": {
@@ -265,10 +261,9 @@ var findQuotaByNameEndpoint = testhelpers.CreateEndpoint(
     }
   ]
 }`},
-)
+	)
 
-func TestFindQuotaByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(findQuotaByNameEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -276,19 +271,20 @@ func TestFindQuotaByName(t *testing.T) {
 	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	quota, apiResponse := repo.FindQuotaByName("my-quota")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota"})
 }
 
-var updateQuotaEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/organizations/my-org-guid",
-	testhelpers.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestUpdateQuota(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(updateQuotaEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/organizations/my-org-guid",
+		testhelpers.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -298,5 +294,6 @@ func TestUpdateQuota(t *testing.T) {
 	quota := cf.Quota{Guid: "my-quota-guid"}
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.UpdateQuota(org, quota)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var instancesEndpoint = testhelpers.CreateEndpoint(
+var instancesEndpoint, instancesEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/apps/my-cool-app-guid/instances",
 	nil,
@@ -31,7 +31,7 @@ var instancesEndpoint = testhelpers.CreateEndpoint(
 }`},
 )
 
-var statsEndpoint = testhelpers.CreateEndpoint(
+var statsEndpoint, statsEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/apps/my-cool-app-guid/stats",
 	nil,
@@ -89,6 +89,8 @@ func TestAppSummaryGetSummary(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	summary, err := summaryRepo.GetSummary(app)
+	assert.True(t, instancesEndpointStatus.Called())
+	assert.True(t, statsEndpointStatus.Called())
 	assert.False(t, err.IsNotSuccessful())
 
 	assert.Equal(t, summary.App.Name, app.Name)

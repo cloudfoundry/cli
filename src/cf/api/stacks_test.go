@@ -11,29 +11,25 @@ import (
 	"testing"
 )
 
-var singleStackResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
+func TestStacksFindByName(t *testing.T) {
+	response := testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
 "resources": [
     {
-      "metadata": {
-        "guid": "custom-linux-guid"
-      },
-      "entity": {
-        "name": "custom-linux"
-      }
+      "metadata": { "guid": "custom-linux-guid" },
+      "entity": { "name": "custom-linux" }
     }
   ]
 }`}
 
-var singleStackEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/stacks?q=name%3Alinux",
-	nil,
-	singleStackResponse,
-)
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/stacks?q=name%3Alinux",
+		nil,
+		response,
+	)
 
-func TestStacksFindByName(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(singleStackEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -44,6 +40,7 @@ func TestStacksFindByName(t *testing.T) {
 	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stack, apiResponse := repo.FindByName("linux")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, stack.Name, "custom-linux")
 	assert.Equal(t, stack.Guid, "custom-linux-guid")
@@ -54,10 +51,6 @@ func TestStacksFindByName(t *testing.T) {
 
 var allStacksResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
-  "total_results": 2,
-  "total_pages": 1,
-  "prev_url": null,
-  "next_url": null,
   "resources": [
     {
       "metadata": {
@@ -86,15 +79,15 @@ var allStacksResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-var allStacksEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/stacks",
-	nil,
-	allStacksResponse,
-)
-
 func TestStacksFindAll(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(allStacksEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/stacks",
+		nil,
+		allStacksResponse,
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -105,9 +98,9 @@ func TestStacksFindAll(t *testing.T) {
 	repo := NewCloudControllerStackRepository(config, gateway)
 
 	stacks, apiResponse := repo.FindAll()
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, len(stacks), 2)
 	assert.Equal(t, stacks[0].Name, "lucid64")
 	assert.Equal(t, stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")
-
 }

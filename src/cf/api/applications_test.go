@@ -53,7 +53,7 @@ var singleAppResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-var findAppEndpoint = testhelpers.CreateEndpoint(
+var findAppEndpoint, findAppEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
 	nil,
@@ -79,7 +79,7 @@ var appSummaryResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
   "instances": 1
 }`}
 
-var appSummaryEndpoint = testhelpers.CreateEndpoint(
+var appSummaryEndpoint, appSummaryEndpointStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/apps/app1-guid/summary",
 	nil,
@@ -97,6 +97,8 @@ var singleAppEndpoint = func(writer http.ResponseWriter, request *http.Request) 
 }
 
 func TestFindByName(t *testing.T) {
+	findAppEndpointStatus.Reset()
+	appSummaryEndpointStatus.Reset()
 	ts := httptest.NewTLSServer(http.HandlerFunc(singleAppEndpoint))
 	defer ts.Close()
 
@@ -109,6 +111,8 @@ func TestFindByName(t *testing.T) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	app, apiResponse := repo.FindByName("App1")
+	assert.True(t, findAppEndpointStatus.Called())
+	assert.True(t, appSummaryEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
@@ -120,20 +124,17 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.Urls[0], "app1.cfapps.io")
 }
 
-var appNotFoundResponse = testhelpers.TestResponse{Status: http.StatusOK, Body: `
-{
-  "resources": []
-}`}
-
-var appNotFoundEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
-	nil,
-	appNotFoundResponse,
-)
-
 func TestFindByNameWhenAppIsNotFound(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(appNotFoundEndpoint))
+	response := testhelpers.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
+
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
+		nil,
+		response,
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -145,19 +146,20 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	_, apiResponse := repo.FindByName("App1")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-var setEnvEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/apps/app1-guid",
-	testhelpers.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestSetEnv(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(setEnvEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/apps/app1-guid",
+		testhelpers.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -171,6 +173,7 @@ func TestSetEnv(t *testing.T) {
 
 	apiResponse := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -184,19 +187,15 @@ var createApplicationResponse = `
     }
 }`
 
-var createApplicationEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
-)
-
-var alwaysSuccessfulEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "{}")
-}
-
 func TestCreateApplication(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/apps",
+		testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -217,20 +216,21 @@ func TestCreateApplication(t *testing.T) {
 	}
 
 	createdApp, apiResponse := repo.Create(newApp)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
 }
 
-var createApplicationWithoutBuildpackOrStackEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/apps",
-	testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
-)
-
 func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(createApplicationWithoutBuildpackOrStackEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/apps",
+		testhelpers.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -250,11 +250,16 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	}
 
 	_, apiResponse := repo.Create(newApp)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestCreateRejectsInproperNames(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(alwaysSuccessfulEndpoint))
+	endpoint := func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintln(writer, "{}")
+	}
+
+	ts := httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	defer ts.Close()
 
 	config := &configuration.Configuration{Target: ts.URL}
@@ -275,15 +280,15 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var deleteApplicationEndpoint = testhelpers.CreateEndpoint(
-	"DELETE",
-	"/v2/apps/my-cool-app-guid?recursive=true",
-	nil,
-	testhelpers.TestResponse{Status: http.StatusOK, Body: ""},
-)
-
 func TestDeleteApplication(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(deleteApplicationEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"DELETE",
+		"/v2/apps/my-cool-app-guid?recursive=true",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusOK, Body: ""},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -296,18 +301,19 @@ func TestDeleteApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	apiResponse := repo.Delete(app)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-var renameAppEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/apps/my-app-guid",
-	testhelpers.RequestBodyMatcher(`{"name":"my-new-app"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestRename(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(renameAppEndpoint))
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/apps/my-app-guid",
+		testhelpers.RequestBodyMatcher(`{"name":"my-new-app"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
@@ -316,11 +322,12 @@ func TestRename(t *testing.T) {
 
 	org := cf.Application{Guid: "my-app-guid"}
 	apiResponse := repo.Rename(org, "my-new-app")
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
-	scaleEndpoint := testhelpers.CreateEndpoint(
+	scaleEndpoint, status := testhelpers.CreateCheckableEndpoint(
 		"PUT",
 		"/v2/apps/my-app-guid",
 		testhelpers.RequestBodyMatcher(expectedBody),
@@ -335,6 +342,7 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	repo := NewCloudControllerApplicationRepository(config, gateway)
 
 	apiResponse := repo.Scale(app)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -372,11 +380,12 @@ func TestScaleApplicationMemory(t *testing.T) {
 	testScale(t, app, `{"memory":512}`)
 }
 
-var startApplicationEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/apps/my-cool-app-guid",
-	testhelpers.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+func TestStartApplication(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/apps/my-cool-app-guid",
+		testhelpers.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
     "guid": "my-updated-app-guid"
@@ -386,10 +395,9 @@ var startApplicationEndpoint = testhelpers.CreateEndpoint(
     "state": "STARTED"
   }
 }`},
-)
+	)
 
-func TestStartApplication(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(startApplicationEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -402,17 +410,19 @@ func TestStartApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	updatedApp, apiResponse := repo.Start(app)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "started", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
 }
 
-var stopApplicationEndpoint = testhelpers.CreateEndpoint(
-	"PUT",
-	"/v2/apps/my-cool-app-guid",
-	testhelpers.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+func TestStopApplication(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/apps/my-cool-app-guid",
+		testhelpers.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
     "guid": "my-updated-app-guid"
@@ -422,10 +432,9 @@ var stopApplicationEndpoint = testhelpers.CreateEndpoint(
     "state": "STOPPED"
   }
 }`},
-)
+	)
 
-func TestStopApplication(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(stopApplicationEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -438,17 +447,19 @@ func TestStopApplication(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	updatedApp, apiResponse := repo.Stop(app)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "stopped", updatedApp.State)
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
 }
 
-var successfulGetInstancesEndpoint = testhelpers.CreateEndpoint(
-	"GET",
-	"/v2/apps/my-cool-app-guid/instances",
-	nil,
-	testhelpers.TestResponse{Status: http.StatusCreated, Body: `
+func TestGetInstances(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"GET",
+		"/v2/apps/my-cool-app-guid/instances",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusCreated, Body: `
 {
   "1": {
     "state": "STARTING"
@@ -457,10 +468,9 @@ var successfulGetInstancesEndpoint = testhelpers.CreateEndpoint(
     "state": "RUNNING"
   }
 }`},
-)
+	)
 
-func TestGetInstances(t *testing.T) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(successfulGetInstancesEndpoint))
+	ts := httptest.NewTLSServer(endpoint)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -473,6 +483,7 @@ func TestGetInstances(t *testing.T) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	instances, apiResponse := repo.GetInstances(app)
+	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")

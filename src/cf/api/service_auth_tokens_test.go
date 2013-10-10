@@ -13,28 +13,27 @@ import (
 	"testing"
 )
 
-var createServiceAuthTokenEndpoint = testhelpers.CreateEndpoint(
-	"POST",
-	"/v2/service_auth_tokens",
-	testhelpers.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
-	testhelpers.TestResponse{Status: http.StatusCreated},
-)
-
 func TestCreate(t *testing.T) {
-	ts, repo := createServiceAuthTokenRepo(createServiceAuthTokenEndpoint)
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"POST",
+		"/v2/service_auth_tokens",
+		testhelpers.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
+		testhelpers.TestResponse{Status: http.StatusCreated},
+	)
+
+	ts, repo := createServiceAuthTokenRepo(endpoint)
 	defer ts.Close()
 
 	apiResponse := repo.Create(cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Token: "a token"})
 
+	assert.True(t, status.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
-var findAllStatus = &testhelpers.RequestStatus{}
-
-var findAllServiceAuthTokensEndpoint = testhelpers.CreateEndpoint(
+var findAllServiceAuthTokensEndpoint, findAllStatus = testhelpers.CreateCheckableEndpoint(
 	"GET",
 	"/v2/service_auth_tokens",
-	testhelpers.EndpointCalledMatcher(findAllStatus),
+	nil,
 	testhelpers.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
