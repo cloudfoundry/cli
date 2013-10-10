@@ -46,13 +46,9 @@ var multipleOrgEndpoint, multipleOrgEndpointStatus = testhelpers.CreateCheckable
 )
 
 func TestOrganizationsFindAll(t *testing.T) {
-	ts := httptest.NewTLSServer(multipleOrgEndpoint)
+	multipleOrgEndpointStatus.Reset()
+	ts, repo := createOrganizationRepo(multipleOrgEndpoint)
 	defer ts.Close()
-	defer multipleOrgEndpointStatus.Reset()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	organizations, apiResponse := repo.FindAll()
 	assert.True(t, multipleOrgEndpointStatus.Called())
@@ -66,31 +62,6 @@ func TestOrganizationsFindAll(t *testing.T) {
 	secondOrg := organizations[1]
 	assert.Equal(t, secondOrg.Name, "Org2")
 	assert.Equal(t, secondOrg.Guid, "org2-guid")
-}
-
-func TestOrganizationsFindAllWithIncorrectToken(t *testing.T) {
-	ts := httptest.NewTLSServer(multipleOrgEndpoint)
-	defer ts.Close()
-	defer multipleOrgEndpointStatus.Reset()
-
-	config := &configuration.Configuration{AccessToken: "BEARER incorrect_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
-
-	var (
-		organizations []cf.Organization
-		apiResponse   net.ApiResponse
-	)
-
-	// Capture output so debugging info does not show up in test
-	// output
-	testhelpers.CaptureOutput(func() {
-		organizations, apiResponse = repo.FindAll()
-	})
-
-	assert.True(t, multipleOrgEndpointStatus.Called())
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 0, len(organizations))
 }
 
 func TestOrganizationsFindByName(t *testing.T) {
@@ -135,12 +106,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 		response,
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
@@ -169,12 +136,8 @@ func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	_, apiResponse := repo.FindByName("org1")
 	assert.True(t, status.Called())
@@ -190,12 +153,8 @@ func TestCreateOrganization(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	apiResponse := repo.Create("my-org")
 	assert.True(t, status.Called())
@@ -210,12 +169,8 @@ func TestRenameOrganization(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.Rename(org, "my-new-org")
@@ -231,12 +186,8 @@ func TestDeleteOrganization(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.Delete(org)
@@ -263,12 +214,8 @@ func TestFindQuotaByName(t *testing.T) {
 }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	quota, apiResponse := repo.FindQuotaByName("my-quota")
 	assert.True(t, status.Called())
@@ -284,16 +231,24 @@ func TestUpdateQuota(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createOrganizationRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: ts.URL}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerOrganizationRepository(config, gateway)
 
 	quota := cf.Quota{Guid: "my-quota-guid"}
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.UpdateQuota(org, quota)
 	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func createOrganizationRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo OrganizationRepository) {
+	ts = httptest.NewTLSServer(endpoint)
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target: ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerOrganizationRepository(config, gateway)
+	return
 }
