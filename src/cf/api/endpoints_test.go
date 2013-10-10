@@ -35,7 +35,7 @@ func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	configRepo.Delete()
 	configRepo.Login()
 
-	ts, repo := createRepo(configRepo, validApiInfoEndpoint)
+	ts, repo := createEndpointRepo(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
 	repo.UpdateEndpoint(ts.URL)
@@ -53,12 +53,9 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	configRepo.Delete()
 	configRepo.Login()
 
-	ts := httptest.NewServer(http.HandlerFunc(validApiInfoEndpoint))
+	ts, repo := createEndpointRepo(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
-	config, _ := configRepo.Get()
-	gateway := net.NewCloudControllerGateway()
-	repo := NewEndpointRepository(config, gateway, configRepo)
 	repo.UpdateEndpoint(ts.URL)
 
 	savedConfig := testhelpers.SavedConfiguration
@@ -72,9 +69,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 func TestApiWhenUrlIsMissingScheme(t *testing.T) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Login()
-	config, _ := configRepo.Get()
-	gateway := net.NewCloudControllerGateway()
-	repo := NewEndpointRepository(config, gateway, configRepo)
+	_, repo := createEndpointRepo(configRepo, nil)
 
 	apiResponse := repo.UpdateEndpoint("example.com")
 
@@ -89,7 +84,7 @@ func TestApiWhenEndpointReturns404(t *testing.T) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Login()
 
-	ts, repo := createRepo(configRepo, notFoundApiEndpoint)
+	ts, repo := createEndpointRepo(configRepo, notFoundApiEndpoint)
 	defer ts.Close()
 
 	apiResponse := repo.UpdateEndpoint(ts.URL)
@@ -105,7 +100,7 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 	configRepo := testhelpers.FakeConfigRepository{}
 	configRepo.Login()
 
-	ts, repo := createRepo(configRepo, invalidJsonResponseApiEndpoint)
+	ts, repo := createEndpointRepo(configRepo, invalidJsonResponseApiEndpoint)
 	defer ts.Close()
 
 	apiResponse := repo.UpdateEndpoint(ts.URL)
@@ -113,8 +108,10 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-func createRepo(configRepo testhelpers.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
-	ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
+func createEndpointRepo(configRepo testhelpers.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+	if endpoint != nil {
+		ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
+	}
 
 	config, _ := configRepo.Get()
 	gateway := net.NewCloudControllerGateway()
