@@ -12,8 +12,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"testhelpers"
 	testapi "testhelpers/api"
+	testcf "testhelpers/cf"
 	"testing"
 )
 
@@ -153,7 +153,7 @@ func testUploadApp(t *testing.T, dir string) {
 		Target:      ts.URL,
 	}
 	gateway := net.NewCloudControllerGateway()
-	zipper := &testhelpers.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
+	zipper := &testcf.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
