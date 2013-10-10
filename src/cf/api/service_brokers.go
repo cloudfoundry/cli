@@ -12,6 +12,7 @@ type ServiceBrokerRepository interface {
 	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
 	Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 	Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
+	Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceBrokerRepository struct {
@@ -26,7 +27,6 @@ func NewCloudControllerServiceBrokerRepository(config *configuration.Configurati
 }
 
 func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
-
 	path := fmt.Sprintf("%s/v2/service_brokers?q=name%%3A%s", repo.config.Target, name)
 	req, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
@@ -77,6 +77,17 @@ func (repo CloudControllerServiceBrokerRepository) createOrUpdate(serviceBroker 
 	)
 
 	req, apiResponse := repo.gateway.NewRequest(method, path, repo.config.AccessToken, strings.NewReader(body))
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(req)
+	return
+}
+
+func (repo CloudControllerServiceBrokerRepository) Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
+	req, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

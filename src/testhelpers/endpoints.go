@@ -46,7 +46,7 @@ func (status *RequestStatus) call() {
 func MatcherSequence(matchers []RequestMatcher) RequestMatcher {
 	return func(request *http.Request) bool {
 		for _, matcher := range matchers {
-			if !matcher(request) {
+			if matcher != nil && !matcher(request) {
 				return false
 			}
 		}

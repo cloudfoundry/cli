@@ -169,6 +169,18 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "delete-service-broker",
+			Description: "Delete a service broker",
+			Usage:       fmt.Sprintf("%s delete-service-broker SERVICE_BROKER", cf.Name),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("delete-service-broker")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "delete-space",
 			Description: "Delete a space",
 			Usage:       fmt.Sprintf("%s delete-space SPACE", cf.Name),

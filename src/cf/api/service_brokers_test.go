@@ -125,6 +125,26 @@ func TestUpdateServiceBroker(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestDeleteServiceBroker(t *testing.T) {
+	endpoint, status := testhelpers.CreateCheckableEndpoint(
+		"DELETE",
+		"/v2/service_brokers/my-guid",
+		nil,
+		testhelpers.TestResponse{Status: http.StatusNoContent},
+	)
+
+	repo, ts := createServiceBrokerRepo(endpoint)
+	defer ts.Close()
+
+	serviceBroker := cf.ServiceBroker{
+		Guid: "my-guid",
+	}
+	apiResponse := repo.Delete(serviceBroker)
+
+	assert.True(t, status.Called())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 func createServiceBrokerRepo(endpoint http.HandlerFunc) (repo ServiceBrokerRepository, ts *httptest.Server) {
 	ts = httptest.NewTLSServer(endpoint)
 
