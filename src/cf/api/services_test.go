@@ -58,13 +58,9 @@ var multipleOfferingsResponse = testhelpers.TestResponse{Status: http.StatusOK, 
 }`}
 
 func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *testhelpers.RequestStatus, config *configuration.Configuration) {
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepoWithConfig(endpoint, config)
 	defer ts.Close()
 
-	config.Target = ts.URL
-
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 	offerings, apiResponse := repo.GetServiceOfferings()
 
 	assert.True(t, status.Called())
@@ -122,24 +118,16 @@ func TestCreateServiceInstance(t *testing.T) {
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"POST",
 		"/v2/service_instances",
-		testhelpers.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"space-guid"}`),
+		testhelpers.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
 	assert.True(t, status.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
 }
 
@@ -164,16 +152,8 @@ func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 		}
 	}
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(endpoints))
+	ts, repo := createServiceRepo(http.HandlerFunc(endpoints))
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	servicePlan := cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"}
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", servicePlan)
@@ -205,16 +185,8 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 		}
 	}
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(endpoints))
+	ts, repo := createServiceRepo(http.HandlerFunc(endpoints))
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	servicePlan := cf.ServicePlan{Guid: "different-plan-guid", Name: "plan-name"}
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", servicePlan)
@@ -229,20 +201,12 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 	endpoint, status := testhelpers.CreateCheckableEndpoint(
 		"POST",
 		"/v2/user_provided_service_instances",
-		testhelpers.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"some-space-guid"}`),
+		testhelpers.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid"}`),
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "some-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	params := map[string]string{
 		"host":     "example.com",
@@ -262,15 +226,8 @@ func TestUpdateUserProvidedServiceInstance(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	params := map[string]string{
 		"host":     "example.com",
@@ -342,16 +299,8 @@ var findServiceInstanceEndpoint, findServiceInstanceEndpointStatus = testhelpers
 
 func TestFindInstanceByName(t *testing.T) {
 	findServiceInstanceEndpointStatus.Reset()
-	ts := httptest.NewTLSServer(findServiceInstanceEndpoint)
+	ts, repo := createServiceRepo(findServiceInstanceEndpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	instance, apiResponse := repo.FindInstanceByName("my-service")
 
@@ -379,16 +328,8 @@ func TestFindInstanceByNameForNonExistentService(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	_, apiResponse := repo.FindInstanceByName("my-service")
 	assert.True(t, status.Called())
@@ -404,15 +345,8 @@ func TestBindService(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
@@ -432,15 +366,8 @@ func TestBindServiceIfError(t *testing.T) {
 		},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	app := cf.Application{Guid: "my-app-guid"}
@@ -460,15 +387,8 @@ var deleteBindingEndpoint, deleteBindingEndpointStatus = testhelpers.CreateCheck
 
 func TestUnbindService(t *testing.T) {
 	deleteBindingEndpointStatus.Reset()
-	ts := httptest.NewTLSServer(deleteBindingEndpoint)
+	ts, repo := createServiceRepo(deleteBindingEndpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
@@ -487,15 +407,8 @@ func TestUnbindService(t *testing.T) {
 }
 
 func TestUnbindServiceWhenBindingDoesNotExist(t *testing.T) {
-	ts := httptest.NewTLSServer(deleteBindingEndpoint)
+	ts, repo := createServiceRepo(deleteBindingEndpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceBindings := []cf.ServiceBinding{}
 
@@ -517,15 +430,8 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusOK},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.DeleteService(serviceInstance)
@@ -534,11 +440,7 @@ func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
 }
 
 func TestDeleteServiceWithServiceBindings(t *testing.T) {
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
+	_, repo := createServiceRepo(nil)
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
@@ -563,19 +465,30 @@ func TestRenameService(t *testing.T) {
 		testhelpers.TestResponse{Status: http.StatusCreated},
 	)
 
-	ts := httptest.NewTLSServer(endpoint)
+	ts, repo := createServiceRepo(endpoint)
 	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerServiceRepository(config, gateway)
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
 	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func createServiceRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo ServiceRepository) {
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Space:       cf.Space{Guid: "my-space-guid"},
+	}
+	return createServiceRepoWithConfig(endpoint, config)
+}
+
+func createServiceRepoWithConfig(endpoint http.HandlerFunc, config *configuration.Configuration) (ts *httptest.Server, repo ServiceRepository) {
+	if endpoint != nil {
+		ts = httptest.NewTLSServer(endpoint)
+		config.Target = ts.URL
+	}
+
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerServiceRepository(config, gateway)
+	return
 }
