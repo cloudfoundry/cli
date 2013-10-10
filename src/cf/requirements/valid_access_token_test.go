@@ -1,7 +1,6 @@
-package requirements_test
+package requirements
 
 import (
-	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testterm "testhelpers/terminal"

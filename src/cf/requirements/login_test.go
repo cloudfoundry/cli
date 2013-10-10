@@ -1,8 +1,7 @@
-package requirements_test
+package requirements
 
 import (
 	"cf/configuration"
-	. "cf/requirements"
 	"github.com/stretchr/testify/assert"
 	testterm "testhelpers/terminal"
 	"testing"
