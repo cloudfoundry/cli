@@ -9,6 +9,7 @@ import (
 )
 
 type ServiceBrokerRepository interface {
+	FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse)
 	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
 	Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 	Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
@@ -27,30 +28,56 @@ func NewCloudControllerServiceBrokerRepository(config *configuration.Configurati
 	return
 }
 
+func (repo CloudControllerServiceBrokerRepository) FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse) {
+	resources, apiResponse := repo.findServiceBrokers(fmt.Sprintf("%s/v2/service_brokers", repo.config.Target))
+
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, serviceBrokerResource := range resources.ServiceBrokers {
+		serviceBrokers = append(serviceBrokers, marshallServiceBrokerFromResource(serviceBrokerResource))
+	}
+
+	return
+}
+
+func marshallServiceBrokerFromResource(resource ServiceBrokerResource) (serviceBroker cf.ServiceBroker) {
+	return cf.ServiceBroker{
+		Name:     resource.Entity.Name,
+		Guid:     resource.Metadata.Guid,
+		Url:      resource.Entity.Url,
+		Username: resource.Entity.Username,
+		Password: resource.Entity.Password,
+	}
+}
+
 func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_brokers?q=name%%3A%s", repo.config.Target, name)
-	req, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	resources, apiResponse := repo.findServiceBrokers(fmt.Sprintf("%s/v2/service_brokers?q=name%%3A%s", repo.config.Target, name))
+
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	resources := new(PaginatedResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(resources.Resources) == 0 {
+	if len(resources.ServiceBrokers) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service Broker", name)
 		return
 	}
 
-	resource := resources.Resources[0]
-	serviceBroker.Name = resource.Entity.Name
-	serviceBroker.Username = resource.Entity.Username
-	serviceBroker.Password = resource.Entity.Password
-	serviceBroker.Url = resource.Entity.Url
-	serviceBroker.Guid = resource.Metadata.Guid
+	serviceBroker = marshallServiceBrokerFromResource(resources.ServiceBrokers[0])
+
+	return
+}
+
+func (repo CloudControllerServiceBrokerRepository) findServiceBrokers(path string) (resources *PaginatedServiceBrokerResources, apiResponse net.ApiResponse) {
+	req, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	resources = new(PaginatedServiceBrokerResources)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, resources)
 
 	return
 }

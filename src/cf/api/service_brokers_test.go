@@ -11,6 +11,63 @@ import (
 	"testing"
 )
 
+func TestServiceBrokersFindAll(t *testing.T) {
+	responseBody := `{
+  "resources": [
+  	{
+  	  "metadata": {
+  	    "guid":"found-guid-1"
+  	  },
+  	  "entity": {
+  	    "name": "found-name-1",
+  	    "broker_url": "http://found.example.com-1",
+  	    "auth_username": "found-username-1",
+  	    "auth_password": "found-password-1"
+  	  }
+  	},
+  	{
+  	  "metadata": {
+  	    "guid":"found-guid-2"
+  	  },
+  	  "entity": {
+  	    "name": "found-name-2",
+  	    "broker_url": "http://found.example.com-2",
+  	    "auth_username": "found-username-2",
+  	    "auth_password": "found-password-2"
+  	  }
+  	}
+  ]
+}`
+
+	endpoint, status := testapi.CreateCheckableEndpoint(
+		"GET",
+		"/v2/service_brokers",
+		nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: responseBody},
+	)
+
+	repo, ts := createServiceBrokerRepo(endpoint)
+	defer ts.Close()
+
+	serviceBrokers, apiResponse := repo.FindAll()
+
+	assert.True(t, status.Called())
+	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.Equal(t, len(serviceBrokers), 2)
+
+	assert.Equal(t, serviceBrokers[0].Name, "found-name-1")
+	assert.Equal(t, serviceBrokers[0].Guid, "found-guid-1")
+	assert.Equal(t, serviceBrokers[0].Url, "http://found.example.com-1")
+	assert.Equal(t, serviceBrokers[0].Username, "found-username-1")
+	assert.Equal(t, serviceBrokers[0].Password, "found-password-1")
+
+	assert.Equal(t, serviceBrokers[1].Name, "found-name-2")
+	assert.Equal(t, serviceBrokers[1].Guid, "found-guid-2")
+	assert.Equal(t, serviceBrokers[1].Url, "http://found.example.com-2")
+	assert.Equal(t, serviceBrokers[1].Username, "found-username-2")
+	assert.Equal(t, serviceBrokers[1].Password, "found-password-2")
+}
+
 func TestFindServiceBrokerByName(t *testing.T) {
 	responseBody := `{
   "resources": [

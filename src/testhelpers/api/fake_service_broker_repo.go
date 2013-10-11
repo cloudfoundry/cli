@@ -14,6 +14,9 @@ type FakeServiceBrokerRepo struct {
 	UpdatedServiceBroker cf.ServiceBroker
 	RenamedServiceBroker cf.ServiceBroker
 	DeletedServiceBroker cf.ServiceBroker
+
+	FindAllServiceBrokers []cf.ServiceBroker
+	FindAllErr bool
 }
 
 func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
@@ -24,6 +27,15 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.Ser
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Service Broker", name)
 	}
 
+	return
+}
+
+func (repo *FakeServiceBrokerRepo) FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse) {
+	if repo.FindAllErr {
+		apiResponse = net.NewApiResponseWithMessage("Error finding all service brokers")
+	}
+
+	serviceBrokers = repo.FindAllServiceBrokers
 	return
 }
 

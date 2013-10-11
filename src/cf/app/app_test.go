@@ -76,6 +76,7 @@ func TestCommands(t *testing.T) {
 		"scale",
 		"service",
 		"service-auth-tokens",
+		"service-brokers",
 		"services",
 		"set-env",
 		"set-quota",

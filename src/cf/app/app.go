@@ -484,6 +484,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "service-brokers",
+			Description: "List service brokers",
+			Usage:       fmt.Sprintf("%s service-brokers", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("service-brokers")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "services",
 			ShortName:   "s",
 			Description: "List all services in the target space",

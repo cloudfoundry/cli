@@ -211,6 +211,23 @@ type ServiceBindingEntity struct {
 	AppGuid string `json:"app_guid"`
 }
 
+type PaginatedServiceBrokerResources struct {
+	ServiceBrokers []ServiceBrokerResource `json:"resources"`
+}
+
+type ServiceBrokerResource struct {
+	Metadata Metadata
+	Entity   ServiceBrokerEntity
+}
+
+type ServiceBrokerEntity struct {
+	Guid     string
+	Name     string
+	Password string `json:"auth_password"`
+	Username string `json:"auth_username"`
+	Url      string `json:"broker_url"`
+}
+
 type PaginatedSpaceResources struct {
 	Resources []SpaceResource
 }
