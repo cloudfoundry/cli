@@ -43,7 +43,7 @@ func (cmd *Logs) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
 	onMessage := func(msg *logmessage.Message) {
-		cmd.ui.Say(logMessageOutput(app.Name, msg))
+		cmd.ui.Say(logMessageOutput(msg))
 	}
 
 	var err error

@@ -75,15 +75,15 @@ func bytesFromString(s string) (bytes uint64, err error) {
 	return
 }
 
-func logMessageOutput(appName string, msg *logmessage.Message) string {
-	logHeader, coloredLogHeader := extractLogHeader(appName, msg)
+func logMessageOutput(msg *logmessage.Message) string {
+	logHeader, coloredLogHeader := extractLogHeader(msg)
 	logMsg := msg.GetLogMessage()
 	logContent := extractLogContent(logMsg, logHeader)
 
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }
 
-func extractLogHeader(appName string, msg *logmessage.Message) (logHeader, coloredLogHeader string) {
+func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader string) {
 	logMsg := msg.GetLogMessage()
 	sourceType := msg.GetShortSourceTypeName()
 	sourceId := logMsg.GetSourceId()
@@ -91,16 +91,16 @@ func extractLogHeader(appName string, msg *logmessage.Message) (logHeader, color
 	timeFormat := TIMESTAMP_FORMAT
 	timeString := t.Format(timeFormat)
 
-	logHeader = fmt.Sprintf("%s %s [%s]", timeString, appName, sourceType)
+	logHeader = fmt.Sprintf("%s [%s]", timeString, sourceType)
 	coloredLogHeader = terminal.LogSysHeaderColor(logHeader)
 
 	if logMsg.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
-		logHeader = fmt.Sprintf("%s %s [%s/%s]", timeString, appName, sourceType, sourceId)
+		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceType, sourceId)
 		coloredLogHeader = terminal.LogAppHeaderColor(logHeader)
 	}
 
 	// Calculate padding
-	longestHeader := fmt.Sprintf("%s %s [Executor] ", timeFormat, appName)
+	longestHeader := fmt.Sprintf("%s [Executor] ", timeFormat)
 	expectedHeaderLength := len(longestHeader)
 	padding := strings.Repeat(" ", expectedHeaderLength-len(logHeader))
 
