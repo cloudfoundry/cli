@@ -15,6 +15,10 @@ type Api struct {
 	config       *configuration.Configuration
 }
 
+type ApiEndpointSetter interface {
+	SetApiEndpoint(endpoint string)
+}
+
 func NewApi(ui terminal.UI, config *configuration.Configuration, endpointRepo api.EndpointRepository) (cmd Api) {
 	cmd.ui = ui
 	cmd.config = config
@@ -32,7 +36,7 @@ func (cmd Api) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.setNewApiEndpoint(c.Args()[0])
+	cmd.SetApiEndpoint(c.Args()[0])
 }
 
 func (cmd Api) showApiEndpoint() {
@@ -43,7 +47,7 @@ func (cmd Api) showApiEndpoint() {
 	)
 }
 
-func (cmd Api) setNewApiEndpoint(endpoint string) {
+func (cmd Api) SetApiEndpoint(endpoint string) {
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
 	apiResponse := cmd.endpointRepo.UpdateEndpoint(endpoint)

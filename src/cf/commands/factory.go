@@ -26,7 +26,6 @@ type ConcreteFactory struct {
 func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
 	factory.cmdsByName = make(map[string]Command)
 
-	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
 	factory.cmdsByName["app"] = application.NewShowApp(ui, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["bind-service"] = service.NewBindService(ui, repoLocator.GetServiceRepository())
@@ -74,7 +73,6 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, config, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["stacks"] = NewStacks(ui, repoLocator.GetStackRepository())
-	factory.cmdsByName["target"] = NewTarget(ui, configRepo, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["unmap-domain"] = domain.NewDomainMapper(ui, repoLocator.GetDomainRepository(), false)
 	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), false)
@@ -82,6 +80,10 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, repoLocator.GetServiceRepository())
+
+	apiEndpointSetter := NewApi(ui, config, repoLocator.GetEndpointRepository())
+	factory.cmdsByName["api"] = apiEndpointSetter
+	factory.cmdsByName["target"] = NewTarget(ui, configRepo, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository(), apiEndpointSetter)
 
 	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())
 	stop := application.NewStop(ui, repoLocator.GetApplicationRepository())
