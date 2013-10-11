@@ -98,30 +98,16 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 	return
 }
 
-func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.Response, apiResponse ApiResponse) {
+func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
+	// copy body bytes for redoing request after an OAUTH refresh
 	var bodyBytes []byte
 	if request.Body != nil {
 		bodyBytes, _ = ioutil.ReadAll(request.Body)
 		request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
 	}
 
-	response, err := doRequest(request.Request)
-	if err != nil {
-		apiResponse = NewApiResponseWithError("Error performing request", err)
-		return
-	}
-
-	if response.StatusCode > 299 {
-		errorResponse := gateway.errHandler(response)
-		message := fmt.Sprintf(
-			"Server error, status code: %d, error code: %s, message: %s",
-			response.StatusCode,
-			errorResponse.Code,
-			errorResponse.Description,
-		)
-		apiResponse = NewApiResponse(message, errorResponse.Code, response.StatusCode)
-	}
-
+	// perform request
+	rawResponse, apiResponse = gateway.doRequestAndHandlerError(request)
 	if apiResponse.IsSuccessful() || gateway.authenticator == nil {
 		return
 	}
@@ -143,9 +129,26 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (response *http.R
 	}
 
 	// make the request again
-	response, err = doRequest(request.Request)
+	rawResponse, apiResponse = gateway.doRequestAndHandlerError(request)
+	return
+}
+
+func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
+	rawResponse, err := doRequest(request.Request)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Error performing request", err)
+		return
+	}
+
+	if rawResponse.StatusCode > 299 {
+		errorResponse := gateway.errHandler(rawResponse)
+		message := fmt.Sprintf(
+			"Server error, status code: %d, error code: %s, message: %s",
+			rawResponse.StatusCode,
+			errorResponse.Code,
+			errorResponse.Description,
+		)
+		apiResponse = NewApiResponse(message, errorResponse.Code, rawResponse.StatusCode)
 	}
 	return
 }

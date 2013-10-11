@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"runtime"
 	"strings"
+	testapi "testhelpers/api"
 	testconfig "testhelpers/configuration"
 	"testing"
 )
@@ -28,7 +29,66 @@ func TestNewRequest(t *testing.T) {
 	assert.Equal(t, request.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
 }
 
-var refreshTokenApiEndPoint = func(unauthorizedBody string) http.HandlerFunc {
+func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
+	gateway := NewUAAGateway()
+	endpoint := refreshTokenApiEndPoint(
+		`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
+		testapi.TestResponse{Status: http.StatusOK},
+	)
+
+	testRefreshTokenWithSuccess(t, gateway, endpoint)
+}
+
+func TestRefreshingTheTokenWithUAARequestAndReturningError(t *testing.T) {
+	gateway := NewUAAGateway()
+	endpoint := refreshTokenApiEndPoint(
+		`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
+		testapi.TestResponse{Status: http.StatusBadRequest, Body: `{
+			"error": "333", "error_description": "bad request"
+		}`},
+	)
+
+	testRefreshTokenWithError(t, gateway, endpoint)
+}
+
+func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
+	gateway := NewCloudControllerGateway()
+	endpoint := refreshTokenApiEndPoint(
+		`{ "code": 1000, "description": "Auth token is invalid" }`,
+		testapi.TestResponse{Status: http.StatusOK},
+	)
+
+	testRefreshTokenWithSuccess(t, gateway, endpoint)
+}
+
+func TestRefreshingTheTokenWithCloudControllerRequestAndReturningError(t *testing.T) {
+	gateway := NewCloudControllerGateway()
+	endpoint := refreshTokenApiEndPoint(
+		`{ "code": 1000, "description": "Auth token is invalid" }`,
+		testapi.TestResponse{Status: http.StatusBadRequest, Body: `{
+			"code": 333, "description": "bad request"
+		}`},
+	)
+
+	testRefreshTokenWithError(t, gateway, endpoint)
+}
+
+func testRefreshTokenWithSuccess(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) {
+	apiResponse := testRefreshToken(t, gateway, endpoint)
+	assert.True(t, apiResponse.IsSuccessful())
+
+	savedConfig := testconfig.SavedConfiguration
+	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
+	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
+}
+
+func testRefreshTokenWithError(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) {
+	apiResponse := testRefreshToken(t, gateway, endpoint)
+	assert.False(t, apiResponse.IsSuccessful())
+	assert.Equal(t, apiResponse.ErrorCode, "333")
+}
+
+var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testapi.TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var jsonResponse string
 
@@ -43,7 +103,8 @@ var refreshTokenApiEndPoint = func(unauthorizedBody string) http.HandlerFunc {
 			writer.WriteHeader(http.StatusUnauthorized)
 			jsonResponse = unauthorizedBody
 		case "bearer new-access-token":
-			writer.WriteHeader(http.StatusOK)
+			writer.WriteHeader(secondReqResp.Status)
+			jsonResponse = secondReqResp.Body
 		default:
 			writer.WriteHeader(http.StatusInternalServerError)
 		}
@@ -52,53 +113,31 @@ var refreshTokenApiEndPoint = func(unauthorizedBody string) http.HandlerFunc {
 	}
 }
 
-var refreshTokenAuthEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	jsonResponse := `
-	{
-	  "access_token": "new-access-token",
-	  "token_type": "bearer",
-	  "refresh_token": "new-refresh-token"
-	}`
-	fmt.Fprintln(writer, jsonResponse)
-}
+func testRefreshToken(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) (apiResponse ApiResponse) {
+	authEndpoint := func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintln(
+			writer,
+			`{ "access_token": "new-access-token", "token_type": "bearer", "refresh_token": "new-refresh-token"}`,
+		)
+	}
 
-var refreshTokenUAAApiEndpoint = refreshTokenApiEndPoint(
-	`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-)
+	apiServer := httptest.NewTLSServer(endpoint)
+	defer apiServer.Close()
 
-func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
-	uaaServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenUAAApiEndpoint))
-	defer uaaServer.Close()
-
-	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
+	authServer := httptest.NewTLSServer(http.HandlerFunc(authEndpoint))
 	defer authServer.Close()
 
-	configRepo, auth := createAuthenticationRepository(t, uaaServer, authServer)
-
-	gateway := NewUAAGateway()
+	config, auth := createAuthenticationRepository(t, apiServer, authServer)
 	gateway.SetTokenRefresher(auth)
 
-	testRefreshToken(t, configRepo, gateway)
+	request, apiResponse := gateway.NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
+	assert.False(t, apiResponse.IsNotSuccessful())
+
+	apiResponse = gateway.PerformRequest(request)
+	return
 }
 
-var refreshTokenCloudControllerApiEndpoint = refreshTokenApiEndPoint(`{ "code": 1000, "description": "Auth token is invalid" }`)
-
-func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
-	ccServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenCloudControllerApiEndpoint))
-	defer ccServer.Close()
-
-	authServer := httptest.NewTLSServer(http.HandlerFunc(refreshTokenAuthEndpoint))
-	defer authServer.Close()
-
-	configRepo, auth := createAuthenticationRepository(t, ccServer, authServer)
-
-	gateway := NewCloudControllerGateway()
-	gateway.SetTokenRefresher(auth)
-
-	testRefreshToken(t, configRepo, gateway)
-}
-
-func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) (configuration.ConfigurationRepository, api.AuthenticationRepository) {
+func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) (*configuration.Configuration, api.AuthenticationRepository) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, err := configRepo.Get()
@@ -112,20 +151,5 @@ func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, au
 	authGateway := NewUAAGateway()
 	authenticator := api.NewUAAAuthenticationRepository(authGateway, configRepo)
 
-	return configRepo, authenticator
-}
-
-func testRefreshToken(t *testing.T, configRepo configuration.ConfigurationRepository, gateway Gateway) {
-	config, err := configRepo.Get()
-	assert.NoError(t, err)
-
-	request, apiResponse := gateway.NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
-	assert.False(t, apiResponse.IsNotSuccessful())
-
-	apiResponse = gateway.PerformRequest(request)
-	assert.False(t, apiResponse.IsNotSuccessful())
-
-	savedConfig := testconfig.SavedConfiguration
-	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
-	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
+	return config, authenticator
 }
