@@ -63,7 +63,7 @@ func (cmd *Events) Run(c *cli.Context) {
 		[]string{"time", "instance", "description", "exit status"},
 	}
 
-	for i := len(appEvents)-1; i >= 0; i-- {
+	for i := len(appEvents) - 1; i >= 0; i-- {
 		event := appEvents[i]
 		table = append(table, []string{
 			event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
