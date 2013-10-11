@@ -27,3 +27,5 @@ release/
 *.iml
 *.zpi
 *.zwi
+
+*.go-e
