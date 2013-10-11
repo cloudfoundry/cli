@@ -84,8 +84,12 @@ func (cmd Push) Run(c *cli.Context) {
 	}
 
 	apiResponse = cmd.appBitsRepo.UploadApp(app, dir)
-
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
 	cmd.ui.Ok()
+
 	updatedApp, _ := cmd.stopper.ApplicationStop(app)
 	if !c.Bool("no-start") {
 		if c.String("b") != "" {

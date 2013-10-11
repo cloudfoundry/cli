@@ -240,6 +240,18 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
+func TestPushingAppWithInvalidPath(t *testing.T) {
+	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+	appBitsRepo.UploadAppErr = true
+	appRepo.FindByNameApp = cf.Application{Name: "app", Guid: "app-guid"}
+
+	fakeUI := callPush([]string{"app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	assert.Equal(t, 3, len(fakeUI.Outputs))
+	assert.Contains(t, fakeUI.Outputs[0], "Uploading")
+	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
+}
+
 func getPushDependencies() (starter *testcmd.FakeAppStarter,
 	stopper *testcmd.FakeAppStopper,
 	appRepo *testapi.FakeApplicationRepository,

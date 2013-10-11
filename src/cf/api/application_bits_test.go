@@ -128,6 +128,19 @@ var uploadEndpoints = func(writer http.ResponseWriter, request *http.Request) {
 	matchResourcesEndpoint(writer, request)
 }
 
+func TestUploadWithInvalidDirectory(t *testing.T) {
+	config := &configuration.Configuration{}
+	gateway := net.NewCloudControllerGateway()
+	zipper := &testcf.FakeZipper{}
+
+	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
+	app := cf.Application{}
+
+	apiResponse := repo.UploadApp(app, "/foo/bar")
+	assert.True(t, apiResponse.IsNotSuccessful())
+	assert.Contains(t, apiResponse.Message, "Error listing app files")
+}
+
 func TestUploadApp(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
