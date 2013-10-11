@@ -26,21 +26,39 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 
 func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (events []cf.Event, apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/apps/%s/events", repo.config.Target, app.Guid)
+	eventResources := repo.doRequest(url)
+
+	for {
+		for _, resource := range eventResources.Resources {
+			events = append(events, cf.Event{
+				Timestamp:       resource.Entity.Timestamp,
+				ExitDescription: resource.Entity.ExitDescription,
+				ExitStatus:      resource.Entity.ExitStatus,
+				InstanceIndex:   resource.Entity.InstanceIndex,
+			})
+		}
+
+		if eventResources.NextURL == "" {
+			break
+		}
+		url = fmt.Sprintf("%s%s", repo.config.Target, eventResources.NextURL)
+
+		eventResources = repo.doRequest(url)
+	}
+
+	return
+}
+
+func (repo CloudControllerAppEventsRepository) doRequest(url string) (eventResources *PaginatedEventResources) {
 	request, apiResponse := repo.gateway.NewRequest("GET", url, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	eventResources := &PaginatedEventResources{}
+	eventResources = &PaginatedEventResources{}
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, eventResources)
-
-	for _, resource := range eventResources.Resources {
-		events = append(events, cf.Event{
-			Timestamp:       resource.Entity.Timestamp,
-			ExitDescription: resource.Entity.ExitDescription,
-			ExitStatus:      resource.Entity.ExitStatus,
-			InstanceIndex:   resource.Entity.InstanceIndex,
-		})
+	if apiResponse.IsNotSuccessful() {
+		return
 	}
 
 	return

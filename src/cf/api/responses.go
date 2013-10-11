@@ -52,6 +52,7 @@ type AppFile struct {
 
 type PaginatedEventResources struct {
 	Resources []EventResource
+	NextURL   string `json:"next_url"`
 }
 
 type EventResource struct {
