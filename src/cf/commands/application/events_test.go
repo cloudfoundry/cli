@@ -56,10 +56,16 @@ func TestEventsSuccess(t *testing.T) {
 	eventsRepo := &testapi.FakeAppEventsRepo{
 		Events: []cf.Event{
 			{
-				InstanceIndex:   9,
+				InstanceIndex:   98,
 				Timestamp:       timestamp,
 				ExitDescription: "app instance exited",
-				ExitStatus:      7,
+				ExitStatus:      78,
+			},
+			{
+				InstanceIndex:   99,
+				Timestamp:       timestamp,
+				ExitDescription: "app instance was stopped",
+				ExitStatus:      77,
 			},
 		},
 	}
@@ -73,14 +79,20 @@ func TestEventsSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "time")
-	assert.Contains(t, ui.Outputs[2], "instance")
-	assert.Contains(t, ui.Outputs[2], "description")
-	assert.Contains(t, ui.Outputs[2], "exit status")
-	assert.Contains(t, ui.Outputs[3], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[3], "9")
-	assert.Contains(t, ui.Outputs[3], "app instance exited")
-	assert.Contains(t, ui.Outputs[3], "7")
+	assert.Contains(t, ui.Outputs[2], "Showing all 2 event(s)")
+	assert.Contains(t, ui.Outputs[3], "time")
+	assert.Contains(t, ui.Outputs[3], "instance")
+	assert.Contains(t, ui.Outputs[3], "description")
+	assert.Contains(t, ui.Outputs[3], "exit status")
+	assert.Contains(t, ui.Outputs[4], timestamp.Local().Format(TIMESTAMP_FORMAT))
+	assert.Contains(t, ui.Outputs[4], "99")
+	assert.Contains(t, ui.Outputs[4], "app instance was stopped")
+	assert.Contains(t, ui.Outputs[4], "77")
+	assert.Contains(t, ui.Outputs[5], timestamp.Local().Format(TIMESTAMP_FORMAT))
+	assert.Contains(t, ui.Outputs[5], "98")
+	assert.Contains(t, ui.Outputs[5], "app instance exited")
+	assert.Contains(t, ui.Outputs[5], "78")
+
 }
 
 func TestEventsWhenNoEventsAvailable(t *testing.T) {

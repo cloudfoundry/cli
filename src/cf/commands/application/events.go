@@ -57,11 +57,14 @@ func (cmd *Events) Run(c *cli.Context) {
 		return
 	}
 
+	cmd.ui.Say("Showing all %d event(s)...\n", len(appEvents))
+
 	table := [][]string{
 		[]string{"time", "instance", "description", "exit status"},
 	}
 
-	for _, event := range appEvents {
+	for i := len(appEvents)-1; i >= 0; i-- {
+		event := appEvents[i]
 		table = append(table, []string{
 			event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
 			strconv.Itoa(event.InstanceIndex),
