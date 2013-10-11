@@ -56,14 +56,13 @@ func TestTargetRequirements(t *testing.T) {
 
 func TestTargetRequirementsWhenSettingAPIEndpoint(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory, endpointSetter := getTargetDependencies()
-	reqFactory.LoginSuccess = false
 
+	reqFactory.LoginSuccess = false
 	callTarget([]string{"foo"}, reqFactory, configRepo, orgRepo, spaceRepo, endpointSetter)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory.LoginSuccess = true
-
-	callTarget([]string{"foo"}, reqFactory, configRepo, orgRepo, spaceRepo, endpointSetter)
+	reqFactory.LoginSuccess = false
+	callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo, endpointSetter)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 

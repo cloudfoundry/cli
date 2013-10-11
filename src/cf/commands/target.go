@@ -42,7 +42,7 @@ func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 		return
 	}
 
-	if len(c.Args()) == 0 {
+	if len(c.Args()) == 0 && (c.String("o") != "" || c.String("s") != "") {
 		reqs = append(reqs, reqFactory.NewLoginRequirement())
 	}
 	return
