@@ -22,10 +22,6 @@ func TestRunningCommands(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, stdout, "FAILED")
 
-	stdout, _, err = runCommand(t, "service-brokers")
-	assert.Error(t, err)
-	assert.Contains(t, stdout, "FAILED")
-
 	stdout, _, err = runCommand(t, "target", "foo", "bar")
 	assert.Error(t, err)
 	assert.Contains(t, stdout, "FAILED")
