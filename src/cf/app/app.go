@@ -108,6 +108,15 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "create-user",
+			Description: "Create a new user",
+			Usage:       fmt.Sprintf("%s create-user USERNAME PASSWORD", cf.Name),
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("create-user")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "create-user-provided-service",
 			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",

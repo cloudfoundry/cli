@@ -64,6 +64,10 @@ func endpointCalledMatcher(status *RequestStatus) (matcher RequestMatcher) {
 }
 
 func RequestBodyMatcher(expectedBody string) RequestMatcher {
+	return RequestBodyMatcherWithContentType(expectedBody, "application/json")
+}
+
+func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {
 	return func(request *http.Request) bool {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 
@@ -73,12 +77,18 @@ func RequestBodyMatcher(expectedBody string) RequestMatcher {
 		}
 
 		actualBody := string(bodyBytes)
-		bodyMatches := actualBody == expectedBody
-
+		bodyMatches := RemoveWhiteSpaceFromBody(actualBody) == RemoveWhiteSpaceFromBody(expectedBody)
 		if !bodyMatches {
 			fmt.Printf("Body did not match. Expected [%s], Actual [%s]", expectedBody, actualBody)
 		}
-		return bodyMatches
+
+		actualContentType := request.Header.Get("content-type")
+		contentTypeMatches := actualContentType == expectedContentType
+		if !contentTypeMatches {
+			fmt.Printf("Content Type did not match. Expected [%s], Actual [%s]", expectedContentType, actualContentType)
+		}
+
+		return bodyMatches && contentTypeMatches
 	}
 }
 

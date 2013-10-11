@@ -24,12 +24,7 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/password/score",
-		func(req *http.Request) bool {
-			bodyMatcher := testapi.RequestBodyMatcher("password=new-password")
-			contentTypeMatches := req.Header.Get("Content-Type") == "application/x-www-form-urlencoded"
-
-			return contentTypeMatches && bodyMatcher(req)
-		},
+		testapi.RequestBodyMatcherWithContentType("password=new-password", "application/x-www-form-urlencoded"),
 		passwordScoreResponse,
 	)
 
@@ -50,12 +45,7 @@ func TestUpdatePassword(t *testing.T) {
 	passwordUpdateEndpoint, passwordUpdateEndpointStatus := testapi.CreateCheckableEndpoint(
 		"PUT",
 		"/Users/my-user-guid/password",
-		func(req *http.Request) bool {
-			bodyMatcher := testapi.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`)
-			contentTypeMatches := req.Header.Get("Content-Type") == "application/json"
-
-			return contentTypeMatches && bodyMatcher(req)
-		},
+		testapi.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`),
 		passwordUpdateResponse,
 	)
 

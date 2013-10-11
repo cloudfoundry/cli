@@ -10,6 +10,7 @@ import (
 	"cf/commands/serviceauthtoken"
 	"cf/commands/servicebroker"
 	"cf/commands/space"
+	"cf/commands/user"
 	"cf/configuration"
 	"cf/terminal"
 	"errors"
@@ -34,6 +35,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["create-service-auth-token"] = serviceauthtoken.NewCreateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["create-service-broker"] = servicebroker.NewCreateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, repoLocator.GetSpaceRepository())
+	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, repoLocator.GetUserRepository())
 	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["delete"] = application.NewDeleteApp(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, repoLocator.GetDomainRepository())

@@ -44,6 +44,7 @@ func TestCommands(t *testing.T) {
 		"create-service-auth-token",
 		"create-service-broker",
 		"create-space",
+		"create-user",
 		"create-user-provided-service",
 		"delete",
 		"delete-org",

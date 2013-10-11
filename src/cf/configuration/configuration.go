@@ -3,6 +3,7 @@ package configuration
 import (
 	"cf"
 	"encoding/json"
+	"strings"
 	"time"
 )
 
@@ -15,6 +16,10 @@ type Configuration struct {
 	Organization            cf.Organization
 	Space                   cf.Space
 	ApplicationStartTimeout time.Duration // will be used as seconds
+}
+
+func (c Configuration) UAAEndpoint() string {
+	return strings.Replace(c.AuthorizationEndpoint, "login", "uaa", 1)
 }
 
 func (c Configuration) UserEmail() (email string) {

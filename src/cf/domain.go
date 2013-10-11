@@ -168,3 +168,9 @@ type ServiceBroker struct {
 	Password string
 	Url      string
 }
+
+type User struct {
+	Guid     string
+	Username string
+	Password string
+}
