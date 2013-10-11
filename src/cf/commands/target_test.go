@@ -43,11 +43,6 @@ func TestTargetFailsWithUsage(t *testing.T) {
 
 func TestTargetRequirements(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory, endpointSetter := getTargetDependencies()
-	reqFactory.LoginSuccess = false
-
-	callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo, endpointSetter)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
 	reqFactory.LoginSuccess = true
 
 	callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo, endpointSetter)
