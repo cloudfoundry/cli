@@ -1,7 +1,7 @@
 ## Windows
 
 1. Download the CLI from github: https://github.com/cloudfoundry/cli/releases
-2. Extract the tgz file.
+2. Extract the zip file.
 3. Move `go-cf` to C:\Program Files\Cloud Foundry\
 4. Set your %PATH% to include C:\Program Files\Cloud Foundry [(see instructions)](http://www.wikihow.com/Create-a-Custom-Windows-Command-Prompt)
   1. Right-click My Computer > Properties
@@ -15,6 +15,11 @@
 5. Open up the command prompt and type `go-cf`
 6. You should see the CLI help if everything is successful
 
-## Mac OSX
+## Mac OSX and Linux
 
-## Linux (terminal-install)
+1. Download the CLI from github: https://github.com/cloudfoundry/cli/releases
+2. Extract the tgz file.
+3. Move `go-cf` to /usr/local/bin
+4. Confirm /usr/local/bin is in your PATH by typing `echo $PATH` at the command line
+5. Type `go-cf` at the command line
+6. You should see the CLI help if everything is successful
