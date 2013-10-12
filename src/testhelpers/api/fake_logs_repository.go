@@ -13,13 +13,13 @@ type FakeLogsRepository struct {
 	TailLogMessages []logmessage.LogMessage
 }
 
-func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), port string) (err error){
+func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message)) (err error){
 	l.logsFor(app, l.RecentLogs, onConnect, onMessage)
 	return
 }
 
 
-func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message),  printInterval time.Duration, port string) (err error){
+func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message),  printInterval time.Duration) (err error){
 	l.logsFor(app, l.TailLogMessages, onConnect, onMessage)
 	return
 }

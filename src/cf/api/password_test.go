@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf"
 	"cf/configuration"
 	"cf/net"
 	"encoding/base64"
@@ -29,9 +30,8 @@ func testScore(t *testing.T, scoreBody string, expectedScore string) {
 	)
 
 	accessToken := "BEARER my_access_token"
-	targetServer, scoreServer, repo := createPasswordRepo(endpoint, accessToken)
+	scoreServer, repo := createPasswordRepo(endpoint, accessToken)
 	defer scoreServer.Close()
-	defer targetServer.Close()
 
 	score, apiResponse := repo.GetScore("new-password")
 	assert.True(t, status.Called())
@@ -53,39 +53,24 @@ func TestUpdatePassword(t *testing.T) {
 	encodedTokenInfo := base64.StdEncoding.EncodeToString([]byte(tokenInfo))
 	accessToken := fmt.Sprintf("BEARER my_access_token.%s.baz", encodedTokenInfo)
 
-	targetServer, passwordUpdateServer, repo := createPasswordRepo(passwordUpdateEndpoint, accessToken)
+	passwordUpdateServer, repo := createPasswordRepo(passwordUpdateEndpoint, accessToken)
 	defer passwordUpdateServer.Close()
-	defer targetServer.Close()
 
 	apiResponse := repo.UpdatePassword("old-password", "new-password")
 	assert.True(t, passwordUpdateEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createPasswordRepo(passwordEndpoint http.HandlerFunc, accessToken string) (targetServer *httptest.Server, passwordServer *httptest.Server, repo PasswordRepository) {
+func createPasswordRepo(passwordEndpoint http.HandlerFunc, accessToken string) (passwordServer *httptest.Server, repo PasswordRepository) {
 	passwordServer = httptest.NewTLSServer(passwordEndpoint)
-	targetServer, _ = createInfoServer(passwordServer.URL)
+	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
+		cf.UaaEndpointKey: passwordServer.URL,
+	}}
 
 	config := &configuration.Configuration{
 		AccessToken: accessToken,
-		Target:      targetServer.URL,
 	}
 	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerPasswordRepository(config, gateway)
-	return
-}
-
-func createInfoServer(tokenEndpoint string) (ts *httptest.Server, status *testapi.RequestStatus) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/info",
-		nil,
-		testapi.TestResponse{
-			Status: http.StatusOK,
-			Body:   fmt.Sprintf(`{"token_endpoint": "%s"}`, tokenEndpoint),
-		},
-	)
-
-	ts = httptest.NewTLSServer(endpoint)
+	repo = NewCloudControllerPasswordRepository(config, gateway, endpointRepo)
 	return
 }

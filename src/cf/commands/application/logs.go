@@ -53,13 +53,13 @@ func (cmd *Logs) Run(c *cli.Context) {
 			cmd.ui.Say("Connected, dumping recent logs...")
 		}
 
-		err = cmd.logsRepo.RecentLogsFor(app, onConnect, onMessage, "4443")
+		err = cmd.logsRepo.RecentLogsFor(app, onConnect, onMessage)
 	} else {
 		onConnect := func() {
 			cmd.ui.Say("Connected, tailing...")
 		}
 
-		err = cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2, "4443")
+		err = cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2)
 	}
 
 	if err != nil {

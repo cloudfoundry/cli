@@ -3,20 +3,18 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	cfnet "cf/net"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
-	"net"
 	"net/http/httptest"
 	"strings"
+	testapi "testhelpers/api"
 	"testing"
 	"time"
 )
 
 func TestRecentLogsFor(t *testing.T) {
-
 	// out of order messages we will send
 	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message", int64(3000)),
@@ -36,21 +34,19 @@ func TestRecentLogsFor(t *testing.T) {
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
-	str := strings.Replace(websocketServer.URL, "https://", "", 1)
-	_, wsServerPort, _ := net.SplitHostPort(str)
 	defer websocketServer.Close()
 
 	expectedMessage, err := logmessage.ParseMessage(messagesSent[0])
 	assert.NoError(t, err)
 
-	gateway := cfnet.NewCloudControllerGateway()
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
-	loggregatorHostResolver := func(hostname string) string {
-		return strings.Replace(hostname, "https", "wss", 1)
-	}
 
-	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
+	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
+		cf.LoggregatorEndpointKey: strings.Replace(websocketServer.URL, "https", "wss", 1),
+	}}
+
+	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 
 	connected := false
 	onConnect := func() {
@@ -64,7 +60,7 @@ func TestRecentLogsFor(t *testing.T) {
 	}
 
 	// method under test
-	err = logsRepo.RecentLogsFor(app, onConnect, onMessage, wsServerPort)
+	err = logsRepo.RecentLogsFor(app, onConnect, onMessage)
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(dumpedMessages), 1)
@@ -95,18 +91,15 @@ func TestTailsLogsFor(t *testing.T) {
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
-	str := strings.Replace(websocketServer.URL, "https://", "", 1)
-	_, wsServerPort, _ := net.SplitHostPort(str)
 	defer websocketServer.Close()
 
-	gateway := cfnet.NewCloudControllerGateway()
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
-	loggregatorHostResolver := func(hostname string) string {
-		return strings.Replace(hostname, "https", "wss", 1)
-	}
+	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
+		cf.LoggregatorEndpointKey: strings.Replace(websocketServer.URL, "https", "wss", 1),
+	}}
 
-	logsRepo := NewLoggregatorLogsRepository(config, gateway, loggregatorHostResolver)
+	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 
 	connected := false
 	onConnect := func() {
@@ -120,7 +113,7 @@ func TestTailsLogsFor(t *testing.T) {
 	}
 
 	// method under test
-	logsRepo.TailLogsFor(app, onConnect, onMessage, time.Duration(1), wsServerPort)
+	logsRepo.TailLogsFor(app, onConnect, onMessage, time.Duration(1))
 
 	assert.True(t, connected)
 
@@ -140,13 +133,6 @@ func TestTailsLogsFor(t *testing.T) {
 	actualMessage, err = proto.Marshal(tailedMessage.GetLogMessage())
 	assert.NoError(t, err)
 	assert.Equal(t, actualMessage, messagesSent[0])
-}
-
-func TestLoggregatorHost(t *testing.T) {
-	apiHost := "https://api.run.pivotal.io"
-	loggregatorHost := LoggregatorHost(apiHost)
-
-	assert.Equal(t, loggregatorHost, "wss://loggregator.run.pivotal.io")
 }
 
 func marshalledLogMessageWithTime(t *testing.T, messageString string, timestamp int64) []byte {

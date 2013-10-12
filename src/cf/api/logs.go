@@ -3,38 +3,37 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"cf/net"
 	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"regexp"
 	"sort"
 	"time"
+	"errors"
 )
 
-const LOGGREGATOR_REDIRECTOR_PORT = "4443"
-
 type LogsRepository interface {
-	RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), port string) (err error)
-	TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), printInterval time.Duration, port string) (err error)
+	RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message)) (err error)
+	TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), printInterval time.Duration) (err error)
 }
 
 type LoggregatorLogsRepository struct {
-	config                  *configuration.Configuration
-	gateway                 net.Gateway
-	loggregatorHostResolver func(string) string
+	config       *configuration.Configuration
+	endpointRepo EndpointRepository
 }
 
-func NewLoggregatorLogsRepository(config *configuration.Configuration, gateway net.Gateway, loggregatorHostResolver func(string) string) (repo LoggregatorLogsRepository) {
+func NewLoggregatorLogsRepository(config *configuration.Configuration, endpointRepo EndpointRepository) (repo LoggregatorLogsRepository) {
 	repo.config = config
-	repo.gateway = gateway
-	repo.loggregatorHostResolver = loggregatorHostResolver
+	repo.endpointRepo = endpointRepo
 	return
 }
 
-func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), port string) (err error) {
-	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + port
+func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message)) (err error) {
+	host, apiResponse := repo.endpointRepo.GetEndpoint(cf.LoggregatorEndpointKey)
+	if apiResponse.IsNotSuccessful() {
+		err = errors.New(apiResponse.Message)
+		return
+	}
 	location := host + fmt.Sprintf("/dump/?app=%s", app.Guid)
 	if err != nil {
 		return
@@ -42,8 +41,11 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnec
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, nil)
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), printInterval time.Duration, port string) error {
-	host := repo.loggregatorHostResolver(repo.config.Target) + ":" + port
+func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), onMessage func(*logmessage.Message), printInterval time.Duration) error {
+	host, apiResponse := repo.endpointRepo.GetEndpoint(cf.LoggregatorEndpointKey)
+	if apiResponse.IsNotSuccessful() {
+		return errors.New(apiResponse.Message)
+	}
 	location := host + fmt.Sprintf("/tail/?app=%s", app.Guid)
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, time.Tick(printInterval*time.Second))
 }
@@ -153,9 +155,4 @@ func (sort *sortableLogMessages) Less(i, j int) bool {
 
 func (sort *sortableLogMessages) Swap(i, j int) {
 	sort.Messages[i], sort.Messages[j] = sort.Messages[j], sort.Messages[i]
-}
-
-func LoggregatorHost(apiHost string) string {
-	re := regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
-	return re.ReplaceAllString(apiHost, "ws${1}://loggregator.${2}")
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf"
 	"cf/net"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ var validApiInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, infoResponse)
 }
 
-func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
+func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	configRepo.Login()
@@ -47,7 +48,7 @@ func TestApiWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
-func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
+func TestUpdateEndpointWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	configRepo.Login()
@@ -65,7 +66,7 @@ func TestApiWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
-func TestApiWhenUrlIsMissingScheme(t *testing.T) {
+func TestUpdateEndpointWhenUrlIsMissingScheme(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 	_, repo := createEndpointRepo(configRepo, nil)
@@ -79,7 +80,7 @@ var notFoundApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 }
 
-func TestApiWhenEndpointReturns404(t *testing.T) {
+func TestUpdateEndpointWhenEndpointReturns404(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
@@ -95,7 +96,7 @@ var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request
 	fmt.Fprintln(w, `Foo`)
 }
 
-func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
+func TestUpdateEndpointWhenEndpointReturnsInvalidJson(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
@@ -105,6 +106,23 @@ func TestApiWhenEndpointReturnsInvalidJson(t *testing.T) {
 	apiResponse := repo.UpdateEndpoint(ts.URL)
 
 	assert.True(t, apiResponse.IsNotSuccessful())
+}
+
+func TestGetEndpointForCloudController(t *testing.T) {
+	configRepo := testconfig.FakeConfigRepository{}
+	configRepo.Delete()
+	configRepo.Login()
+
+	ts, repo := createEndpointRepo(configRepo, validApiInfoEndpoint)
+	defer ts.Close()
+
+	endpoint, apiResponse := repo.GetEndpoint(cf.CloudControllerEndpointKey)
+
+	config := testconfig.TestConfigurationSingleton
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.NotEqual(t, endpoint, "")
+	assert.Equal(t, endpoint, config.Target)
 }
 
 func createEndpointRepo(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
