@@ -13,20 +13,27 @@ type UserRepository interface {
 }
 
 type CloudControllerUserRepository struct {
-	config     *configuration.Configuration
-	uaaGateway net.Gateway
-	ccGateway  net.Gateway
+	config       *configuration.Configuration
+	uaaGateway   net.Gateway
+	ccGateway    net.Gateway
+	endpointRepo EndpointRepository
 }
 
-func NewCloudControllerUserRepository(config *configuration.Configuration, uaaGateway net.Gateway, ccGateway net.Gateway) (repo CloudControllerUserRepository) {
+func NewCloudControllerUserRepository(config *configuration.Configuration, uaaGateway net.Gateway, ccGateway net.Gateway, endpointRepo EndpointRepository) (repo CloudControllerUserRepository) {
 	repo.config = config
 	repo.uaaGateway = uaaGateway
 	repo.ccGateway = ccGateway
+	repo.endpointRepo = endpointRepo
 	return
 }
 
 func (repo CloudControllerUserRepository) Create(user cf.User) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/Users", repo.config.UAAEndpoint())
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	path := fmt.Sprintf("%s/Users", uaaEndpoint)
 	body := fmt.Sprintf(`{
   "userName": "%s",
   "emails": [{"value":"%s"}],

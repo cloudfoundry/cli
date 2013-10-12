@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	testapi "testhelpers/api"
 	"testing"
 )
@@ -37,16 +36,9 @@ func TestCreateUser(t *testing.T) {
 		},
 	)
 
-	endpoints := func(w http.ResponseWriter, req *http.Request) {
-		if strings.Contains(req.RequestURI, "/v2/users") {
-			ccEndpoint(w, req)
-		} else {
-			uaaEndpoint(w, req)
-		}
-	}
-
-	ts, repo := createUsersRepo(endpoints)
-	defer ts.Close()
+	cc, uaa, repo := createUsersRepo(ccEndpoint, uaaEndpoint)
+	defer cc.Close()
+	defer uaa.Close()
 
 	user := cf.User{
 		Username: "my-user",
@@ -58,17 +50,20 @@ func TestCreateUser(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createUsersRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo UserRepository) {
-	ts = httptest.NewTLSServer(endpoint)
+func createUsersRepo(ccEndpoint http.HandlerFunc, uaaEndpoint http.HandlerFunc) (cc *httptest.Server, uaa *httptest.Server, repo UserRepository) {
+	cc = httptest.NewTLSServer(ccEndpoint)
+	uaa = httptest.NewTLSServer(uaaEndpoint)
 
 	config := &configuration.Configuration{
-		AccessToken:           "BEARER my_access_token",
-		Target:                ts.URL,
-		AuthorizationEndpoint: ts.URL,
-		Organization:          cf.Organization{Guid: "some-org-guid"},
+		AccessToken:  "BEARER my_access_token",
+		Target:       cc.URL,
+		Organization: cf.Organization{Guid: "some-org-guid"},
 	}
 	ccGateway := net.NewCloudControllerGateway()
 	uaaGateway := net.NewUAAGateway()
-	repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway)
+	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
+		cf.UaaEndpointKey: uaa.URL,
+	}}
+	repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway, endpointRepo)
 	return
 }
