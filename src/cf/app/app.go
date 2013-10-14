@@ -482,6 +482,18 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "set-org-role",
+			Description: "Assign an org role to a user",
+			Usage: fmt.Sprintf("%s set-org-role USERNAME ORG ROLE\n\n", cf.Name) +
+				"ROLES:\n" +
+				"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
+				"   BillingManager - Create and manage the billing account and payment info\n" +
+				"   OrgAuditor - View logs, reports, and settings on this org and all spaces\n",
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("set-org-role", c)
+			},
+		},
+		{
 			Name:        "set-quota",
 			Description: "Define the quota for an org",
 			Usage: fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name) +

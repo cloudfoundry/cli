@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse)
 	Create(user cf.User) (apiResponse net.ApiResponse)
 	Delete(user cf.User) (apiResponse net.ApiResponse)
+	SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerUserRepository struct {
@@ -139,5 +140,37 @@ func (repo CloudControllerUserRepository) Delete(user cf.User) (apiResponse net.
 	}
 
 	apiResponse = repo.uaaGateway.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerUserRepository) SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
+	roleToPathMap := map[string]string{
+		"OrgManager":     "managers",
+		"BillingManager": "billing_managers",
+		"OrgAuditor":     "auditors",
+	}
+
+	rolePath, found := roleToPathMap[role]
+
+	if !found {
+		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
+		return
+	}
+
+	return repo.setOrgRoleWithRolePath(user, org, rolePath)
+}
+
+func (repo CloudControllerUserRepository) setOrgRoleWithRolePath(user cf.User, org cf.Organization, rolePath string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s/%s", repo.config.Target, org.Guid, rolePath, user.Guid)
+
+	request, apiResponse := repo.ccGateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.ccGateway.PerformRequest(request)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
 	return
 }

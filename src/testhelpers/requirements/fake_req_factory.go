@@ -29,6 +29,9 @@ type FakeReqFactory struct {
 
 	DomainName string
 	Domain cf.Domain
+
+	UserUsername string
+	User cf.User
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -78,6 +81,11 @@ func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRe
 	return FakeRequirement{ f, true }
 }
 
+func (f *FakeReqFactory) NewUserRequirement(username string) requirements.UserRequirement {
+	f.UserUsername = username
+	return FakeRequirement{ f, true }
+}
+
 
 
 type FakeRequirement struct {
@@ -111,4 +119,8 @@ func (r FakeRequirement) GetRoute() cf.Route {
 
 func (r FakeRequirement) GetDomain() cf.Domain {
 	return r.factory.Domain
+}
+
+func (r FakeRequirement) GetUser() cf.User {
+	return r.factory.User
 }

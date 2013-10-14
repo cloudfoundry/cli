@@ -14,6 +14,10 @@ type FakeUserRepository struct {
 	FindByUsernameNotFound bool
 
 	DeleteUser cf.User
+
+	SetOrgRoleUser cf.User
+	SetOrgRoleOrganization cf.Organization
+	SetOrgRoleRole string
 }
 
 func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {
@@ -37,8 +41,14 @@ func (repo *FakeUserRepository) Create(user cf.User) (apiResponse net.ApiRespons
 	return
 }
 
-
 func (repo *FakeUserRepository) Delete(user cf.User) (apiResponse net.ApiResponse) {
 	repo.DeleteUser = user
+	return
+}
+
+func (repo *FakeUserRepository) SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
+	repo.SetOrgRoleUser = user
+	repo.SetOrgRoleOrganization = org
+	repo.SetOrgRoleRole = role
 	return
 }

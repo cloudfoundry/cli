@@ -81,6 +81,7 @@ func TestCommands(t *testing.T) {
 		"service-brokers",
 		"services",
 		"set-env",
+		"set-org-role",
 		"set-quota",
 		//		"share-domain",
 		"space",

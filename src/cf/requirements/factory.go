@@ -21,6 +21,7 @@ type Factory interface {
 	NewOrganizationRequirement(name string) OrganizationRequirement
 	NewRouteRequirement(host, domain string) RouteRequirement
 	NewDomainRequirement(name string) DomainRequirement
+	NewUserRequirement(username string) UserRequirement
 }
 
 type ApiRequirementFactory struct {
@@ -106,5 +107,13 @@ func (f ApiRequirementFactory) NewDomainRequirement(name string) DomainRequireme
 		name,
 		f.ui,
 		f.repoLocator.GetDomainRepository(),
+	)
+}
+
+func (f ApiRequirementFactory) NewUserRequirement(username string) UserRequirement {
+	return NewUserRequirement(
+		username,
+		f.ui,
+		f.repoLocator.GetUserRepository(),
 	)
 }
