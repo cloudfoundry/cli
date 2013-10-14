@@ -28,8 +28,9 @@ func main() {
 
 	cmdFactory := commands.NewFactory(termUI, config, configRepo, repoLocator)
 	reqFactory := requirements.NewFactory(termUI, config, repoLocator)
+	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
 
-	app, err := app.NewApp(cmdFactory, reqFactory)
+	app, err := app.NewApp(cmdRunner)
 	if err != nil {
 		return
 	}

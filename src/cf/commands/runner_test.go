@@ -9,6 +9,17 @@ import (
 	"testing"
 )
 
+type TestCommandFactory struct {
+	Cmd     Command
+	CmdName string
+}
+
+func (f *TestCommandFactory) GetByCmdName(cmdName string) (cmd Command, err error) {
+	f.CmdName = cmdName
+	cmd = f.Cmd
+	return
+}
+
 type TestCommand struct {
 	Reqs       []requirements.Requirement
 	WasRunWith *cli.Context
@@ -39,7 +50,6 @@ func (r *TestRequirement) Execute() (success bool) {
 }
 
 func TestRun(t *testing.T) {
-	runner := Runner{}
 	passingReq := TestRequirement{Passes: true}
 	failingReq := TestRequirement{Passes: false}
 	lastReq := TestRequirement{Passes: true}
@@ -48,8 +58,14 @@ func TestRun(t *testing.T) {
 		Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
 	}
 
+	cmdFactory := &TestCommandFactory{Cmd: &cmd}
+	runner := NewRunner(cmdFactory, nil)
+
 	ctxt := testcmd.NewContext("login", []string{})
-	err := runner.Run(&cmd, ctxt)
+
+	err := runner.RunCmdByName("some-cmd", ctxt)
+
+	assert.Equal(t, cmdFactory.CmdName, "some-cmd")
 
 	assert.True(t, passingReq.WasExecuted, ctxt)
 	assert.True(t, failingReq.WasExecuted, ctxt)

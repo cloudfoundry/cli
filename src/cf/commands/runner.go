@@ -7,10 +7,12 @@ import (
 )
 
 type Runner struct {
+	cmdFactory Factory
 	reqFactory requirements.Factory
 }
 
-func NewRunner(reqFactory requirements.Factory) (runner Runner) {
+func NewRunner(cmdFactory Factory, reqFactory requirements.Factory) (runner Runner) {
+	runner.cmdFactory = cmdFactory
 	runner.reqFactory = reqFactory
 	return
 }
@@ -20,7 +22,12 @@ type Command interface {
 	Run(c *cli.Context)
 }
 
-func (runner Runner) Run(cmd Command, c *cli.Context) (err error) {
+func (runner Runner) RunCmdByName(cmdName string, c *cli.Context) (err error) {
+	cmd, err := runner.cmdFactory.GetByCmdName(cmdName)
+	if err != nil {
+		return
+	}
+
 	requirements, err := cmd.GetRequirements(runner.reqFactory, c)
 	if err != nil {
 		return
