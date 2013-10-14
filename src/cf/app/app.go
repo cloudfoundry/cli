@@ -214,6 +214,18 @@ func NewApp(cmdFactory commands.Factory, reqFactory requirements.Factory) (app *
 			},
 		},
 		{
+			Name:        "delete-user",
+			Description: "Delete a user",
+			Usage:       fmt.Sprintf("%s delete-user USERNAME", cf.Name),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmd, _ := cmdFactory.GetByCmdName("delete-user")
+				cmdRunner.Run(cmd, c)
+			},
+		},
+		{
 			Name:        "domains",
 			Description: "List domains in the target org",
 			Usage:       fmt.Sprintf("%s domains", cf.Name),

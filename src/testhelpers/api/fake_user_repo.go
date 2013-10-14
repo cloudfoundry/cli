@@ -8,6 +8,23 @@ import (
 type FakeUserRepository struct {
 	CreateUserUser cf.User
 	CreateUserExists bool
+
+	FindByUsernameUsername string
+	FindByUsernameUser cf.User
+	FindByUsernameNotFound bool
+
+	DeleteUser cf.User
+}
+
+func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {
+	repo.FindByUsernameUsername = username
+	user = repo.FindByUsernameUser
+
+	if repo.FindByUsernameNotFound {
+		apiResponse = net.NewNotFoundApiResponse("User not found")
+	}
+
+	return
 }
 
 func (repo *FakeUserRepository) Create(user cf.User) (apiResponse net.ApiResponse) {
@@ -17,5 +34,11 @@ func (repo *FakeUserRepository) Create(user cf.User) (apiResponse net.ApiRespons
 		apiResponse = net.NewApiResponse("User already exists", cf.USER_EXISTS, 400)
 	}
 
+	return
+}
+
+
+func (repo *FakeUserRepository) Delete(user cf.User) (apiResponse net.ApiResponse) {
+	repo.DeleteUser = user
 	return
 }

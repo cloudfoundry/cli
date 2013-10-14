@@ -44,6 +44,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["delete-service-auth-token"] = serviceauthtoken.NewDeleteServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["delete-service-broker"] = servicebroker.NewDeleteServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["delete-space"] = space.NewDeleteSpace(ui, repoLocator.GetSpaceRepository(), configRepo)
+	factory.cmdsByName["delete-user"] = user.NewDeleteUser(ui, repoLocator.GetUserRepository())
 	factory.cmdsByName["domains"] = domain.NewListDomains(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["env"] = application.NewEnv(ui)
 	factory.cmdsByName["events"] = application.NewEvents(ui, repoLocator.GetAppEventsRepository())

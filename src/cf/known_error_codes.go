@@ -2,6 +2,7 @@ package cf
 
 const (
 	USER_EXISTS                 = "20002"
+	USER_NOT_FOUND              = "20003"
 	ORG_EXISTS                  = "30002"
 	SPACE_EXISTS                = "40002"
 	APP_NOT_STAGED              = "170002"
