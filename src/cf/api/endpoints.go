@@ -111,11 +111,9 @@ func (repo RemoteEndpointRepository) loggregatorEndpoint() (endpoint string, api
 		return
 	}
 
-	re := regexp.MustCompile(`^http(s?)://(.+)\/?`)
+	re := regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
 
 	endpoint = re.ReplaceAllString(repo.config.AuthorizationEndpoint, "ws${1}://loggregator.${2}")
-	endpoint = strings.Replace(endpoint, uaaEndpointPrefix+".", "", 1)
 	endpoint = endpoint + ":4443"
-
 	return
 }

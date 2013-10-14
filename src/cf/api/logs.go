@@ -5,11 +5,11 @@ import (
 	"cf/configuration"
 	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"sort"
 	"time"
-	"errors"
 )
 
 type LogsRepository interface {
@@ -35,9 +35,6 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnec
 		return
 	}
 	location := host + fmt.Sprintf("/dump/?app=%s", app.Guid)
-	if err != nil {
-		return
-	}
 	return repo.connectToWebsocket(location, app, onConnect, onMessage, nil)
 }
 

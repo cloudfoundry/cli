@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf"
+	"cf/configuration"
 	"cf/net"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +36,7 @@ func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	configRepo.Delete()
 	configRepo.Login()
 
-	ts, repo := createEndpointRepo(configRepo, validApiInfoEndpoint)
+	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
 	repo.UpdateEndpoint(ts.URL)
@@ -53,7 +54,7 @@ func TestUpdateEndpointWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	configRepo.Delete()
 	configRepo.Login()
 
-	ts, repo := createEndpointRepo(configRepo, validApiInfoEndpoint)
+	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
 	repo.UpdateEndpoint(ts.URL)
@@ -69,7 +70,7 @@ func TestUpdateEndpointWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 func TestUpdateEndpointWhenUrlIsMissingScheme(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
-	_, repo := createEndpointRepo(configRepo, nil)
+	_, repo := createEndpointRepoForUpdate(configRepo, nil)
 
 	apiResponse := repo.UpdateEndpoint("example.com")
 
@@ -84,7 +85,7 @@ func TestUpdateEndpointWhenEndpointReturns404(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
-	ts, repo := createEndpointRepo(configRepo, notFoundApiEndpoint)
+	ts, repo := createEndpointRepoForUpdate(configRepo, notFoundApiEndpoint)
 	defer ts.Close()
 
 	apiResponse := repo.UpdateEndpoint(ts.URL)
@@ -100,7 +101,7 @@ func TestUpdateEndpointWhenEndpointReturnsInvalidJson(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
-	ts, repo := createEndpointRepo(configRepo, invalidJsonResponseApiEndpoint)
+	ts, repo := createEndpointRepoForUpdate(configRepo, invalidJsonResponseApiEndpoint)
 	defer ts.Close()
 
 	apiResponse := repo.UpdateEndpoint(ts.URL)
@@ -108,24 +109,7 @@ func TestUpdateEndpointWhenEndpointReturnsInvalidJson(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-func TestGetEndpointForCloudController(t *testing.T) {
-	configRepo := testconfig.FakeConfigRepository{}
-	configRepo.Delete()
-	configRepo.Login()
-
-	ts, repo := createEndpointRepo(configRepo, validApiInfoEndpoint)
-	defer ts.Close()
-
-	endpoint, apiResponse := repo.GetEndpoint(cf.CloudControllerEndpointKey)
-
-	config := testconfig.TestConfigurationSingleton
-
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.NotEqual(t, endpoint, "")
-	assert.Equal(t, endpoint, config.Target)
-}
-
-func createEndpointRepo(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+func createEndpointRepoForUpdate(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
 	if endpoint != nil {
 		ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	}
@@ -133,5 +117,54 @@ func createEndpointRepo(configRepo testconfig.FakeConfigRepository, endpoint fun
 	config, _ := configRepo.Get()
 	gateway := net.NewCloudControllerGateway()
 	repo = NewEndpointRepository(config, gateway, configRepo)
+	return
+}
+
+// Tests for GetEndpoint
+
+func TestGetEndpointForCloudController(t *testing.T) {
+	configRepo := testconfig.FakeConfigRepository{}
+	config := &configuration.Configuration{
+		Target: "http://api.example.com",
+	}
+
+	repo := NewEndpointRepository(config, net.NewCloudControllerGateway(), configRepo)
+
+	endpoint, apiResponse := repo.GetEndpoint(cf.CloudControllerEndpointKey)
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, endpoint, "http://api.example.com")
+}
+
+func TestGetEndpointForLoggregatorSecure(t *testing.T) {
+	config := &configuration.Configuration{
+		AuthorizationEndpoint: "https://foo.run.pivotal.io",
+	}
+
+	repo := createEndpointRepoForGet(config)
+
+	endpoint, apiResponse := repo.GetEndpoint(cf.LoggregatorEndpointKey)
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, endpoint, "wss://loggregator.run.pivotal.io:4443")
+}
+
+func TestGetEndpointForLoggregatorInsecure(t *testing.T) {
+	//This is current behavior, which will probably need to be changed to properly support unsecure websocket connections (SH)
+	config := &configuration.Configuration{
+		AuthorizationEndpoint: "http://bar.run.pivotal.io",
+	}
+
+	repo := createEndpointRepoForGet(config)
+
+	endpoint, apiResponse := repo.GetEndpoint(cf.LoggregatorEndpointKey)
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, endpoint, "ws://loggregator.run.pivotal.io:4443")
+}
+
+func createEndpointRepoForGet(config *configuration.Configuration) (repo EndpointRepository) {
+	configRepo := testconfig.FakeConfigRepository{}
+	repo = NewEndpointRepository(config, net.NewCloudControllerGateway(), configRepo)
 	return
 }
