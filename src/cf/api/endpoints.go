@@ -106,14 +106,14 @@ func (repo RemoteEndpointRepository) uaaControllerEndpoint() (endpoint string, a
 }
 
 func (repo RemoteEndpointRepository) loggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse) {
-	if repo.config.AuthorizationEndpoint == "" {
+	if repo.config.Target == "" {
 		apiResponse = net.NewApiResponseWithMessage("Endpoint missing from config file")
 		return
 	}
 
 	re := regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
 
-	endpoint = re.ReplaceAllString(repo.config.AuthorizationEndpoint, "ws${1}://loggregator.${2}")
+	endpoint = re.ReplaceAllString(repo.config.Target, "ws${1}://loggregator.${2}")
 	endpoint = endpoint + ":4443"
 	return
 }

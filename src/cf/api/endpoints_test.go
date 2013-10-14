@@ -138,7 +138,7 @@ func TestGetEndpointForCloudController(t *testing.T) {
 
 func TestGetEndpointForLoggregatorSecure(t *testing.T) {
 	config := &configuration.Configuration{
-		AuthorizationEndpoint: "https://foo.run.pivotal.io",
+		Target: "https://foo.run.pivotal.io",
 	}
 
 	repo := createEndpointRepoForGet(config)
@@ -152,7 +152,7 @@ func TestGetEndpointForLoggregatorSecure(t *testing.T) {
 func TestGetEndpointForLoggregatorInsecure(t *testing.T) {
 	//This is current behavior, which will probably need to be changed to properly support unsecure websocket connections (SH)
 	config := &configuration.Configuration{
-		AuthorizationEndpoint: "http://bar.run.pivotal.io",
+		Target: "http://bar.run.pivotal.io",
 	}
 
 	repo := createEndpointRepoForGet(config)
