@@ -9,12 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 	testapi "testhelpers/api"
 	testcf "testhelpers/cf"
+	testnet "testhelpers/net"
 	"testing"
 )
 
@@ -45,6 +45,50 @@ var expectedResources = testapi.RemoveWhiteSpaceFromBody(`[
         "size": 111
     }
 ]`)
+
+var uploadApplicationRequest = testnet.TestRequest{
+	Method: "PUT",
+	Path: "/v2/apps/my-cool-app-guid/bits",
+	Matcher: uploadBodyMatcher,
+	Response: testnet.TestResponse{
+		Status: http.StatusCreated,
+		Body: `
+{
+	"metadata":{
+		"guid": "my-job-guid"
+	}
+}
+	`},
+}
+
+
+var matchResourceRequest = testnet.TestRequest {
+	Method:    "PUT",
+	Path: "/v2/resource_match",
+	Matcher: testnet.RequestBodyMatcher(expectedResources),
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `[
+    {
+        "fn": "app.rb",
+        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
+        "size": 51
+    },
+    {
+        "fn": "config.ru",
+        "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
+        "size": 70
+    }
+]`,
+	},
+}
+
+var defaultRequests = []testnet.TestRequest{
+	matchResourceRequest,
+	uploadApplicationRequest,
+	createProgressEndpoint("running"),
+	createProgressEndpoint("finished"),
+}
 
 var uploadBodyMatcher = func(request *http.Request) bool {
 	bodyBytes, err := ioutil.ReadAll(request.Body)
@@ -85,28 +129,15 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 	}
 
 	return zipAttachmentContentDispositionMatches &&
-		zipAttachmentContentTypeMatches &&
-		zipAttachmentContentTransferEncodingMatches &&
-		zipAttachmentContentLengthPresent &&
-		zipAttachmentContentPresent &&
-		resourcesContentDispositionMatches &&
-		resourcesPresent
+			zipAttachmentContentTypeMatches &&
+			zipAttachmentContentTransferEncodingMatches &&
+			zipAttachmentContentLengthPresent &&
+			zipAttachmentContentPresent &&
+			resourcesContentDispositionMatches &&
+			resourcesPresent
 }
 
-var uploadApplicationEndpoint, uploadApplicationEndpointStatus = testapi.CreateCheckableEndpoint(
-	"PUT",
-	"/v2/apps/my-cool-app-guid/bits",
-	uploadBodyMatcher,
-	testapi.TestResponse{Status: http.StatusCreated, Body: `
-{
-	"metadata":{
-		"guid": "my-job-guid"
-	}
-}
-	`},
-)
-
-func createProgressEndpoint(status string) (http.HandlerFunc, *testapi.RequestStatus) {
+func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	body := fmt.Sprintf(`
 	{
 		"entity":{
@@ -114,64 +145,16 @@ func createProgressEndpoint(status string) (http.HandlerFunc, *testapi.RequestSt
 		}
 	}`, status)
 
-	return testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/jobs/my-job-guid",
-		nil,
-		testapi.TestResponse{Status: http.StatusCreated, Body: body},
-	)
-}
-
-var uploadProgressRunning, uploadProgressRunningStatus = createProgressEndpoint("running")
-var uploadProgressFinished, uploadProgressFinishedStatus = createProgressEndpoint("finished")
-var uploadProgressFailed, uploadProgressFailedStatus = createProgressEndpoint("failed")
-
-var matchResourcesEndpoint, matchResourcesEndpointStatus = testapi.CreateCheckableEndpoint(
-	"PUT",
-	"/v2/resource_match",
-	testapi.RequestBodyMatcher(expectedResources),
-	testapi.TestResponse{
-		Status: http.StatusOK,
-		Body: `[
-    {
-        "fn": "app.rb",
-        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51
-    },
-    {
-        "fn": "config.ru",
-        "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70
-    }
-]`},
-)
-
-func uploadEndpoints(statuses []string) func(writer http.ResponseWriter, request *http.Request) {
-	var i int
-
-	return func(writer http.ResponseWriter, request *http.Request) {
-
-		if strings.Contains(request.URL.Path, "bits") {
-			uploadApplicationEndpoint(writer, request)
-			return
-		}
-
-		if strings.Contains(request.URL.Path, "jobs") {
-			switch statuses[i] {
-			case "running":
-				uploadProgressRunning(writer, request)
-			case "failed":
-				uploadProgressFailed(writer, request)
-			case "finished":
-				uploadProgressFinished(writer, request)
-			}
-			i++
-			return
-		}
-
-		matchResourcesEndpoint(writer, request)
+	req.Method = "GET"
+	req.Path = "/v2/jobs/my-job-guid"
+	req.Response = testnet.TestResponse{
+		Status: http.StatusCreated,
+		Body:body,
 	}
+
+	return
 }
+
 func TestUploadWithInvalidDirectory(t *testing.T) {
 	config := &configuration.Configuration{}
 	gateway := net.NewCloudControllerGateway()
@@ -190,7 +173,9 @@ func TestUploadApp(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
 
-	testUploadApp(t, dir, []string{"running", "finished"})
+	app, apiResponse := testUploadApp(t, dir, defaultRequests)
+	assert.True(t, apiResponse.IsSuccessful())
+	testUploadDir(t,app)
 }
 
 func TestCreateUploadDirWithAZipFile(t *testing.T) {
@@ -198,45 +183,28 @@ func TestCreateUploadDirWithAZipFile(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app.zip")
 
-	testUploadApp(t, dir, []string{"running", "finished"})
+	app, apiResponse := testUploadApp(t, dir, defaultRequests)
+	assert.True(t, apiResponse.IsSuccessful())
+	testUploadDir(t,app)
 }
 
 func TestUploadAppFailsWhilePushingBits(t *testing.T) {
-	uploadProgressRunningStatus.Reset()
-	matchResourcesEndpointStatus.Reset()
-
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
 
-	statuses := []string{"running", "failed"}
-
-	ts := httptest.NewTLSServer(http.HandlerFunc(uploadEndpoints(statuses)))
-	defer ts.Close()
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
+	requests := []testnet.TestRequest{
+		matchResourceRequest,
+		uploadApplicationRequest,
+		createProgressEndpoint("running"),
+		createProgressEndpoint("failed"),
 	}
-	gateway := net.NewCloudControllerGateway()
-	zipper := &testcf.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
-	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
-
-	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-
-	apiResponse := repo.UploadApp(app, dir)
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.True(t, uploadProgressRunningStatus.Called())
-	assert.True(t, uploadProgressFailedStatus.Called())
-
+	_, apiResponse := testUploadApp(t, dir, requests)
+	assert.False(t, apiResponse.IsSuccessful())
 }
 
-func testUploadApp(t *testing.T, dir string, statuses []string) {
-	uploadProgressRunningStatus.Reset()
-	uploadProgressFinishedStatus.Reset()
-	matchResourcesEndpointStatus.Reset()
-
-	ts := httptest.NewTLSServer(http.HandlerFunc(uploadEndpoints(statuses)))
+func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse){
+	ts, handler := testnet.NewServer(t, requests)
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -247,21 +215,23 @@ func testUploadApp(t *testing.T, dir string, statuses []string) {
 	zipper := &testcf.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
-	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+	app = cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
-	apiResponse := repo.UploadApp(app, dir)
-	assert.True(t, uploadProgressRunningStatus.Called())
-	assert.True(t, uploadProgressFinishedStatus.Called())
-	assert.True(t, matchResourcesEndpointStatus.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	apiResponse = repo.UploadApp(app, dir)
 
+	assert.True(t,handler.AllRequestsCalled())
+
+	return
+}
+
+func testUploadDir(t *testing.T, app cf.Application){
 	uploadDir := cf.TempDirForApp(app)
 	files, err := filepath.Glob(filepath.Join(uploadDir, "*"))
 	assert.NoError(t, err)
 
 	assert.Equal(t, files, []string{
-		filepath.Join(uploadDir, "Gemfile"),
-		filepath.Join(uploadDir, "Gemfile.lock"),
-		filepath.Join(uploadDir, "manifest.yml"),
-	})
+			filepath.Join(uploadDir, "Gemfile"),
+			filepath.Join(uploadDir, "Gemfile.lock"),
+			filepath.Join(uploadDir, "manifest.yml"),
+		})
 }
