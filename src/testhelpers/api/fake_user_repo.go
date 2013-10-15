@@ -18,6 +18,10 @@ type FakeUserRepository struct {
 	SetOrgRoleUser cf.User
 	SetOrgRoleOrganization cf.Organization
 	SetOrgRoleRole string
+
+	UnsetOrgRoleUser cf.User
+	UnsetOrgRoleOrganization cf.Organization
+	UnsetOrgRoleRole string
 }
 
 func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {
@@ -50,5 +54,12 @@ func (repo *FakeUserRepository) SetOrgRole(user cf.User, org cf.Organization, ro
 	repo.SetOrgRoleUser = user
 	repo.SetOrgRoleOrganization = org
 	repo.SetOrgRoleRole = role
+	return
+}
+
+func (repo *FakeUserRepository) UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
+	repo.UnsetOrgRoleUser = user
+	repo.UnsetOrgRoleOrganization = org
+	repo.UnsetOrgRoleRole = role
 	return
 }

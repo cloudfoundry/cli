@@ -603,6 +603,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "unset-org-role",
+			Description: "Remove an org role from a user",
+			Usage:       fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("unset-org-role", c)
+			},
+		},
+		{
 			Name:        "update-service-broker",
 			Description: "Update a service broker",
 			Usage:       fmt.Sprintf("%s update-service-broker SERVICE_BROKER USERNAME PASSWORD URL", cf.Name),

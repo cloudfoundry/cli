@@ -13,6 +13,7 @@ type UserRepository interface {
 	Create(user cf.User) (apiResponse net.ApiResponse)
 	Delete(user cf.User) (apiResponse net.ApiResponse)
 	SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
+	UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerUserRepository struct {
@@ -144,6 +145,14 @@ func (repo CloudControllerUserRepository) Delete(user cf.User) (apiResponse net.
 }
 
 func (repo CloudControllerUserRepository) SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
+	return repo.setOrUnsetOrgRole("PUT", user, org, role)
+}
+
+func (repo CloudControllerUserRepository) UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
+	return repo.setOrUnsetOrgRole("DELETE", user, org, role)
+}
+
+func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb string, user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
 	roleToPathMap := map[string]string{
 		"OrgManager":     "managers",
 		"BillingManager": "billing_managers",
@@ -157,10 +166,6 @@ func (repo CloudControllerUserRepository) SetOrgRole(user cf.User, org cf.Organi
 		return
 	}
 
-	return repo.setOrgRoleWithRolePath(user, org, rolePath)
-}
-
-func (repo CloudControllerUserRepository) setOrgRoleWithRolePath(user cf.User, org cf.Organization, rolePath string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s/%s", repo.config.Target, org.Guid, rolePath, user.Guid)
 
 	request, apiResponse := repo.ccGateway.NewRequest("PUT", path, repo.config.AccessToken, nil)

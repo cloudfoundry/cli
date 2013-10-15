@@ -142,57 +142,101 @@ func TestDeleteUserWhenNotFoundOnTheCloudController(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
-//"managers_url": "/v2/organizations/27162c62-fa9f-4999-af63-a12db5ed415b/managers",
-//"billing_managers_url": "/v2/organizations/27162c62-fa9f-4999-af63-a12db5ed415b/billing_managers",
-//"auditors_url": "/v2/organizations/27162c62-fa9f-4999-af63-a12db5ed415b/auditors",
-
-//OrgManager
-//BillingManager
-//OrgAuditor
-
 func TestSetOrgRoleToOrgManager(t *testing.T) {
-	testSetOrgRoleWithValidRole(t, "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+		return repo.SetOrgRole(user, org, "OrgManager")
+	}
+
+	testSetOrUnsetOrgRoleWithValidRole(
+		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/managers/my-user-guid",
+	)
 }
 
 func TestSetOrgRoleToBillingManager(t *testing.T) {
-	testSetOrgRoleWithValidRole(t, "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+		return repo.SetOrgRole(user, org, "BillingManager")
+	}
+
+	testSetOrUnsetOrgRoleWithValidRole(
+		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/managers/my-user-guid",
+	)
 }
 
 func TestSetOrgRoleToOrgAuditor(t *testing.T) {
-	testSetOrgRoleWithValidRole(t, "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+		return repo.SetOrgRole(user, org, "OrgAuditor")
+	}
+
+	testSetOrUnsetOrgRoleWithValidRole(
+		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/auditors/my-user-guid",
+	)
 }
 
-func testSetOrgRoleWithValidRole(t *testing.T, role string, path string) {
+func TestSetOrgRoleWithInvalidRole(t *testing.T) {
+	_, _, repo := createUsersRepo(nil, nil)
+	apiResponse := repo.SetOrgRole(cf.User{}, cf.Organization{}, "foo")
+
+	assert.False(t, apiResponse.IsSuccessful())
+	assert.Contains(t, apiResponse.Message, "Invalid Role")
+}
+
+func TestUnsetOrgRoleToOrgManager(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+		return repo.UnsetOrgRole(user, org, "OrgManager")
+	}
+
+	testSetOrUnsetOrgRoleWithValidRole(
+		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/managers/my-user-guid",
+	)
+}
+
+func TestUnsetOrgRoleToBillingManager(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+		return repo.UnsetOrgRole(user, org, "BillingManager")
+	}
+
+	testSetOrUnsetOrgRoleWithValidRole(
+		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/managers/my-user-guid",
+	)
+}
+
+func TestUnsetOrgRoleToOrgAuditor(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+		return repo.UnsetOrgRole(user, org, "OrgAuditor")
+	}
+
+	testSetOrUnsetOrgRoleWithValidRole(
+		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/auditors/my-user-guid",
+	)
+}
+
+func TestUnsetOrgRoleWithInvalidRole(t *testing.T) {
+	_, _, repo := createUsersRepo(nil, nil)
+	apiResponse := repo.UnsetOrgRole(cf.User{}, cf.Organization{}, "foo")
+
+	assert.False(t, apiResponse.IsSuccessful())
+	assert.Contains(t, apiResponse.Message, "Invalid Role")
+}
+
+func testSetOrUnsetOrgRoleWithValidRole(
+	t *testing.T,
+	setOrUnset func(UserRepository, cf.User, cf.Organization)(net.ApiResponse),
+	verb string,
+	path string) {
+
 	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		"PUT",
-		path,
-		nil,
-		testapi.TestResponse{Status: http.StatusOK},
+		verb, path, nil, testapi.TestResponse{Status: http.StatusOK},
 	)
 
 	cc, _, repo := createUsersRepo(ccEndpoint, nil)
 	defer cc.Close()
 
-	apiResponse := repo.SetOrgRole(
-		cf.User{Guid: "my-user-guid"},
-		cf.Organization{Guid: "my-org-guid"},
-		role,
-	)
+	user := cf.User{Guid: "my-user-guid"}
+	org := cf.Organization{Guid: "my-org-guid"}
+	apiResponse := setOrUnset(repo, user, org)
 
 	assert.True(t, ccEndpointStatus.Called())
 	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestSetOrgRoleWithInvalidRole(t *testing.T) {
-	_, _, repo := createUsersRepo(nil, nil)
-	apiResponse := repo.SetOrgRole(
-		cf.User{},
-		cf.Organization{},
-		"foo",
-	)
-
-	assert.False(t, apiResponse.IsSuccessful())
-	assert.Contains(t, apiResponse.Message, "Invalid Role")
 }
 
 func createUsersRepo(ccEndpoint http.HandlerFunc, uaaEndpoint http.HandlerFunc) (cc *httptest.Server, uaa *httptest.Server, repo UserRepository) {
