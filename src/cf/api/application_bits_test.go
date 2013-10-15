@@ -5,6 +5,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -96,8 +97,34 @@ var uploadApplicationEndpoint, uploadApplicationEndpointStatus = testapi.CreateC
 	"PUT",
 	"/v2/apps/my-cool-app-guid/bits",
 	uploadBodyMatcher,
-	testapi.TestResponse{Status: http.StatusCreated},
+	testapi.TestResponse{Status: http.StatusCreated, Body: `
+{
+	"metadata":{
+		"guid": "my-job-guid"
+	}
+}
+	`},
 )
+
+func createProgressEndpoint(status string) (http.HandlerFunc, *testapi.RequestStatus) {
+	body := fmt.Sprintf(`
+	{
+		"entity":{
+			"status":"%s"
+		}
+	}`, status)
+
+	return testapi.CreateCheckableEndpoint(
+		"GET",
+		"/v2/jobs/my-job-guid",
+		nil,
+		testapi.TestResponse{Status: http.StatusCreated, Body: body},
+	)
+}
+
+var uploadProgressRunning, uploadProgressRunningStatus = createProgressEndpoint("running")
+var uploadProgressFinished, uploadProgressFinishedStatus = createProgressEndpoint("finished")
+var uploadProgressFailed, uploadProgressFailedStatus = createProgressEndpoint("failed")
 
 var matchResourcesEndpoint, matchResourcesEndpointStatus = testapi.CreateCheckableEndpoint(
 	"PUT",
@@ -119,15 +146,32 @@ var matchResourcesEndpoint, matchResourcesEndpointStatus = testapi.CreateCheckab
 ]`},
 )
 
-var uploadEndpoints = func(writer http.ResponseWriter, request *http.Request) {
-	if strings.Contains(request.URL.Path, "bits") {
-		uploadApplicationEndpoint(writer, request)
-		return
+func uploadEndpoints(statuses []string) func(writer http.ResponseWriter, request *http.Request) {
+	var i int
+
+	return func(writer http.ResponseWriter, request *http.Request) {
+
+		if strings.Contains(request.URL.Path, "bits") {
+			uploadApplicationEndpoint(writer, request)
+			return
+		}
+
+		if strings.Contains(request.URL.Path, "jobs") {
+			switch statuses[i] {
+			case "running":
+				uploadProgressRunning(writer, request)
+			case "failed":
+				uploadProgressFailed(writer, request)
+			case "finished":
+				uploadProgressFinished(writer, request)
+			}
+			i++
+			return
+		}
+
+		matchResourcesEndpoint(writer, request)
 	}
-
-	matchResourcesEndpoint(writer, request)
 }
-
 func TestUploadWithInvalidDirectory(t *testing.T) {
 	config := &configuration.Configuration{}
 	gateway := net.NewCloudControllerGateway()
@@ -146,7 +190,7 @@ func TestUploadApp(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
 
-	testUploadApp(t, dir)
+	testUploadApp(t, dir, []string{"running", "finished"})
 }
 
 func TestCreateUploadDirWithAZipFile(t *testing.T) {
@@ -154,11 +198,20 @@ func TestCreateUploadDirWithAZipFile(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app.zip")
 
-	testUploadApp(t, dir)
+	testUploadApp(t, dir, []string{"running", "finished"})
 }
 
-func testUploadApp(t *testing.T, dir string) {
-	ts := httptest.NewTLSServer(http.HandlerFunc(uploadEndpoints))
+func TestUploadAppFailsWhilePushingBits(t *testing.T) {
+	uploadProgressRunningStatus.Reset()
+	matchResourcesEndpointStatus.Reset()
+
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+	dir = filepath.Join(dir, "../../fixtures/example-app")
+
+	statuses := []string{"running", "failed"}
+
+	ts := httptest.NewTLSServer(http.HandlerFunc(uploadEndpoints(statuses)))
 	defer ts.Close()
 
 	config := &configuration.Configuration{
@@ -172,7 +225,33 @@ func testUploadApp(t *testing.T, dir string) {
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	apiResponse := repo.UploadApp(app, dir)
-	assert.True(t, uploadApplicationEndpointStatus.Called())
+	assert.True(t, apiResponse.IsNotSuccessful())
+	assert.True(t, uploadProgressRunningStatus.Called())
+	assert.True(t, uploadProgressFailedStatus.Called())
+
+}
+
+func testUploadApp(t *testing.T, dir string, statuses []string) {
+	uploadProgressRunningStatus.Reset()
+	uploadProgressFinishedStatus.Reset()
+	matchResourcesEndpointStatus.Reset()
+
+	ts := httptest.NewTLSServer(http.HandlerFunc(uploadEndpoints(statuses)))
+	defer ts.Close()
+
+	config := &configuration.Configuration{
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+	}
+	gateway := net.NewCloudControllerGateway()
+	zipper := &testcf.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
+	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
+
+	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
+
+	apiResponse := repo.UploadApp(app, dir)
+	assert.True(t, uploadProgressRunningStatus.Called())
+	assert.True(t, uploadProgressFinishedStatus.Called())
 	assert.True(t, matchResourcesEndpointStatus.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
