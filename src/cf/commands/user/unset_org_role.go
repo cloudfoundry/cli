@@ -4,15 +4,15 @@ import (
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
-	"github.com/codegangsta/cli"
 	"errors"
+	"github.com/codegangsta/cli"
 )
 
 type UnsetOrgRole struct {
-	ui terminal.UI
+	ui       terminal.UI
 	userRepo api.UserRepository
-	userReq requirements.UserRequirement
-	orgReq requirements.OrganizationRequirement
+	userReq  requirements.UserRequirement
+	orgReq   requirements.OrganizationRequirement
 }
 
 func NewUnsetOrgRole(ui terminal.UI, userRepo api.UserRepository) (cmd *UnsetOrgRole) {

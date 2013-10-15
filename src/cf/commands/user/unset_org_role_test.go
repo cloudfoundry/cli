@@ -1,14 +1,14 @@
 package user_test
 
 import (
-	"testing"
+	"cf"
 	. "cf/commands/user"
+	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"github.com/stretchr/testify/assert"
-	"cf"
+	"testing"
 )
 
 func TestUnsetOrgRoleFailsWithUsage(t *testing.T) {
@@ -52,7 +52,7 @@ func TestUnsetOrgRole(t *testing.T) {
 	org := cf.Organization{Name: "some-org", Guid: "some-org-guid"}
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess: true,
-		User: user,
+		User:         user,
 		Organization: org,
 	}
 	args := []string{"my-username", "my-org", "my-role"}

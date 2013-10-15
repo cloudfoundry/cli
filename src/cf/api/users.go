@@ -168,7 +168,7 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb string, user cf
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s/%s", repo.config.Target, org.Guid, rolePath, user.Guid)
 
-	request, apiResponse := repo.ccGateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
+	request, apiResponse := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

@@ -143,7 +143,7 @@ func TestDeleteUserWhenNotFoundOnTheCloudController(t *testing.T) {
 }
 
 func TestSetOrgRoleToOrgManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
 		return repo.SetOrgRole(user, org, "OrgManager")
 	}
 
@@ -153,17 +153,17 @@ func TestSetOrgRoleToOrgManager(t *testing.T) {
 }
 
 func TestSetOrgRoleToBillingManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
 		return repo.SetOrgRole(user, org, "BillingManager")
 	}
 
 	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/managers/my-user-guid",
+		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/billing_managers/my-user-guid",
 	)
 }
 
 func TestSetOrgRoleToOrgAuditor(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
 		return repo.SetOrgRole(user, org, "OrgAuditor")
 	}
 
@@ -180,8 +180,8 @@ func TestSetOrgRoleWithInvalidRole(t *testing.T) {
 	assert.Contains(t, apiResponse.Message, "Invalid Role")
 }
 
-func TestUnsetOrgRoleToOrgManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+func TestUnsetOrgRoleFromOrgManager(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
 		return repo.UnsetOrgRole(user, org, "OrgManager")
 	}
 
@@ -190,18 +190,18 @@ func TestUnsetOrgRoleToOrgManager(t *testing.T) {
 	)
 }
 
-func TestUnsetOrgRoleToBillingManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+func TestUnsetOrgRoleFromBillingManager(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
 		return repo.UnsetOrgRole(user, org, "BillingManager")
 	}
 
 	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/managers/my-user-guid",
+		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/billing_managers/my-user-guid",
 	)
 }
 
-func TestUnsetOrgRoleToOrgAuditor(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization)(net.ApiResponse) {
+func TestUnsetOrgRoleFromOrgAuditor(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
 		return repo.UnsetOrgRole(user, org, "OrgAuditor")
 	}
 
@@ -220,7 +220,7 @@ func TestUnsetOrgRoleWithInvalidRole(t *testing.T) {
 
 func testSetOrUnsetOrgRoleWithValidRole(
 	t *testing.T,
-	setOrUnset func(UserRepository, cf.User, cf.Organization)(net.ApiResponse),
+	setOrUnset func(UserRepository, cf.User, cf.Organization) net.ApiResponse,
 	verb string,
 	path string) {
 
