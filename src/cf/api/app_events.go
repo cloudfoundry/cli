@@ -5,9 +5,27 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"time"
 )
 
 const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"
+
+type PaginatedEventResources struct {
+	Resources []EventResource
+	NextURL   string `json:"next_url"`
+}
+
+type EventResource struct {
+	Resource
+	Entity EventEntity
+}
+
+type EventEntity struct {
+	Timestamp       time.Time
+	ExitDescription string `json:"exit_description"`
+	ExitStatus      int    `json:"exit_status"`
+	InstanceIndex   int    `json:"instance_index"`
+}
 
 type AppEventsRepository interface {
 	ListEvents(app cf.Application) (events []cf.Event, apiResponse net.ApiResponse)

@@ -8,6 +8,23 @@ import (
 	"strings"
 )
 
+type PaginatedServiceBrokerResources struct {
+	ServiceBrokers []ServiceBrokerResource `json:"resources"`
+}
+
+type ServiceBrokerResource struct {
+	Resource
+	Entity ServiceBrokerEntity
+}
+
+type ServiceBrokerEntity struct {
+	Guid     string
+	Name     string
+	Password string `json:"auth_password"`
+	Username string `json:"auth_username"`
+	Url      string `json:"broker_url"`
+}
+
 type ServiceBrokerRepository interface {
 	FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse)
 	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
@@ -42,16 +59,6 @@ func (repo CloudControllerServiceBrokerRepository) FindAll() (serviceBrokers []c
 	return
 }
 
-func marshallServiceBrokerFromResource(resource ServiceBrokerResource) (serviceBroker cf.ServiceBroker) {
-	return cf.ServiceBroker{
-		Name:     resource.Entity.Name,
-		Guid:     resource.Metadata.Guid,
-		Url:      resource.Entity.Url,
-		Username: resource.Entity.Username,
-		Password: resource.Entity.Password,
-	}
-}
-
 func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
 	resources, apiResponse := repo.findServiceBrokers(fmt.Sprintf("%s/v2/service_brokers?q=name%%3A%s", repo.config.Target, name))
 
@@ -67,6 +74,16 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 	serviceBroker = marshallServiceBrokerFromResource(resources.ServiceBrokers[0])
 
 	return
+}
+
+func marshallServiceBrokerFromResource(resource ServiceBrokerResource) (serviceBroker cf.ServiceBroker) {
+	return cf.ServiceBroker{
+		Name:     resource.Entity.Name,
+		Guid:     resource.Metadata.Guid,
+		Url:      resource.Entity.Url,
+		Username: resource.Entity.Username,
+		Password: resource.Entity.Password,
+	}
 }
 
 func (repo CloudControllerServiceBrokerRepository) findServiceBrokers(path string) (resources *PaginatedServiceBrokerResources, apiResponse net.ApiResponse) {

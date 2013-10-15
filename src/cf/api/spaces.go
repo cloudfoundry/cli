@@ -8,6 +8,71 @@ import (
 	"strings"
 )
 
+type PaginatedSpaceResources struct {
+	Resources []SpaceResource
+}
+
+type SpaceResource struct {
+	Metadata Metadata
+	Entity   SpaceEntity
+}
+
+type SpaceEntity struct {
+	Name             string
+	Organization     Resource
+	Applications     []Resource `json:"apps"`
+	Domains          []Resource
+	ServiceInstances []Resource `json:"service_instances"`
+}
+
+type SpaceSummary struct {
+	Guid             string
+	Name             string
+	Apps             []ApplicationSummary
+	ServiceInstances []ServiceInstanceSummary `json:"services"`
+}
+
+type ServiceInstanceSummary struct {
+	Name        string
+	ServicePlan ServicePlanSummary `json:"service_plan"`
+}
+
+type ServicePlanSummary struct {
+	Name            string
+	Guid            string
+	ServiceOffering ServiceOfferingSummary `json:"service"`
+}
+
+type ServiceOfferingSummary struct {
+	Label    string
+	Provider string
+	Version  string
+}
+
+type ApplicationSummary struct {
+	Guid             string
+	Name             string
+	Routes           []RouteSummary
+	RunningInstances int `json:"running_instances"`
+	Memory           uint64
+	Instances        int
+	DiskQuota        uint64 `json:"disk_quota"`
+	Urls             []string
+	State            string
+	ServiceNames     []string `json:"service_names"`
+}
+
+type RouteSummary struct {
+	Guid   string
+	Host   string
+	Domain DomainSummary
+}
+
+type DomainSummary struct {
+	Guid string
+	Name string
+}
+
 type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
 	FindAll() (spaces []cf.Space, apiResponse net.ApiResponse)

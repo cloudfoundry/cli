@@ -13,6 +13,34 @@ import (
 	"time"
 )
 
+type PaginatedApplicationResources struct {
+	Resources []ApplicationResource
+}
+
+type ApplicationResource struct {
+	Resource
+	Entity ApplicationEntity
+}
+
+type ApplicationEntity struct {
+	Name            string
+	State           string
+	Instances       int
+	Memory          int
+	Routes          []AppRouteResource
+	EnvironmentJson map[string]string `json:"environment_json"`
+}
+
+type AppRouteResource struct {
+	Resource
+	Entity AppRouteEntity
+}
+
+type AppRouteEntity struct {
+	Host   string
+	Domain Resource
+}
+
 type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, apiResponse net.ApiResponse)
 	SetEnv(app cf.Application, envVars map[string]string) (apiResponse net.ApiResponse)

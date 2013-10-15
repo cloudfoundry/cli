@@ -10,6 +10,58 @@ import (
 	"strings"
 )
 
+type PaginatedServiceOfferingResources struct {
+	Resources []ServiceOfferingResource
+}
+
+type ServiceOfferingResource struct {
+	Metadata Metadata
+	Entity   ServiceOfferingEntity
+}
+
+type ServiceOfferingEntity struct {
+	Label            string
+	Version          string
+	Description      string
+	DocumentationUrl string `json:"documentation_url"`
+	Provider         string
+	ServicePlans     []ServicePlanResource `json:"service_plans"`
+}
+
+type ServicePlanResource struct {
+	Metadata Metadata
+	Entity   ServicePlanEntity
+}
+
+type ServicePlanEntity struct {
+	Name            string
+	ServiceOffering ServiceOfferingResource `json:"service"`
+}
+
+type PaginatedServiceInstanceResources struct {
+	Resources []ServiceInstanceResource
+}
+
+type ServiceInstanceResource struct {
+	Metadata Metadata
+	Entity   ServiceInstanceEntity
+}
+
+type ServiceInstanceEntity struct {
+	Name            string
+	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
+	ServicePlan     ServicePlanResource      `json:"service_plan"`
+}
+
+type ServiceBindingResource struct {
+	Metadata Metadata
+	Entity   ServiceBindingEntity
+}
+
+type ServiceBindingEntity struct {
+	AppGuid string `json:"app_guid"`
+}
+
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
 	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)

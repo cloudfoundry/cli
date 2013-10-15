@@ -7,6 +7,20 @@ import (
 	"fmt"
 )
 
+type PaginatedStackResources struct {
+	Resources []StackResource
+}
+
+type StackResource struct {
+	Resource
+	Entity StackEntity
+}
+
+type StackEntity struct {
+	Name        string
+	Description string
+}
+
 type StackRepository interface {
 	FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse)
 	FindAll() (stacks []cf.Stack, apiResponse net.ApiResponse)

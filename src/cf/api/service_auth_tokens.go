@@ -8,6 +8,20 @@ import (
 	"strings"
 )
 
+type PaginatedAuthTokenResources struct {
+	Resources []AuthTokenResource
+}
+
+type AuthTokenResource struct {
+	Resource
+	Entity AuthTokenEntity
+}
+
+type AuthTokenEntity struct {
+	Label    string
+	Provider string
+}
+
 type ServiceAuthTokenRepository interface {
 	Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
@@ -48,7 +62,7 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf
 		return
 	}
 
-	resources := new(PaginatedResources)
+	resources := new(PaginatedAuthTokenResources)
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return

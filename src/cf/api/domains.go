@@ -8,6 +8,21 @@ import (
 	"strings"
 )
 
+type PaginatedDomainResources struct {
+	Resources []DomainResource
+}
+
+type DomainResource struct {
+	Resource
+	Entity DomainEntity
+}
+
+type DomainEntity struct {
+	Name                   string
+	OwningOrganizationGuid string `json:"owning_organization_guid"`
+	Spaces                 []Resource
+}
+
 type DomainRepository interface {
 	FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse)
 	FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse)

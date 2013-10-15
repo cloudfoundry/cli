@@ -16,6 +16,12 @@ import (
 	"strings"
 )
 
+type AppFileResource struct {
+	Path string `json:"fn"`
+	Sha1 string `json:"sha1"`
+	Size int64  `json:"size"`
+}
+
 type ApplicationBitsRepository interface {
 	UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse)
 }
@@ -174,9 +180,9 @@ func extractZip(app cf.Application, zipFile string) (destDir string, err error) 
 }
 
 func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []cf.AppFile) (appFilesToUpload []cf.AppFile, resourcesJson []byte, apiResponse net.ApiResponse) {
-	appFilesRequest := []AppFile{}
+	appFilesRequest := []AppFileResource{}
 	for _, file := range allAppFiles {
-		appFilesRequest = append(appFilesRequest, AppFile{
+		appFilesRequest = append(appFilesRequest, AppFileResource{
 			Path: file.Path,
 			Sha1: file.Sha1,
 			Size: file.Size,
@@ -195,7 +201,7 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 		return
 	}
 
-	res := []AppFile{}
+	res := []AppFileResource{}
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, &res)
 
 	appFilesToUpload = make([]cf.AppFile, len(allAppFiles))

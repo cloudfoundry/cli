@@ -8,6 +8,21 @@ import (
 	"strings"
 )
 
+type PaginatedRouteResources struct {
+	Resources []RouteResource `json:"resources"`
+}
+
+type RouteResource struct {
+	Resource
+	Entity RouteEntity
+}
+
+type RouteEntity struct {
+	Host   string
+	Domain Resource
+	Apps   []Resource
+}
+
 type RouteRepository interface {
 	FindAll() (routes []cf.Route, apiResponse net.ApiResponse)
 	FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse)
@@ -45,7 +60,7 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResp
 		return
 	}
 
-	for _, routeResponse := range routesResources.Routes {
+	for _, routeResponse := range routesResources.Resources {
 		domainResource := routeResponse.Entity.Domain
 		appNames := []string{}
 
@@ -76,7 +91,7 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 		return
 	}
 
-	resources := new(PaginatedResources)
+	resources := new(PaginatedRouteResources)
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -106,7 +121,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		return
 	}
 
-	resources := new(PaginatedResources)
+	resources := new(PaginatedRouteResources)
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -140,7 +155,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 		return
 	}
 
-	resource := new(Resource)
+	resource := new(RouteResource)
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resource)
 	if apiResponse.IsNotSuccessful() {
 		return

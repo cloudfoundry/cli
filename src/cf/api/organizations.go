@@ -8,6 +8,21 @@ import (
 	"strings"
 )
 
+type PaginatedOrganizationResources struct {
+	Resources []OrganizationResource
+}
+
+type OrganizationResource struct {
+	Resource
+	Entity OrganizationEntity
+}
+
+type OrganizationEntity struct {
+	Name    string
+	Spaces  []Resource
+	Domains []Resource
+}
+
 type OrganizationRepository interface {
 	FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse)
 	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
