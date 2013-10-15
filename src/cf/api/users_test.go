@@ -20,7 +20,7 @@ func TestFindByUsername(t *testing.T) {
 
 	endpoint, endpointStatus := testapi.CreateCheckableEndpoint(
 		"GET",
-		"/Users?attributes=id,userName&filter=userName%20Eq%20\"my-user\"",
+		"/Users?attributes=id,userName&filter=userName+Eq+%22damien%2Buser1%40pivotallabs.com%22",
 		nil,
 		testapi.TestResponse{Status: http.StatusOK, Body: usersResponse},
 	)
@@ -28,7 +28,7 @@ func TestFindByUsername(t *testing.T) {
 	_, uaa, repo := createUsersRepo(nil, endpoint)
 	defer uaa.Close()
 
-	user, apiResponse := repo.FindByUsername("my-user")
+	user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
 	assert.True(t, endpointStatus.Called())
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, user, cf.User{Username: "my-full-username", Guid: "my-guid"})
@@ -37,7 +37,7 @@ func TestFindByUsername(t *testing.T) {
 func TestFindByUsernameWhenNotFound(t *testing.T) {
 	endpoint, endpointStatus := testapi.CreateCheckableEndpoint(
 		"GET",
-		"/Users?attributes=id,userName&filter=userName%20Eq%20\"my-user\"",
+		"/Users?attributes=id,userName&filter=userName+Eq+%22my-user%22",
 		nil,
 		testapi.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	)

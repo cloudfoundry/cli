@@ -47,7 +47,7 @@ func (cmd *UnsetOrgRole) Run(c *cli.Context) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Removing %s role from %s in %s org",
+	cmd.ui.Say("Removing %s role from %s in %s org...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(c.Args()[0]),
 		terminal.EntityNameColor(c.Args()[1]),

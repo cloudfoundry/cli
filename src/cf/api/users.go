@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -15,6 +16,7 @@ type UserRepository interface {
 	SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
 	UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
 	SetSpaceRole(user cf.User, org cf.Space, role string) (apiResponse net.ApiResponse)
+	UnsetSpaceRole(user cf.User, org cf.Space, role string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerUserRepository struct {
@@ -38,7 +40,8 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 		return
 	}
 
-	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=userName%%20Eq%%20\"%s\"", uaaEndpoint, username)
+	usernameFilter := url.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
+	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
 
 	request, apiResponse := repo.uaaGateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
@@ -183,6 +186,10 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb string, user cf
 
 func (repo CloudControllerUserRepository) SetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
 	return repo.setOrUnsetSpaceRole("PUT", user, space, role)
+}
+
+func (repo CloudControllerUserRepository) UnsetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
+	return repo.setOrUnsetSpaceRole("DELETE", user, space, role)
 }
 
 func (repo CloudControllerUserRepository) setOrUnsetSpaceRole(verb string, user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {

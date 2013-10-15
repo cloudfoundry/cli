@@ -26,6 +26,10 @@ type FakeUserRepository struct {
 	SetSpaceRoleUser cf.User
 	SetSpaceRoleSpace cf.Space
 	SetSpaceRoleRole string
+
+	UnsetSpaceRoleUser cf.User
+	UnsetSpaceRoleSpace cf.Space
+	UnsetSpaceRoleRole string
 }
 
 func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {
@@ -72,5 +76,12 @@ func (repo *FakeUserRepository) SetSpaceRole(user cf.User, space cf.Space, role 
 	repo.SetSpaceRoleUser = user
 	repo.SetSpaceRoleSpace = space
 	repo.SetSpaceRoleRole = role
+	return
+}
+
+func (repo *FakeUserRepository) UnsetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
+	repo.UnsetSpaceRoleUser = user
+	repo.UnsetSpaceRoleSpace = space
+	repo.UnsetSpaceRoleRole = role
 	return
 }
