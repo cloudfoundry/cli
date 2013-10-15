@@ -9,7 +9,7 @@ import (
 )
 
 func TestSayWithStringOnly(t *testing.T) {
-	ui := new(TerminalUI)
+	ui := new(terminalUI)
 	out := captureOutput(func() {
 		ui.Say("Hello")
 	})
@@ -18,7 +18,7 @@ func TestSayWithStringOnly(t *testing.T) {
 }
 
 func TestSayWithStringWithFormat(t *testing.T) {
-	ui := new(TerminalUI)
+	ui := new(terminalUI)
 	out := captureOutput(func() {
 		ui.Say("Hello %s", "World!")
 	})
@@ -28,7 +28,7 @@ func TestSayWithStringWithFormat(t *testing.T) {
 
 func TestConfirmYes(t *testing.T) {
 	simulateStdin("y\n", func() {
-		ui := new(TerminalUI)
+		ui := new(terminalUI)
 
 		var result bool
 		out := captureOutput(func() {
@@ -42,7 +42,7 @@ func TestConfirmYes(t *testing.T) {
 
 func TestConfirmNo(t *testing.T) {
 	simulateStdin("wat\n", func() {
-		ui := new(TerminalUI)
+		ui := new(terminalUI)
 
 		var result bool
 		out := captureOutput(func() {

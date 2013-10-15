@@ -11,7 +11,7 @@ import (
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms686033(v=vs.85).aspx
 const ENABLE_ECHO_INPUT = 0x0004
 
-func (ui TerminalUI) AskForPassword(prompt string, args ...interface{}) (passwd string) {
+func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd string) {
 	hStdin := syscall.Handle(os.Stdin.Fd())
 	var originalMode uint32
 

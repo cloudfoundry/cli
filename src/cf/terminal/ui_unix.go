@@ -26,7 +26,7 @@ var sttyArgvEOn []string = []string{"stty", "echo"}
 
 var ws syscall.WaitStatus = 0
 
-func (ui TerminalUI) AskForPassword(prompt string, args ...interface{}) (passwd string) {
+func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd string) {
 	sig := make(chan os.Signal, 10)
 
 	// Display the prompt.

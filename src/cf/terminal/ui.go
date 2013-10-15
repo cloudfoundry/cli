@@ -33,23 +33,23 @@ type UI interface {
 	DisplayTable(table [][]string)
 }
 
-type TerminalUI struct {
+type terminalUI struct {
 }
 
 var Stdin io.Reader = os.Stdin
 
-func (c TerminalUI) Say(message string, args ...interface{}) {
+func (c terminalUI) Say(message string, args ...interface{}) {
 	fmt.Printf(message+"\n", args...)
 	return
 }
 
-func (c TerminalUI) Warn(message string, args ...interface{}) {
+func (c terminalUI) Warn(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	c.Say(WarningColor(message))
 	return
 }
 
-func (c TerminalUI) Confirm(message string, args ...interface{}) bool {
+func (c terminalUI) Confirm(message string, args ...interface{}) bool {
 	response := c.Ask(message, args...)
 	switch strings.ToLower(response) {
 	case "y", "yes":
@@ -58,25 +58,25 @@ func (c TerminalUI) Confirm(message string, args ...interface{}) bool {
 	return false
 }
 
-func (c TerminalUI) Ask(prompt string, args ...interface{}) (answer string) {
+func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Println("")
 	fmt.Printf(prompt+" ", args...)
 	fmt.Fscanln(Stdin, &answer)
 	return
 }
 
-func (c TerminalUI) Ok() {
+func (c terminalUI) Ok() {
 	c.Say(SuccessColor("OK"))
 }
 
-func (c TerminalUI) Failed(message string, args ...interface{}) {
+func (c terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	c.Say(FailureColor("FAILED"))
 	c.Say(message)
 	os.Exit(1)
 }
 
-func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
+func (c terminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 	c.Say(FailureColor("FAILED"))
 	c.Say("Incorrect Usage.\n")
 	cli.ShowCommandHelp(ctxt, cmdName)
@@ -84,14 +84,14 @@ func (c TerminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 	os.Exit(1)
 }
 
-func (c TerminalUI) ConfigFailure(err error) {
+func (c terminalUI) ConfigFailure(err error) {
 	c.Failed("Error loading config. Please reset the api '%s' and log in '%s'.\n%s",
 		CommandColor(fmt.Sprintf("%s api", cf.Name)),
 		CommandColor(fmt.Sprintf("%s login", cf.Name)),
 		err.Error())
 }
 
-func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
+func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 	ui.Say("API endpoint: %s (API version: %s)",
 		EntityNameColor(config.Target),
 		EntityNameColor(config.ApiVersion))
@@ -111,15 +111,15 @@ func (ui TerminalUI) ShowConfiguration(config *configuration.Configuration) {
 	}
 }
 
-func (c TerminalUI) LoadingIndication() {
+func (c terminalUI) LoadingIndication() {
 	fmt.Print(".")
 }
 
-func (c TerminalUI) Wait(duration time.Duration) {
+func (c terminalUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui TerminalUI) DisplayTable(table [][]string) {
+func (ui terminalUI) DisplayTable(table [][]string) {
 
 	columnCount := len(table[0])
 	maxSizes := make([]int, columnCount)
