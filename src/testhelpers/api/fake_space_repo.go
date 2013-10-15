@@ -15,6 +15,10 @@ type FakeSpaceRepository struct {
 	FindByNameErr bool
 	FindByNameNotFound bool
 
+	FindByNameInOrgName string
+	FindByNameInOrgOrg cf.Organization
+	FindByNameInOrgSpace cf.Space
+
 	SummarySpace cf.Space
 
 	CreateSpaceName string
@@ -47,6 +51,13 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiRes
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Space", name)
 	}
 
+	return
+}
+
+func (repo *FakeSpaceRepository) FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse) {
+	repo.FindByNameInOrgName = name
+	repo.FindByNameInOrgOrg = org
+	space = repo.FindByNameInOrgSpace
 	return
 }
 

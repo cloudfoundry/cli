@@ -77,6 +77,7 @@ type SpaceRepository interface {
 	GetCurrentSpace() (space cf.Space)
 	FindAll() (spaces []cf.Space, apiResponse net.ApiResponse)
 	FindByName(name string) (space cf.Space, apiResponse net.ApiResponse)
+	FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse)
 	GetSummary() (space cf.Space, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(space cf.Space, newName string) (apiResponse net.ApiResponse)
@@ -121,8 +122,12 @@ func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiResp
 }
 
 func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
+	return repo.FindByNameInOrg(name, repo.config.Organization)
+}
+
+func (repo CloudControllerSpaceRepository) FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/spaces?q=name%s&inline-relations-depth=1",
-		repo.config.Target, repo.config.Organization.Guid, "%3A"+strings.ToLower(name))
+		repo.config.Target, org.Guid, "%3A"+strings.ToLower(name))
 
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
@@ -168,6 +173,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 		Domains:          domains,
 		ServiceInstances: services,
 	}
+
 	return
 }
 

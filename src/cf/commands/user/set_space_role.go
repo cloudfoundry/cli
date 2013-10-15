@@ -9,50 +9,59 @@ import (
 )
 
 type SetSpaceRole struct {
-	ui       terminal.UI
-	userRepo api.UserRepository
-	userReq  requirements.UserRequirement
-	spaceReq requirements.SpaceRequirement
+	ui        terminal.UI
+	spaceRepo api.SpaceRepository
+	userRepo  api.UserRepository
+	userReq   requirements.UserRequirement
+	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSetSpaceRole(ui terminal.UI, userRepo api.UserRepository) (cmd *SetSpaceRole) {
+func NewSetSpaceRole(ui terminal.UI, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SetSpaceRole) {
 	cmd = new(SetSpaceRole)
 	cmd.ui = ui
+	cmd.spaceRepo = spaceRepo
 	cmd.userRepo = userRepo
-
 	return
 }
 
 func (cmd *SetSpaceRole) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 3 {
+	if len(c.Args()) != 4 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "set-space-role")
 		return
 	}
 
 	cmd.userReq = reqFactory.NewUserRequirement(c.Args()[0])
-	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[1])
+	cmd.orgReq = reqFactory.NewOrganizationRequirement(c.Args()[1])
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		cmd.userReq,
-		cmd.spaceReq,
+		cmd.orgReq,
 	}
 	return
 }
 
 func (cmd *SetSpaceRole) Run(c *cli.Context) {
-	user := cmd.userReq.GetUser()
-	space := cmd.spaceReq.GetSpace()
-	role := c.Args()[2]
+	spaceName := c.Args()[2]
+	role := c.Args()[3]
 
-	cmd.ui.Say("Assigning %s role to %s in %s space...",
+	user := cmd.userReq.GetUser()
+	org := cmd.orgReq.GetOrganization()
+	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+
+	cmd.ui.Say("Assigning %s role to %s in %s space in %s org...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(user.Username),
 		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(org.Name),
 	)
 
-	apiResponse := cmd.userRepo.SetSpaceRole(user, space, role)
+	apiResponse = cmd.userRepo.SetSpaceRole(user, space, role)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

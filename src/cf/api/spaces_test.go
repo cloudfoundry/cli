@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -122,9 +123,29 @@ var findSpaceByNameResponse = testapi.TestResponse{Status: http.StatusOK, Body: 
 }`}
 
 func TestSpacesFindByName(t *testing.T) {
+	testSpacesFindByNameWithOrg(t,
+		"some-org-guid",
+		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+			return repo.FindByName(spaceName)
+		},
+	)
+}
+
+func TestSpacesFindByNameInOrg(t *testing.T) {
+	org := cf.Organization{Guid: "another-org-guid"}
+
+	testSpacesFindByNameWithOrg(t,
+		"another-org-guid",
+		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+			return repo.FindByNameInOrg(spaceName, org)
+		},
+	)
+}
+
+func testSpacesFindByNameWithOrg(t *testing.T, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
 	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
-		"/v2/organizations/some-org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
+		fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
 		nil,
 		findSpaceByNameResponse,
 	)
@@ -144,7 +165,7 @@ func TestSpacesFindByName(t *testing.T) {
 		cf.ServiceInstance{Name: "service1", Guid: "service1-guid"},
 	}
 
-	space, apiResponse := repo.FindByName("Space1")
+	space, apiResponse := findByName(repo, "Space1")
 	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, space.Name, "Space1")
@@ -155,14 +176,36 @@ func TestSpacesFindByName(t *testing.T) {
 	assert.Equal(t, space.Domains, domains)
 	assert.Equal(t, space.ServiceInstances, services)
 
-	space, apiResponse = repo.FindByName("space1")
+	space, apiResponse = findByName(repo, "Space1")
 	assert.False(t, apiResponse.IsNotSuccessful())
+
+	return
 }
 
 func TestSpacesDidNotFindByName(t *testing.T) {
+	testSpacesDidNotFindByNameWithOrg(t,
+		"some-org-guid",
+		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+			return repo.FindByName(spaceName)
+		},
+	)
+}
+
+func TestSpacesDidNotFindByNameInOrg(t *testing.T) {
+	org := cf.Organization{Guid: "another-org-guid"}
+
+	testSpacesDidNotFindByNameWithOrg(t,
+		"another-org-guid",
+		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+			return repo.FindByNameInOrg(spaceName, org)
+		},
+	)
+}
+
+func testSpacesDidNotFindByNameWithOrg(t *testing.T, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
 	endpoint, status := testapi.CreateCheckableEndpoint(
 		"GET",
-		"/v2/organizations/some-org-guid/spaces?q=name%3Aspace1&inline-relations-depth=1",
+		fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
 		nil,
 		testapi.TestResponse{Status: http.StatusOK, Body: ` { "resources": [ ] }`},
 	)
@@ -170,7 +213,7 @@ func TestSpacesDidNotFindByName(t *testing.T) {
 	ts, repo := createSpacesRepo(endpoint)
 	defer ts.Close()
 
-	_, apiResponse := repo.FindByName("space1")
+	_, apiResponse := findByName(repo, "Space1")
 	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())

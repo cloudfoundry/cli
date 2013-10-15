@@ -506,7 +506,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "set-space-role",
 			Description: "Assign a space role to a user",
-			Usage: fmt.Sprintf("%s set-space-role USERNAME SPACE ROLE\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s set-space-role USERNAME ORG SPACE ROLE\n\n", cf.Name) +
 				"ROLES:\n" +
 				"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
 				"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
