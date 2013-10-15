@@ -85,7 +85,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), false)
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, repoLocator.GetUserRepository())
-	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, repoLocator.GetUserRepository())
+	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, repoLocator.GetServiceRepository())
