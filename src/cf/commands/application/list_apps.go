@@ -28,7 +28,8 @@ func (cmd ListApps) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 }
 
 func (cmd ListApps) Run(c *cli.Context) {
-	cmd.ui.Say("Getting apps in %s...", cmd.spaceRepo.GetCurrentSpace().Name)
+	cmd.ui.Say("Getting apps in %s...",
+		terminal.EntityNameColor(cmd.spaceRepo.GetCurrentSpace().Name))
 
 	space, apiResponse := cmd.spaceRepo.GetSummary()
 
