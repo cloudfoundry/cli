@@ -11,49 +11,41 @@ import (
 )
 
 type Target struct {
-	ui                terminal.UI
-	config            *configuration.Configuration
-	configRepo        configuration.ConfigurationRepository
-	orgRepo           api.OrganizationRepository
-	spaceRepo         api.SpaceRepository
-	apiEndpointSetter ApiEndpointSetter
+	ui         terminal.UI
+	config     *configuration.Configuration
+	configRepo configuration.ConfigurationRepository
+	orgRepo    api.OrganizationRepository
+	spaceRepo  api.SpaceRepository
 }
 
 func NewTarget(ui terminal.UI,
 	configRepo configuration.ConfigurationRepository,
 	orgRepo api.OrganizationRepository,
-	spaceRepo api.SpaceRepository,
-	endpointSetter ApiEndpointSetter) (cmd Target) {
+	spaceRepo api.SpaceRepository) (cmd Target) {
 
 	cmd.ui = ui
 	cmd.configRepo = configRepo
 	cmd.config, _ = configRepo.Get()
 	cmd.orgRepo = orgRepo
 	cmd.spaceRepo = spaceRepo
-	cmd.apiEndpointSetter = endpointSetter
 
 	return
 }
 
 func (cmd Target) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) > 1 {
+	if len(c.Args()) != 0 {
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "target")
 		return
 	}
 
-	if len(c.Args()) == 0 && (c.String("o") != "" || c.String("s") != "") {
+	if c.String("o") != "" || c.String("s") != "" {
 		reqs = append(reqs, reqFactory.NewLoginRequirement())
 	}
 	return
 }
 
 func (cmd Target) Run(c *cli.Context) {
-	if len(c.Args()) == 1 {
-		cmd.setNewEndpoint(c.Args()[0])
-		return
-	}
-
 	orgName := c.String("o")
 	spaceName := c.String("s")
 	shouldShowTarget := (orgName == "" && spaceName == "")
@@ -93,12 +85,6 @@ func (cmd Target) Run(c *cli.Context) {
 	}
 	cmd.showConfig()
 	return
-}
-
-func (cmd Target) setNewEndpoint(newEndpoint string) {
-	cmd.apiEndpointSetter.SetApiEndpoint(newEndpoint)
-	cmd.ui.Say("")
-	cmd.ui.Warn("TIP: Use 'cf api' to set the api endpoint, 'cf target API' will be deprecated in a future release ('cf target -o ORG and -s SPACE' will not change)")
 }
 
 func (cmd Target) setOrganization(orgName string) (err error) {
