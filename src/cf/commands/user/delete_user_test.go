@@ -112,7 +112,7 @@ func TestDeleteUserWhenUserNotFound(t *testing.T) {
 	assert.Equal(t, userRepo.DeleteUser.Guid, "")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "User not found")
+	assert.Contains(t, ui.Outputs[2], "does not exist")
 }
 
 func callDeleteUser(args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

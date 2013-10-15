@@ -51,7 +51,7 @@ func (cmd DeleteUser) Run(c *cli.Context) {
 	}
 	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
-		cmd.ui.Say(apiResponse.Message)
+		cmd.ui.Warn("User %s does not exist.", username)
 		return
 	}
 

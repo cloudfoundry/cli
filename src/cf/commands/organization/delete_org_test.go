@@ -110,7 +110,7 @@ func TestDeleteOrgWhenOrgDoesNotExist(t *testing.T) {
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "org-to-delete")
-	assert.Contains(t, ui.Outputs[2], "was already deleted.")
+	assert.Contains(t, ui.Outputs[2], "does not exist.")
 }
 
 func deleteOrg(confirmation string, args []string, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {

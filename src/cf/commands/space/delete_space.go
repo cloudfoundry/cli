@@ -50,7 +50,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
-		cmd.ui.Warn("Space %s was already deleted.", spaceName)
+		cmd.ui.Warn("Space %s does not exist.", spaceName)
 		return
 	}
 

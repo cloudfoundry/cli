@@ -70,7 +70,7 @@ func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 	assert.Equal(t, len(ui.Outputs), 3)
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "space-to-delete")
-	assert.Contains(t, ui.Outputs[2], "was already deleted.")
+	assert.Contains(t, ui.Outputs[2], "does not exist.")
 }
 
 func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {
