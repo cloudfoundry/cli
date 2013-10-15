@@ -13,7 +13,7 @@ func TestSpaceReqExecute(t *testing.T) {
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
 	ui := new(testterm.FakeUI)
 
-	spaceReq := NewSpaceRequirement("foo", ui, spaceRepo)
+	spaceReq := newSpaceRequirement("foo", ui, spaceRepo)
 	success := spaceReq.Execute()
 
 	assert.True(t, success)
@@ -25,7 +25,7 @@ func TestSpaceReqExecuteWhenSpaceNotFound(t *testing.T) {
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	spaceReq := NewSpaceRequirement("foo", ui, spaceRepo)
+	spaceReq := newSpaceRequirement("foo", ui, spaceRepo)
 	success := spaceReq.Execute()
 
 	assert.False(t, success)

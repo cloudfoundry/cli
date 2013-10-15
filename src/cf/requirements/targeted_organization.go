@@ -12,16 +12,16 @@ type TargetedOrgRequirement interface {
 	GetOrganization() cf.Organization
 }
 
-type TargetedOrgApiRequirement struct {
+type targetedOrgApiRequirement struct {
 	ui     terminal.UI
 	config *configuration.Configuration
 }
 
-func NewTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
-	return TargetedOrgApiRequirement{ui, config}
+func newTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
+	return targetedOrgApiRequirement{ui, config}
 }
 
-func (req TargetedOrgApiRequirement) Execute() (success bool) {
+func (req targetedOrgApiRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org targeted, use '%s' to target an org.",
 			terminal.CommandColor(cf.Name+" target -o ORG"))
@@ -32,6 +32,6 @@ func (req TargetedOrgApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req TargetedOrgApiRequirement) GetOrganization() (org cf.Organization) {
+func (req targetedOrgApiRequirement) GetOrganization() (org cf.Organization) {
 	return req.config.Organization
 }

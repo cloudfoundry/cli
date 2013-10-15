@@ -17,7 +17,7 @@ func TestRouteReqExecute(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainRoute: route}
 	ui := new(testterm.FakeUI)
 
-	routeReq := NewRouteRequirement("host", "example.com", ui, routeRepo)
+	routeReq := newRouteRequirement("host", "example.com", ui, routeRepo)
 	success := routeReq.Execute()
 
 	assert.True(t, success)
@@ -30,7 +30,7 @@ func TestRouteReqWhenRouteDoesNotExist(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	routeReq := NewRouteRequirement("host", "example.com", ui, routeRepo)
+	routeReq := newRouteRequirement("host", "example.com", ui, routeRepo)
 	success := routeReq.Execute()
 
 	assert.False(t, success)
@@ -40,7 +40,7 @@ func TestRouteReqOnError(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainErr: true}
 	ui := new(testterm.FakeUI)
 
-	routeReq := NewRouteRequirement("host", "example.com", ui, routeRepo)
+	routeReq := newRouteRequirement("host", "example.com", ui, routeRepo)
 	success := routeReq.Execute()
 
 	assert.False(t, success)

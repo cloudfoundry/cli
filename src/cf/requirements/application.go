@@ -12,22 +12,22 @@ type ApplicationRequirement interface {
 	GetApplication() cf.Application
 }
 
-type ApplicationApiRequirement struct {
+type applicationApiRequirement struct {
 	name        string
 	ui          terminal.UI
 	appRepo     api.ApplicationRepository
 	application cf.Application
 }
 
-func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRepository) (req *ApplicationApiRequirement) {
-	req = new(ApplicationApiRequirement)
+func newApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRepository) (req *applicationApiRequirement) {
+	req = new(applicationApiRequirement)
 	req.name = name
 	req.ui = ui
 	req.appRepo = aR
 	return
 }
 
-func (req *ApplicationApiRequirement) Execute() (success bool) {
+func (req *applicationApiRequirement) Execute() (success bool) {
 	var apiResponse net.ApiResponse
 	req.application, apiResponse = req.appRepo.FindByName(req.name)
 
@@ -39,6 +39,6 @@ func (req *ApplicationApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *ApplicationApiRequirement) GetApplication() cf.Application {
+func (req *applicationApiRequirement) GetApplication() cf.Application {
 	return req.application
 }

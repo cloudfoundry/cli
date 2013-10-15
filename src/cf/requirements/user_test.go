@@ -14,7 +14,7 @@ func TestUserReqExecute(t *testing.T) {
 	userRepo := &testapi.FakeUserRepository{FindByUsernameUser: user}
 	ui := new(testterm.FakeUI)
 
-	userReq := NewUserRequirement("foo", ui, userRepo)
+	userReq := newUserRequirement("foo", ui, userRepo)
 	success := userReq.Execute()
 
 	assert.True(t, success)
@@ -26,7 +26,7 @@ func TestUserReqWhenUserDoesNotExist(t *testing.T) {
 	userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	userReq := NewUserRequirement("foo", ui, userRepo)
+	userReq := newUserRequirement("foo", ui, userRepo)
 	success := userReq.Execute()
 
 	assert.False(t, success)

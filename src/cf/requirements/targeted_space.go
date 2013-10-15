@@ -12,7 +12,7 @@ type TargetedSpaceRequirement struct {
 	config *configuration.Configuration
 }
 
-func NewTargetedSpaceRequirement(ui terminal.UI, config *configuration.Configuration) TargetedSpaceRequirement {
+func newTargetedSpaceRequirement(ui terminal.UI, config *configuration.Configuration) TargetedSpaceRequirement {
 	return TargetedSpaceRequirement{ui, config}
 }
 

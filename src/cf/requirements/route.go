@@ -12,7 +12,7 @@ type RouteRequirement interface {
 	GetRoute() cf.Route
 }
 
-type RouteApiRequirement struct {
+type routeApiRequirement struct {
 	host      string
 	domain    string
 	ui        terminal.UI
@@ -20,8 +20,8 @@ type RouteApiRequirement struct {
 	route     cf.Route
 }
 
-func NewRouteRequirement(host, domain string, ui terminal.UI, routeRepo api.RouteRepository) (req *RouteApiRequirement) {
-	req = new(RouteApiRequirement)
+func newRouteRequirement(host, domain string, ui terminal.UI, routeRepo api.RouteRepository) (req *routeApiRequirement) {
+	req = new(routeApiRequirement)
 	req.host = host
 	req.domain = domain
 	req.ui = ui
@@ -29,7 +29,7 @@ func NewRouteRequirement(host, domain string, ui terminal.UI, routeRepo api.Rout
 	return
 }
 
-func (req *RouteApiRequirement) Execute() bool {
+func (req *routeApiRequirement) Execute() bool {
 	var apiResponse net.ApiResponse
 	req.route, apiResponse = req.routeRepo.FindByHostAndDomain(req.host, req.domain)
 
@@ -41,6 +41,6 @@ func (req *RouteApiRequirement) Execute() bool {
 	return true
 }
 
-func (req *RouteApiRequirement) GetRoute() cf.Route {
+func (req *routeApiRequirement) GetRoute() cf.Route {
 	return req.route
 }

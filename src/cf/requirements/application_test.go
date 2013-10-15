@@ -13,7 +13,7 @@ func TestApplicationReqExecute(t *testing.T) {
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	ui := new(testterm.FakeUI)
 
-	appReq := NewApplicationRequirement("foo", ui, appRepo)
+	appReq := newApplicationRequirement("foo", ui, appRepo)
 	success := appReq.Execute()
 
 	assert.True(t, success)
@@ -25,7 +25,7 @@ func TestApplicationReqExecuteWhenApplicationNotFound(t *testing.T) {
 	appRepo := &testapi.FakeApplicationRepository{FindByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	appReq := NewApplicationRequirement("foo", ui, appRepo)
+	appReq := newApplicationRequirement("foo", ui, appRepo)
 	success := appReq.Execute()
 
 	assert.False(t, success)

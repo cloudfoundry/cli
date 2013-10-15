@@ -17,13 +17,13 @@ func TestTargetedOrgRequirement(t *testing.T) {
 		},
 	}
 
-	req := NewTargetedOrgRequirement(ui, config)
+	req := newTargetedOrgRequirement(ui, config)
 	success := req.Execute()
 	assert.True(t, success)
 
 	config.Organization = cf.Organization{}
 
-	req = NewTargetedOrgRequirement(ui, config)
+	req = newTargetedOrgRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "FAILED")

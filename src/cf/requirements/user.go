@@ -12,22 +12,22 @@ type UserRequirement interface {
 	GetUser() cf.User
 }
 
-type UserApiRequirement struct {
+type userApiRequirement struct {
 	username string
 	ui       terminal.UI
 	userRepo api.UserRepository
 	user     cf.User
 }
 
-func NewUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *UserApiRequirement) {
-	req = new(UserApiRequirement)
+func newUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *userApiRequirement) {
+	req = new(userApiRequirement)
 	req.username = username
 	req.ui = ui
 	req.userRepo = userRepo
 	return
 }
 
-func (req *UserApiRequirement) Execute() (success bool) {
+func (req *userApiRequirement) Execute() (success bool) {
 	var apiResponse net.ApiResponse
 	req.user, apiResponse = req.userRepo.FindByUsername(req.username)
 
@@ -39,6 +39,6 @@ func (req *UserApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *UserApiRequirement) GetUser() cf.User {
+func (req *userApiRequirement) GetUser() cf.User {
 	return req.user
 }

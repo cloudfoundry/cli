@@ -12,22 +12,22 @@ type OrganizationRequirement interface {
 	GetOrganization() cf.Organization
 }
 
-type OrganizationApiRequirement struct {
+type organizationApiRequirement struct {
 	name    string
 	ui      terminal.UI
 	orgRepo api.OrganizationRepository
 	org     cf.Organization
 }
 
-func NewOrganizationRequirement(name string, ui terminal.UI, sR api.OrganizationRepository) (req *OrganizationApiRequirement) {
-	req = new(OrganizationApiRequirement)
+func newOrganizationRequirement(name string, ui terminal.UI, sR api.OrganizationRepository) (req *organizationApiRequirement) {
+	req = new(organizationApiRequirement)
 	req.name = name
 	req.ui = ui
 	req.orgRepo = sR
 	return
 }
 
-func (req *OrganizationApiRequirement) Execute() (success bool) {
+func (req *organizationApiRequirement) Execute() (success bool) {
 	var apiResponse net.ApiResponse
 	req.org, apiResponse = req.orgRepo.FindByName(req.name)
 
@@ -39,6 +39,6 @@ func (req *OrganizationApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *OrganizationApiRequirement) GetOrganization() cf.Organization {
+func (req *organizationApiRequirement) GetOrganization() cf.Organization {
 	return req.org
 }

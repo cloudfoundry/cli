@@ -13,7 +13,7 @@ func TestOrgReqExecute(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 	ui := new(testterm.FakeUI)
 
-	orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
+	orgReq := newOrganizationRequirement("foo", ui, orgRepo)
 	success := orgReq.Execute()
 
 	assert.True(t, success)
@@ -25,7 +25,7 @@ func TestOrgReqWhenOrgDoesNotExist(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
+	orgReq := newOrganizationRequirement("foo", ui, orgRepo)
 	success := orgReq.Execute()
 
 	assert.False(t, success)

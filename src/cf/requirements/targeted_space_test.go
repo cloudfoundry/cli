@@ -21,13 +21,13 @@ func TestSpaceRequirement(t *testing.T) {
 		},
 	}
 
-	req := NewTargetedSpaceRequirement(ui, config)
+	req := newTargetedSpaceRequirement(ui, config)
 	success := req.Execute()
 	assert.True(t, success)
 
 	config.Space = cf.Space{}
 
-	req = NewTargetedSpaceRequirement(ui, config)
+	req = newTargetedSpaceRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "FAILED")
@@ -36,7 +36,7 @@ func TestSpaceRequirement(t *testing.T) {
 	ui.ClearOutputs()
 	config.Organization = cf.Organization{}
 
-	req = NewTargetedSpaceRequirement(ui, config)
+	req = newTargetedSpaceRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "FAILED")

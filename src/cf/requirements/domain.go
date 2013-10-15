@@ -12,22 +12,22 @@ type DomainRequirement interface {
 	GetDomain() cf.Domain
 }
 
-type DomainApiRequirement struct {
+type domainApiRequirement struct {
 	name       string
 	ui         terminal.UI
 	domainRepo api.DomainRepository
 	domain     cf.Domain
 }
 
-func NewDomainRequirement(name string, ui terminal.UI, domainRepo api.DomainRepository) (req *DomainApiRequirement) {
-	req = new(DomainApiRequirement)
+func newDomainRequirement(name string, ui terminal.UI, domainRepo api.DomainRepository) (req *domainApiRequirement) {
+	req = new(domainApiRequirement)
 	req.name = name
 	req.ui = ui
 	req.domainRepo = domainRepo
 	return
 }
 
-func (req *DomainApiRequirement) Execute() bool {
+func (req *domainApiRequirement) Execute() bool {
 	var apiResponse net.ApiResponse
 	req.domain, apiResponse = req.domainRepo.FindByNameInCurrentSpace(req.name)
 
@@ -39,6 +39,6 @@ func (req *DomainApiRequirement) Execute() bool {
 	return true
 }
 
-func (req *DomainApiRequirement) GetDomain() cf.Domain {
+func (req *domainApiRequirement) GetDomain() cf.Domain {
 	return req.domain
 }

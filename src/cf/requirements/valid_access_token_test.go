@@ -13,14 +13,14 @@ func TestValidAccessRequirement(t *testing.T) {
 		FindByNameAuthErr: true,
 	}
 
-	req := NewValidAccessTokenRequirement(ui, appRepo)
+	req := newValidAccessTokenRequirement(ui, appRepo)
 	success := req.Execute()
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "Not logged in.")
 
 	appRepo.FindByNameAuthErr = false
 
-	req = NewValidAccessTokenRequirement(ui, appRepo)
+	req = newValidAccessTokenRequirement(ui, appRepo)
 	success = req.Execute()
 	assert.True(t, success)
 }

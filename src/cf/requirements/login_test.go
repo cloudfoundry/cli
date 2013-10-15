@@ -13,7 +13,7 @@ func TestLoginRequirement(t *testing.T) {
 		AccessToken: "foo bar token",
 	}
 
-	req := NewLoginRequirement(ui, config)
+	req := newLoginRequirement(ui, config)
 	success := req.Execute()
 	assert.True(t, success)
 
@@ -21,7 +21,7 @@ func TestLoginRequirement(t *testing.T) {
 		AccessToken: "",
 	}
 
-	req = NewLoginRequirement(ui, config)
+	req = newLoginRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "Not logged in.")

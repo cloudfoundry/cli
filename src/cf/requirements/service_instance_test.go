@@ -13,7 +13,7 @@ func TestServiceInstanceReqExecute(t *testing.T) {
 	repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
 	ui := new(testterm.FakeUI)
 
-	req := NewServiceInstanceRequirement("foo", ui, repo)
+	req := newServiceInstanceRequirement("foo", ui, repo)
 	success := req.Execute()
 
 	assert.True(t, success)
@@ -25,7 +25,7 @@ func TestServiceInstanceReqExecuteWhenServiceInstanceNotFound(t *testing.T) {
 	repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	req := NewServiceInstanceRequirement("foo", ui, repo)
+	req := newServiceInstanceRequirement("foo", ui, repo)
 	success := req.Execute()
 
 	assert.False(t, success)

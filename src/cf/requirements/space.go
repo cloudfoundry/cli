@@ -12,22 +12,22 @@ type SpaceRequirement interface {
 	GetSpace() cf.Space
 }
 
-type SpaceApiRequirement struct {
+type spaceApiRequirement struct {
 	name      string
 	ui        terminal.UI
 	spaceRepo api.SpaceRepository
 	space     cf.Space
 }
 
-func NewSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (req *SpaceApiRequirement) {
-	req = new(SpaceApiRequirement)
+func newSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (req *spaceApiRequirement) {
+	req = new(spaceApiRequirement)
 	req.name = name
 	req.ui = ui
 	req.spaceRepo = sR
 	return
 }
 
-func (req *SpaceApiRequirement) Execute() (success bool) {
+func (req *spaceApiRequirement) Execute() (success bool) {
 	var apiResponse net.ApiResponse
 	req.space, apiResponse = req.spaceRepo.FindByName(req.name)
 
@@ -39,6 +39,6 @@ func (req *SpaceApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *SpaceApiRequirement) GetSpace() cf.Space {
+func (req *spaceApiRequirement) GetSpace() cf.Space {
 	return req.space
 }

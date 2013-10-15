@@ -13,7 +13,7 @@ func TestDomainReqExecute(t *testing.T) {
 	domainRepo := &testapi.FakeDomainRepository{FindByNameDomain: domain}
 	ui := new(testterm.FakeUI)
 
-	domainReq := NewDomainRequirement("example.com", ui, domainRepo)
+	domainReq := newDomainRequirement("example.com", ui, domainRepo)
 	success := domainReq.Execute()
 
 	assert.True(t, success)
@@ -25,7 +25,7 @@ func TestDomainReqWhenDomainDoesNotExist(t *testing.T) {
 	domainRepo := &testapi.FakeDomainRepository{FindByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	domainReq := NewDomainRequirement("example.com", ui, domainRepo)
+	domainReq := newDomainRequirement("example.com", ui, domainRepo)
 	success := domainReq.Execute()
 
 	assert.False(t, success)
@@ -35,7 +35,7 @@ func TestDomainReqOnError(t *testing.T) {
 	domainRepo := &testapi.FakeDomainRepository{FindByNameErr: true}
 	ui := new(testterm.FakeUI)
 
-	domainReq := NewDomainRequirement("example.com", ui, domainRepo)
+	domainReq := newDomainRequirement("example.com", ui, domainRepo)
 	success := domainReq.Execute()
 
 	assert.False(t, success)

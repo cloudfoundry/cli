@@ -12,22 +12,22 @@ type ServiceInstanceRequirement interface {
 	GetServiceInstance() cf.ServiceInstance
 }
 
-type ServiceInstanceApiRequirement struct {
+type serviceInstanceApiRequirement struct {
 	name            string
 	ui              terminal.UI
 	serviceRepo     api.ServiceRepository
 	serviceInstance cf.ServiceInstance
 }
 
-func NewServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRepository) (req *ServiceInstanceApiRequirement) {
-	req = new(ServiceInstanceApiRequirement)
+func newServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRepository) (req *serviceInstanceApiRequirement) {
+	req = new(serviceInstanceApiRequirement)
 	req.name = name
 	req.ui = ui
 	req.serviceRepo = sR
 	return
 }
 
-func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
+func (req *serviceInstanceApiRequirement) Execute() (success bool) {
 	var apiResponse net.ApiResponse
 	req.serviceInstance, apiResponse = req.serviceRepo.FindInstanceByName(req.name)
 
@@ -39,6 +39,6 @@ func (req *ServiceInstanceApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *ServiceInstanceApiRequirement) GetServiceInstance() cf.ServiceInstance {
+func (req *serviceInstanceApiRequirement) GetServiceInstance() cf.ServiceInstance {
 	return req.serviceInstance
 }

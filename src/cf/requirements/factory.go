@@ -24,77 +24,77 @@ type Factory interface {
 	NewUserRequirement(username string) UserRequirement
 }
 
-type ApiRequirementFactory struct {
+type apiRequirementFactory struct {
 	ui          terminal.UI
 	config      *configuration.Configuration
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator api.RepositoryLocator) (factory ApiRequirementFactory) {
-	return ApiRequirementFactory{ui, config, repoLocator}
+func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
+	return apiRequirementFactory{ui, config, repoLocator}
 }
 
-func (f ApiRequirementFactory) NewApplicationRequirement(name string) ApplicationRequirement {
-	return NewApplicationRequirement(
+func (f apiRequirementFactory) NewApplicationRequirement(name string) ApplicationRequirement {
+	return newApplicationRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
 	)
 }
 
-func (f ApiRequirementFactory) NewServiceInstanceRequirement(name string) ServiceInstanceRequirement {
-	return NewServiceInstanceRequirement(
+func (f apiRequirementFactory) NewServiceInstanceRequirement(name string) ServiceInstanceRequirement {
+	return newServiceInstanceRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetServiceRepository(),
 	)
 }
 
-func (f ApiRequirementFactory) NewLoginRequirement() Requirement {
-	return NewLoginRequirement(
+func (f apiRequirementFactory) NewLoginRequirement() Requirement {
+	return newLoginRequirement(
 		f.ui,
 		f.config,
 	)
 }
-func (f ApiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
-	return NewValidAccessTokenRequirement(
+func (f apiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
+	return newValidAccessTokenRequirement(
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
 	)
 }
 
-func (f ApiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement {
-	return NewSpaceRequirement(
+func (f apiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement {
+	return newSpaceRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetSpaceRepository(),
 	)
 }
 
-func (f ApiRequirementFactory) NewTargetedSpaceRequirement() Requirement {
-	return NewTargetedSpaceRequirement(
+func (f apiRequirementFactory) NewTargetedSpaceRequirement() Requirement {
+	return newTargetedSpaceRequirement(
 		f.ui,
 		f.config,
 	)
 }
 
-func (f ApiRequirementFactory) NewTargetedOrgRequirement() TargetedOrgRequirement {
-	return NewTargetedOrgRequirement(
+func (f apiRequirementFactory) NewTargetedOrgRequirement() TargetedOrgRequirement {
+	return newTargetedOrgRequirement(
 		f.ui,
 		f.config,
 	)
 }
 
-func (f ApiRequirementFactory) NewOrganizationRequirement(name string) OrganizationRequirement {
-	return NewOrganizationRequirement(
+func (f apiRequirementFactory) NewOrganizationRequirement(name string) OrganizationRequirement {
+	return newOrganizationRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetOrganizationRepository(),
 	)
 }
 
-func (f ApiRequirementFactory) NewRouteRequirement(host, domain string) RouteRequirement {
-	return NewRouteRequirement(
+func (f apiRequirementFactory) NewRouteRequirement(host, domain string) RouteRequirement {
+	return newRouteRequirement(
 		host,
 		domain,
 		f.ui,
@@ -102,16 +102,16 @@ func (f ApiRequirementFactory) NewRouteRequirement(host, domain string) RouteReq
 	)
 }
 
-func (f ApiRequirementFactory) NewDomainRequirement(name string) DomainRequirement {
-	return NewDomainRequirement(
+func (f apiRequirementFactory) NewDomainRequirement(name string) DomainRequirement {
+	return newDomainRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetDomainRepository(),
 	)
 }
 
-func (f ApiRequirementFactory) NewUserRequirement(username string) UserRequirement {
-	return NewUserRequirement(
+func (f apiRequirementFactory) NewUserRequirement(username string) UserRequirement {
+	return newUserRequirement(
 		username,
 		f.ui,
 		f.repoLocator.GetUserRepository(),
