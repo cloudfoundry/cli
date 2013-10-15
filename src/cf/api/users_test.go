@@ -239,6 +239,59 @@ func testSetOrUnsetOrgRoleWithValidRole(
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func testSetOrUnsetSpaceRoleWithValidRole(
+	t *testing.T,
+	setOrUnset func(UserRepository, cf.User, cf.Space) net.ApiResponse,
+	verb string,
+	path string) {
+
+	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
+		verb, path, nil, testapi.TestResponse{Status: http.StatusOK},
+	)
+
+	cc, _, repo := createUsersRepo(ccEndpoint, nil)
+	defer cc.Close()
+
+	user := cf.User{Guid: "my-user-guid"}
+	space := cf.Space{Guid: "my-space-guid"}
+	apiResponse := setOrUnset(repo, user, space)
+
+	assert.True(t, ccEndpointStatus.Called())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func TestSetSpaceRoleToSpaceManager(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, space cf.Space) net.ApiResponse {
+		return repo.SetSpaceRole(user, space, "SpaceManager")
+	}
+
+	testSetOrUnsetSpaceRoleWithValidRole(t, setOrUnset, "PUT", "/v2/spaces/my-space-guid/managers/my-user-guid")
+}
+
+func TestSetSpaceRoleToSpaceDeveloper(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, space cf.Space) net.ApiResponse {
+		return repo.SetSpaceRole(user, space, "SpaceDeveloper")
+	}
+
+	testSetOrUnsetSpaceRoleWithValidRole(t, setOrUnset, "PUT", "/v2/spaces/my-space-guid/developers/my-user-guid")
+}
+
+func TestSetSpaceRoleToSpaceAuditor(t *testing.T) {
+	setOrUnset := func(repo UserRepository, user cf.User, space cf.Space) net.ApiResponse {
+		return repo.SetSpaceRole(user, space, "SpaceAuditor")
+	}
+
+	testSetOrUnsetSpaceRoleWithValidRole(t, setOrUnset, "PUT", "/v2/spaces/my-space-guid/auditors/my-user-guid")
+}
+
+func TestSetSpaceRoleWithInvalidRole(t *testing.T) {
+	_, _, repo := createUsersRepo(nil, nil)
+	apiResponse := repo.SetSpaceRole(cf.User{}, cf.Space{}, "foo")
+
+	assert.False(t, apiResponse.IsSuccessful())
+	assert.Contains(t, apiResponse.Message, "Invalid Role")
+}
+
 func createUsersRepo(ccEndpoint http.HandlerFunc, uaaEndpoint http.HandlerFunc) (cc *httptest.Server, uaa *httptest.Server, repo UserRepository) {
 	ccTarget := ""
 	uaaTarget := ""

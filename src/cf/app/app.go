@@ -503,6 +503,18 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				cmdRunner.RunCmdByName("set-quota", c)
 			},
 		},
+		{
+			Name:        "set-space-role",
+			Description: "Assign a space role to a user",
+			Usage: fmt.Sprintf("%s set-space-role USERNAME SPACE ROLE\n\n", cf.Name) +
+				"ROLES:\n" +
+				"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
+				"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
+				"   SpaceAuditor - View logs, reports, and settings on this space\n",
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("set-space-role", c)
+			},
+		},
 		//		{
 		//			Name:        "share-domain",
 		//			Description: "Share a domain with all orgs",

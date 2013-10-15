@@ -14,6 +14,7 @@ type UserRepository interface {
 	Delete(user cf.User) (apiResponse net.ApiResponse)
 	SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
 	UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
+	SetSpaceRole(user cf.User, org cf.Space, role string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerUserRepository struct {
@@ -167,6 +168,38 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb string, user cf
 	}
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s/%s", repo.config.Target, org.Guid, rolePath, user.Guid)
+
+	request, apiResponse := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.ccGateway.PerformRequest(request)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+	return
+}
+
+func (repo CloudControllerUserRepository) SetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
+	return repo.setOrUnsetSpaceRole("PUT", user, space, role)
+}
+
+func (repo CloudControllerUserRepository) setOrUnsetSpaceRole(verb string, user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
+	roleToPathMap := map[string]string{
+		"SpaceManager":   "managers",
+		"SpaceDeveloper": "developers",
+		"SpaceAuditor":   "auditors",
+	}
+
+	rolePath, found := roleToPathMap[role]
+
+	if !found {
+		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/spaces/%s/%s/%s", repo.config.Target, space.Guid, rolePath, user.Guid)
 
 	request, apiResponse := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {

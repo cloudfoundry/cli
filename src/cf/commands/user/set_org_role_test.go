@@ -68,7 +68,7 @@ func TestSetOrgRole(t *testing.T) {
 
 func callSetOrgRole(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-user", args)
+	ctxt := testcmd.NewContext("set-org-role", args)
 	cmd := NewSetOrgRole(ui, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return

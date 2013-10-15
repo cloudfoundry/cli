@@ -83,6 +83,7 @@ func TestCommands(t *testing.T) {
 		"set-env",
 		"set-org-role",
 		"set-quota",
+		"set-space-role",
 		//		"share-domain",
 		"space",
 		"spaces",
