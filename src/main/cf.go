@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	termUI := new(terminal.TerminalUI)
+	termUI := terminal.NewUI()
 	assignTemplates()
 	configRepo := configuration.NewConfigurationDiskRepository()
 	config := loadConfig(termUI, configRepo)

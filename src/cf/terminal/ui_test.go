@@ -56,11 +56,11 @@ func TestConfirmNo(t *testing.T) {
 
 func simulateStdin(input string, block func()) {
 	defer func() {
-		Stdin = os.Stdin
+		stdin = os.Stdin
 	}()
 
 	stdinReader, stdinWriter := io.Pipe()
-	Stdin = stdinReader
+	stdin = stdinReader
 
 	go func() {
 		stdinWriter.Write([]byte(input))

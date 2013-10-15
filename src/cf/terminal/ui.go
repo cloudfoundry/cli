@@ -36,7 +36,11 @@ type UI interface {
 type terminalUI struct {
 }
 
-var Stdin io.Reader = os.Stdin
+var stdin io.Reader = os.Stdin
+
+func NewUI() UI {
+	return terminalUI{}
+}
 
 func (c terminalUI) Say(message string, args ...interface{}) {
 	fmt.Printf(message+"\n", args...)
@@ -61,7 +65,7 @@ func (c terminalUI) Confirm(message string, args ...interface{}) bool {
 func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Println("")
 	fmt.Printf(prompt+" ", args...)
-	fmt.Fscanln(Stdin, &answer)
+	fmt.Fscanln(stdin, &answer)
 	return
 }
 
