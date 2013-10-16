@@ -542,7 +542,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "space-users",
 			Description: "Show space users by role",
-			Usage:       fmt.Sprintf("%s space-users SPACE", cf.Name),
+			Usage:       fmt.Sprintf("%s space-users ORG SPACE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("space-users", c)
 			},
