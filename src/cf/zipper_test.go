@@ -82,7 +82,7 @@ func TestZipWithInvalidFile(t *testing.T) {
 	_, err := zipper.Zip("/a/bogus/directory")
 
 	assert.Error(t, err)
-	assert.Equal(t, err.Error(), "open /a/bogus/directory: no such file or directory")
+	assert.Contains(t, err.Error(), "open /a/bogus/directory")
 }
 
 func TestZipWithEmptyDir(t *testing.T) {
