@@ -10,15 +10,15 @@ import (
 )
 
 type UpdateUserProvidedService struct {
-	ui                 terminal.UI
-	serviceRepo        api.ServiceRepository
-	serviceInstanceReq requirements.ServiceInstanceRequirement
+	ui                              terminal.UI
+	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
+	serviceInstanceReq              requirements.ServiceInstanceRequirement
 }
 
-func NewUpdateUserProvidedService(ui terminal.UI, sR api.ServiceRepository) (cmd *UpdateUserProvidedService) {
+func NewUpdateUserProvidedService(ui terminal.UI, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd *UpdateUserProvidedService) {
 	cmd = new(UpdateUserProvidedService)
 	cmd.ui = ui
-	cmd.serviceRepo = sR
+	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
 	return
 }
 
@@ -57,7 +57,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Updating user provided service %s...", serviceInstance.Name)
 
-	apiResponse := cmd.serviceRepo.UpdateUserProvidedServiceInstance(serviceInstance, paramsMap)
+	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance, paramsMap)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

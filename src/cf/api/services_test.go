@@ -196,48 +196,6 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 	assert.Equal(t, identicalAlreadyExists, false)
 }
 
-func TestCreateUserProvidedServiceInstance(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/user_provided_service_instances",
-		testapi.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
-
-	ts, repo := createServiceRepo(endpoint)
-	defer ts.Close()
-
-	params := map[string]string{
-		"host":     "example.com",
-		"user":     "me",
-		"password": "secret",
-	}
-	apiResponse := repo.CreateUserProvidedServiceInstance("my-custom-service", params)
-	assert.True(t, status.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func TestUpdateUserProvidedServiceInstance(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/user_provided_service_instances/my-instance-guid",
-		testapi.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
-
-	ts, repo := createServiceRepo(endpoint)
-	defer ts.Close()
-
-	params := map[string]string{
-		"host":     "example.com",
-		"user":     "me",
-		"password": "secret",
-	}
-	apiResponse := repo.UpdateUserProvidedServiceInstance(cf.ServiceInstance{Guid: "my-instance-guid"}, params)
-	assert.True(t, status.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
 var singleServiceInstanceResponse = testapi.TestResponse{Status: http.StatusOK, Body: `{
   "resources": [
     {

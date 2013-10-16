@@ -37,7 +37,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["create-service-broker"] = servicebroker.NewCreateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["create-space"] = space.NewCreateSpace(ui, repoLocator.GetSpaceRepository())
 	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, repoLocator.GetUserRepository())
-	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, repoLocator.GetUserProvidedServiceInstanceRepository())
 	factory.cmdsByName["delete"] = application.NewDeleteApp(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, repoLocator.GetOrganizationRepository(), configRepo)
@@ -90,7 +90,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
-	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, repoLocator.GetServiceRepository())
+	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, repoLocator.GetUserProvidedServiceInstanceRepository())
 	factory.cmdsByName["users"] = user.NewListUsers(ui, repoLocator.GetUserRepository())
 
 	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())

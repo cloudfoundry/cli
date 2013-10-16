@@ -1,11 +1,9 @@
 package api
 
 import (
-	"bytes"
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -65,8 +63,6 @@ type ServiceBindingEntity struct {
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
 	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
-	CreateUserProvidedServiceInstance(name string, params map[string]string) (apiResponse net.ApiResponse)
-	UpdateUserProvidedServiceInstance(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
 	BindService(instance cf.ServiceInstance, app cf.Application) (apiResponse net.ApiResponse)
 	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse)
@@ -149,54 +145,6 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 		}
 	}
 
-	return
-}
-
-func (repo CloudControllerServiceRepository) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.Target)
-
-	type RequestBody struct {
-		Name        string            `json:"name"`
-		Credentials map[string]string `json:"credentials"`
-		SpaceGuid   string            `json:"space_guid"`
-	}
-
-	reqBody := RequestBody{name, params, repo.config.Space.Guid}
-	jsonBytes, err := json.Marshal(reqBody)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
-		return
-	}
-
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
-}
-
-func (repo CloudControllerServiceRepository) UpdateUserProvidedServiceInstance(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstance.Guid)
-
-	type RequestBody struct {
-		Credentials map[string]string `json:"credentials"`
-	}
-
-	reqBody := RequestBody{params}
-	jsonBytes, err := json.Marshal(reqBody)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
-		return
-	}
-
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 

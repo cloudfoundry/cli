@@ -9,24 +9,25 @@ import (
 type RepositoryLocator struct {
 	authRepo AuthenticationRepository
 
-	endpointRepo       RemoteEndpointRepository
-	organizationRepo   CloudControllerOrganizationRepository
-	spaceRepo          CloudControllerSpaceRepository
-	appRepo            CloudControllerApplicationRepository
-	appBitsRepo        CloudControllerApplicationBitsRepository
-	appSummaryRepo     CloudControllerAppSummaryRepository
-	appEventsRepo      CloudControllerAppEventsRepository
-	appFilesRepo       CloudControllerAppFilesRepository
-	domainRepo         CloudControllerDomainRepository
-	routeRepo          CloudControllerRouteRepository
-	stackRepo          CloudControllerStackRepository
-	serviceRepo        CloudControllerServiceRepository
-	serviceSummaryRepo CloudControllerServiceSummaryRepository
-	userRepo           CloudControllerUserRepository
-	passwordRepo       CloudControllerPasswordRepository
-	logsRepo           LoggregatorLogsRepository
-	authTokenRepo      CloudControllerServiceAuthTokenRepository
-	serviceBrokerRepo  CloudControllerServiceBrokerRepository
+	endpointRepo                    RemoteEndpointRepository
+	organizationRepo                CloudControllerOrganizationRepository
+	spaceRepo                       CloudControllerSpaceRepository
+	appRepo                         CloudControllerApplicationRepository
+	appBitsRepo                     CloudControllerApplicationBitsRepository
+	appSummaryRepo                  CloudControllerAppSummaryRepository
+	appEventsRepo                   CloudControllerAppEventsRepository
+	appFilesRepo                    CloudControllerAppFilesRepository
+	domainRepo                      CloudControllerDomainRepository
+	routeRepo                       CloudControllerRouteRepository
+	stackRepo                       CloudControllerStackRepository
+	serviceRepo                     CloudControllerServiceRepository
+	serviceSummaryRepo              CloudControllerServiceSummaryRepository
+	userRepo                        CloudControllerUserRepository
+	passwordRepo                    CloudControllerPasswordRepository
+	logsRepo                        LoggregatorLogsRepository
+	authTokenRepo                   CloudControllerServiceAuthTokenRepository
+	serviceBrokerRepo               CloudControllerServiceBrokerRepository
+	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
 }
 
 func NewRepositoryLocator(config *configuration.Configuration, configRepo configuration.ConfigurationRepository, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -58,6 +59,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.endpointRepo)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.serviceBrokerRepo = NewCloudControllerServiceBrokerRepository(config, cloudControllerGateway)
+	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
 
 	return
 }
@@ -136,4 +138,8 @@ func (locator RepositoryLocator) GetServiceAuthTokenRepository() ServiceAuthToke
 
 func (locator RepositoryLocator) GetServiceBrokerRepository() ServiceBrokerRepository {
 	return locator.serviceBrokerRepo
+}
+
+func (locator RepositoryLocator) GetUserProvidedServiceInstanceRepository() UserProvidedServiceInstanceRepository {
+	return locator.userProvidedServiceInstanceRepo
 }

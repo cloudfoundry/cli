@@ -11,13 +11,13 @@ import (
 )
 
 type CreateUserProvidedService struct {
-	ui          terminal.UI
-	serviceRepo api.ServiceRepository
+	ui                              terminal.UI
+	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 }
 
-func NewCreateUserProvidedService(ui terminal.UI, sR api.ServiceRepository) (cmd CreateUserProvidedService) {
+func NewCreateUserProvidedService(ui terminal.UI, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
 	cmd.ui = ui
-	cmd.serviceRepo = sR
+	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
 	return
 }
 
@@ -45,7 +45,7 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating user provided service...")
 
-	apiResponse := cmd.serviceRepo.CreateUserProvidedServiceInstance(name, paramsMap)
+	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, paramsMap)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

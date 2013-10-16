@@ -12,19 +12,19 @@ import (
 )
 
 func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
-	serviceRepo := &testapi.FakeServiceRepo{}
+	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service", `"foo, bar, baz"`},
 		[]string{"foo value", "bar value", "baz value"},
-		serviceRepo,
+		userProvidedServiceInstanceRepo,
 	)
 
 	assert.Contains(t, fakeUI.Prompts[0], "foo")
 	assert.Contains(t, fakeUI.Prompts[1], "bar")
 	assert.Contains(t, fakeUI.Prompts[2], "baz")
 
-	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceName, "my-custom-service")
-	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceParameters, map[string]string{
+	assert.Equal(t, userProvidedServiceInstanceRepo.CreateName, "my-custom-service")
+	assert.Equal(t, userProvidedServiceInstanceRepo.CreateParameters, map[string]string{
 		"foo": "foo value",
 		"bar": "bar value",
 		"baz": "baz value",
@@ -35,17 +35,17 @@ func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceWithJson(t *testing.T) {
-	serviceRepo := &testapi.FakeServiceRepo{}
+	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`},
 		[]string{},
-		serviceRepo,
+		userProvidedServiceInstanceRepo,
 	)
 
 	assert.Empty(t, fakeUI.Prompts)
 
-	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceName, "my-custom-service")
-	assert.Equal(t, serviceRepo.CreateUserProvidedServiceInstanceParameters, map[string]string{
+	assert.Equal(t, userProvidedServiceInstanceRepo.CreateName, "my-custom-service")
+	assert.Equal(t, userProvidedServiceInstanceRepo.CreateParameters, map[string]string{
 		"foo": "foo value",
 		"bar": "bar value",
 		"baz": "baz value",
@@ -56,20 +56,20 @@ func TestCreateUserProvidedServiceWithJson(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
-	serviceRepo := &testapi.FakeServiceRepo{}
+	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(
 		[]string{"my-custom-service"},
 		[]string{},
-		serviceRepo,
+		userProvidedServiceInstanceRepo,
 	)
 
 	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
 }
 
-func callCreateUserProvidedService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+func callCreateUserProvidedService(args []string, inputs []string, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{Inputs: inputs}
 	ctxt := testcmd.NewContext("create-user-provided-service", args)
-	cmd := NewCreateUserProvidedService(fakeUI, serviceRepo)
+	cmd := NewCreateUserProvidedService(fakeUI, userProvidedServiceInstanceRepo)
 	reqFactory := &testreq.FakeReqFactory{}
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
