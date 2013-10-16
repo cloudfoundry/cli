@@ -169,3 +169,9 @@ type User struct {
 	Password string
 	IsAdmin  bool
 }
+
+type Buildpack struct {
+	Guid     string `json:"guid,omitempty"`
+	Name     string `json:"name"`
+	Priority int    `json:"priority,omitempty"`
+}

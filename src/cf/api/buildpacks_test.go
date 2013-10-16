@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -45,6 +46,39 @@ var multipleBuildpacksEndpoint, multipleBuildpacksEndpointStatus = testapi.Creat
 	nil,
 	multipleBuildpacksResponse,
 )
+
+var createBuildpackResponse = `
+{
+    "metadata": {
+        "guid": "my-cool-buildpack-guid"
+    },
+    "entity": {
+        "name": "my-cool-buildpack",
+		"priority":10
+    }
+}`
+
+var createBuildpackResponseWithPriority = `
+{
+    "metadata": {
+        "guid": "my-cool-buildpack-guid"
+    },
+    "entity": {
+        "name": "my-cool-buildpack",
+		"priority":999
+    }
+}`
+
+var updateBuildpackResponseWithPriority = `
+{
+    "metadata": {
+        "guid": "my-cool-buildpack-guid"
+    },
+    "entity": {
+        "name": "my-cool-buildpack",
+		"priority":555
+    }
+}`
 
 func TestBuildpacksFindAll(t *testing.T) {
 	multipleBuildpacksEndpointStatus.Reset()
@@ -102,6 +136,110 @@ func TestBuildpacksFindByName(t *testing.T) {
 
 	buildpack, apiResponse = repo.FindByName("buildpack1")
 	assert.True(t, apiResponse.IsNotSuccessful())
+}
+
+func TestBuildpackCreateRejectsInproperNames(t *testing.T) {
+	endpoint := func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintln(writer, "{}")
+	}
+
+	ts, repo := createBuildpackRepo(endpoint)
+	defer ts.Close()
+
+	createdBuildpack, apiResponse := repo.Create(cf.Buildpack{Name: "name with space"})
+	assert.Equal(t, createdBuildpack, cf.Buildpack{})
+	assert.Contains(t, apiResponse.Message, "Buildpack name is invalid")
+
+	_, apiResponse = repo.Create(cf.Buildpack{Name: "name-with-inv@lid-chars!"})
+	assert.True(t, apiResponse.IsNotSuccessful())
+
+	_, apiResponse = repo.Create(cf.Buildpack{Name: "Valid-Name"})
+	assert.True(t, apiResponse.IsSuccessful())
+
+	_, apiResponse = repo.Create(cf.Buildpack{Name: "name_with_numbers_2"})
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func TestCreateBuildpack(t *testing.T) {
+	endpoint, status := testapi.CreateCheckableEndpoint(
+		"POST",
+		"/v2/buildpacks",
+		testapi.RequestBodyMatcher(`{"name":"my-cool-buildpack"}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: createBuildpackResponse},
+	)
+
+	ts, repo := createBuildpackRepo(endpoint)
+	defer ts.Close()
+
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack"}
+
+	created, apiResponse := repo.Create(buildpack)
+	assert.True(t, status.Called())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.NotNil(t, created.Guid)
+	assert.Equal(t, buildpack.Name, created.Name)
+	assert.NotEqual(t, created.Priority, 0)
+}
+
+func TestCreateBuildpackWithPriority(t *testing.T) {
+	endpoint, status := testapi.CreateCheckableEndpoint(
+		"POST",
+		"/v2/buildpacks",
+		testapi.RequestBodyMatcher(`{"name":"my-cool-buildpack","priority":999}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: createBuildpackResponseWithPriority},
+	)
+
+	ts, repo := createBuildpackRepo(endpoint)
+	defer ts.Close()
+
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Priority: 999}
+
+	created, apiResponse := repo.Create(buildpack)
+	assert.True(t, status.Called())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.NotNil(t, created.Guid)
+	assert.Equal(t, buildpack.Name, created.Name)
+	assert.Equal(t, buildpack.Priority, 999)
+}
+
+func TestDeleteBuildpack(t *testing.T) {
+	endpoint, status := testapi.CreateCheckableEndpoint(
+		"DELETE",
+		"/v2/buildpacks/my-cool-buildpack-guid",
+		nil,
+		testapi.TestResponse{Status: http.StatusNoContent, Body: ""},
+	)
+
+	ts, repo := createBuildpackRepo(endpoint)
+	defer ts.Close()
+
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
+
+	apiResponse := repo.Delete(buildpack)
+	assert.True(t, status.Called())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestUpdateBuildpack(t *testing.T) {
+	endpoint, status := testapi.CreateCheckableEndpoint(
+		"PUT",
+		"/v2/buildpacks/my-cool-buildpack-guid",
+		testapi.RequestBodyMatcher(`{"name":"my-cool-buildpack","priority":555}`),
+		testapi.TestResponse{Status: http.StatusCreated, Body: updateBuildpackResponseWithPriority},
+	)
+
+	ts, repo := createBuildpackRepo(endpoint)
+	defer ts.Close()
+
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid", Priority: 555}
+
+	updated, apiResponse := repo.Update(buildpack)
+	assert.True(t, status.Called())
+	assert.False(t, apiResponse.IsNotSuccessful())
+
+	assert.Equal(t, buildpack, updated)
 }
 
 func createBuildpackRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo BuildpackRepository) {
