@@ -6,12 +6,15 @@ import (
 )
 
 type FakeUserRepository struct {
-	CreateUserUser cf.User
-	CreateUserExists bool
-
 	FindByUsernameUsername string
 	FindByUsernameUser cf.User
 	FindByUsernameNotFound bool
+
+	FindAllInOrgByRoleOrganization cf.Organization
+	FindAllInOrgByRoleUsersByRole map[string][]cf.User
+
+	CreateUserUser cf.User
+	CreateUserExists bool
 
 	DeleteUser cf.User
 
@@ -40,6 +43,12 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, a
 		apiResponse = net.NewNotFoundApiResponse("User not found")
 	}
 
+	return
+}
+
+func (repo *FakeUserRepository) FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
+	repo.FindAllInOrgByRoleOrganization = org
+	usersByRole = repo.FindAllInOrgByRoleUsersByRole
 	return
 }
 

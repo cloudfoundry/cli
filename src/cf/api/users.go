@@ -11,6 +11,7 @@ import (
 
 type UserRepository interface {
 	FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse)
+	FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
 	Create(user cf.User) (apiResponse net.ApiResponse)
 	Delete(user cf.User) (apiResponse net.ApiResponse)
 	SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
@@ -43,6 +44,73 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 	usernameFilter := url.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
 	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
 
+	users, apiResponse := repo.findUsersWithUAAPath(path)
+	if len(users) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("User %s not found", username)
+		return
+	}
+
+	user = users[0]
+	return
+}
+
+func (repo CloudControllerUserRepository) FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
+	managers, apiResponse := repo.findAllInOrgWithRole(org, "managers")
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	billingManagers, apiResponse := repo.findAllInOrgWithRole(org, "billing_managers")
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	auditors, apiResponse := repo.findAllInOrgWithRole(org, "auditors")
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	usersByRole = make(map[string][]cf.User)
+	usersByRole["ORG MANAGER"] = managers
+	usersByRole["BILLING MANAGER"] = billingManagers
+	usersByRole["ORG AUDITOR"] = auditors
+	return
+}
+
+func (repo CloudControllerUserRepository) findAllInOrgWithRole(org cf.Organization, role string) (users []cf.User, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.Target, org.Guid, role)
+	request, apiResponse := repo.ccGateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	resources := new(PaginatedResources)
+	_, apiResponse = repo.ccGateway.PerformRequestForJSONResponse(request, resources)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if len(resources.Resources) == 0 {
+		return
+	}
+
+	guidFilters := []string{}
+	for _, r := range resources.Resources {
+		guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, r.Metadata.Guid))
+	}
+	filter := strings.Join(guidFilters, " or ")
+	path = fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, url.QueryEscape(filter))
+
+	users, apiResponse = repo.findUsersWithUAAPath(path)
+	return
+}
+
+func (repo CloudControllerUserRepository) findUsersWithUAAPath(path string) (users []cf.User, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.uaaGateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -50,27 +118,21 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 
 	type uaaUserResource struct {
 		Id       string
-		UserName string
+		Username string
 	}
 	type uaaUserResources struct {
 		Resources []uaaUserResource
 	}
 
-	findUserResponse := uaaUserResources{}
-	_, apiResponse = repo.uaaGateway.PerformRequestForJSONResponse(request, &findUserResponse)
+	uaaResponse := uaaUserResources{}
+	_, apiResponse = repo.uaaGateway.PerformRequestForJSONResponse(request, &uaaResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(findUserResponse.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("User %s not found", username)
-		return
+	for _, resource := range uaaResponse.Resources {
+		users = append(users, cf.User{Guid: resource.Id, Username: resource.Username})
 	}
-
-	userResource := findUserResponse.Resources[0]
-	user.Username = userResource.UserName
-	user.Guid = userResource.Id
-
 	return
 }
 

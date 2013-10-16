@@ -63,6 +63,7 @@ func TestCommands(t *testing.T) {
 		"map-route",
 		"marketplace",
 		"org",
+		"org-users",
 		"orgs",
 		"passwd",
 		"push",

@@ -4,12 +4,100 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	testapi "testhelpers/api"
 	"testing"
 )
+
+func TestFindAllInOrgByRole(t *testing.T) {
+	managersResp := `{"resources": [ {"metadata": {"guid": "user-1-guid"}, "entity": {}} ] }`
+	billingManagersResp := `{"resources": [
+	  {"metadata": {"guid": "user-2-guid"}, "entity": {}},
+	  {"metadata": {"guid": "user-3-guid"}, "entity": {}}
+	]}`
+	auditorsResp := `{"resources": [] }`
+
+	ccOrgManagersEndpoint, ccOrgManagersEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", "/v2/organizations/my-org-guid/managers", nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: managersResp},
+	)
+	ccBillingManagersEndpoint, ccBillingManagersEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", "/v2/organizations/my-org-guid/billing_managers", nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: billingManagersResp},
+	)
+	ccOrgAuditorsEndpoint, ccOrgAuditorsEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", "/v2/organizations/my-org-guid/auditors", nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: auditorsResp},
+	)
+
+	ccEndpoints := func(res http.ResponseWriter, req *http.Request) {
+		switch {
+		case strings.Contains(req.RequestURI, "billing"):
+			ccBillingManagersEndpoint(res, req)
+		case strings.Contains(req.RequestURI, "managers"):
+			ccOrgManagersEndpoint(res, req)
+		case strings.Contains(req.RequestURI, "auditors"):
+			ccOrgAuditorsEndpoint(res, req)
+		}
+	}
+
+	filter := url.QueryEscape(`Id eq "user-1-guid"`)
+	uaaManagersEndpoint, uaaManagersEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", fmt.Sprintf("/Users?attributes=id,userName&filter=%s", filter), nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [
+          { "id": "user-1-guid", "userName": "Super user 1" }
+        ]}`},
+	)
+
+	filter = url.QueryEscape(`Id eq "user-2-guid" or Id eq "user-3-guid"`)
+	uaaBillingManagersEndpoint, uaaBillingManagersEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", fmt.Sprintf("/Users?attributes=id,userName&filter=%s", filter), nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [
+          { "id": "user-2-guid", "userName": "Super user 2" },
+          { "id": "user-3-guid", "userName": "Super user 3" }
+        ]}`},
+	)
+
+	uaaEndpoints := func(res http.ResponseWriter, req *http.Request) {
+		switch {
+		case strings.Contains(req.URL.RawQuery, "user-1-guid"):
+			uaaManagersEndpoint(res, req)
+		case strings.Contains(req.URL.RawQuery, "user-2-guid"):
+			uaaBillingManagersEndpoint(res, req)
+		}
+	}
+
+	cc, uaa, repo := createUsersRepo(ccEndpoints, uaaEndpoints)
+	defer cc.Close()
+	defer uaa.Close()
+
+	usersByRole, apiResponse := repo.FindAllInOrgByRole(cf.Organization{Guid: "my-org-guid"})
+	assert.True(t, ccOrgManagersEndpointStatus.Called())
+	assert.True(t, ccBillingManagersEndpointStatus.Called())
+	assert.True(t, ccOrgAuditorsEndpointStatus.Called())
+	assert.True(t, uaaManagersEndpointStatus.Called())
+	assert.True(t, uaaBillingManagersEndpointStatus.Called())
+
+	assert.True(t, apiResponse.IsSuccessful())
+
+	expectedUser1 := cf.User{Guid: "user-1-guid", Username: "Super user 1"}
+	expectedUser2 := cf.User{Guid: "user-2-guid", Username: "Super user 2"}
+	expectedUser3 := cf.User{Guid: "user-3-guid", Username: "Super user 3"}
+
+	assert.Equal(t, 1, len(usersByRole["ORG MANAGER"]))
+	assert.Equal(t, expectedUser1, usersByRole["ORG MANAGER"][0])
+
+	assert.Equal(t, 2, len(usersByRole["BILLING MANAGER"]))
+	assert.Equal(t, expectedUser2, usersByRole["BILLING MANAGER"][0])
+	assert.Equal(t, expectedUser3, usersByRole["BILLING MANAGER"][1])
+
+	assert.Equal(t, 0, len(usersByRole["ORG AUDITOR"]))
+}
 
 func TestFindByUsername(t *testing.T) {
 	usersResponse := `{

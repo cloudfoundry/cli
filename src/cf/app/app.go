@@ -308,6 +308,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "org-users",
+			Description: "Show org users by role",
+			Usage:       fmt.Sprintf("%s org-users ORG", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("org-users", c)
+			},
+		},
+		{
 			Name:        "orgs",
 			ShortName:   "o",
 			Description: "List all orgs",
