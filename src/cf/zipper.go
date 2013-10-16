@@ -44,9 +44,8 @@ func readZipFile(file string) (zipBuffer *bytes.Buffer, err error) {
 
 func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 	zipBuffer = new(bytes.Buffer)
-
 	isEmpty, err := IsDirEmpty(dir)
-	if isEmpty {
+	if isEmpty || err != nil {
 		return
 	}
 
