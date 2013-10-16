@@ -673,6 +673,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				cmdRunner.RunCmdByName("update-user-provided-service", c)
 			},
 		},
+		{
+			Name:        "users",
+			Description: "Show all users",
+			Usage:       fmt.Sprintf("%s users", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("users", c)
+			},
+		},
 	}
 	return
 }

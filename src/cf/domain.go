@@ -173,4 +173,5 @@ type User struct {
 	Guid     string
 	Username string
 	Password string
+	IsAdmin  bool
 }

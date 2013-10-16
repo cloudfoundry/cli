@@ -101,6 +101,7 @@ func TestCommands(t *testing.T) {
 		"unset-space-role",
 		"update-service-broker",
 		"update-user-provided-service",
+		"users",
 	}
 
 	for _, cmdName := range availableCmds {

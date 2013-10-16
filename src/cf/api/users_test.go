@@ -14,6 +14,43 @@ import (
 	"testing"
 )
 
+func TestUserRepoFindAll(t *testing.T) {
+	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", "/v2/users", nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+		{"metadata": {"guid": "user-2-guid"}, "entity": {"admin":true}},
+		{"metadata": {"guid": "user-3-guid"}, "entity": {"admin":false}}
+	]}`})
+
+	uaaResp := `{ "resources": [
+          { "id": "user-2-guid", "userName": "Super user 2" },
+          { "id": "user-3-guid", "userName": "Super user 3" }
+        ]}`
+	filter := `Id eq "user-2-guid" or Id eq "user-3-guid"`
+
+	uaaEndpoint, uaaEndpointStatus := testapi.CreateCheckableEndpoint(
+		"GET", fmt.Sprintf("/Users?attributes=id,userName&filter=%s", url.QueryEscape(filter)), nil,
+		testapi.TestResponse{Status: http.StatusOK, Body: uaaResp},
+	)
+
+	cc, uaa, repo := createUsersRepo(ccEndpoint, uaaEndpoint)
+	defer cc.Close()
+	defer uaa.Close()
+
+	users, apiResponse := repo.FindAll()
+
+	assert.True(t, ccEndpointStatus.Called())
+	assert.True(t, uaaEndpointStatus.Called())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.Equal(t, 2, len(users))
+
+	expectedUser1 := cf.User{Guid: "user-2-guid", Username: "Super user 2", IsAdmin: true}
+	expectedUser2 := cf.User{Guid: "user-3-guid", Username: "Super user 3", IsAdmin: false}
+	assert.Equal(t, expectedUser1, users[0])
+	assert.Equal(t, expectedUser2, users[1])
+}
+
 func createUsersByRoleEndpoints(rolePaths []string) (ccEndpointsRouter http.HandlerFunc, uaaEndpointsRouter http.HandlerFunc, statuses []*testapi.RequestStatus) {
 	roleResponses := []string{
 		`{"resources": [ {"metadata": {"guid": "user-1-guid"}, "entity": {}} ] }`,
@@ -355,8 +392,7 @@ func TestUnsetOrgRoleWithInvalidRole(t *testing.T) {
 	assert.Contains(t, apiResponse.Message, "Invalid Role")
 }
 
-func testSetOrUnsetOrgRoleWithValidRole(
-	t *testing.T,
+func testSetOrUnsetOrgRoleWithValidRole(t *testing.T,
 	setOrUnset func(UserRepository, cf.User, cf.Organization) net.ApiResponse,
 	verb string,
 	path string) {
@@ -376,8 +412,7 @@ func testSetOrUnsetOrgRoleWithValidRole(
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
-func testSetOrUnsetSpaceRoleWithValidRole(
-	t *testing.T,
+func testSetOrUnsetSpaceRoleWithValidRole(t *testing.T,
 	setOrUnset func(UserRepository, cf.User, cf.Space) net.ApiResponse,
 	verb string,
 	path string) {

@@ -6,6 +6,9 @@ import (
 )
 
 type FakeUserRepository struct {
+	FindAllWasCalled bool
+	FindAllUsers []cf.User
+
 	FindByUsernameUsername string
 	FindByUsernameUser cf.User
 	FindByUsernameNotFound bool
@@ -36,6 +39,12 @@ type FakeUserRepository struct {
 	UnsetSpaceRoleUser cf.User
 	UnsetSpaceRoleSpace cf.Space
 	UnsetSpaceRoleRole string
+}
+
+func (repo *FakeUserRepository) FindAll() (users []cf.User, apiResponse net.ApiResponse) {
+	repo.FindAllWasCalled = true
+	users = repo.FindAllUsers
+	return
 }
 
 func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {

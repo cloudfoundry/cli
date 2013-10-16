@@ -9,6 +9,20 @@ import (
 	"strings"
 )
 
+type PaginatedUserResources struct {
+	Resources []UserResource
+}
+
+type UserResource struct {
+	Resource
+	Entity UserEntity
+}
+
+type UserEntity struct {
+	Entity
+	Admin bool
+}
+
 var orgRoleToPathMap = map[string]string{
 	"OrgManager":     "managers",
 	"BillingManager": "billing_managers",
@@ -34,6 +48,7 @@ var spacePathToDisplayNameMap = map[string]string{
 }
 
 type UserRepository interface {
+	FindAll() (users []cf.User, apiResponse net.ApiResponse)
 	FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse)
 	FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
 	FindAllInSpaceByRole(space cf.Space) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
@@ -60,6 +75,11 @@ func NewCloudControllerUserRepository(config *configuration.Configuration, uaaGa
 	return
 }
 
+func (repo CloudControllerUserRepository) FindAll() (users []cf.User, apiResponse net.ApiResponse) {
+	users, apiResponse = repo.findAllWithPath("/v2/users")
+	return
+}
+
 func (repo CloudControllerUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {
 	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
 	if apiResponse.IsNotSuccessful() {
@@ -69,7 +89,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 	usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
 	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
 
-	users, apiResponse := repo.findUsersWithUAAPath(path)
+	users, apiResponse := repo.updateOrFindUsersWithUAAPath([]cf.User{}, path)
 	if len(users) == 0 {
 		apiResponse = net.NewNotFoundApiResponse("User %s not found", username)
 		return
@@ -118,7 +138,7 @@ func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []
 		return
 	}
 
-	resources := new(PaginatedResources)
+	resources := new(PaginatedUserResources)
 	_, apiResponse = repo.ccGateway.PerformRequestForJSONResponse(request, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -135,16 +155,17 @@ func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []
 
 	guidFilters := []string{}
 	for _, r := range resources.Resources {
+		users = append(users, cf.User{Guid: r.Metadata.Guid, IsAdmin: r.Entity.Admin})
 		guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, r.Metadata.Guid))
 	}
 	filter := strings.Join(guidFilters, " or ")
 	url = fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, neturl.QueryEscape(filter))
 
-	users, apiResponse = repo.findUsersWithUAAPath(url)
+	users, apiResponse = repo.updateOrFindUsersWithUAAPath(users, url)
 	return
 }
 
-func (repo CloudControllerUserRepository) findUsersWithUAAPath(path string) (users []cf.User, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers []cf.User, path string) (updatedUsers []cf.User, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.uaaGateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -164,8 +185,21 @@ func (repo CloudControllerUserRepository) findUsersWithUAAPath(path string) (use
 		return
 	}
 
-	for _, resource := range uaaResponse.Resources {
-		users = append(users, cf.User{Guid: resource.Id, Username: resource.Username})
+	for _, uaaResource := range uaaResponse.Resources {
+		var ccUser cf.User
+
+		for _, u := range ccUsers {
+			if u.Guid == uaaResource.Id {
+				ccUser = u
+				break
+			}
+		}
+
+		updatedUsers = append(updatedUsers, cf.User{
+			Guid:     uaaResource.Id,
+			Username: uaaResource.Username,
+			IsAdmin:  ccUser.IsAdmin,
+		})
 	}
 	return
 }
