@@ -87,6 +87,7 @@ func TestCommands(t *testing.T) {
 		"set-space-role",
 		//		"share-domain",
 		"space",
+		"space-users",
 		"spaces",
 		"stacks",
 		"start",

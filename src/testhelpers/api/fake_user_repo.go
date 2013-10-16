@@ -13,6 +13,9 @@ type FakeUserRepository struct {
 	FindAllInOrgByRoleOrganization cf.Organization
 	FindAllInOrgByRoleUsersByRole map[string][]cf.User
 
+	FindAllInSpaceByRoleSpace cf.Space
+	FindAllInSpaceByRoleUsersByRole map[string][]cf.User
+
 	CreateUserUser cf.User
 	CreateUserExists bool
 
@@ -49,6 +52,12 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, a
 func (repo *FakeUserRepository) FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
 	repo.FindAllInOrgByRoleOrganization = org
 	usersByRole = repo.FindAllInOrgByRoleUsersByRole
+	return
+}
+
+func (repo *FakeUserRepository) FindAllInSpaceByRole(space cf.Space) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
+	repo.FindAllInSpaceByRoleSpace = space
+	usersByRole = repo.FindAllInSpaceByRoleUsersByRole
 	return
 }
 

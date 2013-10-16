@@ -5,7 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
-	"net/url"
+	neturl "net/url"
 	"strings"
 )
 
@@ -15,15 +15,28 @@ var orgRoleToPathMap = map[string]string{
 	"OrgAuditor":     "auditors",
 }
 
+var spaceRoleToPathMap = map[string]string{
+	"SpaceManager":   "managers",
+	"SpaceDeveloper": "developers",
+	"SpaceAuditor":   "auditors",
+}
+
 var orgPathToDisplayNameMap = map[string]string{
 	"managers":         "ORG MANAGER",
 	"billing_managers": "BILLING MANAGER",
 	"auditors":         "ORG AUDITOR",
 }
 
+var spacePathToDisplayNameMap = map[string]string{
+	"managers":   "SPACE MANAGER",
+	"developers": "SPACE DEVELOPER",
+	"auditors":   "SPACE AUDITOR",
+}
+
 type UserRepository interface {
 	FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse)
 	FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
+	FindAllInSpaceByRole(space cf.Space) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
 	Create(user cf.User) (apiResponse net.ApiResponse)
 	Delete(user cf.User) (apiResponse net.ApiResponse)
 	SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse)
@@ -53,7 +66,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 		return
 	}
 
-	usernameFilter := url.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
+	usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
 	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
 
 	users, apiResponse := repo.findUsersWithUAAPath(path)
@@ -69,10 +82,11 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 func (repo CloudControllerUserRepository) FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
 	usersByRole = make(map[string][]cf.User)
 
-	for path, displayName := range orgPathToDisplayNameMap {
+	for rolePath, displayName := range orgPathToDisplayNameMap {
 		var users []cf.User
 
-		users, apiResponse = repo.findAllInOrgWithRole(org, path)
+		path := fmt.Sprintf("/v2/organizations/%s/%s", org.Guid, rolePath)
+		users, apiResponse = repo.findAllWithPath(path)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
@@ -81,9 +95,25 @@ func (repo CloudControllerUserRepository) FindAllInOrgByRole(org cf.Organization
 	return
 }
 
-func (repo CloudControllerUserRepository) findAllInOrgWithRole(org cf.Organization, role string) (users []cf.User, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s/%s", repo.config.Target, org.Guid, role)
-	request, apiResponse := repo.ccGateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+func (repo CloudControllerUserRepository) FindAllInSpaceByRole(space cf.Space) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
+	usersByRole = make(map[string][]cf.User)
+
+	for rolePath, displayName := range spacePathToDisplayNameMap {
+		var users []cf.User
+
+		path := fmt.Sprintf("/v2/spaces/%s/%s", space.Guid, rolePath)
+		users, apiResponse = repo.findAllWithPath(path)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+		usersByRole[displayName] = users
+	}
+	return
+}
+
+func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []cf.User, apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s%s", repo.config.Target, path)
+	request, apiResponse := repo.ccGateway.NewRequest("GET", url, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -108,9 +138,9 @@ func (repo CloudControllerUserRepository) findAllInOrgWithRole(org cf.Organizati
 		guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, r.Metadata.Guid))
 	}
 	filter := strings.Join(guidFilters, " or ")
-	path = fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, url.QueryEscape(filter))
+	url = fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, neturl.QueryEscape(filter))
 
-	users, apiResponse = repo.findUsersWithUAAPath(path)
+	users, apiResponse = repo.findUsersWithUAAPath(url)
 	return
 }
 
@@ -253,13 +283,7 @@ func (repo CloudControllerUserRepository) UnsetSpaceRole(user cf.User, space cf.
 }
 
 func (repo CloudControllerUserRepository) setOrUnsetSpaceRole(verb string, user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
-	roleToPathMap := map[string]string{
-		"SpaceManager":   "managers",
-		"SpaceDeveloper": "developers",
-		"SpaceAuditor":   "auditors",
-	}
-
-	rolePath, found := roleToPathMap[role]
+	rolePath, found := spaceRoleToPathMap[role]
 
 	if !found {
 		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)

@@ -540,6 +540,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "space-users",
+			Description: "Show space users by role",
+			Usage:       fmt.Sprintf("%s space-users SPACE", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("space-users", c)
+			},
+		},
+		{
 			Name:        "spaces",
 			Description: "List all spaces in an org",
 			Usage:       fmt.Sprintf("%s spaces", cf.Name),
