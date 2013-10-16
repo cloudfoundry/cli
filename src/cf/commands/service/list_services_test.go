@@ -3,6 +3,7 @@ package service_test
 import (
 	"cf"
 	. "cf/commands/service"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
@@ -38,16 +39,19 @@ func TestServices(t *testing.T) {
 			Name: "my-service-provided-by-user",
 		},
 	}
-	spaceRepo := &testapi.FakeSpaceRepository{
-		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
-		SummarySpace: cf.Space{ServiceInstances: serviceInstances},
+	serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
+		GetSummariesInCurrentSpaceInstances: serviceInstances,
 	}
 	ui := &testterm.FakeUI{}
+	config := &configuration.Configuration{
+		Space: cf.Space{Name: "development"},
+	}
 
-	cmd := NewListServices(ui, spaceRepo)
+	cmd := NewListServices(ui, config, serviceSummaryRepo)
 	cmd.Run(testcmd.NewContext("services", []string{}))
 
-	assert.Contains(t, ui.Outputs[0], "Getting services in development")
+	assert.Contains(t, ui.Outputs[0], "Getting services in")
+	assert.Contains(t, ui.Outputs[0], "development")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "my-service-1")

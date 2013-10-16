@@ -9,23 +9,24 @@ import (
 type RepositoryLocator struct {
 	authRepo AuthenticationRepository
 
-	endpointRepo      RemoteEndpointRepository
-	organizationRepo  CloudControllerOrganizationRepository
-	spaceRepo         CloudControllerSpaceRepository
-	appRepo           CloudControllerApplicationRepository
-	appBitsRepo       CloudControllerApplicationBitsRepository
-	appSummaryRepo    CloudControllerAppSummaryRepository
-	appEventsRepo     CloudControllerAppEventsRepository
-	appFilesRepo      CloudControllerAppFilesRepository
-	domainRepo        CloudControllerDomainRepository
-	routeRepo         CloudControllerRouteRepository
-	stackRepo         CloudControllerStackRepository
-	serviceRepo       CloudControllerServiceRepository
-	userRepo          CloudControllerUserRepository
-	passwordRepo      CloudControllerPasswordRepository
-	logsRepo          LoggregatorLogsRepository
-	authTokenRepo     CloudControllerServiceAuthTokenRepository
-	serviceBrokerRepo CloudControllerServiceBrokerRepository
+	endpointRepo       RemoteEndpointRepository
+	organizationRepo   CloudControllerOrganizationRepository
+	spaceRepo          CloudControllerSpaceRepository
+	appRepo            CloudControllerApplicationRepository
+	appBitsRepo        CloudControllerApplicationBitsRepository
+	appSummaryRepo     CloudControllerAppSummaryRepository
+	appEventsRepo      CloudControllerAppEventsRepository
+	appFilesRepo       CloudControllerAppFilesRepository
+	domainRepo         CloudControllerDomainRepository
+	routeRepo          CloudControllerRouteRepository
+	stackRepo          CloudControllerStackRepository
+	serviceRepo        CloudControllerServiceRepository
+	serviceSummaryRepo CloudControllerServiceSummaryRepository
+	userRepo           CloudControllerUserRepository
+	passwordRepo       CloudControllerPasswordRepository
+	logsRepo           LoggregatorLogsRepository
+	authTokenRepo      CloudControllerServiceAuthTokenRepository
+	serviceBrokerRepo  CloudControllerServiceBrokerRepository
 }
 
 func NewRepositoryLocator(config *configuration.Configuration, configRepo configuration.ConfigurationRepository, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -51,6 +52,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.routeRepo = NewCloudControllerRouteRepository(config, cloudControllerGateway, loc.domainRepo)
 	loc.stackRepo = NewCloudControllerStackRepository(config, cloudControllerGateway)
 	loc.serviceRepo = NewCloudControllerServiceRepository(config, cloudControllerGateway)
+	loc.serviceSummaryRepo = NewCloudControllerServiceSummaryRepository(config, cloudControllerGateway)
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway, loc.endpointRepo)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway, loc.endpointRepo)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.endpointRepo)
@@ -110,6 +112,10 @@ func (locator RepositoryLocator) GetStackRepository() StackRepository {
 
 func (locator RepositoryLocator) GetServiceRepository() ServiceRepository {
 	return locator.serviceRepo
+}
+
+func (locator RepositoryLocator) GetServiceSummaryRepository() ServiceSummaryRepository {
+	return locator.serviceSummaryRepo
 }
 
 func (locator RepositoryLocator) GetUserRepository() UserRepository {

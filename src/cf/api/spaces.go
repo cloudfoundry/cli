@@ -25,41 +25,10 @@ type SpaceEntity struct {
 	ServiceInstances []Resource `json:"service_instances"`
 }
 
-type SpaceSummary struct {
-	Guid             string
-	Name             string
-	Apps             []SpaceSummaryApp
-	ServiceInstances []ServiceInstanceSummary `json:"services"`
-}
-
-type SpaceSummaryApp struct {
-	Name         string
-	ServiceNames []string `json:"service_names"`
-}
-
-type ServiceInstanceSummary struct {
-	Name        string
-	ServicePlan ServicePlanSummary `json:"service_plan"`
-}
-
-type ServicePlanSummary struct {
-	Name            string
-	Guid            string
-	ServiceOffering ServiceOfferingSummary `json:"service"`
-}
-
-type ServiceOfferingSummary struct {
-	Label    string
-	Provider string
-	Version  string
-}
-
 type SpaceRepository interface {
-	GetCurrentSpace() (space cf.Space)
 	FindAll() (spaces []cf.Space, apiResponse net.ApiResponse)
 	FindByName(name string) (space cf.Space, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse)
-	GetSummary() (space cf.Space, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(space cf.Space, newName string) (apiResponse net.ApiResponse)
 	Delete(space cf.Space) (apiResponse net.ApiResponse)
@@ -74,10 +43,6 @@ func NewCloudControllerSpaceRepository(config *configuration.Configuration, gate
 	repo.config = config
 	repo.gateway = gateway
 	return
-}
-
-func (repo CloudControllerSpaceRepository) GetCurrentSpace() (space cf.Space) {
-	return repo.config.Space
 }
 
 func (repo CloudControllerSpaceRepository) FindAll() (spaces []cf.Space, apiResponse net.ApiResponse) {
@@ -158,27 +123,6 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name string, org cf.O
 	return
 }
 
-func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	response := new(SpaceSummary) // but not an ApiResponse
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
-
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	serviceInstances := extractServiceInstancesFromSummary(response.ServiceInstances, response.Apps)
-
-	space = cf.Space{Name: response.Name, Guid: response.Guid, ServiceInstances: serviceInstances}
-
-	return
-}
-
 func (repo CloudControllerSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
@@ -214,48 +158,5 @@ func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiResponse n
 	}
 
 	apiResponse = repo.gateway.PerformRequest(request)
-	return
-}
-
-func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSummary, apps []SpaceSummaryApp) (instances []cf.ServiceInstance) {
-	for _, instanceSummary := range instanceSummaries {
-		applicationNames := findApplicationNamesForInstance(instanceSummary.Name, apps)
-
-		planSummary := instanceSummary.ServicePlan
-		offeringSummary := planSummary.ServiceOffering
-
-		serviceOffering := cf.ServiceOffering{
-			Label:    offeringSummary.Label,
-			Provider: offeringSummary.Provider,
-			Version:  offeringSummary.Version,
-		}
-
-		servicePlan := cf.ServicePlan{
-			Name:            planSummary.Name,
-			Guid:            planSummary.Guid,
-			ServiceOffering: serviceOffering,
-		}
-
-		instance := cf.ServiceInstance{
-			Name:             instanceSummary.Name,
-			ServicePlan:      servicePlan,
-			ApplicationNames: applicationNames,
-		}
-
-		instances = append(instances, instance)
-	}
-
-	return
-}
-
-func findApplicationNamesForInstance(instanceName string, apps []SpaceSummaryApp) (applicationNames []string) {
-	for _, app := range apps {
-		for _, name := range app.ServiceNames {
-			if name == instanceName {
-				applicationNames = append(applicationNames, app.Name)
-			}
-		}
-	}
-
 	return
 }

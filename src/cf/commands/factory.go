@@ -71,7 +71,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["service-auth-tokens"] = serviceauthtoken.NewListServiceAuthTokens(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["service-brokers"] = servicebroker.NewListServiceBrokers(ui, repoLocator.GetServiceBrokerRepository())
-	factory.cmdsByName["services"] = service.NewListServices(ui, repoLocator.GetSpaceRepository())
+	factory.cmdsByName["services"] = service.NewListServices(ui, config, repoLocator.GetServiceSummaryRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["set-org-role"] = user.NewSetOrgRole(ui, repoLocator.GetUserRepository())
 	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, repoLocator.GetOrganizationRepository())

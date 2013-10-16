@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -9,13 +10,15 @@ import (
 )
 
 type ListServices struct {
-	ui        terminal.UI
-	spaceRepo api.SpaceRepository
+	ui                 terminal.UI
+	config             *configuration.Configuration
+	serviceSummaryRepo api.ServiceSummaryRepository
 }
 
-func NewListServices(ui terminal.UI, spaceRepo api.SpaceRepository) (cmd ListServices) {
+func NewListServices(ui terminal.UI, config *configuration.Configuration, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
 	cmd.ui = ui
-	cmd.spaceRepo = spaceRepo
+	cmd.config = config
+	cmd.serviceSummaryRepo = serviceSummaryRepo
 	return
 }
 
@@ -24,9 +27,9 @@ func (cmd ListServices) GetRequirements(reqFactory requirements.Factory, c *cli.
 }
 
 func (cmd ListServices) Run(c *cli.Context) {
-	cmd.ui.Say("Getting services in %s...", cmd.spaceRepo.GetCurrentSpace().Name)
+	cmd.ui.Say("Getting services in %s...", terminal.EntityNameColor(cmd.config.Space.Name))
 
-	space, apiResponse := cmd.spaceRepo.GetSummary()
+	serviceInstances, apiResponse := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
@@ -39,7 +42,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 		[]string{"name", "service", "plan", "bound apps"},
 	}
 
-	for _, instance := range space.ServiceInstances {
+	for _, instance := range serviceInstances {
 		var serviceColumn string
 
 		if instance.IsUserProvided() {
