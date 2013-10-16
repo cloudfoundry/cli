@@ -9,13 +9,14 @@ import (
 )
 
 type TestRequest struct {
-	Method   string
-	Path     string
-	Matcher  RequestMatcher
-	Response TestResponse
+	Method     string
+	Path       string
+	Header 	http.Header
+	Matcher    RequestMatcher
+	Response   TestResponse
 }
 
-type RequestMatcher func (*http.Request) bool
+type RequestMatcher func (*http.Request) error
 
 type TestResponse struct {
 	Body   string
@@ -35,7 +36,7 @@ func (h *TestHandler) AllRequestsCalled() bool {
 
 func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if (len(h.Requests) <= h.CallCount) {
-		h.logError("Index out of range! Test server called too many times. Final Request:",r.Method, r.RequestURI)
+		h.logError("Index out of range! Test server called too many times. Final Request:", r.Method, r.RequestURI)
 		return
 	}
 
@@ -44,32 +45,35 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// match method
 	if tester.Method != r.Method {
-		h.logError("Method does not match.\nExpected: %s\nActual:   %s",tester.Method,r.Method)
+		h.logError("Method does not match.\nExpected: %s\nActual:   %s", tester.Method, r.Method)
 	}
 
 	// match path
 	paths := strings.Split(tester.Path, "?")
 	if paths[0] != r.URL.Path {
-		h.logError("Path does not match.\nExpected: %s\nActual:   %s",paths[0],r.URL.Path)
+		h.logError("Path does not match.\nExpected: %s\nActual:   %s", paths[0], r.URL.Path)
 	}
 	// match query string
 	if len(paths) > 1 {
 		if !strings.Contains(r.RequestURI, paths[1]) {
-			h.logError("Query string does not match.\nExpected: %s\nActual:   %s",paths[1],r.URL.Path)
+			h.logError("Query string does not match.\nExpected: %s\nActual:   %s", paths[1], r.URL.Path)
 		}
 	}
 
-	// match required headers
-	if r.Header.Get("accept") != "application/json" {
-		h.logError("Accept header did not match.\nExpected: application/json\nActual:   ",r.Header.Get("accept"))
-	}
-	if !strings.HasPrefix(r.Header.Get("authorization"), "BEARER my_access_token") {
-		h.logError("Authorization header did not match.\nExpected: BEARER my_access_token\nActual:   ",r.Header.Get("authorization"))
+	for key, values := range tester.Header {
+		actualValues := strings.Join(r.Header[http.CanonicalHeaderKey(key)],";")
+		expectedValues := strings.Join(values,";")
+		if  actualValues != expectedValues {
+			h.logError("%s header did not match.\nExpected: %s\nActual:   %s", key, expectedValues, actualValues)
+		}
 	}
 
 	// match custom request matcher
-	if tester.Matcher != nil && !tester.Matcher(r){
-		h.logError("Custom request matcher did not match")
+	if tester.Matcher != nil {
+		err := tester.Matcher(r)
+		if err != nil {
+			h.logError("Custom request matcher did not match:\n%s", err.Error())
+		}
 	}
 
 	// set response headers
@@ -86,7 +90,7 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, tester.Response.Body)
 }
 
-func NewServer(t *testing.T, requests []TestRequest) ( s *httptest.Server, h *TestHandler) {
+func NewTLSServer(t *testing.T, requests []TestRequest) ( s *httptest.Server, h *TestHandler) {
 	h = &TestHandler{
 		Requests:requests,
 		T: t,

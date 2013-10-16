@@ -5,6 +5,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -46,7 +47,7 @@ var expectedResources = testapi.RemoveWhiteSpaceFromBody(`[
     }
 ]`)
 
-var uploadApplicationRequest = testnet.TestRequest{
+var uploadApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
 	Path:    "/v2/apps/my-cool-app-guid/bits",
 	Matcher: uploadBodyMatcher,
@@ -59,7 +60,7 @@ var uploadApplicationRequest = testnet.TestRequest{
 	}
 }
 	`},
-}
+})
 
 var matchResourceRequest = testnet.TestRequest{
 	Method:  "PUT",
@@ -89,51 +90,45 @@ var defaultRequests = []testnet.TestRequest{
 	createProgressEndpoint("finished"),
 }
 
-var uploadBodyMatcher = func(request *http.Request) bool {
+var uploadBodyMatcher = func(request *http.Request) error {
 	bodyBytes, err := ioutil.ReadAll(request.Body)
 
 	if err != nil {
-		return false
+		return err
 	}
 
 	bodyString := string(bodyBytes)
 	zipAttachmentContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="application"; filename="application.zip"`)
 	if !zipAttachmentContentDispositionMatches {
-		println("Zip Attachment ContentDisposition does not match")
+		return errors.New("Zip Attachment ContentDisposition does not match")
 	}
 	zipAttachmentContentTypeMatches := strings.Contains(bodyString, `Content-Type: application/zip`)
 	if !zipAttachmentContentTypeMatches {
-		println("Zip Attachment Content Type does not match")
+		return errors.New("Zip Attachment Content Type does not match")
 	}
 	zipAttachmentContentTransferEncodingMatches := strings.Contains(bodyString, `Content-Transfer-Encoding: binary`)
 	if !zipAttachmentContentTransferEncodingMatches {
-		println("Zip Attachment Content Transfer Encoding does not match")
+		return errors.New("Zip Attachment Content Transfer Encoding does not match")
 	}
 	zipAttachmentContentLengthPresent := strings.Contains(bodyString, `Content-Length:`)
 	if !zipAttachmentContentLengthPresent {
-		println("Zip Attachment Content Length missing")
+		return errors.New("Zip Attachment Content Length missing")
 	}
 	zipAttachmentContentPresent := strings.Contains(bodyString, `hello world!`)
 	if !zipAttachmentContentPresent {
-		println("Zip Attachment Content missing")
+		return errors.New("Zip Attachment Content missing")
 	}
 
 	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
 	if !resourcesContentDispositionMatches {
-		println("Resources Content Disposition does not match")
+		return errors.New("Resources Content Disposition does not match")
 	}
 	resourcesPresent := strings.Contains(bodyString, expectedResources)
 	if !resourcesPresent {
-		println("Resources not present")
+		return errors.New("Resources not present")
 	}
 
-	return zipAttachmentContentDispositionMatches &&
-		zipAttachmentContentTypeMatches &&
-		zipAttachmentContentTransferEncodingMatches &&
-		zipAttachmentContentLengthPresent &&
-		zipAttachmentContentPresent &&
-		resourcesContentDispositionMatches &&
-		resourcesPresent
+	return nil
 }
 
 func createProgressEndpoint(status string) (req testnet.TestRequest) {
@@ -203,7 +198,7 @@ func TestUploadAppFailsWhilePushingBits(t *testing.T) {
 }
 
 func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewServer(t, requests)
+	ts, handler := testnet.NewTLSServer(t, requests)
 	defer ts.Close()
 
 	config := &configuration.Configuration{

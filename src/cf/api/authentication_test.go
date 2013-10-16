@@ -3,118 +3,152 @@ package api
 import (
 	"cf/net"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	testconfig "testhelpers/configuration"
+	testnet "testhelpers/net"
 	"testing"
 )
 
-var successfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	contentTypeMatches := request.Header.Get("content-type") == "application/x-www-form-urlencoded"
-	acceptHeaderMatches := request.Header.Get("accept") == "application/json"
-	methodMatches := request.Method == "POST"
-	pathMatches := request.URL.Path == "/oauth/token"
-	encodedAuth := base64.StdEncoding.EncodeToString([]byte("cf:"))
-	basicAuthMatches := request.Header.Get("authorization") == "Basic "+encodedAuth
+var authHeaders = http.Header{
+	"accept":        {"application/json"},
+	"content-type":  {"application/x-www-form-urlencoded"},
+	"authorization": {"Basic " + base64.StdEncoding.EncodeToString([]byte("cf:"))},
+}
 
-	err := request.ParseForm()
-
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	usernameMatches := request.Form.Get("username") == "foo@example.com"
-	passwordMatches := request.Form.Get("password") == "bar"
-	grantTypeMatches := request.Form.Get("grant_type") == "password"
-	scopeMatches := request.Form.Get("scope") == ""
-	bodyMatches := usernameMatches && passwordMatches && grantTypeMatches && scopeMatches
-
-	if !(contentTypeMatches && acceptHeaderMatches && methodMatches && pathMatches && bodyMatches && basicAuthMatches) {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	jsonResponse := `
+var successfulLoginRequest = testnet.TestRequest{
+	Method:  "POST",
+	Path:    "/oauth/token",
+	Header:  authHeaders,
+	Matcher: successfulLoginMatcher,
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
 {
   "access_token": "my_access_token",
   "token_type": "BEARER",
   "refresh_token": "my_refresh_token",
   "scope": "openid",
   "expires_in": 98765
-} `
-	fmt.Fprintln(writer, jsonResponse)
+} `},
+}
+
+var successfulLoginMatcher = func(request *http.Request) (err error) {
+	err = request.ParseForm()
+	if err != nil {
+		return
+	}
+
+	if !(request.Form.Get("username") == "foo@example.com") {
+		err = errors.New(fmt.Sprintf("Username did not match.\nExpected:%s\nActual:   %s",
+			"foo@example.com",
+			request.Form.Get("username")))
+		return
+	}
+	if !(request.Form.Get("password") == "bar") {
+		err = errors.New(fmt.Sprintf("Password did not match.\nExpected:%s\nActual:   %s",
+			"bar",
+			request.Form.Get("password")))
+		return
+	}
+	if !(request.Form.Get("grant_type") == "password") {
+		err = errors.New(fmt.Sprintf("Grant type did not match.\nExpected:%s\nActual:   %s",
+			"password",
+			request.Form.Get("grant_type")))
+		return
+	}
+	if !(request.Form.Get("scope") == "") {
+		err = errors.New(fmt.Sprintf("Scope did not match.\nExpected empty string. \nActual:   %s",
+			request.Form.Get("scope")))
+		return
+	}
+	return
 }
 
 func TestSuccessfullyLoggingIn(t *testing.T) {
-	ts, auth := setupAuthWithEndpoint(t, successfulLoginEndpoint)
+	ts, handler, auth := setupAuthWithEndpoint(t, successfulLoginRequest)
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "bar")
 	savedConfig := testconfig.SavedConfiguration
 
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, ts.URL)
 	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 }
 
-var unsuccessfulLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusUnauthorized)
+var unsuccessfulLoginRequest = testnet.TestRequest{
+	Method: "POST",
+	Path:   "/oauth/token",
+	Response: testnet.TestResponse{
+		Status: http.StatusUnauthorized,
+	},
 }
 
 func TestUnsuccessfullyLoggingIn(t *testing.T) {
-	ts, auth := setupAuthWithEndpoint(t, unsuccessfulLoginEndpoint)
+	ts, handler, auth := setupAuthWithEndpoint(t, unsuccessfulLoginRequest)
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
 	savedConfig := testconfig.SavedConfiguration
 
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, apiResponse.Message, "Password is incorrect, please try again.")
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
-var errorLoginEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	writer.WriteHeader(http.StatusInternalServerError)
+var errorLoginRequest = testnet.TestRequest{
+	Method: "POST",
+	Path:   "/oauth/token",
+	Response: testnet.TestResponse{
+		Status: http.StatusInternalServerError,
+	},
 }
 
 func TestServerErrorLoggingIn(t *testing.T) {
-	ts, auth := setupAuthWithEndpoint(t, errorLoginEndpoint)
+	ts, handler, auth := setupAuthWithEndpoint(t, errorLoginRequest)
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "bar")
 	savedConfig := testconfig.SavedConfiguration
 
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsError())
 	assert.Equal(t, apiResponse.Message, "Server error, status code: 500, error code: , message: ")
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
-var errorMaskedAsSuccessEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	jsonResponse := `
+var errorMaskedAsSuccessLoginRequest = testnet.TestRequest{
+	Method: "POST",
+	Path:   "/oauth/token",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
 {"error":{"error":"rest_client_error","error_description":"I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"}}
-`
-
-	writer.WriteHeader(http.StatusOK)
-	fmt.Fprintln(writer, jsonResponse)
+`},
 }
 
 func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
-	ts, auth := setupAuthWithEndpoint(t, errorMaskedAsSuccessEndpoint)
+	ts, handler, auth := setupAuthWithEndpoint(t, errorMaskedAsSuccessLoginRequest)
 	defer ts.Close()
 
 	apiResponse := auth.Authenticate("foo@example.com", "bar")
 	savedConfig := testconfig.SavedConfiguration
 
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsError())
 	assert.Equal(t, apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
 	assert.Empty(t, savedConfig.AccessToken)
 }
 
-func setupAuthWithEndpoint(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (ts *httptest.Server, auth UAAAuthenticationRepository) {
-	ts = httptest.NewTLSServer(http.HandlerFunc(handler))
+func setupAuthWithEndpoint(t *testing.T, request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, auth UAAAuthenticationRepository) {
+	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{request})
 
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()

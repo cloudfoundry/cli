@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"errors"
 )
 
 func RequestBodyMatcher(expectedBody string) RequestMatcher {
@@ -12,27 +13,25 @@ func RequestBodyMatcher(expectedBody string) RequestMatcher {
 }
 
 func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {
-	return func(request *http.Request) bool {
+	return func(request *http.Request) error {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
-
 		if err != nil {
-			fmt.Printf("\nError reading request body: %s", err.Error())
-			return false
+			return err
 		}
 
 		actualBody := string(bodyBytes)
 		bodyMatches := removeWhiteSpaceFromBody(actualBody) == removeWhiteSpaceFromBody(expectedBody)
 		if !bodyMatches {
-			fmt.Printf("\nBody did not match. Expected [%s], Actual [%s]", expectedBody, actualBody)
+			return errors.New(fmt.Sprintf("\nBody did not match. Expected [%s], Actual [%s]", expectedBody, actualBody))
 		}
 
 		actualContentType := request.Header.Get("content-type")
 		contentTypeMatches := actualContentType == expectedContentType
 		if !contentTypeMatches {
-			fmt.Printf("\nContent Type did not match. Expected [%s], Actual [%s]", expectedContentType, actualContentType)
+			return errors.New(fmt.Sprintf("\nContent Type did not match. Expected [%s], Actual [%s]", expectedContentType, actualContentType))
 		}
 
-		return bodyMatches && contentTypeMatches
+		return nil
 	}
 }
 
