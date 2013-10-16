@@ -76,3 +76,25 @@ func TestZipWithJarFile(t *testing.T) {
 
 	assert.Equal(t, string(zipFile.Bytes()), "This is an application jar file\n")
 }
+
+func TestZipWithInvalidFile(t *testing.T) {
+	zipper := ApplicationZipper{}
+	_, err := zipper.Zip("/a/bogus/directory")
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "open /a/bogus/directory: no such file or directory")
+}
+
+func TestZipWithEmptyDir(t *testing.T) {
+	tmpdir := os.TempDir()
+	emptyDir := filepath.Join(tmpdir, "emptyDir")
+	err := os.MkdirAll(emptyDir, 0755)
+	assert.NoError(t, err)
+	defer os.RemoveAll(emptyDir)
+
+	zipper := ApplicationZipper{}
+	_, err = zipper.Zip(emptyDir)
+
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "Directory is empty")
+}

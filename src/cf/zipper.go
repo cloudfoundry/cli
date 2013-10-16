@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"errors"
 )
 
 type Zipper interface {
@@ -46,7 +47,11 @@ func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 	zipBuffer = new(bytes.Buffer)
 
 	isEmpty, err := IsDirEmpty(dir)
+	if err != nil {
+		return
+	}
 	if isEmpty {
+		err = errors.New("Directory is empty")
 		return
 	}
 
