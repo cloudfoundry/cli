@@ -9,6 +9,18 @@ import (
 	"strings"
 )
 
+var orgRoleToPathMap = map[string]string{
+	"OrgManager":     "managers",
+	"BillingManager": "billing_managers",
+	"OrgAuditor":     "auditors",
+}
+
+var orgPathToDisplayNameMap = map[string]string{
+	"managers":         "ORG MANAGER",
+	"billing_managers": "BILLING MANAGER",
+	"auditors":         "ORG AUDITOR",
+}
+
 type UserRepository interface {
 	FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse)
 	FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
@@ -55,25 +67,17 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 }
 
 func (repo CloudControllerUserRepository) FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
-	managers, apiResponse := repo.findAllInOrgWithRole(org, "managers")
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	billingManagers, apiResponse := repo.findAllInOrgWithRole(org, "billing_managers")
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	auditors, apiResponse := repo.findAllInOrgWithRole(org, "auditors")
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	usersByRole = make(map[string][]cf.User)
-	usersByRole["ORG MANAGER"] = managers
-	usersByRole["BILLING MANAGER"] = billingManagers
-	usersByRole["ORG AUDITOR"] = auditors
+
+	for path, displayName := range orgPathToDisplayNameMap {
+		var users []cf.User
+
+		users, apiResponse = repo.findAllInOrgWithRole(org, path)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+		usersByRole[displayName] = users
+	}
 	return
 }
 
@@ -219,13 +223,7 @@ func (repo CloudControllerUserRepository) UnsetOrgRole(user cf.User, org cf.Orga
 }
 
 func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb string, user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
-	roleToPathMap := map[string]string{
-		"OrgManager":     "managers",
-		"BillingManager": "billing_managers",
-		"OrgAuditor":     "auditors",
-	}
-
-	rolePath, found := roleToPathMap[role]
+	rolePath, found := orgRoleToPathMap[role]
 
 	if !found {
 		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
