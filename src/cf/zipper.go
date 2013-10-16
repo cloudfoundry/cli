@@ -3,12 +3,12 @@ package cf
 import (
 	"archive/zip"
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-	"errors"
 )
 
 type Zipper interface {

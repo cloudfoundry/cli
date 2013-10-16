@@ -47,8 +47,8 @@ var expectedResources = testapi.RemoveWhiteSpaceFromBody(`[
 ]`)
 
 var uploadApplicationRequest = testnet.TestRequest{
-	Method: "PUT",
-	Path: "/v2/apps/my-cool-app-guid/bits",
+	Method:  "PUT",
+	Path:    "/v2/apps/my-cool-app-guid/bits",
 	Matcher: uploadBodyMatcher,
 	Response: testnet.TestResponse{
 		Status: http.StatusCreated,
@@ -61,10 +61,9 @@ var uploadApplicationRequest = testnet.TestRequest{
 	`},
 }
 
-
-var matchResourceRequest = testnet.TestRequest {
-	Method:    "PUT",
-	Path: "/v2/resource_match",
+var matchResourceRequest = testnet.TestRequest{
+	Method:  "PUT",
+	Path:    "/v2/resource_match",
 	Matcher: testnet.RequestBodyMatcher(expectedResources),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
@@ -129,12 +128,12 @@ var uploadBodyMatcher = func(request *http.Request) bool {
 	}
 
 	return zipAttachmentContentDispositionMatches &&
-			zipAttachmentContentTypeMatches &&
-			zipAttachmentContentTransferEncodingMatches &&
-			zipAttachmentContentLengthPresent &&
-			zipAttachmentContentPresent &&
-			resourcesContentDispositionMatches &&
-			resourcesPresent
+		zipAttachmentContentTypeMatches &&
+		zipAttachmentContentTransferEncodingMatches &&
+		zipAttachmentContentLengthPresent &&
+		zipAttachmentContentPresent &&
+		resourcesContentDispositionMatches &&
+		resourcesPresent
 }
 
 func createProgressEndpoint(status string) (req testnet.TestRequest) {
@@ -149,7 +148,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	req.Path = "/v2/jobs/my-job-guid"
 	req.Response = testnet.TestResponse{
 		Status: http.StatusCreated,
-		Body:body,
+		Body:   body,
 	}
 
 	return
@@ -175,7 +174,7 @@ func TestUploadApp(t *testing.T) {
 
 	app, apiResponse := testUploadApp(t, dir, defaultRequests)
 	assert.True(t, apiResponse.IsSuccessful())
-	testUploadDir(t,app)
+	testUploadDir(t, app)
 }
 
 func TestCreateUploadDirWithAZipFile(t *testing.T) {
@@ -185,7 +184,7 @@ func TestCreateUploadDirWithAZipFile(t *testing.T) {
 
 	app, apiResponse := testUploadApp(t, dir, defaultRequests)
 	assert.True(t, apiResponse.IsSuccessful())
-	testUploadDir(t,app)
+	testUploadDir(t, app)
 }
 
 func TestUploadAppFailsWhilePushingBits(t *testing.T) {
@@ -203,7 +202,7 @@ func TestUploadAppFailsWhilePushingBits(t *testing.T) {
 	assert.False(t, apiResponse.IsSuccessful())
 }
 
-func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse){
+func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse) {
 	ts, handler := testnet.NewServer(t, requests)
 	defer ts.Close()
 
@@ -219,19 +218,19 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 
 	apiResponse = repo.UploadApp(app, dir)
 
-	assert.True(t,handler.AllRequestsCalled())
+	assert.True(t, handler.AllRequestsCalled())
 
 	return
 }
 
-func testUploadDir(t *testing.T, app cf.Application){
+func testUploadDir(t *testing.T, app cf.Application) {
 	uploadDir := cf.TempDirForApp(app)
 	files, err := filepath.Glob(filepath.Join(uploadDir, "*"))
 	assert.NoError(t, err)
 
 	assert.Equal(t, files, []string{
-			filepath.Join(uploadDir, "Gemfile"),
-			filepath.Join(uploadDir, "Gemfile.lock"),
-			filepath.Join(uploadDir, "manifest.yml"),
-		})
+		filepath.Join(uploadDir, "Gemfile"),
+		filepath.Join(uploadDir, "Gemfile.lock"),
+		filepath.Join(uploadDir, "manifest.yml"),
+	})
 }
