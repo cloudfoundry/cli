@@ -4,16 +4,17 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
-var singleAppResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
+var singleAppResponse = testnet.TestResponse{
+	Status: http.StatusOK,
+	Body: `
 {
   "resources": [
     {
@@ -52,14 +53,15 @@ var singleAppResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-var findAppEndpoint, findAppEndpointStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
-	nil,
-	singleAppResponse,
-)
+var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "GET",
+	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
+	Response: singleAppResponse,
+})
 
-var appSummaryResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
+var appSummaryResponse = testnet.TestResponse{
+	Status: http.StatusOK,
+	Body: `
 {
   "guid": "app1-guid",
   "name": "App1",
@@ -78,33 +80,33 @@ var appSummaryResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
   "instances": 1
 }`}
 
-var appSummaryEndpoint, appSummaryEndpointStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/apps/app1-guid/summary",
-	nil,
-	appSummaryResponse,
-)
+var appSummaryRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "GET",
+	Path:     "/v2/apps/app1-guid/summary",
+	Response: appSummaryResponse,
+})
 
-var singleAppEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	if strings.Contains(request.URL.Path, "summary") {
-		appSummaryEndpoint(writer, request)
-		return
-	}
-
-	findAppEndpoint(writer, request)
-	return
+var singleAppRequests = []testnet.TestRequest{
+	findAppRequest,
+	appSummaryRequest,
 }
 
-func TestFindByName(t *testing.T) {
-	findAppEndpointStatus.Reset()
-	appSummaryEndpointStatus.Reset()
+//var singleAppEndpoint = func(writer http.ResponseWriter, request *http.Request) {
+//	if strings.Contains(request.URL.Path, "summary") {
+//		appSummaryEndpoint(writer, request)
+//		return
+//	}
+//
+//	findAppEndpoint(writer, request)
+//	return
+//}
 
-	ts, repo := createAppRepo(http.HandlerFunc(singleAppEndpoint))
+func TestFindByName(t *testing.T) {
+	ts, handler, repo := createAppRepo(t, singleAppRequests)
 	defer ts.Close()
 
 	app, apiResponse := repo.FindByName("App1")
-	assert.True(t, findAppEndpointStatus.Called())
-	assert.True(t, appSummaryEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
@@ -117,40 +119,34 @@ func TestFindByName(t *testing.T) {
 }
 
 func TestFindByNameWhenAppIsNotFound(t *testing.T) {
-	response := testapi.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
+	request := testapi.NewCloudControllerTestRequest(findAppRequest)
+	request.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
-		nil,
-		response,
-	)
-
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
 	_, apiResponse := repo.FindByName("App1")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
 func TestSetEnv(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/apps/app1-guid",
-		testapi.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/apps/app1-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"environment_json":{"DATABASE_URL":"mysql://example.com/my-db"}}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
 	app := cf.Application{Guid: "app1-guid", Name: "App1"}
 
 	apiResponse := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -164,15 +160,17 @@ var createApplicationResponse = `
     }
 }`
 
-func TestCreateApplication(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/apps",
-		testapi.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
-		testapi.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
-	)
+var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:  "POST",
+	Path:    "/v2/apps",
+	Matcher: testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+	Response: testnet.TestResponse{
+		Status: http.StatusCreated,
+		Body:   createApplicationResponse},
+})
 
-	ts, repo := createAppRepo(endpoint)
+func TestCreateApplication(t *testing.T) {
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
 	defer ts.Close()
 
 	newApp := cf.Application{
@@ -185,21 +183,21 @@ func TestCreateApplication(t *testing.T) {
 	}
 
 	createdApp, apiResponse := repo.Create(newApp)
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
 }
 
 func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/apps",
-		testapi.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
-		testapi.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
-	)
+	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/apps",
+		Matcher:  testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
 	newApp := cf.Application{
@@ -211,16 +209,23 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	}
 
 	_, apiResponse := repo.Create(newApp)
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestCreateRejectsInproperNames(t *testing.T) {
-	endpoint := func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintln(writer, "{}")
+	baseRequest := testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/apps",
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: "{}"},
 	}
 
-	ts, repo := createAppRepo(endpoint)
+	requests := []testnet.TestRequest{
+		baseRequest,
+		baseRequest,
+	}
+
+	ts, _, repo := createAppRepo(t, requests)
 	defer ts.Close()
 
 	createdApp, apiResponse := repo.Create(cf.Application{Name: "name with space"})
@@ -231,60 +236,62 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 
 	_, apiResponse = repo.Create(cf.Application{Name: "Valid-Name"})
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 
 	_, apiResponse = repo.Create(cf.Application{Name: "name_with_numbers_2"})
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestDeleteApplication(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/v2/apps/my-cool-app-guid?recursive=true",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: ""},
-	)
+	deleteApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/apps/my-cool-app-guid?recursive=true",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: ""},
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{deleteApplicationRequest})
 	defer ts.Close()
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	apiResponse := repo.Delete(app)
-	assert.True(t, status.Called())
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestRename(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/apps/my-app-guid",
-		testapi.RequestBodyMatcher(`{"name":"my-new-app"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	renameApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/apps/my-app-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-new-app"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{renameApplicationRequest})
 	defer ts.Close()
 
 	org := cf.Application{Guid: "my-app-guid"}
 	apiResponse := repo.Rename(org, "my-new-app")
-	assert.True(t, status.Called())
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func testScale(t *testing.T, app cf.Application, expectedBody string) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/apps/my-app-guid",
-		testapi.RequestBodyMatcher(expectedBody),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	scaleApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/apps/my-app-guid",
+		Matcher:  testnet.RequestBodyMatcher(expectedBody),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{scaleApplicationRequest})
 	defer ts.Close()
 
 	apiResponse := repo.Scale(app)
-	assert.True(t, status.Called())
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
@@ -323,11 +330,11 @@ func TestScaleApplicationMemory(t *testing.T) {
 }
 
 func TestStartApplication(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/apps/my-cool-app-guid",
-		testapi.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
-		testapi.TestResponse{Status: http.StatusCreated, Body: `
+	startApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "PUT",
+		Path:    "/v2/apps/my-cool-app-guid",
+		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
     "guid": "my-updated-app-guid"
@@ -337,15 +344,15 @@ func TestStartApplication(t *testing.T) {
     "state": "STARTED"
   }
 }`},
-	)
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{startApplicationRequest})
 	defer ts.Close()
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-
 	updatedApp, apiResponse := repo.Start(app)
-	assert.True(t, status.Called())
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "started", updatedApp.State)
@@ -353,11 +360,11 @@ func TestStartApplication(t *testing.T) {
 }
 
 func TestStopApplication(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/apps/my-cool-app-guid",
-		testapi.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
-		testapi.TestResponse{Status: http.StatusCreated, Body: `
+	stopApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "PUT",
+		Path:    "/v2/apps/my-cool-app-guid",
+		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
     "guid": "my-updated-app-guid"
@@ -367,15 +374,15 @@ func TestStopApplication(t *testing.T) {
     "state": "STOPPED"
   }
 }`},
-	)
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{stopApplicationRequest})
 	defer ts.Close()
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-
 	updatedApp, apiResponse := repo.Stop(app)
-	assert.True(t, status.Called())
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, "cli1", updatedApp.Name)
 	assert.Equal(t, "stopped", updatedApp.State)
@@ -383,11 +390,10 @@ func TestStopApplication(t *testing.T) {
 }
 
 func TestGetInstances(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/apps/my-cool-app-guid/instances",
-		nil,
-		testapi.TestResponse{Status: http.StatusCreated, Body: `
+	getInstancesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/apps/my-cool-app-guid/instances",
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
   "1": {
     "state": "STARTING"
@@ -396,23 +402,23 @@ func TestGetInstances(t *testing.T) {
     "state": "RUNNING"
   }
 }`},
-	)
+	})
 
-	ts, repo := createAppRepo(endpoint)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{getInstancesRequest})
 	defer ts.Close()
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-
 	instances, apiResponse := repo.GetInstances(app)
-	assert.True(t, status.Called())
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, len(instances), 2)
 	assert.Equal(t, instances[0].State, "running")
 	assert.Equal(t, instances[1].State, "starting")
 }
 
-func createAppRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo ApplicationRepository) {
-	ts = httptest.NewTLSServer(endpoint)
+func createAppRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
