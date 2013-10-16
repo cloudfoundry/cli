@@ -10,15 +10,15 @@ import (
 
 type UnbindService struct {
 	ui                 terminal.UI
-	serviceRepo        api.ServiceRepository
+	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui terminal.UI, sR api.ServiceRepository) (cmd *UnbindService) {
+func NewUnbindService(ui terminal.UI, serviceBindingRepo api.ServiceBindingRepository) (cmd *UnbindService) {
 	cmd = new(UnbindService)
 	cmd.ui = ui
-	cmd.serviceRepo = sR
+	cmd.serviceBindingRepo = serviceBindingRepo
 	return
 }
 
@@ -45,7 +45,7 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Unbinding service %s from %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
-	found, apiResponse := cmd.serviceRepo.UnbindService(instance, app)
+	found, apiResponse := cmd.serviceBindingRepo.Delete(instance, app)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

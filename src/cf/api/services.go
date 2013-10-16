@@ -64,8 +64,6 @@ type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
 	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
-	BindService(instance cf.ServiceInstance, app cf.Application) (apiResponse net.ApiResponse)
-	UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse)
 	DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse)
 	RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 }
@@ -191,46 +189,6 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 		instance.ServiceBindings = append(instance.ServiceBindings, newBinding)
 	}
 
-	return
-}
-
-func (repo CloudControllerServiceRepository) BindService(instance cf.ServiceInstance, app cf.Application) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_bindings", repo.config.Target)
-	body := fmt.Sprintf(
-		`{"app_guid":"%s","service_instance_guid":"%s"}`,
-		app.Guid, instance.Guid,
-	)
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
-}
-
-func (repo CloudControllerServiceRepository) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse) {
-	var path string
-
-	for _, binding := range instance.ServiceBindings {
-		if binding.AppGuid == app.Guid {
-			path = repo.config.Target + binding.Url
-			break
-		}
-	}
-
-	if path == "" {
-		return
-	} else {
-		found = true
-	}
-
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 

@@ -19,8 +19,8 @@ func TestUnbindCommand(t *testing.T) {
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testapi.FakeServiceRepo{}
-	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
+	serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
@@ -29,8 +29,8 @@ func TestUnbindCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-service")
 	assert.Contains(t, fakeUI.Outputs[0], "my-app")
 
-	assert.Equal(t, serviceRepo.UnbindServiceServiceInstance, serviceInstance)
-	assert.Equal(t, serviceRepo.UnbindServiceApplication, app)
+	assert.Equal(t, serviceBindingRepo.DeleteServiceInstance, serviceInstance)
+	assert.Equal(t, serviceBindingRepo.DeleteApplication, app)
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
@@ -42,8 +42,8 @@ func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testapi.FakeServiceRepo{UnbindServiceBindingNotFound: true}
-	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
+	serviceBindingRepo := &testapi.FakeServiceBindingRepo{DeleteBindingNotFound: true}
+	fakeUI := callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
@@ -52,8 +52,8 @@ func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-service")
 	assert.Contains(t, fakeUI.Outputs[0], "my-app")
 
-	assert.Equal(t, serviceRepo.UnbindServiceServiceInstance, serviceInstance)
-	assert.Equal(t, serviceRepo.UnbindServiceApplication, app)
+	assert.Equal(t, serviceBindingRepo.DeleteServiceInstance, serviceInstance)
+	assert.Equal(t, serviceBindingRepo.DeleteApplication, app)
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-service")
@@ -63,22 +63,22 @@ func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
 
 func TestUnbindCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
-	serviceRepo := &testapi.FakeServiceRepo{}
+	serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
 
-	fakeUI := callUnbindService([]string{"my-service"}, reqFactory, serviceRepo)
+	fakeUI := callUnbindService([]string{"my-service"}, reqFactory, serviceBindingRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callUnbindService([]string{"my-app"}, reqFactory, serviceRepo)
+	fakeUI = callUnbindService([]string{"my-app"}, reqFactory, serviceBindingRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
+	fakeUI = callUnbindService([]string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func callUnbindService(args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+func callUnbindService(args []string, reqFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("unbind-service", args)
-	cmd := NewUnbindService(fakeUI, serviceRepo)
+	cmd := NewUnbindService(fakeUI, serviceBindingRepo)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return

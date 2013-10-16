@@ -10,15 +10,15 @@ import (
 
 type BindService struct {
 	ui                 terminal.UI
-	serviceRepo        api.ServiceRepository
+	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewBindService(ui terminal.UI, sR api.ServiceRepository) (cmd *BindService) {
+func NewBindService(ui terminal.UI, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
 	cmd = new(BindService)
 	cmd.ui = ui
-	cmd.serviceRepo = sR
+	cmd.serviceBindingRepo = serviceBindingRepo
 	return
 }
 
@@ -45,7 +45,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Binding service %s to %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
 
-	apiResponse := cmd.serviceRepo.BindService(instance, app)
+	apiResponse := cmd.serviceBindingRepo.Create(instance, app)
 	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != "90003" {
 		cmd.ui.Failed(apiResponse.Message)
 		return

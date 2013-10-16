@@ -19,8 +19,8 @@ func TestBindCommand(t *testing.T) {
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testapi.FakeServiceRepo{}
-	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
+	serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
@@ -29,8 +29,8 @@ func TestBindCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-service")
 	assert.Contains(t, fakeUI.Outputs[0], "my-app")
 
-	assert.Equal(t, serviceRepo.BindServiceServiceInstance, serviceInstance)
-	assert.Equal(t, serviceRepo.BindServiceApplication, app)
+	assert.Equal(t, serviceBindingRepo.CreateServiceInstance, serviceInstance)
+	assert.Equal(t, serviceBindingRepo.CreateApplication, app)
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "TIP")
@@ -44,8 +44,8 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 		Application:     app,
 		ServiceInstance: serviceInstance,
 	}
-	serviceRepo := &testapi.FakeServiceRepo{BindServiceErrorCode: "90003"}
-	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
+	serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
+	fakeUI := callBindService([]string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 	assert.Equal(t, len(fakeUI.Outputs), 3)
 	assert.Contains(t, fakeUI.Outputs[0], "Binding service")
@@ -57,22 +57,22 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 
 func TestBindCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
-	serviceRepo := &testapi.FakeServiceRepo{}
+	serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
 
-	fakeUI := callBindService([]string{"my-service"}, reqFactory, serviceRepo)
+	fakeUI := callBindService([]string{"my-service"}, reqFactory, serviceBindingRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callBindService([]string{"my-app"}, reqFactory, serviceRepo)
+	fakeUI = callBindService([]string{"my-app"}, reqFactory, serviceBindingRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callBindService([]string{"my-app", "my-service"}, reqFactory, serviceRepo)
+	fakeUI = callBindService([]string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func callBindService(args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+func callBindService(args []string, reqFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("bind-service", args)
-	cmd := NewBindService(fakeUI, serviceRepo)
+	cmd := NewBindService(fakeUI, serviceBindingRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

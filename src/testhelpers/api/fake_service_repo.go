@@ -3,7 +3,6 @@ package api
 import (
 	"cf"
 	"cf/net"
-	"net/http"
 )
 
 type FakeServiceRepo struct {
@@ -23,14 +22,6 @@ type FakeServiceRepo struct {
 	FindInstanceByNameServiceInstance cf.ServiceInstance
 	FindInstanceByNameErr bool
 	FindInstanceByNameNotFound bool
-
-	BindServiceServiceInstance cf.ServiceInstance
-	BindServiceApplication cf.Application
-	BindServiceErrorCode string
-
-	UnbindServiceServiceInstance cf.ServiceInstance
-	UnbindServiceApplication cf.Application
-	UnbindServiceBindingNotFound bool
 
 	DeleteServiceServiceInstance cf.ServiceInstance
 
@@ -75,24 +66,6 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.Servic
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Service instance", name)
 	}
 
-	return
-}
-
-func (repo *FakeServiceRepo) BindService(instance cf.ServiceInstance, app cf.Application) (apiResponse net.ApiResponse) {
-	repo.BindServiceServiceInstance = instance
-	repo.BindServiceApplication = app
-
-	if repo.BindServiceErrorCode != "" {
-		apiResponse = net.NewApiResponse("Error binding service", repo.BindServiceErrorCode, http.StatusBadRequest)
-	}
-
-	return
-}
-
-func (repo *FakeServiceRepo) UnbindService(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse) {
-	repo.UnbindServiceServiceInstance = instance
-	repo.UnbindServiceApplication = app
-	found = !repo.UnbindServiceBindingNotFound
 	return
 }
 
