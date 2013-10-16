@@ -3,6 +3,7 @@ package application_test
 import (
 	"cf"
 	. "cf/commands/application"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
@@ -19,14 +20,13 @@ func TestApps(t *testing.T) {
 		cf.Application{Name: "Application-1", State: "started", RunningInstances: 1, Instances: 1, Memory: 512, DiskQuota: 1024, Urls: app1Urls},
 		cf.Application{Name: "Application-2", State: "started", RunningInstances: 1, Instances: 2, Memory: 256, DiskQuota: 1024, Urls: app2Urls},
 	}
-	spaceRepo := &testapi.FakeSpaceRepository{
-		CurrentSpace: cf.Space{Name: "development", Guid: "development-guid"},
-		SummarySpace: cf.Space{Applications: apps},
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{
+		GetSummariesInCurrentSpaceApps: apps,
 	}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-	ui := callApps(spaceRepo, reqFactory)
+	ui := callApps(appSummaryRepo, reqFactory)
 
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
@@ -49,28 +49,31 @@ func TestApps(t *testing.T) {
 }
 
 func TestAppsRequiresLogin(t *testing.T) {
-	spaceRepo := &testapi.FakeSpaceRepository{}
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 
-	callApps(spaceRepo, reqFactory)
+	callApps(appSummaryRepo, reqFactory)
 
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestAppsRequiresASelectedSpaceAndOrg(t *testing.T) {
-	spaceRepo := &testapi.FakeSpaceRepository{}
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 
-	callApps(spaceRepo, reqFactory)
+	callApps(appSummaryRepo, reqFactory)
 
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
-func callApps(spaceRepo *testapi.FakeSpaceRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callApps(appSummaryRepo *testapi.FakeAppSummaryRepo, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
+	config := &configuration.Configuration{
+		Space: cf.Space{Name: "development"},
+	}
 
 	ctxt := testcmd.NewContext("apps", []string{})
-	cmd := NewListApps(ui, spaceRepo)
+	cmd := NewListApps(ui, config, appSummaryRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return

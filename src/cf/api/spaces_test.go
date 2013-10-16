@@ -225,44 +225,12 @@ var spaceSummaryResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
   "name":"development",
   "apps":[
     {
-      "guid":"app-1-guid",
-      "urls":["app1.cfapps.io"],
-      "routes":[
-        {
-          "guid":"route-1-guid",
-          "host":"app1",
-          "domain":{
-            "guid":"domain-1-guid",
-            "name":"cfapps.io"
-          }
-        }
-      ],
-      "running_instances":1,
       "name":"app1",
-      "memory":128,
-      "instances":1,
-      "state":"STARTED",
       "service_names":[
       	"my-service-instance"
       ]
     },{
-      "guid":"app-2-guid",
-      "urls":["app2.cfapps.io", "foo.cfapps.io"],
-      "routes":[
-        {
-          "guid":"route-2-guid",
-          "host":"app2",
-          "domain":{
-            "guid":"domain-1-guid",
-            "name":"cfapps.io"
-          }
-        }
-      ],
-      "running_instances":1,
       "name":"app2",
-      "memory":512,
-      "instances":3,
-      "state":"STARTED",
       "service_names":[
       	"my-service-instance"
       ]
@@ -301,34 +269,10 @@ func TestSpacesGetSummary(t *testing.T) {
 	space, apiResponse := repo.GetSummary()
 	assert.True(t, status.Called())
 
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, "my-space-guid", space.Guid)
 	assert.Equal(t, "development", space.Name)
-	assert.Equal(t, 2, len(space.Applications))
 	assert.Equal(t, 1, len(space.ServiceInstances))
-
-	app1 := space.Applications[0]
-	assert.Equal(t, app1.Name, "app1")
-	assert.Equal(t, app1.Guid, "app-1-guid")
-	assert.Equal(t, len(app1.Urls), 1)
-	assert.Equal(t, app1.Urls[0], "app1.cfapps.io")
-
-	assert.Equal(t, app1.State, "started")
-	assert.Equal(t, app1.Instances, 1)
-	assert.Equal(t, app1.RunningInstances, 1)
-	assert.Equal(t, app1.Memory, uint64(128))
-
-	app2 := space.Applications[1]
-	assert.Equal(t, app2.Name, "app2")
-	assert.Equal(t, app2.Guid, "app-2-guid")
-	assert.Equal(t, len(app2.Urls), 2)
-	assert.Equal(t, app2.Urls[0], "app2.cfapps.io")
-	assert.Equal(t, app2.Urls[1], "foo.cfapps.io")
-
-	assert.Equal(t, app2.State, "started")
-	assert.Equal(t, app2.Instances, 3)
-	assert.Equal(t, app2.RunningInstances, 1)
-	assert.Equal(t, app2.Memory, uint64(512))
 
 	instance1 := space.ServiceInstances[0]
 	assert.Equal(t, instance1.Name, "my-service-instance")

@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -9,13 +10,15 @@ import (
 )
 
 type ListApps struct {
-	ui        terminal.UI
-	spaceRepo api.SpaceRepository
+	ui             terminal.UI
+	config         *configuration.Configuration
+	appSummaryRepo api.AppSummaryRepository
 }
 
-func NewListApps(ui terminal.UI, spaceRepo api.SpaceRepository) (cmd ListApps) {
+func NewListApps(ui terminal.UI, config *configuration.Configuration, appSummaryRepo api.AppSummaryRepository) (cmd ListApps) {
 	cmd.ui = ui
-	cmd.spaceRepo = spaceRepo
+	cmd.config = config
+	cmd.appSummaryRepo = appSummaryRepo
 	return
 }
 
@@ -29,16 +32,14 @@ func (cmd ListApps) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Say("Getting apps in %s...",
-		terminal.EntityNameColor(cmd.spaceRepo.GetCurrentSpace().Name))
+		terminal.EntityNameColor(cmd.config.Space.Name))
 
-	space, apiResponse := cmd.spaceRepo.GetSummary()
+	apps, apiResponse := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
-
-	apps := space.Applications
 
 	cmd.ui.Ok()
 

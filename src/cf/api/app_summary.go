@@ -6,9 +6,38 @@ import (
 	"cf/net"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
+type ApplicationSummaries struct {
+	Apps []ApplicationSummary
+}
+
+type ApplicationSummary struct {
+	Guid             string
+	Name             string
+	Routes           []RouteSummary
+	RunningInstances int `json:"running_instances"`
+	Memory           uint64
+	Instances        int
+	DiskQuota        uint64 `json:"disk_quota"`
+	Urls             []string
+	State            string
+}
+
+type RouteSummary struct {
+	Guid   string
+	Host   string
+	Domain DomainSummary
+}
+
+type DomainSummary struct {
+	Guid string
+	Name string
+}
+
 type AppSummaryRepository interface {
+	GetSummariesInCurrentSpace() (apps []cf.Application, apiResponse net.ApiResponse)
 	GetSummary(app cf.Application) (summary cf.AppSummary, apiResponse net.ApiResponse)
 }
 
@@ -22,6 +51,43 @@ func NewCloudControllerAppSummaryRepository(config *configuration.Configuration,
 	repo.config = config
 	repo.gateway = gateway
 	repo.appRepo = appRepo
+	return
+}
+
+func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []cf.Application, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	response := new(ApplicationSummaries)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apps = extractApplicationsFromSummary(response.Apps)
+
+	return
+}
+
+func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applications []cf.Application) {
+	for _, appSummary := range appSummaries {
+		app := cf.Application{
+			Name:             appSummary.Name,
+			Guid:             appSummary.Guid,
+			Urls:             appSummary.Urls,
+			State:            strings.ToLower(appSummary.State),
+			Instances:        appSummary.Instances,
+			DiskQuota:        appSummary.DiskQuota,
+			RunningInstances: appSummary.RunningInstances,
+			Memory:           appSummary.Memory,
+		}
+		applications = append(applications, app)
+	}
+
 	return
 }
 

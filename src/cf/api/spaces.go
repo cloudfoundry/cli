@@ -28,8 +28,13 @@ type SpaceEntity struct {
 type SpaceSummary struct {
 	Guid             string
 	Name             string
-	Apps             []ApplicationSummary
+	Apps             []SpaceSummaryApp
 	ServiceInstances []ServiceInstanceSummary `json:"services"`
+}
+
+type SpaceSummaryApp struct {
+	Name         string
+	ServiceNames []string `json:"service_names"`
 }
 
 type ServiceInstanceSummary struct {
@@ -47,30 +52,6 @@ type ServiceOfferingSummary struct {
 	Label    string
 	Provider string
 	Version  string
-}
-
-type ApplicationSummary struct {
-	Guid             string
-	Name             string
-	Routes           []RouteSummary
-	RunningInstances int `json:"running_instances"`
-	Memory           uint64
-	Instances        int
-	DiskQuota        uint64 `json:"disk_quota"`
-	Urls             []string
-	State            string
-	ServiceNames     []string `json:"service_names"`
-}
-
-type RouteSummary struct {
-	Guid   string
-	Host   string
-	Domain DomainSummary
-}
-
-type DomainSummary struct {
-	Guid string
-	Name string
 }
 
 type SpaceRepository interface {
@@ -191,10 +172,9 @@ func (repo CloudControllerSpaceRepository) GetSummary() (space cf.Space, apiResp
 		return
 	}
 
-	applications := extractApplicationsFromSummary(response.Apps)
 	serviceInstances := extractServiceInstancesFromSummary(response.ServiceInstances, response.Apps)
 
-	space = cf.Space{Name: response.Name, Guid: response.Guid, Applications: applications, ServiceInstances: serviceInstances}
+	space = cf.Space{Name: response.Name, Guid: response.Guid, ServiceInstances: serviceInstances}
 
 	return
 }
@@ -237,27 +217,9 @@ func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiResponse n
 	return
 }
 
-func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applications []cf.Application) {
-	for _, appSummary := range appSummaries {
-		app := cf.Application{
-			Name:             appSummary.Name,
-			Guid:             appSummary.Guid,
-			Urls:             appSummary.Urls,
-			State:            strings.ToLower(appSummary.State),
-			Instances:        appSummary.Instances,
-			DiskQuota:        appSummary.DiskQuota,
-			RunningInstances: appSummary.RunningInstances,
-			Memory:           appSummary.Memory,
-		}
-		applications = append(applications, app)
-	}
-
-	return
-}
-
-func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSummary, appSummaries []ApplicationSummary) (instances []cf.ServiceInstance) {
+func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSummary, apps []SpaceSummaryApp) (instances []cf.ServiceInstance) {
 	for _, instanceSummary := range instanceSummaries {
-		applicationNames := findApplicationNamesForInstance(instanceSummary.Name, appSummaries)
+		applicationNames := findApplicationNamesForInstance(instanceSummary.Name, apps)
 
 		planSummary := instanceSummary.ServicePlan
 		offeringSummary := planSummary.ServiceOffering
@@ -286,11 +248,11 @@ func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSumma
 	return
 }
 
-func findApplicationNamesForInstance(instanceName string, appSummaries []ApplicationSummary) (applicationNames []string) {
-	for _, appSummary := range appSummaries {
-		for _, name := range appSummary.ServiceNames {
+func findApplicationNamesForInstance(instanceName string, apps []SpaceSummaryApp) (applicationNames []string) {
+	for _, app := range apps {
+		for _, name := range app.ServiceNames {
 			if name == instanceName {
-				applicationNames = append(applicationNames, appSummary.Name)
+				applicationNames = append(applicationNames, app.Name)
 			}
 		}
 	}
