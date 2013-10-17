@@ -194,52 +194,6 @@ func TestDeleteOrganization(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func TestFindQuotaByName(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/quota_definitions?q=name%3Amy-quota",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: `{
-  "resources": [
-    {
-      "metadata": {
-        "guid": "my-quota-guid"
-      },
-      "entity": {
-        "name": "my-remote-quota"
-      }
-    }
-  ]
-}`},
-	)
-
-	ts, repo := createOrganizationRepo(endpoint)
-	defer ts.Close()
-
-	quota, apiResponse := repo.FindQuotaByName("my-quota")
-	assert.True(t, status.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota"})
-}
-
-func TestUpdateQuota(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/organizations/my-org-guid",
-		testapi.RequestBodyMatcher(`{"quota_definition_guid":"my-quota-guid"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
-
-	ts, repo := createOrganizationRepo(endpoint)
-	defer ts.Close()
-
-	quota := cf.Quota{Guid: "my-quota-guid"}
-	org := cf.Organization{Guid: "my-org-guid"}
-	apiResponse := repo.UpdateQuota(org, quota)
-	assert.True(t, status.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
 func createOrganizationRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo OrganizationRepository) {
 	ts = httptest.NewTLSServer(endpoint)
 

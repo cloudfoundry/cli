@@ -9,15 +9,15 @@ import (
 )
 
 type SetQuota struct {
-	ui      terminal.UI
-	orgRepo api.OrganizationRepository
-	orgReq  requirements.OrganizationRequirement
+	ui        terminal.UI
+	quotaRepo api.QuotaRepository
+	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSetQuota(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd *SetQuota) {
+func NewSetQuota(ui terminal.UI, quotaRepo api.QuotaRepository) (cmd *SetQuota) {
 	cmd = new(SetQuota)
 	cmd.ui = ui
-	cmd.orgRepo = orgRepo
+	cmd.quotaRepo = quotaRepo
 	return
 }
 
@@ -40,7 +40,7 @@ func (cmd *SetQuota) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 func (cmd *SetQuota) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	quotaName := c.Args()[1]
-	quota, apiResponse := cmd.orgRepo.FindQuotaByName(quotaName)
+	quota, apiResponse := cmd.quotaRepo.FindByName(quotaName)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
@@ -51,7 +51,7 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 		terminal.EntityNameColor(quota.Name),
 		terminal.EntityNameColor(org.Name))
 
-	apiResponse = cmd.orgRepo.UpdateQuota(org, quota)
+	apiResponse = cmd.quotaRepo.Update(org, quota)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

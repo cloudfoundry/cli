@@ -11,6 +11,7 @@ type RepositoryLocator struct {
 
 	endpointRepo                    RemoteEndpointRepository
 	organizationRepo                CloudControllerOrganizationRepository
+	quotaRepo                       CloudControllerQuotaRepository
 	spaceRepo                       CloudControllerSpaceRepository
 	appRepo                         CloudControllerApplicationRepository
 	appBitsRepo                     CloudControllerApplicationBitsRepository
@@ -44,6 +45,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, configRepo)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
+	loc.quotaRepo = NewCloudControllerQuotaRepository(config, cloudControllerGateway)
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, cf.ApplicationZipper{})
@@ -76,6 +78,10 @@ func (locator RepositoryLocator) GetEndpointRepository() EndpointRepository {
 
 func (locator RepositoryLocator) GetOrganizationRepository() OrganizationRepository {
 	return locator.organizationRepo
+}
+
+func (locator RepositoryLocator) GetQuotaRepository() QuotaRepository {
+	return locator.quotaRepo
 }
 
 func (locator RepositoryLocator) GetSpaceRepository() SpaceRepository {

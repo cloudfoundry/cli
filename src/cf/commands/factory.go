@@ -76,7 +76,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["services"] = service.NewListServices(ui, config, repoLocator.GetServiceSummaryRepository())
 	factory.cmdsByName["set-env"] = application.NewSetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["set-org-role"] = user.NewSetOrgRole(ui, repoLocator.GetUserRepository())
-	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, repoLocator.GetOrganizationRepository())
+	factory.cmdsByName["set-quota"] = organization.NewSetQuota(ui, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["set-space-role"] = user.NewSetSpaceRole(ui, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["share-domain"] = domain.NewShareDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, config)

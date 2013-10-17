@@ -29,8 +29,6 @@ type OrganizationRepository interface {
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(org cf.Organization, name string) (apiResponse net.ApiResponse)
 	Delete(org cf.Organization) (apiResponse net.ApiResponse)
-	FindQuotaByName(name string) (quota cf.Quota, apiResponse net.ApiResponse)
-	UpdateQuota(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -140,45 +138,6 @@ func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, na
 func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
 	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
-}
-
-func (repo CloudControllerOrganizationRepository) FindQuotaByName(name string) (quota cf.Quota, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/quota_definitions?q=name%%3A%s", repo.config.Target, name)
-
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	resources := new(PaginatedResources)
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(resources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
-		return
-	}
-
-	res := resources.Resources[0]
-	quota.Guid = res.Metadata.Guid
-	quota.Name = res.Entity.Name
-
-	return
-}
-
-func (repo CloudControllerOrganizationRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
-	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quota.Guid)
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
