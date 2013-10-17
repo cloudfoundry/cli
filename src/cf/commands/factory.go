@@ -30,6 +30,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
 	factory.cmdsByName["app"] = application.NewShowApp(ui, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
+	factory.cmdsByName["authenticate"] = NewAuthenticate(ui, configRepo, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["bind-service"] = service.NewBindService(ui, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["create-org"] = organization.NewCreateOrg(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["create-service"] = service.NewCreateService(ui, repoLocator.GetServiceRepository())

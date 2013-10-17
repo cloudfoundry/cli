@@ -38,6 +38,7 @@ func TestCommands(t *testing.T) {
 		"api",
 		"app",
 		"apps",
+		"authenticate",
 		"bind-service",
 		"create-org",
 		"create-service",

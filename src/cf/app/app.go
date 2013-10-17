@@ -40,6 +40,20 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "authenticate",
+			Description: "Log user in",
+			Usage: fmt.Sprintf("%s authenticate [USERNAME] [PASSWORD]\n\n", cf.Name) +
+				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
+				"EXAMPLE:\n" +
+				fmt.Sprintf("   %s authenticate (omit username and password to login interactively -- %s will prompt for both)\n", cf.Name, cf.Name) +
+				fmt.Sprintf("   %s authenticate name@example.com pa55woRD (specify username and password to login non-interactively)\n", cf.Name) +
+				fmt.Sprintf("   %s authenticate name@example.com \"my password\" (use quotes for passwords with a space)\n", cf.Name) +
+				fmt.Sprintf("   %s authenticate name@example.com \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("authenticate", c)
+			},
+		},
+		{
 			Name:        "bind-service",
 			ShortName:   "bs",
 			Description: "Bind a service instance to an app",
