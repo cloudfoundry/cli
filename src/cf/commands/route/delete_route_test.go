@@ -57,7 +57,7 @@ func TestDeleteRouteWithConfirmation(t *testing.T) {
 
 func TestDeleteRouteWithForce(t *testing.T) {
 	domain := cf.Domain{Guid: "domain-guid", Name: "example.com"}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Domain: domain}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	routeRepo := &testapi.FakeRouteRepository{
 		FindByHostAndDomainRoute: cf.Route{Host: "my-host", Domain: domain},
 	}
@@ -72,6 +72,22 @@ func TestDeleteRouteWithForce(t *testing.T) {
 	assert.Equal(t, routeRepo.DeleteRoute, cf.Route{Host: "my-host", Domain: domain})
 
 	assert.Contains(t, ui.Outputs[1], "OK")
+}
+
+func TestDeleteRouteWhenRouteDoesNotExist(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	routeRepo := &testapi.FakeRouteRepository{
+		FindByHostAndDomainNotFound: true,
+	}
+
+	ui := callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
+
+	assert.Contains(t, ui.Outputs[0], "Deleting")
+	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
+
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[2], "my-host")
+	assert.Contains(t, ui.Outputs[2], "does not exist")
 }
 
 func callDeleteRoute(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {
