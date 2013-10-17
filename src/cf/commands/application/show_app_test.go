@@ -109,6 +109,50 @@ func TestDisplayingAppSummary(t *testing.T) {
 	assert.Contains(t, ui.Outputs[8], "0 of 0")
 }
 
+func TestDisplayingStoppedAppSummary(t *testing.T) {
+	testDisplayingAppSummaryWithErrorCode(t, cf.APP_STOPPED)
+}
+
+func TestDisplayingNotStagedAppSummary(t *testing.T) {
+	testDisplayingAppSummaryWithErrorCode(t, cf.APP_NOT_STAGED)
+}
+
+func testDisplayingAppSummaryWithErrorCode(t *testing.T, errorCode string) {
+	reqApp := cf.Application{Name: "my-app"}
+
+	app := cf.Application{
+		State:            "stopped",
+		Instances:        2,
+		RunningInstances: 0,
+		Memory:           256,
+		Urls:             []string{"my-app.example.com", "foo.example.com"},
+	}
+
+	appSummary := cf.AppSummary{App: app}
+
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary, GetSummaryErrorCode: errorCode}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
+	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo)
+
+	assert.Equal(t, appSummaryRepo.GetSummaryApp.Name, "my-app")
+	assert.Equal(t, len(ui.Outputs), 6)
+
+	assert.Contains(t, ui.Outputs[0], "Showing health and status")
+	assert.Contains(t, ui.Outputs[0], "my-app")
+
+	assert.Contains(t, ui.Outputs[2], "state")
+	assert.Contains(t, ui.Outputs[2], "stopped")
+
+	assert.Contains(t, ui.Outputs[3], "instances")
+	assert.Contains(t, ui.Outputs[3], "0/2")
+
+	assert.Contains(t, ui.Outputs[4], "usage")
+	assert.Contains(t, ui.Outputs[4], "256M x 2 instances")
+
+	assert.Contains(t, ui.Outputs[5], "urls")
+	assert.Contains(t, ui.Outputs[5], "my-app.example.com, foo.example.com")
+}
+
 func callApp(args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("app", args)

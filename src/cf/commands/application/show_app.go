@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf"
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
@@ -45,7 +46,9 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	cmd.ui.Say("Showing health and status for app %s...", terminal.EntityNameColor(app.Name))
 
 	summary, apiResponse := cmd.appSummaryRepo.GetSummary(app)
-	if apiResponse.IsNotSuccessful() {
+	appIsStopped := apiResponse.ErrorCode == cf.APP_STOPPED || apiResponse.ErrorCode == cf.APP_NOT_STAGED
+
+	if apiResponse.IsNotSuccessful() && !appIsStopped {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
@@ -55,6 +58,10 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstaces(summary.App))
 	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), byteSize(summary.App.Memory*MEGABYTE), summary.App.Instances)
 	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
+
+	if appIsStopped {
+		return
+	}
 
 	table := [][]string{
 		[]string{"", "status", "since", "cpu", "memory", "disk"},
