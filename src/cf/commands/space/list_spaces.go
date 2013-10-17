@@ -30,7 +30,9 @@ func (cmd ListSpaces) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 }
 
 func (cmd ListSpaces) Run(c *cli.Context) {
-	cmd.ui.Say("Getting spaces in %s...", terminal.EntityNameColor(cmd.config.Organization.Name))
+	cmd.ui.Say("Getting spaces in org %s as %s...",
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Username()))
 
 	spaces, apiResponse := cmd.spaceRepo.FindAll()
 	if apiResponse.IsNotSuccessful() {

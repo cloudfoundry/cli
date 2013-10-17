@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -36,11 +37,21 @@ func TestListingSpaces(t *testing.T) {
 			cf.Space{Name: "space1"}, cf.Space{Name: "space2"},
 		},
 	}
-	config := &configuration.Configuration{}
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+
+	assert.NoError(t, err)
+	config := &configuration.Configuration{
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
-	assert.Contains(t, ui.Outputs[0], "Getting spaces")
+	assert.Contains(t, ui.Outputs[0], "Getting spaces in org")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "space1")
 	assert.Contains(t, ui.Outputs[3], "space2")
