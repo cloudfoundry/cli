@@ -43,18 +43,28 @@ func TestUpdateServiceAuthTokenRequirements(t *testing.T) {
 }
 
 func TestUpdateServiceAuthToken(t *testing.T) {
-	authTokenRepo := &testapi.FakeAuthTokenRepo{}
+	foundAuthToken := cf.ServiceAuthToken{
+		Guid:     "found-auth-token-guid",
+		Label:    "found label",
+		Provider: "found provider",
+	}
+	authTokenRepo := &testapi.FakeAuthTokenRepo{FindByLabelAndProviderServiceAuthToken: foundAuthToken}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider", "a value"}
 
 	ui := callUpdateServiceAuthToken(args, reqFactory, authTokenRepo)
 	expectedAuthToken := cf.ServiceAuthToken{
-		Label:    "a label",
-		Provider: "a provider",
+		Guid:     "found-auth-token-guid",
+		Label:    "found label",
+		Provider: "found provider",
 		Token:    "a value",
 	}
 	assert.Equal(t, ui.Outputs[0], "Updating service auth token...")
 	assert.Contains(t, ui.Outputs[1], "OK")
+
+	assert.Equal(t, authTokenRepo.FindByLabelAndProviderLabel, "a label")
+	assert.Equal(t, authTokenRepo.FindByLabelAndProviderProvider, "a provider")
+	assert.Equal(t, authTokenRepo.UpdatedServiceAuthToken, expectedAuthToken)
 	assert.Equal(t, authTokenRepo.UpdatedServiceAuthToken, expectedAuthToken)
 }
 

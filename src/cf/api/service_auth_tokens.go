@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -27,7 +28,7 @@ type ServiceAuthTokenRepository interface {
 	Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse)
-	FindByName(tokenName cf.ServiceAuthTokenNameKey) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse)
+	FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceAuthTokenRepository struct {
@@ -56,7 +57,26 @@ func (repo CloudControllerServiceAuthTokenRepository) Create(authToken cf.Servic
 
 func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
+	return repo.findAllWithPath(path)
+}
 
+func (repo CloudControllerServiceAuthTokenRepository) FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_auth_tokens?q=label:%s;provider:%s", repo.config.Target, label, provider)
+	authTokens, apiResponse := repo.findAllWithPath(path)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if len(authTokens) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("Service Auth Token %s %s not found", label, provider)
+		return
+	}
+
+	authToken = authTokens[0]
+	return
+}
+
+func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path string) (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -75,55 +95,26 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []cf
 			Provider: resource.Entity.Provider,
 		})
 	}
-
-	return
-}
-
-func (repo CloudControllerServiceAuthTokenRepository) FindByName(tokenName cf.ServiceAuthTokenNameKey) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
-	authTokens, apiResponse := repo.FindAll()
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	tokenIndex := indexOfToken(authTokens, tokenName)
-	if tokenIndex == -1 {
-		apiResponse = net.NewNotFoundApiResponse("Service Auth Token not found")
-		return
-	}
-	authToken = authTokens[tokenIndex]
 	return
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
-
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.updateOrDelete(authToken, "DELETE", nil)
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
 	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	return repo.updateOrDelete(authToken, "PUT", strings.NewReader(body))
+}
+
+func (repo CloudControllerServiceAuthTokenRepository) updateOrDelete(authToken cf.ServiceAuthToken, verb string, body io.Reader) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
+
+	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	apiResponse = repo.gateway.PerformRequest(request)
 	return
-}
-
-func indexOfToken(tokens []cf.ServiceAuthToken, key cf.ServiceAuthTokenNameKey) int {
-	for i, token := range tokens {
-		if token.FindByNameKey() == key {
-			return i
-		}
-	}
-
-	return -1
 }

@@ -55,8 +55,8 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// match query string
 	if len(paths) > 1 {
-		if !strings.Contains(r.RequestURI, paths[1]) {
-			h.logError("Query string does not match.\nExpected: %s\nActual:   %s", paths[1], r.URL.Path)
+		if !strings.Contains(r.URL.RawQuery, paths[1]) {
+			h.logError("Query string does not match.\nExpected: %s\nActual:   %s", paths[1], r.URL.RawQuery)
 		}
 	}
 

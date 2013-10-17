@@ -10,9 +10,10 @@ type FakeAuthTokenRepo struct {
 	
 	FindAllAuthTokens []cf.ServiceAuthToken
 
-	FindByNameServiceAuthToken cf.ServiceAuthToken
-	FindByNameTokenNameKey cf.ServiceAuthTokenNameKey
-	FindByNameServiceApiResponse net.ApiResponse
+	FindByLabelAndProviderLabel string
+	FindByLabelAndProviderProvider string
+	FindByLabelAndProviderServiceAuthToken cf.ServiceAuthToken
+	FindByLabelAndProviderApiResponse net.ApiResponse
 
 	UpdatedServiceAuthToken cf.ServiceAuthToken
 
@@ -28,10 +29,12 @@ func (repo *FakeAuthTokenRepo) FindAll() (authTokens []cf.ServiceAuthToken, apiR
 	authTokens = repo.FindAllAuthTokens
 	return
 }
-func (repo *FakeAuthTokenRepo) FindByName(tokenName cf.ServiceAuthTokenNameKey) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
-	repo.FindByNameTokenNameKey = tokenName
-	authToken = repo.FindByNameServiceAuthToken
-	apiResponse = repo.FindByNameServiceApiResponse
+func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
+	repo.FindByLabelAndProviderLabel = label
+	repo.FindByLabelAndProviderProvider = provider
+
+	authToken = repo.FindByLabelAndProviderServiceAuthToken
+	apiResponse = repo.FindByLabelAndProviderApiResponse
 	return
 }
 

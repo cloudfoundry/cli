@@ -8,118 +8,60 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
-var findAllServiceAuthTokensEndpoint, findAllStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/service_auth_tokens",
-	nil,
-	testapi.TestResponse{Status: http.StatusOK, Body: `
-{
-  "resources": [
-    {
-      "metadata": {
-        "guid": "mysql-core-guid"
-      },
-      "entity": {
-        "label": "mysql",
-        "provider": "mysql-core",
-        "token": "mysql-token-guid"
-      }
-    },
-    {
-      "metadata": {
-        "guid": "postgres-core-guid"
-      },
-      "entity": {
-        "label": "postgres",
-        "provider": "postgres-core"
-      }
-    }
-  ]
-}`},
-)
-
-var updateServiceAuthTokenEndpoint, updateStatus = testapi.CreateCheckableEndpoint(
-	"PUT",
-	"/v2/service_auth_tokens/mysql-core-guid",
-	testapi.RequestBodyMatcher(`{"token":"a value"}`),
-	testapi.TestResponse{Status: http.StatusCreated},
-)
-
-var deleteServiceAuthTokenEndpoint, deleteStatus = testapi.CreateCheckableEndpoint(
-	"DELETE",
-	"/v2/service_auth_tokens/mysql-core-guid",
-	nil,
-	testapi.TestResponse{Status: http.StatusOK},
-)
-
-var servicesEndpoints = http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-	switch request.Method {
-	case "GET":
-		findAllServiceAuthTokensEndpoint(writer, request)
-	case "PUT":
-		updateServiceAuthTokenEndpoint(writer, request)
-	case "DELETE":
-		deleteServiceAuthTokenEndpoint(writer, request)
-	}
-})
-
-func createServiceAuthTokenRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo ServiceAuthTokenRepository) {
-	ts = httptest.NewTLSServer(endpoint)
-
-	config := &configuration.Configuration{
-		Target:      ts.URL,
-		AccessToken: "BEARER my_access_token",
-	}
-	gateway := net.NewCloudControllerGateway()
-
-	repo = NewCloudControllerServiceAuthTokenRepository(config, gateway)
-	return
-}
-
-func TestCreate(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/service_auth_tokens",
-		testapi.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
-
-	ts, repo := createServiceAuthTokenRepo(endpoint)
-	defer ts.Close()
-
-	apiResponse := repo.Create(cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Token: "a token"})
-
-	assert.True(t, status.Called())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
 func TestServiceAuthCreate(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/service_auth_tokens",
-		testapi.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/service_auth_tokens",
+		Matcher:  testnet.RequestBodyMatcher(`{"label":"a label","provider":"a provider","token":"a token"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createServiceAuthTokenRepo(endpoint)
+	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
 
 	apiResponse := repo.Create(cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Token: "a token"})
 
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestServiceAuthFindAll(t *testing.T) {
-	findAllStatus.Reset()
-	ts, repo := createServiceAuthTokenRepo(findAllServiceAuthTokensEndpoint)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/service_auth_tokens",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body: `{ "resources": [
+				{
+				  "metadata": {
+					"guid": "mysql-core-guid"
+				  },
+				  "entity": {
+					"label": "mysql",
+					"provider": "mysql-core"
+				  }
+				},
+				{
+				  "metadata": {
+					"guid": "postgres-core-guid"
+				  },
+				  "entity": {
+					"label": "postgres",
+					"provider": "postgres-core"
+				  }
+				}
+			]}`},
+	})
+
+	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
 
 	authTokens, apiResponse := repo.FindAll()
-	assert.True(t, findAllStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 
 	assert.Equal(t, len(authTokens), 2)
@@ -133,60 +75,85 @@ func TestServiceAuthFindAll(t *testing.T) {
 	assert.Equal(t, authTokens[1].Guid, "postgres-core-guid")
 }
 
-func TestServiceAuthFindByName(t *testing.T) {
-	findAllStatus.Reset()
-	ts, repo := createServiceAuthTokenRepo(findAllServiceAuthTokensEndpoint)
+func TestServiceAuthFindByLabelAndProvider(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/service_auth_tokens?q=label:a-label;provider:a-provider",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body: `{"resources": [{
+			"metadata": { "guid": "mysql-core-guid" },
+			"entity": {
+				"label": "mysql",
+				"provider": "mysql-core"
+			}
+		}]}`},
+	})
+
+	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
 
-	finderToken := cf.ServiceAuthToken{
-		Label:    "mysql",
-		Provider: "mysql-core",
-	}
+	serviceAuthToken, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-	authToken, apiResponse := repo.FindByName(finderToken.FindByNameKey())
-	assert.True(t, findAllStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
-
-	assert.Equal(t, authToken.FindByNameKey(), finderToken.FindByNameKey())
-	assert.Equal(t, authToken.Label, "mysql")
-	assert.Equal(t, authToken.Provider, "mysql-core")
-	assert.Equal(t, authToken.Guid, "mysql-core-guid")
+	assert.Equal(t, serviceAuthToken, cf.ServiceAuthToken{Guid: "mysql-core-guid", Label: "mysql", Provider: "mysql-core"})
 }
 
-func TestServiceAuthFindByNameWithoutMatch(t *testing.T) {
-	findAllStatus.Reset()
-	ts, repo := createServiceAuthTokenRepo(findAllServiceAuthTokensEndpoint)
+func TestServiceAuthFindByLabelAndProviderWhenNotFound(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/service_auth_tokens?q=label:a-label;provider:a-provider",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body:   `{"resources": []}`},
+	})
+
+	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
 
-	noMatchToken := cf.ServiceAuthToken{
-		Label:    "no",
-		Provider: "match",
-	}
+	_, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-	_, apiResponse := repo.FindByName(noMatchToken.FindByNameKey())
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
-	assert.True(t, findAllStatus.Called())
 }
 
 func TestServiceAuthUpdate(t *testing.T) {
-	updateStatus.Reset()
-	ts, repo := createServiceAuthTokenRepo(servicesEndpoints)
-	defer ts.Close()
-
-	apiResponse := repo.Update(cf.ServiceAuthToken{
-		Guid:  "mysql-core-guid",
-		Token: "a value",
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/service_auth_tokens/mysql-core-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"token":"a value"}`),
+		Response: testnet.TestResponse{Status: http.StatusOK},
 	})
 
-	assert.True(t, updateStatus.Called())
+	ts, handler, repo := createServiceAuthTokenRepo(t, req)
+	defer ts.Close()
+
+	apiResponse := repo.Update(cf.ServiceAuthToken{Guid: "mysql-core-guid", Token: "a value"})
+
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestServiceAuthDelete(t *testing.T) {
-	deleteStatus.Reset()
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/service_auth_tokens/mysql-core-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	ts := httptest.NewTLSServer(servicesEndpoints)
+	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
+
+	apiResponse := repo.Delete(cf.ServiceAuthToken{Guid: "mysql-core-guid"})
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func createServiceAuthTokenRepo(t *testing.T, request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceAuthTokenRepository) {
+	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{request})
 
 	config := &configuration.Configuration{
 		Target:      ts.URL,
@@ -194,11 +161,6 @@ func TestServiceAuthDelete(t *testing.T) {
 	}
 	gateway := net.NewCloudControllerGateway()
 
-	repo := NewCloudControllerServiceAuthTokenRepository(config, gateway)
-	apiResponse := repo.Delete(cf.ServiceAuthToken{
-		Guid: "mysql-core-guid",
-	})
-
-	assert.True(t, deleteStatus.Called())
-	assert.True(t, apiResponse.IsSuccessful())
+	repo = NewCloudControllerServiceAuthTokenRepository(config, gateway)
+	return
 }

@@ -46,7 +46,7 @@ func TestDeleteServiceAuthToken(t *testing.T) {
 		Provider: "a provider",
 	}
 	authTokenRepo := &testapi.FakeAuthTokenRepo{
-		FindByNameServiceAuthToken: expectedToken,
+		FindByLabelAndProviderServiceAuthToken: expectedToken,
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
@@ -54,6 +54,8 @@ func TestDeleteServiceAuthToken(t *testing.T) {
 	ui := callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
 	assert.Contains(t, ui.Outputs[0], "Deleting service auth token...")
 
+	assert.Equal(t, authTokenRepo.FindByLabelAndProviderLabel, "a label")
+	assert.Equal(t, authTokenRepo.FindByLabelAndProviderProvider, "a provider")
 	assert.Equal(t, authTokenRepo.DeletedServiceAuthToken, expectedToken)
 
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -83,7 +85,7 @@ func TestDeleteServiceAuthTokenWithY(t *testing.T) {
 		Provider: "a provider",
 	}
 	authTokenRepo := &testapi.FakeAuthTokenRepo{
-		FindByNameServiceAuthToken: expectedToken,
+		FindByLabelAndProviderServiceAuthToken: expectedToken,
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
@@ -109,7 +111,7 @@ func TestDeleteServiceAuthTokenWithForce(t *testing.T) {
 		Provider: "a provider",
 	}
 	authTokenRepo := &testapi.FakeAuthTokenRepo{
-		FindByNameServiceAuthToken: expectedToken,
+		FindByLabelAndProviderServiceAuthToken: expectedToken,
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"-f", "a label", "a provider"}
@@ -128,7 +130,7 @@ func TestDeleteServiceAuthTokenWithForce(t *testing.T) {
 
 func TestDeleteServiceAuthTokenWhenTokenDoesNotExist(t *testing.T) {
 	authTokenRepo := &testapi.FakeAuthTokenRepo{
-		FindByNameServiceApiResponse: net.NewNotFoundApiResponse("not found"),
+		FindByLabelAndProviderApiResponse: net.NewNotFoundApiResponse("not found"),
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
@@ -141,7 +143,7 @@ func TestDeleteServiceAuthTokenWhenTokenDoesNotExist(t *testing.T) {
 
 func TestDeleteServiceAuthTokenFailsWithError(t *testing.T) {
 	authTokenRepo := &testapi.FakeAuthTokenRepo{
-		FindByNameServiceApiResponse: net.NewApiResponseWithMessage("OH NOES"),
+		FindByLabelAndProviderApiResponse: net.NewApiResponseWithMessage("OH NOES"),
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}

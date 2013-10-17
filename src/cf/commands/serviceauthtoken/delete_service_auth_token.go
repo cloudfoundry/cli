@@ -1,7 +1,6 @@
 package serviceauthtoken
 
 import (
-	"cf"
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
@@ -33,13 +32,8 @@ func (cmd DeleteServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 }
 
 func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
-
 	tokenLabel := c.Args()[0]
 	tokenProvider := c.Args()[1]
-	token := cf.ServiceAuthToken{
-		Label:    tokenLabel,
-		Provider: tokenProvider,
-	}
 
 	if c.Bool("f") == false {
 		response := cmd.ui.Confirm(
@@ -53,7 +47,7 @@ func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("Deleting service auth token...")
-	token, apiResponse := cmd.authTokenRepo.FindByName(token.FindByNameKey())
+	token, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
 	if apiResponse.IsError() {
 		cmd.ui.Failed("Error deleting service auth token.\n%s", apiResponse.Message)
 		return

@@ -1,7 +1,6 @@
 package serviceauthtoken
 
 import (
-	"cf"
 	"cf/api"
 	"cf/requirements"
 	"cf/terminal"
@@ -36,13 +35,15 @@ func (cmd UpdateServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 func (cmd UpdateServiceAuthToken) Run(c *cli.Context) {
 	cmd.ui.Say("Updating service auth token...")
 
-	serviceAuthToken := cf.ServiceAuthToken{
-		Label:    c.Args()[0],
-		Provider: c.Args()[1],
-		Token:    c.Args()[2],
+	serviceAuthToken, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
 	}
 
-	apiResponse := cmd.authTokenRepo.Update(serviceAuthToken)
+	serviceAuthToken.Token = c.Args()[2]
+
+	apiResponse = cmd.authTokenRepo.Update(serviceAuthToken)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
