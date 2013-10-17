@@ -49,7 +49,46 @@ func NewCloudControllerRouteRepository(config *configuration.Configuration, gate
 
 func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
+	return repo.findAllWithPath(path)
+}
 
+func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
+	return repo.findOneWithPath(path)
+}
+
+func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiResponse net.ApiResponse) {
+	domain, apiResponse := repo.domainRepo.FindByNameInCurrentSpace(domainName)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/routes?q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
+	route, apiResponse = repo.findOneWithPath(path)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	route.Domain = domain
+	return
+}
+
+func (repo CloudControllerRouteRepository) findOneWithPath(path string) (route cf.Route, apiResponse net.ApiResponse) {
+	routes, apiResponse := repo.findAllWithPath(path)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if len(routes) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("Route not found")
+		return
+	}
+
+	route = routes[0]
+	return
+}
+
+func (repo CloudControllerRouteRepository) findAllWithPath(path string) (routes []cf.Route, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -81,63 +120,6 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResp
 			},
 		)
 	}
-	return
-}
-
-func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
-
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	resources := new(PaginatedRouteResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(resources.Resources) == 0 {
-		apiResponse = net.NewApiResponseWithMessage("Route not found")
-		return
-	}
-
-	resource := resources.Resources[0]
-	route.Guid = resource.Metadata.Guid
-	route.Host = resource.Entity.Host
-
-	return
-}
-
-func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiResponse net.ApiResponse) {
-	domain, apiResponse := repo.domainRepo.FindByNameInCurrentSpace(domainName)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	path := fmt.Sprintf("%s/v2/routes?q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	resources := new(PaginatedRouteResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(resources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Route", fmt.Sprintf("%s.%s", host, domainName))
-		return
-	}
-
-	resource := resources.Resources[0]
-	route.Guid = resource.Metadata.Guid
-	route.Host = resource.Entity.Host
-	route.Domain = domain
-
 	return
 }
 

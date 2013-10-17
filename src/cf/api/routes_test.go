@@ -132,7 +132,8 @@ func TestFindByHost(t *testing.T) {
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
+	assert.Equal(t, route.Host, "my-cool-app")
+	assert.Equal(t, route.Guid, "my-route-guid")
 }
 
 func TestFindByHostWhenHostIsNotFound(t *testing.T) {
@@ -167,7 +168,9 @@ func TestFindByHostAndDomain(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.True(t, handler.AllRequestsCalled())
 	assert.Equal(t, domainRepo.FindByNameName, "my-domain.com")
-	assert.Equal(t, route, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domainRepo.FindByNameDomain})
+	assert.Equal(t, route.Host, "my-cool-app")
+	assert.Equal(t, route.Guid, "my-route-guid")
+	assert.Equal(t, route.Domain, domainRepo.FindByNameDomain)
 }
 
 func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
