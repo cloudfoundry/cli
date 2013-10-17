@@ -24,11 +24,11 @@ type AuthTokenEntity struct {
 }
 
 type ServiceAuthTokenRepository interface {
+	FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse)
+	FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse)
 	Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
 	Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse)
-	FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse)
-	FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceAuthTokenRepository struct {
@@ -39,19 +39,6 @@ type CloudControllerServiceAuthTokenRepository struct {
 func NewCloudControllerServiceAuthTokenRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerServiceAuthTokenRepository) {
 	repo.gateway = gateway
 	repo.config = config
-	return
-}
-
-func (repo CloudControllerServiceAuthTokenRepository) Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
-	body := fmt.Sprintf(`{"label":"%s","provider":"%s","token":"%s"}`, authToken.Label, authToken.Provider, authToken.Token)
-
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
 
@@ -98,17 +85,26 @@ func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path strin
 	return
 }
 
+func (repo CloudControllerServiceAuthTokenRepository) Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
+	body := fmt.Sprintf(`{"label":"%s","provider":"%s","token":"%s"}`, authToken.Label, authToken.Provider, authToken.Token)
+	return repo.createUpdateOrDelete(authToken, "POST", strings.NewReader(body))
+}
+
 func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	return repo.updateOrDelete(authToken, "DELETE", nil)
+	return repo.createUpdateOrDelete(authToken, "DELETE", nil)
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
-	return repo.updateOrDelete(authToken, "PUT", strings.NewReader(body))
+	return repo.createUpdateOrDelete(authToken, "PUT", strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceAuthTokenRepository) updateOrDelete(authToken cf.ServiceAuthToken, verb string, body io.Reader) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
+func (repo CloudControllerServiceAuthTokenRepository) createUpdateOrDelete(authToken cf.ServiceAuthToken, verb string, body io.Reader) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
+
+	if authToken.Guid != "" {
+		path = fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
+	}
 
 	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
 	if apiResponse.IsNotSuccessful() {
