@@ -7,32 +7,26 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
 func TestStacksFindByName(t *testing.T) {
-	response := testapi.TestResponse{Status: http.StatusOK, Body: `
-{
-"resources": [
-    {
-      "metadata": { "guid": "custom-linux-guid" },
-      "entity": { "name": "custom-linux" }
-    }
-  ]
-}`}
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/stacks?q=name%3Alinux",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: ` { "resources": [
+			{
+			  "metadata": { "guid": "custom-linux-guid" },
+			  "entity": { "name": "custom-linux" }
+			}
+  		]}`}})
 
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/stacks?q=name%3Alinux",
-		nil,
-		response,
-	)
-
-	ts, repo := createStackRepo(endpoint)
+	ts, handler, repo := createStackRepo(t, req)
 	defer ts.Close()
 
 	stack, apiResponse := repo.FindByName("linux")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, stack.Name, "custom-linux")
 	assert.Equal(t, stack.Guid, "custom-linux-guid")
@@ -41,7 +35,7 @@ func TestStacksFindByName(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-var allStacksResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
+var allStacksResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -72,26 +66,25 @@ var allStacksResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
 }`}
 
 func TestStacksFindAll(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/stacks",
-		nil,
-		allStacksResponse,
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/stacks",
+		Response: allStacksResponse,
+	})
 
-	ts, repo := createStackRepo(endpoint)
+	ts, handler, repo := createStackRepo(t, req)
 	defer ts.Close()
 
 	stacks, apiResponse := repo.FindAll()
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, len(stacks), 2)
 	assert.Equal(t, stacks[0].Name, "lucid64")
 	assert.Equal(t, stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")
 }
 
-func createStackRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo StackRepository) {
-	ts = httptest.NewTLSServer(endpoint)
+func createStackRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo StackRepository) {
+	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",

@@ -39,31 +39,26 @@ func NewCloudControllerStackRepository(config *configuration.Configuration, gate
 
 func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	stacks, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	resources := new(PaginatedResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(resources.Resources) == 0 {
+	if len(stacks) == 0 {
 		apiResponse = net.NewApiResponseWithMessage("Stack %s not found", name)
 		return
 	}
 
-	res := resources.Resources[0]
-	stack.Guid = res.Metadata.Guid
-	stack.Name = res.Entity.Name
-
+	stack = stacks[0]
 	return
 }
 
 func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
+	return repo.findAllWithPath(path)
+}
+
+func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []cf.Stack, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -78,6 +73,5 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiResp
 	for _, r := range resources.Resources {
 		stacks = append(stacks, cf.Stack{Guid: r.Metadata.Guid, Name: r.Entity.Name, Description: r.Entity.Description})
 	}
-
 	return
 }
