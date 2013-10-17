@@ -150,6 +150,18 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "delete-route",
+			Description: "Delete a route",
+			Usage:       fmt.Sprintf("%s delete-route DOMAIN -n HOSTNAME", cf.Name),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+				cli.StringFlag{Name: "n", Usage: "Hostname"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("delete-route", c)
+			},
+		},
+		{
 			Name:        "delete-service",
 			ShortName:   "ds",
 			Description: "Delete a service instance",

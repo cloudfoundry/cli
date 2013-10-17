@@ -31,6 +31,7 @@ type RouteRepository interface {
 	CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiResponse net.ApiResponse)
 	Bind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse)
 	Unbind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse)
+	Delete(route cf.Route) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerRouteRepository struct {
@@ -172,6 +173,17 @@ func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Applicati
 
 func (repo CloudControllerRouteRepository) Unbind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
 	return repo.change("DELETE", route, app)
+}
+
+func (repo CloudControllerRouteRepository) Delete(route cf.Route) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/routes/%s", repo.config.Target, route.Guid)
+	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(request)
+	return
 }
 
 func (repo CloudControllerRouteRepository) change(verb string, route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {

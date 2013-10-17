@@ -32,6 +32,8 @@ type FakeRouteRepository struct {
 
 	FindAllErr    bool
 	FindAllRoutes []cf.Route
+
+	DeleteRoute cf.Route
 }
 
 func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, apiResponse net.ApiResponse) {
@@ -102,5 +104,7 @@ func (repo *FakeRouteRepository) Unbind(route cf.Route, app cf.Application) (api
 	return
 }
 
-
-
+func (repo *FakeRouteRepository) Delete(route cf.Route) (apiResponse net.ApiResponse) {
+	repo.DeleteRoute = route
+	return
+}

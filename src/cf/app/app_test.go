@@ -48,6 +48,7 @@ func TestCommands(t *testing.T) {
 		"create-user-provided-service",
 		"delete",
 		"delete-org",
+		"delete-route",
 		"delete-service",
 		"delete-service-auth-token",
 		"delete-service-broker",
