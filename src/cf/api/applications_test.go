@@ -27,7 +27,7 @@ var singleAppResponse = testnet.TestResponse{
       		"foo": "bar",
       		"baz": "boom"
     	},
-        "memory": 256,
+        "memory": 128,
         "instances": 1,
         "state": "STOPPED",
         "routes": [
@@ -59,50 +59,8 @@ var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Response: singleAppResponse,
 })
 
-var appSummaryResponse = testnet.TestResponse{
-	Status: http.StatusOK,
-	Body: `
-{
-  "guid": "app1-guid",
-  "name": "App1",
-  "routes": [
-    {
-      "guid": "route-1-guid",
-      "host": "app1",
-      "domain": {
-        "guid": "domain-1-guid",
-        "name": "cfapps.io"
-      }
-    }
-  ],
-  "running_instances": 1,
-  "memory": 128,
-  "instances": 1
-}`}
-
-var appSummaryRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:   "GET",
-	Path:     "/v2/apps/app1-guid/summary",
-	Response: appSummaryResponse,
-})
-
-var singleAppRequests = []testnet.TestRequest{
-	findAppRequest,
-	appSummaryRequest,
-}
-
-//var singleAppEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-//	if strings.Contains(request.URL.Path, "summary") {
-//		appSummaryEndpoint(writer, request)
-//		return
-//	}
-//
-//	findAppEndpoint(writer, request)
-//	return
-//}
-
 func TestFindByName(t *testing.T) {
-	ts, handler, repo := createAppRepo(t, singleAppRequests)
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{findAppRequest})
 	defer ts.Close()
 
 	app, apiResponse := repo.FindByName("App1")
@@ -113,9 +71,6 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.Memory, uint64(128))
 	assert.Equal(t, app.Instances, 1)
 	assert.Equal(t, app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
-
-	assert.Equal(t, len(app.Urls), 1)
-	assert.Equal(t, app.Urls[0], "app1.cfapps.io")
 }
 
 func TestFindByNameWhenAppIsNotFound(t *testing.T) {

@@ -83,38 +83,13 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	res := appResources.Resources[0]
-	path = fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, res.Metadata.Guid)
-	request, apiResponse = repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	summaryResponse := new(ApplicationSummary)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, summaryResponse)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	urls := []string{}
-	// This is a little wonky but we made a concious effort
-	// to keep the domain very separate from the API repsonses
-	// to maintain flexibility.
-	domainRoute := cf.Route{}
-	for _, route := range summaryResponse.Routes {
-		domainRoute.Domain = cf.Domain{Name: route.Domain.Name}
-		domainRoute.Host = route.Host
-		urls = append(urls, domainRoute.URL())
-	}
-
 	app = cf.Application{
-		Name:             summaryResponse.Name,
-		Guid:             summaryResponse.Guid,
-		Instances:        summaryResponse.Instances,
-		RunningInstances: summaryResponse.RunningInstances,
-		Memory:           summaryResponse.Memory,
-		EnvironmentVars:  res.Entity.EnvironmentJson,
-		Urls:             urls,
-		State:            strings.ToLower(summaryResponse.State),
+		Guid:            res.Metadata.Guid,
+		Name:            res.Entity.Name,
+		EnvironmentVars: res.Entity.EnvironmentJson,
+		State:           res.Entity.State,
+		Instances:       res.Entity.Instances,
+		Memory:          uint64(res.Entity.Memory),
 	}
 
 	return

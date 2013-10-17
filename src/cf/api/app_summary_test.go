@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 	"time"
 )
 
-var getAppSummariesResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
+var getAppSummariesResponseBody = `
 {
   "apps":[
     {
@@ -60,21 +60,20 @@ var getAppSummariesResponse = testapi.TestResponse{Status: http.StatusOK, Body: 
       ]
     }
   ]
-}`}
+}`
 
 func TestGetAppSummariesInCurrentSpace(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/spaces/my-space-guid/summary",
-		nil,
-		getAppSummariesResponse,
-	)
+	getAppSummariesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/spaces/my-space-guid/summary",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: getAppSummariesResponseBody},
+	})
 
-	ts, repo := createAppSummaryRepo(endpoint)
+	ts, handler, repo := createAppSummaryRepo(t, []testnet.TestRequest{getAppSummariesRequest})
 	defer ts.Close()
 
 	apps, apiResponse := repo.GetSummariesInCurrentSpace()
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, 2, len(apps))
@@ -103,28 +102,10 @@ func TestGetAppSummariesInCurrentSpace(t *testing.T) {
 	assert.Equal(t, app2.Memory, uint64(512))
 }
 
-var instancesEndpoint, instancesEndpointStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/apps/my-cool-app-guid/instances",
-	nil,
-	testapi.TestResponse{Status: http.StatusOK, Body: `
-{
-  "1": {
-    "state": "STARTING",
-    "since": 1379522342.6783738
-  },
-  "0": {
-    "state": "RUNNING",
-    "since": 1379522342.6783738
-  }
-}`},
-)
-
-var statsEndpoint, statsEndpointStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/apps/my-cool-app-guid/stats",
-	nil,
-	testapi.TestResponse{Status: http.StatusOK, Body: `
+var appStatsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-cool-app-guid/stats",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
 {
   "1":{
     "stats": {
@@ -148,28 +129,57 @@ var statsEndpoint, statsEndpointStatus = testapi.CreateCheckableEndpoint(
         }
     }
   }
-}`})
+}`}})
 
-var appDetailsEndpoints = func(writer http.ResponseWriter, request *http.Request) {
-	if strings.HasSuffix(request.URL.Path, "/instances") {
-		instancesEndpoint(writer, request)
-		return
-	}
-	if strings.HasSuffix(request.URL.Path, "/stats") {
-		statsEndpoint(writer, request)
-		return
-	}
-}
+var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-cool-app-guid/instances",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+  "1": {
+    "state": "STARTING",
+    "since": 1379522342.6783738
+  },
+  "0": {
+    "state": "RUNNING",
+    "since": 1379522342.6783738
+  }
+}`}})
+
+var appSummaryRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-cool-app-guid/summary",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+  "guid": "app1-guid",
+  "name": "App1",
+  "routes": [
+    {
+      "guid": "route-1-guid",
+      "host": "app1",
+      "domain": {
+        "guid": "domain-1-guid",
+        "name": "cfapps.io"
+      }
+    }
+  ],
+  "running_instances": 1,
+  "memory": 128,
+  "instances": 1
+}`}})
 
 func TestAppSummaryGetSummary(t *testing.T) {
-	ts, repo := createAppSummaryRepo(http.HandlerFunc(appDetailsEndpoints))
+	ts, handler, repo := createAppSummaryRepo(t, []testnet.TestRequest{
+		appSummaryRequest,
+		appInstancesRequest,
+		appStatsRequest,
+	})
 	defer ts.Close()
 
 	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	summary, err := repo.GetSummary(app)
-	assert.True(t, instancesEndpointStatus.Called())
-	assert.True(t, statsEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, err.IsNotSuccessful())
 
 	assert.Equal(t, summary.App.Name, app.Name)
@@ -190,8 +200,8 @@ func TestAppSummaryGetSummary(t *testing.T) {
 	assert.Equal(t, instance0.CpuUsage, 3.659571249238058e-05)
 }
 
-func createAppSummaryRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo AppSummaryRepository) {
-	ts = httptest.NewTLSServer(endpoint)
+func createAppSummaryRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppSummaryRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
 
 	config := &configuration.Configuration{
 		Space:       cf.Space{Guid: "my-space-guid"},

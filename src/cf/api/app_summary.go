@@ -92,6 +92,35 @@ func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applicat
 }
 
 func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (summary cf.AppSummary, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, app.Guid)
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	summaryResponse := new(ApplicationSummary)
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, summaryResponse)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	urls := []string{}
+	// This is a little wonky but we made a concious effort
+	// to keep the domain very separate from the API repsonses
+	// to maintain flexibility.
+	domainRoute := cf.Route{}
+	for _, route := range summaryResponse.Routes {
+		domainRoute.Domain = cf.Domain{Name: route.Domain.Name}
+		domainRoute.Host = route.Host
+		urls = append(urls, domainRoute.URL())
+	}
+
+	app.Instances = summaryResponse.Instances
+	app.RunningInstances = summaryResponse.RunningInstances
+	app.Memory = summaryResponse.Memory
+	app.Urls = urls
+	app.State = strings.ToLower(summaryResponse.State)
+
 	summary.App = app
 
 	instances, apiResponse := repo.appRepo.GetInstances(app)
