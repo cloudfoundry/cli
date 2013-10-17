@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"fmt"
 	"strings"
+	"io"
 )
 
 type PaginatedSpaceResources struct {
@@ -117,28 +118,30 @@ func (repo CloudControllerSpaceRepository) findAllWithPath(path string) (spaces 
 }
 
 func (repo CloudControllerSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
-
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.createOrUpdate(cf.Space{Name: name}, strings.NewReader(body))
 }
 
 func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
+	return repo.createOrUpdate(space, strings.NewReader(body))
+}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+func (repo CloudControllerSpaceRepository) createOrUpdate(space cf.Space, body io.Reader) (apiResponse net.ApiResponse) {
+	verb := "POST"
+	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
+
+	if space.Guid != "" {
+		verb = "PUT"
+		path = fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
+	}
+
+	req, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiResponse = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.PerformRequest(req)
 	return
 }
 
