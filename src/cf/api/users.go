@@ -309,21 +309,35 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb string, user cf
 }
 
 func (repo CloudControllerUserRepository) SetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
-	return repo.setOrUnsetSpaceRole("PUT", user, space, role)
-}
-
-func (repo CloudControllerUserRepository) UnsetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
-	return repo.setOrUnsetSpaceRole("DELETE", user, space, role)
-}
-
-func (repo CloudControllerUserRepository) setOrUnsetSpaceRole(verb string, user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
-	rolePath, found := spaceRoleToPathMap[role]
-
-	if !found {
-		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
+	rolePath, apiResponse := checkSpaceRole(role)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
+	path := fmt.Sprintf("%s/v2/organizations/%s/users/%s", repo.config.Target, space.Organization.Guid, user.Guid)
+	request, apiResponse := repo.ccGateway.NewRequest("PUT", path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.ccGateway.PerformRequest(request)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	return repo.setOrUnsetSpaceRole("PUT", user, space, rolePath)
+}
+
+func (repo CloudControllerUserRepository) UnsetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
+	rolePath, apiResponse := checkSpaceRole(role)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	return repo.setOrUnsetSpaceRole("DELETE", user, space, rolePath)
+}
+
+func (repo CloudControllerUserRepository) setOrUnsetSpaceRole(verb string, user cf.User, space cf.Space, rolePath string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/%s/%s", repo.config.Target, space.Guid, rolePath, user.Guid)
 
 	request, apiResponse := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken, nil)
@@ -334,6 +348,15 @@ func (repo CloudControllerUserRepository) setOrUnsetSpaceRole(verb string, user 
 	apiResponse = repo.ccGateway.PerformRequest(request)
 	if apiResponse.IsNotSuccessful() {
 		return
+	}
+	return
+}
+
+func checkSpaceRole(role string) (rolePath string, apiResponse net.ApiResponse) {
+	rolePath, found := spaceRoleToPathMap[role]
+
+	if !found {
+		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
 	}
 	return
 }

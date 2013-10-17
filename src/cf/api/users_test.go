@@ -9,18 +9,20 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strings"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
 func TestUserRepoFindAll(t *testing.T) {
-	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		"GET", "/v2/users", nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-		{"metadata": {"guid": "user-2-guid"}, "entity": {"admin":true}},
-		{"metadata": {"guid": "user-3-guid"}, "entity": {"admin":false}}
-	]}`})
+	ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/users",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{"metadata": {"guid": "user-2-guid"}, "entity": {"admin":true}},
+			{"metadata": {"guid": "user-3-guid"}, "entity": {"admin":false}}
+		]}`},
+	})
 
 	uaaResp := `{ "resources": [
           { "id": "user-2-guid", "userName": "Super user 2" },
@@ -28,19 +30,20 @@ func TestUserRepoFindAll(t *testing.T) {
         ]}`
 	filter := `Id eq "user-2-guid" or Id eq "user-3-guid"`
 
-	uaaEndpoint, uaaEndpointStatus := testapi.CreateCheckableEndpoint(
-		"GET", fmt.Sprintf("/Users?attributes=id,userName&filter=%s", url.QueryEscape(filter)), nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: uaaResp},
-	)
+	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     fmt.Sprintf("/Users?attributes=id,userName&filter=%s", url.QueryEscape(filter)),
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: uaaResp},
+	})
 
-	cc, uaa, repo := createUsersRepo(ccEndpoint, uaaEndpoint)
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 	defer cc.Close()
 	defer uaa.Close()
 
 	users, apiResponse := repo.FindAll()
 
-	assert.True(t, ccEndpointStatus.Called())
-	assert.True(t, uaaEndpointStatus.Called())
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 
 	assert.Equal(t, 2, len(users))
@@ -51,7 +54,7 @@ func TestUserRepoFindAll(t *testing.T) {
 	assert.Equal(t, expectedUser2, users[1])
 }
 
-func createUsersByRoleEndpoints(rolePaths []string) (ccEndpointsRouter http.HandlerFunc, uaaEndpointsRouter http.HandlerFunc, statuses []*testapi.RequestStatus) {
+func createUsersByRoleEndpoints(rolePaths []string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {
 	roleResponses := []string{
 		`{"resources": [ {"metadata": {"guid": "user-1-guid"}, "entity": {}} ] }`,
 		`{"resources": [
@@ -61,23 +64,13 @@ func createUsersByRoleEndpoints(rolePaths []string) (ccEndpointsRouter http.Hand
 		`{"resources": [] }`,
 	}
 
-	ccEndpoints := []http.HandlerFunc{}
-
 	for index, resp := range roleResponses {
-		endpoint, endpointStatus := testapi.CreateCheckableEndpoint(
-			"GET", rolePaths[index], nil,
-			testapi.TestResponse{Status: http.StatusOK, Body: resp},
-		)
-		ccEndpoints = append(ccEndpoints, endpoint)
-		statuses = append(statuses, endpointStatus)
-	}
-
-	ccEndpointsRouter = func(res http.ResponseWriter, req *http.Request) {
-		for index, endpoint := range ccEndpoints {
-			if strings.Contains(req.RequestURI, rolePaths[index]) {
-				endpoint(res, req)
-			}
-		}
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     rolePaths[index],
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: resp},
+		})
+		ccReqs = append(ccReqs, req)
 	}
 
 	uaaRoleResponses := []string{
@@ -91,28 +84,18 @@ func createUsersByRoleEndpoints(rolePaths []string) (ccEndpointsRouter http.Hand
 		`Id eq "user-1-guid"`,
 		`Id eq "user-2-guid" or Id eq "user-3-guid"`,
 	}
-	uaaEndpoints := []http.HandlerFunc{}
 
 	for index, resp := range uaaRoleResponses {
 		path := fmt.Sprintf(
 			"/Users?attributes=id,userName&filter=%s",
 			url.QueryEscape(filters[index]),
 		)
-		endpoint, endpointStatus := testapi.CreateCheckableEndpoint(
-			"GET", path, nil,
-			testapi.TestResponse{Status: http.StatusOK, Body: resp},
-		)
-
-		uaaEndpoints = append(uaaEndpoints, endpoint)
-		statuses = append(statuses, endpointStatus)
-	}
-
-	uaaEndpointsRouter = func(res http.ResponseWriter, req *http.Request) {
-		for index, endpoint := range uaaEndpoints {
-			if strings.Contains(req.URL.RawQuery, url.QueryEscape(filters[index])) {
-				endpoint(res, req)
-			}
-		}
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     path,
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: resp},
+		})
+		uaaReqs = append(uaaReqs, req)
 	}
 	return
 }
@@ -123,18 +106,16 @@ func TestFindAllInOrgByRole(t *testing.T) {
 		"/v2/organizations/my-org-guid/billing_managers",
 		"/v2/organizations/my-org-guid/auditors",
 	}
-	ccEndpoints, uaaEndpoints, statuses := createUsersByRoleEndpoints(rolePaths)
+	ccReqs, uaaReqs := createUsersByRoleEndpoints(rolePaths)
 
-	cc, uaa, repo := createUsersRepo(ccEndpoints, uaaEndpoints)
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
 	defer cc.Close()
 	defer uaa.Close()
 
 	usersByRole, apiResponse := repo.FindAllInOrgByRole(cf.Organization{Guid: "my-org-guid"})
 
-	for _, status := range statuses {
-		assert.True(t, status.Called())
-	}
-
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 
 	expectedUser1 := cf.User{Guid: "user-1-guid", Username: "Super user 1"}
@@ -157,18 +138,16 @@ func TestFindAllInSpaceByRole(t *testing.T) {
 		"/v2/spaces/my-space-guid/developers",
 		"/v2/spaces/my-space-guid/auditors",
 	}
-	ccEndpoints, uaaEndpoints, statuses := createUsersByRoleEndpoints(rolePaths)
+	ccReqs, uaaReqs := createUsersByRoleEndpoints(rolePaths)
 
-	cc, uaa, repo := createUsersRepo(ccEndpoints, uaaEndpoints)
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
 	defer cc.Close()
 	defer uaa.Close()
 
 	usersByRole, apiResponse := repo.FindAllInSpaceByRole(cf.Space{Guid: "my-space-guid"})
 
-	for _, status := range statuses {
-		assert.True(t, status.Called())
-	}
-
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 
 	expectedUser1 := cf.User{Guid: "user-1-guid", Username: "Super user 1"}
@@ -186,57 +165,53 @@ func TestFindAllInSpaceByRole(t *testing.T) {
 }
 
 func TestFindByUsername(t *testing.T) {
-	usersResponse := `{
-    "resources": [
+	usersResponse := `{ "resources": [
         { "id": "my-guid", "userName": "my-full-username" }
-    ]
-}`
+    ]}`
 
-	endpoint, endpointStatus := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/Users?attributes=id,userName&filter=userName+Eq+%22damien%2Buser1%40pivotallabs.com%22",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: usersResponse},
-	)
+	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/Users?attributes=id,userName&filter=userName+Eq+%22damien%2Buser1%40pivotallabs.com%22",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: usersResponse},
+	})
 
-	_, uaa, repo := createUsersRepo(nil, endpoint)
+	uaa, handler, repo := createUsersRepoWithoutCCEndpoints(t, []testnet.TestRequest{uaaReq})
 	defer uaa.Close()
 
 	user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
-	assert.True(t, endpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, user, cf.User{Username: "my-full-username", Guid: "my-guid"})
 }
 
 func TestFindByUsernameWhenNotFound(t *testing.T) {
-	endpoint, endpointStatus := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/Users?attributes=id,userName&filter=userName+Eq+%22my-user%22",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-	)
+	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/Users?attributes=id,userName&filter=userName+Eq+%22my-user%22",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
 
-	_, uaa, repo := createUsersRepo(nil, endpoint)
+	uaa, handler, repo := createUsersRepoWithoutCCEndpoints(t, []testnet.TestRequest{uaaReq})
 	defer uaa.Close()
 
 	_, apiResponse := repo.FindByUsername("my-user")
-	assert.True(t, endpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
 func TestCreateUser(t *testing.T) {
-	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/users",
-		testapi.RequestBodyMatcher(`{"guid":"my-user-guid"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/users",
+		Matcher:  testnet.RequestBodyMatcher(`{"guid":"my-user-guid"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	uaaEndpoint, uaaEndpointStatus := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/Users",
-		testapi.RequestBodyMatcher(`{
+	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "POST",
+		Path:   "/Users",
+		Matcher: testnet.RequestBodyMatcher(`{
 				"userName":"my-user",
 				"emails":[{"value":"my-user"}],
 				"password":"my-password",
@@ -244,13 +219,13 @@ func TestCreateUser(t *testing.T) {
 					"givenName":"my-user",
 					"familyName":"my-user"}
 				}`),
-		testapi.TestResponse{
+		Response: testnet.TestResponse{
 			Status: http.StatusCreated,
 			Body:   `{"id":"my-user-guid"}`,
 		},
-	)
+	})
 
-	cc, uaa, repo := createUsersRepo(ccEndpoint, uaaEndpoint)
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 	defer cc.Close()
 	defer uaa.Close()
 
@@ -259,60 +234,56 @@ func TestCreateUser(t *testing.T) {
 		Password: "my-password",
 	}
 	apiResponse := repo.Create(user)
-	assert.True(t, ccEndpointStatus.Called())
-	assert.True(t, uaaEndpointStatus.Called())
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestDeleteUser(t *testing.T) {
-	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/v2/users/my-user-guid",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK},
-	)
+	ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	uaaEndpoint, uaaEndpointStatus := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/Users/my-user-guid",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK},
-	)
+	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/Users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	cc, uaa, repo := createUsersRepo(ccEndpoint, uaaEndpoint)
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 	defer cc.Close()
 	defer uaa.Close()
 
 	apiResponse := repo.Delete(cf.User{Guid: "my-user-guid"})
-	assert.True(t, ccEndpointStatus.Called())
-	assert.True(t, uaaEndpointStatus.Called())
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestDeleteUserWhenNotFoundOnTheCloudController(t *testing.T) {
-	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/v2/users/my-user-guid",
-		nil,
-		testapi.TestResponse{Status: http.StatusNotFound, Body: `{
+	ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "DELETE",
+		Path:   "/v2/users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{
 		  "code": 20003, "description": "The user could not be found"
 		}`},
-	)
+	})
 
-	uaaEndpoint, uaaEndpointStatus := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/Users/my-user-guid",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK},
-	)
+	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/Users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	cc, uaa, repo := createUsersRepo(ccEndpoint, uaaEndpoint)
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 	defer cc.Close()
 	defer uaa.Close()
 
 	apiResponse := repo.Delete(cf.User{Guid: "my-user-guid"})
-	assert.True(t, ccEndpointStatus.Called())
-	assert.True(t, uaaEndpointStatus.Called())
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -347,7 +318,7 @@ func TestSetOrgRoleToOrgAuditor(t *testing.T) {
 }
 
 func TestSetOrgRoleWithInvalidRole(t *testing.T) {
-	_, _, repo := createUsersRepo(nil, nil)
+	repo := createUsersRepoWithoutEndpoints()
 	apiResponse := repo.SetOrgRole(cf.User{}, cf.Organization{}, "foo")
 
 	assert.False(t, apiResponse.IsSuccessful())
@@ -385,7 +356,7 @@ func TestUnsetOrgRoleFromOrgAuditor(t *testing.T) {
 }
 
 func TestUnsetOrgRoleWithInvalidRole(t *testing.T) {
-	_, _, repo := createUsersRepo(nil, nil)
+	repo := createUsersRepoWithoutEndpoints()
 	apiResponse := repo.UnsetOrgRole(cf.User{}, cf.Organization{}, "foo")
 
 	assert.False(t, apiResponse.IsSuccessful())
@@ -397,18 +368,20 @@ func testSetOrUnsetOrgRoleWithValidRole(t *testing.T,
 	verb string,
 	path string) {
 
-	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		verb, path, nil, testapi.TestResponse{Status: http.StatusOK},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   verb,
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	cc, _, repo := createUsersRepo(ccEndpoint, nil)
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req})
 	defer cc.Close()
 
 	user := cf.User{Guid: "my-user-guid"}
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := setOrUnset(repo, user, org)
 
-	assert.True(t, ccEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -417,18 +390,32 @@ func testSetOrUnsetSpaceRoleWithValidRole(t *testing.T,
 	verb string,
 	path string) {
 
-	ccEndpoint, ccEndpointStatus := testapi.CreateCheckableEndpoint(
-		verb, path, nil, testapi.TestResponse{Status: http.StatusOK},
-	)
+	reqs := []testnet.TestRequest{}
 
-	cc, _, repo := createUsersRepo(ccEndpoint, nil)
+	if verb == "PUT" {
+		addToOrgReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "PUT",
+			Path:     "/v2/organizations/my-space-org-guid/users/my-user-guid",
+			Response: testnet.TestResponse{Status: http.StatusOK},
+		})
+		reqs = append(reqs, addToOrgReq)
+	}
+
+	setOrUnsetReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   verb,
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+	reqs = append(reqs, setOrUnsetReq)
+
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, reqs)
 	defer cc.Close()
 
 	user := cf.User{Guid: "my-user-guid"}
-	space := cf.Space{Guid: "my-space-guid"}
+	space := cf.Space{Guid: "my-space-guid", Organization: cf.Organization{Guid: "my-space-org-guid"}}
 	apiResponse := setOrUnset(repo, user, space)
 
-	assert.True(t, ccEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -457,23 +444,40 @@ func TestSetSpaceRoleToSpaceAuditor(t *testing.T) {
 }
 
 func TestSetSpaceRoleWithInvalidRole(t *testing.T) {
-	_, _, repo := createUsersRepo(nil, nil)
+	repo := createUsersRepoWithoutEndpoints()
 	apiResponse := repo.SetSpaceRole(cf.User{}, cf.Space{}, "foo")
 
 	assert.False(t, apiResponse.IsSuccessful())
 	assert.Contains(t, apiResponse.Message, "Invalid Role")
 }
 
-func createUsersRepo(ccEndpoint http.HandlerFunc, uaaEndpoint http.HandlerFunc) (cc *httptest.Server, uaa *httptest.Server, repo UserRepository) {
+func createUsersRepoWithoutEndpoints() (repo UserRepository) {
+	_, _, _, _, repo = createUsersRepo(nil, []testnet.TestRequest{}, []testnet.TestRequest{})
+	return
+}
+
+func createUsersRepoWithoutUAAEndpoints(t *testing.T, ccReqs []testnet.TestRequest) (cc *httptest.Server, ccHandler *testnet.TestHandler, repo UserRepository) {
+	cc, ccHandler, _, _, repo = createUsersRepo(t, ccReqs, []testnet.TestRequest{})
+	return
+}
+
+func createUsersRepoWithoutCCEndpoints(t *testing.T, uaaReqs []testnet.TestRequest) (uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
+	_, _, uaa, uaaHandler, repo = createUsersRepo(t, []testnet.TestRequest{}, uaaReqs)
+	return
+}
+
+func createUsersRepo(t *testing.T, ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) (cc *httptest.Server,
+	ccHandler *testnet.TestHandler, uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
+
 	ccTarget := ""
 	uaaTarget := ""
 
-	if ccEndpoint != nil {
-		cc = httptest.NewTLSServer(ccEndpoint)
+	if len(ccReqs) > 0 {
+		cc, ccHandler = testnet.NewTLSServer(t, ccReqs)
 		ccTarget = cc.URL
 	}
-	if uaaEndpoint != nil {
-		uaa = httptest.NewTLSServer(uaaEndpoint)
+	if len(uaaReqs) > 0 {
+		uaa, uaaHandler = testnet.NewTLSServer(t, uaaReqs)
 		uaaTarget = uaa.URL
 	}
 
