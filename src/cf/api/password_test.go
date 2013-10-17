@@ -4,12 +4,11 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"encoding/base64"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	"testing"
 )
 
@@ -49,9 +48,8 @@ func TestUpdatePassword(t *testing.T) {
 		passwordUpdateResponse,
 	)
 
-	tokenInfo := `{"user_id":"my-user-guid"}`
-	encodedTokenInfo := base64.StdEncoding.EncodeToString([]byte(tokenInfo))
-	accessToken := fmt.Sprintf("BEARER my_access_token.%s.baz", encodedTokenInfo)
+	accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{UserGuid: "my-user-guid"})
+	assert.NoError(t, err)
 
 	passwordUpdateServer, repo := createPasswordRepo(passwordUpdateEndpoint, accessToken)
 	defer passwordUpdateServer.Close()

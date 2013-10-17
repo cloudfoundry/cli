@@ -60,7 +60,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, repoLocator.GetRouteRepository(), true)
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui)
 	factory.cmdsByName["org-users"] = user.NewOrgUsers(ui, repoLocator.GetUserRepository())
-	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, repoLocator.GetOrganizationRepository())
+	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, config, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["password"] = NewPassword(ui, repoLocator.GetPasswordRepository(), configRepo)
 	factory.cmdsByName["rename"] = application.NewRenameApp(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["rename-org"] = organization.NewRenameOrg(ui, repoLocator.GetOrganizationRepository())

@@ -8,18 +8,21 @@ import (
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+	testconfig "testhelpers/configuration"
 	"testing"
+	"cf/configuration"
 )
 
 func TestListOrgsRequirements(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
+	config := &configuration.Configuration{}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callListOrgs(reqFactory, orgRepo)
+	callListOrgs(config, reqFactory, orgRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	callListOrgs(reqFactory, orgRepo)
+	callListOrgs(config, reqFactory, orgRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
@@ -34,18 +37,24 @@ func TestListOrgs(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	ui := callListOrgs(reqFactory, orgRepo)
+	tokenInfo := configuration.TokenInfo{Username: "my-user"}
+	accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(tokenInfo)
+	assert.NoError(t, err)
+	config := &configuration.Configuration{AccessToken: accessToken}
 
-	assert.Contains(t, ui.Outputs[0], "Getting orgs")
+	ui := callListOrgs(config, reqFactory, orgRepo)
+
+	assert.Contains(t, ui.Outputs[0], "Getting orgs as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "Organization-1")
-	assert.Contains(t, ui.Outputs[3], "Organization-2")
+	assert.Contains(t, ui.Outputs[3], "Organization-1")
+	assert.Contains(t, ui.Outputs[4], "Organization-2")
 }
 
-func callListOrgs(reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+func callListOrgs(config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("orgs", []string{})
-	cmd := NewListOrgs(fakeUI, orgRepo)
+	cmd := NewListOrgs(fakeUI, config, orgRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
