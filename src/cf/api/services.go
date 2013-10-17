@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -196,21 +197,17 @@ func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceIn
 	if len(instance.ServiceBindings) > 0 {
 		return net.NewApiResponseWithMessage("Cannot delete service instance, apps are still bound to it")
 	}
-
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.deleteOrUpdateService(instance, "DELETE", nil)
 }
 
 func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
+	return repo.deleteOrUpdateService(instance, "PUT", strings.NewReader(body))
+}
+
+func (repo CloudControllerServiceRepository) deleteOrUpdateService(instance cf.ServiceInstance, verb string, body io.Reader) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
+	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

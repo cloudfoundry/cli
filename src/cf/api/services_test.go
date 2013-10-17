@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
-var multipleOfferingsResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
+var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
   "resources": [
     {
@@ -56,13 +56,13 @@ var multipleOfferingsResponse = testapi.TestResponse{Status: http.StatusOK, Body
   ]
 }`}
 
-func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *testapi.RequestStatus, config *configuration.Configuration) {
-	ts, repo := createServiceRepoWithConfig(endpoint, config)
+func testGetServiceOfferings(t *testing.T, req testnet.TestRequest, config *configuration.Configuration) {
+	ts, handler, repo := createServiceRepoWithConfig(t, []testnet.TestRequest{req}, config)
 	defer ts.Close()
 
 	offerings, apiResponse := repo.GetServiceOfferings()
 
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(offerings))
 
@@ -85,183 +85,152 @@ func testGetServiceOfferings(t *testing.T, endpoint http.HandlerFunc, status *te
 }
 
 func TestGetServiceOfferingsWhenNotTargetingASpace(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/services?inline-relations-depth=1",
-		nil,
-		multipleOfferingsResponse,
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/services?inline-relations-depth=1",
+		Response: multipleOfferingsResponse,
+	})
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
-	testGetServiceOfferings(t, endpoint, status, config)
+	testGetServiceOfferings(t, req, config)
 }
 
 func TestGetServiceOfferingsWhenTargetingASpace(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-		nil,
-		multipleOfferingsResponse,
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+		Response: multipleOfferingsResponse,
+	})
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	testGetServiceOfferings(t, endpoint, status, config)
+	testGetServiceOfferings(t, req, config)
 }
 
 func TestCreateServiceInstance(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/service_instances",
-		testapi.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/service_instances",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createServiceRepo(endpoint)
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", cf.ServicePlan{Guid: "plan-guid"})
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
 }
 
 func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
-	findServiceInstanceEndpointStatus.Reset()
-
-	errorEndpoint, errorEndpointStatus := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/service_instances",
-		testapi.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
-		testapi.TestResponse{
+	errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "POST",
+		Path:    "/v2/service_instances",
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		Response: testnet.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
 		},
-	)
+	})
 
-	endpoints := func(res http.ResponseWriter, req *http.Request) {
-		if strings.Contains(req.RequestURI, "/v2/service_instances") {
-			errorEndpoint(res, req)
-		} else {
-			findServiceInstanceEndpoint(res, req)
-		}
-	}
-
-	ts, repo := createServiceRepo(http.HandlerFunc(endpoints))
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{errorReq, findServiceInstanceReq})
 	defer ts.Close()
 
 	servicePlan := cf.ServicePlan{Guid: "plan-guid", Name: "plan-name"}
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", servicePlan)
 
-	assert.True(t, findServiceInstanceEndpointStatus.Called())
-	assert.True(t, errorEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, true)
 }
 
 func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
-	findServiceInstanceEndpointStatus.Reset()
-
-	errorEndpoint, errorEndpointStatus := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/service_instances",
-		testapi.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
-		testapi.TestResponse{
+	errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "POST",
+		Path:    "/v2/service_instances",
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
+		Response: testnet.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
 		},
-	)
+	})
 
-	endpoints := func(res http.ResponseWriter, req *http.Request) {
-		if strings.Contains(req.RequestURI, "/v2/service_instances") {
-			errorEndpoint(res, req)
-		} else {
-			findServiceInstanceEndpoint(res, req)
-		}
-	}
-
-	ts, repo := createServiceRepo(http.HandlerFunc(endpoints))
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{errorReq, findServiceInstanceReq})
 	defer ts.Close()
 
 	servicePlan := cf.ServicePlan{Guid: "different-plan-guid", Name: "plan-name"}
 	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", servicePlan)
 
-	assert.True(t, findServiceInstanceEndpointStatus.Called())
-	assert.True(t, errorEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
 }
 
-var singleServiceInstanceResponse = testapi.TestResponse{Status: http.StatusOK, Body: `{
-  "resources": [
-    {
-      "metadata": {
-        "guid": "my-service-instance-guid"
-      },
-      "entity": {
-        "name": "my-service",
-        "service_bindings": [
-          {
-            "metadata": {
-              "guid": "service-binding-1-guid",
-              "url": "/v2/service_bindings/service-binding-1-guid"
-            },
-            "entity": {
-              "app_guid": "app-1-guid"
-            }
-          },
-          {
-            "metadata": {
-              "guid": "service-binding-2-guid",
-              "url": "/v2/service_bindings/service-binding-2-guid"
-            },
-            "entity": {
-              "app_guid": "app-2-guid"
-            }
-          }
-        ],
-        "service_plan": {
-          "metadata": {
-            "guid": "plan-guid"
-          },
-   		  "entity": {
-            "name": "plan-name",
-            "service": {
-			  "metadata": {
-				"guid": "service-guid"
+var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+		{
+		  "metadata": {
+			"guid": "my-service-instance-guid"
+		  },
+		  "entity": {
+			"name": "my-service",
+			"service_bindings": [
+			  {
+				"metadata": {
+				  "guid": "service-binding-1-guid",
+				  "url": "/v2/service_bindings/service-binding-1-guid"
+				},
+				"entity": {
+				  "app_guid": "app-1-guid"
+				}
 			  },
-              "entity": {
-                "label": "mysql",
-                "description": "MySQL database",
-                "documentation_url": "http://info.example.com"
-              }
-            }
-          }
-   		}
-      }
-    }
-  ]
-}`}
-
-var findServiceInstanceEndpoint, findServiceInstanceEndpointStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-	nil,
-	singleServiceInstanceResponse,
-)
+			  {
+				"metadata": {
+				  "guid": "service-binding-2-guid",
+				  "url": "/v2/service_bindings/service-binding-2-guid"
+				},
+				"entity": {
+				  "app_guid": "app-2-guid"
+				}
+			  }
+			],
+			"service_plan": {
+			  "metadata": {
+				"guid": "plan-guid"
+			  },
+			  "entity": {
+				"name": "plan-name",
+				"service": {
+				  "metadata": {
+					"guid": "service-guid"
+				  },
+				  "entity": {
+					"label": "mysql",
+					"description": "MySQL database",
+					"documentation_url": "http://info.example.com"
+				  }
+				}
+			  }
+			}
+		  }
+		}
+  	]}`}})
 
 func TestFindInstanceByName(t *testing.T) {
-	findServiceInstanceEndpointStatus.Reset()
-	ts, repo := createServiceRepo(findServiceInstanceEndpoint)
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{findServiceInstanceReq})
 	defer ts.Close()
 
 	instance, apiResponse := repo.FindInstanceByName("my-service")
 
-	assert.True(t, findServiceInstanceEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, instance.Name, "my-service")
 	assert.Equal(t, instance.Guid, "my-service-instance-guid")
@@ -278,41 +247,39 @@ func TestFindInstanceByName(t *testing.T) {
 }
 
 func TestFindInstanceByNameForNonExistentService(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+	})
 
-	ts, repo := createServiceRepo(endpoint)
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	_, apiResponse := repo.FindInstanceByName("my-service")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
 func TestDeleteServiceWithoutServiceBindings(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/v2/service_instances/my-service-instance-guid",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/service_instances/my-service-instance-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	ts, repo := createServiceRepo(endpoint)
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.DeleteService(serviceInstance)
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestDeleteServiceWithServiceBindings(t *testing.T) {
-	_, repo := createServiceRepo(nil)
+	_, _, repo := createServiceRepo(t, []testnet.TestRequest{})
 
 	serviceBindings := []cf.ServiceBinding{
 		cf.ServiceBinding{Url: "/v2/service_bindings/service-binding-1-guid", AppGuid: "app-1-guid"},
@@ -330,33 +297,33 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 }
 
 func TestRenameService(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/service_instances/my-service-instance-guid",
-		testapi.RequestBodyMatcher(`{"name":"new-name"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/service_instances/my-service-instance-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createServiceRepo(endpoint)
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createServiceRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo ServiceRepository) {
+func createServiceRepo(t *testing.T, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Space:       cf.Space{Guid: "my-space-guid"},
 	}
-	return createServiceRepoWithConfig(endpoint, config)
+	return createServiceRepoWithConfig(t, reqs, config)
 }
 
-func createServiceRepoWithConfig(endpoint http.HandlerFunc, config *configuration.Configuration) (ts *httptest.Server, repo ServiceRepository) {
-	if endpoint != nil {
-		ts = httptest.NewTLSServer(endpoint)
+func createServiceRepoWithConfig(t *testing.T, reqs []testnet.TestRequest, config *configuration.Configuration) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+	if len(reqs) > 0 {
+		ts, handler = testnet.NewTLSServer(t, reqs)
 		config.Target = ts.URL
 	}
 
