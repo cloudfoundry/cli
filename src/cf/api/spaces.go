@@ -5,8 +5,8 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
-	"strings"
 	"io"
+	"strings"
 )
 
 type PaginatedSpaceResources struct {
