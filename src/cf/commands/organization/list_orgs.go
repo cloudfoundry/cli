@@ -2,15 +2,15 @@ package organization
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
-	"cf/configuration"
 )
 
 type ListOrgs struct {
 	ui      terminal.UI
-	config *configuration.Configuration
+	config  *configuration.Configuration
 	orgRepo api.OrganizationRepository
 }
 

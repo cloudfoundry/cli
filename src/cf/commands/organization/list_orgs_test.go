@@ -3,14 +3,14 @@ package organization_test
 import (
 	"cf"
 	. "cf/commands/organization"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	testconfig "testhelpers/configuration"
 	"testing"
-	"cf/configuration"
 )
 
 func TestListOrgsRequirements(t *testing.T) {
