@@ -21,8 +21,8 @@ type buildpackResource struct {
 }
 
 type buildpackEntity struct {
-    Name     string
-    Priority int
+    Name     string `json:"name"`
+    Priority *int   `json:"priority,omitempty"`
 }
 
 type BuildpackRepository interface {
@@ -103,13 +103,14 @@ func (repo CloudControllerBuildpackRepository) Create(newBuildpack cf.Buildpack)
     }
 
     path := repo.config.Target + buildpacks_path
-    data, err := json.Marshal(newBuildpack)
+    entity := buildpackEntity{newBuildpack.Name, newBuildpack.Priority}
+    body, err := json.Marshal(entity)
     if err != nil {
         apiResponse = net.NewApiResponseWithError("Could not serialize information", err)
         return
     }
 
-    request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(data))
+    request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(body))
     if apiResponse.IsNotSuccessful() {
         return
     }
@@ -140,7 +141,8 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpack cf.Buildpack) (a
 func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
     path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
 
-    body, err := json.Marshal(buildpack)
+    entity := buildpackEntity{buildpack.Name, buildpack.Priority}
+    body, err := json.Marshal(entity)
     if err != nil {
         apiResponse = net.NewApiResponseWithError("Could not serialize updates.", err)
         return

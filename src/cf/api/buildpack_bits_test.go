@@ -5,6 +5,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"mime/multipart"
 	"net/http"
@@ -30,44 +31,38 @@ var uploadBuildpackRequest = testnet.TestRequest{
 }
 
 var buildpackContent = []string{"detect", "compile", "package"}
-var uploadBuildpackBodyMatcher = func(request *http.Request) bool {
+var uploadBuildpackBodyMatcher = func(request *http.Request) error {
 	err := request.ParseMultipartForm(4096)
 	defer request.MultipartForm.RemoveAll()
 	if err != nil {
-		println("Invalid request")
-		return false
+		return err
 	}
 
 	if len(request.MultipartForm.Value) != 0 {
-		println("Should have 0 values")
-		return false
+		return errors.New("Should have 0 values")
 	}
 
 	if len(request.MultipartForm.File) != 1 {
-		println("Wrong number of files")
-		return false
+		return errors.New("Wrong number of files")
 	}
 
 	for k, v := range request.MultipartForm.File {
 		if k != "buildpack" && len(v) == 1 && v[0].Filename != "buildpack.zip" {
-			println("Wrong content disposition")
-			return false
+			return errors.New("Wrong content disposition")
 		}
 		multipartFile := v[0]
 
 		var file multipart.File
 		if file, err = multipartFile.Open(); err != nil {
-			println("Cannot get multipart file")
-			return false
+			return errors.New("Cannot get multipart file")
+
 		}
 
 		if zipReader, err := zip.NewReader(file, 4096); err != nil {
-			println("Error reading zip content")
-			return false
+			return errors.New("Error reading zip content")
 		} else {
 			if len(zipReader.File) != 3 {
-				println("Wrong number of files in zip")
-				return false
+				return errors.New("Wrong number of files in zip")
 			}
 
 		nextFile:
@@ -77,13 +72,13 @@ var uploadBuildpackBodyMatcher = func(request *http.Request) bool {
 						continue nextFile
 					}
 				}
-				return false
+				return errors.New("Missing file: " + f.Name)
 			}
 
 		}
 	}
 
-	return true
+	return nil
 }
 
 var defaultBuildpackRequests = []testnet.TestRequest{
@@ -121,7 +116,7 @@ func TestUploadBuildpackWithAZipFile(t *testing.T) {
 }
 
 func testUploadBuildpack(t *testing.T, dir string, requests []testnet.TestRequest) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewServer(t, requests)
+	ts, handler := testnet.NewTLSServer(t, requests)
 	defer ts.Close()
 
 	config := &configuration.Configuration{

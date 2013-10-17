@@ -193,7 +193,8 @@ func TestCreateBuildpackWithPriority(t *testing.T) {
 	ts, repo := createBuildpackRepo(endpoint)
 	defer ts.Close()
 
-	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Priority: 999}
+	priority := 999
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Priority: &priority}
 
 	created, apiResponse := repo.Create(buildpack)
 	assert.True(t, status.Called())
@@ -201,7 +202,7 @@ func TestCreateBuildpackWithPriority(t *testing.T) {
 
 	assert.NotNil(t, created.Guid)
 	assert.Equal(t, buildpack.Name, created.Name)
-	assert.Equal(t, buildpack.Priority, 999)
+	assert.Equal(t, *buildpack.Priority, 999)
 }
 
 func TestDeleteBuildpack(t *testing.T) {
@@ -233,7 +234,8 @@ func TestUpdateBuildpack(t *testing.T) {
 	ts, repo := createBuildpackRepo(endpoint)
 	defer ts.Close()
 
-	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid", Priority: 555}
+	priority := 555
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid", Priority: &priority}
 
 	updated, apiResponse := repo.Update(buildpack)
 	assert.True(t, status.Called())

@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/commands/application"
+	"cf/commands/buildpack"
 	"cf/commands/domain"
 	"cf/commands/organization"
 	"cf/commands/route"
@@ -32,6 +33,8 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["auth"] = NewAuthenticate(ui, configRepo, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["bind-service"] = service.NewBindService(ui, repoLocator.GetServiceBindingRepository())
+	factory.cmdsByName["buildpacks"] = buildpack.NewListBuildpacks(ui, repoLocator.GetBuildpackRepository())
+	factory.cmdsByName["create-buildpack"] = buildpack.NewCreateBuildpack(ui, repoLocator.GetBuildpackRepository(), repoLocator.GetBuildpackBitsRepository())
 	factory.cmdsByName["create-org"] = organization.NewCreateOrg(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["create-service"] = service.NewCreateService(ui, repoLocator.GetServiceRepository())
 	factory.cmdsByName["create-service-auth-token"] = serviceauthtoken.NewCreateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
@@ -40,6 +43,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["create-user"] = user.NewCreateUser(ui, repoLocator.GetUserRepository())
 	factory.cmdsByName["create-user-provided-service"] = service.NewCreateUserProvidedService(ui, repoLocator.GetUserProvidedServiceInstanceRepository())
 	factory.cmdsByName["delete"] = application.NewDeleteApp(ui, repoLocator.GetApplicationRepository())
+	factory.cmdsByName["delete-buildpack"] = buildpack.NewDeleteBuildpack(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, repoLocator.GetDomainRepository())
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, repoLocator.GetOrganizationRepository(), configRepo)
 	factory.cmdsByName["delete-route"] = route.NewDeleteRoute(ui, repoLocator.GetRouteRepository())
@@ -91,6 +95,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, repoLocator.GetUserRepository())
 	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
+	factory.cmdsByName["update-buildpack"] = buildpack.NewUpdateBuildpack(ui, repoLocator.GetBuildpackRepository(), repoLocator.GetBuildpackBitsRepository())
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, repoLocator.GetUserProvidedServiceInstanceRepository())

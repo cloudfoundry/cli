@@ -171,7 +171,7 @@ type User struct {
 }
 
 type Buildpack struct {
-	Guid     string `json:"guid,omitempty"`
-	Name     string `json:"name"`
-	Priority int    `json:"priority,omitempty"`
+	Guid     string
+	Name     string
+	Priority *int
 }
