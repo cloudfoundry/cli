@@ -241,7 +241,7 @@ func TestShareDomain(t *testing.T) {
 	endpoint, status := testapi.CreateCheckableEndpoint(
 		"POST",
 		"/v2/domains",
-		testapi.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"shared":true}`),
+		testapi.RequestBodyMatcher(`{"name":"example.com","wildcard":true}`),
 		testapi.TestResponse{Status: http.StatusCreated, Body: shareDomainResponse},
 	)
 
@@ -251,7 +251,7 @@ func TestShareDomain(t *testing.T) {
 	domainToShare := cf.Domain{Name: "example.com"}
 	apiResponse := repo.Share(domainToShare)
 	assert.True(t, status.Called())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestFindByNameInOrgWhenDomainExists(t *testing.T) {

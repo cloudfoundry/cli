@@ -142,7 +142,7 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 
 func (repo CloudControllerDomainRepository) Share(domainToShare cf.Domain) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
-	data := fmt.Sprintf(`{"name":"%s","wildcard":true,"shared":true}`, domainToShare.Name)
+	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domainToShare.Name)
 
 	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
 	if apiResponse.IsNotSuccessful() {

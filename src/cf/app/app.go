@@ -549,14 +549,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				cmdRunner.RunCmdByName("set-space-role", c)
 			},
 		},
-		//		{
-		//			Name:        "share-domain",
-		//			Description: "Share a domain with all orgs",
-		//			Usage:       fmt.Sprintf("%s share-domain DOMAIN", cf.Name),
-		//			Action: func(c *cli.Context) {
-		//				cmdRunner.RunCmdByName("share-domain", c)
-		//			},
-		//		},
+		{
+			Name:        "share-domain",
+			Description: "Share a domain with all orgs",
+			Usage:       fmt.Sprintf("%s share-domain DOMAIN", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("share-domain", c)
+			},
+		},
 		{
 			Name:        "space",
 			Description: "Show target space's info",
