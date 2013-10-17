@@ -53,7 +53,7 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, paramsMap)
+	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, paramsMap, c.String("l"))
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

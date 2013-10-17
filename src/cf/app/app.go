@@ -152,10 +152,17 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",
 			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{\"name\":\"value\",\"name\":\"value\"}'\n\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{\"name\":\"value\",\"name\":\"value\"}'\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{}' -l SYSLOG-DRAIN-URL\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{\"name\":\"value\",\"name\":\"value\"}' -l SYSLOG-DRAIN-URL\n\n", cf.Name) +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'", cf.Name),
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service my-drain-service '{}' -l syslog://example.com\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service my-drain-service '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com\n", cf.Name),
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "l", Value: "", Usage: "Syslog Drain Url"},
+			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-user-provided-service", c)
 			},

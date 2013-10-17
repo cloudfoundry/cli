@@ -16,7 +16,7 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/user_provided_service_instances",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid"}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":""}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
 
@@ -28,7 +28,28 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 		"user":     "me",
 		"password": "secret",
 	}
-	apiResponse := repo.Create("my-custom-service", params)
+	apiResponse := repo.Create("my-custom-service", params, "")
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestCreateUserProvidedServiceInstanceWithSyslogDrain(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/user_provided_service_instances",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-custom-service","credentials":{"host":"example.com","password":"secret","user":"me"},"space_guid":"my-space-guid","syslog_drain_url":"syslog://example.com"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
+
+	ts, handler, repo := createUserProvidedServiceInstanceRepo(t, req)
+	defer ts.Close()
+
+	params := map[string]string{
+		"host":     "example.com",
+		"user":     "me",
+		"password": "secret",
+	}
+	apiResponse := repo.Create("my-custom-service", params, "syslog://example.com")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

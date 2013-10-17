@@ -73,6 +73,19 @@ func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
 }
 
+func TestCreateUserProvidedServiceWithSyslogDrain(t *testing.T) {
+	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+
+	fakeUI := callCreateUserProvidedService(t,
+		[]string{"-l", "syslog://example.com", "my-custom-service", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`},
+		[]string{},
+		userProvidedServiceInstanceRepo,
+	)
+	assert.Equal(t, userProvidedServiceInstanceRepo.CreateSyslogDrainUrl, "syslog://example.com")
+	assert.Contains(t, fakeUI.Outputs[0], "Creating user provided service")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+}
+
 func callCreateUserProvidedService(t *testing.T, args []string, inputs []string, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{Inputs: inputs}
 	ctxt := testcmd.NewContext("create-user-provided-service", args)

@@ -8,14 +8,16 @@ import (
 type FakeUserProvidedServiceInstanceRepo struct {
 	CreateName string
 	CreateParameters map[string]string
+	CreateSyslogDrainUrl string
 
 	UpdateServiceInstance cf.ServiceInstance
 	UpdateParameters map[string]string
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Create(name string, params map[string]string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Create(name string, params map[string]string, syslogDrainUrl string) (apiResponse net.ApiResponse) {
 	repo.CreateName = name
 	repo.CreateParameters = params
+	repo.CreateSyslogDrainUrl = syslogDrainUrl
 	return
 }
 
