@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
+	"time"
 )
 
 type Logs struct {
@@ -59,7 +60,7 @@ func (cmd *Logs) Run(c *cli.Context) {
 			cmd.ui.Say("Connected, tailing...")
 		}
 
-		err = cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 2)
+		err = cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 5*time.Second)
 	}
 
 	if err != nil {
