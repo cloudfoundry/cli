@@ -24,7 +24,6 @@ type DomainEntity struct {
 }
 
 type DomainRepository interface {
-	FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse)
 	FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse)
@@ -44,11 +43,6 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 	repo.config = config
 	repo.gateway = gateway
 	return
-}
-
-func (repo CloudControllerDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/domains", repo.config.Target, repo.config.Space.Guid)
-	return repo.findAllWithPath(path)
 }
 
 func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse) {
@@ -83,24 +77,33 @@ func (repo CloudControllerDomainRepository) findAllWithPath(path string) (domain
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/domains?q=name%%3A%s", repo.config.Target, repo.config.Space.Guid, name)
-	return repo.findOneWithPath(path, name)
+	spacePath := fmt.Sprintf("%s/v2/spaces/%s/domains?q=name%%3A%s", repo.config.Target, repo.config.Space.Guid, name)
+	sharedPath := fmt.Sprintf("%s/v2/domains?q=name%%3A%s", repo.config.Target, name)
+	return repo.findOneWithPaths(spacePath, sharedPath, name)
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, org cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, org.Guid, name)
-	return repo.findOneWithPath(path, name)
+	orgPath := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, org.Guid, name)
+	sharedPath := fmt.Sprintf("%s/v2/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, name)
+	return repo.findOneWithPaths(orgPath, sharedPath, name)
 }
 
-func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	domains, apiResponse := repo.findAllWithPath(path)
+func (repo CloudControllerDomainRepository) findOneWithPaths(scopedPath, sharedPath, name string) (domain cf.Domain, apiResponse net.ApiResponse) {
+	domains, apiResponse := repo.findAllWithPath(scopedPath)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(domains) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Domain %s not found", name)
-		return
+		domains, apiResponse = repo.findAllWithPath(sharedPath)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+
+		if len(domains) == 0 || !domains[0].Shared {
+			apiResponse = net.NewNotFoundApiResponse("Domain %s not found", name)
+			return
+		}
 	}
 
 	domain = domains[0]

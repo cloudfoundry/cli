@@ -36,11 +36,6 @@ type FakeDomainRepository struct {
 	DeleteApiResponse net.ApiResponse
 }
 
-func (repo *FakeDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse){
-	domains = repo.FindAllInCurrentSpaceDomains
-	return
-}
-
 func (repo *FakeDomainRepository) FindAllByOrg(org cf.Organization)(domains []cf.Domain, apiResponse net.ApiResponse){
 	repo.FindAllByOrgOrg = org
 	domains = repo.FindAllByOrgDomains

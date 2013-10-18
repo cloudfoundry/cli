@@ -12,46 +12,6 @@ import (
 	"testing"
 )
 
-func TestFindAllInCurrentSpace(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/spaces/my-space-guid/domains",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [
-			{
-			  "metadata": {
-				"guid": "domain1-guid"
-			  },
-			  "entity": {
-				"name": "domain1.cf-app.com"
-			  }
-			},
-			{
-			  "metadata": {
-				"guid": "domain2-guid"
-			  },
-			  "entity": {
-				"name": "domain2.cf-app.com"
-			  }
-			}
-		]}`},
-	})
-
-	ts, handler, repo := createDomainRepo(t, req)
-	defer ts.Close()
-
-	domains, apiResponse := repo.FindAllInCurrentSpace()
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 2, len(domains))
-
-	first := domains[0]
-	assert.Equal(t, first.Name, "domain1.cf-app.com")
-	assert.Equal(t, first.Guid, "domain1-guid")
-	second := domains[1]
-	assert.Equal(t, second.Name, "domain2.cf-app.com")
-	assert.Equal(t, second.Guid, "domain2-guid")
-}
-
 var orgDomainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
     {
       "metadata": {
@@ -102,7 +62,7 @@ func TestFindAllByOrg(t *testing.T) {
 		Response: orgDomainsResponse,
 	})
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	org := cf.Organization{Guid: "my-org-guid"}
@@ -134,30 +94,98 @@ func TestFindByNameInCurrentSpace(t *testing.T) {
 		]}`},
 	})
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	domain, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 
 	assert.Equal(t, domain.Name, "domain2.cf-app.com")
 	assert.Equal(t, domain.Guid, "domain2-guid")
 }
 
 func TestFindByNameInCurrentSpaceWhenNotFound(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	})
 
-	ts, handler, repo := createDomainRepo(t, req)
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{spaceDomainsReq, sharedDomainsReq})
 	defer ts.Close()
 
 	_, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
 	assert.True(t, handler.AllRequestsCalled())
 
+	assert.False(t, apiResponse.IsError())
+	assert.True(t, apiResponse.IsNotFound())
+}
+
+func TestFindByNameInCurrentSpaceWhenFoundAsSharedDomain(t *testing.T) {
+	spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{
+			  "metadata": { "guid": "shared-domain-guid" },
+			  "entity": {
+			    "name": "shared-domain.cf-app.com",
+				"owning_organization_guid": null
+			  }
+			}
+		]}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{spaceDomainsReq, sharedDomainsReq})
+	defer ts.Close()
+
+	domain, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.Equal(t, domain.Name, "shared-domain.cf-app.com")
+	assert.Equal(t, domain.Guid, "shared-domain-guid")
+}
+
+func TestFindByNameInCurrentSpaceWhenFoundInDomainsButNotShared(t *testing.T) {
+	spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{
+			  "metadata": { "guid": "some-domain-guid" },
+			  "entity": {
+			    "name": "some.cf-app.com",
+				"owning_organization_guid": "some-org-guid"
+			  }
+			}
+		]}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{spaceDomainsReq, sharedDomainsReq})
+	defer ts.Close()
+
+	_, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
@@ -168,10 +196,10 @@ func TestFindByNameInOrg(t *testing.T) {
 		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
 			{
-			  "metadata": { "guid": "shared-domain-guid" },
+			  "metadata": { "guid": "my-domain-guid" },
 			  "entity": {
-				"name": "shared-example.com",
-				"owning_organization_guid": null,
+				"name": "my-example.com",
+				"owning_organization_guid": "my-org-guid",
 				"wildcard": true,
 				"spaces": [
 				  {
@@ -184,7 +212,65 @@ func TestFindByNameInOrg(t *testing.T) {
 		]}`},
 	})
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
+	defer ts.Close()
+
+	domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", cf.Organization{Guid: "my-org-guid"})
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+
+	assert.Equal(t, domain.Name, "my-example.com")
+	assert.Equal(t, domain.Guid, "my-domain-guid")
+	assert.False(t, domain.Shared)
+	assert.Equal(t, domain.Spaces[0].Name, "my-space")
+}
+
+func TestFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
+	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
+	defer ts.Close()
+
+	_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", cf.Organization{Guid: "my-org-guid"})
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsError())
+	assert.True(t, apiResponse.IsNotFound())
+}
+
+func TestFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
+	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{
+			  "metadata": { "guid": "shared-domain-guid" },
+			  "entity": {
+				"name": "shared-example.com",
+				"owning_organization_guid": null,
+				"wildcard": true,
+				"spaces": []
+			  }
+			}
+		]}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 	defer ts.Close()
 
 	domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", cf.Organization{Guid: "my-org-guid"})
@@ -194,7 +280,38 @@ func TestFindByNameInOrg(t *testing.T) {
 	assert.Equal(t, domain.Name, "shared-example.com")
 	assert.Equal(t, domain.Guid, "shared-domain-guid")
 	assert.True(t, domain.Shared)
-	assert.Equal(t, domain.Spaces[0].Name, "my-space")
+}
+
+func TestFindByNameInOrgWhenFoundInDomainsButNotShared(t *testing.T) {
+	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{
+			  "metadata": { "guid": "shared-domain-guid" },
+			  "entity": {
+				"name": "shared-example.com",
+				"owning_organization_guid": "some-other-org-guid",
+				"wildcard": true,
+				"spaces": []
+			  }
+			}
+		]}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
+	defer ts.Close()
+
+	_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", cf.Organization{Guid: "my-org-guid"})
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsError())
+	assert.True(t, apiResponse.IsNotFound())
 }
 
 func TestCreateDomain(t *testing.T) {
@@ -208,7 +325,7 @@ func TestCreateDomain(t *testing.T) {
 		}`},
 	})
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	domainToCreate := cf.Domain{Name: "example.com"}
@@ -231,7 +348,7 @@ func TestShareDomain(t *testing.T) {
 		}`},
 	})
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	apiResponse := repo.CreateSharedDomain(cf.Domain{Name: "example.com"})
@@ -251,7 +368,7 @@ func deleteDomainReq(statusCode int) testnet.TestRequest {
 func TestDeleteDomainSuccess(t *testing.T) {
 	req := deleteDomainReq(http.StatusOK)
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
@@ -265,7 +382,7 @@ func TestDeleteDomainSuccess(t *testing.T) {
 func TestDeleteDomainFailure(t *testing.T) {
 	req := deleteDomainReq(http.StatusBadRequest)
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	domain := cf.Domain{Name: "example.com", Guid: "my-domain-guid"}
@@ -287,7 +404,7 @@ func mapDomainReq(statusCode int) testnet.TestRequest {
 func TestMapDomainSuccess(t *testing.T) {
 	req := mapDomainReq(http.StatusOK)
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
@@ -302,7 +419,7 @@ func TestMapDomainSuccess(t *testing.T) {
 func TestMapDomainWhenServerError(t *testing.T) {
 	req := mapDomainReq(http.StatusBadRequest)
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
@@ -325,7 +442,7 @@ func unmapDomainReq(statusCode int) testnet.TestRequest {
 func TestUnmapDomainSuccess(t *testing.T) {
 	req := unmapDomainReq(http.StatusOK)
 
-	ts, handler, repo := createDomainRepo(t, req)
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
@@ -337,8 +454,8 @@ func TestUnmapDomainSuccess(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createDomainRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
-	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
+func createDomainRepo(t *testing.T, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
+	ts, handler = testnet.NewTLSServer(t, reqs)
 
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",
