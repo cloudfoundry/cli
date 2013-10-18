@@ -57,7 +57,7 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 	if updateBuildpack {
 		buildpack, apiResponse := cmd.buildpackRepo.Update(buildpack)
 		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Error updating buildpack %s\n%s", buildpack.Name, apiResponse.Message)
+			cmd.ui.Failed("Error updating buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiResponse.Message)
 			return
 		}
 	}
@@ -65,7 +65,7 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 	if dir := c.String("p"); dir != "" {
 		apiResponse := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
 		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Error uploading buildpack %s\n%s", buildpack.Name, apiResponse.Message)
+			cmd.ui.Failed("Error uploading buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiResponse.Message)
 			return
 		}
 
