@@ -74,7 +74,7 @@ func (repo CloudControllerBuildpackRepository) FindAll() (buildpacks []cf.Buildp
 }
 
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s%s?name=%s", repo.config.Target, buildpacks_path, url.QueryEscape(name))
+	path := fmt.Sprintf("%s%s?q=name%%3A%s", repo.config.Target, buildpacks_path, url.QueryEscape(name))
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
