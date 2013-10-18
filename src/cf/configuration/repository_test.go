@@ -12,9 +12,9 @@ func TestLoadingWithNoConfigFile(t *testing.T) {
 	config := repo.loadDefaultConfig(t)
 	defer repo.restoreConfig(t)
 
-	assert.Equal(t, config.Target, "https://api.run.pivotal.io")
-	assert.Equal(t, config.ApiVersion, "2")
-	assert.Equal(t, config.AuthorizationEndpoint, "https://login.run.pivotal.io")
+	assert.Equal(t, config.Target, "")
+	assert.Equal(t, config.ApiVersion, "")
+	assert.Equal(t, config.AuthorizationEndpoint, "")
 	assert.Equal(t, config.AccessToken, "")
 }
 

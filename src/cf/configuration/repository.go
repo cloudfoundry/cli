@@ -129,9 +129,9 @@ func userHomeDir() string {
 
 func defaultConfig() (c *Configuration) {
 	c = new(Configuration)
-	c.Target = "https://api.run.pivotal.io"
-	c.ApiVersion = "2"
-	c.AuthorizationEndpoint = "https://login.run.pivotal.io"
+	c.Target = ""
+	c.ApiVersion = ""
+	c.AuthorizationEndpoint = ""
 	c.ApplicationStartTimeout = 30 // seconds
 
 	return
