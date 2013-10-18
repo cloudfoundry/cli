@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const MAX_INT64 = 1<<63 - 1
+const MAX_INT64 int64 = 1<<63 - 1
 
 type Item struct {
 	message                  *logmessage.Message
