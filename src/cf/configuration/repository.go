@@ -21,6 +21,8 @@ type ConfigurationRepository interface {
 	Delete()
 	Save() (err error)
 	ClearSession() (err error)
+	SetOrganization(org cf.Organization) (err error)
+	SetSpace(space cf.Space) (err error)
 }
 
 type ConfigurationDiskRepository struct {
@@ -28,6 +30,29 @@ type ConfigurationDiskRepository struct {
 
 func NewConfigurationDiskRepository() (repo ConfigurationDiskRepository) {
 	return ConfigurationDiskRepository{}
+}
+
+func (repo ConfigurationDiskRepository) SetOrganization(org cf.Organization) (err error) {
+	config, err := repo.Get()
+	if err != nil {
+		return
+	}
+
+	config.Organization = org
+	config.Space = cf.Space{}
+
+	return saveConfiguration(config)
+}
+
+func (repo ConfigurationDiskRepository) SetSpace(space cf.Space) (err error) {
+	config, err := repo.Get()
+	if err != nil {
+		return
+	}
+
+	config.Space = space
+
+	return saveConfiguration(config)
 }
 
 func (repo ConfigurationDiskRepository) Get() (c *Configuration, err error) {

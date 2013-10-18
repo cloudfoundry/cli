@@ -99,9 +99,11 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 		return
 	}
 
-	cmd.config.Organization = org
-	cmd.config.Space = cf.Space{}
-	cmd.saveConfig()
+	err = cmd.configRepo.SetOrganization(org)
+	if err != nil {
+		cmd.ui.Failed("Error setting org in config file.\n%s", apiResponse.Message)
+		return
+	}
 	return
 }
 

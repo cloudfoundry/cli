@@ -52,11 +52,9 @@ func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
 
 	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Equal(t, len(ui.Outputs), 4)
-	assert.Contains(t, ui.Outputs[0], "https://api.run.pivotal.io")
-	assert.Contains(t, ui.Outputs[1], "user: ")
-	assert.Contains(t, ui.Outputs[2], "No org targeted")
-	assert.Contains(t, ui.Outputs[3], "No space targeted")
+	assert.Equal(t, len(ui.Outputs), 2)
+	assert.Contains(t, ui.Outputs[0], "No org targeted")
+	assert.Contains(t, ui.Outputs[1], "No space targeted")
 }
 
 // Start test with organization option
@@ -77,14 +75,10 @@ func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
-	assert.Contains(t, ui.Outputs[2], "org:")
-	assert.Contains(t, ui.Outputs[2], "my-organization")
-	assert.Contains(t, ui.Outputs[3], "No space targeted")
+	assert.True(t, ui.ShowConfigurationCalled)
 
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[2], "my-organization")
-	assert.NotContains(t, ui.Outputs[3], "my-space")
+	savedConfig := testconfig.SavedConfiguration
+	assert.Equal(t, savedConfig.Organization.Guid, "my-organization-guid")
 }
 
 func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
@@ -99,7 +93,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[2], "No org targeted")
+	assert.Contains(t, ui.Outputs[0], "No org targeted")
 
 	ui = callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
@@ -107,7 +101,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[2], "No org targeted")
+	assert.Contains(t, ui.Outputs[0], "No org targeted")
 }
 
 func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
@@ -145,10 +139,8 @@ func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "An org must be targeted before targeting a space")
-
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[2], "No org targeted")
+	savedConfig := testconfig.SavedConfiguration
+	assert.Equal(t, savedConfig.Organization.Guid, "")
 }
 
 func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
@@ -167,12 +159,9 @@ func TestTargetSpaceWhenUserHasAccess(t *testing.T) {
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
-	assert.Contains(t, ui.Outputs[3], "space:")
-	assert.Contains(t, ui.Outputs[3], "my-space")
-
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[3], "my-space")
+	savedConfig := testconfig.SavedConfiguration
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.True(t, ui.ShowConfigurationCalled)
 }
 
 func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
@@ -189,9 +178,9 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "FAILED")
 	assert.Contains(t, ui.Outputs[1], "my-space")
 
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[3], "No space targeted")
+	savedConfig := testconfig.SavedConfiguration
+	assert.Equal(t, savedConfig.Space.Guid, "")
+	assert.True(t, ui.ShowConfigurationCalled)
 }
 
 func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
@@ -227,18 +216,14 @@ func TestTargetOrganizationAndSpace(t *testing.T) {
 
 	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
+	savedConfig := testconfig.SavedConfiguration
+	assert.True(t, ui.ShowConfigurationCalled)
+
 	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
-	assert.Contains(t, ui.Outputs[2], "org:")
-	assert.Contains(t, ui.Outputs[2], "my-organization")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-organization-guid")
 
 	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
-	assert.Contains(t, ui.Outputs[3], "space:")
-	assert.Contains(t, ui.Outputs[3], "my-space")
-
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[2], "my-organization")
-	assert.Contains(t, ui.Outputs[3], "my-space")
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
 }
 
 func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
@@ -253,14 +238,14 @@ func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
 
 	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
+	savedConfig := testconfig.SavedConfiguration
+	assert.True(t, ui.ShowConfigurationCalled)
+
 	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-organization-guid")
 	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
+	assert.Equal(t, savedConfig.Space.Guid, "")
 	assert.Contains(t, ui.Outputs[0], "FAILED")
-
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[2], "my-organization")
-	assert.Contains(t, ui.Outputs[3], "No space targeted")
 }
 
 // End test with org and space options

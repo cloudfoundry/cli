@@ -5,7 +5,6 @@ import (
 	"strings"
 	"github.com/codegangsta/cli"
 	"cf/configuration"
-	"cf"
 	"time"
 )
 
@@ -15,6 +14,7 @@ type FakeUI struct {
 	PasswordPrompts []string
 	Inputs  []string
 	FailedWithUsage bool
+	ShowConfigurationCalled bool
 }
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
@@ -80,24 +80,7 @@ func (ui *FakeUI) ClearOutputs() {
 }
 
 func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
-	ui.Say("API endpoint: %s (API version: %s)",
-		config.Target,
-		config.ApiVersion)
-
-	if !config.IsLoggedIn() {
-		ui.Say("Logged out, use '%s login USERNAME' to login", cf.Name)
-		return
-	} else {
-		ui.Say("user:            %s", config.UserEmail())
-	}
-
-	if config.HasOrganization() {
-		ui.Say("org:             %s", config.Organization.Name)
-	}
-
-	if config.HasSpace() {
-		ui.Say("space:           %s", config.Space.Name)
-	}
+	ui.ShowConfigurationCalled = true
 }
 
 func (ui FakeUI) LoadingIndication() {

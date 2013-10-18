@@ -11,6 +11,27 @@ var SavedConfiguration configuration.Configuration
 type FakeConfigRepository struct {
 }
 
+func (repo FakeConfigRepository) SetOrganization(org cf.Organization) (err error) {
+	config, err := repo.Get()
+	if err != nil{
+		return
+	}
+
+	config.Organization = org
+	config.Space = cf.Space{}
+	return repo.Save()
+}
+
+func (repo FakeConfigRepository) SetSpace(space cf.Space) (err error) {
+	config, err := repo.Get()
+	if err != nil {
+		return
+	}
+
+	config.Space = space
+	return repo.Save()
+}
+
 func (repo FakeConfigRepository) Get() (c *configuration.Configuration, err error) {
 	if TestConfigurationSingleton == nil {
 		TestConfigurationSingleton = new(configuration.Configuration)

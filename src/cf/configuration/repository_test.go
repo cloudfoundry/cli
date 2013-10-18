@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"cf"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -33,6 +34,42 @@ func TestSavingAndLoading(t *testing.T) {
 	savedConfig, err := repo.Get()
 	assert.NoError(t, err)
 	assert.Equal(t, savedConfig, configToSave)
+}
+
+func TestSetOrganization(t *testing.T) {
+	repo := NewConfigurationDiskRepository()
+	config := repo.loadDefaultConfig(t)
+	defer repo.restoreConfig(t)
+
+	config.Space = cf.Space{Guid: "my-space-guid"}
+	config.Organization = cf.Organization{}
+
+	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	err := repo.SetOrganization(org)
+	assert.NoError(t, err)
+
+	repo.Save()
+
+	savedConfig, err := repo.Get()
+	assert.NoError(t, err)
+	assert.Equal(t, savedConfig.Organization, org)
+	assert.Equal(t, savedConfig.Space, cf.Space{})
+}
+
+func TestSetSpace(t *testing.T) {
+	repo := NewConfigurationDiskRepository()
+	repo.loadDefaultConfig(t)
+	defer repo.restoreConfig(t)
+
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	err := repo.SetSpace(space)
+	assert.NoError(t, err)
+
+	repo.Save()
+
+	savedConfig, err := repo.Get()
+	assert.NoError(t, err)
+	assert.Equal(t, savedConfig.Space, space)
 }
 
 func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config *Configuration) {
