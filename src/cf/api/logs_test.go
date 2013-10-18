@@ -233,12 +233,12 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 			timeNow := time.Now().UnixNano()
 			delta := timeNow - firstMessageTime
 			assert.True(t, delta < (5*time.Millisecond).Nanoseconds())
-			assert.True(t, delta > 0)
+			assert.True(t, delta >= 0)
 		case "My message 3":
 			timeNow := time.Now().UnixNano()
 			delta := timeNow - firstMessageTime
 			assert.True(t, delta < (5*time.Millisecond).Nanoseconds())
-			assert.True(t, delta > 0)
+			assert.True(t, delta >= 0)
 		}
 	}
 
