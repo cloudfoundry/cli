@@ -4,30 +4,27 @@ import (
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/terminal"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
 )
 
-func testSuccessfulAuthenticate(t *testing.T, args []string, inputs []string) (ui *testterm.FakeUI) {
+func testSuccessfulAuthenticate(t *testing.T, args []string) (ui *testterm.FakeUI) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
-	ui = new(testterm.FakeUI)
-	ui.Inputs = inputs
 	auth := &testapi.FakeAuthenticationRepository{
 		AccessToken:  "my_access_token",
 		RefreshToken: "my_refresh_token",
 		ConfigRepo:   configRepo,
 	}
-	callAuthenticate(
+	ui = callAuthenticate(
 		args,
-		ui,
 		configRepo,
 		auth,
 	)
@@ -45,43 +42,29 @@ func testSuccessfulAuthenticate(t *testing.T, args []string, inputs []string) (u
 	return
 }
 
-func TestSuccessfullyAuthenticating(t *testing.T) {
-	ui := testSuccessfulAuthenticate(t, []string{}, []string{"user@example.com", "password"})
+func TestAuthenticateFailsWithUsage(t *testing.T) {
+	configRepo := testconfig.FakeConfigRepository{}
+	configRepo.Delete()
 
-	assert.Contains(t, ui.PasswordPrompts[0], "Password")
-}
+	auth := &testapi.FakeAuthenticationRepository{
+		AccessToken:  "my_access_token",
+		RefreshToken: "my_refresh_token",
+		ConfigRepo:   configRepo,
+	}
 
-func TestSuccessfullyAuthenticatingWithUsernameAsArgument(t *testing.T) {
-	ui := testSuccessfulAuthenticate(t, []string{"user@example.com"}, []string{"password"})
+	ui := callAuthenticate([]string{}, configRepo, auth)
+	assert.True(t, ui.FailedWithUsage)
 
-	assert.Contains(t, ui.PasswordPrompts[0], "Password")
+	ui = callAuthenticate([]string{"my-username"}, configRepo, auth)
+	assert.True(t, ui.FailedWithUsage)
+
+	ui = callAuthenticate([]string{"my-username", "my-password"}, configRepo, auth)
+	assert.False(t, ui.FailedWithUsage)
+
 }
 
 func TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments(t *testing.T) {
-	testSuccessfulAuthenticate(t, []string{"user@example.com", "password"}, []string{})
-}
-
-func TestUnsuccessfullyAuthenticating(t *testing.T) {
-	configRepo := testconfig.FakeConfigRepository{}
-	configRepo.Delete()
-	config, _ := configRepo.Get()
-
-	ui := new(testterm.FakeUI)
-	ui.Inputs = []string{
-		"foo@example.com",
-		"bar",
-	}
-
-	callAuthenticate(
-		[]string{},
-		ui,
-		configRepo,
-		&testapi.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
-	)
-
-	assert.Contains(t, ui.Outputs[0], config.Target)
-	assert.Equal(t, ui.Outputs[1], "Authenticating...")
-	assert.Equal(t, ui.Outputs[2], "FAILED")
+	testSuccessfulAuthenticate(t, []string{"user@example.com", "password"})
 }
 
 func TestUnsuccessfullyAuthenticatingWithoutInteractivity(t *testing.T) {
@@ -89,14 +72,11 @@ func TestUnsuccessfullyAuthenticatingWithoutInteractivity(t *testing.T) {
 	configRepo.Delete()
 	config, _ := configRepo.Get()
 
-	ui := new(testterm.FakeUI)
-
-	callAuthenticate(
+	ui := callAuthenticate(
 		[]string{
 			"foo@example.com",
 			"bar",
 		},
-		ui,
 		configRepo,
 		&testapi.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
 	)
@@ -108,7 +88,10 @@ func TestUnsuccessfullyAuthenticatingWithoutInteractivity(t *testing.T) {
 	assert.Equal(t, len(ui.Outputs), 4)
 }
 
-func callAuthenticate(args []string, ui terminal.UI, configRepo configuration.ConfigurationRepository, auth api.AuthenticationRepository) {
-	l := NewAuthenticate(ui, configRepo, auth)
-	l.Run(testcmd.NewContext("authenticate", args))
+func callAuthenticate(args []string, configRepo configuration.ConfigurationRepository, auth api.AuthenticationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("auth", args)
+	cmd := NewAuthenticate(ui, configRepo, auth)
+	testcmd.RunCommand(cmd, ctxt, &testreq.FakeReqFactory{})
+	return
 }

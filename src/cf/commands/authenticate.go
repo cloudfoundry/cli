@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -26,41 +27,28 @@ func NewAuthenticate(ui terminal.UI, configRepo configuration.ConfigurationRepos
 }
 
 func (cmd Authenticate) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) < 2 {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "auth")
+		return
+	}
 	return
 }
 
 func (cmd Authenticate) Run(c *cli.Context) {
 	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.Target))
 
-	var (
-		username string
-		password string
-	)
+	username := c.Args()[0]
+	password := c.Args()[1]
 
-	if len(c.Args()) > 0 {
-		username = c.Args()[0]
-	} else {
-		username = cmd.ui.Ask("Username%s", terminal.PromptColor(">"))
-	}
-
-	if len(c.Args()) > 1 {
-		password = c.Args()[1]
-		cmd.ui.Say("Authenticating...")
-
-		apiResponse := cmd.doLogin(username, password)
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
-		}
-		return
-	}
-
-	password = cmd.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
 	cmd.ui.Say("Authenticating...")
 
 	apiResponse := cmd.doLogin(username, password)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
+		return
 	}
+
 	return
 }
 
