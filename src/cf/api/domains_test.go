@@ -15,20 +15,16 @@ import (
 var orgDomainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
     {
       "metadata": {
-        "guid": "shared-domain-guid"
+        "guid": "some-shared-domain-guid"
       },
       "entity": {
-        "name": "shared-example.com",
+        "name": "some-shared.example.com",
         "owning_organization_guid": null,
         "wildcard": true,
         "spaces": [
           {
-            "metadata": {
-              "guid": "my-space-guid"
-            },
-            "entity": {
-              "name": "my-space"
-            }
+            "metadata": { "guid": "my-space-guid" },
+            "entity": { "name": "my-space" }
           }
         ]
       }
@@ -43,12 +39,43 @@ var orgDomainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"re
         "wildcard": true,
         "spaces": [
           {
-            "metadata": {
-              "guid": "my-space-guid"
-            },
-            "entity": {
-              "name": "my-space"
-            }
+            "metadata": { "guid": "my-space-guid" },
+            "entity": { "name": "my-space" }
+          }
+        ]
+      }
+    }
+]}`}
+
+var sharedDomainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+    {
+      "metadata": {
+        "guid": "some-shared-domain-guid"
+      },
+      "entity": {
+        "name": "some-shared.example.com",
+        "owning_organization_guid": null,
+        "wildcard": true,
+        "spaces": [
+          {
+            "metadata": { "guid": "my-space-guid" },
+            "entity": { "name": "my-space" }
+          }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "guid": "shared-domain-guid"
+      },
+      "entity": {
+        "name": "shared.example.com",
+        "owning_organization_guid": null,
+        "wildcard": true,
+        "spaces": [
+          {
+            "metadata": { "guid": "my-space-guid" },
+            "entity": { "name": "my-space" }
           }
         ]
       }
@@ -56,23 +83,31 @@ var orgDomainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"re
 ]}`}
 
 func TestFindAllByOrg(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1",
 		Response: orgDomainsResponse,
 	})
 
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
+	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/domains?inline-relations-depth=1",
+		Response: sharedDomainsResponse,
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 	defer ts.Close()
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	domains, apiResponse := repo.FindAllByOrg(org)
 
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 2, len(domains))
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, 3, len(domains))
 
 	domain := domains[0]
+	assert.Equal(t, domain.Name, "some-shared.example.com")
+	assert.Equal(t, domain.Guid, "some-shared-domain-guid")
 	assert.True(t, domain.Shared)
 
 	domain = domains[1]
@@ -80,6 +115,11 @@ func TestFindAllByOrg(t *testing.T) {
 	assert.Equal(t, domain.Guid, "my-domain-guid")
 	assert.False(t, domain.Shared)
 	assert.Equal(t, domain.Spaces[0].Name, "my-space")
+
+	domain = domains[2]
+	assert.Equal(t, domain.Name, "shared.example.com")
+	assert.Equal(t, domain.Guid, "shared-domain-guid")
+	assert.True(t, domain.Shared)
 }
 
 func TestFindByNameInCurrentSpace(t *testing.T) {
@@ -113,8 +153,8 @@ func TestFindByNameInCurrentSpaceWhenNotFound(t *testing.T) {
 	})
 
 	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/domains?q=name%3Adomain2.cf-app.com",
+		Method:   "GET",
+		Path:     "/v2/domains?q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	})
 
@@ -227,14 +267,14 @@ func TestFindByNameInOrg(t *testing.T) {
 
 func TestFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Method:   "GET",
+		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	})
 
 	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Method:   "GET",
+		Path:     "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	})
 
@@ -249,8 +289,8 @@ func TestFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
 
 func TestFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Method:   "GET",
+		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	})
 
@@ -284,8 +324,8 @@ func TestFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
 
 func TestFindByNameInOrgWhenFoundInDomainsButNotShared(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Method:   "GET",
+		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 	})
 

@@ -46,8 +46,33 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 }
 
 func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, org.Guid)
-	return repo.findAllWithPath(path)
+	scopedPath := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, org.Guid)
+	domains, apiResponse = repo.findAllWithPath(scopedPath)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	sharedPath := fmt.Sprintf("%s/v2/domains?inline-relations-depth=1", repo.config.Target)
+	sharedDomains, apiResponse := repo.findAllWithPath(sharedPath)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	var domainIsNotIncluded = func(domain cf.Domain) bool {
+		for _, d := range domains {
+			if d.Guid == domain.Guid {
+				return false
+			}
+		}
+		return true
+	}
+
+	for _, d := range sharedDomains {
+		if domainIsNotIncluded(d) {
+			domains = append(domains, d)
+		}
+	}
+	return
 }
 
 func (repo CloudControllerDomainRepository) findAllWithPath(path string) (domains []cf.Domain, apiResponse net.ApiResponse) {
