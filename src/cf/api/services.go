@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
-	"io"
 	"strings"
 )
 
@@ -63,10 +62,10 @@ type ServiceBindingEntity struct {
 
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
-	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
-	DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse)
+	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse)
+	DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceRepository struct {
@@ -88,14 +87,8 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 		path = fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.Target, spaceGuid)
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	resources := new(PaginatedServiceOfferingResources)
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -118,50 +111,17 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
-
-	data := fmt.Sprintf(
-		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
-		name, plan.Guid, repo.config.Space.Guid,
-	)
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-
-	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
-
-		serviceInstance, findInstanceApiResponse := repo.FindInstanceByName(name)
-
-		if !findInstanceApiResponse.IsNotSuccessful() &&
-			serviceInstance.ServicePlan.Guid == plan.Guid {
-			apiResponse = net.ApiResponse{}
-			identicalAlreadyExists = true
-			return
-		}
-	}
-
-	return
-}
-
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
 
 	resources := new(PaginatedServiceInstanceResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(resources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service instance", name)
+		apiResponse = net.NewNotFoundApiResponse("Service instance %s not found", name)
 		return
 	}
 
@@ -193,25 +153,39 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	return
 }
 
-func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse) {
-	if len(instance.ServiceBindings) > 0 {
-		return net.NewApiResponseWithMessage("Cannot delete service instance, apps are still bound to it")
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
+	data := fmt.Sprintf(
+		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
+		name, plan.Guid, repo.config.Space.Guid,
+	)
+
+	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
+
+	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
+
+		serviceInstance, findInstanceApiResponse := repo.FindInstanceByName(name)
+
+		if !findInstanceApiResponse.IsNotSuccessful() &&
+			serviceInstance.ServicePlan.Guid == plan.Guid {
+			apiResponse = net.ApiResponse{}
+			identicalAlreadyExists = true
+			return
+		}
 	}
-	return repo.deleteOrUpdateService(instance, "DELETE", nil)
+	return
 }
 
 func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
-	return repo.deleteOrUpdateService(instance, "PUT", strings.NewReader(body))
+	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceRepository) deleteOrUpdateService(instance cf.ServiceInstance, verb string, body io.Reader) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
-	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
-	if apiResponse.IsNotSuccessful() {
-		return
+func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+	if len(instance.ServiceBindings) > 0 {
+		return net.NewApiResponseWithMessage("Cannot delete service instance, apps are still bound to it")
 	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }

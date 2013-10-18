@@ -42,6 +42,36 @@ func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
 	gateway.authenticator = auth
 }
 
+func (gateway Gateway) GetResource(url, accessToken string, resource interface{}) (apiResponse ApiResponse) {
+	request, apiResponse := gateway.NewRequest("GET", url, accessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	_, apiResponse = gateway.PerformRequestForJSONResponse(request, resource)
+	return
+}
+
+func (gateway Gateway) CreateResource(url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
+	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body)
+}
+
+func (gateway Gateway) UpdateResource(url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
+	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body)
+}
+
+func (gateway Gateway) DeleteResource(url, accessToken string) (apiResponse ApiResponse) {
+	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil)
+}
+
+func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
+	request, apiResponse := gateway.NewRequest(verb, url, accessToken, body)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+	return gateway.PerformRequest(request)
+}
+
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Reader) (req *Request, apiResponse ApiResponse) {
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {

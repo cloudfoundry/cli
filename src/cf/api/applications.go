@@ -67,13 +67,8 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 
 func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	appResources := new(PaginatedApplicationResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, appResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, appResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -111,12 +106,7 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envV
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.UpdateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 	return
 }
 
@@ -153,13 +143,7 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 
 func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, app.Guid)
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
 
 func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newName string) (apiResponse net.ApiResponse) {
@@ -197,14 +181,7 @@ func (repo CloudControllerApplicationRepository) updateApp(app cf.Application, b
 	}
 
 	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
-
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, body)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, body)
 }
 
 func validateApplication(app cf.Application) (apiResponse net.ApiResponse) {

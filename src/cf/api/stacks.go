@@ -59,13 +59,8 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiResp
 }
 
 func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []cf.Stack, apiResponse net.ApiResponse) {
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	resources := new(PaginatedStackResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

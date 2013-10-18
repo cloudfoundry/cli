@@ -51,14 +51,9 @@ func NewCloudControllerServiceSummaryRepository(config *configuration.Configurat
 
 func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []cf.ServiceInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	response := new(ServiceInstancesSummaries)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
 
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

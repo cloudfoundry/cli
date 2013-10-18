@@ -56,19 +56,13 @@ func NewCloudControllerAppSummaryRepository(config *configuration.Configuration,
 
 func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []cf.Application, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	resource := new(ApplicationSummaries)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	response := new(ApplicationSummaries)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
-
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apps = extractApplicationsFromSummary(response.Apps)
+	apps = extractApplicationsFromSummary(resource.Apps)
 
 	return
 }
@@ -93,13 +87,8 @@ func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applicat
 
 func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (summary cf.AppSummary, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, app.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	summaryResponse := new(ApplicationSummary)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, summaryResponse)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, summaryResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -154,14 +143,8 @@ type InstanceStatsApiResponse struct {
 
 func (repo CloudControllerAppSummaryRepository) updateInstancesWithStats(app cf.Application, instances []cf.ApplicationInstance) (updatedInst []cf.ApplicationInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.Target, app.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	statsResponse := StatsApiResponse{}
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &statsResponse)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, &statsResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

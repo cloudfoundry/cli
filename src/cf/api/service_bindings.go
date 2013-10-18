@@ -30,13 +30,7 @@ func (repo CloudControllerServiceBindingRepository) Create(instance cf.ServiceIn
 		`{"app_guid":"%s","service_instance_guid":"%s"}`,
 		app.Guid, instance.Guid,
 	)
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBindingRepository) Delete(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse) {
@@ -55,11 +49,6 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance cf.ServiceIn
 		found = true
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
 	return
 }

@@ -41,13 +41,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name string, params m
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.CreateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
@@ -64,11 +58,5 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstance cf.Se
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 }

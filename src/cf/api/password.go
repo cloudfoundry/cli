@@ -67,15 +67,8 @@ func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new str
 
 	path := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())
 	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
 
-	request.Header.Set("Content-Type", "application/json")
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
 func translateScoreResponse(response ScoreResponse) string {

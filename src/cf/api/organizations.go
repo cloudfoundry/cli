@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
-	"io"
 	"strings"
 )
 
@@ -66,13 +65,8 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 }
 
 func (repo CloudControllerOrganizationRepository) findAllWithPath(path string) (orgs []cf.Organization, apiResponse net.ApiResponse) {
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
 	orgResources := new(PaginatedOrganizationResources)
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, orgResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, orgResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -99,28 +93,18 @@ func (repo CloudControllerOrganizationRepository) findAllWithPath(path string) (
 }
 
 func (repo CloudControllerOrganizationRepository) Create(name string) (apiResponse net.ApiResponse) {
-	path := repo.config.Target + "/v2/organizations"
+	url := repo.config.Target + "/v2/organizations"
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.createUpdateOrDelete(path, "POST", strings.NewReader(data))
+	return repo.gateway.CreateResource(url, repo.config.AccessToken, strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
+	url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.createUpdateOrDelete(path, "PUT", strings.NewReader(data))
+	return repo.gateway.UpdateResource(url, repo.config.AccessToken, strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
-	return repo.createUpdateOrDelete(path, "DELETE", nil)
-}
-
-func (repo CloudControllerOrganizationRepository) createUpdateOrDelete(path, verb string, body io.Reader) (apiResponse net.ApiResponse) {
-	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	url := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
+	return repo.gateway.DeleteResource(url, repo.config.AccessToken)
 }

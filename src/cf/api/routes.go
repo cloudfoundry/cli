@@ -89,13 +89,8 @@ func (repo CloudControllerRouteRepository) findOneWithPath(path string) (route c
 }
 
 func (repo CloudControllerRouteRepository) findAllWithPath(path string) (routes []cf.Route, apiResponse net.ApiResponse) {
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	routesResources := new(PaginatedRouteResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, routesResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, routesResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -150,32 +145,16 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 }
 
 func (repo CloudControllerRouteRepository) Bind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
-	return repo.change("PUT", route, app)
+	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, nil)
 }
 
 func (repo CloudControllerRouteRepository) Unbind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
-	return repo.change("DELETE", route, app)
+	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
 
 func (repo CloudControllerRouteRepository) Delete(route cf.Route) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/routes/%s", repo.config.Target, route.Guid)
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
-}
-
-func (repo CloudControllerRouteRepository) change(verb string, route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.Target, app.Guid, route.Guid)
-	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-
-	return
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }

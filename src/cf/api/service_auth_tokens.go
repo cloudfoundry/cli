@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
-	"io"
 	"strings"
 )
 
@@ -64,13 +63,9 @@ func (repo CloudControllerServiceAuthTokenRepository) FindByLabelAndProvider(lab
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path string) (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse) {
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	resources := new(PaginatedAuthTokenResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
+
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -87,30 +82,17 @@ func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path strin
 
 func (repo CloudControllerServiceAuthTokenRepository) Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"label":"%s","provider":"%s","token":"%s"}`, authToken.Label, authToken.Provider, authToken.Token)
-	return repo.createUpdateOrDelete(authToken, "POST", strings.NewReader(body))
+	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
+	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	return repo.createUpdateOrDelete(authToken, "DELETE", nil)
+	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
-	return repo.createUpdateOrDelete(authToken, "PUT", strings.NewReader(body))
-}
-
-func (repo CloudControllerServiceAuthTokenRepository) createUpdateOrDelete(authToken cf.ServiceAuthToken, verb string, body io.Reader) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.Target)
-
-	if authToken.Guid != "" {
-		path = fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
-	}
-
-	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.Target, authToken.Guid)
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }

@@ -57,13 +57,8 @@ func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (d
 }
 
 func (repo CloudControllerDomainRepository) findAllWithPath(path string) (domains []cf.Domain, apiResponse net.ApiResponse) {
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	domainResources := new(PaginatedDomainResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, domainResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, domainResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -137,44 +132,20 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 func (repo CloudControllerDomainRepository) Share(domainToShare cf.Domain) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
 	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domainToShare.Name)
-
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-
-	return
+	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
 }
 
 func (repo CloudControllerDomainRepository) Delete(domain cf.Domain) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domain.Guid)
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
 
 func (repo CloudControllerDomainRepository) Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	return repo.mapOrUnmap("PUT", domain, space)
+	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, nil)
 }
 
 func (repo CloudControllerDomainRepository) Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	return repo.mapOrUnmap("DELETE", domain, space)
-}
-
-func (repo CloudControllerDomainRepository) mapOrUnmap(verb string, domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
-
-	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }

@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
-	"io"
 	"strings"
 )
 
@@ -67,13 +66,9 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 }
 
 func (repo CloudControllerServiceBrokerRepository) findAllWithPath(path string) (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse) {
-	req, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	resources := new(PaginatedServiceBrokerResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(req, resources)
+
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -93,43 +88,30 @@ func (repo CloudControllerServiceBrokerRepository) findAllWithPath(path string) 
 }
 
 func (repo CloudControllerServiceBrokerRepository) Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers", repo.config.Target)
 	body := fmt.Sprintf(
 		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
 		serviceBroker.Name, serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
 	)
-	return repo.createUpdateOrDelete(serviceBroker, "POST", strings.NewReader(body))
+	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
 	body := fmt.Sprintf(
 		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
 		serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
 	)
-	return repo.createUpdateOrDelete(serviceBroker, "PUT", strings.NewReader(body))
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
 	body := fmt.Sprintf(`{"name":"%s"}`, serviceBroker.Name)
-
-	return repo.createUpdateOrDelete(serviceBroker, "PUT", strings.NewReader(body))
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceBrokerRepository) Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	return repo.createUpdateOrDelete(serviceBroker, "DELETE", nil)
-}
-
-func (repo CloudControllerServiceBrokerRepository) createUpdateOrDelete(serviceBroker cf.ServiceBroker, verb string, body io.Reader) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_brokers", repo.config.Target)
-
-	if serviceBroker.Guid != "" {
-		path = fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
-	}
-
-	req, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(req)
-	return
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
