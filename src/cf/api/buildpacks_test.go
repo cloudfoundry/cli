@@ -93,10 +93,12 @@ func TestBuildpacksFindAll(t *testing.T) {
 	firstBuildpack := buildpacks[0]
 	assert.Equal(t, firstBuildpack.Name, "Buildpack1")
 	assert.Equal(t, firstBuildpack.Guid, "buildpack1-guid")
+	assert.Equal(t, *firstBuildpack.Priority, 1)
 
 	secondBuildpack := buildpacks[1]
 	assert.Equal(t, secondBuildpack.Name, "Buildpack2")
 	assert.Equal(t, secondBuildpack.Guid, "buildpack2-guid")
+	assert.Equal(t, *secondBuildpack.Priority, 2)
 }
 
 func TestBuildpacksFindByName(t *testing.T) {
@@ -133,6 +135,7 @@ func TestBuildpacksFindByName(t *testing.T) {
 
 	assert.Equal(t, buildpack.Name, existingBuildpack.Name)
 	assert.Equal(t, buildpack.Guid, existingBuildpack.Guid)
+	assert.Equal(t, *buildpack.Priority, 10)
 
 	buildpack, apiResponse = repo.FindByName("buildpack1")
 	assert.True(t, apiResponse.IsNotSuccessful())
@@ -179,7 +182,7 @@ func TestCreateBuildpack(t *testing.T) {
 
 	assert.NotNil(t, created.Guid)
 	assert.Equal(t, buildpack.Name, created.Name)
-	assert.NotEqual(t, created.Priority, 0)
+	assert.NotEqual(t, *created.Priority, 0)
 }
 
 func TestCreateBuildpackWithPriority(t *testing.T) {

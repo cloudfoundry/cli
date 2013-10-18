@@ -46,7 +46,7 @@ func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
 
 	assert.Equal(t, len(fakeUI.Outputs), 3)
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")	
+	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-buildpack")
 	assert.Contains(t, fakeUI.Outputs[2], "already exists")
