@@ -2,12 +2,12 @@ package domain
 
 import (
 	"cf/api"
-	"cf/commands/application"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
+	"cf/formatters"
 )
 
 type ListDomains struct {
@@ -65,7 +65,7 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		table = append(table, []string{
 			domain.Name,
 			status,
-			strings.Join(application.MapStr(domain.Spaces), ", "),
+			strings.Join(formatters.MapStr(domain.Spaces), ", "),
 		})
 	}
 
