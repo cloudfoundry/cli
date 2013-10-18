@@ -59,8 +59,8 @@ func TestMapDomainSuccess(t *testing.T) {
 	cmd := NewDomainMapper(ui, domainRepo, true)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	assert.Equal(t, domainRepo.MapDomainDomain.Name, "foo.com")
-	assert.Equal(t, domainRepo.MapDomainSpace.Name, "my-space")
+	assert.Equal(t, domainRepo.MapDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.MapSpace.Name, "my-space")
 	assert.Contains(t, ui.Outputs[0], "Mapping domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
 	assert.Contains(t, ui.Outputs[0], "my-space")
@@ -98,7 +98,7 @@ func TestMapDomainMappingFails(t *testing.T) {
 	ui := &testterm.FakeUI{}
 	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
-		MapDomainApiResponse:  net.NewApiResponseWithError("Did not work %s", errors.New("bummer")),
+		MapApiResponse:        net.NewApiResponseWithError("Did not work %s", errors.New("bummer")),
 	}
 
 	reqFactory := &testreq.FakeReqFactory{
@@ -138,8 +138,8 @@ func TestUnmapDomainSuccess(t *testing.T) {
 	cmd := NewDomainMapper(ui, domainRepo, false)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.UnmapDomainDomain.Name, "foo.com")
-	assert.Equal(t, domainRepo.UnmapDomainSpace.Name, "my-space")
+	assert.Equal(t, domainRepo.UnmapDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.UnmapSpace.Name, "my-space")
 	assert.Contains(t, ui.Outputs[0], "Unmapping domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
 	assert.Contains(t, ui.Outputs[0], "my-space")

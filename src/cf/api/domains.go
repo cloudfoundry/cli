@@ -30,9 +30,9 @@ type DomainRepository interface {
 	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse)
 	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse)
 	Share(domainToShare cf.Domain) (apiResponse net.ApiResponse)
-	MapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
-	UnmapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
-	DeleteDomain(domain cf.Domain) (apiResponse net.ApiResponse)
+	Delete(domain cf.Domain) (apiResponse net.ApiResponse)
+	Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
+	Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerDomainRepository struct {
@@ -48,28 +48,15 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 
 func (repo CloudControllerDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/domains", repo.config.Target, repo.config.Space.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	resources := new(PaginatedResources)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	for _, r := range resources.Resources {
-		domains = append(domains, cf.Domain{Name: r.Entity.Name, Guid: r.Metadata.Guid})
-	}
-
-	return
+	return repo.findAllWithPath(path)
 }
 
 func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse) {
-	orgGuid := org.Guid
+	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, org.Guid)
+	return repo.findAllWithPath(path)
+}
 
-	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, orgGuid)
+func (repo CloudControllerDomainRepository) findAllWithPath(path string) (domains []cf.Domain, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -101,20 +88,27 @@ func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (d
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	domains, apiResponse := repo.FindAllInCurrentSpace()
+	path := fmt.Sprintf("%s/v2/spaces/%s/domains?q=name%%3A%s", repo.config.Target, repo.config.Space.Guid, name)
+	return repo.findOneWithPath(path, name)
+}
 
+func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, org cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, org.Guid, name)
+	return repo.findOneWithPath(path, name)
+}
+
+func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain cf.Domain, apiResponse net.ApiResponse) {
+	domains, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	domainIndex := indexOfDomain(domains, name)
-
-	if domainIndex >= 0 {
-		domain = domains[domainIndex]
-	} else {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Domain", name)
+	if len(domains) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("Domain %s not found", name)
+		return
 	}
 
+	domain = domains[0]
 	return
 }
 
@@ -154,43 +148,7 @@ func (repo CloudControllerDomainRepository) Share(domainToShare cf.Domain) (apiR
 	return
 }
 
-func (repo CloudControllerDomainRepository) MapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	return repo.changeDomain("PUT", domain, space)
-}
-
-func (repo CloudControllerDomainRepository) UnmapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	return repo.changeDomain("DELETE", domain, space)
-}
-
-func (repo CloudControllerDomainRepository) changeDomain(verb string, domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
-
-	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
-}
-
-func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
-	domains, apiResponse := repo.FindAllByOrg(owningOrg)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	domainIndex := indexOfDomain(domains, name)
-	if domainIndex >= 0 {
-		domain = domains[domainIndex]
-	} else {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Domain", name)
-	}
-
-	return
-}
-
-func (repo CloudControllerDomainRepository) DeleteDomain(domain cf.Domain) (apiResponse net.ApiResponse) {
+func (repo CloudControllerDomainRepository) Delete(domain cf.Domain) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domain.Guid)
 	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
@@ -200,18 +158,23 @@ func (repo CloudControllerDomainRepository) DeleteDomain(domain cf.Domain) (apiR
 	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
-func indexOfDomain(domains []cf.Domain, domainName string) int {
-	domainName = strings.ToLower(domainName)
 
-	if len(domains) > 0 && domainName == "" {
-		return 0
+func (repo CloudControllerDomainRepository) Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
+	return repo.mapOrUnmap("PUT", domain, space)
+}
+
+func (repo CloudControllerDomainRepository) Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
+	return repo.mapOrUnmap("DELETE", domain, space)
+}
+
+func (repo CloudControllerDomainRepository) mapOrUnmap(verb string, domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
+
+	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, nil)
+	if apiResponse.IsNotSuccessful() {
+		return
 	}
 
-	for i, d := range domains {
-		if strings.ToLower(d.Name) == domainName {
-			return i
-		}
-	}
-
-	return -1
+	apiResponse = repo.gateway.PerformRequest(request)
+	return
 }

@@ -76,9 +76,9 @@ func (cmd *DomainMapper) Run(c *cli.Context) {
 	}
 
 	if cmd.bind {
-		apiResponse = cmd.domainRepo.MapDomain(domain, space)
+		apiResponse = cmd.domainRepo.Map(domain, space)
 	} else {
-		apiResponse = cmd.domainRepo.UnmapDomain(domain, space)
+		apiResponse = cmd.domainRepo.Unmap(domain, space)
 	}
 
 	if apiResponse.IsNotSuccessful() {

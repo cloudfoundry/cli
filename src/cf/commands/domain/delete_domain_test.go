@@ -54,7 +54,7 @@ func TestDeleteDomainSuccess(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "foo.com")
@@ -77,7 +77,7 @@ func TestDeleteDomainNoConfirmation(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "")
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "foo.com")
@@ -101,7 +101,7 @@ func TestDeleteDomainNotFound(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
@@ -123,7 +123,7 @@ func TestDeleteDomainFindError(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
@@ -135,8 +135,8 @@ func TestDeleteDomainFindError(t *testing.T) {
 func TestDeleteDomainDeleteError(t *testing.T) {
 	ui := &testterm.FakeUI{Inputs: []string{"y"}}
 	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain:   cf.Domain{Name: "foo.com"},
-		DeleteDomainApiResponse: net.NewApiResponseWithMessage("failed badly"),
+		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
+		DeleteApiResponse:     net.NewApiResponseWithMessage("failed badly"),
 	}
 
 	cmd := NewDeleteDomain(ui, domainRepo)
@@ -146,7 +146,7 @@ func TestDeleteDomainDeleteError(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
@@ -168,7 +168,7 @@ func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
 
 	assert.Contains(t, ui.Prompts[0], "shared")
 	assert.Contains(t, ui.Prompts[0], "foo.com")
@@ -191,7 +191,7 @@ func TestDeleteDomainForceFlagSkipsConfirmation(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, domainRepo.DeleteDomainDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
 
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")

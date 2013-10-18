@@ -24,16 +24,16 @@ type FakeDomainRepository struct {
 
 	ShareDomainDomainToCreate cf.Domain
 
-	MapDomainDomain cf.Domain
-	MapDomainSpace cf.Space
-	MapDomainApiResponse net.ApiResponse
+	MapDomain cf.Domain
+	MapSpace cf.Space
+	MapApiResponse net.ApiResponse
 
-	UnmapDomainDomain cf.Domain
-	UnmapDomainSpace cf.Space
-	UnmapDomainApiResponse net.ApiResponse
+	UnmapDomain cf.Domain
+	UnmapSpace cf.Space
+	UnmapApiResponse net.ApiResponse
 
-	DeleteDomainDomain cf.Domain
-	DeleteDomainApiResponse net.ApiResponse
+	DeleteDomain cf.Domain
+	DeleteApiResponse net.ApiResponse
 }
 
 func (repo *FakeDomainRepository) FindAllInCurrentSpace() (domains []cf.Domain, apiResponse net.ApiResponse){
@@ -62,6 +62,13 @@ func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain 
 	return
 }
 
+func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
+
+	domain = repo.FindByNameInOrgDomain
+	apiResponse = repo.FindByNameInOrgApiResponse
+	return
+}
+
 func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse){
 	repo.ReserveDomainDomainToCreate = domainToCreate
 	repo.ReserveDomainOwningOrg = owningOrg
@@ -73,29 +80,22 @@ func (repo *FakeDomainRepository) Share(domainToShare cf.Domain) (apiResponse ne
 	return
 }
 
-func (repo *FakeDomainRepository) MapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	repo.MapDomainDomain = domain
-	repo.MapDomainSpace = space
-	apiResponse = repo.MapDomainApiResponse
+func (repo *FakeDomainRepository) Delete(domain cf.Domain) (apiResponse net.ApiResponse) {
+	repo.DeleteDomain = domain
+	apiResponse = repo.DeleteApiResponse
 	return
 }
 
-func (repo *FakeDomainRepository) UnmapDomain(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	repo.UnmapDomainDomain = domain
-	repo.UnmapDomainSpace = space
-	apiResponse = repo.UnmapDomainApiResponse
+func (repo *FakeDomainRepository) Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
+	repo.MapDomain = domain
+	repo.MapSpace = space
+	apiResponse = repo.MapApiResponse
 	return
 }
 
-func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
-
-	domain = repo.FindByNameInOrgDomain
-	apiResponse = repo.FindByNameInOrgApiResponse
-	return
-}
-
-func (repo *FakeDomainRepository) DeleteDomain(domain cf.Domain) (apiResponse net.ApiResponse) {
-	repo.DeleteDomainDomain = domain
-	apiResponse = repo.DeleteDomainApiResponse
+func (repo *FakeDomainRepository) Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
+	repo.UnmapDomain = domain
+	repo.UnmapSpace = space
+	apiResponse = repo.UnmapApiResponse
 	return
 }
