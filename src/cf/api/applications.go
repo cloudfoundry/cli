@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"encoding/json"
 	"fmt"
+	"io"
 	"regexp"
 	"strconv"
 	"strings"
@@ -150,14 +151,6 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 	return
 }
 
-func stringOrNull(s string) string {
-	if s == "" {
-		return "null"
-	}
-
-	return fmt.Sprintf(`"%s"`, s)
-}
-
 func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, app.Guid)
 	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
@@ -170,20 +163,13 @@ func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (api
 }
 
 func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newName string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+	app.Name = newName
 	data := fmt.Sprintf(`{"name":"%s"}`, newName)
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
+	apiResponse = repo.updateApp(app, strings.NewReader(data))
 	return
 }
 
 func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
-
 	values := map[string]interface{}{}
 	if app.DiskQuota > 0 {
 		values["disk_quota"] = app.DiskQuota
@@ -200,7 +186,19 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiR
 		return net.NewApiResponseWithError("Error generating body", err)
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(bodyBytes))
+	apiResponse = repo.updateApp(app, bytes.NewReader(bodyBytes))
+	return
+}
+
+func (repo CloudControllerApplicationRepository) updateApp(app cf.Application, body io.Reader) (apiResponse net.ApiResponse) {
+	apiResponse = validateApplication(app)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -209,16 +207,54 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiR
 	return
 }
 
+func validateApplication(app cf.Application) (apiResponse net.ApiResponse) {
+	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
+	if !reg.MatchString(app.Name) {
+		apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
+	}
+
+	return
+}
+
 func (repo CloudControllerApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse) {
 	updates := map[string]interface{}{"state": "STARTED"}
 	if app.BuildpackUrl != "" {
 		updates["buildpack"] = app.BuildpackUrl
 	}
-	return repo.updateApplication(app, updates)
+	return repo.startOrStopApp(app, updates)
 }
 
 func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	return repo.updateApplication(app, map[string]interface{}{"state": "STOPPED"})
+	return repo.startOrStopApp(app, map[string]interface{}{"state": "STOPPED"})
+}
+
+func (repo CloudControllerApplicationRepository) startOrStopApp(app cf.Application, updates map[string]interface{}) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+
+	updates["console"] = true
+
+	body, err := json.Marshal(updates)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Could not serialize app updates.", err)
+		return
+	}
+
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(body))
+
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	response := ApplicationResource{}
+	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &response)
+
+	updatedApp = cf.Application{
+		Name:  response.Entity.Name,
+		Guid:  response.Metadata.Guid,
+		State: strings.ToLower(response.Entity.State),
+	}
+
+	return
 }
 
 type InstancesApiResponse map[string]InstanceApiResponse
@@ -254,43 +290,5 @@ func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application
 			Since: time.Unix(int64(v.Since), 0),
 		}
 	}
-	return
-}
-
-func (repo CloudControllerApplicationRepository) updateApplication(app cf.Application, updates map[string]interface{}) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
-
-	updates["console"] = true
-
-	body, err := json.Marshal(updates)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Could not serialize app updates.", err)
-		return
-	}
-
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(body))
-
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	response := ApplicationResource{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &response)
-
-	updatedApp = cf.Application{
-		Name:  response.Entity.Name,
-		Guid:  response.Metadata.Guid,
-		State: strings.ToLower(response.Entity.State),
-	}
-
-	return
-}
-
-func validateApplication(app cf.Application) (apiResponse net.ApiResponse) {
-	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-	if !reg.MatchString(app.Name) {
-		apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
-	}
-
 	return
 }
