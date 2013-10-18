@@ -23,7 +23,8 @@ func TestFindQuotaByName(t *testing.T) {
         "guid": "my-quota-guid"
       },
       "entity": {
-        "name": "my-remote-quota"
+        "name": "my-remote-quota",
+        "memory_limit": 1024
       }
     }
   ]
@@ -36,7 +37,7 @@ func TestFindQuotaByName(t *testing.T) {
 	quota, apiResponse := repo.FindByName("my-quota")
 	assert.True(t, status.Called())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota"})
+	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota", MemoryLimit: 1024})
 }
 
 func TestUpdateQuota(t *testing.T) {

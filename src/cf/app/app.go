@@ -389,6 +389,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "quotas",
+			Description: "List available usage quotas ",
+			Usage:       fmt.Sprintf("%s quotas", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("quotas", c)
+			},
+		},
+		{
 			Name:        "rename",
 			Description: "Rename an app",
 			Usage:       fmt.Sprintf("%s rename APP NEW_APP", cf.Name),

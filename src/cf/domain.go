@@ -137,14 +137,15 @@ func (inst ServiceInstance) ServiceOffering() ServiceOffering {
 }
 
 type ServiceBinding struct {
-	Url     string
 	Guid    string
+	Url     string
 	AppGuid string
 }
 
 type Quota struct {
-	Name string
-	Guid string
+	Guid        string
+	Name        string
+	MemoryLimit uint64 // in Megabytes
 }
 
 type ServiceAuthToken struct {

@@ -62,6 +62,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["org-users"] = user.NewOrgUsers(ui, repoLocator.GetUserRepository())
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, config, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["passwd"] = NewPassword(ui, repoLocator.GetPasswordRepository(), configRepo)
+	factory.cmdsByName["quotas"] = organization.NewListQuotas(ui, repoLocator.GetQuotaRepository())
 	factory.cmdsByName["rename"] = application.NewRenameApp(ui, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["rename-org"] = organization.NewRenameOrg(ui, repoLocator.GetOrganizationRepository())
 	factory.cmdsByName["rename-service"] = service.NewRenameService(ui, repoLocator.GetServiceRepository())
