@@ -42,7 +42,7 @@ func (cmd *ShareDomain) Run(c *cli.Context) {
 
 	domain := cf.Domain{Name: domainName}
 
-	apiResponse := cmd.domainRepo.Share(domain)
+	apiResponse := cmd.domainRepo.CreateSharedDomain(domain)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

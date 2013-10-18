@@ -29,7 +29,7 @@ type DomainRepository interface {
 	FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse)
 	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse)
-	Share(domainToShare cf.Domain) (apiResponse net.ApiResponse)
+	CreateSharedDomain(domainToShare cf.Domain) (apiResponse net.ApiResponse)
 	Delete(domain cf.Domain) (apiResponse net.ApiResponse)
 	Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
 	Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
@@ -129,9 +129,9 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 	return
 }
 
-func (repo CloudControllerDomainRepository) Share(domainToShare cf.Domain) (apiResponse net.ApiResponse) {
+func (repo CloudControllerDomainRepository) CreateSharedDomain(domain cf.Domain) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
-	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domainToShare.Name)
+	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domain.Name)
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
 }
 

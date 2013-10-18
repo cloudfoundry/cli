@@ -234,7 +234,7 @@ func TestShareDomain(t *testing.T) {
 	ts, handler, repo := createDomainRepo(t, req)
 	defer ts.Close()
 
-	apiResponse := repo.Share(cf.Domain{Name: "example.com"})
+	apiResponse := repo.CreateSharedDomain(cf.Domain{Name: "example.com"})
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())

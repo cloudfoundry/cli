@@ -37,7 +37,7 @@ func TestShareDomain(t *testing.T) {
 	domainRepo := &testapi.FakeDomainRepository{}
 	fakeUI := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.ShareDomainDomainToCreate.Name, "example.com")
+	assert.Equal(t, domainRepo.CreateSharedDomainDomain.Name, "example.com")
 	assert.Contains(t, fakeUI.Outputs[0], "example.com")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
