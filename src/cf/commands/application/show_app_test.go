@@ -3,6 +3,7 @@ package application_test
 import (
 	"cf"
 	. "cf/commands/application"
+	"cf/formatters"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
@@ -61,10 +62,10 @@ func TestDisplayingAppSummary(t *testing.T) {
 			State:     cf.InstanceRunning,
 			Since:     time1,
 			CpuUsage:  1.0,
-			DiskQuota: 1 * GIGABYTE,
-			DiskUsage: 32 * MEGABYTE,
-			MemQuota:  64 * MEGABYTE,
-			MemUsage:  13 * BYTE,
+			DiskQuota: 1 * formatters.GIGABYTE,
+			DiskUsage: 32 * formatters.MEGABYTE,
+			MemQuota:  64 * formatters.MEGABYTE,
+			MemUsage:  13 * formatters.BYTE,
 		},
 		cf.ApplicationInstance{
 			State: cf.InstanceDown,

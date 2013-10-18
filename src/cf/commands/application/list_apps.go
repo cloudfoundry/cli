@@ -3,6 +3,7 @@ package application
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -56,8 +57,8 @@ func (cmd ListApps) Run(c *cli.Context) {
 			app.Name,
 			coloredAppState(app),
 			coloredAppInstaces(app),
-			byteSize(app.Memory * MEGABYTE),
-			byteSize(app.DiskQuota * MEGABYTE),
+			formatters.ByteSize(app.Memory * formatters.MEGABYTE),
+			formatters.ByteSize(app.DiskQuota * formatters.MEGABYTE),
 			strings.Join(app.Urls, ", "),
 		})
 	}

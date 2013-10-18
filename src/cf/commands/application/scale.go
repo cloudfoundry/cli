@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -74,11 +75,11 @@ func (cmd *Scale) Run(c *cli.Context) {
 func extractMegaBytes(arg string) (megaBytes uint64, err error) {
 	if arg != "" {
 		var byteSize uint64
-		byteSize, err = bytesFromString(arg)
+		byteSize, err = formatters.BytesFromString(arg)
 		if err != nil {
 			return
 		}
-		megaBytes = byteSize / MEGABYTE
+		megaBytes = byteSize / formatters.MEGABYTE
 	}
 
 	return

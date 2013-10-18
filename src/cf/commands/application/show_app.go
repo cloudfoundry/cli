@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -56,7 +57,7 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("\n%s %s", terminal.HeaderColor("state:"), coloredAppState(summary.App))
 	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstaces(summary.App))
-	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), byteSize(summary.App.Memory*MEGABYTE), summary.App.Instances)
+	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(summary.App.Memory*formatters.MEGABYTE), summary.App.Instances)
 	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
 
 	if appIsStopped {
@@ -73,8 +74,8 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 			coloredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
 			fmt.Sprintf("%.1f%%", instance.CpuUsage),
-			fmt.Sprintf("%s of %s", byteSize(instance.MemUsage), byteSize(instance.MemQuota)),
-			fmt.Sprintf("%s of %s", byteSize(instance.DiskUsage), byteSize(instance.DiskQuota)),
+			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.MemUsage), formatters.ByteSize(instance.MemQuota)),
+			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.DiskUsage), formatters.ByteSize(instance.DiskQuota)),
 		})
 	}
 
