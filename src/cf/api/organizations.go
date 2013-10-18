@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -44,31 +45,27 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 
 func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/organizations"
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-	response := new(PaginatedOrganizationResources)
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
-
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	for _, r := range response.Resources {
-		orgs = append(orgs, cf.Organization{
-			Name: r.Entity.Name,
-			Guid: r.Metadata.Guid,
-		},
-		)
-	}
-
-	return
+	return repo.findAllWithPath(path)
 }
 
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
+
+	orgs, apiResponse := repo.findAllWithPath(path)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if len(orgs) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("Org %s not found", name)
+		return
+	}
+
+	org = orgs[0]
+	return
+}
+
+func (repo CloudControllerOrganizationRepository) findAllWithPath(path string) (orgs []cf.Organization, apiResponse net.ApiResponse) {
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -76,68 +73,50 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 	orgResources := new(PaginatedOrganizationResources)
 
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, orgResources)
-
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	if len(orgResources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
-		return
+	for _, r := range orgResources.Resources {
+		spaces := []cf.Space{}
+		for _, s := range r.Entity.Spaces {
+			spaces = append(spaces, cf.Space{Name: s.Entity.Name, Guid: s.Metadata.Guid})
+		}
+
+		domains := []cf.Domain{}
+		for _, d := range r.Entity.Domains {
+			domains = append(domains, cf.Domain{Name: d.Entity.Name, Guid: d.Metadata.Guid})
+		}
+
+		orgs = append(orgs, cf.Organization{
+			Name:    r.Entity.Name,
+			Guid:    r.Metadata.Guid,
+			Spaces:  spaces,
+			Domains: domains,
+		})
 	}
-
-	r := orgResources.Resources[0]
-	spaces := []cf.Space{}
-
-	for _, s := range r.Entity.Spaces {
-		spaces = append(spaces, cf.Space{Name: s.Entity.Name, Guid: s.Metadata.Guid})
-	}
-
-	domains := []cf.Domain{}
-
-	for _, d := range r.Entity.Domains {
-		domains = append(domains, cf.Domain{Name: d.Entity.Name, Guid: d.Metadata.Guid})
-	}
-
-	org = cf.Organization{
-		Name:    r.Entity.Name,
-		Guid:    r.Metadata.Guid,
-		Spaces:  spaces,
-		Domains: domains,
-	}
-
 	return
 }
 
 func (repo CloudControllerOrganizationRepository) Create(name string) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/organizations"
-	data := fmt.Sprintf(
-		`{"name":"%s"}`, name,
-	)
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	data := fmt.Sprintf(`{"name":"%s"}`, name)
+	return repo.createUpdateOrDelete(path, "POST", strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
-	return
+	return repo.createUpdateOrDelete(path, "PUT", strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
+	return repo.createUpdateOrDelete(path, "DELETE", nil)
+}
+
+func (repo CloudControllerOrganizationRepository) createUpdateOrDelete(path, verb string, body io.Reader) (apiResponse net.ApiResponse) {
+	request, apiResponse := repo.gateway.NewRequest(verb, path, repo.config.AccessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

@@ -8,49 +8,31 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
-var multipleOrgResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
-{
-  "total_results": 2,
-  "total_pages": 1,
-  "prev_url": null,
-  "next_url": null,
-  "resources": [
-    {
-      "metadata": {
-        "guid": "org1-guid"
-      },
-      "entity": {
-        "name": "Org1"
-      }
-    },
-    {
-      "metadata": {
-        "guid": "org2-guid"
-      },
-      "entity": {
-        "name": "Org2"
-      }
-    }
-  ]
-}`}
-
-var multipleOrgEndpoint, multipleOrgEndpointStatus = testapi.CreateCheckableEndpoint(
-	"GET",
-	"/v2/organizations",
-	nil,
-	multipleOrgResponse,
-)
-
 func TestOrganizationsFindAll(t *testing.T) {
-	multipleOrgEndpointStatus.Reset()
-	ts, repo := createOrganizationRepo(multipleOrgEndpoint)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{
+			  "metadata": { "guid": "org1-guid" },
+			  "entity": { "name": "Org1" }
+			},
+			{
+			  "metadata": { "guid": "org2-guid" },
+			  "entity": { "name": "Org2" }
+			}
+		]}`},
+	})
+
+	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
 	organizations, apiResponse := repo.FindAll()
-	assert.True(t, multipleOrgEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, 2, len(organizations))
 
@@ -64,54 +46,32 @@ func TestOrganizationsFindAll(t *testing.T) {
 }
 
 func TestOrganizationsFindByName(t *testing.T) {
-	response := testapi.TestResponse{Status: http.StatusOK, Body: `
-{
-  "resources": [
-    {
-      "metadata": {
-        "guid": "org1-guid"
-      },
-      "entity": {
-        "name": "Org1",
-        "spaces": [
-          {
-            "metadata": {
-              "guid": "space1-guid"
-            },
-            "entity": {
-              "name": "Space1"
-            }
-          }
-        ],
-        "domains": [
-          {
-            "metadata": {
-              "guid": "domain1-guid"
-            },
-            "entity": {
-              "name": "cfapps.io"
-            }
-          }
-        ]
-      }
-    }
-  ]
-}`}
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [{
+		  "metadata": { "guid": "org1-guid" },
+		  "entity": {
+			"name": "Org1",
+			"spaces": [{
+			  "metadata": { "guid": "space1-guid" },
+			  "entity": { "name": "Space1" }
+			}],
+			"domains": [{
+			  "metadata": { "guid": "domain1-guid" },
+			  "entity": { "name": "cfapps.io" }
+			}]
+		  }
+		}]}`},
+	})
 
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
-		nil,
-		response,
-	)
-
-	ts, repo := createOrganizationRepo(endpoint)
+	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
 	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
 
 	org, apiResponse := repo.FindByName("Org1")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	assert.Equal(t, org.Name, existingOrg.Name)
@@ -122,80 +82,75 @@ func TestOrganizationsFindByName(t *testing.T) {
 	assert.Equal(t, len(org.Domains), 1)
 	assert.Equal(t, org.Domains[0].Name, "cfapps.io")
 	assert.Equal(t, org.Domains[0].Guid, "domain1-guid")
-
-	org, apiResponse = repo.FindByName("org1")
-	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestOrganizationsFindByNameWhenDoesNotExist(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/organizations?q=name%3Aorg1&inline-relations-depth=1",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
 
-	ts, repo := createOrganizationRepo(endpoint)
+	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
 	_, apiResponse := repo.FindByName("org1")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
 }
 
 func TestCreateOrganization(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/v2/organizations",
-		testapi.RequestBodyMatcher(`{"name":"my-org"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/v2/organizations",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-org"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createOrganizationRepo(endpoint)
+	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
 	apiResponse := repo.Create("my-org")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestRenameOrganization(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/v2/organizations/my-org-guid",
-		testapi.RequestBodyMatcher(`{"name":"my-new-org"}`),
-		testapi.TestResponse{Status: http.StatusCreated},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/organizations/my-org-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-new-org"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
 
-	ts, repo := createOrganizationRepo(endpoint)
+	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.Rename(org, "my-new-org")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestDeleteOrganization(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"DELETE",
-		"/v2/organizations/my-org-guid?recursive=true",
-		nil,
-		testapi.TestResponse{Status: http.StatusOK},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/organizations/my-org-guid?recursive=true",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
-	ts, repo := createOrganizationRepo(endpoint)
+	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
 	org := cf.Organization{Guid: "my-org-guid"}
 	apiResponse := repo.Delete(org)
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createOrganizationRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo OrganizationRepository) {
-	ts = httptest.NewTLSServer(endpoint)
+func createOrganizationRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
+	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
