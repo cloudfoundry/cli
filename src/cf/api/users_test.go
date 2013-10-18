@@ -15,20 +15,34 @@ import (
 )
 
 func TestUserRepoFindAll(t *testing.T) {
-	ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	ccFirstPageReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/users",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{"metadata": {"guid": "user-2-guid"}, "entity": {"admin":true}},
-			{"metadata": {"guid": "user-3-guid"}, "entity": {"admin":false}}
-		]}`},
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+			"next_url": "/v2/users?page=2",
+			"resources": [
+				{"metadata": {"guid": "user-1-guid"}, "entity": {"admin":true}},
+				{"metadata": {"guid": "user-2-guid"}, "entity": {"admin":false}}
+			]
+		}`},
+	})
+	ccSecondPageReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/users",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+			"next_url": "",
+			"resources": [
+				{"metadata": {"guid": "user-3-guid"}, "entity": {"admin":true}}
+			]
+		}`},
 	})
 
 	uaaResp := `{ "resources": [
+          { "id": "user-1-guid", "userName": "Super user 1" },
           { "id": "user-2-guid", "userName": "Super user 2" },
           { "id": "user-3-guid", "userName": "Super user 3" }
         ]}`
-	filter := `Id eq "user-2-guid" or Id eq "user-3-guid"`
+	filter := `Id eq "user-1-guid" or Id eq "user-2-guid" or Id eq "user-3-guid"`
 
 	uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
@@ -36,7 +50,10 @@ func TestUserRepoFindAll(t *testing.T) {
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: uaaResp},
 	})
 
-	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t,
+		[]testnet.TestRequest{ccFirstPageReq, ccSecondPageReq},
+		[]testnet.TestRequest{uaaReq})
+
 	defer cc.Close()
 	defer uaa.Close()
 
@@ -46,12 +63,14 @@ func TestUserRepoFindAll(t *testing.T) {
 	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 
-	assert.Equal(t, 2, len(users))
+	assert.Equal(t, 3, len(users))
 
-	expectedUser1 := cf.User{Guid: "user-2-guid", Username: "Super user 2", IsAdmin: true}
-	expectedUser2 := cf.User{Guid: "user-3-guid", Username: "Super user 3", IsAdmin: false}
+	expectedUser1 := cf.User{Guid: "user-1-guid", Username: "Super user 1", IsAdmin: true}
+	expectedUser2 := cf.User{Guid: "user-2-guid", Username: "Super user 2", IsAdmin: false}
+	expectedUser3 := cf.User{Guid: "user-3-guid", Username: "Super user 3", IsAdmin: true}
 	assert.Equal(t, expectedUser1, users[0])
 	assert.Equal(t, expectedUser2, users[1])
+	assert.Equal(t, expectedUser3, users[2])
 }
 
 func createUsersByRoleEndpoints(rolePaths []string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {

@@ -10,6 +10,7 @@ import (
 )
 
 type PaginatedUserResources struct {
+	NextUrl string `json:"next_url"`
 	Resources []UserResource
 }
 
@@ -132,11 +133,22 @@ func (repo CloudControllerUserRepository) FindAllInSpaceByRole(space cf.Space) (
 }
 
 func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []cf.User, apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s%s", repo.config.Target, path)
-	resources := new(PaginatedUserResources)
+	allUserResources := []UserResource{}
 
-	apiResponse = repo.ccGateway.GetResource(url, repo.config.AccessToken, resources)
-	if apiResponse.IsNotSuccessful() {
+	for path != "" {
+		paginatedResources := new(PaginatedUserResources)
+		url := fmt.Sprintf("%s%s", repo.config.Target, path)
+
+		apiResponse = repo.ccGateway.GetResource(url, repo.config.AccessToken, paginatedResources)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+
+		allUserResources = append(allUserResources, paginatedResources.Resources...)
+		path = paginatedResources.NextUrl
+	}
+
+	if len(allUserResources) == 0 {
 		return
 	}
 
@@ -145,17 +157,13 @@ func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []
 		return
 	}
 
-	if len(resources.Resources) == 0 {
-		return
-	}
-
 	guidFilters := []string{}
-	for _, r := range resources.Resources {
+	for _, r := range allUserResources {
 		users = append(users, cf.User{Guid: r.Metadata.Guid, IsAdmin: r.Entity.Admin})
 		guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, r.Metadata.Guid))
 	}
 	filter := strings.Join(guidFilters, " or ")
-	url = fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, neturl.QueryEscape(filter))
+	url := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, neturl.QueryEscape(filter))
 
 	users, apiResponse = repo.updateOrFindUsersWithUAAPath(users, url)
 	return
