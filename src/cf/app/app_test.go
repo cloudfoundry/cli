@@ -69,6 +69,7 @@ func TestCommands(t *testing.T) {
 		"orgs",
 		"passwd",
 		"push",
+		"quotas",
 		"rename",
 		"rename-org",
 		"rename-service",
@@ -87,7 +88,7 @@ func TestCommands(t *testing.T) {
 		"set-org-role",
 		"set-quota",
 		"set-space-role",
-		//		"share-domain",
+		"share-domain",
 		"space",
 		"space-users",
 		"spaces",
@@ -103,7 +104,6 @@ func TestCommands(t *testing.T) {
 		"unset-space-role",
 		"update-service-broker",
 		"update-user-provided-service",
-		"users",
 	}
 
 	for _, cmdName := range availableCmds {

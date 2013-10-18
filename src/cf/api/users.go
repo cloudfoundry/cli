@@ -49,7 +49,6 @@ var spacePathToDisplayNameMap = map[string]string{
 }
 
 type UserRepository interface {
-	FindAll() (users []cf.User, apiResponse net.ApiResponse)
 	FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse)
 	FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
 	FindAllInSpaceByRole(space cf.Space) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse)
@@ -73,11 +72,6 @@ func NewCloudControllerUserRepository(config *configuration.Configuration, uaaGa
 	repo.uaaGateway = uaaGateway
 	repo.ccGateway = ccGateway
 	repo.endpointRepo = endpointRepo
-	return
-}
-
-func (repo CloudControllerUserRepository) FindAll() (users []cf.User, apiResponse net.ApiResponse) {
-	users, apiResponse = repo.findAllWithPath("/v2/users")
 	return
 }
 

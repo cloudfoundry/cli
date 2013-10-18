@@ -94,7 +94,6 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, repoLocator.GetUserProvidedServiceInstanceRepository())
-	factory.cmdsByName["users"] = user.NewListUsers(ui, repoLocator.GetUserRepository())
 
 	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())
 	stop := application.NewStop(ui, repoLocator.GetApplicationRepository())
