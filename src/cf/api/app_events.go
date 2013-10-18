@@ -55,11 +55,11 @@ func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (e
 
 		for _, resource := range eventResources.Resources {
 			events = append(events, cf.Event{
-					Timestamp:       resource.Entity.Timestamp,
-					ExitDescription: resource.Entity.ExitDescription,
-					ExitStatus:      resource.Entity.ExitStatus,
-					InstanceIndex:   resource.Entity.InstanceIndex,
-				})
+				Timestamp:       resource.Entity.Timestamp,
+				ExitDescription: resource.Entity.ExitDescription,
+				ExitStatus:      resource.Entity.ExitStatus,
+				InstanceIndex:   resource.Entity.InstanceIndex,
+			})
 		}
 
 		path = eventResources.NextURL

@@ -10,7 +10,7 @@ import (
 )
 
 type PaginatedUserResources struct {
-	NextUrl string `json:"next_url"`
+	NextUrl   string `json:"next_url"`
 	Resources []UserResource
 }
 

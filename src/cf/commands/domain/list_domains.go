@@ -2,12 +2,12 @@ package domain
 
 import (
 	"cf/api"
+	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
-	"cf/formatters"
 )
 
 type ListDomains struct {
