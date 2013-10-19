@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"regexp"
 )
 
 const (
@@ -103,11 +102,6 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 }
 
 func (repo CloudControllerBuildpackRepository) Create(newBuildpack cf.Buildpack) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
-	apiResponse = validateBuildpack(newBuildpack)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	path := repo.config.Target + buildpacks_path
 	entity := BuildpackEntity{newBuildpack.Name, newBuildpack.Priority}
 	body, err := json.Marshal(entity)
@@ -169,15 +163,6 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (u
 		Guid:     response.Metadata.Guid,
 		Name:     response.Entity.Name,
 		Priority: response.Entity.Priority,
-	}
-
-	return
-}
-
-func validateBuildpack(buildpack cf.Buildpack) (apiResponse net.ApiResponse) {
-	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-	if !reg.MatchString(buildpack.Name) {
-		apiResponse = net.NewApiResponseWithMessage("Buildpack name is invalid: name can only contain letters, numbers, underscores and hyphens")
 	}
 
 	return

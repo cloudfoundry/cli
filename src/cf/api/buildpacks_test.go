@@ -119,32 +119,26 @@ func TestFindByNameWhenBuildpackIsNotFound(t *testing.T) {
 }
 
 func TestBuildpackCreateRejectsImproperNames(t *testing.T) {
-	baseRequest := testnet.TestRequest{
-		Method:   "POST",
-		Path:     "/v2/buildpacks",
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: "{}"},
-	}
+	badRequest := testnet.TestRequest{
+		Method: "POST",
+		Path:   "/v2/buildpacks",
+		Response: testnet.TestResponse{
+			Status: http.StatusBadRequest,
+			Body: `{
+				"code":290003,
+				"description":"Buildpack is invalid: [\"name name can only contain alphanumeric characters\"]",
+				"error_code":"CF-BuildpackInvalid"
+			}`,
+		}}
 
-	requests := []testnet.TestRequest{
-		baseRequest,
-		baseRequest,
-	}
-
-	ts, _, repo := createBuildpackRepo(t, requests)
+	ts, _, repo := createBuildpackRepo(t, []testnet.TestRequest{badRequest})
 	defer ts.Close()
 
 	createdBuildpack, apiResponse := repo.Create(cf.Buildpack{Name: "name with space"})
-	assert.Equal(t, createdBuildpack, cf.Buildpack{})
-	assert.Contains(t, apiResponse.Message, "Buildpack name is invalid")
-
-	_, apiResponse = repo.Create(cf.Buildpack{Name: "name-with-inv@lid-chars!"})
 	assert.True(t, apiResponse.IsNotSuccessful())
-
-	_, apiResponse = repo.Create(cf.Buildpack{Name: "Valid-Name"})
-	assert.True(t, apiResponse.IsSuccessful())
-
-	_, apiResponse = repo.Create(cf.Buildpack{Name: "name_with_numbers_2"})
-	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, createdBuildpack, cf.Buildpack{})
+	assert.Equal(t, apiResponse.ErrorCode, "290003")
+	assert.Contains(t, apiResponse.Message, "Buildpack is invalid")
 }
 
 func TestCreateBuildpack(t *testing.T) {
