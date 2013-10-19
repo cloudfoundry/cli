@@ -17,7 +17,7 @@ import (
 func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(t,
-		[]string{"my-custom-service", `"foo, bar, baz"`},
+		[]string{"-p", `"foo, bar, baz"`, "my-custom-service"},
 		[]string{"foo value", "bar value", "baz value"},
 		userProvidedServiceInstanceRepo,
 	)
@@ -44,7 +44,7 @@ func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 func TestCreateUserProvidedServiceWithJson(t *testing.T) {
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(t,
-		[]string{"my-custom-service", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`},
+		[]string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 		[]string{},
 		userProvidedServiceInstanceRepo,
 	)
@@ -70,14 +70,15 @@ func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
 		userProvidedServiceInstanceRepo,
 	)
 
-	assert.Contains(t, fakeUI.Outputs[0], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[0], "Creating user provided service")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestCreateUserProvidedServiceWithSyslogDrain(t *testing.T) {
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
 	fakeUI := callCreateUserProvidedService(t,
-		[]string{"-l", "syslog://example.com", "my-custom-service", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`},
+		[]string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 		[]string{},
 		userProvidedServiceInstanceRepo,
 	)

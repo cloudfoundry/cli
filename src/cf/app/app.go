@@ -151,19 +151,18 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "create-user-provided-service",
 			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",
-			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE PARAMETERS [-l SYSLOG-DRAIN-URL]\n", cf.Name) +
+			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n", cf.Name) +
 				"\n   Pass comma separated parameter names to enable interactive mode:\n" +
-				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE \"comma, separated, parameter, names\"\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n", cf.Name) +
 				"\n   Pass parameters as JSON to create a service non-interactively:\n" +
-				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{\"name\":\"value\",\"name\":\"value\"}'\n", cf.Name) +
-				"\n   Pass empty JSON parameters to create a service that only has a logging url:\n" +
-				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE '{}' -l SYSLOG-DRAIN-URL\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n", cf.Name) +
 				"\nEXAMPLE:\n" +
 				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"\n", cf.Name) +
 				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service my-drain-service '{}' -l syslog://example.com\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service my-drain-service '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com\n", cf.Name),
+				fmt.Sprintf("   %s create-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com\n", cf.Name),
 			Flags: []cli.Flag{
+				cli.StringFlag{Name: "p", Value: "", Usage: "Parameters"},
 				cli.StringFlag{Name: "l", Value: "", Usage: "Syslog Drain Url"},
 			},
 			Action: func(c *cli.Context) {

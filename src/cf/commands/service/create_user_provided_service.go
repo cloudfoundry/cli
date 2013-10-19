@@ -25,7 +25,7 @@ func NewCreateUserProvidedService(ui terminal.UI, config *configuration.Configur
 }
 
 func (cmd CreateUserProvidedService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
+	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-user-provided-service")
 		return
@@ -37,12 +37,12 @@ func (cmd CreateUserProvidedService) GetRequirements(reqFactory requirements.Fac
 func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 	name := c.Args()[0]
 
-	params := c.Args()[1]
+	params := c.String("p")
 	params = strings.Trim(params, `"`)
 	paramsMap := make(map[string]string)
 
 	err := json.Unmarshal([]byte(params), &paramsMap)
-	if err != nil {
+	if err != nil && params != "" {
 		paramsMap = cmd.mapValuesFromPrompt(params, paramsMap)
 	}
 
