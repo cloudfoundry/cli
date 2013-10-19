@@ -17,6 +17,11 @@ func TestUpdateBuildpackRequirements(t *testing.T) {
 	callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
+	callUpdateBuildpack([]string{"my-buildpack", "buildpack.zip", "extraArg"}, reqFactory, repo, bitsRepo)
+	assert.False(t, testcmd.CommandDidPassRequirements)
+
+
 	// TestUpdateBuildpackWhenDoesNotExist
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
 	callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
@@ -24,7 +29,7 @@ func TestUpdateBuildpackRequirements(t *testing.T) {
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, BuildpackSuccess: true}
 	callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
+	assert.False(t, testcmd.CommandDidPassRequirements)	
 }
 
 func TestUpdateBuildpack(t *testing.T) {
@@ -55,7 +60,7 @@ func TestUpdateBuildpackPath(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callUpdateBuildpack([]string{"-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	fakeUI := callUpdateBuildpack([]string{"my-buildpack", "buildpack.zip"}, reqFactory, repo, bitsRepo)
 
 	assert.Equal(t, bitsRepo.UploadBuildpackPath, "buildpack.zip")
 
@@ -69,7 +74,7 @@ func TestUpdateBuildpackWithInvalidPath(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 	bitsRepo.UploadBuildpackErr = true
 
-	fakeUI := callUpdateBuildpack([]string{"-p", "bogus/path", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	fakeUI := callUpdateBuildpack([]string{"my-buildpack", "bogus/path"}, reqFactory, repo, bitsRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
 	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")

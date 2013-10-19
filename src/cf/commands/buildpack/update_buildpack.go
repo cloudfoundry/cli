@@ -24,7 +24,7 @@ func NewUpdateBuildpack(ui terminal.UI, repo api.BuildpackRepository, bitsRepo a
 }
 
 func (cmd *UpdateBuildpack) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
+	if len(c.Args()) < 1 || len(c.Args()) > 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "update-buildpack")
 		return
@@ -62,7 +62,8 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 		}
 	}
 
-	if dir := c.String("p"); dir != "" {
+	if len(c.Args()) > 1 {
+		dir := c.Args()[1]
 		apiResponse := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed("Error uploading buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiResponse.Message)

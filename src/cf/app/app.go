@@ -719,9 +719,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-buildpack",
 			Description: "Update a buildpack",
-			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-prioirity PRIORITY]", cf.Name),
+			Usage: fmt.Sprintf("%s update-buildpack BUILDPACK [PATH] [-prioirity PRIORITY]\n"+
+				"\tPATH: Path to a directory or zip file", cf.Name),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "p", Value: "", Usage: "Path of buildpack directory or zip file"},
 				cli.IntFlag{Name: "priority", Value: 0, Usage: "Buildpack priority"},
 			},
 			Action: func(c *cli.Context) {
