@@ -169,3 +169,9 @@ type User struct {
 	Password string
 	IsAdmin  bool
 }
+
+type Buildpack struct {
+	Guid     string
+	Name     string
+	Priority *int
+}

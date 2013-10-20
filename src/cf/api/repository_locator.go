@@ -7,8 +7,7 @@ import (
 )
 
 type RepositoryLocator struct {
-	authRepo AuthenticationRepository
-
+	authRepo                        AuthenticationRepository
 	endpointRepo                    RemoteEndpointRepository
 	organizationRepo                CloudControllerOrganizationRepository
 	quotaRepo                       CloudControllerQuotaRepository
@@ -30,6 +29,8 @@ type RepositoryLocator struct {
 	authTokenRepo                   CloudControllerServiceAuthTokenRepository
 	serviceBrokerRepo               CloudControllerServiceBrokerRepository
 	userProvidedServiceInstanceRepo CCUserProvidedServiceInstanceRepository
+	buildpackRepo                   CloudControllerBuildpackRepository
+	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
 }
 
 func NewRepositoryLocator(config *configuration.Configuration, configRepo configuration.ConfigurationRepository, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
@@ -64,6 +65,8 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.spaceRepo = NewCloudControllerSpaceRepository(config, cloudControllerGateway)
 	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway, loc.endpointRepo)
+	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
+	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, cf.ApplicationZipper{})
 
 	return
 }
@@ -154,4 +157,12 @@ func (locator RepositoryLocator) GetServiceBrokerRepository() ServiceBrokerRepos
 
 func (locator RepositoryLocator) GetUserProvidedServiceInstanceRepository() UserProvidedServiceInstanceRepository {
 	return locator.userProvidedServiceInstanceRepo
+}
+
+func (locator RepositoryLocator) GetBuildpackRepository() BuildpackRepository {
+	return locator.buildpackRepo
+}
+
+func (locator RepositoryLocator) GetBuildpackBitsRepository() BuildpackBitsRepository {
+	return locator.buildpackBitsRepo
 }

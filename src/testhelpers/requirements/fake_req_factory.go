@@ -1,8 +1,8 @@
 package requirements
 
 import (
-	"cf/requirements"
 	"cf"
+	"cf/requirements"
 )
 
 type FakeReqFactory struct {
@@ -12,26 +12,29 @@ type FakeReqFactory struct {
 	ServiceInstanceName string
 	ServiceInstance     cf.ServiceInstance
 
-	LoginSuccess bool
+	LoginSuccess            bool
 	ValidAccessTokenSuccess bool
-	TargetedSpaceSuccess bool
-	TargetedOrgSuccess bool
+	TargetedSpaceSuccess    bool
+	TargetedOrgSuccess      bool
+	BuildpackSuccess		bool
 
 	SpaceName string
-	Space cf.Space
+	Space     cf.Space
 
 	OrganizationName string
-	Organization cf.Organization
+	Organization     cf.Organization
 
-	RouteHost string
+	RouteHost   string
 	RouteDomain string
-	Route cf.Route
+	Route       cf.Route
 
 	DomainName string
-	Domain cf.Domain
+	Domain     cf.Domain
 
 	UserUsername string
-	User cf.User
+	User         cf.User
+
+	Buildpack     cf.Buildpack
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -45,48 +48,51 @@ func (f *FakeReqFactory) NewServiceInstanceRequirement(name string) requirements
 }
 
 func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
-	return FakeRequirement{ f, f.LoginSuccess }
+	return FakeRequirement{f, f.LoginSuccess}
 }
 
 func (f *FakeReqFactory) NewValidAccessTokenRequirement() requirements.Requirement {
-	return FakeRequirement{ f, f.ValidAccessTokenSuccess }
+	return FakeRequirement{f, f.ValidAccessTokenSuccess}
 }
 
 func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {
-	return FakeRequirement{ f, f.TargetedSpaceSuccess }
+	return FakeRequirement{f, f.TargetedSpaceSuccess}
 }
 
 func (f *FakeReqFactory) NewTargetedOrgRequirement() requirements.TargetedOrgRequirement {
-	return FakeRequirement{ f, f.TargetedOrgSuccess }
+	return FakeRequirement{f, f.TargetedOrgSuccess}
 }
 
 func (f *FakeReqFactory) NewSpaceRequirement(name string) requirements.SpaceRequirement {
 	f.SpaceName = name
-	return FakeRequirement{ f, true }
+	return FakeRequirement{f, true}
 }
 
 func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.OrganizationRequirement {
 	f.OrganizationName = name
-	return FakeRequirement{ f, true }
+	return FakeRequirement{f, true}
 }
 
 func (f *FakeReqFactory) NewRouteRequirement(host, domain string) requirements.RouteRequirement {
 	f.RouteHost = host
 	f.RouteDomain = domain
-	return FakeRequirement{ f, true }
+	return FakeRequirement{f, true}
 }
 
 func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRequirement {
 	f.DomainName = name
-	return FakeRequirement{ f, true }
+	return FakeRequirement{f, true}
 }
 
 func (f *FakeReqFactory) NewUserRequirement(username string) requirements.UserRequirement {
 	f.UserUsername = username
-	return FakeRequirement{ f, true }
+	return FakeRequirement{f, true}
 }
 
-
+func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.BuildpackRequirement {
+	f.Buildpack.Name = buildpack
+	return FakeRequirement{f, f.BuildpackSuccess}
+}
 
 type FakeRequirement struct {
 	factory *FakeReqFactory
@@ -123,4 +129,8 @@ func (r FakeRequirement) GetDomain() cf.Domain {
 
 func (r FakeRequirement) GetUser() cf.User {
 	return r.factory.User
+}
+
+func (r FakeRequirement) GetBuildpack() cf.Buildpack {
+	return r.factory.Buildpack
 }

@@ -8,4 +8,5 @@ const (
 	SERVICE_INSTANCE_NAME_TAKEN = "60002"
 	APP_NOT_STAGED              = "170002"
 	APP_STOPPED                 = "220001"
+	BUILDPACK_EXISTS            = "290001"
 )

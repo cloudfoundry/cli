@@ -61,6 +61,26 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "buildpacks",
+			Description: "List all buildpacks",
+			Usage:       fmt.Sprintf("%s buildpacks", cf.Name),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("buildpacks", c)
+			},
+		},
+		{
+			Name:        "create-buildpack",
+			Description: "Create a buildpack",
+			Usage: fmt.Sprintf("%s create-buildpack BUILDPACK PATH\n"+
+				"\tPATH: Path to a directory or zip file", cf.Name),
+			Flags: []cli.Flag{
+				cli.IntFlag{Name: "priority", Value: 0, Usage: "Buildpack priority"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("create-buildpack", c)
+			},
+		},
+		{
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create an org",
@@ -137,6 +157,17 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete", c)
+			},
+		},
+		{
+			Name:        "delete-buildpack",
+			Description: "Delete a buildpack",
+			Usage:       fmt.Sprintf("%s delete-buildpack BUILDPACK", cf.Name),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("delete-buildpack", c)
 			},
 		},
 		{
@@ -683,6 +714,18 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE", cf.Name),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-space-role", c)
+			},
+		},
+		{
+			Name:        "update-buildpack",
+			Description: "Update a buildpack",
+			Usage: fmt.Sprintf("%s update-buildpack BUILDPACK [PATH] [-prioirity PRIORITY]\n"+
+				"\tPATH: Path to a directory or zip file", cf.Name),
+			Flags: []cli.Flag{
+				cli.IntFlag{Name: "priority", Value: 0, Usage: "Buildpack priority"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("update-buildpack", c)
 			},
 		},
 		{
