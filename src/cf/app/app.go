@@ -42,7 +42,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "auth",
 			Description: "Authenticate user non-interactively",
-			Usage: fmt.Sprintf("%s auth [USERNAME] [PASSWORD]\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s auth USERNAME PASSWORD\n\n", cf.Name) +
 				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s auth name@example.com \"my password\" (use quotes for passwords with a space)\n", cf.Name) +
