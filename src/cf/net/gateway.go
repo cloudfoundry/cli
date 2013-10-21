@@ -53,22 +53,36 @@ func (gateway Gateway) GetResource(url, accessToken string, resource interface{}
 }
 
 func (gateway Gateway) CreateResource(url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
-	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body)
+	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body, nil)
+}
+
+func (gateway Gateway) CreateResourceForResponse(url, accessToken string, body io.Reader, resource interface{}) (apiResponse ApiResponse) {
+	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body, resource)
 }
 
 func (gateway Gateway) UpdateResource(url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body)
+	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body, nil)
+}
+
+func (gateway Gateway) UpdateResourceForResponse(url, accessToken string, body io.Reader, resource interface{}) (apiResponse ApiResponse) {
+	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body, resource)
 }
 
 func (gateway Gateway) DeleteResource(url, accessToken string) (apiResponse ApiResponse) {
-	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil)
+	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, nil)
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
+func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.Reader, resource interface{}) (apiResponse ApiResponse) {
 	request, apiResponse := gateway.NewRequest(verb, url, accessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	if resource != nil {
+		_, apiResponse = gateway.PerformRequestForJSONResponse(request, resource)
+		return
+	}
+
 	return gateway.PerformRequest(request)
 }
 

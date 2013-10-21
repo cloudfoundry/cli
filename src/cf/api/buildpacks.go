@@ -49,53 +49,35 @@ func NewCloudControllerBuildpackRepository(config *configuration.Configuration, 
 
 func (repo CloudControllerBuildpackRepository) FindAll() (buildpacks []cf.Buildpack, apiResponse net.ApiResponse) {
 	path := repo.config.Target + buildpacks_path
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	return repo.findAllWithPath(path)
+}
+
+func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s%s?q=name%%3A%s", repo.config.Target, buildpacks_path, url.QueryEscape(name))
+	buildpacks, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	if len(buildpacks) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Buildpack", name)
+		return
+	}
+
+	buildpack = buildpacks[0]
+	return
+}
+
+func (repo CloudControllerBuildpackRepository) findAllWithPath(path string) (buildpacks []cf.Buildpack, apiResponse net.ApiResponse) {
 	response := new(PaginatedBuildpackResources)
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	for _, r := range response.Resources {
-		buildpacks = append(buildpacks, cf.Buildpack{
-			Name:     r.Entity.Name,
-			Guid:     r.Metadata.Guid,
-			Priority: r.Entity.Priority,
-		},
-		)
-	}
-
-	return
-}
-
-func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s%s?q=name%%3A%s", repo.config.Target, buildpacks_path, url.QueryEscape(name))
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-	buildpackResources := new(PaginatedBuildpackResources)
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, buildpackResources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(buildpackResources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Buildpack", name)
-		return
-	}
-
-	r := buildpackResources.Resources[0]
-
-	buildpack = cf.Buildpack{
-		Name:     r.Entity.Name,
-		Guid:     r.Metadata.Guid,
-		Priority: r.Entity.Priority,
+		buildpacks = append(buildpacks, unmarshallBuildpack(r))
 	}
 
 	return
@@ -103,38 +85,26 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 
 func (repo CloudControllerBuildpackRepository) Create(newBuildpack cf.Buildpack) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := repo.config.Target + buildpacks_path
-	entity := BuildpackEntity{newBuildpack.Name, newBuildpack.Priority}
+	entity := BuildpackEntity{Name: newBuildpack.Name, Priority: newBuildpack.Priority}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize information", err)
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, bytes.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	resource := new(BuildpackResource)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, bytes.NewReader(body), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	createdBuildpack.Guid = resource.Metadata.Guid
-	createdBuildpack.Name = resource.Entity.Name
-	createdBuildpack.Priority = resource.Entity.Priority
+	createdBuildpack = unmarshallBuildpack(*resource)
 	return
 }
 
 func (repo CloudControllerBuildpackRepository) Delete(buildpack cf.Buildpack) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
-	request, apiResponse := repo.gateway.NewRequest("DELETE", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	apiResponse = repo.gateway.PerformRequest(request)
+	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
 	return
 }
 
@@ -148,22 +118,19 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (u
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(body))
+	resource := new(BuildpackResource)
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, bytes.NewReader(body), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	response := BuildpackResource{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &response)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+	updatedBuildpack = unmarshallBuildpack(*resource)
+	return
+}
 
-	updatedBuildpack = cf.Buildpack{
-		Guid:     response.Metadata.Guid,
-		Name:     response.Entity.Name,
-		Priority: response.Entity.Priority,
-	}
-
+func unmarshallBuildpack(resource BuildpackResource) (buildpack cf.Buildpack) {
+	buildpack.Guid = resource.Metadata.Guid
+	buildpack.Name = resource.Entity.Name
+	buildpack.Priority = resource.Entity.Priority
 	return
 }
