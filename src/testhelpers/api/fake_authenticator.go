@@ -23,6 +23,11 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 	auth.Email = email
 	auth.Password = password
 
+	if auth.AuthError {
+		apiResponse =  net.NewApiResponseWithMessage("Error authenticating.")
+		return
+	}
+
 	if auth.AccessToken == "" {
 		auth.AccessToken = "BEARER some_access_token"
 	}
@@ -31,9 +36,6 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 	auth.Config.RefreshToken = auth.RefreshToken
 	auth.ConfigRepo.Save()
 
-	if auth.AuthError {
-		apiResponse =  net.NewApiResponseWithMessage("Error authenticating.")
-	}
 	return
 }
 

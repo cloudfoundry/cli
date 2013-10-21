@@ -45,15 +45,9 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 
 func (cmd Login) Run(c *cli.Context) {
 	var apiResponse net.ApiResponse
-
-	api := c.String("a")
-	username := c.String("u")
-	password := c.String("p")
-	orgName := c.String("o")
-	spaceName := c.String("s")
-
 	prompt := terminal.PromptColor(">")
 
+	api := c.String("a")
 	if api == "" {
 		api = cmd.ui.Ask("API endpoint%s", prompt)
 	}
@@ -64,31 +58,34 @@ func (cmd Login) Run(c *cli.Context) {
 		return
 	}
 
+	username := c.String("u")
 	if username == "" {
 		username = cmd.ui.Ask("Username%s", prompt)
 	}
 
-	if password == "" {
-		for i := 0; i < maxLoginTries; i++ {
+	password := c.String("p")
+
+	for i := 0; i < maxLoginTries; i++ {
+		if password == "" || i > 0 {
 			password = cmd.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
-			cmd.ui.Say("Authenticating...")
-
-			apiResponse = cmd.authenticator.Authenticate(username, password)
-			if apiResponse.IsNotSuccessful() {
-				cmd.ui.Say(apiResponse.Message)
-				continue
-			}
-			break
 		}
 
+		cmd.ui.Say("Authenticating...")
+
+		apiResponse = cmd.authenticator.Authenticate(username, password)
 		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Unable to authenticate.")
-			return
+			cmd.ui.Say(apiResponse.Message)
+			continue
 		}
-
-		cmd.ui.Ok()
+		break
 	}
 
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Unable to authenticate.")
+		return
+	}
+
+	orgName := c.String("o")
 	if orgName == "" {
 		orgName = cmd.ui.Ask("Org%s", prompt)
 	}
@@ -96,13 +93,16 @@ func (cmd Login) Run(c *cli.Context) {
 	organization, apiResponse := cmd.orgRepo.FindByName(orgName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), apiResponse.Message)
+		return
 	}
 
 	err := cmd.configRepo.SetOrganization(organization)
 	if err != nil {
 		cmd.ui.Failed("Error setting org %s in config file\n%s", terminal.EntityNameColor(orgName), err.Error())
+		return
 	}
 
+	spaceName := c.String("s")
 	if spaceName == "" {
 		spaceName = cmd.ui.Ask("Space%s", prompt)
 	}
@@ -110,11 +110,13 @@ func (cmd Login) Run(c *cli.Context) {
 	space, apiResponse := cmd.spaceRepo.FindByName(spaceName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiResponse.Message)
+		return
 	}
 
 	err = cmd.configRepo.SetSpace(space)
 	if err != nil {
 		cmd.ui.Failed("Error setting space %s in config file\n%s", terminal.EntityNameColor(spaceName), err.Error())
+		return
 	}
 
 	cmd.ui.ShowConfiguration(cmd.config)
