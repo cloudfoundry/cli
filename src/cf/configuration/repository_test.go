@@ -72,6 +72,32 @@ func TestSetSpace(t *testing.T) {
 	assert.Equal(t, savedConfig.Space, space)
 }
 
+func TestClearSession(t *testing.T) {
+	repo := NewConfigurationDiskRepository()
+	config := repo.loadDefaultConfig(t)
+	defer repo.restoreConfig(t)
+
+	config.Target = "http://api.example.com"
+	config.RefreshToken = "some old refresh token"
+	config.AccessToken = "some old access token"
+	config.Organization = cf.Organization{Name: "my-org"}
+	config.Space = cf.Space{Name: "my-space"}
+	repo.Save()
+
+	err := repo.ClearSession()
+	assert.NoError(t, err)
+
+	repo.Save()
+
+	savedConfig, err := repo.Get()
+	assert.NoError(t, err)
+	assert.Equal(t, savedConfig.Target, "http://api.example.com")
+	assert.Empty(t, savedConfig.AccessToken)
+	assert.Empty(t, savedConfig.RefreshToken)
+	assert.Equal(t, savedConfig.Organization, cf.Organization{})
+	assert.Equal(t, savedConfig.Space, cf.Space{})
+}
+
 func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config *Configuration) {
 	file, err := ConfigFile()
 	assert.NoError(t, err)

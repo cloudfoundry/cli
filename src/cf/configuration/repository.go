@@ -92,6 +92,7 @@ func (repo ConfigurationDiskRepository) ClearSession() (err error) {
 		return
 	}
 	c.AccessToken = ""
+	c.RefreshToken = ""
 	c.Organization = cf.Organization{}
 	c.Space = cf.Space{}
 
