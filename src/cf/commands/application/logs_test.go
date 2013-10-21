@@ -109,6 +109,22 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "Log Line 1")
 }
 
+func TestLogsHasAnErrorCallback(t *testing.T) {
+	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	logs := []logmessage.LogMessage{}
+
+	reqFactory, logsRepo := getLogsDependencies()
+	reqFactory.Application = app
+	logsRepo.TailLogMessages = logs
+	logsRepo.Error = "Oops"
+
+	ui := callLogs([]string{"my-app"}, reqFactory, logsRepo)
+
+	assert.Equal(t, reqFactory.ApplicationName, "my-app")
+	assert.Contains(t, ui.Outputs[2], "FAILED")
+	assert.Contains(t, ui.Outputs[3], "Oops")
+}
+
 func getLogsDependencies() (reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) {
 	logsRepo = &testapi.FakeLogsRepository{}
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}

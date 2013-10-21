@@ -59,8 +59,10 @@ func TestRecentLogsFor(t *testing.T) {
 		dumpedMessages = append(dumpedMessages, message)
 	}
 
+	onError := func(err error) {}
+
 	// method under test
-	err = logsRepo.RecentLogsFor(app, onConnect, onMessage)
+	err = logsRepo.RecentLogsFor(app, onConnect, onMessage, onError)
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(dumpedMessages), 1)
@@ -112,8 +114,10 @@ func TestTailsLogsFor(t *testing.T) {
 		tailedMessages = append(tailedMessages, message)
 	}
 
+	onError := func(err error) {}
+
 	// method under test
-	logsRepo.TailLogsFor(app, onConnect, onMessage, time.Duration(1))
+	logsRepo.TailLogsFor(app, onConnect, onMessage, onError, time.Duration(1))
 
 	assert.True(t, connected)
 
@@ -187,7 +191,9 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 		}
 	}
 
-	logsRepo.TailLogsFor(app, func() {}, onMessage, time.Duration(1*time.Second))
+	onError := func(err error) {}
+
+	logsRepo.TailLogsFor(app, func() {}, onMessage, onError, time.Duration(1*time.Second))
 }
 
 func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
@@ -242,7 +248,9 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 		}
 	}
 
-	logsRepo.TailLogsFor(app, func() {}, onMessage, time.Duration(1*time.Second))
+	onError := func(err error) {}
+
+	logsRepo.TailLogsFor(app, func() {}, onMessage, onError, time.Duration(1*time.Second))
 }
 
 func marshalledLogMessageWithTime(t *testing.T, messageString string, timestamp int64) []byte {
