@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"time"
+	"cf/net"
+	"cf/terminal"
 )
 
 type LogsRepository interface {
@@ -47,6 +49,10 @@ func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect 
 }
 
 func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf.Application, onConnect func(), onMessage func(*logmessage.Message), onError func(error), printTimeBuffer time.Duration) (err error) {
+	if net.TraceEnabled() {
+		fmt.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
+	}
+
 	config, err := websocket.NewConfig(location, "http://localhost")
 	if err != nil {
 		return

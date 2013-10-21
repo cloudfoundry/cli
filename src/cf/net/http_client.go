@@ -36,7 +36,7 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 
 	req.Header.Set("Authorization", prevReq.Header.Get("Authorization"))
 
-	if traceEnabled() {
+	if TraceEnabled() {
 		dumpRequest(req)
 	}
 
@@ -64,7 +64,7 @@ func Sanitize(input string) (sanitized string) {
 func doRequest(request *http.Request) (response *http.Response, err error) {
 	httpClient := newHttpClient()
 
-	if traceEnabled() {
+	if TraceEnabled() {
 		dumpRequest(request)
 	}
 
@@ -74,7 +74,7 @@ func doRequest(request *http.Request) (response *http.Response, err error) {
 		return
 	}
 
-	if traceEnabled() {
+	if TraceEnabled() {
 		dumpedResponse, err := httputil.DumpResponse(response, true)
 		if err != nil {
 			fmt.Println("Error dumping response")
@@ -86,7 +86,7 @@ func doRequest(request *http.Request) (response *http.Response, err error) {
 	return
 }
 
-func traceEnabled() bool {
+func TraceEnabled() bool {
 	traceEnv := strings.ToLower(os.Getenv("CF_TRACE"))
 	return traceEnv == "true" || traceEnv == "yes"
 }
