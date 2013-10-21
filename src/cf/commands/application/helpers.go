@@ -5,6 +5,7 @@ import (
 	"cf/terminal"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -49,8 +50,13 @@ func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader stri
 }
 
 func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logContent string) {
-	msgText := logMsg.GetMessage()
-	msgLines := strings.Split(string(msgText), "\n")
+	msgText := string(logMsg.GetMessage())
+	reg, err := regexp.Compile("[\n\r]+$")
+	if err == nil {
+		msgText = reg.ReplaceAllString(msgText, "")
+	}
+
+	msgLines := strings.Split(msgText, "\n")
 	padding := strings.Repeat(" ", len(logHeader))
 	coloringFunc := terminal.LogStdoutColor
 	logType := "STDOUT"
