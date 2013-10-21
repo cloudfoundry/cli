@@ -1,11 +1,11 @@
 package app
 
 import (
+	"cf/terminal"
 	"github.com/codegangsta/cli"
-	"text/template"
 	"os"
 	"text/tabwriter"
-	"cf/terminal"
+	"text/template"
 )
 
 var appHelpTemplate = `{{.Title "NAME:"}}

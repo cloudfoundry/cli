@@ -3,14 +3,14 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/net"
+	"cf/terminal"
 	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
 	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"time"
-	"cf/net"
-	"cf/terminal"
 )
 
 type LogsRepository interface {
