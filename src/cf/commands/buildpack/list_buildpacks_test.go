@@ -60,7 +60,7 @@ func TestListingBuildpacksWhenNoneExist(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 	ui := callListBuildpacks(reqFactory, buildpackRepo)
-	
+
 	assert.Contains(t, ui.Outputs[0], "Getting buildpacks")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "No buildpacks found")

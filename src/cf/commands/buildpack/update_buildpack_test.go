@@ -21,7 +21,6 @@ func TestUpdateBuildpackRequirements(t *testing.T) {
 	callUpdateBuildpack([]string{"my-buildpack", "buildpack.zip", "extraArg"}, reqFactory, repo, bitsRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
-
 	// TestUpdateBuildpackWhenDoesNotExist
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: false}
 	callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
@@ -29,7 +28,7 @@ func TestUpdateBuildpackRequirements(t *testing.T) {
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, BuildpackSuccess: true}
 	callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)	
+	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestUpdateBuildpack(t *testing.T) {

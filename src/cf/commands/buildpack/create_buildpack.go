@@ -36,9 +36,9 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	}
 
 	buildpackName := c.Args()[0]
-	
+
 	cmd.ui.Say("Creating buildpack %s...", terminal.EntityNameColor(buildpackName))
-	
+
 	buildpack, apiResponse := cmd.createBuildpack(buildpackName, c)
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.BUILDPACK_EXISTS {
