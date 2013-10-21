@@ -3,28 +3,36 @@ package commands
 import (
 	"cf/requirements"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
+	"os"
 )
-
-type Runner struct {
-	cmdFactory Factory
-	reqFactory requirements.Factory
-}
-
-func NewRunner(cmdFactory Factory, reqFactory requirements.Factory) (runner Runner) {
-	runner.cmdFactory = cmdFactory
-	runner.reqFactory = reqFactory
-	return
-}
 
 type Command interface {
 	GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error)
 	Run(c *cli.Context)
 }
 
-func (runner Runner) RunCmdByName(cmdName string, c *cli.Context) (err error) {
+type Runner interface {
+	RunCmdByName(cmdName string, c *cli.Context) (err error)
+}
+
+type ConcreteRunner struct {
+	cmdFactory Factory
+	reqFactory requirements.Factory
+}
+
+func NewRunner(cmdFactory Factory, reqFactory requirements.Factory) (runner ConcreteRunner) {
+	runner.cmdFactory = cmdFactory
+	runner.reqFactory = reqFactory
+	return
+}
+
+func (runner ConcreteRunner) RunCmdByName(cmdName string, c *cli.Context) (err error) {
 	cmd, err := runner.cmdFactory.GetByCmdName(cmdName)
 	if err != nil {
+		fmt.Printf("Error finding command %s\n", cmdName)
+		os.Exit(1)
 		return
 	}
 

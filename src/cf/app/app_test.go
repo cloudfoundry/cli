@@ -1,35 +1,32 @@
 package app
 
 import (
+	"cf/api"
 	"cf/commands"
-	"cf/requirements"
+	"cf/configuration"
+	"cf/net"
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"strings"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
+	testterm "testhelpers/terminal"
 	"testing"
 )
 
-type FakeCmd struct {
-	factory *FakeCmdFactory
+type FakeRunner struct {
+	cmdFactory commands.Factory
+	t          *testing.T
+	cmdName    string
 }
 
-func (cmd FakeCmd) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	return
-}
-
-func (cmd FakeCmd) Run(c *cli.Context) {
-	cmd.factory.CmdCompleted = true
-}
-
-type FakeCmdFactory struct {
-	CmdName      string
-	CmdCompleted bool
-}
-
-func (f *FakeCmdFactory) GetByCmdName(cmdName string) (cmd commands.Command, err error) {
-	f.CmdName = cmdName
-	cmd = FakeCmd{f}
+func (runner *FakeRunner) RunCmdByName(cmdName string, c *cli.Context) (err error) {
+	_, err = runner.cmdFactory.GetByCmdName(cmdName)
+	if err != nil {
+		runner.t.Fatal("Error instantiating command with name", cmdName)
+		return
+	}
+	runner.cmdName = cmdName
 	return
 }
 
@@ -111,21 +108,28 @@ func TestCommands(t *testing.T) {
 	}
 
 	for _, cmdName := range availableCmds {
-		cmdFactory := &FakeCmdFactory{}
-		reqFactory := &testreq.FakeReqFactory{}
-		cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
+		ui := &testterm.FakeUI{}
+		config := &configuration.Configuration{}
+		configRepo := testconfig.FakeConfigRepository{}
+
+		repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
+			"auth":             net.NewUAAGateway(),
+			"cloud-controller": net.NewCloudControllerGateway(),
+			"uaa":              net.NewUAAGateway(),
+		})
+
+		cmdFactory := commands.NewFactory(ui, config, configRepo, repoLocator)
+		cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: t}
 		app, _ := NewApp(cmdRunner)
 		app.Run([]string{"", cmdName})
 
-		assert.Equal(t, cmdFactory.CmdName, cmdName)
-		assert.True(t, cmdFactory.CmdCompleted)
+		assert.Equal(t, cmdRunner.cmdName, cmdName)
 	}
 }
 
 func TestUsageIncludesCommandName(t *testing.T) {
-	cmdFactory := &FakeCmdFactory{}
 	reqFactory := &testreq.FakeReqFactory{}
-	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
+	cmdRunner := commands.NewRunner(nil, reqFactory)
 	app, _ := NewApp(cmdRunner)
 	for _, cmd := range app.Commands {
 		assert.Contains(t, strings.Split(cmd.Usage, "\n")[0], cmd.Name)
