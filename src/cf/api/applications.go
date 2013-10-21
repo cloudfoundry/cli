@@ -125,13 +125,9 @@ func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (
 		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s,"command":%s}`,
 		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid, command,
 	)
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
 
 	resource := new(Resource)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -216,19 +212,16 @@ func (repo CloudControllerApplicationRepository) startOrStopApp(app cf.Applicati
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(body))
-
+	resource := new(ApplicationResource)
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, bytes.NewReader(body), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	response := ApplicationResource{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &response)
-
 	updatedApp = cf.Application{
-		Name:  response.Entity.Name,
-		Guid:  response.Metadata.Guid,
-		State: strings.ToLower(response.Entity.State),
+		Name:  resource.Entity.Name,
+		Guid:  resource.Metadata.Guid,
+		State: strings.ToLower(resource.Entity.State),
 	}
 
 	return

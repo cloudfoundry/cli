@@ -128,13 +128,9 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 		`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`,
 		newRoute.Host, domain.Guid, space.Guid,
 	)
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
 
 	resource := new(RouteResource)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

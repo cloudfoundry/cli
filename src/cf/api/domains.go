@@ -141,13 +141,8 @@ func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, own
 		`{"name":"%s","wildcard":true,"owning_organization_guid":"%s"}`, domainToCreate.Name, owningOrg.Guid,
 	)
 
-	request, apiResponse := repo.gateway.NewRequest("POST", path, repo.config.AccessToken, strings.NewReader(data))
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	resource := new(Resource)
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, resource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
