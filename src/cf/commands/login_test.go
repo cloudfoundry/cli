@@ -53,7 +53,6 @@ func callLogin(t *testing.T, context LoginTestContext) (ui *testterm.FakeUI, aut
 	return
 }
 
-// TODO: make this a matrix test
 func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	context := LoginTestContext{
 		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
@@ -99,7 +98,6 @@ func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
 	assert.True(t, ui.ShowConfigurationCalled)
 }
 
-// TODO: make this a matrix test
 func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 	context := LoginTestContext{
 		Flags:     []string{"-u", "user@example.com"},
