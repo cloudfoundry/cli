@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,16 +12,16 @@ import (
 
 type Events struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	appReq     requirements.ApplicationRequirement
 	eventsRepo api.AppEventsRepository
 }
 
-func NewEvents(ui terminal.UI, eventsRepo api.AppEventsRepository) (cmd *Events) {
-	cmd = &Events{
-		ui:         ui,
-		eventsRepo: eventsRepo,
-	}
-
+func NewEvents(ui terminal.UI, config *configuration.Configuration, eventsRepo api.AppEventsRepository) (cmd *Events) {
+	cmd = new(Events)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.eventsRepo = eventsRepo
 	return
 }
 
@@ -44,7 +45,12 @@ func (cmd *Events) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 func (cmd *Events) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Getting events for %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Getting events for %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	appEvents, apiStatus := cmd.eventsRepo.ListEvents(app)
 	if apiStatus.IsNotSuccessful() {

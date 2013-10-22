@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -20,8 +21,18 @@ var defaultAppForStart = cf.Application{
 	Urls:      []string{"http://my-app.example.com"},
 }
 
-func startAppWithInstancesAndErrors(app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []string) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, reqFactory *testreq.FakeReqFactory) {
-	config := &configuration.Configuration{ApplicationStartTimeout: 2}
+func startAppWithInstancesAndErrors(t *testing.T, app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []string) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, reqFactory *testreq.FakeReqFactory) {
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:                   cf.Space{Name: "my-space"},
+		Organization:            cf.Organization{Name: "my-org"},
+		AccessToken:             token,
+		ApplicationStartTimeout: 2,
+	}
 
 	appRepo = &testapi.FakeApplicationRepository{
 		FindByNameApp:          app,
@@ -64,9 +75,12 @@ func TestStartApplication(t *testing.T) {
 	}
 
 	errorCodes := []string{"", ""}
-	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(t, defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
 	assert.Contains(t, ui.Outputs[4], "Started: app my-app available at http://my-app.example.com")
@@ -86,7 +100,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	}
 
 	errorCodes := []string{""}
-	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(app, instances, errorCodes)
+	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(t, app, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -116,7 +130,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 
 	errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, "", "", ""}
 
-	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(t, defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -129,7 +143,7 @@ func TestStartApplicationWhenStagingFails(t *testing.T) {
 	instances := [][]cf.ApplicationInstance{[]cf.ApplicationInstance{}}
 	errorCodes := []string{"170001"}
 
-	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(t, defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -151,7 +165,7 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 
 	errorCodes := []string{"", ""}
 
-	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(t, defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -178,7 +192,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 
 	errorCodes := []string{"", "", ""}
 
-	ui, _, _ := startAppWithInstancesAndErrors(defaultAppForStart, instances, errorCodes)
+	ui, _, _ := startAppWithInstancesAndErrors(t, defaultAppForStart, instances, errorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")

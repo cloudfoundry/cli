@@ -4,10 +4,12 @@ import (
 	"cf"
 	"cf/api"
 	. "cf/commands/application"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	"os"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -16,11 +18,11 @@ import (
 func TestPushingRequirements(t *testing.T) {
 	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 	fakeUI := new(testterm.FakeUI)
-	cmd := NewPush(fakeUI, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	config := &configuration.Configuration{}
+	cmd := NewPush(fakeUI, config, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 	ctxt := testcmd.NewContext("push", []string{})
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
@@ -46,9 +48,13 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	appRepo.FindByNameNotFound = true
 	stopper.StoppedApp = cf.Application{Name: "my-stopped-app"}
 
-	fakeUI := callPush([]string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush(t, []string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
+	assert.Contains(t, fakeUI.Outputs[0], "Creating app")
 	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
+	assert.Contains(t, fakeUI.Outputs[0], "my-org")
+	assert.Contains(t, fakeUI.Outputs[0], "my-space")
+	assert.Contains(t, fakeUI.Outputs[0], "my-user")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Instances, 1)
 	assert.Equal(t, appRepo.CreatedApp.Memory, uint64(128))
@@ -90,7 +96,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	routeRepo.FindByHostRoute = route
 	appRepo.FindByNameNotFound = true
 
-	fakeUI := callPush([]string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush(t, []string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Empty(t, routeRepo.CreatedRoute.Host)
 	assert.Empty(t, routeRepo.CreatedRouteDomain.Guid)
@@ -114,7 +120,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	stackRepo.FindByNameStack = stack
 	appRepo.FindByNameNotFound = true
 
-	fakeUI := callPush([]string{
+	fakeUI := callPush(t, []string{
 		"-c", "unicorn -c config/unicorn.rb -D",
 		"-d", "bar.cf-app.com",
 		"-n", "my-hostname",
@@ -170,7 +176,7 @@ func TestPushingAppWithNoRoute(t *testing.T) {
 	stackRepo.FindByNameStack = stack
 	appRepo.FindByNameNotFound = true
 
-	fakeUI := callPush([]string{
+	fakeUI := callPush(t, []string{
 		"--no-route",
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -188,7 +194,7 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	domainRepo.FindByNameDomain = domain
 	appRepo.FindByNameNotFound = true
 
-	callPush([]string{
+	callPush(t, []string{
 		"-m", "256M",
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -203,7 +209,7 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 	domainRepo.FindByNameDomain = domain
 	appRepo.FindByNameNotFound = true
 
-	callPush([]string{
+	callPush(t, []string{
 		"-m", "512",
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -218,7 +224,7 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 	domainRepo.FindByNameDomain = domain
 	appRepo.FindByNameNotFound = true
 
-	callPush([]string{
+	callPush(t, []string{
 		"-m", "abcM",
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -232,7 +238,7 @@ func TestPushingAppWhenItAlreadyExists(t *testing.T) {
 	existingApp := cf.Application{Name: "existing-app", Guid: "existing-app-guid"}
 	appRepo.FindByNameApp = existingApp
 
-	fakeUI := callPush([]string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush(t, []string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, stopper.AppToStop.Name, "existing-app")
 	assert.Contains(t, fakeUI.Outputs[0], "existing-app")
@@ -245,7 +251,7 @@ func TestPushingAppWithInvalidPath(t *testing.T) {
 	appBitsRepo.UploadAppErr = true
 	appRepo.FindByNameApp = cf.Application{Name: "app", Guid: "app-guid"}
 
-	fakeUI := callPush([]string{"app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	fakeUI := callPush(t, []string{"app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, 3, len(fakeUI.Outputs))
 	assert.Contains(t, fakeUI.Outputs[0], "Uploading")
@@ -271,7 +277,8 @@ func getPushDependencies() (starter *testcmd.FakeAppStarter,
 	return
 }
 
-func callPush(args []string,
+func callPush(t *testing.T,
+	args []string,
 	starter ApplicationStarter,
 	stopper ApplicationStopper,
 	appRepo api.ApplicationRepository,
@@ -282,7 +289,19 @@ func callPush(args []string,
 
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("push", args)
-	cmd := NewPush(fakeUI, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewPush(fakeUI, config, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 

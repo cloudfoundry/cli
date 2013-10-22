@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -12,13 +13,15 @@ import (
 
 type Logs struct {
 	ui       terminal.UI
+	config   *configuration.Configuration
 	logsRepo api.LogsRepository
 	appReq   requirements.ApplicationRequirement
 }
 
-func NewLogs(ui terminal.UI, logsRepo api.LogsRepository) (cmd *Logs) {
+func NewLogs(ui terminal.UI, config *configuration.Configuration, logsRepo api.LogsRepository) (cmd *Logs) {
 	cmd = new(Logs)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.logsRepo = logsRepo
 	return
 }
@@ -51,13 +54,23 @@ func (cmd *Logs) Run(c *cli.Context) {
 
 	if c.Bool("recent") {
 		onConnect := func() {
-			cmd.ui.Say("Connected, dumping recent logs...\n")
+			cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
+				terminal.EntityNameColor(app.Name),
+				terminal.EntityNameColor(cmd.config.Organization.Name),
+				terminal.EntityNameColor(cmd.config.Space.Name),
+				terminal.EntityNameColor(cmd.config.Username()),
+			)
 		}
 
 		err = cmd.logsRepo.RecentLogsFor(app, onConnect, onMessage)
 	} else {
 		onConnect := func() {
-			cmd.ui.Say("Connected, tailing...\n")
+			cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
+				terminal.EntityNameColor(app.Name),
+				terminal.EntityNameColor(cmd.config.Organization.Name),
+				terminal.EntityNameColor(cmd.config.Space.Name),
+				terminal.EntityNameColor(cmd.config.Username()),
+			)
 		}
 
 		err = cmd.logsRepo.TailLogsFor(app, onConnect, onMessage, 5*time.Second)

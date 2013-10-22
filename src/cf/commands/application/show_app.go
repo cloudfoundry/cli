@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
@@ -14,13 +15,15 @@ import (
 
 type ShowApp struct {
 	ui             terminal.UI
+	config         *configuration.Configuration
 	appSummaryRepo api.AppSummaryRepository
 	appReq         requirements.ApplicationRequirement
 }
 
-func NewShowApp(ui terminal.UI, appSummaryRepo api.AppSummaryRepository) (cmd *ShowApp) {
+func NewShowApp(ui terminal.UI, config *configuration.Configuration, appSummaryRepo api.AppSummaryRepository) (cmd *ShowApp) {
 	cmd = new(ShowApp)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo
 	return
 }
@@ -44,7 +47,12 @@ func (cmd *ShowApp) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd *ShowApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	cmd.ui.Say("Showing health and status for app %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Showing health and status for app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	summary, apiResponse := cmd.appSummaryRepo.GetSummary(app)
 	appIsStopped := apiResponse.ErrorCode == cf.APP_STOPPED || apiResponse.ErrorCode == cf.APP_NOT_STAGED

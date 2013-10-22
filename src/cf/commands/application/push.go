@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -15,6 +16,7 @@ import (
 
 type Push struct {
 	ui          terminal.UI
+	config      *configuration.Configuration
 	starter     ApplicationStarter
 	stopper     ApplicationStopper
 	appRepo     api.ApplicationRepository
@@ -24,11 +26,12 @@ type Push struct {
 	appBitsRepo api.ApplicationBitsRepository
 }
 
-func NewPush(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper,
+func NewPush(ui terminal.UI, config *configuration.Configuration, starter ApplicationStarter, stopper ApplicationStopper,
 	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository,
 	appBitsRepo api.ApplicationBitsRepository) (cmd Push) {
 
 	cmd.ui = ui
+	cmd.config = config
 	cmd.starter = starter
 	cmd.stopper = stopper
 	cmd.appRepo = aR
@@ -125,7 +128,12 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stack.Name))
 	}
 
-	cmd.ui.Say("Creating %s...", terminal.EntityNameColor(appName))
+	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(appName),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 	app, apiResponse = cmd.appRepo.Create(newApp)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

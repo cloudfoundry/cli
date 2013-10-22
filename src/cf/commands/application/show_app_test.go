@@ -3,10 +3,12 @@ package application_test
 import (
 	"cf"
 	. "cf/commands/application"
+	"cf/configuration"
 	"cf/formatters"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -18,15 +20,15 @@ func TestAppRequirements(t *testing.T) {
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: cf.Application{}}
-	callApp(args, reqFactory, appSummaryRepo)
+	callApp(t, args, reqFactory, appSummaryRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: cf.Application{}}
-	callApp(args, reqFactory, appSummaryRepo)
+	callApp(t, args, reqFactory, appSummaryRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
-	callApp(args, reqFactory, appSummaryRepo)
+	callApp(t, args, reqFactory, appSummaryRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
@@ -34,7 +36,7 @@ func TestAppRequirements(t *testing.T) {
 func TestAppFailsWithUsage(t *testing.T) {
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
-	ui := callApp([]string{}, reqFactory, appSummaryRepo)
+	ui := callApp(t, []string{}, reqFactory, appSummaryRepo)
 
 	assert.True(t, ui.FailedWithUsage)
 	assert.False(t, testcmd.CommandDidPassRequirements)
@@ -76,7 +78,7 @@ func TestDisplayingAppSummary(t *testing.T) {
 
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo)
+	ui := callApp(t, []string{"my-app"}, reqFactory, appSummaryRepo)
 
 	assert.Equal(t, appSummaryRepo.GetSummaryApp.Name, "my-app")
 
@@ -133,13 +135,16 @@ func testDisplayingAppSummaryWithErrorCode(t *testing.T, errorCode string) {
 
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary, GetSummaryErrorCode: errorCode}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo)
+	ui := callApp(t, []string{"my-app"}, reqFactory, appSummaryRepo)
 
 	assert.Equal(t, appSummaryRepo.GetSummaryApp.Name, "my-app")
 	assert.Equal(t, len(ui.Outputs), 6)
 
 	assert.Contains(t, ui.Outputs[0], "Showing health and status")
 	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Contains(t, ui.Outputs[2], "state")
 	assert.Contains(t, ui.Outputs[2], "stopped")
@@ -154,10 +159,22 @@ func testDisplayingAppSummaryWithErrorCode(t *testing.T, errorCode string) {
 	assert.Contains(t, ui.Outputs[5], "my-app.example.com, foo.example.com")
 }
 
-func callApp(args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo) (ui *testterm.FakeUI) {
+func callApp(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("app", args)
-	cmd := NewShowApp(ui, appSummaryRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewShowApp(ui, config, appSummaryRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return

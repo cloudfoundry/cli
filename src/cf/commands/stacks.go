@@ -2,6 +2,7 @@ package commands
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -9,12 +10,14 @@ import (
 
 type Stacks struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	stacksRepo api.StackRepository
 }
 
-func NewStacks(ui terminal.UI, stacksRepo api.StackRepository) (cmd *Stacks) {
+func NewStacks(ui terminal.UI, config *configuration.Configuration, stacksRepo api.StackRepository) (cmd *Stacks) {
 	cmd = new(Stacks)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.stacksRepo = stacksRepo
 	return
 }
@@ -24,7 +27,11 @@ func (cmd *Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 }
 
 func (cmd *Stacks) Run(c *cli.Context) {
-	cmd.ui.Say("Getting stacks...")
+	cmd.ui.Say("Getting stacks in org %s / space %s as %s...",
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	stacks, apiResponse := cmd.stacksRepo.FindAll()
 	if apiResponse.IsNotSuccessful() {

@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,14 +12,16 @@ import (
 
 type SetEnv struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui terminal.UI, appRepo api.ApplicationRepository) (se *SetEnv) {
-	se = new(SetEnv)
-	se.ui = ui
-	se.appRepo = appRepo
+func NewSetEnv(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *SetEnv) {
+	cmd = new(SetEnv)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.appRepo = appRepo
 	return
 }
 
@@ -38,14 +41,18 @@ func (cmd *SetEnv) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 	return
 }
 
-func (se *SetEnv) Run(c *cli.Context) {
+func (cmd *SetEnv) Run(c *cli.Context) {
 	varName := c.Args()[1]
 	varValue := c.Args()[2]
-	app := se.appReq.GetApplication()
+	app := cmd.appReq.GetApplication()
 
-	se.ui.Say("Updating env variable %s for app %s...",
+	cmd.ui.Say("Setting env variable %s for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(varName),
-		terminal.EntityNameColor(app.Name))
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	var envVars map[string]string
 
@@ -56,20 +63,20 @@ func (se *SetEnv) Run(c *cli.Context) {
 	}
 
 	if envVarFound(varName, envVars) {
-		se.ui.Ok()
-		se.ui.Warn("Env var %s was already set.", varName)
+		cmd.ui.Ok()
+		cmd.ui.Warn("Env var %s was already set.", varName)
 		return
 	}
 
 	envVars[varName] = varValue
 
-	apiResponse := se.appRepo.SetEnv(app, envVars)
+	apiResponse := cmd.appRepo.SetEnv(app, envVars)
 
 	if apiResponse.IsNotSuccessful() {
-		se.ui.Failed(apiResponse.Message)
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	se.ui.Ok()
-	se.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name)
+	cmd.ui.Ok()
+	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name)
 }

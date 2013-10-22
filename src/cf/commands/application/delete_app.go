@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,13 +11,15 @@ import (
 
 type DeleteApp struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewDeleteApp(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *DeleteApp) {
+func NewDeleteApp(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *DeleteApp) {
 	cmd = new(DeleteApp)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.appRepo = appRepo
 	return
 }
@@ -46,7 +49,12 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting app %s...", terminal.EntityNameColor(appName))
+	cmd.ui.Say("Deleting app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(appName),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	app, apiResponse := cmd.appRepo.FindByName(appName)
 

@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,13 +12,15 @@ import (
 
 type UnsetEnv struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewUnsetEnv(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *UnsetEnv) {
+func NewUnsetEnv(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *UnsetEnv) {
 	cmd = new(UnsetEnv)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.appRepo = appRepo
 	return
 }
@@ -42,7 +45,13 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	varName := c.Args()[1]
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Removing env variable %s for app %s...", terminal.EntityNameColor(varName), terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Removing env variable %s for app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(varName),
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	envVars := app.EnvironmentVars
 

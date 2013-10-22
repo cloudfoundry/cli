@@ -2,6 +2,7 @@ package application
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,13 +11,15 @@ import (
 
 type RenameApp struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewRenameApp(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *RenameApp) {
+func NewRenameApp(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *RenameApp) {
 	cmd = new(RenameApp)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.appRepo = appRepo
 	return
 }
@@ -38,7 +41,13 @@ func (cmd *RenameApp) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 func (cmd *RenameApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	new_name := c.Args()[1]
-	cmd.ui.Say("Renaming %s to %s...", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(new_name))
+	cmd.ui.Say("Renaming %s to %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(new_name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.appRepo.Rename(app, new_name)
 	if apiResponse.IsNotSuccessful() {

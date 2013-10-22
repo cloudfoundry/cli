@@ -3,11 +3,13 @@ package application_test
 import (
 	"cf"
 	. "cf/commands/application"
+	"cf/configuration"
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -17,10 +19,10 @@ import (
 func TestLogsFailWithUsage(t *testing.T) {
 	reqFactory, logsRepo := getLogsDependencies()
 
-	fakeUI := callLogs([]string{}, reqFactory, logsRepo)
+	fakeUI := callLogs(t, []string{}, reqFactory, logsRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callLogs([]string{"foo"}, reqFactory, logsRepo)
+	fakeUI = callLogs(t, []string{"foo"}, reqFactory, logsRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
@@ -28,12 +30,12 @@ func TestLogsRequirements(t *testing.T) {
 	reqFactory, logsRepo := getLogsDependencies()
 
 	reqFactory.LoginSuccess = true
-	callLogs([]string{"my-app"}, reqFactory, logsRepo)
+	callLogs(t, []string{"my-app"}, reqFactory, logsRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 
 	reqFactory.LoginSuccess = false
-	callLogs([]string{"my-app"}, reqFactory, logsRepo)
+	callLogs(t, []string{"my-app"}, reqFactory, logsRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
@@ -68,12 +70,16 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 	reqFactory.Application = app
 	logsRepo.RecentLogs = recentLogs
 
-	ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
+	ui := callLogs(t, []string{"--recent", "my-app"}, reqFactory, logsRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app, logsRepo.AppLogged)
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "Connected, dumping recent logs...")
+	assert.Contains(t, ui.Outputs[0], "Connected, dumping recent logs for app")
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "Log Line 1")
 	assert.Contains(t, ui.Outputs[2], "Log Line 2")
 }
@@ -100,12 +106,16 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	reqFactory.Application = app
 	logsRepo.TailLogMessages = logs
 
-	ui := callLogs([]string{"my-app"}, reqFactory, logsRepo)
+	ui := callLogs(t, []string{"my-app"}, reqFactory, logsRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app, logsRepo.AppLogged)
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Outputs[0], "Connected")
+	assert.Contains(t, ui.Outputs[0], "Connected, tailing logs for app")
+	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "Log Line 1")
 }
 
@@ -115,10 +125,22 @@ func getLogsDependencies() (reqFactory *testreq.FakeReqFactory, logsRepo *testap
 	return
 }
 
-func callLogs(args []string, reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) (ui *testterm.FakeUI) {
+func callLogs(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("logs", args)
-	cmd := NewLogs(ui, logsRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewLogs(ui, config, logsRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

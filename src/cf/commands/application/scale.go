@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
@@ -12,14 +13,16 @@ import (
 
 type Scale struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	restarter ApplicationRestarter
 	appReq    requirements.ApplicationRequirement
 	appRepo   api.ApplicationRepository
 }
 
-func NewScale(ui terminal.UI, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
+func NewScale(ui terminal.UI, config *configuration.Configuration, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
 	cmd = new(Scale)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.restarter = restarter
 	cmd.appRepo = appRepo
 	return
@@ -45,7 +48,12 @@ func (cmd *Scale) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 
 func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()
-	cmd.ui.Say("Scaling app %s...", terminal.EntityNameColor(currentApp.Name))
+	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(currentApp.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	changedApp := cf.Application{
 		Guid: currentApp.Guid,

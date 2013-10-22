@@ -57,7 +57,12 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		return
 	}
 
-	cmd.ui.Say("Starting %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Starting %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	updatedApp, apiResponse := cmd.appRepo.Start(app)
 	if apiResponse.IsNotSuccessful() {

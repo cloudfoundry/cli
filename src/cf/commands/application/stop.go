@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -15,13 +16,15 @@ type ApplicationStopper interface {
 
 type Stop struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui terminal.UI, appRepo api.ApplicationRepository) (cmd *Stop) {
+func NewStop(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Stop) {
 	cmd = new(Stop)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.appRepo = appRepo
 
 	return
@@ -47,7 +50,12 @@ func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application,
 		return
 	}
 
-	cmd.ui.Say("Stopping %s...", terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Stopping %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	updatedApp, apiResponse := cmd.appRepo.Stop(app)
 	if apiResponse.IsNotSuccessful() {
