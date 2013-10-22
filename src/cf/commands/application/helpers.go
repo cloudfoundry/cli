@@ -59,11 +59,11 @@ func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logCont
 	msgLines := strings.Split(msgText, "\n")
 	padding := strings.Repeat(" ", len(logHeader))
 	coloringFunc := terminal.LogStdoutColor
-	logType := "STDOUT"
+	logType := "OUT"
 
 	if logMsg.GetMessageType() == logmessage.LogMessage_ERR {
 		coloringFunc = terminal.LogStderrColor
-		logType = "STDERR"
+		logType = "ERR"
 	}
 
 	logContent = fmt.Sprintf("%s %s", logType, msgLines[0])

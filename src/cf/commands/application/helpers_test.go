@@ -41,43 +41,43 @@ func TestLogMessageOutput(t *testing.T) {
 
 	msg := createMessage(t, protoMessage, &cloud_controller, &stdout)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [API]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("STDOUT Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 
 	msg = createMessage(t, protoMessage, &cloud_controller, &stderr)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [API]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("STDERR Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "1"
 	msg = createMessage(t, protoMessage, &router, &stdout)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [Router]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("STDOUT Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &router, &stderr)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [Router]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("STDERR Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "2"
 	msg = createMessage(t, protoMessage, &uaa, &stdout)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [UAA]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("STDOUT Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &uaa, &stderr)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [UAA]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("STDERR Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "3"
 	msg = createMessage(t, protoMessage, &dea, &stdout)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [Executor]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("STDOUT Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &dea, &stderr)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [Executor]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("STDERR Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "4"
 	msg = createMessage(t, protoMessage, &wardenContainer, &stdout)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [App/4]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("STDOUT Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &wardenContainer, &stderr)
 	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [App/4]", expectedTZ))
-	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("STDERR Hello World!"))
+	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 }
 
 func createMessage(t *testing.T, protoMsg *logmessage.LogMessage, sourceType *logmessage.LogMessage_SourceType, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
