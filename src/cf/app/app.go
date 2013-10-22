@@ -9,25 +9,28 @@ import (
 )
 
 func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
+	helpCommand := cli.Command{
+		Name:        "help",
+		ShortName:   "h",
+		Description: "Show help",
+		Usage:       fmt.Sprintf("%s help [COMMAND]", cf.Name),
+		Action: func(c *cli.Context) {
+			args := c.Args()
+			if len(args) > 0 {
+				cli.ShowCommandHelp(c, args[0])
+			} else {
+				showAppHelp(c.App)
+			}
+		},
+	}
+
 	app = cli.NewApp()
 	app.Name = cf.Name
 	app.Usage = cf.Usage
 	app.Version = cf.Version
+	app.Action = helpCommand.Action
 	app.Commands = []cli.Command{
-		{
-			Name:        "help",
-			ShortName:   "h",
-			Description: "Show help",
-			Usage:       fmt.Sprintf("%s help [COMMAND]", cf.Name),
-			Action: func(c *cli.Context) {
-				args := c.Args()
-				if len(args) > 0 {
-					cli.ShowCommandHelp(c, args[0])
-				} else {
-					showAppHelp(c.App)
-				}
-			},
-		},
+		helpCommand,
 		{
 			Name:        "api",
 			Description: "Set or view target api url",
