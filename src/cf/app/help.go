@@ -4,6 +4,7 @@ import (
 	"cf/terminal"
 	"github.com/codegangsta/cli"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"text/template"
 )
@@ -16,12 +17,10 @@ var appHelpTemplate = `{{.Title "NAME:"}}
 
 {{.Title "VERSION:"}}
    {{.Version}}
-
-{{.Title "COMMANDS:"}}
    {{range .Commands}}
 {{.SubTitle .Name}}
 {{range .CommandSubGroups}}
-{{range .}}   {{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Description}}
+{{range .}}   {{.Name}} {{.Description}}
 {{end}}{{end}}{{end}}
 {{.Title "GLOBAL OPTIONS:"}}
    {{range .Flags}}{{.}}
@@ -30,6 +29,40 @@ var appHelpTemplate = `{{.Title "NAME:"}}
    CF_TRACE=true - will output HTTP requests and responses during command
    HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
 `
+
+type groupedCommands struct {
+	Name             string
+	CommandSubGroups [][]cmdPresenter
+}
+
+func (c groupedCommands) SubTitle(name string) string {
+	return terminal.HeaderColor(name + ":")
+}
+
+type cmdPresenter struct {
+	Name        string
+	Description string
+}
+
+func newCmdPresenter(app *cli.App, maxNameLen int, cmdName string) (presenter cmdPresenter) {
+	cmd := app.Command(cmdName)
+
+	presenter.Name = presentCmdName(*cmd)
+	padding := strings.Repeat(" ", maxNameLen-len(presenter.Name))
+	presenter.Name = presenter.Name + padding
+
+	presenter.Description = cmd.Description
+
+	return
+}
+
+func presentCmdName(cmd cli.Command) (name string) {
+	name = cmd.Name
+	if cmd.ShortName != "" {
+		name = name + ", " + cmd.ShortName
+	}
+	return
+}
 
 type appPresenter struct {
 	cli.App
@@ -40,16 +73,19 @@ func (p appPresenter) Title(name string) string {
 	return terminal.HeaderColor(name)
 }
 
-type groupedCommands struct {
-	Name             string
-	CommandSubGroups [][]*cli.Command
-}
-
-func (c groupedCommands) SubTitle(name string) string {
-	return terminal.TableContentHeaderColor(name)
+func getMaxCmdNameLength(app *cli.App) (length int) {
+	for _, cmd := range app.Commands {
+		name := presentCmdName(cmd)
+		if len(name) > length {
+			length = len(name)
+		}
+	}
+	return
 }
 
 func newAppPresenter(app *cli.App) (presenter appPresenter) {
+	maxNameLen := getMaxCmdNameLength(app)
+
 	presenter.Name = app.Name
 	presenter.Usage = app.Usage
 	presenter.Version = app.Version
@@ -59,158 +95,158 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 	presenter.Commands = []groupedCommands{
 		{
 			Name: "GETTING STARTED",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("login"),
-					app.Command("logout"),
-					app.Command("passwd"),
-					app.Command("target"),
+					newCmdPresenter(app, maxNameLen, "login"),
+					newCmdPresenter(app, maxNameLen, "logout"),
+					newCmdPresenter(app, maxNameLen, "passwd"),
+					newCmdPresenter(app, maxNameLen, "target"),
 				}, {
-					app.Command("api"),
-					app.Command("auth"),
+					newCmdPresenter(app, maxNameLen, "api"),
+					newCmdPresenter(app, maxNameLen, "auth"),
 				},
 			},
 		}, {
 			Name: "APPS",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("apps"),
-					app.Command("app"),
+					newCmdPresenter(app, maxNameLen, "apps"),
+					newCmdPresenter(app, maxNameLen, "app"),
 				}, {
-					app.Command("push"),
-					app.Command("scale"),
-					app.Command("delete"),
-					app.Command("rename"),
+					newCmdPresenter(app, maxNameLen, "push"),
+					newCmdPresenter(app, maxNameLen, "scale"),
+					newCmdPresenter(app, maxNameLen, "delete"),
+					newCmdPresenter(app, maxNameLen, "rename"),
 				}, {
-					app.Command("start"),
-					app.Command("stop"),
-					app.Command("restart"),
+					newCmdPresenter(app, maxNameLen, "start"),
+					newCmdPresenter(app, maxNameLen, "stop"),
+					newCmdPresenter(app, maxNameLen, "restart"),
 				}, {
-					app.Command("events"),
-					app.Command("files"),
-					app.Command("logs"),
+					newCmdPresenter(app, maxNameLen, "events"),
+					newCmdPresenter(app, maxNameLen, "files"),
+					newCmdPresenter(app, maxNameLen, "logs"),
 				}, {
-					app.Command("env"),
-					app.Command("set-env"),
-					app.Command("unset-env"),
+					newCmdPresenter(app, maxNameLen, "env"),
+					newCmdPresenter(app, maxNameLen, "set-env"),
+					newCmdPresenter(app, maxNameLen, "unset-env"),
 				}, {
-					app.Command("stacks"),
+					newCmdPresenter(app, maxNameLen, "stacks"),
 				},
 			},
 		}, {
 			Name: "SERVICES",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("marketplace"),
-					app.Command("services"),
-					app.Command("service"),
+					newCmdPresenter(app, maxNameLen, "marketplace"),
+					newCmdPresenter(app, maxNameLen, "services"),
+					newCmdPresenter(app, maxNameLen, "service"),
 				}, {
-					app.Command("create-service"),
-					app.Command("delete-service"),
-					app.Command("rename-service"),
+					newCmdPresenter(app, maxNameLen, "create-service"),
+					newCmdPresenter(app, maxNameLen, "delete-service"),
+					newCmdPresenter(app, maxNameLen, "rename-service"),
 				}, {
-					app.Command("bind-service"),
-					app.Command("unbind-service"),
+					newCmdPresenter(app, maxNameLen, "bind-service"),
+					newCmdPresenter(app, maxNameLen, "unbind-service"),
 				}, {
-					app.Command("create-user-provided-service"),
-					app.Command("update-user-provided-service"),
+					newCmdPresenter(app, maxNameLen, "create-user-provided-service"),
+					newCmdPresenter(app, maxNameLen, "update-user-provided-service"),
 				},
 			},
 		}, {
 			Name: "ORGS",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("orgs"),
-					app.Command("org"),
+					newCmdPresenter(app, maxNameLen, "orgs"),
+					newCmdPresenter(app, maxNameLen, "org"),
 				}, {
-					app.Command("create-org"),
-					app.Command("delete-org"),
-					app.Command("rename-org"),
+					newCmdPresenter(app, maxNameLen, "create-org"),
+					newCmdPresenter(app, maxNameLen, "delete-org"),
+					newCmdPresenter(app, maxNameLen, "rename-org"),
 				},
 			},
 		}, {
 			Name: "SPACES",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("spaces"),
-					app.Command("space"),
+					newCmdPresenter(app, maxNameLen, "spaces"),
+					newCmdPresenter(app, maxNameLen, "space"),
 				}, {
-					app.Command("create-space"),
-					app.Command("delete-space"),
-					app.Command("rename-space"),
+					newCmdPresenter(app, maxNameLen, "create-space"),
+					newCmdPresenter(app, maxNameLen, "delete-space"),
+					newCmdPresenter(app, maxNameLen, "rename-space"),
 				},
 			},
 		}, {
 			Name: "DOMAINS",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("domains"),
-					app.Command("share-domain"),
-					app.Command("reserve-domain"),
-					app.Command("map-domain"),
-					app.Command("unmap-domain"),
-					app.Command("delete-domain"),
+					newCmdPresenter(app, maxNameLen, "domains"),
+					newCmdPresenter(app, maxNameLen, "share-domain"),
+					newCmdPresenter(app, maxNameLen, "reserve-domain"),
+					newCmdPresenter(app, maxNameLen, "map-domain"),
+					newCmdPresenter(app, maxNameLen, "unmap-domain"),
+					newCmdPresenter(app, maxNameLen, "delete-domain"),
 				},
 			},
 		}, {
 			Name: "ROUTES",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("routes"),
-					app.Command("reserve-route"),
-					app.Command("map-route"),
-					app.Command("unmap-route"),
-					app.Command("delete-route"),
+					newCmdPresenter(app, maxNameLen, "routes"),
+					newCmdPresenter(app, maxNameLen, "reserve-route"),
+					newCmdPresenter(app, maxNameLen, "map-route"),
+					newCmdPresenter(app, maxNameLen, "unmap-route"),
+					newCmdPresenter(app, maxNameLen, "delete-route"),
 				},
 			},
 		}, {
 			Name: "BUILDPACKS",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("buildpacks"),
-					app.Command("create-buildpack"),
-					app.Command("delete-buildpack"),
-					app.Command("update-buildpack"),
+					newCmdPresenter(app, maxNameLen, "buildpacks"),
+					newCmdPresenter(app, maxNameLen, "create-buildpack"),
+					newCmdPresenter(app, maxNameLen, "update-buildpack"),
+					newCmdPresenter(app, maxNameLen, "delete-buildpack"),
 				},
 			},
 		}, {
 			Name: "USER ADMIN",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("create-user"),
-					app.Command("delete-user"),
+					newCmdPresenter(app, maxNameLen, "create-user"),
+					newCmdPresenter(app, maxNameLen, "delete-user"),
 				}, {
-					app.Command("org-users"),
-					app.Command("set-org-role"),
-					app.Command("unset-org-role"),
+					newCmdPresenter(app, maxNameLen, "org-users"),
+					newCmdPresenter(app, maxNameLen, "set-org-role"),
+					newCmdPresenter(app, maxNameLen, "unset-org-role"),
 				}, {
-					app.Command("space-users"),
-					app.Command("set-space-role"),
-					app.Command("unset-space-role"),
+					newCmdPresenter(app, maxNameLen, "space-users"),
+					newCmdPresenter(app, maxNameLen, "set-space-role"),
+					newCmdPresenter(app, maxNameLen, "unset-space-role"),
 				},
 			},
 		}, {
 			Name: "ORG ADMIN",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("quotas"),
-					app.Command("set-quota"),
+					newCmdPresenter(app, maxNameLen, "quotas"),
+					newCmdPresenter(app, maxNameLen, "set-quota"),
 				},
 			},
 		}, {
 			Name: "SERVICE ADMIN",
-			CommandSubGroups: [][]*cli.Command{
+			CommandSubGroups: [][]cmdPresenter{
 				{
-					app.Command("service-auth-tokens"),
-					app.Command("create-service-auth-token"),
-					app.Command("update-service-auth-token"),
-					app.Command("delete-service-auth-token"),
+					newCmdPresenter(app, maxNameLen, "service-auth-tokens"),
+					newCmdPresenter(app, maxNameLen, "create-service-auth-token"),
+					newCmdPresenter(app, maxNameLen, "update-service-auth-token"),
+					newCmdPresenter(app, maxNameLen, "delete-service-auth-token"),
 				}, {
-					app.Command("service-brokers"),
-					app.Command("create-service-broker"),
-					app.Command("update-service-broker"),
-					app.Command("delete-service-broker"),
-					app.Command("rename-service-broker"),
+					newCmdPresenter(app, maxNameLen, "service-brokers"),
+					newCmdPresenter(app, maxNameLen, "create-service-broker"),
+					newCmdPresenter(app, maxNameLen, "update-service-broker"),
+					newCmdPresenter(app, maxNameLen, "delete-service-broker"),
+					newCmdPresenter(app, maxNameLen, "rename-service-broker"),
 				},
 			},
 		},
