@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -10,11 +11,13 @@ import (
 
 type MarketplaceServices struct {
 	ui          terminal.UI
+	config      *configuration.Configuration
 	serviceRepo api.ServiceRepository
 }
 
-func NewMarketplaceServices(ui terminal.UI, serviceRepo api.ServiceRepository) (cmd MarketplaceServices) {
+func NewMarketplaceServices(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd MarketplaceServices) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.serviceRepo = serviceRepo
 	return
 }
@@ -24,7 +27,15 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 }
 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
-	cmd.ui.Say("Getting services from marketplace...")
+	if cmd.config.HasSpace() {
+		cmd.ui.Say("Getting services from marketplace in org %s / space %s as %s...",
+			terminal.EntityNameColor(cmd.config.Organization.Name),
+			terminal.EntityNameColor(cmd.config.Space.Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
+	} else {
+		cmd.ui.Say("Getting services from marketplace...")
+	}
 
 	serviceOfferings, apiResponse := cmd.serviceRepo.GetServiceOfferings()
 

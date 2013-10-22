@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"encoding/json"
@@ -11,13 +12,15 @@ import (
 
 type UpdateUserProvidedService struct {
 	ui                              terminal.UI
+	config                          *configuration.Configuration
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 	serviceInstanceReq              requirements.ServiceInstanceRequirement
 }
 
-func NewUpdateUserProvidedService(ui terminal.UI, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd *UpdateUserProvidedService) {
+func NewUpdateUserProvidedService(ui terminal.UI, config *configuration.Configuration, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd *UpdateUserProvidedService) {
 	cmd = new(UpdateUserProvidedService)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
 	return
 }
@@ -55,7 +58,12 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Updating user provided service %s...", terminal.EntityNameColor(serviceInstance.Name))
+	cmd.ui.Say("Updating user provided service %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(serviceInstance.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance, paramsMap)
 	if apiResponse.IsNotSuccessful() {

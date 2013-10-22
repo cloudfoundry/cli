@@ -4,9 +4,11 @@ import (
 	"cf"
 	"cf/api"
 	. "cf/commands/service"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -16,13 +18,13 @@ func TestUpdateUserProvidedServiceFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-	fakeUI := callUpdateUserProvidedService([]string{}, reqFactory, userProvidedServiceInstanceRepo)
+	fakeUI := callUpdateUserProvidedService(t, []string{}, reqFactory, userProvidedServiceInstanceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callUpdateUserProvidedService([]string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
+	fakeUI = callUpdateUserProvidedService(t, []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callUpdateUserProvidedService([]string{"foo", "bar"}, reqFactory, userProvidedServiceInstanceRepo)
+	fakeUI = callUpdateUserProvidedService(t, []string{"foo", "bar"}, reqFactory, userProvidedServiceInstanceRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
@@ -32,11 +34,11 @@ func TestUpdateUserProvidedServiceRequirements(t *testing.T) {
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
 	reqFactory.LoginSuccess = false
-	callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+	callUpdateUserProvidedService(t, args, reqFactory, userProvidedServiceInstanceRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+	callUpdateUserProvidedService(t, args, reqFactory, userProvidedServiceInstanceRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, reqFactory.ServiceInstanceName, "service-name")
@@ -52,10 +54,13 @@ func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	expectedParams := map[string]string{"foo": "bar"}
 
-	ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+	ui := callUpdateUserProvidedService(t, args, reqFactory, userProvidedServiceInstanceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Updating user provided service")
 	assert.Contains(t, ui.Outputs[0], "found-service-name")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
 	assert.Equal(t, userProvidedServiceInstanceRepo.UpdateParameters, expectedParams)
@@ -72,7 +77,7 @@ func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
 	}
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-	ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+	ui := callUpdateUserProvidedService(t, args, reqFactory, userProvidedServiceInstanceRepo)
 
 	assert.NotEqual(t, userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
 
@@ -94,7 +99,7 @@ func TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided(t *t
 	}
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-	ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
+	ui := callUpdateUserProvidedService(t, args, reqFactory, userProvidedServiceInstanceRepo)
 
 	assert.NotEqual(t, userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
 
@@ -102,11 +107,22 @@ func TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided(t *t
 	assert.Contains(t, ui.Outputs[1], "Service Instance is not user provided")
 }
 
-func callUpdateUserProvidedService(args []string, reqFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
+func callUpdateUserProvidedService(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("udpate-user-provided-service", args)
-	cmd := NewUpdateUserProvidedService(fakeUI, userProvidedServiceInstanceRepo)
 
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewUpdateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

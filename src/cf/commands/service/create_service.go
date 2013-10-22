@@ -3,6 +3,7 @@ package service
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -12,12 +13,14 @@ import (
 
 type CreateService struct {
 	ui          terminal.UI
+	config      *configuration.Configuration
 	serviceRepo api.ServiceRepository
 }
 
-func NewCreateService(ui terminal.UI, sR api.ServiceRepository) (cmd CreateService) {
+func NewCreateService(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd CreateService) {
 	cmd.ui = ui
-	cmd.serviceRepo = sR
+	cmd.config = config
+	cmd.serviceRepo = serviceRepo
 	return
 }
 
@@ -36,7 +39,12 @@ func (cmd CreateService) Run(c *cli.Context) {
 	planName := c.Args()[1]
 	name := c.Args()[2]
 
-	cmd.ui.Say("Creating service %s...", terminal.EntityNameColor(name))
+	cmd.ui.Say("Creating service %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	offerings, apiResponse := cmd.serviceRepo.GetServiceOfferings()
 	if apiResponse.IsNotSuccessful() {

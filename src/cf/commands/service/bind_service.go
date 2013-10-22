@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,14 +11,16 @@ import (
 
 type BindService struct {
 	ui                 terminal.UI
+	config             *configuration.Configuration
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewBindService(ui terminal.UI, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
+func NewBindService(ui terminal.UI, config *configuration.Configuration, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
 	cmd = new(BindService)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.serviceBindingRepo = serviceBindingRepo
 	return
 }
@@ -43,7 +46,13 @@ func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Binding service %s to %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Binding service %s to app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(instance.Name),
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.serviceBindingRepo.Create(instance, app)
 	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != "90003" {

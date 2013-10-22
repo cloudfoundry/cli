@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,14 +11,16 @@ import (
 
 type UnbindService struct {
 	ui                 terminal.UI
+	config             *configuration.Configuration
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui terminal.UI, serviceBindingRepo api.ServiceBindingRepository) (cmd *UnbindService) {
+func NewUnbindService(ui terminal.UI, config *configuration.Configuration, serviceBindingRepo api.ServiceBindingRepository) (cmd *UnbindService) {
 	cmd = new(UnbindService)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.serviceBindingRepo = serviceBindingRepo
 	return
 }
@@ -43,7 +46,13 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Unbinding service %s from %s...", terminal.EntityNameColor(instance.Name), terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Unbinding app %s from service %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(app.Name),
+		terminal.EntityNameColor(instance.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	found, apiResponse := cmd.serviceBindingRepo.Delete(instance, app)
 	if apiResponse.IsNotSuccessful() {

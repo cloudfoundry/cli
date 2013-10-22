@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -43,15 +44,25 @@ func TestServices(t *testing.T) {
 		GetSummariesInCurrentSpaceInstances: serviceInstances,
 	}
 	ui := &testterm.FakeUI{}
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
 	config := &configuration.Configuration{
-		Space: cf.Space{Name: "development"},
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
 	}
 
 	cmd := NewListServices(ui, config, serviceSummaryRepo)
 	cmd.Run(testcmd.NewContext("services", []string{}))
 
-	assert.Contains(t, ui.Outputs[0], "Getting services in")
-	assert.Contains(t, ui.Outputs[0], "development")
+	assert.Contains(t, ui.Outputs[0], "Getting services in org")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[4], "my-service-1")

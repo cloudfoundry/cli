@@ -3,6 +3,7 @@ package service
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,13 +12,15 @@ import (
 
 type RenameService struct {
 	ui                 terminal.UI
+	config             *configuration.Configuration
 	serviceRepo        api.ServiceRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewRenameService(ui terminal.UI, serviceRepo api.ServiceRepository) (cmd *RenameService) {
+func NewRenameService(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd *RenameService) {
 	cmd = new(RenameService)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.serviceRepo = serviceRepo
 	return
 }
@@ -44,7 +47,13 @@ func (cmd *RenameService) Run(c *cli.Context) {
 	newName := c.Args()[1]
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Renaming service %s...", terminal.EntityNameColor(serviceInstance.Name))
+	cmd.ui.Say("Renaming service %s to %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(serviceInstance.Name),
+		terminal.EntityNameColor(newName),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 	apiResponse := cmd.serviceRepo.RenameService(serviceInstance, newName)
 
 	if apiResponse.IsNotSuccessful() {

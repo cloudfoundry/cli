@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"encoding/json"
@@ -12,11 +13,13 @@ import (
 
 type CreateUserProvidedService struct {
 	ui                              terminal.UI
+	config                          *configuration.Configuration
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 }
 
-func NewCreateUserProvidedService(ui terminal.UI, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
+func NewCreateUserProvidedService(ui terminal.UI, config *configuration.Configuration, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
 	return
 }
@@ -43,7 +46,12 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 		paramsMap = cmd.mapValuesFromPrompt(params, paramsMap)
 	}
 
-	cmd.ui.Say("Creating user provided service...")
+	cmd.ui.Say("Creating user provided service %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, paramsMap)
 	if apiResponse.IsNotSuccessful() {
