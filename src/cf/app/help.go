@@ -94,7 +94,6 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					app.Command("set-env"),
 					app.Command("unset-env"),
 				}, {
-					app.Command("buildpacks"),
 					app.Command("stacks"),
 				},
 			},
@@ -162,6 +161,16 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					app.Command("map-route"),
 					app.Command("unmap-route"),
 					app.Command("delete-route"),
+				},
+			},
+		}, {
+			Name: "BUILDPACKS",
+			CommandSubGroups: [][]*cli.Command{
+				{
+					app.Command("buildpacks"),
+					app.Command("create-buildpack"),
+					app.Command("delete-buildpack"),
+					app.Command("update-buildpack"),
 				},
 			},
 		}, {

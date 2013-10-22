@@ -14,6 +14,19 @@ import (
 	"testing"
 )
 
+func availableCmdNames() (names []string) {
+	reqFactory := &testreq.FakeReqFactory{}
+	cmdRunner := commands.NewRunner(nil, reqFactory)
+	app, _ := NewApp(cmdRunner)
+
+	for _, cliCmd := range app.Commands {
+		if cliCmd.Name != "help" {
+			names = append(names, cliCmd.Name)
+		}
+	}
+	return
+}
+
 type FakeRunner struct {
 	cmdFactory commands.Factory
 	t          *testing.T
@@ -31,83 +44,7 @@ func (runner *FakeRunner) RunCmdByName(cmdName string, c *cli.Context) (err erro
 }
 
 func TestCommands(t *testing.T) {
-	availableCmds := []string{
-		"api",
-		"app",
-		"apps",
-		"auth",
-		"bind-service",
-		"buildpacks",
-		"create-buildpack",
-		"create-org",
-		"create-service",
-		"create-service-auth-token",
-		"create-service-broker",
-		"create-space",
-		"create-user",
-		"create-user-provided-service",
-		"delete",
-		"delete-buildpack",
-		"delete-org",
-		"delete-route",
-		"delete-service",
-		"delete-service-auth-token",
-		"delete-service-broker",
-		"delete-space",
-		"delete-user",
-		"env",
-		"events",
-		"files",
-		"login",
-		"logout",
-		"logs",
-		"map-domain",
-		"map-route",
-		"marketplace",
-		"org",
-		"org-users",
-		"orgs",
-		"passwd",
-		"push",
-		"quotas",
-		"rename",
-		"rename-org",
-		"rename-service",
-		"rename-service-broker",
-		"rename-space",
-		"reserve-domain",
-		"reserve-route",
-		"restart",
-		"routes",
-		"scale",
-		"service",
-		"service-auth-tokens",
-		"service-brokers",
-		"services",
-		"set-env",
-		"set-org-role",
-		"set-quota",
-		"set-space-role",
-		"share-domain",
-		"space",
-		"space-users",
-		"spaces",
-		"stacks",
-		"start",
-		"stop",
-		"target",
-		"unbind-service",
-		"unmap-domain",
-		"unmap-route",
-		"unset-env",
-		"unset-org-role",
-		"unset-space-role",
-		"update-buildpack",
-		"update-service-broker",
-		"update-user-provided-service",
-	}
-
-	for _, cmdName := range availableCmds {
+	for _, cmdName := range availableCmdNames() {
 		ui := &testterm.FakeUI{}
 		config := &configuration.Configuration{}
 		configRepo := testconfig.FakeConfigRepository{}

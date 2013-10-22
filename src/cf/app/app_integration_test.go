@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -25,6 +26,16 @@ func TestRunningCommands(t *testing.T) {
 	stdout, _, err = runCommand(t, "target", "foo", "bar")
 	assert.Error(t, err)
 	assert.Contains(t, stdout, "FAILED")
+}
+
+func TestHelpCommand(t *testing.T) {
+	helpOutput, _, err := runCommand(t, "help")
+	assert.NoError(t, err)
+
+	for _, cmdName := range availableCmdNames() {
+		included := strings.Contains(helpOutput, "\n   "+cmdName)
+		assert.True(t, included, "Could not find command %s in help text", cmdName)
+	}
 }
 
 func runCommand(t *testing.T, params ...string) (stdout, stderr string, err error) {
