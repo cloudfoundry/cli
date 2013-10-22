@@ -297,9 +297,24 @@ func TestDeleteServiceWithServiceBindings(t *testing.T) {
 }
 
 func TestRenameService(t *testing.T) {
+	path := "/v2/service_instances/my-service-instance-guid"
+	serviceInstance := cf.ServiceInstance{
+		Guid:        "my-service-instance-guid",
+		ServicePlan: cf.ServicePlan{Guid: "some-plan-guid"},
+	}
+	testRenameService(t, path, serviceInstance)
+}
+
+func TestRenameServiceWhenServiceIsUserProvided(t *testing.T) {
+	path := "/v2/user_provided_service_instances/my-service-instance-guid"
+	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
+	testRenameService(t, path, serviceInstance)
+}
+
+func testRenameService(t *testing.T, endpointPath string, serviceInstance cf.ServiceInstance) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
-		Path:     "/v2/service_instances/my-service-instance-guid",
+		Path:     endpointPath,
 		Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
@@ -307,7 +322,6 @@ func TestRenameService(t *testing.T) {
 	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
-	serviceInstance := cf.ServiceInstance{Guid: "my-service-instance-guid"}
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())

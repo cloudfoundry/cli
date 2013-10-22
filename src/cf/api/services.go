@@ -179,6 +179,10 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
+
+	if instance.IsUserProvided() {
+		path = fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, instance.Guid)
+	}
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
