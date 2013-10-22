@@ -25,6 +25,8 @@ type LoginTestContext struct {
 func callLogin(t *testing.T, context LoginTestContext) (ui *testterm.FakeUI, authRepo *testapi.FakeAuthenticationRepository, endpointRepo *testapi.FakeEndpointRepo) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
+	config, _ := configRepo.Get()
+	config.Target = context.Config.Target
 
 	ui = &testterm.FakeUI{
 		Inputs: context.Inputs,
@@ -75,7 +77,6 @@ func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	assert.True(t, ui.ShowConfigurationCalled)
 }
 
-// TODO: make this a matrix test
 func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
 	context := LoginTestContext{
 		Flags: []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"},
@@ -92,6 +93,33 @@ func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
 	assert.Equal(t, endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, authRepo.Email, "user@example.com")
+	assert.Equal(t, authRepo.Password, "password")
+
+	assert.True(t, ui.ShowConfigurationCalled)
+}
+
+func TestSuccessfullyLoggingInWithConfig(t *testing.T) {
+	existingConfig := configuration.Configuration{
+		Target: "http://api.example.com",
+	}
+
+	context := LoginTestContext{
+		Inputs: []string{"user@example.com", "password", "my-org", "my-space"},
+		Config: existingConfig,
+	}
+
+	ui, authRepo, endpointRepo := callLogin(t, context)
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Equal(t, savedConfig.Target, "http://api.example.com")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+
+	assert.Equal(t, endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
 	assert.Equal(t, authRepo.Email, "user@example.com")
 	assert.Equal(t, authRepo.Password, "password")
 

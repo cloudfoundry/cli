@@ -44,15 +44,9 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd Login) Run(c *cli.Context) {
-	var apiResponse net.ApiResponse
 	prompt := terminal.PromptColor(">")
 
-	api := c.String("a")
-	if api == "" {
-		api = cmd.ui.Ask("API endpoint%s", prompt)
-	}
-
-	apiResponse = cmd.endpointRepo.UpdateEndpoint(api)
+	apiResponse := cmd.setApi(c)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -120,5 +114,18 @@ func (cmd Login) Run(c *cli.Context) {
 	}
 
 	cmd.ui.ShowConfiguration(cmd.config)
+	return
+}
+
+func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
+	api := c.String("a")
+	if api == "" {
+		api = cmd.config.Target
+	}
+	if api == "" {
+		api = cmd.ui.Ask("API endpoint%s", terminal.PromptColor(">"))
+	}
+
+	apiResponse = cmd.endpointRepo.UpdateEndpoint(api)
 	return
 }
