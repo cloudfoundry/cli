@@ -3,6 +3,7 @@ package space
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,12 +12,14 @@ import (
 
 type CreateSpace struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 }
 
-func NewCreateSpace(ui terminal.UI, sR api.SpaceRepository) (cmd CreateSpace) {
+func NewCreateSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd CreateSpace) {
 	cmd.ui = ui
-	cmd.spaceRepo = sR
+	cmd.config = config
+	cmd.spaceRepo = spaceRepo
 	return
 }
 
@@ -36,7 +39,11 @@ func (cmd CreateSpace) GetRequirements(reqFactory requirements.Factory, c *cli.C
 
 func (cmd CreateSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
-	cmd.ui.Say("Creating space %s...", terminal.EntityNameColor(spaceName))
+	cmd.ui.Say("Creating space %s in org %s as %s...",
+		terminal.EntityNameColor(spaceName),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.spaceRepo.Create(spaceName)
 	if apiResponse.IsNotSuccessful() {

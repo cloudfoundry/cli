@@ -1,10 +1,13 @@
 package organization_test
 
 import (
+	"cf"
 	. "cf/commands/organization"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -14,10 +17,10 @@ func TestCreateOrgFailsWithUsage(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	fakeUI := callCreateOrg([]string{}, reqFactory, orgRepo)
+	fakeUI := callCreateOrg(t, []string{}, reqFactory, orgRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+	fakeUI = callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
@@ -25,21 +28,22 @@ func TestCreateOrgRequirements(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+	callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+	callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestCreateOrg(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	fakeUI := callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+	fakeUI := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating org")
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
+	assert.Contains(t, fakeUI.Outputs[0], "my-user")
 	assert.Equal(t, orgRepo.CreateName, "my-org")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
@@ -47,7 +51,7 @@ func TestCreateOrg(t *testing.T) {
 func TestCreateOrgWhenAlreadyExists(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	fakeUI := callCreateOrg([]string{"my-org"}, reqFactory, orgRepo)
+	fakeUI := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating org")
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
@@ -56,10 +60,22 @@ func TestCreateOrgWhenAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "already exists")
 }
 
-func callCreateOrg(args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+func callCreateOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-org", args)
-	cmd := NewCreateOrg(fakeUI, orgRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewCreateOrg(fakeUI, config, orgRepo)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return

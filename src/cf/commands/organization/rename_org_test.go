@@ -3,9 +3,11 @@ package organization_test
 import (
 	"cf"
 	. "cf/commands/organization"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -15,10 +17,10 @@ func TestRenameOrgFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	orgRepo := &testapi.FakeOrgRepository{}
 
-	fakeUI := callRenameOrg([]string{}, reqFactory, orgRepo)
+	fakeUI := callRenameOrg(t, []string{}, reqFactory, orgRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callRenameOrg([]string{"foo"}, reqFactory, orgRepo)
+	fakeUI = callRenameOrg(t, []string{"foo"}, reqFactory, orgRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 }
 
@@ -26,7 +28,7 @@ func TestRenameOrgRequirements(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callRenameOrg([]string{"my-org", "my-new-org"}, reqFactory, orgRepo)
+	callRenameOrg(t, []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.OrganizationName, "my-org")
 }
@@ -36,18 +38,33 @@ func TestRenameOrgRun(t *testing.T) {
 
 	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
-	ui := callRenameOrg([]string{"my-org", "my-new-org"}, reqFactory, orgRepo)
+	ui := callRenameOrg(t, []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Renaming org")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-new-org")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Equal(t, orgRepo.RenameOrganization, org)
 	assert.Equal(t, orgRepo.RenameNewName, "my-new-org")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callRenameOrg(args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
+func callRenameOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("rename-org", args)
-	cmd := NewRenameOrg(ui, orgRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewRenameOrg(ui, config, orgRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

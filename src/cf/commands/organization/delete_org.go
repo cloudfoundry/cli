@@ -12,14 +12,16 @@ import (
 
 type DeleteOrg struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	orgRepo    api.OrganizationRepository
 	orgReq     requirements.OrganizationRequirement
 	configRepo configuration.ConfigurationRepository
 }
 
-func NewDeleteOrg(ui terminal.UI, sR api.OrganizationRepository, cR configuration.ConfigurationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui terminal.UI, config *configuration.Configuration, sR api.OrganizationRepository, cR configuration.ConfigurationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.orgRepo = sR
 	cmd.configRepo = cR
 	return
@@ -52,7 +54,10 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting org %s...", terminal.EntityNameColor(orgName))
+	cmd.ui.Say("Deleting org %s as %s...",
+		terminal.EntityNameColor(orgName),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	org, apiResponse := cmd.orgRepo.FindByName(orgName)
 

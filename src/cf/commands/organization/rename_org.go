@@ -2,6 +2,7 @@ package organization
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,13 +11,15 @@ import (
 
 type RenameOrg struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	orgRepo api.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewRenameOrg(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
+func NewRenameOrg(ui terminal.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
 	cmd = new(RenameOrg)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.orgRepo = orgRepo
 	return
 }
@@ -37,9 +40,15 @@ func (cmd *RenameOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd *RenameOrg) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
-	cmd.ui.Say("Renaming org %s...", terminal.EntityNameColor(org.Name))
+	newName := c.Args()[1]
 
-	apiResponse := cmd.orgRepo.Rename(org, c.Args()[1])
+	cmd.ui.Say("Renaming org %s to %s as %s...",
+		terminal.EntityNameColor(org.Name),
+		terminal.EntityNameColor(newName),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
+
+	apiResponse := cmd.orgRepo.Rename(org, newName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

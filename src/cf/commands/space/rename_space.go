@@ -11,18 +11,18 @@ import (
 
 type RenameSpace struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	spaceRepo  api.SpaceRepository
 	spaceReq   requirements.SpaceRequirement
 	configRepo configuration.ConfigurationRepository
-	config     *configuration.Configuration
 }
 
-func NewRenameSpace(ui terminal.UI, spaceRepo api.SpaceRepository, configRepo configuration.ConfigurationRepository) (cmd *RenameSpace) {
+func NewRenameSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, configRepo configuration.ConfigurationRepository) (cmd *RenameSpace) {
 	cmd = new(RenameSpace)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	cmd.configRepo = configRepo
-	cmd.config, _ = cmd.configRepo.Get()
 	return
 }
 
@@ -43,7 +43,12 @@ func (cmd *RenameSpace) GetRequirements(reqFactory requirements.Factory, c *cli.
 func (cmd *RenameSpace) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
 	newName := c.Args()[1]
-	cmd.ui.Say("Renaming space %s...", terminal.EntityNameColor(space.Name))
+	cmd.ui.Say("Renaming space %s to %s in org %s as %s...",
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(newName),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.spaceRepo.Rename(space, newName)
 	if apiResponse.IsNotSuccessful() {

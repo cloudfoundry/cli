@@ -31,7 +31,11 @@ func (cmd *ShowSpace) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd *ShowSpace) Run(c *cli.Context) {
 	space := cmd.config.Space
-	cmd.ui.Say("Getting info for space %s...", terminal.EntityNameColor(space.Name))
+	cmd.ui.Say("Getting info for space %s in org %s as %s...",
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 	cmd.ui.Ok()
 	cmd.ui.Say("\n%s:", terminal.EntityNameColor(space.Name))
 	cmd.ui.Say("  Org: %s", terminal.EntityNameColor(space.Organization.Name))

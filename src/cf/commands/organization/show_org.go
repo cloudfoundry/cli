@@ -1,6 +1,7 @@
 package organization
 
 import (
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,12 +11,14 @@ import (
 
 type ShowOrg struct {
 	ui     terminal.UI
+	config *configuration.Configuration
 	orgReq requirements.OrganizationRequirement
 }
 
-func NewShowOrg(ui terminal.UI) (cmd *ShowOrg) {
+func NewShowOrg(ui terminal.UI, config *configuration.Configuration) (cmd *ShowOrg) {
 	cmd = new(ShowOrg)
 	cmd.ui = ui
+	cmd.config = config
 	return
 }
 
@@ -37,7 +40,10 @@ func (cmd *ShowOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd *ShowOrg) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
-	cmd.ui.Say("Getting info for org %s...", terminal.EntityNameColor(org.Name))
+	cmd.ui.Say("Getting info for org %s as %s...",
+		terminal.EntityNameColor(org.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 	cmd.ui.Ok()
 	cmd.ui.Say("\n%s:", terminal.EntityNameColor(org.Name))
 

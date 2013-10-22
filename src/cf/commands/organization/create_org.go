@@ -3,6 +3,7 @@ package organization
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,11 +12,13 @@ import (
 
 type CreateOrg struct {
 	ui      terminal.UI
+	config  *configuration.Configuration
 	orgRepo api.OrganizationRepository
 }
 
-func NewCreateOrg(ui terminal.UI, orgRepo api.OrganizationRepository) (cmd CreateOrg) {
+func NewCreateOrg(ui terminal.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository) (cmd CreateOrg) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.orgRepo = orgRepo
 	return
 }
@@ -36,7 +39,10 @@ func (cmd CreateOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 func (cmd CreateOrg) Run(c *cli.Context) {
 	name := c.Args()[0]
 
-	cmd.ui.Say("Creating org %s...", terminal.EntityNameColor(name))
+	cmd.ui.Say("Creating org %s as %s...",
+		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 	apiResponse := cmd.orgRepo.Create(name)
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.ORG_EXISTS {

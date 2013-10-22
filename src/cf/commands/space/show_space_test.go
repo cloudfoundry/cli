@@ -6,27 +6,25 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
 )
 
 func TestShowSpaceRequirements(t *testing.T) {
-	config := &configuration.Configuration{
-		Space:        cf.Space{},
-		Organization: cf.Organization{},
-	}
+	config := &configuration.Configuration{}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	callShowSpace([]string{}, reqFactory, config)
+	callShowSpace(t, []string{}, reqFactory, config)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-	callShowSpace([]string{}, reqFactory, config)
+	callShowSpace(t, []string{}, reqFactory, config)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-	callShowSpace([]string{}, reqFactory, config)
+	callShowSpace(t, []string{}, reqFactory, config)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
@@ -45,9 +43,11 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	config := &configuration.Configuration{Space: space}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	ui := callShowSpace([]string{}, reqFactory, config)
+	ui := callShowSpace(t, []string{}, reqFactory, config)
 	assert.Contains(t, ui.Outputs[0], "Getting info for space")
 	assert.Contains(t, ui.Outputs[0], "space1")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "space1")
 	assert.Contains(t, ui.Outputs[3], "Org")
@@ -60,9 +60,17 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[6], "service1")
 }
 
-func callShowSpace(args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration) (ui *testterm.FakeUI) {
+func callShowSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("space", args)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config.Organization = cf.Organization{Name: "my-org"}
+	config.AccessToken = token
 
 	cmd := NewShowSpace(ui, config)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
