@@ -41,7 +41,8 @@ func TestRenameService(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
 	fakeUI, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, reqFactory)
 
-	assert.Equal(t, fakeUI.Outputs[0], "Renaming service different-name...")
+	assert.Contains(t, fakeUI.Outputs[0], "Renaming service")
+	assert.Contains(t, fakeUI.Outputs[0], "different-name")
 	assert.Equal(t, fakeUI.Outputs[1], "OK")
 
 	assert.Equal(t, fakeServiceRepo.RenameServiceServiceInstance, serviceInstance)

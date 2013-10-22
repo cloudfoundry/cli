@@ -33,6 +33,7 @@ func (cmd *Stacks) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	table := [][]string{
 		[]string{"name", "description"},

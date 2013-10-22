@@ -33,7 +33,7 @@ func (cmd *ShowSpace) Run(c *cli.Context) {
 	space := cmd.config.Space
 	cmd.ui.Say("Getting info for space %s...", terminal.EntityNameColor(space.Name))
 	cmd.ui.Ok()
-	cmd.ui.Say("%s:", terminal.EntityNameColor(space.Name))
+	cmd.ui.Say("\n%s:", terminal.EntityNameColor(space.Name))
 	cmd.ui.Say("  Org: %s", terminal.EntityNameColor(space.Organization.Name))
 
 	apps := []string{}

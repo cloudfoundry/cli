@@ -21,13 +21,13 @@ func TestStacks(t *testing.T) {
 
 	ui := callStacks(stackRepo)
 
-	assert.Equal(t, len(ui.Outputs), 5)
+	assert.Equal(t, len(ui.Outputs), 6)
 	assert.Contains(t, ui.Outputs[0], "Getting stacks")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "Stack-1")
-	assert.Contains(t, ui.Outputs[3], "Stack 1 Description")
-	assert.Contains(t, ui.Outputs[4], "Stack-2")
-	assert.Contains(t, ui.Outputs[4], "Stack 2 Description")
+	assert.Contains(t, ui.Outputs[4], "Stack-1")
+	assert.Contains(t, ui.Outputs[4], "Stack 1 Description")
+	assert.Contains(t, ui.Outputs[5], "Stack-2")
+	assert.Contains(t, ui.Outputs[5], "Stack 2 Description")
 }
 
 func callStacks(stackRepo *testapi.FakeStackRepository) (ui *testterm.FakeUI) {

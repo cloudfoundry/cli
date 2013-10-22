@@ -55,7 +55,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Updating user provided service %s...", serviceInstance.Name)
+	cmd.ui.Say("Updating user provided service %s...", terminal.EntityNameColor(serviceInstance.Name))
 
 	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance, paramsMap)
 	if apiResponse.IsNotSuccessful() {

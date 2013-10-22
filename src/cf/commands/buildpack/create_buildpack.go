@@ -43,13 +43,14 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Warn("Buildpack %s already exists", terminal.EntityNameColor(buildpackName))
+			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
 		} else {
 			cmd.ui.Failed(apiResponse.Message)
 		}
-
 		return
 	}
+	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	cmd.ui.Say("Uploading buildpack %s...", terminal.EntityNameColor(buildpackName))
 

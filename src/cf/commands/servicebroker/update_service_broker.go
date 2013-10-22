@@ -48,6 +48,7 @@ func (cmd UpdateServiceBroker) Run(c *cli.Context) {
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
+		return
 	}
 
 	cmd.ui.Ok()

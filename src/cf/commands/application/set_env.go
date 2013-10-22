@@ -43,7 +43,9 @@ func (se *SetEnv) Run(c *cli.Context) {
 	varValue := c.Args()[2]
 	app := se.appReq.GetApplication()
 
-	se.ui.Say("Updating env variable %s for app %s...", varName, app.Name)
+	se.ui.Say("Updating env variable %s for app %s...",
+		terminal.EntityNameColor(varName),
+		terminal.EntityNameColor(app.Name))
 
 	var envVars map[string]string
 

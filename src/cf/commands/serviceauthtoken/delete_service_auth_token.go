@@ -49,7 +49,7 @@ func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
 	cmd.ui.Say("Deleting service auth token...")
 	token, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
 	if apiResponse.IsError() {
-		cmd.ui.Failed("Error deleting service auth token.\n%s", apiResponse.Message)
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 	if apiResponse.IsNotFound() {
@@ -60,6 +60,7 @@ func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
 
 	apiResponse = cmd.authTokenRepo.Delete(token)
 	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 

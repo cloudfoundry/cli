@@ -89,8 +89,12 @@ func (cmd Push) Run(c *cli.Context) {
 		return
 	}
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	updatedApp, _ := cmd.stopper.ApplicationStop(app)
+
+	cmd.ui.Say("")
+
 	if !c.Bool("no-start") {
 		if c.String("b") != "" {
 			updatedApp.BuildpackUrl = c.String("b")
@@ -128,6 +132,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		return
 	}
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	if !c.Bool("no-route") {
 		domainName := c.String("d")
@@ -143,9 +148,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 }
 
 func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) {
-
 	domain, apiResponse := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
-
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -164,6 +167,7 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 			return
 		}
 		cmd.ui.Ok()
+		cmd.ui.Say("")
 	} else {
 		existingUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
 		cmd.ui.Say("Using route %s", terminal.EntityNameColor(existingUrl))
@@ -178,6 +182,7 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 }
 
 func getMemoryLimit(arg string) (memory uint64) {

@@ -38,7 +38,7 @@ func (cmd *ShareDomain) GetRequirements(reqFactory requirements.Factory, c *cli.
 func (cmd *ShareDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 
-	cmd.ui.Say("Sharing domain %s...", domainName)
+	cmd.ui.Say("Sharing domain %s...", terminal.EntityNameColor(domainName))
 
 	domain := cf.Domain{Name: domainName}
 

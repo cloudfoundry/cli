@@ -64,14 +64,18 @@ func (cmd *DomainMapper) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 
 	if cmd.bind {
-		cmd.ui.Say("Mapping domain %s to space %s...", domainName, space.Name)
+		cmd.ui.Say("Mapping domain %s to space %s...",
+			terminal.EntityNameColor(domainName),
+			terminal.EntityNameColor(space.Name))
 	} else {
-		cmd.ui.Say("Unmapping domain %s from space %s...", domainName, space.Name)
+		cmd.ui.Say("Unmapping domain %s from space %s...",
+			terminal.EntityNameColor(domainName),
+			terminal.EntityNameColor(space.Name))
 	}
 
 	domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, org)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Message)
+		cmd.ui.Failed("Error finding domain %s\n%s", terminal.EntityNameColor(domainName), apiResponse.Message)
 		return
 	}
 

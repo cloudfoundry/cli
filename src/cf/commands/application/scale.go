@@ -68,7 +68,14 @@ func (cmd *Scale) Run(c *cli.Context) {
 	changedApp.Memory = memory
 	changedApp.Instances = c.Int("i")
 
-	cmd.appRepo.Scale(changedApp)
+	apiResponse := cmd.appRepo.Scale(changedApp)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+	cmd.ui.Ok()
+	cmd.ui.Say("")
+
 	cmd.restarter.ApplicationRestart(currentApp)
 }
 

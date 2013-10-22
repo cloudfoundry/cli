@@ -41,6 +41,7 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	for _, space := range spaces {
 		cmd.ui.Say(space.Name)

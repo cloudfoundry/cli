@@ -35,7 +35,7 @@ func (cmd CreateUser) Run(c *cli.Context) {
 	username := c.Args()[0]
 	password := c.Args()[1]
 
-	cmd.ui.Say("Creating user %s...", username)
+	cmd.ui.Say("Creating user %s...", terminal.EntityNameColor(username))
 
 	user := cf.User{
 		Username: username,

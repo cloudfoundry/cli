@@ -41,7 +41,9 @@ func (cmd *ReserveDomain) Run(c *cli.Context) {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Reserving domain %s for org %s...", domainName, owningOrg.Name)
+	cmd.ui.Say("Reserving domain %s for org %s...",
+		terminal.EntityNameColor(domainName),
+		terminal.EntityNameColor(owningOrg.Name))
 
 	domain := cf.Domain{Name: domainName}
 

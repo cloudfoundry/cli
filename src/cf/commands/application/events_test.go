@@ -79,24 +79,23 @@ func TestEventsSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "Showing all 2 event(s)")
-	assert.Contains(t, ui.Outputs[3], "time")
-	assert.Contains(t, ui.Outputs[3], "instance")
-	assert.Contains(t, ui.Outputs[3], "description")
-	assert.Contains(t, ui.Outputs[3], "exit status")
-	assert.Contains(t, ui.Outputs[4], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[4], "99")
-	assert.Contains(t, ui.Outputs[4], "app instance was stopped")
-	assert.Contains(t, ui.Outputs[4], "77")
+	assert.Contains(t, ui.Outputs[3], "Showing all 2 events")
+	assert.Contains(t, ui.Outputs[4], "time")
+	assert.Contains(t, ui.Outputs[4], "instance")
+	assert.Contains(t, ui.Outputs[4], "description")
+	assert.Contains(t, ui.Outputs[4], "exit status")
 	assert.Contains(t, ui.Outputs[5], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[5], "98")
-	assert.Contains(t, ui.Outputs[5], "app instance exited")
-	assert.Contains(t, ui.Outputs[5], "78")
+	assert.Contains(t, ui.Outputs[5], "99")
+	assert.Contains(t, ui.Outputs[5], "app instance was stopped")
+	assert.Contains(t, ui.Outputs[5], "77")
+	assert.Contains(t, ui.Outputs[6], timestamp.Local().Format(TIMESTAMP_FORMAT))
+	assert.Contains(t, ui.Outputs[6], "98")
+	assert.Contains(t, ui.Outputs[6], "app instance exited")
+	assert.Contains(t, ui.Outputs[6], "78")
 
 }
 
 func TestEventsWhenNoEventsAvailable(t *testing.T) {
-
 	app := cf.Application{
 		Name: "my-app",
 		Guid: "my-app-guid",
@@ -112,6 +111,6 @@ func TestEventsWhenNoEventsAvailable(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "no events")
-	assert.Contains(t, ui.Outputs[2], "my-app")
+	assert.Contains(t, ui.Outputs[3], "no events")
+	assert.Contains(t, ui.Outputs[3], "my-app")
 }

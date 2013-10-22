@@ -56,6 +56,8 @@ func (cmd *Restart) ApplicationRestart(app cf.Application) {
 		return
 	}
 
+	cmd.ui.Say("")
+
 	_, err = cmd.starter.ApplicationStart(stoppedApp)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

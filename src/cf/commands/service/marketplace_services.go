@@ -34,6 +34,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	table := [][]string{
 		[]string{"service", "plans", "description"},

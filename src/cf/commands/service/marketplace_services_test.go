@@ -42,11 +42,11 @@ func TestMarketplaceServices(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Getting services from marketplace...")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "my-service-offering-1")
-	assert.Contains(t, ui.Outputs[3], "service offering 1 description")
-	assert.Contains(t, ui.Outputs[3], "service-plan-a, service-plan-b")
+	assert.Contains(t, ui.Outputs[4], "my-service-offering-1")
+	assert.Contains(t, ui.Outputs[4], "service offering 1 description")
+	assert.Contains(t, ui.Outputs[4], "service-plan-a, service-plan-b")
 
-	assert.Contains(t, ui.Outputs[4], "my-service-offering-2")
-	assert.Contains(t, ui.Outputs[4], "service offering 2 description")
-	assert.Contains(t, ui.Outputs[4], "service-plan-c, service-plan-d")
+	assert.Contains(t, ui.Outputs[5], "my-service-offering-2")
+	assert.Contains(t, ui.Outputs[5], "service offering 2 description")
+	assert.Contains(t, ui.Outputs[5], "service-plan-c, service-plan-d")
 }

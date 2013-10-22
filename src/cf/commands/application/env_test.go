@@ -45,10 +45,10 @@ func TestEnvListsEnvironmentVariables(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[2], "my-key")
-	assert.Contains(t, ui.Outputs[2], "my-value")
-	assert.Contains(t, ui.Outputs[3], "my-key2")
-	assert.Contains(t, ui.Outputs[3], "my-value2")
+	assert.Contains(t, ui.Outputs[3], "my-key")
+	assert.Contains(t, ui.Outputs[3], "my-value")
+	assert.Contains(t, ui.Outputs[4], "my-key2")
+	assert.Contains(t, ui.Outputs[4], "my-value2")
 }
 
 func TestEnvShowsEmptyMessage(t *testing.T) {
@@ -62,7 +62,7 @@ func TestEnvShowsEmptyMessage(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[2], "No env variables exist")
+	assert.Contains(t, ui.Outputs[3], "No env variables exist")
 }
 
 func callEnv(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

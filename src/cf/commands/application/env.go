@@ -41,6 +41,8 @@ func (cmd *Env) Run(c *cli.Context) {
 	envVars := app.EnvironmentVars
 
 	cmd.ui.Ok()
+	cmd.ui.Say("")
+
 	if len(envVars) == 0 {
 		cmd.ui.Say("No env variables exist")
 		return

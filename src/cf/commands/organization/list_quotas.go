@@ -37,6 +37,7 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 		return
 	}
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	table := [][]string{
 		[]string{"name", "memory limit"},
@@ -49,6 +50,5 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.Say("")
 	cmd.ui.DisplayTable(table)
 }

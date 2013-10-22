@@ -29,12 +29,13 @@ func TestCreateBuildpack(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 3)
+	assert.Equal(t, len(fakeUI.Outputs), 5)
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
 	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[2], "OK")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
+	assert.Contains(t, fakeUI.Outputs[3], "my-buildpack")
+	assert.Contains(t, fakeUI.Outputs[4], "OK")
 }
 
 func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
@@ -57,12 +58,13 @@ func TestCreateBuildpackWithPriority(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 	fakeUI := callCreateBuildpack([]string{"-priority", "5", "my-buildpack", "my.war"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 3)
+	assert.Equal(t, len(fakeUI.Outputs), 5)
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
 	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[2], "OK")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
+	assert.Contains(t, fakeUI.Outputs[3], "my-buildpack")
+	assert.Contains(t, fakeUI.Outputs[4], "OK")
 }
 
 func TestCreateBuildpackWithInvalidPath(t *testing.T) {
@@ -74,8 +76,9 @@ func TestCreateBuildpackWithInvalidPath(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
 	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[2], "FAILED")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
+	assert.Contains(t, fakeUI.Outputs[4], "FAILED")
 }
 
 func TestCreateBuildpackFailsWithUsage(t *testing.T) {

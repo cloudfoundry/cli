@@ -41,7 +41,7 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 	force := c.Bool("f")
 
-	cmd.ui.Say("Deleting domain %s...", domainName)
+	cmd.ui.Say("Deleting domain %s...", terminal.EntityNameColor(domainName))
 
 	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganization())
 	if apiResponse.IsError() {

@@ -44,8 +44,9 @@ func (cmd *RenameService) Run(c *cli.Context) {
 	newName := c.Args()[1]
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.ui.Say("Renaming service %s...", serviceInstance.Name)
+	cmd.ui.Say("Renaming service %s...", terminal.EntityNameColor(serviceInstance.Name))
 	apiResponse := cmd.serviceRepo.RenameService(serviceInstance, newName)
+
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
 			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiResponse.Message, cf.Name)
@@ -54,5 +55,6 @@ func (cmd *RenameService) Run(c *cli.Context) {
 		}
 		return
 	}
+
 	cmd.ui.Ok()
 }

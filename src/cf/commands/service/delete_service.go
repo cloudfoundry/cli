@@ -46,6 +46,7 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)
+		return
 	}
 
 	if apiResponse.IsNotFound() {

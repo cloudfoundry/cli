@@ -54,16 +54,16 @@ func TestServices(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "development")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "my-service-1")
-	assert.Contains(t, ui.Outputs[3], "cleardb")
-	assert.Contains(t, ui.Outputs[3], "spark")
-	assert.Contains(t, ui.Outputs[3], "cli1, cli2")
-
-	assert.Contains(t, ui.Outputs[4], "my-service-2")
+	assert.Contains(t, ui.Outputs[4], "my-service-1")
 	assert.Contains(t, ui.Outputs[4], "cleardb")
 	assert.Contains(t, ui.Outputs[4], "spark")
-	assert.Contains(t, ui.Outputs[4], "cli1")
+	assert.Contains(t, ui.Outputs[4], "cli1, cli2")
 
-	assert.Contains(t, ui.Outputs[5], "my-service-provided-by-user")
-	assert.Contains(t, ui.Outputs[5], "user-provided")
+	assert.Contains(t, ui.Outputs[5], "my-service-2")
+	assert.Contains(t, ui.Outputs[5], "cleardb")
+	assert.Contains(t, ui.Outputs[5], "spark")
+	assert.Contains(t, ui.Outputs[5], "cli1")
+
+	assert.Contains(t, ui.Outputs[6], "my-service-provided-by-user")
+	assert.Contains(t, ui.Outputs[6], "user-provided")
 }

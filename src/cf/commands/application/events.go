@@ -45,19 +45,26 @@ func (cmd *Events) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
 	cmd.ui.Say("Getting events for %s...", terminal.EntityNameColor(app.Name))
-	cmd.ui.Ok()
 
 	appEvents, apiStatus := cmd.eventsRepo.ListEvents(app)
-	if !apiStatus.IsSuccessful() {
+	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed("Failed fetching events.\n%s", apiStatus.Message)
+		return
 	}
+
+	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	if len(appEvents) == 0 {
 		cmd.ui.Say("There are no events available for %s at this time", terminal.EntityNameColor(app.Name))
 		return
 	}
 
-	cmd.ui.Say("Showing all %d event(s)...\n", len(appEvents))
+	if len(appEvents) == 1 {
+		cmd.ui.Say("Showing 1 of 1 events...\n")
+	} else {
+		cmd.ui.Say("Showing all %d events...\n", len(appEvents))
+	}
 
 	table := [][]string{
 		[]string{"time", "instance", "description", "exit status"},

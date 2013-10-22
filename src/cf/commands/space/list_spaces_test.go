@@ -53,8 +53,8 @@ func TestListingSpaces(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "space1")
-	assert.Contains(t, ui.Outputs[3], "space2")
+	assert.Contains(t, ui.Outputs[3], "space1")
+	assert.Contains(t, ui.Outputs[4], "space2")
 }
 
 func callSpaces(args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {

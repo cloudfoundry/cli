@@ -53,15 +53,15 @@ func TestListDomains(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
-	assert.Contains(t, fakeUI.Outputs[3], "Domain1")
-	assert.Contains(t, fakeUI.Outputs[3], "shared")
+	assert.Contains(t, fakeUI.Outputs[4], "Domain1")
+	assert.Contains(t, fakeUI.Outputs[4], "shared")
 
-	assert.Contains(t, fakeUI.Outputs[4], "Domain2")
-	assert.Contains(t, fakeUI.Outputs[4], "owned")
-	assert.Contains(t, fakeUI.Outputs[4], "my-space, my-other-space")
+	assert.Contains(t, fakeUI.Outputs[5], "Domain2")
+	assert.Contains(t, fakeUI.Outputs[5], "owned")
+	assert.Contains(t, fakeUI.Outputs[5], "my-space, my-other-space")
 
-	assert.Contains(t, fakeUI.Outputs[5], "Domain3")
-	assert.Contains(t, fakeUI.Outputs[5], "reserved")
+	assert.Contains(t, fakeUI.Outputs[6], "Domain3")
+	assert.Contains(t, fakeUI.Outputs[6], "reserved")
 }
 
 func callListDomains(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {

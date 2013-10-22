@@ -50,7 +50,7 @@ func TestListingDirectoryEntries(t *testing.T) {
 	assert.Equal(t, appFilesRepo.Path, "/foo")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "file 1\nfile 2")
+	assert.Contains(t, ui.Outputs[3], "file 1\nfile 2")
 }
 
 func callFiles(args []string, reqFactory *testreq.FakeReqFactory, appFilesRepo *testapi.FakeAppFilesRepo) (ui *testterm.FakeUI) {

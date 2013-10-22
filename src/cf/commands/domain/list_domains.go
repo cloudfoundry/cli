@@ -49,6 +49,9 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		return
 	}
 
+	cmd.ui.Ok()
+	cmd.ui.Say("")
+
 	table := [][]string{
 		[]string{"name", "status", "spaces"},
 	}
@@ -69,6 +72,5 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		})
 	}
 
-	cmd.ui.Ok()
 	cmd.ui.DisplayTable(table)
 }

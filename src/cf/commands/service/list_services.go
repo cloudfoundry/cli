@@ -37,6 +37,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("")
 
 	table := [][]string{
 		[]string{"name", "service", "plan", "bound apps"},
