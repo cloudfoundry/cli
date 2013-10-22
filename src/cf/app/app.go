@@ -16,6 +16,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 	app.Commands = []cli.Command{
 		{
 			Name:        "help",
+			ShortName:   "h",
 			Description: "Show help",
 			Usage:       fmt.Sprintf("%s help [COMMAND]", cf.Name),
 			Action: func(c *cli.Context) {
