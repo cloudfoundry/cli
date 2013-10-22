@@ -57,7 +57,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		return
 	}
 
-	cmd.ui.Say("Starting %s in org %s / space %s as %s...",
+	cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.Organization.Name),
 		terminal.EntityNameColor(cmd.config.Space.Name),

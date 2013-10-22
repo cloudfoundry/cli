@@ -45,7 +45,7 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	varName := c.Args()[1]
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Removing env variable %s for app %s in org %s / space %s as %s...",
+	cmd.ui.Say("Removing env variable %s from app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(varName),
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.Organization.Name),

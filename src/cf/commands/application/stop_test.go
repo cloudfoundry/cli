@@ -33,7 +33,7 @@ func TestStopApplication(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Stopping")
+	assert.Contains(t, ui.Outputs[0], "Stopping app")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")

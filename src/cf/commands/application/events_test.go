@@ -55,7 +55,7 @@ func TestEventsSuccess(t *testing.T) {
 
 	ui := callEvents(t, []string{"my-app"}, reqFactory, eventsRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting events")
+	assert.Contains(t, ui.Outputs[0], "Getting events for app")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")

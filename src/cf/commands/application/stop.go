@@ -50,7 +50,7 @@ func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application,
 		return
 	}
 
-	cmd.ui.Say("Stopping %s in org %s / space %s as %s...",
+	cmd.ui.Say("Stopping app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.Organization.Name),
 		terminal.EntityNameColor(cmd.config.Space.Name),

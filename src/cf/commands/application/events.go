@@ -45,7 +45,7 @@ func (cmd *Events) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 func (cmd *Events) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Getting events for %s in org %s / space %s as %s...",
+	cmd.ui.Say("Getting events for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.Organization.Name),
 		terminal.EntityNameColor(cmd.config.Space.Name),

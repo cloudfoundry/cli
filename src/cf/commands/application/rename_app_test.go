@@ -40,7 +40,7 @@ func TestRenameRun(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	ui := callRename(t, []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Renaming ")
+	assert.Contains(t, ui.Outputs[0], "Renaming app ")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "my-new-app")
 	assert.Contains(t, ui.Outputs[0], "my-org")
