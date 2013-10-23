@@ -48,6 +48,10 @@ func (cmd Api) showApiEndpoint() {
 }
 
 func (cmd Api) SetApiEndpoint(endpoint string) {
+	if strings.HasSuffix(endpoint, "/") {
+		endpoint = strings.TrimSuffix(endpoint, "/")
+	}
+
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
 	apiResponse := cmd.endpointRepo.UpdateEndpoint(endpoint)

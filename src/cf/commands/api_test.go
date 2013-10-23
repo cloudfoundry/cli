@@ -36,6 +36,17 @@ func TestApiWhenChangingTheEndpoint(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
+func TestApiWithTrailingSlash(t *testing.T) {
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	config := &configuration.Configuration{}
+
+	ui := callApi([]string{"https://example.com/"}, config, endpointRepo)
+
+	assert.Contains(t, ui.Outputs[0], "Setting api endpoint to")
+	assert.Equal(t, endpointRepo.UpdateEndpointEndpoint, "https://example.com")
+	assert.Contains(t, ui.Outputs[1], "OK")
+}
+
 func callApi(args []string, config *configuration.Configuration, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
