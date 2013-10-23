@@ -20,6 +20,7 @@ type ConfigurationRepository interface {
 	Get() (config *Configuration, err error)
 	Delete()
 	Save() (err error)
+	ClearTokens() (err error)
 	ClearSession() (err error)
 	SetOrganization(org cf.Organization) (err error)
 	SetSpace(space cf.Space) (err error)
@@ -86,13 +87,26 @@ func (repo ConfigurationDiskRepository) Save() (err error) {
 	return saveConfiguration(c)
 }
 
-func (repo ConfigurationDiskRepository) ClearSession() (err error) {
+func (repo ConfigurationDiskRepository) ClearTokens() (err error) {
 	c, err := repo.Get()
 	if err != nil {
 		return
 	}
 	c.AccessToken = ""
 	c.RefreshToken = ""
+	return
+}
+
+func (repo ConfigurationDiskRepository) ClearSession() (err error) {
+	err = repo.ClearTokens()
+	if err != nil {
+		return
+	}
+
+	c, err := repo.Get()
+	if err != nil {
+		return
+	}
 	c.Organization = cf.Organization{}
 	c.Space = cf.Space{}
 

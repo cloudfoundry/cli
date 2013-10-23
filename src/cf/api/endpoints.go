@@ -9,10 +9,8 @@ import (
 )
 
 const (
-	authEndpointPrefix         = "login"
-	uaaEndpointPrefix          = "uaa"
-	loggregatorEndpointKey     = "loggregator"
-	cloudControllerEndpointKey = "api"
+	authEndpointPrefix = "login"
+	uaaEndpointPrefix  = "uaa"
 )
 
 type EndpointRepository interface {
@@ -56,7 +54,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiRespons
 		return
 	}
 
-	repo.configRepo.ClearSession()
+	repo.configRepo.ClearTokens()
 	repo.config.Target = endpoint
 	repo.config.ApiVersion = serverResponse.ApiVersion
 	repo.config.AuthorizationEndpoint = serverResponse.AuthorizationEndpoint

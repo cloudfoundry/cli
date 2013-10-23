@@ -54,9 +54,18 @@ func (repo FakeConfigRepository) Save() (err error) {
 	return
 }
 
-func (repo FakeConfigRepository) ClearSession() (err error) {
+func (repo FakeConfigRepository) ClearTokens() (err error) {
 	c, _ := repo.Get()
 	c.AccessToken = ""
+	c.RefreshToken = ""
+
+	return nil
+}
+
+func (repo FakeConfigRepository) ClearSession() (err error) {
+	repo.ClearTokens()
+
+	c, _ := repo.Get()
 	c.Organization = cf.Organization{}
 	c.Space = cf.Space{}
 
