@@ -8,6 +8,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
+	"strconv"
 )
 
 const maxLoginTries = 3
@@ -103,6 +104,8 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 
 		apiResponse = cmd.authenticator.Authenticate(username, password)
 		if apiResponse.IsSuccessful() {
+			cmd.ui.Ok()
+			cmd.ui.Say("")
 			break
 		}
 
@@ -114,20 +117,27 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 	orgName := c.String("o")
 
-	// Reuse org in config
-	if orgName == "" && cmd.config.HasOrganization() {
-		return
-	}
-
-	// Target only org if possible
-	availableOrgs, apiResponse := cmd.orgRepo.FindAll()
-	if apiResponse.IsSuccessful() && len(availableOrgs) == 1 {
-		return cmd.targetOrganization(availableOrgs[0])
-	}
-
-	// Prompt for org name
 	if orgName == "" {
-		orgName = cmd.ui.Ask("Org%s", terminal.PromptColor(">"))
+		// Reuse org in config
+		if cmd.config.HasOrganization() {
+			return
+		}
+
+		// Get available orgs
+		var availableOrgs []cf.Organization
+
+		availableOrgs, apiResponse = cmd.orgRepo.FindAll()
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed("Error finding avilable orgs\n%s", apiResponse.Message)
+			return
+		}
+
+		// Target only org if possible
+		if len(availableOrgs) == 1 {
+			return cmd.targetOrganization(availableOrgs[0])
+		}
+
+		orgName = cmd.promptForOrgName(availableOrgs)
 	}
 
 	// Find org
@@ -138,6 +148,28 @@ func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 	}
 
 	return cmd.targetOrganization(org)
+}
+
+func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
+	orgIndex := 0
+
+	for orgIndex < 1 || orgIndex > len(orgs) {
+		var err error
+
+		cmd.ui.Say("Select an org:")
+		for i, o := range orgs {
+			cmd.ui.Say("%d. %s", i+1, o.Name)
+		}
+		orgNumber := cmd.ui.Ask("Org%s", terminal.PromptColor(">"))
+		orgIndex, err = strconv.Atoi(orgNumber)
+
+		if err != nil {
+			orgIndex = 0
+			cmd.ui.Say("")
+		}
+	}
+
+	return orgs[orgIndex-1].Name
 }
 
 func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiResponse) {

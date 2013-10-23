@@ -69,12 +69,21 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 
 func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	c := LoginTestContext{
-		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", "3", "abc", "2", "my-space"},
 	}
 
-	callLogin(t, &c, defaultBeforeBlock)
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.Organizations = []cf.Organization{
+			{Guid: "some-org-guid", Name: "some-org"},
+			{Guid: "my-org-guid", Name: "my-org"},
+		}
+	})
 
 	savedConfig := testconfig.SavedConfiguration
+
+	assert.Contains(t, c.ui.Outputs[3], "Select an org:")
+	assert.Contains(t, c.ui.Outputs[4], "1. some-org")
+	assert.Contains(t, c.ui.Outputs[5], "2. my-org")
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
@@ -85,6 +94,9 @@ func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
+
+	assert.Equal(t, c.orgRepo.FindByNameName, "my-org")
+	assert.Equal(t, c.spaceRepo.FindByNameName, "my-space")
 
 	assert.True(t, c.ui.ShowConfigurationCalled)
 }
@@ -117,7 +129,8 @@ func TestSuccessfullyLoggingInWithEndpointSetInConfig(t *testing.T) {
 	}
 
 	c := LoginTestContext{
-		Inputs: []string{"user@example.com", "password", "my-org", "my-space"},
+		Flags:  []string{"-o", "my-org", "-s", "my-space"},
+		Inputs: []string{"user@example.com", "password"},
 		Config: existingConfig,
 	}
 
@@ -271,8 +284,8 @@ func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
 
 func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
 	c := LoginTestContext{
-		Flags:  []string{"-u", "user@example.com"},
-		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+		Flags:  []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"},
+		Inputs: []string{"api.example.com", "user@example.com", "password"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
@@ -293,8 +306,8 @@ func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
 
 func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
 	c := LoginTestContext{
-		Flags:  []string{"-u", "user@example.com"},
-		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+		Flags:  []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"},
+		Inputs: []string{"api.example.com", "user@example.com", "password"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
