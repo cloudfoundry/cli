@@ -113,6 +113,11 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 	orgName := c.String("o")
 
+	// Reuse org in config
+	if orgName == "" && cmd.config.HasOrganization() {
+		return
+	}
+
 	// Prompt for org name
 	if orgName == "" {
 		orgName = cmd.ui.Ask("Org%s", terminal.PromptColor(">"))
@@ -135,6 +140,11 @@ func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 
 func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 	spaceName := c.String("s")
+
+	// Reuse space in config
+	if spaceName == "" && cmd.config.HasSpace() {
+		return
+	}
 
 	// Prompt for space name
 	if spaceName == "" {

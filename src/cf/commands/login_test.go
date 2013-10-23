@@ -138,6 +138,66 @@ func TestSuccessfullyLoggingInWithEndpointSetInConfig(t *testing.T) {
 	assert.True(t, c.ui.ShowConfigurationCalled)
 }
 
+func TestSuccessfullyLoggingInWithOrgSetInConfig(t *testing.T) {
+	existingConfig := configuration.Configuration{
+		Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
+	}
+
+	c := LoginTestContext{
+		Inputs: []string{"http://api.example.com", "user@example.com", "password", "my-space"},
+		Config: existingConfig,
+	}
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.FindByNameOrganization = cf.Organization{}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Equal(t, savedConfig.Target, "http://api.example.com")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
+
+	assert.True(t, c.ui.ShowConfigurationCalled)
+}
+
+func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
+	existingConfig := configuration.Configuration{
+		Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
+		Space:        cf.Space{Name: "my-space", Guid: "my-space-guid"},
+	}
+
+	c := LoginTestContext{
+		Inputs: []string{"http://api.example.com", "user@example.com", "password"},
+		Config: existingConfig,
+	}
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.FindByNameOrganization = cf.Organization{}
+		c.spaceRepo.FindByNameInOrgSpace = cf.Space{}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Equal(t, savedConfig.Target, "http://api.example.com")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
+
+	assert.True(t, c.ui.ShowConfigurationCalled)
+}
+
 func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 	c := LoginTestContext{
 		Flags:  []string{"-u", "user@example.com"},
