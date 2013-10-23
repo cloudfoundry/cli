@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/net"
@@ -118,22 +119,35 @@ func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 		return
 	}
 
+	// Target only org if possible
+	availableOrgs, apiResponse := cmd.orgRepo.FindAll()
+	if apiResponse.IsSuccessful() && len(availableOrgs) == 1 {
+		return cmd.targetOrganization(availableOrgs[0])
+	}
+
 	// Prompt for org name
 	if orgName == "" {
 		orgName = cmd.ui.Ask("Org%s", terminal.PromptColor(">"))
 	}
 
 	// Find org
-	organization, apiResponse := cmd.orgRepo.FindByName(orgName)
+	org, apiResponse := cmd.orgRepo.FindByName(orgName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), apiResponse.Message)
 		return
 	}
 
-	// Target org
-	err := cmd.configRepo.SetOrganization(organization)
+	return cmd.targetOrganization(org)
+}
+
+func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiResponse) {
+	err := cmd.configRepo.SetOrganization(org)
+
 	if err != nil {
-		apiResponse = net.NewApiResponseWithMessage("Error setting org %s in config file\n%s", terminal.EntityNameColor(orgName), err.Error())
+		apiResponse = net.NewApiResponseWithMessage("Error setting org %s in config file\n%s",
+			terminal.EntityNameColor(org.Name),
+			err.Error(),
+		)
 	}
 	return
 }

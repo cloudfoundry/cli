@@ -198,6 +198,33 @@ func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
 	assert.True(t, c.ui.ShowConfigurationCalled)
 }
 
+func TestSuccessfullyLoggingInWithOnlyOneOrg(t *testing.T) {
+	c := LoginTestContext{
+		Inputs: []string{"http://api.example.com", "user@example.com", "password", "my-space"},
+	}
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.FindByNameOrganization = cf.Organization{}
+		c.orgRepo.Organizations = []cf.Organization{
+			{Guid: "my-org-guid", Name: "my-org"},
+		}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Equal(t, savedConfig.Target, "http://api.example.com")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
+
+	assert.True(t, c.ui.ShowConfigurationCalled)
+}
+
 func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 	c := LoginTestContext{
 		Flags:  []string{"-u", "user@example.com"},
