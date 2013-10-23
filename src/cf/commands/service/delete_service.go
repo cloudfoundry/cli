@@ -42,6 +42,14 @@ func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cl
 
 func (cmd *DeleteService) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
+	force := c.Bool("f")
+
+	if !force {
+		answer := cmd.ui.Confirm("Are you sure you want to delete the service %s ?", terminal.EntityNameColor(serviceName))
+		if !answer {
+			return
+		}
+	}
 
 	cmd.ui.Say("Deleting service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(serviceName),
