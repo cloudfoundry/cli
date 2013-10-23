@@ -151,25 +151,12 @@ func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 }
 
 func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
-	orgIndex := 0
-
-	for orgIndex < 1 || orgIndex > len(orgs) {
-		var err error
-
-		cmd.ui.Say("Select an org:")
-		for i, o := range orgs {
-			cmd.ui.Say("%d. %s", i+1, o.Name)
-		}
-		orgNumber := cmd.ui.Ask("Org%s", terminal.PromptColor(">"))
-		orgIndex, err = strconv.Atoi(orgNumber)
-
-		if err != nil {
-			orgIndex = 0
-			cmd.ui.Say("")
-		}
+	orgNames := []string{}
+	for _, org := range orgs {
+		orgNames = append(orgNames, org.Name)
 	}
 
-	return orgs[orgIndex-1].Name
+	return cmd.promptForName(orgNames, "Select an org:", "Org")
 }
 
 func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiResponse) {
@@ -207,8 +194,6 @@ func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 			return cmd.targetSpace(availableSpaces[0])
 		}
 
-		// Prompt for space name
-		spaceName = cmd.ui.Ask("Space%s", terminal.PromptColor(">"))
 		spaceName = cmd.promptForSpaceName(availableSpaces)
 	}
 
@@ -223,25 +208,12 @@ func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 }
 
 func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
-	spaceIndex := 0
-
-	for spaceIndex < 1 || spaceIndex > len(spaces) {
-		var err error
-
-		cmd.ui.Say("Select a space:")
-		for i, o := range spaces {
-			cmd.ui.Say("%d. %s", i+1, o.Name)
-		}
-		spaceNumber := cmd.ui.Ask("Space%s", terminal.PromptColor(">"))
-		spaceIndex, err = strconv.Atoi(spaceNumber)
-
-		if err != nil {
-			spaceIndex = 0
-			cmd.ui.Say("")
-		}
+	spaceNames := []string{}
+	for _, space := range spaces {
+		spaceNames = append(spaceNames, space.Name)
 	}
 
-	return spaces[spaceIndex-1].Name
+	return cmd.promptForName(spaceNames, "Select a space:", "Space")
 }
 
 func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
@@ -253,4 +225,26 @@ func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
 		)
 	}
 	return
+}
+
+func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) string {
+	nameIndex := 0
+
+	for nameIndex < 1 || nameIndex > len(names) {
+		var err error
+
+		cmd.ui.Say(listPrompt)
+		for i, name := range names {
+			cmd.ui.Say("%d. %s", i+1, name)
+		}
+		nameNumber := cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
+		nameIndex, err = strconv.Atoi(nameNumber)
+
+		if err != nil {
+			nameIndex = 0
+			cmd.ui.Say("")
+		}
+	}
+
+	return names[nameIndex-1]
 }
