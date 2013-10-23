@@ -3,10 +3,12 @@ package route_test
 import (
 	"cf"
 	. "cf/commands/route"
+	"cf/configuration"
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -16,13 +18,13 @@ func TestRouteMapperFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	fakeUI := callRouteMapper([]string{}, reqFactory, routeRepo, true)
+	fakeUI := callRouteMapper(t, []string{}, reqFactory, routeRepo, true)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callRouteMapper([]string{"foo"}, reqFactory, routeRepo, true)
+	fakeUI = callRouteMapper(t, []string{"foo"}, reqFactory, routeRepo, true)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callRouteMapper([]string{"foo", "bar"}, reqFactory, routeRepo, true)
+	fakeUI = callRouteMapper(t, []string{"foo", "bar"}, reqFactory, routeRepo, true)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
@@ -30,7 +32,7 @@ func TestRouteMapperRequirements(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	callRouteMapper([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, true)
+	callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, true)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.RouteHost, "my-host")
@@ -48,11 +50,14 @@ func TestRouteMapperWhenBinding(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Route: route, Application: app}
 
-	ui := callRouteMapper([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, true)
+	ui := callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, true)
 
-	assert.Contains(t, ui.Outputs[0], "Adding url route")
+	assert.Contains(t, ui.Outputs[0], "Adding route")
 	assert.Contains(t, ui.Outputs[0], "foo.example.com")
 	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, route, routeRepo.BoundRoute)
 	assert.Equal(t, app, routeRepo.BoundApp)
@@ -71,11 +76,14 @@ func TestRouteMapperWhenUnbinding(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Route: route, Application: app}
 
-	ui := callRouteMapper([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, false)
+	ui := callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, false)
 
-	assert.Contains(t, ui.Outputs[0], "Removing url route")
+	assert.Contains(t, ui.Outputs[0], "Removing route")
 	assert.Contains(t, ui.Outputs[0], "foo.example.com")
 	assert.Contains(t, ui.Outputs[0], "my-app")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, route, routeRepo.UnboundRoute)
 	assert.Equal(t, app, routeRepo.UnboundApp)
@@ -83,7 +91,7 @@ func TestRouteMapperWhenUnbinding(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callRouteMapper(args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, bind bool) (ui *testterm.FakeUI) {
+func callRouteMapper(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, bind bool) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	var ctxt *cli.Context
 	if bind {
@@ -92,7 +100,18 @@ func callRouteMapper(args []string, reqFactory *testreq.FakeReqFactory, routeRep
 		ctxt = testcmd.NewContext("unmap-route", args)
 	}
 
-	cmd := NewRouteMapper(ui, routeRepo, bind)
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewRouteMapper(ui, config, routeRepo, bind)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

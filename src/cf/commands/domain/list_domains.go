@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
@@ -12,13 +13,15 @@ import (
 
 type ListDomains struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
-func NewListDomains(ui terminal.UI, domainRepo api.DomainRepository) (cmd *ListDomains) {
+func NewListDomains(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *ListDomains) {
 	cmd = new(ListDomains)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
 }
@@ -41,7 +44,10 @@ func (cmd *ListDomains) GetRequirements(reqFactory requirements.Factory, c *cli.
 func (cmd *ListDomains) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Getting domains in org %s...", org.Name)
+	cmd.ui.Say("Getting domains in org %s...",
+		terminal.EntityNameColor(org.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	domains, apiResponse := cmd.domainRepo.FindAllByOrg(org)
 	if apiResponse.IsNotSuccessful() {

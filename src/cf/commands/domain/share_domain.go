@@ -3,6 +3,7 @@ package domain
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,13 +12,15 @@ import (
 
 type ShareDomain struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewShareDomain(ui terminal.UI, domainRepo api.DomainRepository) (cmd *ShareDomain) {
+func NewShareDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *ShareDomain) {
 	cmd = new(ShareDomain)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
 }
@@ -38,7 +41,10 @@ func (cmd *ShareDomain) GetRequirements(reqFactory requirements.Factory, c *cli.
 func (cmd *ShareDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 
-	cmd.ui.Say("Sharing domain %s...", terminal.EntityNameColor(domainName))
+	cmd.ui.Say("Sharing domain %s as %s...",
+		terminal.EntityNameColor(domainName),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	domain := cf.Domain{Name: domainName}
 

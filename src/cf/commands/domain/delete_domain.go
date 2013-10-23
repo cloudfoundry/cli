@@ -2,6 +2,7 @@ package domain
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,12 +11,16 @@ import (
 
 type DeleteDomain struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
-func NewDeleteDomain(ui terminal.UI, repo api.DomainRepository) (cmd *DeleteDomain) {
-	cmd = &DeleteDomain{ui: ui, domainRepo: repo}
+func NewDeleteDomain(ui terminal.UI, config *configuration.Configuration, repo api.DomainRepository) (cmd *DeleteDomain) {
+	cmd = new(DeleteDomain)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.domainRepo = repo
 	return
 }
 
@@ -41,7 +46,10 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 	force := c.Bool("f")
 
-	cmd.ui.Say("Deleting domain %s...", terminal.EntityNameColor(domainName))
+	cmd.ui.Say("Deleting domain %s as %s...",
+		terminal.EntityNameColor(domainName),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganization())
 	if apiResponse.IsError() {

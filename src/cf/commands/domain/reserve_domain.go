@@ -3,6 +3,7 @@ package domain
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,13 +12,15 @@ import (
 
 type ReserveDomain struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewReserveDomain(ui terminal.UI, domainRepo api.DomainRepository) (cmd *ReserveDomain) {
+func NewReserveDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *ReserveDomain) {
 	cmd = new(ReserveDomain)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
 }
@@ -41,9 +44,11 @@ func (cmd *ReserveDomain) Run(c *cli.Context) {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Reserving domain %s for org %s...",
+	cmd.ui.Say("Reserving domain %s for org %s as %s...",
 		terminal.EntityNameColor(domainName),
-		terminal.EntityNameColor(owningOrg.Name))
+		terminal.EntityNameColor(owningOrg.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	domain := cf.Domain{Name: domainName}
 

@@ -3,6 +3,7 @@ package route
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,14 +12,16 @@ import (
 
 type ReserveRoute struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	routeRepo api.RouteRepository
 	spaceReq  requirements.SpaceRequirement
 	domainReq requirements.DomainRequirement
 }
 
-func NewReserveRoute(ui terminal.UI, routeRepo api.RouteRepository) (cmd *ReserveRoute) {
+func NewReserveRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *ReserveRoute) {
 	cmd = new(ReserveRoute)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
 }
@@ -46,8 +49,12 @@ func (cmd *ReserveRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 	route := cf.Route{Host: c.String("n"), Domain: domain}
 
-	cmd.ui.Say("Reserving url route %s for space %s...",
-		terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(space.Name))
+	cmd.ui.Say("Reserving route %s for org %s / space %s as %s...",
+		terminal.EntityNameColor(route.URL()),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	_, apiResponse := cmd.routeRepo.CreateInSpace(route, domain, space)
 	if apiResponse.IsNotSuccessful() {

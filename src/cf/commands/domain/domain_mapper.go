@@ -3,6 +3,7 @@ package domain
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -12,18 +13,19 @@ import (
 
 type DomainMapper struct {
 	ui         terminal.UI
+	config     *configuration.Configuration
 	domainRepo api.DomainRepository
 	spaceReq   requirements.SpaceRequirement
 	orgReq     requirements.TargetedOrgRequirement
 	bind       bool
 }
 
-func NewDomainMapper(ui terminal.UI, domainRepo api.DomainRepository, bind bool) (cmd *DomainMapper) {
-	cmd = &DomainMapper{
-		ui:         ui,
-		domainRepo: domainRepo,
-		bind:       bind,
-	}
+func NewDomainMapper(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository, bind bool) (cmd *DomainMapper) {
+	cmd = new(DomainMapper)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.domainRepo = domainRepo
+	cmd.bind = bind
 	return
 }
 
@@ -64,13 +66,19 @@ func (cmd *DomainMapper) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 
 	if cmd.bind {
-		cmd.ui.Say("Mapping domain %s to space %s...",
+		cmd.ui.Say("Mapping domain %s to org %s / space %s as %s...",
 			terminal.EntityNameColor(domainName),
-			terminal.EntityNameColor(space.Name))
+			terminal.EntityNameColor(cmd.config.Organization.Name),
+			terminal.EntityNameColor(space.Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
 	} else {
-		cmd.ui.Say("Unmapping domain %s from space %s...",
+		cmd.ui.Say("Unmapping domain %s from org %s / space %s as %s...",
 			terminal.EntityNameColor(domainName),
-			terminal.EntityNameColor(space.Name))
+			terminal.EntityNameColor(cmd.config.Organization.Name),
+			terminal.EntityNameColor(space.Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
 	}
 
 	domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, org)

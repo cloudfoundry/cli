@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -25,16 +27,13 @@ func TestListingRoutes(t *testing.T) {
 		},
 	}
 	routeRepo := &testapi.FakeRouteRepository{FindAllRoutes: routes}
-	config := &configuration.Configuration{
-		Space: cf.Space{Name: "my-space"},
-	}
-	ui := &testterm.FakeUI{}
 
-	cmd := NewListRoutes(ui, config, routeRepo)
-	cmd.Run(testcmd.NewContext("routes", []string{}))
+	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes in space")
 	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "host")
@@ -53,11 +52,8 @@ func TestListingRoutes(t *testing.T) {
 func TestListingRoutesWhenNoneExist(t *testing.T) {
 	routes := []cf.Route{}
 	routeRepo := &testapi.FakeRouteRepository{FindAllRoutes: routes}
-	config := &configuration.Configuration{}
-	ui := &testterm.FakeUI{}
 
-	cmd := NewListRoutes(ui, config, routeRepo)
-	cmd.Run(testcmd.NewContext("routes", []string{}))
+	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -66,12 +62,32 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 
 func TestListingRoutesWhenFindFails(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{FindAllErr: true}
-	config := &configuration.Configuration{}
-	ui := &testterm.FakeUI{}
 
-	cmd := NewListRoutes(ui, config, routeRepo)
-	cmd.Run(testcmd.NewContext("routes", []string{}))
+	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting routes")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
+}
+
+func callListRoutes(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {
+
+	ui = &testterm.FakeUI{}
+
+	ctxt := testcmd.NewContext("list-routes", args)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewListRoutes(ui, config, routeRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+
+	return
 }

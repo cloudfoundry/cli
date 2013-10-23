@@ -2,6 +2,7 @@ package route
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,14 +11,15 @@ import (
 
 type DeleteRoute struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	routeRepo api.RouteRepository
 }
 
-func NewDeleteRoute(ui terminal.UI, routeRepo api.RouteRepository) (cmd *DeleteRoute) {
-	cmd = &DeleteRoute{
-		ui:        ui,
-		routeRepo: routeRepo,
-	}
+func NewDeleteRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *DeleteRoute) {
+	cmd = new(DeleteRoute)
+	cmd.ui = ui
+	cmd.config = config
+	cmd.routeRepo = routeRepo
 	return
 }
 
@@ -56,7 +58,11 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting route %s...", terminal.EntityNameColor(url))
+	cmd.ui.Say("Deleting route %s in org %s / space %s...",
+		terminal.EntityNameColor(url),
+		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.Space.Name),
+	)
 
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(host, domainName)
 	if apiResponse.IsError() {
