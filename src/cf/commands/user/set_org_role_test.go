@@ -56,7 +56,7 @@ func TestSetOrgRole(t *testing.T) {
 
 	ui := callSetOrgRole(t, []string{"some-user", "some-org", "some-role"}, reqFactory, userRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Assigning")
+	assert.Contains(t, ui.Outputs[0], "Assigning role ")
 	assert.Contains(t, ui.Outputs[0], "some-role")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[0], "my-org")

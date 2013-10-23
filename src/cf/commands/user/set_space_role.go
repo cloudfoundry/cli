@@ -57,7 +57,7 @@ func (cmd *SetSpaceRole) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Assigning %s role to %s in org %s / space %s as %s...",
+	cmd.ui.Say("Assigning role %s to user %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(user.Username),
 		terminal.EntityNameColor(org.Name),

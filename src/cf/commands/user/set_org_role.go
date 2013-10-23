@@ -49,7 +49,7 @@ func (cmd *SetOrgRole) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	role := c.Args()[2]
 
-	cmd.ui.Say("Assigning %s role to %s in %s org as %s...",
+	cmd.ui.Say("Assigning role %s to user %s in org %s as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(user.Username),
 		terminal.EntityNameColor(org.Name),

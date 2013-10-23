@@ -58,7 +58,7 @@ func (cmd *UnsetSpaceRole) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Removing %s role from %s in org %s / space %s as %s...",
+	cmd.ui.Say("Removing role %s from user %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(user.Username),
 		terminal.EntityNameColor(org.Name),
