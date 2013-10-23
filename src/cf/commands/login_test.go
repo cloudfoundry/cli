@@ -13,54 +13,66 @@ import (
 )
 
 type LoginTestContext struct {
-	Flags               []string
-	Inputs              []string
-	Config              configuration.Configuration
-	AuthError           bool
-	UpdateEndpointError bool
-	OrgFindByNameErr    bool
-	SpaceFindByNameErr  bool
+
+	// test-specific setup
+	Flags  []string
+	Inputs []string
+	Config configuration.Configuration
+
+	// fakes created by callLogin
+	configRepo   testconfig.FakeConfigRepository
+	ui           *testterm.FakeUI
+	authRepo     *testapi.FakeAuthenticationRepository
+	endpointRepo *testapi.FakeEndpointRepo
+	orgRepo      *testapi.FakeOrgRepository
+	spaceRepo    *testapi.FakeSpaceRepository
 }
 
-func callLogin(t *testing.T, context LoginTestContext) (ui *testterm.FakeUI, authRepo *testapi.FakeAuthenticationRepository, endpointRepo *testapi.FakeEndpointRepo) {
-	configRepo := testconfig.FakeConfigRepository{}
-	configRepo.Delete()
-	config, _ := configRepo.Get()
-	config.Target = context.Config.Target
+// pass defaultBeforeBlock to callLogin instead of nil
+func defaultBeforeBlock(*LoginTestContext) {}
 
-	ui = &testterm.FakeUI{
-		Inputs: context.Inputs,
+func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestContext)) {
+
+	// setup test fakes
+	c.configRepo = testconfig.FakeConfigRepository{}
+	c.ui = &testterm.FakeUI{
+		Inputs: c.Inputs,
 	}
-	authRepo = &testapi.FakeAuthenticationRepository{
+	c.authRepo = &testapi.FakeAuthenticationRepository{
 		AccessToken:  "my_access_token",
 		RefreshToken: "my_refresh_token",
-		ConfigRepo:   configRepo,
-		AuthError:    context.AuthError,
+		ConfigRepo:   c.configRepo,
 	}
-	endpointRepo = &testapi.FakeEndpointRepo{
-		UpdateEndpointError: context.UpdateEndpointError,
-	}
-	orgRepo := &testapi.FakeOrgRepository{
+	c.endpointRepo = &testapi.FakeEndpointRepo{}
+	c.orgRepo = &testapi.FakeOrgRepository{
 		FindByNameOrganization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
-		FindByNameErr:          context.OrgFindByNameErr,
 	}
-	spaceRepo := &testapi.FakeSpaceRepository{
+
+	c.spaceRepo = &testapi.FakeSpaceRepository{
 		FindByNameSpace: cf.Space{Name: "my-space", Guid: "my-space-guid"},
-		FindByNameErr:   context.SpaceFindByNameErr,
 	}
 
-	l := NewLogin(ui, configRepo, authRepo, endpointRepo, orgRepo, spaceRepo)
-	l.Run(testcmd.NewContext("login", context.Flags))
+	// initialize config
+	c.configRepo.Delete()
+	config, _ := c.configRepo.Get()
+	config.Target = c.Config.Target
+	config.Organization = c.Config.Organization
+	config.Space = c.Config.Space
 
-	return
+	// run any test-specific setup
+	beforeBlock(c)
+
+	// run login command
+	l := NewLogin(c.ui, c.configRepo, c.authRepo, c.endpointRepo, c.orgRepo, c.spaceRepo)
+	l.Run(testcmd.NewContext("login", c.Flags))
 }
 
 func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
-	context := LoginTestContext{
+	c := LoginTestContext{
 		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
 	}
 
-	ui, authRepo, endpointRepo := callLogin(t, context)
+	callLogin(t, &c, defaultBeforeBlock)
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -70,19 +82,19 @@ func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, endpointRepo.UpdateEndpointEndpoint, "api.example.com")
-	assert.Equal(t, authRepo.Email, "user@example.com")
-	assert.Equal(t, authRepo.Password, "password")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
 
-	assert.True(t, ui.ShowConfigurationCalled)
+	assert.True(t, c.ui.ShowConfigurationCalled)
 }
 
 func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
-	context := LoginTestContext{
+	c := LoginTestContext{
 		Flags: []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"},
 	}
 
-	ui, authRepo, endpointRepo := callLogin(t, context)
+	callLogin(t, &c, defaultBeforeBlock)
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -92,24 +104,24 @@ func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, endpointRepo.UpdateEndpointEndpoint, "api.example.com")
-	assert.Equal(t, authRepo.Email, "user@example.com")
-	assert.Equal(t, authRepo.Password, "password")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
 
-	assert.True(t, ui.ShowConfigurationCalled)
+	assert.True(t, c.ui.ShowConfigurationCalled)
 }
 
-func TestSuccessfullyLoggingInWithConfig(t *testing.T) {
+func TestSuccessfullyLoggingInWithEndpointSetInConfig(t *testing.T) {
 	existingConfig := configuration.Configuration{
 		Target: "http://api.example.com",
 	}
 
-	context := LoginTestContext{
+	c := LoginTestContext{
 		Inputs: []string{"user@example.com", "password", "my-org", "my-space"},
 		Config: existingConfig,
 	}
 
-	ui, authRepo, endpointRepo := callLogin(t, context)
+	callLogin(t, &c, defaultBeforeBlock)
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -119,20 +131,22 @@ func TestSuccessfullyLoggingInWithConfig(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
-	assert.Equal(t, authRepo.Email, "user@example.com")
-	assert.Equal(t, authRepo.Password, "password")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
 
-	assert.True(t, ui.ShowConfigurationCalled)
+	assert.True(t, c.ui.ShowConfigurationCalled)
 }
 
 func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
-	context := LoginTestContext{
-		Flags:     []string{"-u", "user@example.com"},
-		Inputs:    []string{"api.example.com", "password", "password2", "password3"},
-		AuthError: true,
+	c := LoginTestContext{
+		Flags:  []string{"-u", "user@example.com"},
+		Inputs: []string{"api.example.com", "password", "password2", "password3"},
 	}
-	ui, _, _ := callLogin(t, context)
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.authRepo.AuthError = true
+	})
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -142,18 +156,19 @@ func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
 
-	failIndex := len(ui.Outputs) - 2
-	assert.Equal(t, ui.Outputs[failIndex], "FAILED")
-	assert.Equal(t, len(ui.PasswordPrompts), 3)
+	failIndex := len(c.ui.Outputs) - 2
+	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
+	assert.Equal(t, len(c.ui.PasswordPrompts), 3)
 }
 
 func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
-	context := LoginTestContext{
-		Flags:               []string{"-u", "user@example.com"},
-		Inputs:              []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
-		UpdateEndpointError: true,
+	c := LoginTestContext{
+		Flags:  []string{"-u", "user@example.com"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
 	}
-	ui, _, _ := callLogin(t, context)
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.endpointRepo.UpdateEndpointError = true
+	})
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -163,17 +178,19 @@ func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
 
-	failIndex := len(ui.Outputs) - 2
-	assert.Equal(t, ui.Outputs[failIndex], "FAILED")
+	failIndex := len(c.ui.Outputs) - 2
+	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
 }
 
 func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
-	context := LoginTestContext{
-		Flags:            []string{"-u", "user@example.com"},
-		Inputs:           []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
-		OrgFindByNameErr: true,
+	c := LoginTestContext{
+		Flags:  []string{"-u", "user@example.com"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
 	}
-	ui, _, _ := callLogin(t, context)
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.FindByNameErr = true
+	})
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -183,17 +200,19 @@ func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	failIndex := len(ui.Outputs) - 2
-	assert.Equal(t, ui.Outputs[failIndex], "FAILED")
+	failIndex := len(c.ui.Outputs) - 2
+	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
 }
 
 func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
-	context := LoginTestContext{
-		Flags:              []string{"-u", "user@example.com"},
-		Inputs:             []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
-		SpaceFindByNameErr: true,
+	c := LoginTestContext{
+		Flags:  []string{"-u", "user@example.com"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
 	}
-	ui, _, _ := callLogin(t, context)
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.spaceRepo.FindByNameErr = true
+	})
 
 	savedConfig := testconfig.SavedConfiguration
 
@@ -203,6 +222,6 @@ func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	failIndex := len(ui.Outputs) - 2
-	assert.Equal(t, ui.Outputs[failIndex], "FAILED")
+	failIndex := len(c.ui.Outputs) - 2
+	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
 }
