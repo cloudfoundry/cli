@@ -3,6 +3,7 @@ package servicebroker
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,11 +12,13 @@ import (
 
 type CreateServiceBroker struct {
 	ui                terminal.UI
+	config            *configuration.Configuration
 	serviceBrokerRepo api.ServiceBrokerRepository
 }
 
-func NewCreateServiceBroker(ui terminal.UI, serviceBrokerRepo api.ServiceBrokerRepository) (cmd CreateServiceBroker) {
+func NewCreateServiceBroker(ui terminal.UI, config *configuration.Configuration, serviceBrokerRepo api.ServiceBrokerRepository) (cmd CreateServiceBroker) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.serviceBrokerRepo = serviceBrokerRepo
 	return
 }
@@ -40,7 +43,10 @@ func (cmd CreateServiceBroker) Run(c *cli.Context) {
 		Password: c.Args()[2],
 		Url:      c.Args()[3],
 	}
-	cmd.ui.Say("Creating service broker %s...", terminal.EntityNameColor(serviceBroker.Name))
+	cmd.ui.Say("Creating service broker %s as %s...",
+		terminal.EntityNameColor(serviceBroker.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	apiResponse := cmd.serviceBrokerRepo.Create(serviceBroker)
 	if apiResponse.IsNotSuccessful() {

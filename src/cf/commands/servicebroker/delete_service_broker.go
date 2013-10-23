@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -9,12 +10,14 @@ import (
 )
 
 type DeleteServiceBroker struct {
-	ui   terminal.UI
-	repo api.ServiceBrokerRepository
+	ui     terminal.UI
+	config *configuration.Configuration
+	repo   api.ServiceBrokerRepository
 }
 
-func NewDeleteServiceBroker(ui terminal.UI, repo api.ServiceBrokerRepository) (cmd DeleteServiceBroker) {
+func NewDeleteServiceBroker(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd DeleteServiceBroker) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.repo = repo
 	return
 }
@@ -45,7 +48,10 @@ func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting service broker %s...", terminal.EntityNameColor(brokerName))
+	cmd.ui.Say("Deleting service broker %s as %s...",
+		terminal.EntityNameColor(brokerName),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	broker, apiResponse := cmd.repo.FindByName(brokerName)
 

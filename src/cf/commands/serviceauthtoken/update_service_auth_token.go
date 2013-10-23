@@ -2,6 +2,7 @@ package serviceauthtoken
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,11 +11,13 @@ import (
 
 type UpdateServiceAuthToken struct {
 	ui            terminal.UI
+	config        *configuration.Configuration
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewUpdateServiceAuthToken(ui terminal.UI, authTokenRepo api.ServiceAuthTokenRepository) (cmd UpdateServiceAuthToken) {
+func NewUpdateServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd UpdateServiceAuthToken) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
 }
@@ -33,7 +36,7 @@ func (cmd UpdateServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 }
 
 func (cmd UpdateServiceAuthToken) Run(c *cli.Context) {
-	cmd.ui.Say("Updating service auth token...")
+	cmd.ui.Say("Updating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
 	serviceAuthToken, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
 	if apiResponse.IsNotSuccessful() {

@@ -2,6 +2,7 @@ package organization
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
@@ -10,12 +11,14 @@ import (
 
 type ListQuotas struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	quotaRepo api.QuotaRepository
 }
 
-func NewListQuotas(ui terminal.UI, quotaRepo api.QuotaRepository) (cmd *ListQuotas) {
+func NewListQuotas(ui terminal.UI, config *configuration.Configuration, quotaRepo api.QuotaRepository) (cmd *ListQuotas) {
 	cmd = new(ListQuotas)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.quotaRepo = quotaRepo
 	return
 }
@@ -28,7 +31,7 @@ func (cmd *ListQuotas) GetRequirements(reqFactory requirements.Factory, c *cli.C
 }
 
 func (cmd *ListQuotas) Run(c *cli.Context) {
-	cmd.ui.Say("Getting quotas...")
+	cmd.ui.Say("Getting quotas as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
 	quotas, apiResponse := cmd.quotaRepo.FindAll()
 

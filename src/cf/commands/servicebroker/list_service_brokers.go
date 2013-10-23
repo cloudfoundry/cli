@@ -2,18 +2,21 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
 )
 
 type ListServiceBrokers struct {
-	ui   terminal.UI
-	repo api.ServiceBrokerRepository
+	ui     terminal.UI
+	config *configuration.Configuration
+	repo   api.ServiceBrokerRepository
 }
 
-func NewListServiceBrokers(ui terminal.UI, repo api.ServiceBrokerRepository) (cmd ListServiceBrokers) {
+func NewListServiceBrokers(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd ListServiceBrokers) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.repo = repo
 	return
 }
@@ -23,7 +26,7 @@ func (cmd ListServiceBrokers) GetRequirements(reqFactory requirements.Factory, c
 }
 
 func (cmd ListServiceBrokers) Run(c *cli.Context) {
-	cmd.ui.Say("Getting service brokers...")
+	cmd.ui.Say("Getting service brokers as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
 	serviceBrokers, apiResponse := cmd.repo.FindAll()
 

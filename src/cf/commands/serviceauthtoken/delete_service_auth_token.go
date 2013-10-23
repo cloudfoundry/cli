@@ -2,6 +2,7 @@ package serviceauthtoken
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,11 +12,13 @@ import (
 
 type DeleteServiceAuthToken struct {
 	ui            terminal.UI
+	config        *configuration.Configuration
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewDeleteServiceAuthToken(ui terminal.UI, authTokenRepo api.ServiceAuthTokenRepository) (cmd DeleteServiceAuthToken) {
+func NewDeleteServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd DeleteServiceAuthToken) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
 }
@@ -46,7 +49,7 @@ func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting service auth token...")
+	cmd.ui.Say("Deleting service auth token as %s", terminal.EntityNameColor(cmd.config.Username()))
 	token, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)

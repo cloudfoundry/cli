@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -9,12 +10,14 @@ import (
 )
 
 type UpdateServiceBroker struct {
-	ui   terminal.UI
-	repo api.ServiceBrokerRepository
+	ui     terminal.UI
+	config *configuration.Configuration
+	repo   api.ServiceBrokerRepository
 }
 
-func NewUpdateServiceBroker(ui terminal.UI, repo api.ServiceBrokerRepository) (cmd UpdateServiceBroker) {
+func NewUpdateServiceBroker(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd UpdateServiceBroker) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.repo = repo
 	return
 }
@@ -38,7 +41,10 @@ func (cmd UpdateServiceBroker) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Updating service broker %s...", terminal.EntityNameColor(serviceBroker.Name))
+	cmd.ui.Say("Updating service broker %s as %s...",
+		terminal.EntityNameColor(serviceBroker.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	serviceBroker.Username = c.Args()[1]
 	serviceBroker.Password = c.Args()[2]

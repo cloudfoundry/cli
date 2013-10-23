@@ -2,6 +2,7 @@ package servicebroker
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -9,12 +10,14 @@ import (
 )
 
 type RenameServiceBroker struct {
-	ui   terminal.UI
-	repo api.ServiceBrokerRepository
+	ui     terminal.UI
+	config *configuration.Configuration
+	repo   api.ServiceBrokerRepository
 }
 
-func NewRenameServiceBroker(ui terminal.UI, repo api.ServiceBrokerRepository) (cmd RenameServiceBroker) {
+func NewRenameServiceBroker(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd RenameServiceBroker) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.repo = repo
 	return
 }
@@ -38,7 +41,11 @@ func (cmd RenameServiceBroker) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Renaming service broker %s...", terminal.EntityNameColor(serviceBroker.Name))
+	cmd.ui.Say("Renaming service broker %s to %s as %s",
+		terminal.EntityNameColor(serviceBroker.Name),
+		terminal.EntityNameColor(c.Args()[1]),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	serviceBroker.Name = c.Args()[1]
 

@@ -3,6 +3,7 @@ package serviceauthtoken
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,11 +12,13 @@ import (
 
 type CreateServiceAuthToken struct {
 	ui            terminal.UI
+	config        *configuration.Configuration
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewCreateServiceAuthToken(ui terminal.UI, authTokenRepo api.ServiceAuthTokenRepository) (cmd CreateServiceAuthToken) {
+func NewCreateServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd CreateServiceAuthToken) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
 }
@@ -34,7 +37,7 @@ func (cmd CreateServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 }
 
 func (cmd CreateServiceAuthToken) Run(c *cli.Context) {
-	cmd.ui.Say("Creating service auth token...")
+	cmd.ui.Say("Creating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
 	serviceAuthTokenRepo := cf.ServiceAuthToken{
 		Label:    c.Args()[0],

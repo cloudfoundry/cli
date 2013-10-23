@@ -3,9 +3,11 @@ package serviceauthtoken_test
 import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -16,11 +18,11 @@ func TestListServiceAuthTokensRequirements(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 
 	reqFactory.LoginSuccess = false
-	callListServiceAuthTokens(reqFactory, authTokenRepo)
+	callListServiceAuthTokens(t, reqFactory, authTokenRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callListServiceAuthTokens(reqFactory, authTokenRepo)
+	callListServiceAuthTokens(t, reqFactory, authTokenRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
@@ -33,8 +35,9 @@ func TestListServiceAuthTokens(t *testing.T) {
 		cf.ServiceAuthToken{Label: "a second label", Provider: "a second provider"},
 	}
 
-	ui := callListServiceAuthTokens(reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Getting service auth tokens")
+	ui := callListServiceAuthTokens(t, reqFactory, authTokenRepo)
+	assert.Contains(t, ui.Outputs[0], "Getting service auth tokens as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "label")
@@ -47,9 +50,21 @@ func TestListServiceAuthTokens(t *testing.T) {
 	assert.Contains(t, ui.Outputs[5], "a second provider")
 }
 
-func callListServiceAuthTokens(reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callListServiceAuthTokens(t *testing.T, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-	cmd := NewListServiceAuthTokens(ui, authTokenRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewListServiceAuthTokens(ui, config, authTokenRepo)
 	ctxt := testcmd.NewContext("service-auth-tokens", []string{})
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 

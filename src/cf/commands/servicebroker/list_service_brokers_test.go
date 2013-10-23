@@ -3,9 +3,12 @@ package servicebroker_test
 import (
 	"cf"
 	. "cf/commands/servicebroker"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -28,12 +31,10 @@ func TestListServiceBrokers(t *testing.T) {
 		FindAllServiceBrokers: serviceBrokers,
 	}
 
-	ui := &testterm.FakeUI{}
+	ui := callListServiceBrokers(t, []string{}, repo)
 
-	cmd := NewListServiceBrokers(ui, repo)
-	cmd.Run(testcmd.NewContext("service-brokers", []string{}))
-
-	assert.Contains(t, ui.Outputs[0], "Getting service brokers...")
+	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "Name")
@@ -51,23 +52,41 @@ func TestListingServiceBrokersWhenNoneExist(t *testing.T) {
 		FindAllServiceBrokers: []cf.ServiceBroker{},
 	}
 
-	ui := &testterm.FakeUI{}
+	ui := callListServiceBrokers(t, []string{}, repo)
 
-	cmd := NewListServiceBrokers(ui, repo)
-	cmd.Run(testcmd.NewContext("service-brokers", []string{}))
-
-	assert.Contains(t, ui.Outputs[0], "Getting service brokers...")
+	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "No service brokers found")
 }
 
 func TestListingServiceBrokersWhenFindFails(t *testing.T) {
 	repo := &testapi.FakeServiceBrokerRepo{FindAllErr: true}
-	ui := &testterm.FakeUI{}
 
-	cmd := NewListServiceBrokers(ui, repo)
-	cmd.Run(testcmd.NewContext("service-brokers", []string{}))
+	ui := callListServiceBrokers(t, []string{}, repo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting service brokers...")
+	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
+}
+
+func callListServiceBrokers(t *testing.T, args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	ctxt := testcmd.NewContext("service-brokers", args)
+	cmd := NewListServiceBrokers(ui, config, serviceBrokerRepo)
+	testcmd.RunCommand(cmd, ctxt, &testreq.FakeReqFactory{})
+
+	return
 }

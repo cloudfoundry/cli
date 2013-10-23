@@ -3,10 +3,12 @@ package serviceauthtoken_test
 import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
+	"cf/configuration"
 	"cf/net"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -16,13 +18,13 @@ func TestDeleteServiceAuthTokenFailsWithUsage(t *testing.T) {
 	authTokenRepo := &testapi.FakeAuthTokenRepo{}
 	reqFactory := &testreq.FakeReqFactory{}
 
-	ui := callDeleteServiceAuthToken([]string{}, reqFactory, authTokenRepo)
+	ui := callDeleteServiceAuthToken(t, []string{}, []string{"Y"}, reqFactory, authTokenRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callDeleteServiceAuthToken([]string{"arg1"}, reqFactory, authTokenRepo)
+	ui = callDeleteServiceAuthToken(t, []string{"arg1"}, []string{"Y"}, reqFactory, authTokenRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callDeleteServiceAuthToken([]string{"arg1", "arg2"}, reqFactory, authTokenRepo)
+	ui = callDeleteServiceAuthToken(t, []string{"arg1", "arg2"}, []string{"Y"}, reqFactory, authTokenRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
@@ -32,11 +34,11 @@ func TestDeleteServiceAuthTokenRequirements(t *testing.T) {
 	args := []string{"arg1", "arg2"}
 
 	reqFactory.LoginSuccess = true
-	callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
+	callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = false
-	callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
+	callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
@@ -51,8 +53,9 @@ func TestDeleteServiceAuthToken(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
 
-	ui := callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Deleting service auth token...")
+	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
+	assert.Contains(t, ui.Outputs[0], "Deleting service auth token as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, authTokenRepo.FindByLabelAndProviderLabel, "a label")
 	assert.Equal(t, authTokenRepo.FindByLabelAndProviderProvider, "a provider")
@@ -65,13 +68,8 @@ func TestDeleteServiceAuthTokenWithN(t *testing.T) {
 	authTokenRepo := &testapi.FakeAuthTokenRepo{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
-	ui := &testterm.FakeUI{
-		Inputs: []string{"N"},
-	}
-	ctxt := testcmd.NewContext("delete-service-auth-token", args)
-	cmd := NewDeleteServiceAuthToken(ui, authTokenRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	ui := callDeleteServiceAuthToken(t, args, []string{"N"}, reqFactory, authTokenRepo)
 
 	assert.Contains(t, ui.Prompts[0], "Are you sure you want to delete")
 	assert.Contains(t, ui.Prompts[0], "a label a provider")
@@ -89,13 +87,8 @@ func TestDeleteServiceAuthTokenWithY(t *testing.T) {
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
-	ui := &testterm.FakeUI{
-		Inputs: []string{"Y"},
-	}
-	ctxt := testcmd.NewContext("delete-service-auth-token", args)
-	cmd := NewDeleteServiceAuthToken(ui, authTokenRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "a label")
@@ -115,11 +108,7 @@ func TestDeleteServiceAuthTokenWithForce(t *testing.T) {
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"-f", "a label", "a provider"}
-	ui := &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("delete-service-auth-token", args)
-	cmd := NewDeleteServiceAuthToken(ui, authTokenRepo)
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
 
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Contains(t, ui.Outputs[0], "Deleting")
@@ -135,8 +124,9 @@ func TestDeleteServiceAuthTokenWhenTokenDoesNotExist(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
 
-	ui := callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Deleting service auth token...")
+	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
+	assert.Contains(t, ui.Outputs[0], "Deleting service auth token as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "does not exist")
 }
@@ -148,17 +138,30 @@ func TestDeleteServiceAuthTokenFailsWithError(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	args := []string{"a label", "a provider"}
 
-	ui := callDeleteServiceAuthToken(args, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Deleting service auth token...")
+	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
+	assert.Contains(t, ui.Outputs[0], "Deleting service auth token as")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
 	assert.Contains(t, ui.Outputs[2], "OH NOES")
 }
 
-func callDeleteServiceAuthToken(args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callDeleteServiceAuthToken(t *testing.T, args []string, inputs []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{
-		Inputs: []string{"Y"},
+		Inputs: inputs,
 	}
-	cmd := NewDeleteServiceAuthToken(ui, authTokenRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewDeleteServiceAuthToken(ui, config, authTokenRepo)
 	ctxt := testcmd.NewContext("delete-service-auth-token", args)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
