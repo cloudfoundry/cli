@@ -39,7 +39,7 @@ func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader stri
 	}
 
 	// Calculate padding
-	longestHeader := fmt.Sprintf("%s [Executor] ", timeFormat)
+	longestHeader := fmt.Sprintf("%s  [API] ", timeFormat)
 	expectedHeaderLength := len(longestHeader)
 	padding := strings.Repeat(" ", expectedHeaderLength-len(logHeader))
 
