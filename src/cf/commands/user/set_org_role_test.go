@@ -3,9 +3,11 @@ package user_test
 import (
 	"cf"
 	. "cf/commands/user"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -15,16 +17,16 @@ func TestSetOrgRoleFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	userRepo := &testapi.FakeUserRepository{}
 
-	ui := callSetOrgRole([]string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+	ui := callSetOrgRole(t, []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 	assert.False(t, ui.FailedWithUsage)
 
-	ui = callSetOrgRole([]string{"my-user", "my-org"}, reqFactory, userRepo)
+	ui = callSetOrgRole(t, []string{"my-user", "my-org"}, reqFactory, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSetOrgRole([]string{"my-user"}, reqFactory, userRepo)
+	ui = callSetOrgRole(t, []string{"my-user"}, reqFactory, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSetOrgRole([]string{}, reqFactory, userRepo)
+	ui = callSetOrgRole(t, []string{}, reqFactory, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 }
 
@@ -33,11 +35,11 @@ func TestSetOrgRoleRequirements(t *testing.T) {
 	userRepo := &testapi.FakeUserRepository{}
 
 	reqFactory.LoginSuccess = false
-	callSetOrgRole([]string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+	callSetOrgRole(t, []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callSetOrgRole([]string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+	callSetOrgRole(t, []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, reqFactory.UserUsername, "my-user")
@@ -52,12 +54,13 @@ func TestSetOrgRole(t *testing.T) {
 	}
 	userRepo := &testapi.FakeUserRepository{}
 
-	ui := callSetOrgRole([]string{"some-user", "some-org", "some-role"}, reqFactory, userRepo)
+	ui := callSetOrgRole(t, []string{"some-user", "some-org", "some-role"}, reqFactory, userRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Assigning")
 	assert.Contains(t, ui.Outputs[0], "some-role")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.SetOrgRoleUser, reqFactory.User)
 	assert.Equal(t, userRepo.SetOrgRoleOrganization, reqFactory.Organization)
@@ -66,10 +69,22 @@ func TestSetOrgRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callSetOrgRole(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSetOrgRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-org-role", args)
-	cmd := NewSetOrgRole(ui, userRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "current-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewSetOrgRole(ui, config, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

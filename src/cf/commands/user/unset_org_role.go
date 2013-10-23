@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,14 +11,16 @@ import (
 
 type UnsetOrgRole struct {
 	ui       terminal.UI
+	config   *configuration.Configuration
 	userRepo api.UserRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }
 
-func NewUnsetOrgRole(ui terminal.UI, userRepo api.UserRepository) (cmd *UnsetOrgRole) {
+func NewUnsetOrgRole(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd *UnsetOrgRole) {
 	cmd = new(UnsetOrgRole)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.userRepo = userRepo
 
 	return
@@ -47,10 +50,11 @@ func (cmd *UnsetOrgRole) Run(c *cli.Context) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Removing %s role from %s in %s org...",
+	cmd.ui.Say("Removing %s role from %s in %s org as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(c.Args()[0]),
 		terminal.EntityNameColor(c.Args()[1]),
+		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
 	apiResponse := cmd.userRepo.UnsetOrgRole(user, org, role)

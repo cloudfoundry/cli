@@ -3,9 +3,11 @@ package user_test
 import (
 	"cf"
 	. "cf/commands/user"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -14,19 +16,19 @@ import (
 func TestSetSpaceRoleFailsWithUsage(t *testing.T) {
 	reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
-	ui := callSetSpaceRole([]string{}, reqFactory, spaceRepo, userRepo)
+	ui := callSetSpaceRole(t, []string{}, reqFactory, spaceRepo, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSetSpaceRole([]string{"my-user"}, reqFactory, spaceRepo, userRepo)
+	ui = callSetSpaceRole(t, []string{"my-user"}, reqFactory, spaceRepo, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSetSpaceRole([]string{"my-user", "my-org"}, reqFactory, spaceRepo, userRepo)
+	ui = callSetSpaceRole(t, []string{"my-user", "my-org"}, reqFactory, spaceRepo, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
+	ui = callSetSpaceRole(t, []string{"my-user", "my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSetSpaceRole([]string{"my-user", "my-org", "my-space", "my-role"}, reqFactory, spaceRepo, userRepo)
+	ui = callSetSpaceRole(t, []string{"my-user", "my-org", "my-space", "my-role"}, reqFactory, spaceRepo, userRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
@@ -35,11 +37,11 @@ func TestSetSpaceRoleRequirements(t *testing.T) {
 	reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
 	reqFactory.LoginSuccess = false
-	callSetSpaceRole(args, reqFactory, spaceRepo, userRepo)
+	callSetSpaceRole(t, args, reqFactory, spaceRepo, userRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callSetSpaceRole(args, reqFactory, spaceRepo, userRepo)
+	callSetSpaceRole(t, args, reqFactory, spaceRepo, userRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, reqFactory.UserUsername, "username")
@@ -56,7 +58,7 @@ func TestSetSpaceRole(t *testing.T) {
 
 	spaceRepo.FindByNameInOrgSpace = cf.Space{Guid: "my-space-guid", Name: "my-space"}
 
-	ui := callSetSpaceRole(args, reqFactory, spaceRepo, userRepo)
+	ui := callSetSpaceRole(t, args, reqFactory, spaceRepo, userRepo)
 
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "some-space")
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrg, reqFactory.Organization)
@@ -64,8 +66,9 @@ func TestSetSpaceRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Assigning")
 	assert.Contains(t, ui.Outputs[0], "some-role")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.SetSpaceRoleUser, reqFactory.User)
 	assert.Equal(t, userRepo.SetSpaceRoleSpace, spaceRepo.FindByNameInOrgSpace)
@@ -81,10 +84,22 @@ func getSetSpaceRoleDeps() (reqFactory *testreq.FakeReqFactory, spaceRepo *testa
 	return
 }
 
-func callSetSpaceRole(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSetSpaceRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-space-role", args)
-	cmd := NewSetSpaceRole(ui, spaceRepo, userRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "current-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewSetSpaceRole(ui, config, spaceRepo, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,15 +11,17 @@ import (
 
 type SetSpaceRole struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSetSpaceRole(ui terminal.UI, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SetSpaceRole) {
+func NewSetSpaceRole(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SetSpaceRole) {
 	cmd = new(SetSpaceRole)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	cmd.userRepo = userRepo
 	return
@@ -54,11 +57,12 @@ func (cmd *SetSpaceRole) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Assigning %s role to %s in %s space in %s org...",
+	cmd.ui.Say("Assigning %s role to %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(user.Username),
-		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(org.Name),
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
 	apiResponse = cmd.userRepo.SetSpaceRole(user, space, role)

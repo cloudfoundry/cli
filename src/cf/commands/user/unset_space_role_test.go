@@ -3,9 +3,11 @@ package user_test
 import (
 	"cf"
 	. "cf/commands/user"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -14,19 +16,19 @@ import (
 func TestUnsetSpaceRoleFailsWithUsage(t *testing.T) {
 	reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 
-	ui := callUnsetSpaceRole([]string{}, spaceRepo, userRepo, reqFactory)
+	ui := callUnsetSpaceRole(t, []string{}, spaceRepo, userRepo, reqFactory)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callUnsetSpaceRole([]string{"username"}, spaceRepo, userRepo, reqFactory)
+	ui = callUnsetSpaceRole(t, []string{"username"}, spaceRepo, userRepo, reqFactory)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callUnsetSpaceRole([]string{"username", "org"}, spaceRepo, userRepo, reqFactory)
+	ui = callUnsetSpaceRole(t, []string{"username", "org"}, spaceRepo, userRepo, reqFactory)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, reqFactory)
+	ui = callUnsetSpaceRole(t, []string{"username", "org", "space"}, spaceRepo, userRepo, reqFactory)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callUnsetSpaceRole([]string{"username", "org", "space", "role"}, spaceRepo, userRepo, reqFactory)
+	ui = callUnsetSpaceRole(t, []string{"username", "org", "space", "role"}, spaceRepo, userRepo, reqFactory)
 	assert.False(t, ui.FailedWithUsage)
 }
 
@@ -35,11 +37,11 @@ func TestUnsetSpaceRoleRequirements(t *testing.T) {
 	args := []string{"username", "org", "space", "role"}
 
 	reqFactory.LoginSuccess = false
-	callUnsetSpaceRole(args, spaceRepo, userRepo, reqFactory)
+	callUnsetSpaceRole(t, args, spaceRepo, userRepo, reqFactory)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callUnsetSpaceRole(args, spaceRepo, userRepo, reqFactory)
+	callUnsetSpaceRole(t, args, spaceRepo, userRepo, reqFactory)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, reqFactory.UserUsername, "username")
@@ -59,16 +61,17 @@ func TestUnsetSpaceRole(t *testing.T) {
 
 	args := []string{"my-username", "my-org", "my-space", "my-role"}
 
-	ui := callUnsetSpaceRole(args, spaceRepo, userRepo, reqFactory)
+	ui := callUnsetSpaceRole(t, args, spaceRepo, userRepo, reqFactory)
 
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "my-space")
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrg, reqFactory.Organization)
 
 	assert.Contains(t, ui.Outputs[0], "Removing")
+	assert.Contains(t, ui.Outputs[0], "my-role")
+	assert.Contains(t, ui.Outputs[0], "some-user")
 	assert.Contains(t, ui.Outputs[0], "some-org")
 	assert.Contains(t, ui.Outputs[0], "some-space")
-	assert.Contains(t, ui.Outputs[0], "some-user")
-	assert.Contains(t, ui.Outputs[0], "my-role")
+	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.UnsetSpaceRoleRole, "my-role")
 	assert.Equal(t, userRepo.UnsetSpaceRoleUser, user)
@@ -84,10 +87,22 @@ func getUnsetSpaceRoleDeps() (reqFactory *testreq.FakeReqFactory, spaceRepo *tes
 	return
 }
 
-func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callUnsetSpaceRole(t *testing.T, args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("unset-space-role", args)
-	cmd := NewUnsetSpaceRole(ui, spaceRepo, userRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "current-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -3,6 +3,7 @@ package user
 import (
 	"cf"
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,11 +12,13 @@ import (
 
 type CreateUser struct {
 	ui       terminal.UI
+	config   *configuration.Configuration
 	userRepo api.UserRepository
 }
 
-func NewCreateUser(ui terminal.UI, userRepo api.UserRepository) (cmd CreateUser) {
+func NewCreateUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd CreateUser) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
@@ -35,7 +38,10 @@ func (cmd CreateUser) Run(c *cli.Context) {
 	username := c.Args()[0]
 	password := c.Args()[1]
 
-	cmd.ui.Say("Creating user %s...", terminal.EntityNameColor(username))
+	cmd.ui.Say("Creating user %s as %s...",
+		terminal.EntityNameColor(username),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	user := cf.User{
 		Username: username,

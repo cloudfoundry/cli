@@ -3,9 +3,11 @@ package user_test
 import (
 	"cf"
 	. "cf/commands/user"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -16,13 +18,13 @@ func TestSpaceUsersFailsWithUsage(t *testing.T) {
 	spaceRepo := &testapi.FakeSpaceRepository{}
 	userRepo := &testapi.FakeUserRepository{}
 
-	ui := callSpaceUsers([]string{}, reqFactory, spaceRepo, userRepo)
+	ui := callSpaceUsers(t, []string{}, reqFactory, spaceRepo, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSpaceUsers([]string{"my-org"}, reqFactory, spaceRepo, userRepo)
+	ui = callSpaceUsers(t, []string{"my-org"}, reqFactory, spaceRepo, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callSpaceUsers([]string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
+	ui = callSpaceUsers(t, []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
@@ -33,11 +35,11 @@ func TestSpaceUsersRequirements(t *testing.T) {
 	args := []string{"my-org", "my-space"}
 
 	reqFactory.LoginSuccess = false
-	callSpaceUsers(args, reqFactory, spaceRepo, userRepo)
+	callSpaceUsers(t, args, reqFactory, spaceRepo, userRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callSpaceUsers(args, reqFactory, spaceRepo, userRepo)
+	callSpaceUsers(t, args, reqFactory, spaceRepo, userRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, "my-org", reqFactory.OrganizationName)
@@ -61,14 +63,15 @@ func TestSpaceUsers(t *testing.T) {
 	}
 	userRepo := &testapi.FakeUserRepository{FindAllInSpaceByRoleUsersByRole: usersByRole}
 
-	ui := callSpaceUsers([]string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
+	ui := callSpaceUsers(t, []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "my-space")
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrg, org)
 
-	assert.Contains(t, ui.Outputs[0], "Getting users in space")
-	assert.Contains(t, ui.Outputs[0], "Space1")
+	assert.Contains(t, ui.Outputs[0], "Getting users in org")
 	assert.Contains(t, ui.Outputs[0], "Org1")
+	assert.Contains(t, ui.Outputs[0], "Space1")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, userRepo.FindAllInSpaceByRoleSpace, space)
 
@@ -82,9 +85,21 @@ func TestSpaceUsers(t *testing.T) {
 	assert.Contains(t, ui.Outputs[8], "My User 3")
 }
 
-func callSpaceUsers(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSpaceUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	cmd := NewSpaceUsers(ui, spaceRepo, userRepo)
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewSpaceUsers(ui, config, spaceRepo, userRepo)
 	ctxt := testcmd.NewContext("space-users", args)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

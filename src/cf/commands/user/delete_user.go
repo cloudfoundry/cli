@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,11 +11,13 @@ import (
 
 type DeleteUser struct {
 	ui       terminal.UI
+	config   *configuration.Configuration
 	userRepo api.UserRepository
 }
 
-func NewDeleteUser(ui terminal.UI, userRepo api.UserRepository) (cmd DeleteUser) {
+func NewDeleteUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd DeleteUser) {
 	cmd.ui = ui
+	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
@@ -42,7 +45,10 @@ func (cmd DeleteUser) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Deleting user %s...", terminal.EntityNameColor(username))
+	cmd.ui.Say("Deleting user %s as %s...",
+		terminal.EntityNameColor(username),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	user, apiResponse := cmd.userRepo.FindByUsername(username)
 	if apiResponse.IsError() {

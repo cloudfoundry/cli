@@ -3,9 +3,11 @@ package user_test
 import (
 	"cf"
 	. "cf/commands/user"
+	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -14,10 +16,10 @@ import (
 func TestOrgUsersFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	userRepo := &testapi.FakeUserRepository{}
-	ui := callOrgUsers([]string{}, reqFactory, userRepo)
+	ui := callOrgUsers(t, []string{}, reqFactory, userRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callOrgUsers([]string{"Org1"}, reqFactory, userRepo)
+	ui = callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
@@ -27,11 +29,11 @@ func TestOrgUsersRequirements(t *testing.T) {
 	args := []string{"Org1"}
 
 	reqFactory.LoginSuccess = false
-	callOrgUsers(args, reqFactory, userRepo)
+	callOrgUsers(t, args, reqFactory, userRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
-	callOrgUsers(args, reqFactory, userRepo)
+	callOrgUsers(t, args, reqFactory, userRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	assert.Equal(t, "Org1", reqFactory.OrganizationName)
@@ -51,10 +53,11 @@ func TestOrgUsers(t *testing.T) {
 		Organization: org,
 	}
 
-	ui := callOrgUsers([]string{"Org1"}, reqFactory, userRepo)
+	ui := callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting users in org")
 	assert.Contains(t, ui.Outputs[0], "Found Org")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, org, userRepo.FindAllInOrgByRoleOrganization)
 
@@ -68,10 +71,21 @@ func TestOrgUsers(t *testing.T) {
 	assert.Contains(t, ui.Outputs[8], "user3")
 }
 
-func callOrgUsers(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callOrgUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
-	cmd := NewOrgUsers(ui, userRepo)
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+
+	config := &configuration.Configuration{
+		Space:        cf.Space{Name: "my-space"},
+		Organization: cf.Organization{Name: "my-org"},
+		AccessToken:  token,
+	}
+
+	cmd := NewOrgUsers(ui, config, userRepo)
 	ctxt := testcmd.NewContext("org-users", args)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

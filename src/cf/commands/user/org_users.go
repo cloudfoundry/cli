@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,13 +11,15 @@ import (
 
 type OrgUsers struct {
 	ui       terminal.UI
+	config   *configuration.Configuration
 	orgReq   requirements.OrganizationRequirement
 	userRepo api.UserRepository
 }
 
-func NewOrgUsers(ui terminal.UI, userRepo api.UserRepository) (cmd *OrgUsers) {
+func NewOrgUsers(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd *OrgUsers) {
 	cmd = new(OrgUsers)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
@@ -38,7 +41,10 @@ func (cmd *OrgUsers) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 func (cmd *OrgUsers) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Getting users in org %s...", terminal.EntityNameColor(org.Name))
+	cmd.ui.Say("Getting users in org %s as %s...",
+		terminal.EntityNameColor(org.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	usersByRole, apiResponse := cmd.userRepo.FindAllInOrgByRole(org)
 	if apiResponse.IsNotSuccessful() {

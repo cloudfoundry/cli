@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,14 +11,16 @@ import (
 
 type SpaceUsers struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 	userRepo  api.UserRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSpaceUsers(ui terminal.UI, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
+func NewSpaceUsers(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
 	cmd = new(SpaceUsers)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	cmd.userRepo = userRepo
 	return
@@ -46,9 +49,11 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 		cmd.ui.Failed(apiResponse.Message)
 	}
 
-	cmd.ui.Say("Getting users in space %s in org %s",
+	cmd.ui.Say("Getting users in org %s / space %s as %s",
+		terminal.EntityNameColor(org.Name),
 		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(org.Name))
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
 
 	cmd.userRepo.FindAllInSpaceByRole(space)
 	usersByRole, apiResponse := cmd.userRepo.FindAllInSpaceByRole(space)

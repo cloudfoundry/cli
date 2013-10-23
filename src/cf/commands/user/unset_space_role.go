@@ -2,6 +2,7 @@ package user
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -10,15 +11,17 @@ import (
 
 type UnsetSpaceRole struct {
 	ui        terminal.UI
+	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewUnsetSpaceRole(ui terminal.UI, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
+func NewUnsetSpaceRole(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
 	cmd = new(UnsetSpaceRole)
 	cmd.ui = ui
+	cmd.config = config
 	cmd.spaceRepo = spaceRepo
 	cmd.userRepo = userRepo
 	return
@@ -55,11 +58,12 @@ func (cmd *UnsetSpaceRole) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Removing %s role from %s in %s space in %s org...",
+	cmd.ui.Say("Removing %s role from %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(user.Username),
-		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(org.Name),
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
 	apiResponse = cmd.userRepo.UnsetSpaceRole(user, space, role)
