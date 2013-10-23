@@ -46,6 +46,8 @@ func startAppWithInstancesAndErrors(t *testing.T, app cf.Application, instances 
 }
 
 func TestStartCommandFailsWithUsage(t *testing.T) {
+	t.Parallel()
+
 	config := &configuration.Configuration{}
 	appRepo := &testapi.FakeApplicationRepository{
 		GetInstancesResponses: [][]cf.ApplicationInstance{
@@ -63,6 +65,8 @@ func TestStartCommandFailsWithUsage(t *testing.T) {
 }
 
 func TestStartApplication(t *testing.T) {
+	t.Parallel()
+
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: cf.InstanceStarting},
@@ -90,6 +94,8 @@ func TestStartApplication(t *testing.T) {
 }
 
 func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
+	t.Parallel()
+
 	app := defaultAppForStart
 	app.Urls = []string{}
 
@@ -111,6 +117,8 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 }
 
 func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
+	t.Parallel()
+
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{},
 		[]cf.ApplicationInstance{},
@@ -140,6 +148,8 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 }
 
 func TestStartApplicationWhenStagingFails(t *testing.T) {
+	t.Parallel()
+
 	instances := [][]cf.ApplicationInstance{[]cf.ApplicationInstance{}}
 	errorCodes := []string{"170001"}
 
@@ -152,6 +162,8 @@ func TestStartApplicationWhenStagingFails(t *testing.T) {
 }
 
 func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
+	t.Parallel()
+
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: cf.InstanceStarting},
@@ -175,6 +187,8 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 }
 
 func TestStartApplicationWhenStartTimesOut(t *testing.T) {
+	t.Parallel()
+
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{
 			cf.ApplicationInstance{State: cf.InstanceStarting},
@@ -204,6 +218,8 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 }
 
 func TestStartApplicationWhenStartFails(t *testing.T) {
+	t.Parallel()
+
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app, StartAppErr: true}
@@ -218,6 +234,8 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 }
 
 func TestStartApplicationIsAlreadyStarted(t *testing.T) {
+	t.Parallel()
+
 	config := &configuration.Configuration{}
 	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}

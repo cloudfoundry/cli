@@ -15,6 +15,8 @@ import (
 )
 
 func TestRecentLogsFor(t *testing.T) {
+	t.Parallel()
+
 	// out of order messages we will send
 	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message", int64(3000)),
@@ -70,6 +72,8 @@ func TestRecentLogsFor(t *testing.T) {
 }
 
 func TestTailsLogsFor(t *testing.T) {
+	t.Parallel()
+
 	// out of order messages we will send
 	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message 3", int64(300000)),
@@ -136,6 +140,8 @@ func TestTailsLogsFor(t *testing.T) {
 }
 
 func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
+	t.Parallel()
+
 	// out of order messages we will send
 	startTime := time.Now()
 	messagesSent := [][]byte{
@@ -191,6 +197,8 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 }
 
 func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
+	t.Parallel()
+
 	// out of order messages we will send
 	startTime := time.Now()
 	messagesSent := [][]byte{
