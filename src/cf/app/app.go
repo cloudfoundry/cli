@@ -312,19 +312,20 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",
-			Usage: fmt.Sprintf("%s login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE] [--no-interactive]\n\n", cf.Name) +
 				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s login (omit username and password to login interactively -- %s will prompt for both)\n", cf.Name, cf.Name) +
-				fmt.Sprintf("   %s login -u name@example.com -p pa55woRD (specify username and password to login non-interactively)\n", cf.Name) +
-				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name) +
-				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name),
+				fmt.Sprintf("   %s login -u name@example.com -p pa55woRD --no-interactive (specify username and password, and no-interactive flag to login without prompts)\n", cf.Name) +
+				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" --no-interactive (use quotes for passwords with a space)\n", cf.Name) +
+				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" --no-interactive (escape quotes if used in password)", cf.Name),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "a", Value: "", Usage: "API endpoint (for example: https://api.example.com)"},
 				cli.StringFlag{Name: "u", Value: "", Usage: "Username"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Password"},
 				cli.StringFlag{Name: "o", Value: "", Usage: "Org"},
 				cli.StringFlag{Name: "s", Value: "", Usage: "Space"},
+				cli.StringFlag{Name: "no-interactive", Value: "", Usage: "Log in without interactive prompts for missing information"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("login", c)
