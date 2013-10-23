@@ -49,7 +49,7 @@ func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
-func TestUpdateEndpointWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
+func TestUpdateEndpointWhenUrlIsAlreadyTargeted(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	configRepo.Login()
@@ -57,14 +57,20 @@ func TestUpdateEndpointWhenUrlIsValidHttpInfoEndpoint(t *testing.T) {
 	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
+	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+
+	config, _ := configRepo.Get()
+	config.Target = ts.URL
+	config.AccessToken = "some access token"
+	config.RefreshToken = "some refresh token"
+	config.Organization = org
+	config.Space = space
+
+	originalConfig := *config
 	repo.UpdateEndpoint(ts.URL)
 
-	savedConfig := testconfig.SavedConfiguration
-
-	assert.Equal(t, savedConfig.AccessToken, "")
-	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
-	assert.Equal(t, savedConfig.Target, ts.URL)
-	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
+	assert.Equal(t, *config, originalConfig)
 }
 
 func TestUpdateEndpointWhenUrlIsMissingScheme(t *testing.T) {

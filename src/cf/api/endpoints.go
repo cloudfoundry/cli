@@ -32,6 +32,10 @@ func NewEndpointRepository(config *configuration.Configuration, gateway net.Gate
 }
 
 func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiResponse net.ApiResponse) {
+	if endpoint == repo.config.Target {
+		return
+	}
+
 	request, apiResponse := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 	if apiResponse.IsNotSuccessful() {
 		return

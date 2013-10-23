@@ -32,19 +32,15 @@ func (cmd Api) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 
 func (cmd Api) Run(c *cli.Context) {
 	if len(c.Args()) == 0 {
-		cmd.showApiEndpoint()
+		cmd.ui.Say(
+			"API endpoint: %s (API version: %s)",
+			terminal.EntityNameColor(cmd.config.Target),
+			terminal.EntityNameColor(cmd.config.ApiVersion),
+		)
 		return
 	}
 
 	cmd.SetApiEndpoint(c.Args()[0])
-}
-
-func (cmd Api) showApiEndpoint() {
-	cmd.ui.Say(
-		"API endpoint: %s (API version: %s)",
-		terminal.EntityNameColor(cmd.config.Target),
-		terminal.EntityNameColor(cmd.config.ApiVersion),
-	)
 }
 
 func (cmd Api) SetApiEndpoint(endpoint string) {
@@ -67,7 +63,5 @@ func (cmd Api) SetApiEndpoint(endpoint string) {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}
 
-	cmd.showApiEndpoint()
-
-	cmd.ui.Say(terminal.NotLoggedInText())
+	cmd.ui.ShowConfiguration(cmd.config)
 }
