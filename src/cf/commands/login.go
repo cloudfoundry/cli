@@ -187,13 +187,27 @@ func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiRes
 func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 	spaceName := c.String("s")
 
-	// Reuse space in config
-	if spaceName == "" && cmd.config.HasSpace() {
-		return
-	}
-
-	// Prompt for space name
 	if spaceName == "" {
+		// Reuse space in config
+		if cmd.config.HasSpace() {
+			return
+		}
+
+		// Get available spaces
+		var availableSpaces []cf.Space
+
+		availableSpaces, apiResponse = cmd.spaceRepo.FindAll()
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed("Error finding avilable spaces\n%s", apiResponse.Message)
+			return
+		}
+
+		// Target only space if possible
+		if len(availableSpaces) == 1 {
+			return cmd.targetSpace(availableSpaces[0])
+		}
+
+		// Prompt for space name
 		spaceName = cmd.ui.Ask("Space%s", terminal.PromptColor(">"))
 	}
 
@@ -204,11 +218,16 @@ func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 		return
 	}
 
-	// Target space
+	return cmd.targetSpace(space)
+}
+
+func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
 	err := cmd.configRepo.SetSpace(space)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithMessage("Error setting space %s in config file\n%s", terminal.EntityNameColor(spaceName), err.Error())
-		return
+		apiResponse = net.NewApiResponseWithMessage("Error setting space %s in config file\n%s",
+			terminal.EntityNameColor(space.Name),
+			err.Error(),
+		)
 	}
 	return
 }
