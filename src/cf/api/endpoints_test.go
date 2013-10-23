@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	testconfig "testhelpers/configuration"
 	"testing"
 )
@@ -73,14 +74,46 @@ func TestUpdateEndpointWhenUrlIsAlreadyTargeted(t *testing.T) {
 	assert.Equal(t, *config, originalConfig)
 }
 
-func TestUpdateEndpointWhenUrlIsMissingScheme(t *testing.T) {
+func TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpsEndpointExists(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
+	configRepo.Delete()
 	configRepo.Login()
-	_, repo := createEndpointRepoForUpdate(configRepo, nil)
 
-	apiResponse := repo.UpdateEndpoint("example.com")
+	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
+	defer ts.Close()
 
-	assert.True(t, apiResponse.IsNotSuccessful())
+	schemelessURL := strings.Replace(ts.URL, "https://", "", 1)
+	apiResponse := repo.UpdateEndpoint(schemelessURL)
+
+	assert.True(t, apiResponse.IsSuccessful())
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Equal(t, savedConfig.AccessToken, "")
+	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
+	assert.Equal(t, savedConfig.Target, ts.URL)
+	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
+}
+
+func TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpEndpointExists(t *testing.T) {
+	configRepo := testconfig.FakeConfigRepository{}
+	configRepo.Delete()
+	configRepo.Login()
+
+	ts, repo := createInsecureEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
+	defer ts.Close()
+
+	schemelessURL := strings.Replace(ts.URL, "http://", "", 1)
+	apiResponse := repo.UpdateEndpoint(schemelessURL)
+
+	assert.True(t, apiResponse.IsSuccessful())
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Equal(t, savedConfig.AccessToken, "")
+	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
+	assert.Equal(t, savedConfig.Target, ts.URL)
+	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
 var notFoundApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -119,11 +152,20 @@ func createEndpointRepoForUpdate(configRepo testconfig.FakeConfigRepository, end
 	if endpoint != nil {
 		ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	}
+	return ts, makeRepo(configRepo)
+}
 
+func createInsecureEndpointRepoForUpdate(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+	if endpoint != nil {
+		ts = httptest.NewServer(http.HandlerFunc(endpoint))
+	}
+	return ts, makeRepo(configRepo)
+}
+
+func makeRepo(configRepo testconfig.FakeConfigRepository) (repo EndpointRepository) {
 	config, _ := configRepo.Get()
 	gateway := net.NewCloudControllerGateway()
-	repo = NewEndpointRepository(config, gateway, configRepo)
-	return
+	return NewEndpointRepository(config, gateway, configRepo)
 }
 
 // Tests for GetEndpoint

@@ -36,14 +36,25 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiRespons
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
-	if apiResponse.IsNotSuccessful() {
+	endpointMissingScheme := !strings.HasPrefix(endpoint, "https://") && !strings.HasPrefix(endpoint, "http://")
+
+	if endpointMissingScheme {
+		apiResponse = repo.doUpdateEndpoint("https://" + endpoint)
+
+		if apiResponse.IsNotSuccessful() {
+			apiResponse = repo.doUpdateEndpoint("http://" + endpoint)
+		}
 		return
 	}
 
-	scheme := request.URL.Scheme
-	if scheme != "http" && scheme != "https" {
-		apiResponse = net.NewApiResponseWithMessage("API endpoints should start with https:// or http://")
+	apiResponse = repo.doUpdateEndpoint(endpoint)
+
+	return
+}
+
+func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiResponse net.ApiResponse) {
+	request, apiResponse := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
+	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
@@ -67,7 +78,6 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiRespons
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage(err.Error())
 	}
-
 	return
 }
 
