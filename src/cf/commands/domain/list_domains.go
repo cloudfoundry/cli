@@ -44,7 +44,7 @@ func (cmd *ListDomains) GetRequirements(reqFactory requirements.Factory, c *cli.
 func (cmd *ListDomains) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 
-	cmd.ui.Say("Getting domains in org %s...",
+	cmd.ui.Say("Getting domains in org %s as %s...",
 		terminal.EntityNameColor(org.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
