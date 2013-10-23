@@ -69,13 +69,18 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 
 func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	c := LoginTestContext{
-		Inputs: []string{"api.example.com", "user@example.com", "password", "3", "abc", "2", "my-space"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", "3", "abc", "2", "3", "abc", "1"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
 		c.orgRepo.Organizations = []cf.Organization{
 			{Guid: "some-org-guid", Name: "some-org"},
 			{Guid: "my-org-guid", Name: "my-org"},
+		}
+
+		c.spaceRepo.Spaces = []cf.Space{
+			{Guid: "my-space-guid", Name: "my-space"},
+			{Guid: "some-space-guid", Name: "some-space"},
 		}
 	})
 
@@ -84,6 +89,10 @@ func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	assert.Contains(t, c.ui.Outputs[3], "Select an org:")
 	assert.Contains(t, c.ui.Outputs[4], "1. some-org")
 	assert.Contains(t, c.ui.Outputs[5], "2. my-org")
+
+	assert.Contains(t, c.ui.Outputs[13], "Select a space:")
+	assert.Contains(t, c.ui.Outputs[14], "1. my-space")
+	assert.Contains(t, c.ui.Outputs[15], "2. some-space")
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
@@ -157,7 +166,8 @@ func TestSuccessfullyLoggingInWithOrgSetInConfig(t *testing.T) {
 	}
 
 	c := LoginTestContext{
-		Inputs: []string{"http://api.example.com", "user@example.com", "password", "my-space"},
+		Flags:  []string{"-s", "my-space"},
+		Inputs: []string{"http://api.example.com", "user@example.com", "password"},
 		Config: existingConfig,
 	}
 
@@ -213,7 +223,8 @@ func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
 
 func TestSuccessfullyLoggingInWithOnlyOneOrg(t *testing.T) {
 	c := LoginTestContext{
-		Inputs: []string{"http://api.example.com", "user@example.com", "password", "my-space"},
+		Flags:  []string{"-s", "my-space"},
+		Inputs: []string{"http://api.example.com", "user@example.com", "password"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
@@ -290,8 +301,7 @@ func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 
 func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
 	c := LoginTestContext{
-		Flags:  []string{"-u", "user@example.com"},
-		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+		Inputs: []string{"api.example.com"},
 	}
 	callLogin(t, &c, func(c *LoginTestContext) {
 		c.endpointRepo.UpdateEndpointError = true

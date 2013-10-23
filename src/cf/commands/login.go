@@ -209,6 +209,7 @@ func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 
 		// Prompt for space name
 		spaceName = cmd.ui.Ask("Space%s", terminal.PromptColor(">"))
+		spaceName = cmd.promptForSpaceName(availableSpaces)
 	}
 
 	// Find space
@@ -219,6 +220,28 @@ func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
 	}
 
 	return cmd.targetSpace(space)
+}
+
+func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
+	spaceIndex := 0
+
+	for spaceIndex < 1 || spaceIndex > len(spaces) {
+		var err error
+
+		cmd.ui.Say("Select a space:")
+		for i, o := range spaces {
+			cmd.ui.Say("%d. %s", i+1, o.Name)
+		}
+		spaceNumber := cmd.ui.Ask("Space%s", terminal.PromptColor(">"))
+		spaceIndex, err = strconv.Atoi(spaceNumber)
+
+		if err != nil {
+			spaceIndex = 0
+			cmd.ui.Say("")
+		}
+	}
+
+	return spaces[spaceIndex-1].Name
 }
 
 func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
