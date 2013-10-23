@@ -30,9 +30,9 @@ func TestListingRoutes(t *testing.T) {
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting routes in space")
-	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "Getting routes in org")
 	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
@@ -55,7 +55,10 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting routes")
+	assert.Contains(t, ui.Outputs[0], "Getting routes in org")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[3], "No routes found")
 }
