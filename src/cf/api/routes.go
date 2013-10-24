@@ -19,7 +19,7 @@ type RouteResource struct {
 
 type RouteEntity struct {
 	Host   string
-	Domain Resource
+	Domain DomainResource
 	Apps   []Resource
 }
 
@@ -137,6 +137,8 @@ func (repo CloudControllerRouteRepository) CreateInSpace(newRoute cf.Route, doma
 
 	createdRoute.Guid = resource.Metadata.Guid
 	createdRoute.Host = resource.Entity.Host
+	createdRoute.Domain = domain
+
 	return
 }
 

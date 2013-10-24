@@ -4,11 +4,16 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
+
+type RouteCreator interface {
+	CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse)
+}
 
 type ReserveRoute struct {
 	ui        terminal.UI
@@ -34,8 +39,12 @@ func (cmd *ReserveRoute) GetRequirements(reqFactory requirements.Factory, c *cli
 		return
 	}
 
-	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
-	cmd.domainReq = reqFactory.NewDomainRequirement(c.Args()[1])
+	spaceName := c.Args()[0]
+	domainName := c.Args()[1]
+
+	cmd.spaceReq = reqFactory.NewSpaceRequirement(spaceName)
+	cmd.domainReq = reqFactory.NewDomainRequirement(domainName)
+
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		cmd.spaceReq,
@@ -45,22 +54,32 @@ func (cmd *ReserveRoute) GetRequirements(reqFactory requirements.Factory, c *cli
 }
 
 func (cmd *ReserveRoute) Run(c *cli.Context) {
+	hostName := c.String("n")
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
-	route := cf.Route{Host: c.String("n"), Domain: domain}
+
+	_, apiResponse := cmd.CreateRoute(hostName, domain, space)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+}
+
+func (cmd *ReserveRoute) CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse) {
+	routeToCreate := cf.Route{Host: hostName, Domain: domain}
 
 	cmd.ui.Say("Reserving route %s for org %s / space %s as %s...",
-		terminal.EntityNameColor(route.URL()),
+		terminal.EntityNameColor(routeToCreate.URL()),
 		terminal.EntityNameColor(cmd.config.Organization.Name),
 		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	_, apiResponse := cmd.routeRepo.CreateInSpace(route, domain, space)
+	route, apiResponse = cmd.routeRepo.CreateInSpace(routeToCreate, domain, space)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
 	cmd.ui.Ok()
+	return
 }

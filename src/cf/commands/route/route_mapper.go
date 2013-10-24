@@ -3,7 +3,6 @@ package route
 import (
 	"cf/api"
 	"cf/configuration"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,19 +10,21 @@ import (
 )
 
 type RouteMapper struct {
-	ui        terminal.UI
-	config    *configuration.Configuration
-	routeRepo api.RouteRepository
-	appReq    requirements.ApplicationRequirement
-	routeReq  requirements.RouteRequirement
-	bind      bool
+	ui           terminal.UI
+	config       *configuration.Configuration
+	routeRepo    api.RouteRepository
+	appReq       requirements.ApplicationRequirement
+	domainReq    requirements.DomainRequirement
+	routeCreator RouteCreator
+	bind         bool
 }
 
-func NewRouteMapper(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository, bind bool) (cmd *RouteMapper) {
+func NewRouteMapper(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository, routeCreator RouteCreator, bind bool) (cmd *RouteMapper) {
 	cmd = new(RouteMapper)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.routeRepo = routeRepo
+	cmd.routeCreator = routeCreator
 	cmd.bind = bind
 	return
 }
@@ -41,24 +42,30 @@ func (cmd *RouteMapper) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 	appName := c.Args()[0]
 	domainName := c.Args()[1]
-	hostName := c.String("n")
 
 	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
-	cmd.routeReq = reqFactory.NewRouteRequirement(hostName, domainName)
+	cmd.domainReq = reqFactory.NewDomainRequirement(domainName)
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		cmd.appReq,
-		cmd.routeReq,
+		cmd.domainReq,
 	}
 	return
 }
 
 func (cmd *RouteMapper) Run(c *cli.Context) {
-	route := cmd.routeReq.GetRoute()
-	app := cmd.appReq.GetApplication()
 
-	var apiResponse net.ApiResponse
+	// resolve the route we will bind to
+	hostName := c.String("n")
+	domain := cmd.domainReq.GetDomain()
+
+	route, apiResponse := cmd.routeCreator.CreateRoute(hostName, domain, cmd.config.Space)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Error resolving route:\n%s", apiResponse.Message)
+	}
+
+	app := cmd.appReq.GetApplication()
 
 	if cmd.bind {
 		cmd.ui.Say("Adding route %s to app %s in org %s / space %s as %s...",

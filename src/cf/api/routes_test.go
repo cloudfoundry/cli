@@ -191,6 +191,32 @@ func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
 	assert.True(t, apiResponse.IsNotFound())
 }
 
+func TestCreateInSpace(t *testing.T) {
+	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "POST",
+		Path:    "/v2/routes",
+		Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+{
+  "metadata": { "guid": "my-route-guid" },
+  "entity": { "host": "my-cool-app" }
+}`},
+	})
+
+	ts, handler, repo, _ := createRoutesRepo(t, request)
+	defer ts.Close()
+
+	domain := cf.Domain{Guid: "my-domain-guid"}
+	newRoute := cf.Route{Host: "my-cool-app"}
+	space := cf.Space{Guid: "my-space-guid"}
+
+	createdRoute, apiResponse := repo.CreateInSpace(newRoute, domain, space)
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+
+	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domain})
+}
+
 func TestCreateRoute(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
@@ -213,7 +239,7 @@ func TestCreateRoute(t *testing.T) {
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
-	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid"})
+	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domain})
 }
 
 func TestBind(t *testing.T) {

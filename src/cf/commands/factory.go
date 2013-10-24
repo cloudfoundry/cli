@@ -61,7 +61,6 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["logs"] = application.NewLogs(ui, config, repoLocator.GetLogsRepository())
 	factory.cmdsByName["marketplace"] = service.NewMarketplaceServices(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["map-domain"] = domain.NewDomainMapper(ui, config, repoLocator.GetDomainRepository(), true)
-	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), true)
 	factory.cmdsByName["org"] = organization.NewShowOrg(ui, config)
 	factory.cmdsByName["org-users"] = user.NewOrgUsers(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["orgs"] = organization.NewListOrgs(ui, config, repoLocator.GetOrganizationRepository())
@@ -73,7 +72,6 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["rename-service-broker"] = servicebroker.NewRenameServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["rename-space"] = space.NewRenameSpace(ui, config, repoLocator.GetSpaceRepository(), configRepo)
 	factory.cmdsByName["reserve-domain"] = domain.NewReserveDomain(ui, config, repoLocator.GetDomainRepository())
-	factory.cmdsByName["reserve-route"] = route.NewReserveRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["routes"] = route.NewListRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["service"] = service.NewShowService(ui)
 	factory.cmdsByName["service-auth-tokens"] = serviceauthtoken.NewListServiceAuthTokens(ui, config, repoLocator.GetServiceAuthTokenRepository())
@@ -91,7 +89,6 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["target"] = NewTarget(ui, configRepo, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["unmap-domain"] = domain.NewDomainMapper(ui, config, repoLocator.GetDomainRepository(), false)
-	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), false)
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, config, repoLocator.GetApplicationRepository())
 	factory.cmdsByName["unset-org-role"] = user.NewUnsetOrgRole(ui, config, repoLocator.GetUserRepository())
 	factory.cmdsByName["unset-space-role"] = user.NewUnsetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
@@ -99,6 +96,11 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["update-service-broker"] = servicebroker.NewUpdateServiceBroker(ui, config, repoLocator.GetServiceBrokerRepository())
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
+
+	reserveRoute := route.NewReserveRoute(ui, config, repoLocator.GetRouteRepository())
+	factory.cmdsByName["reserve-route"] = reserveRoute
+	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), reserveRoute, true)
+	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), reserveRoute, false)
 
 	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
