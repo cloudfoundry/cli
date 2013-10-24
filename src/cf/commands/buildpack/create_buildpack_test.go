@@ -27,7 +27,7 @@ func TestCreateBuildpackRequirements(t *testing.T) {
 func TestCreateBuildpack(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war"}, reqFactory, repo, bitsRepo)
+	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.Equal(t, len(fakeUI.Outputs), 5)
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
@@ -43,7 +43,7 @@ func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 
 	repo.CreateBuildpackExists = true
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war"}, reqFactory, repo, bitsRepo)
+	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.Equal(t, len(fakeUI.Outputs), 3)
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
@@ -53,10 +53,10 @@ func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "already exists")
 }
 
-func TestCreateBuildpackWithPriority(t *testing.T) {
+func TestCreateBuildpackWithPosition(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	fakeUI := callCreateBuildpack([]string{"-priority", "5", "my-buildpack", "my.war"}, reqFactory, repo, bitsRepo)
+	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.Equal(t, len(fakeUI.Outputs), 5)
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
@@ -72,7 +72,7 @@ func TestCreateBuildpackWithInvalidPath(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 
 	bitsRepo.UploadBuildpackErr = true
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "bogus/path"}, reqFactory, repo, bitsRepo)
+	fakeUI := callCreateBuildpack([]string{"my-buildpack", "bogus/path", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
 	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
@@ -88,7 +88,7 @@ func TestCreateBuildpackFailsWithUsage(t *testing.T) {
 	fakeUI := callCreateBuildpack([]string{}, reqFactory, repo, bitsRepo)
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callCreateBuildpack([]string{"my-buildpack", "my.war"}, reqFactory, repo, bitsRepo)
+	fakeUI = callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 

@@ -42,13 +42,13 @@ func TestUpdateBuildpack(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
-func TestUpdateBuildpackPriority(t *testing.T) {
+func TestUpdateBuildpackPosition(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
 	fakeUI := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, *repo.UpdateBuildpack.Priority, 999)
+	assert.Equal(t, *repo.UpdateBuildpack.Position, 999)
 
 	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
 	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")

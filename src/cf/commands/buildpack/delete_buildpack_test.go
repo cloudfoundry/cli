@@ -108,7 +108,7 @@ func TestDeleteBuildpackForceFlagSkipsConfirmation(t *testing.T) {
 
 	cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"-F", "foo.com"})
+	ctxt := testcmd.NewContext("delete-buildpack", []string{"-f", "foo.com"})
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

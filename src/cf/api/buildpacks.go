@@ -25,7 +25,7 @@ type BuildpackResource struct {
 
 type BuildpackEntity struct {
 	Name     string `json:"name"`
-	Priority *int   `json:"priority,omitempty"`
+	Position *int   `json:"position,omitempty"`
 }
 
 type BuildpackRepository interface {
@@ -85,7 +85,7 @@ func (repo CloudControllerBuildpackRepository) findAllWithPath(path string) (bui
 
 func (repo CloudControllerBuildpackRepository) Create(newBuildpack cf.Buildpack) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := repo.config.Target + buildpacks_path
-	entity := BuildpackEntity{Name: newBuildpack.Name, Priority: newBuildpack.Priority}
+	entity := BuildpackEntity{Name: newBuildpack.Name, Position: newBuildpack.Position}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize information", err)
@@ -111,7 +111,7 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpack cf.Buildpack) (a
 func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
 
-	entity := BuildpackEntity{buildpack.Name, buildpack.Priority}
+	entity := BuildpackEntity{buildpack.Name, buildpack.Position}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize updates.", err)
@@ -131,6 +131,6 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (u
 func unmarshallBuildpack(resource BuildpackResource) (buildpack cf.Buildpack) {
 	buildpack.Guid = resource.Metadata.Guid
 	buildpack.Name = resource.Entity.Name
-	buildpack.Priority = resource.Entity.Priority
+	buildpack.Position = resource.Entity.Position
 	return
 }

@@ -30,7 +30,7 @@ func TestBuildpacksFindAll(t *testing.T) {
 			      },
 			      "entity": {
 			        "name": "Buildpack1",
-				"priority" : 1
+				"position" : 1
 			      }
 			    },
 			    {
@@ -39,7 +39,7 @@ func TestBuildpacksFindAll(t *testing.T) {
 			      },
 			      "entity": {
 			        "name": "Buildpack2",
-				"priority" : 2
+				"position" : 2
 			      }
 			    }
 			  ]
@@ -58,12 +58,12 @@ func TestBuildpacksFindAll(t *testing.T) {
 	firstBuildpack := buildpacks[0]
 	assert.Equal(t, firstBuildpack.Name, "Buildpack1")
 	assert.Equal(t, firstBuildpack.Guid, "buildpack1-guid")
-	assert.Equal(t, *firstBuildpack.Priority, 1)
+	assert.Equal(t, *firstBuildpack.Position, 1)
 
 	secondBuildpack := buildpacks[1]
 	assert.Equal(t, secondBuildpack.Name, "Buildpack2")
 	assert.Equal(t, secondBuildpack.Guid, "buildpack2-guid")
-	assert.Equal(t, *secondBuildpack.Priority, 2)
+	assert.Equal(t, *secondBuildpack.Position, 2)
 }
 
 var singleBuildpackResponse = testnet.TestResponse{
@@ -75,7 +75,7 @@ var singleBuildpackResponse = testnet.TestResponse{
 			  },
 			  "entity": {
 				  "name": "Buildpack1",
-				  "priority": 10
+				  "position": 10
 			  }
 		  }
 		  ]
@@ -102,7 +102,7 @@ func TestBuildpacksFindByName(t *testing.T) {
 
 	assert.Equal(t, buildpack.Name, existingBuildpack.Name)
 	assert.Equal(t, buildpack.Guid, existingBuildpack.Guid)
-	assert.Equal(t, *buildpack.Priority, 10)
+	assert.Equal(t, *buildpack.Position, 10)
 }
 
 func TestFindByNameWhenBuildpackIsNotFound(t *testing.T) {
@@ -154,7 +154,7 @@ func TestCreateBuildpack(t *testing.T) {
 			    },
 			    "entity": {
 			        "name": "my-cool-buildpack",
-					"priority":10
+					"position":10
 			    }
 			}`},
 	})
@@ -171,14 +171,14 @@ func TestCreateBuildpack(t *testing.T) {
 
 	assert.NotNil(t, created.Guid)
 	assert.Equal(t, buildpack.Name, created.Name)
-	assert.NotEqual(t, *created.Priority, 0)
+	assert.NotEqual(t, *created.Position, 0)
 }
 
-func TestCreateBuildpackWithPriority(t *testing.T) {
+func TestCreateBuildpackWithPosition(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
 		Path:    "/v2/buildpacks",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","priority":999}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":999}`),
 		Response: testnet.TestResponse{
 			Status: http.StatusCreated,
 			Body: `{
@@ -187,7 +187,7 @@ func TestCreateBuildpackWithPriority(t *testing.T) {
 				},
 				"entity": {
 					"name": "my-cool-buildpack",
-					"priority":999
+					"position":999
 				}
 			}`},
 	})
@@ -195,8 +195,8 @@ func TestCreateBuildpackWithPriority(t *testing.T) {
 	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
-	priority := 999
-	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Priority: &priority}
+	position := 999
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Position: &position}
 	created, apiResponse := repo.Create(buildpack)
 
 	assert.True(t, handler.AllRequestsCalled())
@@ -204,7 +204,7 @@ func TestCreateBuildpackWithPriority(t *testing.T) {
 
 	assert.NotNil(t, created.Guid)
 	assert.Equal(t, buildpack.Name, created.Name)
-	assert.Equal(t, *buildpack.Priority, 999)
+	assert.Equal(t, *buildpack.Position, 999)
 }
 
 func TestDeleteBuildpack(t *testing.T) {
@@ -229,7 +229,7 @@ func TestUpdateBuildpack(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
 		Path:    "/v2/buildpacks/my-cool-buildpack-guid",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","priority":555}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":555}`),
 		Response: testnet.TestResponse{
 			Status: http.StatusCreated,
 			Body: `{
@@ -239,7 +239,7 @@ func TestUpdateBuildpack(t *testing.T) {
 				    },
 				    "entity": {
 				        "name": "my-cool-buildpack",
-						"priority":555
+						"position":555
 				    }
 				}`},
 	})
@@ -247,8 +247,8 @@ func TestUpdateBuildpack(t *testing.T) {
 	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
-	priority := 555
-	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid", Priority: &priority}
+	position := 555
+	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid", Position: &position}
 	updated, apiResponse := repo.Update(buildpack)
 
 	assert.True(t, handler.AllRequestsCalled())

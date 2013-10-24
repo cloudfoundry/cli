@@ -39,7 +39,7 @@ func (cmd *DeleteBuildpack) GetRequirements(reqFactory requirements.Factory, c *
 
 func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 	buildpack := cmd.buildpackReq.GetBuildpack()
-	force := c.Bool("F")
+	force := c.Bool("f")
 
 	cmd.ui.Say("Deleting buildpack %s...", terminal.EntityNameColor(buildpack.Name))
 

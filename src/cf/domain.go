@@ -173,5 +173,5 @@ type User struct {
 type Buildpack struct {
 	Guid     string
 	Name     string
-	Priority *int
+	Position *int
 }

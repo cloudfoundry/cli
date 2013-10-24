@@ -7,6 +7,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
+	"strconv"
 )
 
 type CreateBuildpack struct {
@@ -30,7 +31,7 @@ func (cmd CreateBuildpack) GetRequirements(reqFactory requirements.Factory, c *c
 }
 
 func (cmd CreateBuildpack) Run(c *cli.Context) {
-	if len(c.Args()) != 2 {
+	if len(c.Args()) != 3 {
 		cmd.ui.FailWithUsage(c, "create-buildpack")
 		return
 	}
@@ -66,15 +67,15 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 }
 
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
-	var priority *int = nil
-	if c.String("priority") != "" {
-		val := c.Int("priority")
-		priority = &val
+	position, err := strconv.Atoi(c.Args()[2])
+	println("position: ", position)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())
 	}
 
 	newBuildpack := cf.Buildpack{
 		Name:     buildpackName,
-		Priority: priority,
+		Position: &position,
 	}
 
 	buildpack, apiResponse = cmd.buildpackRepo.Create(newBuildpack)

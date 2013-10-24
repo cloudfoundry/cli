@@ -16,7 +16,7 @@ import (
 )
 
 var uploadBuildpackRequest = testnet.TestRequest{
-	Method:  "POST",
+	Method:  "PUT",
 	Path:    "/v2/buildpacks/my-cool-buildpack-guid/bits",
 	Matcher: uploadBuildpackBodyMatcher,
 	Response: testnet.TestResponse{

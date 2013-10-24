@@ -50,7 +50,7 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, 
 		return
 	}
 
-	request, apiResponse := repo.gateway.NewRequest("POST", url, repo.config.AccessToken, body)
+	request, apiResponse := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 	request.Header.Set("Content-Type", contentType)
 	if apiResponse.IsNotSuccessful() {

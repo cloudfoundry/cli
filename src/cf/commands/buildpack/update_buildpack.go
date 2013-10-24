@@ -50,7 +50,7 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 
 	if c.String("i") != "" {
 		val := c.Int("i")
-		buildpack.Priority = &val
+		buildpack.Position = &val
 		updateBuildpack = true
 	}
 

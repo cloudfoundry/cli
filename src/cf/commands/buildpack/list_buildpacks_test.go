@@ -24,11 +24,11 @@ func TestListBuildpacksRequirements(t *testing.T) {
 }
 
 func TestListBuildpacks(t *testing.T) {
-	priority5 := 5
-	priority10 := 10
+	position5 := 5
+	position10 := 10
 	buildpacks := []cf.Buildpack{
-		{Name: "Buildpack-1", Priority: &priority5},
-		{Name: "Buildpack-2", Priority: &priority10},
+		{Name: "Buildpack-1", Position: &position5},
+		{Name: "Buildpack-2", Position: &position10},
 	}
 	buildpackRepo := &testapi.FakeBuildpackRepository{
 		Buildpacks: buildpacks,
@@ -42,7 +42,7 @@ func TestListBuildpacks(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Contains(t, ui.Outputs[3], "buildpack")
-	assert.Contains(t, ui.Outputs[3], "priority")
+	assert.Contains(t, ui.Outputs[3], "position")
 
 	assert.Contains(t, ui.Outputs[4], "Buildpack-1")
 	assert.Contains(t, ui.Outputs[4], "5")

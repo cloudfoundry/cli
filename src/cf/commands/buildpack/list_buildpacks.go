@@ -44,17 +44,17 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 	}
 
 	table := [][]string{
-		{"buildpack", "priority"},
+		{"buildpack", "position"},
 	}
 
 	for _, buildpack := range buildpacks {
-		priority := ""
-		if buildpack.Priority != nil {
-			priority = strconv.Itoa(*buildpack.Priority)
+		position := ""
+		if buildpack.Position != nil {
+			position = strconv.Itoa(*buildpack.Position)
 		}
 		table = append(table, []string{
 			buildpack.Name,
-			priority,
+			position,
 		})
 	}
 
