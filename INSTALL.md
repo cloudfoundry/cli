@@ -1,5 +1,5 @@
 ## Windows
- 
+
 1. Download the CLI from github: https://github.com/cloudfoundry/cli/releases
 2. Extract the zip file.
 3. Move `go-cf` to C:\Program Files\Cloud Foundry\
