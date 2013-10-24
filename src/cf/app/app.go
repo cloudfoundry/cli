@@ -88,8 +88,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-buildpack",
 			Description: "Create a buildpack",
-			Usage: fmt.Sprintf("%s create-buildpack BUILDPACK PATH\n"+
-				"\tPATH: Path to a directory or zip file", cf.Name),
+			Usage:       fmt.Sprintf("%s create-buildpack BUILDPACK PATH [-p PRIORITY]\n", cf.Name),
 			Flags: []cli.Flag{
 				cli.IntFlag{Name: "priority", Value: 0, Usage: "Buildpack priority"},
 			},
@@ -181,7 +180,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Delete a buildpack",
 			Usage:       fmt.Sprintf("%s delete-buildpack BUILDPACK", cf.Name),
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
+				cli.BoolFlag{Name: "F", Usage: "force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete-buildpack", c)
@@ -739,10 +738,10 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-buildpack",
 			Description: "Update a buildpack",
-			Usage: fmt.Sprintf("%s update-buildpack BUILDPACK [PATH] [-prioirity PRIORITY]\n"+
-				"\tPATH: Path to a directory or zip file", cf.Name),
+			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-i PRIORITY]\n", cf.Name),
 			Flags: []cli.Flag{
-				cli.IntFlag{Name: "priority", Value: 0, Usage: "Buildpack priority"},
+				cli.IntFlag{Name: "i", Value: 0, Usage: "Buildpack priority"},
+				cli.StringFlag{Name: "p", Value: "", Usage: "Path to directory or zip file"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("update-buildpack", c)
