@@ -40,6 +40,13 @@ func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
+	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+
+	config, _ := configRepo.Get()
+	config.Organization = org
+	config.Space = space
+
 	repo.UpdateEndpoint(ts.URL)
 
 	savedConfig := testconfig.SavedConfiguration
@@ -48,6 +55,8 @@ func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
 	assert.Equal(t, savedConfig.Target, ts.URL)
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
+	assert.False(t, savedConfig.HasOrganization())
+	assert.False(t, savedConfig.HasSpace())
 }
 
 func TestUpdateEndpointWhenUrlIsAlreadyTargeted(t *testing.T) {

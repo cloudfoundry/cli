@@ -69,7 +69,7 @@ func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiRespo
 		return
 	}
 
-	repo.configRepo.ClearTokens()
+	repo.configRepo.ClearSession()
 	repo.config.Target = endpoint
 	repo.config.ApiVersion = serverResponse.ApiVersion
 	repo.config.AuthorizationEndpoint = serverResponse.AuthorizationEndpoint
