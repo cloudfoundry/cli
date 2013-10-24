@@ -170,7 +170,7 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiR
 	return
 }
 
-func (repo CloudControllerApplicationRepository) updateApp(app cf.Application, body io.Reader) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) updateApp(app cf.Application, body io.ReadSeeker) (apiResponse net.ApiResponse) {
 	apiResponse = validateApplication(app)
 	if apiResponse.IsNotSuccessful() {
 		return

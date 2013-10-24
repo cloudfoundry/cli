@@ -46,12 +46,13 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 		return
 	}
 
-	zipBuffer, err := repo.zipper.Zip(dir)
+	zipFile, err := repo.zipper.Zip(dir)
 	if err != nil {
 		return
 	}
+	defer zipFile.Close()
 
-	apiResponse = repo.uploadBits(app, zipBuffer, resourcesJson)
+	apiResponse = repo.uploadBits(app, zipFile, resourcesJson)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -59,21 +60,22 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipBuffer *bytes.Buffer, resourcesJson []byte) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipFile *os.File, resourcesJson []byte) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits?async=true", repo.config.Target, app.Guid)
 
-	body, boundary, err := createApplicationUploadBody(zipBuffer, resourcesJson)
+	body, boundary, err := createApplicationUploadBody(zipFile, resourcesJson)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error creating upload", err)
 		return
 	}
 
 	request, apiResponse := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
-	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
-	request.Header.Set("Content-Type", contentType)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
+	request.HttpReq.Header.Set("Content-Type", contentType)
 
 	response := &Resource{}
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
@@ -279,8 +281,11 @@ func deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
 	return appFiles
 }
 
-func createApplicationUploadBody(zipBuffer *bytes.Buffer, resourcesJson []byte) (body *bytes.Buffer, boundary string, err error) {
-	body = new(bytes.Buffer)
+func createApplicationUploadBody(zipFile *os.File, resourcesJson []byte) (body *os.File, boundary string, err error) {
+	body, err = os.Create("/tmp/cf-cli-body")
+	if err != nil {
+		return
+	}
 
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
@@ -297,28 +302,32 @@ func createApplicationUploadBody(zipBuffer *bytes.Buffer, resourcesJson []byte) 
 		return
 	}
 
-	if zipBuffer.Len() == 0 {
-		return
-	}
-
-	part, err = createZipPartWriter(zipBuffer, writer)
+	zipStats, err := zipFile.Stat()
 	if err != nil {
 		return
 	}
 
-	_, err = io.Copy(part, zipBuffer)
+	if zipStats.Size() == 0 {
+		return
+	}
+
+	part, err = createZipPartWriter(zipStats, writer)
 	if err != nil {
 		return
 	}
 
+	_, err = io.Copy(part, zipFile)
+	if err != nil {
+		return
+	}
 	return
 }
 
-func createZipPartWriter(zipBuffer *bytes.Buffer, writer *multipart.Writer) (io.Writer, error) {
+func createZipPartWriter(zipStats os.FileInfo, writer *multipart.Writer) (io.Writer, error) {
 	h := make(textproto.MIMEHeader)
 	h.Set("Content-Disposition", `form-data; name="application"; filename="application.zip"`)
 	h.Set("Content-Type", "application/zip")
-	h.Set("Content-Length", fmt.Sprintf("%d", zipBuffer.Len()))
+	h.Set("Content-Length", fmt.Sprintf("%d", zipStats.Size()))
 	h.Set("Content-Transfer-Encoding", "binary")
 	return writer.CreatePart(h)
 }

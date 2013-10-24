@@ -6,8 +6,8 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"errors"
+	"fmt"
 	"github.com/stretchr/testify/assert"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -52,29 +52,28 @@ var uploadBuildpackBodyMatcher = func(request *http.Request) error {
 		}
 		multipartFile := v[0]
 
-		var file multipart.File
-		if file, err = multipartFile.Open(); err != nil {
-			return errors.New("Cannot get multipart file")
-
+		file, err := multipartFile.Open()
+		if err != nil {
+			return errors.New(fmt.Sprintf("Cannot get multipart file: %s", err.Error()))
 		}
 
-		if zipReader, err := zip.NewReader(file, 4096); err != nil {
-			return errors.New("Error reading zip content")
-		} else {
-			if len(zipReader.File) != 3 {
-				return errors.New("Wrong number of files in zip")
-			}
+		zipReader, err := zip.NewReader(file, 4096)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Error reading zip content: %s", err.Error()))
+		}
 
-		nextFile:
-			for _, f := range zipReader.File {
-				for _, expected := range buildpackContent {
-					if f.Name == expected {
-						continue nextFile
-					}
+		if len(zipReader.File) != 3 {
+			return errors.New("Wrong number of files in zip")
+		}
+
+	nextFile:
+		for _, f := range zipReader.File {
+			for _, expected := range buildpackContent {
+				if f.Name == expected {
+					continue nextFile
 				}
-				return errors.New("Missing file: " + f.Name)
 			}
-
+			return errors.New("Missing file: " + f.Name)
 		}
 	}
 

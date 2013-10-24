@@ -1,13 +1,15 @@
 package cf
 
-import "bytes"
+import (
+	"os"
+)
 
 type FakeZipper struct {
 	ZippedDir string
-	ZippedBuffer *bytes.Buffer
+	ZippedFile *os.File
 }
 
-func (zipper *FakeZipper) Zip(dir string) (zipBuffer *bytes.Buffer, err error) {
+func (zipper *FakeZipper) Zip(dir string) (zipFile *os.File, err error) {
 	zipper.ZippedDir = dir
-	return zipper.ZippedBuffer, nil
+	return zipper.ZippedFile, nil
 }

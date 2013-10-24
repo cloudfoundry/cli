@@ -80,7 +80,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
 	_, apiResponse = uaa.gateway.PerformRequestForJSONResponse(request, &response)

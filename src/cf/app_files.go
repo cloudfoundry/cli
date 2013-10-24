@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -18,12 +17,16 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 		size := fileInfo.Size()
 
 		h := sha1.New()
-		fileBytes, err := ioutil.ReadFile(fullPath)
+		file, err := os.Open(fullPath)
 		if err != nil {
 			return
 		}
 
-		h.Write(fileBytes)
+		_, err = io.Copy(h, file)
+		if err != nil {
+			return
+		}
+
 		sha1Bytes := h.Sum(nil)
 		sha1 := fmt.Sprintf("%x", sha1Bytes)
 

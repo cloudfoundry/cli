@@ -1,7 +1,6 @@
 package api
 
 import (
-	"bytes"
 	"cf"
 	"cf/configuration"
 	"cf/net"
@@ -206,7 +205,9 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 		Target:      ts.URL,
 	}
 	gateway := net.NewCloudControllerGateway()
-	zipper := &testcf.FakeZipper{ZippedBuffer: bytes.NewBufferString("hello world!")}
+	file, err := os.Open("../../fixtures/hello_world.txt")
+	assert.NoError(t, err)
+	zipper := &testcf.FakeZipper{ZippedFile: file}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
 	app = cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}

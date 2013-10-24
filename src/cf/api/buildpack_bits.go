@@ -1,13 +1,13 @@
 package api
 
 import (
-	"bytes"
 	"cf"
 	"cf/configuration"
 	"cf/net"
 	"fmt"
 	"io"
 	"mime/multipart"
+	"os"
 )
 
 type BuildpackBitsRepository interface {
@@ -28,12 +28,13 @@ func NewCloudControllerBuildpackBitsRepository(config *configuration.Configurati
 }
 
 func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.Buildpack, dir string) (apiResponse net.ApiResponse) {
-	zipBuffer, err := repo.zipper.Zip(dir)
+	zipFile, err := repo.zipper.Zip(dir)
 	if err != nil {
 		return net.NewApiResponseWithError("Invalid buildpack", err)
 	}
+	defer zipFile.Close()
 
-	apiResponse = repo.uploadBits(buildpack, zipBuffer)
+	apiResponse = repo.uploadBits(buildpack, zipFile)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -41,10 +42,10 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, zipBuffer *bytes.Buffer) (apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, zipFile *os.File) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, app.Guid)
 
-	body, boundary, err := createBuildpackUploadBody(zipBuffer)
+	body, boundary, err := createBuildpackUploadBody(zipFile)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error creating upload", err)
 		return
@@ -52,7 +53,7 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, 
 
 	request, apiResponse := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
 	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
-	request.Header.Set("Content-Type", contentType)
+	request.HttpReq.Header.Set("Content-Type", contentType)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -61,15 +62,23 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, 
 	return
 }
 
-func createBuildpackUploadBody(zipBuffer *bytes.Buffer) (body *bytes.Buffer, boundary string, err error) {
-	body = new(bytes.Buffer)
+func createBuildpackUploadBody(zipFile *os.File) (body *os.File, boundary string, err error) {
+	body, err = os.Create("/tmp/cf-cli-body")
+	if err != nil {
+		return
+	}
 
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 
 	boundary = writer.Boundary()
 
-	if zipBuffer.Len() == 0 {
+	zipStats, err := zipFile.Stat()
+	if err != nil {
+		return
+	}
+
+	if zipStats.Size() == 0 {
 		return
 	}
 
@@ -78,7 +87,7 @@ func createBuildpackUploadBody(zipBuffer *bytes.Buffer) (body *bytes.Buffer, bou
 		return
 	}
 
-	_, err = io.Copy(part, zipBuffer)
+	_, err = io.Copy(part, zipFile)
 	if err != nil {
 		return
 	}

@@ -1,13 +1,13 @@
 package net
 
 import (
-	"bytes"
 	"cf"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"runtime"
 )
 
@@ -25,7 +25,8 @@ type tokenRefresher interface {
 }
 
 type Request struct {
-	*http.Request
+	HttpReq      *http.Request
+	SeekableBody io.ReadSeeker
 }
 
 type Gateway struct {
@@ -52,19 +53,19 @@ func (gateway Gateway) GetResource(url, accessToken string, resource interface{}
 	return
 }
 
-func (gateway Gateway) CreateResource(url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
+func (gateway Gateway) CreateResource(url, accessToken string, body io.ReadSeeker) (apiResponse ApiResponse) {
 	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body, nil)
 }
 
-func (gateway Gateway) CreateResourceForResponse(url, accessToken string, body io.Reader, resource interface{}) (apiResponse ApiResponse) {
+func (gateway Gateway) CreateResourceForResponse(url, accessToken string, body io.ReadSeeker, resource interface{}) (apiResponse ApiResponse) {
 	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body, resource)
 }
 
-func (gateway Gateway) UpdateResource(url, accessToken string, body io.Reader) (apiResponse ApiResponse) {
+func (gateway Gateway) UpdateResource(url, accessToken string, body io.ReadSeeker) (apiResponse ApiResponse) {
 	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body, nil)
 }
 
-func (gateway Gateway) UpdateResourceForResponse(url, accessToken string, body io.Reader, resource interface{}) (apiResponse ApiResponse) {
+func (gateway Gateway) UpdateResourceForResponse(url, accessToken string, body io.ReadSeeker, resource interface{}) (apiResponse ApiResponse) {
 	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body, resource)
 }
 
@@ -72,7 +73,7 @@ func (gateway Gateway) DeleteResource(url, accessToken string) (apiResponse ApiR
 	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, nil)
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.Reader, resource interface{}) (apiResponse ApiResponse) {
+func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.ReadSeeker, resource interface{}) (apiResponse ApiResponse) {
 	request, apiResponse := gateway.NewRequest(verb, url, accessToken, body)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -86,7 +87,11 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken strin
 	return gateway.PerformRequest(request)
 }
 
-func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Reader) (req *Request, apiResponse ApiResponse) {
+func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiResponse ApiResponse) {
+	if body != nil {
+		body.Seek(0, 0)
+	}
+
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Error building request", err)
@@ -100,7 +105,19 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("content-type", "application/json")
 	request.Header.Set("User-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
-	req = &Request{request}
+
+	if body != nil {
+		switch v := body.(type) {
+		case *os.File:
+			fileStats, err := v.Stat()
+			if err != nil {
+				break
+			}
+			request.ContentLength = fileStats.Size()
+		}
+	}
+
+	req = &Request{HttpReq: request, SeekableBody: body}
 	return
 }
 
@@ -144,12 +161,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 }
 
 func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
-	// copy body bytes for redoing request after an OAUTH refresh
-	var bodyBytes []byte
-	if request.Body != nil {
-		bodyBytes, _ = ioutil.ReadAll(request.Body)
-		request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
-	}
+	httpReq := request.HttpReq
 
 	// perform request
 	rawResponse, apiResponse = gateway.doRequestAndHandlerError(request)
@@ -168,9 +180,10 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 	}
 
 	// reset the auth token and request body
-	request.Header.Set("Authorization", newToken)
-	if len(bodyBytes) > 0 {
-		request.Body = ioutil.NopCloser(bytes.NewReader(bodyBytes))
+	httpReq.Header.Set("Authorization", newToken)
+	if request.SeekableBody != nil {
+		request.SeekableBody.Seek(0, 0)
+		httpReq.Body = ioutil.NopCloser(request.SeekableBody)
 	}
 
 	// make the request again
@@ -179,7 +192,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 }
 
 func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
-	rawResponse, err := doRequest(request.Request)
+	rawResponse, err := doRequest(request.HttpReq)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Error performing request", err)
 		return

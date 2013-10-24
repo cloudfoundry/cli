@@ -5,26 +5,31 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
 type Zipper interface {
-	Zip(dirToZip string) (zip *bytes.Buffer, err error)
+	Zip(dirToZip string) (zipFile *os.File, err error)
 }
 
 type ApplicationZipper struct{}
 
 var doNotZipExtensions = []string{".zip", ".war", ".jar"}
 
-func (zipper ApplicationZipper) Zip(dirOrZipFile string) (zipBuffer *bytes.Buffer, err error) {
+func (zipper ApplicationZipper) Zip(dirOrZipFile string) (zipFile *os.File, err error) {
 	if shouldNotZip(filepath.Ext(dirOrZipFile)) {
-		return readZipFile(dirOrZipFile)
+		return os.Open(dirOrZipFile)
 	}
 
-	return createZipFile(dirOrZipFile)
+	zipFile, err = createZipFile(dirOrZipFile)
+	if err != nil {
+		return
+	}
+
+	_, err = zipFile.Seek(0, os.SEEK_SET)
+	return
 }
 
 func shouldNotZip(extension string) (result bool) {
@@ -36,15 +41,11 @@ func shouldNotZip(extension string) (result bool) {
 	return
 }
 
-func readZipFile(file string) (zipBuffer *bytes.Buffer, err error) {
-	var zipBytes []byte
-	zipBytes, err = ioutil.ReadFile(file)
-	zipBuffer = bytes.NewBuffer(zipBytes)
-	return
-}
-
-func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
-	zipBuffer = new(bytes.Buffer)
+func createZipFile(dir string) (zipFile *os.File, err error) {
+	zipFile, err = os.Create("/tmp/cf-cli-zipfile.zip")
+	if err != nil {
+		return
+	}
 
 	isEmpty, err := IsDirEmpty(dir)
 	if err != nil {
@@ -55,7 +56,7 @@ func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 		return
 	}
 
-	writer := zip.NewWriter(zipBuffer)
+	writer := zip.NewWriter(zipFile)
 	defer writer.Close()
 
 	err = walkAppFiles(dir, func(fileName string, fullPath string) {
@@ -64,12 +65,12 @@ func createZipFile(dir string) (zipBuffer *bytes.Buffer, err error) {
 			return
 		}
 
-		content, err := ioutil.ReadFile(fullPath)
+		file, err := os.Open(fullPath)
 		if err != nil {
 			return
 		}
 
-		_, err = zipFile.Write(content)
+		_, err = io.Copy(zipFile, file)
 		if err != nil {
 			return
 		}

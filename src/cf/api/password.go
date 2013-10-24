@@ -47,7 +47,7 @@ func (repo CloudControllerPasswordRepository) GetScore(password string) (score s
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
-	scoreRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	scoreRequest.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	scoreResponse := ScoreResponse{}
 
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(scoreRequest, &scoreResponse)

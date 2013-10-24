@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"runtime"
 	"strings"
 	testconfig "testhelpers/configuration"
@@ -23,10 +24,22 @@ func TestNewRequest(t *testing.T) {
 
 	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, request.Header.Get("Authorization"), "BEARER my-access-token")
-	assert.Equal(t, request.Header.Get("accept"), "application/json")
-	assert.Equal(t, request.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, request.HttpReq.Header.Get("Authorization"), "BEARER my-access-token")
+	assert.Equal(t, request.HttpReq.Header.Get("accept"), "application/json")
+	assert.Equal(t, request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
+}
+
+func TestNewRequestWithAFileBody(t *testing.T) {
+	// arbitrarily picking cloud controller to test
+	gateway := NewCloudControllerGateway()
+
+	body, err := os.Open("../../fixtures/hello_world.txt")
+	assert.NoError(t, err)
+	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, request.HttpReq.ContentLength, 12) // 12 is the size of the file
 }
 
 func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
