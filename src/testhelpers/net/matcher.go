@@ -20,7 +20,7 @@ func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string)
 		}
 
 		actualBody := string(bodyBytes)
-		bodyMatches := removeWhiteSpaceFromBody(actualBody) == removeWhiteSpaceFromBody(expectedBody)
+		bodyMatches := RemoveWhiteSpaceFromBody(actualBody) == RemoveWhiteSpaceFromBody(expectedBody)
 		if !bodyMatches {
 			return errors.New(fmt.Sprintf("\nBody did not match. Expected [%s], Actual [%s]", expectedBody, actualBody))
 		}
@@ -35,7 +35,7 @@ func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string)
 	}
 }
 
-func removeWhiteSpaceFromBody(body string) string {
+func RemoveWhiteSpaceFromBody(body string) string {
 	body = strings.Replace(body, " ", "", -1)
 	body = strings.Replace(body, "\n", "", -1)
 	body = strings.Replace(body, "\r", "", -1)

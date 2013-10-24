@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	testapi "testhelpers/api"
 	testconfig "testhelpers/configuration"
+	testnet "testhelpers/net"
 	"testing"
 )
 
@@ -19,48 +20,45 @@ func TestGetScore(t *testing.T) {
 }
 
 func testScore(t *testing.T, scoreBody string, expectedScore string) {
-	passwordScoreResponse := testapi.TestResponse{Status: http.StatusOK, Body: scoreBody}
-
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"POST",
-		"/password/score",
-		testapi.RequestBodyMatcherWithContentType("password=new-password", "application/x-www-form-urlencoded"),
-		passwordScoreResponse,
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "POST",
+		Path:     "/password/score",
+		Matcher:  testnet.RequestBodyMatcherWithContentType("password=new-password", "application/x-www-form-urlencoded"),
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: scoreBody},
+	})
 
 	accessToken := "BEARER my_access_token"
-	scoreServer, repo := createPasswordRepo(endpoint, accessToken)
+	scoreServer, handler, repo := createPasswordRepo(t, req, accessToken)
 	defer scoreServer.Close()
 
 	score, apiResponse := repo.GetScore("new-password")
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, score, expectedScore)
 }
 
 func TestUpdatePassword(t *testing.T) {
-	passwordUpdateResponse := testapi.TestResponse{Status: http.StatusOK}
-
-	passwordUpdateEndpoint, passwordUpdateEndpointStatus := testapi.CreateCheckableEndpoint(
-		"PUT",
-		"/Users/my-user-guid/password",
-		testapi.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`),
-		passwordUpdateResponse,
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/Users/my-user-guid/password",
+		Matcher:  testnet.RequestBodyMatcher(`{"password":"new-password","oldPassword":"old-password"}`),
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
 
 	accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{UserGuid: "my-user-guid"})
 	assert.NoError(t, err)
 
-	passwordUpdateServer, repo := createPasswordRepo(passwordUpdateEndpoint, accessToken)
+	passwordUpdateServer, handler, repo := createPasswordRepo(t, req, accessToken)
 	defer passwordUpdateServer.Close()
 
 	apiResponse := repo.UpdatePassword("old-password", "new-password")
-	assert.True(t, passwordUpdateEndpointStatus.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createPasswordRepo(passwordEndpoint http.HandlerFunc, accessToken string) (passwordServer *httptest.Server, repo PasswordRepository) {
-	passwordServer = httptest.NewTLSServer(passwordEndpoint)
+func createPasswordRepo(t *testing.T, req testnet.TestRequest, accessToken string) (passwordServer *httptest.Server, handler *testnet.TestHandler, repo PasswordRepository) {
+	passwordServer, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
+
 	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
 		cf.UaaEndpointKey: passwordServer.URL,
 	}}

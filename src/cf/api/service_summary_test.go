@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
-var serviceInstanceSummariesResponse = testapi.TestResponse{Status: http.StatusOK, Body: `
+var serviceInstanceSummariesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
   "apps":[
     {
@@ -46,18 +47,17 @@ var serviceInstanceSummariesResponse = testapi.TestResponse{Status: http.StatusO
 }`}
 
 func TestServiceSummaryGetSummariesInCurrentSpace(t *testing.T) {
-	endpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/spaces/my-space-guid/summary",
-		nil,
-		serviceInstanceSummariesResponse,
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/spaces/my-space-guid/summary",
+		Response: serviceInstanceSummariesResponse,
+	})
 
-	ts, repo := createServiceSummaryRepo(endpoint)
+	ts, handler, repo := createServiceSummaryRepo(t, req)
 	defer ts.Close()
 
 	serviceInstances, apiResponse := repo.GetSummariesInCurrentSpace()
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, 1, len(serviceInstances))
@@ -74,8 +74,8 @@ func TestServiceSummaryGetSummariesInCurrentSpace(t *testing.T) {
 	assert.Equal(t, instance1.ApplicationNames[1], "app2")
 }
 
-func createServiceSummaryRepo(endpoint http.HandlerFunc) (ts *httptest.Server, repo ServiceSummaryRepository) {
-	ts = httptest.NewTLSServer(endpoint)
+func createServiceSummaryRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceSummaryRepository) {
+	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",

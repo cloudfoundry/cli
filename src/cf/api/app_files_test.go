@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testnet "testhelpers/net"
 	"testing"
 )
 
@@ -34,19 +35,18 @@ func TestListFiles(t *testing.T) {
 	listFilesServer := httptest.NewTLSServer(http.HandlerFunc(listFilesEndpoint))
 	defer listFilesServer.Close()
 
-	baseEndpoint, status := testapi.CreateCheckableEndpoint(
-		"GET",
-		"/v2/apps/my-app-guid/instances/0/files/some/path",
-		nil,
-		testapi.TestResponse{Status: http.StatusTemporaryRedirect},
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/apps/my-app-guid/instances/0/files/some/path",
+		Response: testnet.TestResponse{
+			Status: http.StatusTemporaryRedirect,
+			Header: http.Header{
+				"Location": {fmt.Sprintf("%s/some/path", listFilesServer.URL)},
+			},
+		},
+	})
 
-	listFilesRedirectEndpoint := func(writer http.ResponseWriter, req *http.Request) {
-		writer.Header().Add("Location", fmt.Sprintf("%s/some/path", listFilesServer.URL))
-		baseEndpoint(writer, req)
-	}
-
-	listFilesRedirectServer := httptest.NewTLSServer(http.HandlerFunc(listFilesRedirectEndpoint))
+	listFilesRedirectServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{req})
 	defer listFilesRedirectServer.Close()
 
 	config := &configuration.Configuration{
@@ -59,7 +59,7 @@ func TestListFiles(t *testing.T) {
 
 	list, err := repo.ListFiles(cf.Application{Guid: "my-app-guid"}, "some/path")
 
-	assert.True(t, status.Called())
+	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, err.IsNotSuccessful())
 	assert.Equal(t, list, expectedResponse)
 }

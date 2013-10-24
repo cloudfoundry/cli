@@ -12,8 +12,8 @@ import (
 	"net/http/httptest"
 	"runtime"
 	"strings"
-	testapi "testhelpers/api"
 	testconfig "testhelpers/configuration"
+	testnet "testhelpers/net"
 	"testing"
 )
 
@@ -33,7 +33,7 @@ func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
 	gateway := NewUAAGateway()
 	endpoint := refreshTokenApiEndPoint(
 		`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-		testapi.TestResponse{Status: http.StatusOK},
+		testnet.TestResponse{Status: http.StatusOK},
 	)
 
 	testRefreshTokenWithSuccess(t, gateway, endpoint)
@@ -43,7 +43,7 @@ func TestRefreshingTheTokenWithUAARequestAndReturningError(t *testing.T) {
 	gateway := NewUAAGateway()
 	endpoint := refreshTokenApiEndPoint(
 		`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-		testapi.TestResponse{Status: http.StatusBadRequest, Body: `{
+		testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
 			"error": "333", "error_description": "bad request"
 		}`},
 	)
@@ -55,7 +55,7 @@ func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
 	gateway := NewCloudControllerGateway()
 	endpoint := refreshTokenApiEndPoint(
 		`{ "code": 1000, "description": "Auth token is invalid" }`,
-		testapi.TestResponse{Status: http.StatusOK},
+		testnet.TestResponse{Status: http.StatusOK},
 	)
 
 	testRefreshTokenWithSuccess(t, gateway, endpoint)
@@ -65,7 +65,7 @@ func TestRefreshingTheTokenWithCloudControllerRequestAndReturningError(t *testin
 	gateway := NewCloudControllerGateway()
 	endpoint := refreshTokenApiEndPoint(
 		`{ "code": 1000, "description": "Auth token is invalid" }`,
-		testapi.TestResponse{Status: http.StatusBadRequest, Body: `{
+		testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
 			"code": 333, "description": "bad request"
 		}`},
 	)
@@ -88,7 +88,7 @@ func testRefreshTokenWithError(t *testing.T, gateway Gateway, endpoint http.Hand
 	assert.Equal(t, apiResponse.ErrorCode, "333")
 }
 
-var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testapi.TestResponse) http.HandlerFunc {
+var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		var jsonResponse string
 

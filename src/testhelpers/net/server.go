@@ -61,9 +61,14 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for key, values := range tester.Header {
-		actualValues := strings.Join(r.Header[http.CanonicalHeaderKey(key)],";")
+		key = http.CanonicalHeaderKey(key)
+		actualValues := strings.Join(r.Header[key],";")
 		expectedValues := strings.Join(values,";")
-		if  actualValues != expectedValues {
+
+		if key == "Authorization" && !strings.Contains(actualValues, expectedValues) {
+			h.logError("%s header is not contained in actual value.\nExpected: %s\nActual:   %s", key, expectedValues, actualValues)
+		}
+		if  key != "Authorization" && actualValues != expectedValues {
 			h.logError("%s header did not match.\nExpected: %s\nActual:   %s", key, expectedValues, actualValues)
 		}
 	}

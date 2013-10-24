@@ -19,7 +19,7 @@ import (
 	"testing"
 )
 
-var expectedResources = testapi.RemoveWhiteSpaceFromBody(`[
+var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
     {
         "fn": "Gemfile",
         "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
