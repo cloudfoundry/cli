@@ -89,10 +89,7 @@ func (c terminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 }
 
 func (c terminalUI) ConfigFailure(err error) {
-	c.Failed("Error loading config. Please reset the api '%s' and log in '%s'.\n%s",
-		CommandColor(fmt.Sprintf("%s api", cf.Name)),
-		CommandColor(fmt.Sprintf("%s login", cf.Name)),
-		err.Error())
+	c.Failed("Please use 'cf api' to set an API endpoint and then 'cf login' to login.")
 }
 
 func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
