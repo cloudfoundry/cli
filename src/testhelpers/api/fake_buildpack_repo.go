@@ -28,14 +28,15 @@ func (repo *FakeBuildpackRepository) FindAll() (buildpacks []cf.Buildpack, apiRe
 	return
 }
 
-func (repo *FakeBuildpackRepository) FindByName(name string) (cf.Buildpack, net.ApiResponse) {
+func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
+	buildpack = repo.FindByNameBuildpack
 
 	if repo.FindByNameNotFound {
-		return repo.FindByNameBuildpack, net.NewNotFoundApiResponse("%s %s not found", "Buildpack", name)
+		apiResponse = net.NewNotFoundApiResponse("Buildpack %s not found", name)
 	}
 
-	return repo.FindByNameBuildpack, repo.FindByNameApiResponse
+	return
 }
 
 func (repo *FakeBuildpackRepository) Create(newBuildpack cf.Buildpack) (cf.Buildpack, net.ApiResponse) {

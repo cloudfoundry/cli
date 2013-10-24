@@ -68,7 +68,6 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	position, err := strconv.Atoi(c.Args()[2])
-	println("position: ", position)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())
 	}

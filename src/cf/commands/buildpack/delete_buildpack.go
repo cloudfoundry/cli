@@ -11,11 +11,12 @@ import (
 type DeleteBuildpack struct {
 	ui            terminal.UI
 	buildpackRepo api.BuildpackRepository
-	buildpackReq  requirements.BuildpackRequirement
 }
 
 func NewDeleteBuildpack(ui terminal.UI, repo api.BuildpackRepository) (cmd *DeleteBuildpack) {
-	cmd = &DeleteBuildpack{ui: ui, buildpackRepo: repo}
+	cmd = new(DeleteBuildpack)
+	cmd.ui = ui
+	cmd.buildpackRepo = repo
 	return
 }
 
@@ -27,30 +28,42 @@ func (cmd *DeleteBuildpack) GetRequirements(reqFactory requirements.Factory, c *
 	}
 
 	loginReq := reqFactory.NewLoginRequirement()
-	cmd.buildpackReq = reqFactory.NewBuildpackRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
 		loginReq,
-		cmd.buildpackReq,
 	}
 
 	return
 }
 
 func (cmd *DeleteBuildpack) Run(c *cli.Context) {
-	buildpack := cmd.buildpackReq.GetBuildpack()
+	buildpackName := c.Args()[0]
+
 	force := c.Bool("f")
 
-	cmd.ui.Say("Deleting buildpack %s...", terminal.EntityNameColor(buildpack.Name))
-
 	if !force {
-		answer := cmd.ui.Confirm("Are you sure you want to delete the buildpack %s ?", terminal.EntityNameColor(buildpack.Name))
+		answer := cmd.ui.Confirm("Are you sure you want to delete the buildpack %s ?", terminal.EntityNameColor(buildpackName))
 		if !answer {
 			return
 		}
 	}
 
-	apiResponse := cmd.buildpackRepo.Delete(buildpack)
+	cmd.ui.Say("Deleting buildpack %s...", terminal.EntityNameColor(buildpackName))
+
+	buildpack, apiResponse := cmd.buildpackRepo.FindByName(buildpackName)
+
+	if apiResponse.IsNotFound() {
+		cmd.ui.Ok()
+		cmd.ui.Warn("Buildpack %s does not exist.", buildpackName)
+		return
+	}
+
+	if apiResponse.IsError() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+
+	apiResponse = cmd.buildpackRepo.Delete(buildpack)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error deleting buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiResponse.Message)
 		return
