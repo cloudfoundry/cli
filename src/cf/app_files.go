@@ -44,6 +44,16 @@ func TempDirForApp(app Application) (dir string) {
 	return
 }
 
+func TempFileForZip() (file string) {
+	file = filepath.Join(os.TempDir(), "cf", "upload.zip")
+	return
+}
+
+func TempFileForRequestBody() (file string) {
+	file = filepath.Join(os.TempDir(), "cf", "body.txt")
+	return
+}
+
 func InitializeDir(dir string) (err error) {
 	err = os.RemoveAll(dir)
 	if err != nil {

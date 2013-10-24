@@ -63,7 +63,7 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, 
 }
 
 func createBuildpackUploadBody(zipFile *os.File) (body *os.File, boundary string, err error) {
-	body, err = os.Create("/tmp/cf-cli-body")
+	body, err = os.Create(cf.TempFileForRequestBody())
 	if err != nil {
 		return
 	}

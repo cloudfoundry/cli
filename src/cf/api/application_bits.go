@@ -282,7 +282,7 @@ func deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
 }
 
 func createApplicationUploadBody(zipFile *os.File, resourcesJson []byte) (body *os.File, boundary string, err error) {
-	body, err = os.Create("/tmp/cf-cli-body")
+	body, err = os.Create(cf.TempFileForRequestBody())
 	if err != nil {
 		return
 	}
