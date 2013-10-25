@@ -61,9 +61,6 @@ func TestScaleAll(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(2048)) // in megabytes
 	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(512))
 	assert.Equal(t, appRepo.ScaledApp.Instances, 5)
-
-	assert.Equal(t, restarter.AppToRestart.Guid, app.Guid)
-	assert.Equal(t, restarter.AppToRestart.Name, app.Name)
 }
 
 func TestScaleOnlyDisk(t *testing.T) {

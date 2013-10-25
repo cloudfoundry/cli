@@ -83,8 +83,6 @@ func (cmd *Scale) Run(c *cli.Context) {
 	}
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-
-	cmd.restarter.ApplicationRestart(currentApp)
 }
 
 func extractMegaBytes(arg string) (megaBytes uint64, err error) {
