@@ -46,6 +46,8 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd Login) Run(c *cli.Context) {
+	oldUserName := cmd.config.Username()
+
 	apiResponse := cmd.setApi(c)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
@@ -58,13 +60,15 @@ func (cmd Login) Run(c *cli.Context) {
 		return
 	}
 
-	apiResponse = cmd.setOrganization(c)
+	userChanged := (cmd.config.Username() != oldUserName && oldUserName != "")
+
+	apiResponse = cmd.setOrganization(c, userChanged)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	apiResponse = cmd.setSpace(c)
+	apiResponse = cmd.setSpace(c, userChanged)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -114,12 +118,17 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 	return
 }
 
-func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
+func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse net.ApiResponse) {
 	orgName := c.String("o")
 
 	if orgName == "" {
+		// If the user is changing, clear out the org
+		if userChanged {
+			cmd.config.Organization = cf.Organization{}
+		}
+
 		// Reuse org in config
-		if cmd.config.HasOrganization() {
+		if cmd.config.HasOrganization() && !userChanged {
 			return
 		}
 
@@ -136,7 +145,6 @@ func (cmd Login) setOrganization(c *cli.Context) (apiResponse net.ApiResponse) {
 		if len(availableOrgs) == 1 {
 			return cmd.targetOrganization(availableOrgs[0])
 		}
-
 		orgName = cmd.promptForOrgName(availableOrgs)
 	}
 
@@ -171,12 +179,16 @@ func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiRes
 	return
 }
 
-func (cmd Login) setSpace(c *cli.Context) (apiResponse net.ApiResponse) {
+func (cmd Login) setSpace(c *cli.Context, userChanged bool) (apiResponse net.ApiResponse) {
 	spaceName := c.String("s")
 
 	if spaceName == "" {
+		// If user is changing, clear the space
+		if userChanged {
+			cmd.config.Space = cf.Space{}
+		}
 		// Reuse space in config
-		if cmd.config.HasSpace() {
+		if cmd.config.HasSpace() && !userChanged {
 			return
 		}
 
