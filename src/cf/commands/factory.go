@@ -102,7 +102,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, true)
 	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, false)
 
-	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())
+	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository(), repoLocator.GetLogsRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, start, stop)
 

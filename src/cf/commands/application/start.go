@@ -11,12 +11,14 @@ import (
 	"github.com/codegangsta/cli"
 	"strings"
 	"time"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 type Start struct {
 	ui        terminal.UI
 	config    *configuration.Configuration
 	appRepo   api.ApplicationRepository
+	logRepo   api.LogsRepository
 	startTime time.Time
 	appReq    requirements.ApplicationRequirement
 }
@@ -25,11 +27,12 @@ type ApplicationStarter interface {
 	ApplicationStart(cf.Application) (startedApp cf.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appRepo = appRepo
+	cmd.logRepo = logRepo
 
 	return
 }
@@ -71,6 +74,14 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	}
 
 	cmd.ui.Ok()
+
+	onConnect := func() {}
+	onMessage := func(msg *logmessage.Message) {
+		cmd.ui.Say(logMessageOutput(msg))
+	}
+
+	go cmd.logRepo.TailLogsFor(app, onConnect, onMessage, 1)
+//	cmd.logRepo.TailLogsFor(app, onConnect, onMessage, 0)
 
 	instances, apiResponse := cmd.appRepo.GetInstances(app)
 
