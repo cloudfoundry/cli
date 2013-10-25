@@ -23,12 +23,15 @@ func TestCreateUserProvidedServiceInstance(t *testing.T) {
 	ts, handler, repo := createUserProvidedServiceInstanceRepo(t, req)
 	defer ts.Close()
 
-	params := map[string]string{
-		"host":     "example.com",
-		"user":     "me",
-		"password": "secret",
+	serviceInstance := cf.ServiceInstance{
+		Name: "my-custom-service",
+		Params: map[string]string{
+			"host":     "example.com",
+			"user":     "me",
+			"password": "secret",
+		},
 	}
-	apiResponse := repo.Create("my-custom-service", params, "")
+	apiResponse := repo.Create(serviceInstance)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -44,12 +47,17 @@ func TestCreateUserProvidedServiceInstanceWithSyslogDrain(t *testing.T) {
 	ts, handler, repo := createUserProvidedServiceInstanceRepo(t, req)
 	defer ts.Close()
 
-	params := map[string]string{
-		"host":     "example.com",
-		"user":     "me",
-		"password": "secret",
+	serviceInstance := cf.ServiceInstance{
+		Name: "my-custom-service",
+		Params: map[string]string{
+			"host":     "example.com",
+			"user":     "me",
+			"password": "secret",
+		},
+		SysLogDrainUrl: "syslog://example.com",
 	}
-	apiResponse := repo.Create("my-custom-service", params, "syslog://example.com")
+
+	apiResponse := repo.Create(serviceInstance)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

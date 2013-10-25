@@ -10,7 +10,7 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name string, params map[string]string, syslogDrainUrl string) (apiResponse net.ApiResponse)
+	Create(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
 	Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
@@ -25,7 +25,7 @@ func NewCCUserProvidedServiceInstanceRepository(config *configuration.Configurat
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name string, params map[string]string, sysLogDrainUrl string) (apiResponse net.ApiResponse) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.Target)
 
 	type RequestBody struct {
@@ -35,7 +35,12 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name string, params m
 		SysLogDrainUrl string            `json:"syslog_drain_url"`
 	}
 
-	reqBody := RequestBody{name, params, repo.config.Space.Guid, sysLogDrainUrl}
+	reqBody := RequestBody{
+		serviceInstance.Name,
+		serviceInstance.Params,
+		repo.config.Space.Guid,
+		serviceInstance.SysLogDrainUrl,
+	}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error parsing response", err)

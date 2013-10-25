@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -53,7 +54,13 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, paramsMap, c.String("l"))
+	serviceInstance := cf.ServiceInstance{
+		Name:           name,
+		Params:         paramsMap,
+		SysLogDrainUrl: c.String("l"),
+	}
+
+	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(serviceInstance)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

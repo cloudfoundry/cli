@@ -15,19 +15,19 @@ import (
 )
 
 func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
-	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(t,
 		[]string{"-p", `"foo, bar, baz"`, "my-custom-service"},
 		[]string{"foo value", "bar value", "baz value"},
-		userProvidedServiceInstanceRepo,
+		repo,
 	)
 
 	assert.Contains(t, fakeUI.Prompts[0], "foo")
 	assert.Contains(t, fakeUI.Prompts[1], "bar")
 	assert.Contains(t, fakeUI.Prompts[2], "baz")
 
-	assert.Equal(t, userProvidedServiceInstanceRepo.CreateName, "my-custom-service")
-	assert.Equal(t, userProvidedServiceInstanceRepo.CreateParameters, map[string]string{
+	assert.Equal(t, repo.CreateServiceInstance.Name, "my-custom-service")
+	assert.Equal(t, repo.CreateServiceInstance.Params, map[string]string{
 		"foo": "foo value",
 		"bar": "bar value",
 		"baz": "baz value",
@@ -42,17 +42,17 @@ func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceWithJson(t *testing.T) {
-	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	fakeUI := callCreateUserProvidedService(t,
 		[]string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 		[]string{},
-		userProvidedServiceInstanceRepo,
+		repo,
 	)
 
 	assert.Empty(t, fakeUI.Prompts)
 
-	assert.Equal(t, userProvidedServiceInstanceRepo.CreateName, "my-custom-service")
-	assert.Equal(t, userProvidedServiceInstanceRepo.CreateParameters, map[string]string{
+	assert.Equal(t, repo.CreateServiceInstance.Name, "my-custom-service")
+	assert.Equal(t, repo.CreateServiceInstance.Params, map[string]string{
 		"foo": "foo value",
 		"bar": "bar value",
 		"baz": "baz value",
@@ -75,14 +75,14 @@ func TestCreateUserProvidedServiceWithNoSecondArgument(t *testing.T) {
 }
 
 func TestCreateUserProvidedServiceWithSyslogDrain(t *testing.T) {
-	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
 	fakeUI := callCreateUserProvidedService(t,
 		[]string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 		[]string{},
-		userProvidedServiceInstanceRepo,
+		repo,
 	)
-	assert.Equal(t, userProvidedServiceInstanceRepo.CreateSyslogDrainUrl, "syslog://example.com")
+	assert.Equal(t, repo.CreateServiceInstance.SysLogDrainUrl, "syslog://example.com")
 	assert.Contains(t, fakeUI.Outputs[0], "Creating user provided service")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
