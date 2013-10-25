@@ -42,7 +42,12 @@ func shouldNotZip(extension string) (result bool) {
 }
 
 func createZipFile(dir string) (zipFile *os.File, err error) {
-	zipFile, err = os.Create(TempFileForZip())
+	tempFile, err := TempFileForZip()
+	if err != nil {
+		return
+	}
+
+	zipFile, err = os.Create(tempFile)
 	if err != nil {
 		return
 	}

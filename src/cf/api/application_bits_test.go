@@ -215,12 +215,12 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 	apiResponse = repo.UploadApp(app, dir)
 
 	assert.True(t, handler.AllRequestsCalled())
-
 	return
 }
 
 func testUploadDir(t *testing.T, app cf.Application) {
-	uploadDir := cf.TempDirForApp(app)
+	uploadDir, err := cf.TempDirForApp(app)
+	assert.NoError(t, err)
 	files, err := filepath.Glob(filepath.Join(uploadDir, "*"))
 	assert.NoError(t, err)
 

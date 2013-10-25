@@ -48,6 +48,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 
 	zipFile, err := repo.zipper.Zip(dir)
 	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Error zipping application", err)
 		return
 	}
 	defer zipFile.Close()
@@ -156,7 +157,11 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 	}
 
 	// Copy files into a temporary directory and return it
-	uploadDir = cf.TempDirForApp(app)
+	uploadDir, err = cf.TempDirForApp(app)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Error creating temporary directory", err)
+		return
+	}
 
 	err = cf.InitializeDir(uploadDir)
 	if err != nil {
@@ -182,7 +187,12 @@ func fileIsZip(file string) bool {
 }
 
 func extractZip(app cf.Application, zipFile string) (destDir string, err error) {
-	destDir = cf.TempDirForApp(app) + "-zip"
+	destDir, err = cf.TempDirForApp(app)
+	if err != nil {
+		return
+	}
+
+	destDir = destDir + "-zip"
 	err = cf.InitializeDir(destDir)
 	if err != nil {
 		return
@@ -282,7 +292,11 @@ func deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
 }
 
 func createApplicationUploadBody(zipFile *os.File, resourcesJson []byte) (body *os.File, boundary string, err error) {
-	body, err = os.Create(cf.TempFileForRequestBody())
+	tempFile, err := cf.TempFileForRequestBody()
+	if err != nil {
+		return
+	}
+	body, err = os.Create(tempFile)
 	if err != nil {
 		return
 	}

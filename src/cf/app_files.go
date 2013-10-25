@@ -39,18 +39,36 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 	return
 }
 
-func TempDirForApp(app Application) (dir string) {
-	dir = filepath.Join(os.TempDir(), "cf", app.Guid)
+func TempDirForApp(app Application) (appDir string, err error) {
+	dir, err := baseTempDir()
+	if err != nil {
+		return
+	}
+	appDir = filepath.Join(dir, app.Guid)
 	return
 }
 
-func TempFileForZip() (file string) {
-	file = filepath.Join(os.TempDir(), "cf", "upload.zip")
+func TempFileForZip() (file string, err error) {
+	dir, err := baseTempDir()
+	if err != nil {
+		return
+	}
+	file = filepath.Join(dir, "upload.zip")
 	return
 }
 
-func TempFileForRequestBody() (file string) {
-	file = filepath.Join(os.TempDir(), "cf", "body.txt")
+func TempFileForRequestBody() (file string, err error) {
+	dir, err := baseTempDir()
+	if err != nil {
+		return
+	}
+	file = filepath.Join(dir, "body.txt")
+	return
+}
+
+func baseTempDir() (dir string, err error) {
+	dir = filepath.Join(os.TempDir(), "cf")
+	err = os.MkdirAll(dir, os.ModeDir|os.ModeTemporary|os.ModePerm)
 	return
 }
 
