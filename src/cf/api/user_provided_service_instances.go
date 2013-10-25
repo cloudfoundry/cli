@@ -11,7 +11,7 @@ import (
 
 type UserProvidedServiceInstanceRepository interface {
 	Create(name string, params map[string]string, syslogDrainUrl string) (apiResponse net.ApiResponse)
-	Update(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse)
+	Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -32,7 +32,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name string, params m
 		Name           string            `json:"name"`
 		Credentials    map[string]string `json:"credentials"`
 		SpaceGuid      string            `json:"space_guid"`
-		SyslogDrainUrl string            `json:"syslog_drain_url"`
+		SysLogDrainUrl string            `json:"syslog_drain_url"`
 	}
 
 	reqBody := RequestBody{name, params, repo.config.Space.Guid, sysLogDrainUrl}
@@ -45,14 +45,15 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name string, params m
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
+func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstance.Guid)
 
 	type RequestBody struct {
-		Credentials map[string]string `json:"credentials"`
+		Credentials    map[string]string `json:"credentials,omitempty"`
+		SysLogDrainUrl string            `json:"syslog_drain_url,omitempty"`
 	}
 
-	reqBody := RequestBody{params}
+	reqBody := RequestBody{serviceInstance.Params, serviceInstance.SysLogDrainUrl}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error parsing response", err)

@@ -126,6 +126,8 @@ type ServiceInstance struct {
 	ServiceBindings  []ServiceBinding
 	ServicePlan      ServicePlan
 	ApplicationNames []string
+	Params           map[string]string
+	SysLogDrainUrl   string
 }
 
 func (inst ServiceInstance) IsUserProvided() bool {

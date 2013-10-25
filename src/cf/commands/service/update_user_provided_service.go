@@ -26,7 +26,7 @@ func NewUpdateUserProvidedService(ui terminal.UI, config *configuration.Configur
 }
 
 func (cmd *UpdateUserProvidedService) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 2 {
+	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "update-user-provided-service")
 		return
@@ -49,13 +49,15 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 		return
 	}
 
-	params := c.Args()[1]
+	params := c.String("p")
 	paramsMap := make(map[string]string)
+	if params != "" {
 
-	err := json.Unmarshal([]byte(params), &paramsMap)
-	if err != nil {
-		cmd.ui.Failed("JSON is invalid: %s", err.Error())
-		return
+		err := json.Unmarshal([]byte(params), &paramsMap)
+		if err != nil {
+			cmd.ui.Failed("JSON is invalid: %s", err.Error())
+			return
+		}
 	}
 
 	cmd.ui.Say("Updating user provided service %s in org %s / space %s as %s...",
@@ -65,7 +67,10 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance, paramsMap)
+	serviceInstance.Params = paramsMap
+	serviceInstance.SysLogDrainUrl = c.String("l")
+
+	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

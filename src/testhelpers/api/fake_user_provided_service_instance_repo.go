@@ -11,7 +11,6 @@ type FakeUserProvidedServiceInstanceRepo struct {
 	CreateSyslogDrainUrl string
 
 	UpdateServiceInstance cf.ServiceInstance
-	UpdateParameters map[string]string
 }
 
 func (repo *FakeUserProvidedServiceInstanceRepo) Create(name string, params map[string]string, syslogDrainUrl string) (apiResponse net.ApiResponse) {
@@ -21,8 +20,7 @@ func (repo *FakeUserProvidedServiceInstanceRepo) Create(name string, params map[
 	return
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
 	repo.UpdateServiceInstance = serviceInstance
-	repo.UpdateParameters = params
 	return
 }

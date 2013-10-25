@@ -58,6 +58,27 @@ func TestUpdateUserProvidedServiceInstance(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/user_provided_service_instances/my-instance-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"},"syslog_drain_url":"syslog://example.com"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
+
+	ts, handler, repo := createUserProvidedServiceInstanceRepo(t, req)
+	defer ts.Close()
+
+	params := map[string]string{
+		"host":     "example.com",
+		"user":     "me",
+		"password": "secret",
+	}
+	apiResponse := repo.Update(cf.ServiceInstance{Guid: "my-instance-guid", Params: params, SysLogDrainUrl: "syslog://example.com"})
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestUpdateUserProvidedServiceInstanceWithOnlyParams(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/user_provided_service_instances/my-instance-guid",
 		Matcher:  testnet.RequestBodyMatcher(`{"credentials":{"host":"example.com","password":"secret","user":"me"}}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
@@ -70,7 +91,23 @@ func TestUpdateUserProvidedServiceInstance(t *testing.T) {
 		"user":     "me",
 		"password": "secret",
 	}
-	apiResponse := repo.Update(cf.ServiceInstance{Guid: "my-instance-guid"}, params)
+	apiResponse := repo.Update(cf.ServiceInstance{Guid: "my-instance-guid", Params: params})
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestUpdateUserProvidedServiceInstanceWithOnlySysLogDrainUrl(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/user_provided_service_instances/my-instance-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"syslog_drain_url":"syslog://example.com"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
+
+	ts, handler, repo := createUserProvidedServiceInstanceRepo(t, req)
+	defer ts.Close()
+
+	apiResponse := repo.Update(cf.ServiceInstance{Guid: "my-instance-guid", SysLogDrainUrl: "syslog://example.com"})
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
