@@ -105,8 +105,11 @@ func readCfIgnore(dir string) (exclusions []string) {
 	ignores = append([]string{".cfignore"}, ignores...)
 
 	for _, pattern := range ignores {
+		pattern = strings.TrimSpace(pattern)
+		if pattern == "" {
+			continue
+		}
 		pattern = filepath.Clean(pattern)
-
 		patternExclusions := exclusionsForPattern(dir, pattern)
 		exclusions = append(exclusions, patternExclusions...)
 	}
