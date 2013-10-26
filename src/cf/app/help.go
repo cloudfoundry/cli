@@ -18,8 +18,7 @@ var appHelpTemplate = `{{.Title "NAME:"}}
 {{.Title "VERSION:"}}
    {{.Version}}
    {{range .Commands}}
-{{.SubTitle .Name}}
-{{range .CommandSubGroups}}
+{{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
 {{end}}{{end}}{{end}}
 {{.Title "GLOBAL OPTIONS:"}}
