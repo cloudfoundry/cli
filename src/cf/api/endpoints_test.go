@@ -92,7 +92,8 @@ func TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpsEndpointExists(t *testing.T
 	defer ts.Close()
 
 	schemelessURL := strings.Replace(ts.URL, "https://", "", 1)
-	apiResponse := repo.UpdateEndpoint(schemelessURL)
+	endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
+	assert.Equal(t, "https://"+schemelessURL, endpoint)
 
 	assert.True(t, apiResponse.IsSuccessful())
 
@@ -113,7 +114,9 @@ func TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpEndpointExists(t *testing.T)
 	defer ts.Close()
 
 	schemelessURL := strings.Replace(ts.URL, "http://", "", 1)
-	apiResponse := repo.UpdateEndpoint(schemelessURL)
+
+	endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
+	assert.Equal(t, "http://"+schemelessURL, endpoint)
 
 	assert.True(t, apiResponse.IsSuccessful())
 
@@ -136,7 +139,7 @@ func TestUpdateEndpointWhenEndpointReturns404(t *testing.T) {
 	ts, repo := createEndpointRepoForUpdate(configRepo, notFoundApiEndpoint)
 	defer ts.Close()
 
-	apiResponse := repo.UpdateEndpoint(ts.URL)
+	_, apiResponse := repo.UpdateEndpoint(ts.URL)
 
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
@@ -152,7 +155,7 @@ func TestUpdateEndpointWhenEndpointReturnsInvalidJson(t *testing.T) {
 	ts, repo := createEndpointRepoForUpdate(configRepo, invalidJsonResponseApiEndpoint)
 	defer ts.Close()
 
-	apiResponse := repo.UpdateEndpoint(ts.URL)
+	_, apiResponse := repo.UpdateEndpoint(ts.URL)
 
 	assert.True(t, apiResponse.IsNotSuccessful())
 }

@@ -14,7 +14,7 @@ const (
 )
 
 type EndpointRepository interface {
-	UpdateEndpoint(endpoint string) (apiResponse net.ApiResponse)
+	UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse)
 	GetEndpoint(name cf.EndpointType) (endpoint string, apiResponse net.ApiResponse)
 }
 
@@ -31,7 +31,7 @@ func NewEndpointRepository(config *configuration.Configuration, gateway net.Gate
 	return
 }
 
-func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse) {
 	if endpoint == repo.config.Target {
 		return
 	}
@@ -39,15 +39,18 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (apiRespons
 	endpointMissingScheme := !strings.HasPrefix(endpoint, "https://") && !strings.HasPrefix(endpoint, "http://")
 
 	if endpointMissingScheme {
-		apiResponse = repo.doUpdateEndpoint("https://" + endpoint)
+		finalEndpoint = "https://" + endpoint
+		apiResponse = repo.doUpdateEndpoint(finalEndpoint)
 
 		if apiResponse.IsNotSuccessful() {
-			apiResponse = repo.doUpdateEndpoint("http://" + endpoint)
+			finalEndpoint = "http://" + endpoint
+			apiResponse = repo.doUpdateEndpoint(finalEndpoint)
 		}
 		return
 	}
 
-	apiResponse = repo.doUpdateEndpoint(endpoint)
+	finalEndpoint = endpoint
+	apiResponse = repo.doUpdateEndpoint(finalEndpoint)
 
 	return
 }

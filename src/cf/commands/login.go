@@ -9,6 +9,7 @@ import (
 	"cf/terminal"
 	"github.com/codegangsta/cli"
 	"strconv"
+	"strings"
 )
 
 const maxLoginTries = 3
@@ -87,7 +88,11 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
 		api = cmd.ui.Ask("API endpoint%s", terminal.PromptColor(">"))
 	}
 
-	apiResponse = cmd.endpointRepo.UpdateEndpoint(api)
+	endpoint, apiResponse := cmd.endpointRepo.UpdateEndpoint(api)
+	if !strings.HasPrefix(endpoint, "https://") {
+		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
+	}
+
 	return
 }
 

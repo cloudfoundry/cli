@@ -17,7 +17,7 @@ type FakeEndpointRepo struct {
 	GetEndpointEndpoints map[cf.EndpointType]string
 }
 
-func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (apiResponse net.ApiResponse) {
+func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse) {
 	repo.UpdateEndpointEndpoint = endpoint
 
 	if repo.UpdateEndpointError {
@@ -27,7 +27,7 @@ func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (apiResponse net.A
 	repo.Config, _ = repo.ConfigRepo.Get()
 	repo.Config.Target = endpoint
 	repo.ConfigRepo.Save()
-
+	finalEndpoint = endpoint
 	return
 }
 

@@ -86,13 +86,13 @@ func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	assert.Contains(t, c.ui.Outputs[3], "Select an org:")
-	assert.Contains(t, c.ui.Outputs[4], "1. some-org")
-	assert.Contains(t, c.ui.Outputs[5], "2. my-org")
+	assert.Contains(t, c.ui.Outputs[4], "Select an org:")
+	assert.Contains(t, c.ui.Outputs[5], "1. some-org")
+	assert.Contains(t, c.ui.Outputs[6], "2. my-org")
 
-	assert.Contains(t, c.ui.Outputs[13], "Select a space:")
-	assert.Contains(t, c.ui.Outputs[14], "1. my-space")
-	assert.Contains(t, c.ui.Outputs[15], "2. some-space")
+	assert.Contains(t, c.ui.Outputs[14], "Select a space:")
+	assert.Contains(t, c.ui.Outputs[15], "1. my-space")
+	assert.Contains(t, c.ui.Outputs[16], "2. some-space")
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
