@@ -500,14 +500,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
-			Name:        "reserve-route",
-			Description: "Reserve a url route on a space for later use",
-			Usage:       fmt.Sprintf("%s reserve-route SPACE DOMAIN [-n HOSTNAME]", cf.Name()),
+			Name:        "create-route",
+			Description: "Create a url route on a space for later use",
+			Usage:       fmt.Sprintf("%s create-route SPACE DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
-				cmdRunner.RunCmdByName("reserve-route", c)
+				cmdRunner.RunCmdByName("create-route", c)
 			},
 		},
 		{

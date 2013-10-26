@@ -13,40 +13,40 @@ import (
 	"testing"
 )
 
-func TestReserveRouteRequirements(t *testing.T) {
+func TestCreateRouteRequirements(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	callReserveRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+	callCreateRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 
-	callReserveRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+	callCreateRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
-func TestReserveRouteFailsWithUsage(t *testing.T) {
+func TestCreateRouteFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	ui := callReserveRoute(t, []string{""}, reqFactory, routeRepo)
+	ui := callCreateRoute(t, []string{""}, reqFactory, routeRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callReserveRoute(t, []string{"my-space"}, reqFactory, routeRepo)
+	ui = callCreateRoute(t, []string{"my-space"}, reqFactory, routeRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callReserveRoute(t, []string{"my-space", "example.com", "host"}, reqFactory, routeRepo)
+	ui = callCreateRoute(t, []string{"my-space", "example.com", "host"}, reqFactory, routeRepo)
 	assert.True(t, ui.FailedWithUsage)
 
-	ui = callReserveRoute(t, []string{"my-space", "example.com", "-n", "host"}, reqFactory, routeRepo)
+	ui = callCreateRoute(t, []string{"my-space", "example.com", "-n", "host"}, reqFactory, routeRepo)
 	assert.False(t, ui.FailedWithUsage)
 
-	ui = callReserveRoute(t, []string{"my-space", "example.com"}, reqFactory, routeRepo)
+	ui = callCreateRoute(t, []string{"my-space", "example.com"}, reqFactory, routeRepo)
 	assert.False(t, ui.FailedWithUsage)
 }
 
-func TestReserveRoute(t *testing.T) {
+func TestCreateRoute(t *testing.T) {
 	space := cf.Space{Guid: "my-space-guid", Name: "my-space"}
 	domain := cf.Domain{Guid: "domain-guid", Name: "example.com"}
 	reqFactory := &testreq.FakeReqFactory{
@@ -56,7 +56,7 @@ func TestReserveRoute(t *testing.T) {
 	}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	ui := callReserveRoute(t, []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
+	ui := callCreateRoute(t, []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Reserving route")
 	assert.Contains(t, ui.Outputs[0], "host.example.com")
@@ -93,7 +93,7 @@ func TestRouteCreator(t *testing.T) {
 		AccessToken:  token,
 	}
 
-	cmd := NewReserveRoute(ui, config, routeRepo)
+	cmd := NewCreateRoute(ui, config, routeRepo)
 	route, apiResponse := cmd.CreateRoute("my-host", domain, space)
 
 	assert.True(t, apiResponse.IsSuccessful())
@@ -110,9 +110,9 @@ func TestRouteCreator(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func callReserveRoute(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
+func callCreateRoute(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("reserve-route", args)
+	ctxt := testcmd.NewContext("create-route", args)
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
@@ -125,7 +125,7 @@ func callReserveRoute(t *testing.T, args []string, reqFactory *testreq.FakeReqFa
 		AccessToken:  token,
 	}
 
-	cmd := NewReserveRoute(fakeUI, config, routeRepo)
+	cmd := NewCreateRoute(fakeUI, config, routeRepo)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return

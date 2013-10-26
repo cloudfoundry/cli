@@ -97,10 +97,10 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["update-service-auth-token"] = serviceauthtoken.NewUpdateServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
 	factory.cmdsByName["update-user-provided-service"] = service.NewUpdateUserProvidedService(ui, config, repoLocator.GetUserProvidedServiceInstanceRepository())
 
-	reserveRoute := route.NewReserveRoute(ui, config, repoLocator.GetRouteRepository())
-	factory.cmdsByName["reserve-route"] = reserveRoute
-	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), reserveRoute, true)
-	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), reserveRoute, false)
+	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
+	factory.cmdsByName["create-route"] = createRoute
+	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, true)
+	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, false)
 
 	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())

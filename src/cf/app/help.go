@@ -192,7 +192,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 			CommandSubGroups: [][]cmdPresenter{
 				{
 					newCmdPresenter(app, maxNameLen, "routes"),
-					newCmdPresenter(app, maxNameLen, "reserve-route"),
+					newCmdPresenter(app, maxNameLen, "create-route"),
 					newCmdPresenter(app, maxNameLen, "map-route"),
 					newCmdPresenter(app, maxNameLen, "unmap-route"),
 					newCmdPresenter(app, maxNameLen, "delete-route"),

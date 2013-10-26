@@ -15,7 +15,7 @@ type RouteCreator interface {
 	CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse)
 }
 
-type ReserveRoute struct {
+type CreateRoute struct {
 	ui        terminal.UI
 	config    *configuration.Configuration
 	routeRepo api.RouteRepository
@@ -23,19 +23,19 @@ type ReserveRoute struct {
 	domainReq requirements.DomainRequirement
 }
 
-func NewReserveRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *ReserveRoute) {
-	cmd = new(ReserveRoute)
+func NewCreateRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *CreateRoute) {
+	cmd = new(CreateRoute)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.routeRepo = routeRepo
 	return
 }
 
-func (cmd *ReserveRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateRoute) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "reserve-route")
+		cmd.ui.FailWithUsage(c, "create-route")
 		return
 	}
 
@@ -53,7 +53,7 @@ func (cmd *ReserveRoute) GetRequirements(reqFactory requirements.Factory, c *cli
 	return
 }
 
-func (cmd *ReserveRoute) Run(c *cli.Context) {
+func (cmd *CreateRoute) Run(c *cli.Context) {
 	hostName := c.String("n")
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
@@ -65,7 +65,7 @@ func (cmd *ReserveRoute) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *ReserveRoute) CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse) {
+func (cmd *CreateRoute) CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse) {
 	routeToCreate := cf.Route{Host: hostName, Domain: domain}
 
 	cmd.ui.Say("Reserving route %s for org %s / space %s as %s...",
