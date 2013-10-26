@@ -56,5 +56,5 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\nTIP: Use '%s' to target new org", terminal.CommandColor(cf.Name+" target -o "+name))
+	cmd.ui.Say("\nTIP: Use '%s' to target new org", terminal.CommandColor(cf.Name()+" target -o "+name))
 }

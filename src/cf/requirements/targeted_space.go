@@ -19,7 +19,7 @@ func newTargetedSpaceRequirement(ui terminal.UI, config *configuration.Configura
 func (req TargetedSpaceRequirement) Execute() (success bool) {
 	if !req.config.HasOrganization() {
 		message := fmt.Sprintf("No org and space targeted, use '%s' to target an org and space",
-			terminal.CommandColor(cf.Name+" target -o ORG -s SPACE"))
+			terminal.CommandColor(cf.Name()+" target -o ORG -s SPACE"))
 		req.ui.Failed(message)
 		return false
 	}

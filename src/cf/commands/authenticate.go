@@ -56,7 +56,7 @@ func (cmd Authenticate) doLogin(username, password string) (apiResponse net.ApiR
 	apiResponse = cmd.authenticator.Authenticate(username, password)
 	if apiResponse.IsSuccessful() {
 		cmd.ui.Ok()
-		cmd.ui.Say("Use '%s' to view or set your target org and space", terminal.CommandColor(cf.Name+" target"))
+		cmd.ui.Say("Use '%s' to view or set your target org and space", terminal.CommandColor(cf.Name()+" target"))
 	}
 	return
 }

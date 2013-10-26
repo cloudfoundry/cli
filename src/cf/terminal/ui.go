@@ -14,7 +14,7 @@ import (
 type ColoringFunction func(value string, row int, col int) string
 
 func NotLoggedInText() string {
-	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor(cf.Name+" login"))
+	return fmt.Sprintf("Not logged in. Use '%s' to log in.", CommandColor(cf.Name()+" login"))
 }
 
 type UI interface {
@@ -98,7 +98,7 @@ func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 		EntityNameColor(config.ApiVersion))
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out, use '%s' to login", CommandColor(cf.Name+" login USERNAME"))
+		ui.Say("Logged out, use '%s' to login", CommandColor(cf.Name()+" login USERNAME"))
 	} else {
 		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
 	}

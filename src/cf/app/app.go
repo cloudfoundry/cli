@@ -13,7 +13,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		Name:        "help",
 		ShortName:   "h",
 		Description: "Show help",
-		Usage:       fmt.Sprintf("%s help [COMMAND]", cf.Name),
+		Usage:       fmt.Sprintf("%s help [COMMAND]", cf.Name()),
 		Action: func(c *cli.Context) {
 			args := c.Args()
 			if len(args) > 0 {
@@ -25,7 +25,6 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 	}
 
 	app = cli.NewApp()
-	app.Name = cf.Name
 	app.Usage = cf.Usage
 	app.Version = cf.Version
 	app.Action = helpCommand.Action
@@ -34,7 +33,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "api",
 			Description: "Set or view target api url",
-			Usage:       fmt.Sprintf("%s api [URL]", cf.Name),
+			Usage:       fmt.Sprintf("%s api [URL]", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("api", c)
 			},
@@ -42,7 +41,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "app",
 			Description: "Display health and status for app",
-			Usage:       fmt.Sprintf("%s app APP", cf.Name),
+			Usage:       fmt.Sprintf("%s app APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("app", c)
 			},
@@ -51,7 +50,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "apps",
 			ShortName:   "a",
 			Description: "List all apps in the target space",
-			Usage:       fmt.Sprintf("%s apps", cf.Name),
+			Usage:       fmt.Sprintf("%s apps", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("apps", c)
 			},
@@ -59,11 +58,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "auth",
 			Description: "Authenticate user non-interactively",
-			Usage: fmt.Sprintf("%s auth USERNAME PASSWORD\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s auth USERNAME PASSWORD\n\n", cf.Name()) +
 				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
 				"EXAMPLE:\n" +
-				fmt.Sprintf("   %s auth name@example.com \"my password\" (use quotes for passwords with a space)\n", cf.Name) +
-				fmt.Sprintf("   %s auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name),
+				fmt.Sprintf("   %s auth name@example.com \"my password\" (use quotes for passwords with a space)\n", cf.Name()) +
+				fmt.Sprintf("   %s auth name@example.com \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("auth", c)
 			},
@@ -72,7 +71,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "bind-service",
 			ShortName:   "bs",
 			Description: "Bind a service instance to an app",
-			Usage:       fmt.Sprintf("%s bind-service APP SERVICE_INSTANCE", cf.Name),
+			Usage:       fmt.Sprintf("%s bind-service APP SERVICE_INSTANCE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("bind-service", c)
 			},
@@ -80,7 +79,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "buildpacks",
 			Description: "List all buildpacks",
-			Usage:       fmt.Sprintf("%s buildpacks", cf.Name),
+			Usage:       fmt.Sprintf("%s buildpacks", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("buildpacks", c)
 			},
@@ -88,7 +87,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-buildpack",
 			Description: "Create a buildpack",
-			Usage:       fmt.Sprintf("%s create-buildpack BUILDPACK PATH POSITION", cf.Name),
+			Usage:       fmt.Sprintf("%s create-buildpack BUILDPACK PATH POSITION", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-buildpack", c)
 			},
@@ -97,7 +96,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create an org",
-			Usage:       fmt.Sprintf("%s create-org ORG", cf.Name),
+			Usage:       fmt.Sprintf("%s create-org ORG", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-org", c)
 			},
@@ -106,9 +105,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "create-service",
 			ShortName:   "cs",
 			Description: "Create a service instance",
-			Usage: fmt.Sprintf("%s create-service SERVICE PLAN SERVICE_INSTANCE\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s create-service SERVICE PLAN SERVICE_INSTANCE\n\n", cf.Name()) +
 				"EXAMPLE:\n" +
-				fmt.Sprintf("   %s create-service cleardb spark clear-db-mine\n\n", cf.Name) +
+				fmt.Sprintf("   %s create-service cleardb spark clear-db-mine\n\n", cf.Name()) +
 				"TIP:\n" +
 				"   Use 'cf create-user-provided-service' to make user-provided services available to cf apps",
 			Action: func(c *cli.Context) {
@@ -118,7 +117,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-service-auth-token",
 			Description: "Create a service auth token",
-			Usage:       fmt.Sprintf("%s create-service-auth-token LABEL PROVIDER TOKEN", cf.Name),
+			Usage:       fmt.Sprintf("%s create-service-auth-token LABEL PROVIDER TOKEN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-service-auth-token", c)
 			},
@@ -126,7 +125,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-service-broker",
 			Description: "Create a service broker",
-			Usage:       fmt.Sprintf("%s create-service-broker SERVICE_BROKER USERNAME PASSWORD URL", cf.Name),
+			Usage:       fmt.Sprintf("%s create-service-broker SERVICE_BROKER USERNAME PASSWORD URL", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-service-broker", c)
 			},
@@ -134,7 +133,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-space",
 			Description: "Create a space",
-			Usage:       fmt.Sprintf("%s create-space SPACE", cf.Name),
+			Usage:       fmt.Sprintf("%s create-space SPACE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-space", c)
 			},
@@ -142,7 +141,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-user",
 			Description: "Create a new user",
-			Usage:       fmt.Sprintf("%s create-user USERNAME PASSWORD", cf.Name),
+			Usage:       fmt.Sprintf("%s create-user USERNAME PASSWORD", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-user", c)
 			},
@@ -151,16 +150,16 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "create-user-provided-service",
 			ShortName:   "cups",
 			Description: "Make a user-provided service available to cf apps",
-			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n", cf.Name) +
+			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n", cf.Name()) +
 				"\n   Pass comma separated parameter names to enable interactive mode:\n" +
-				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n", cf.Name()) +
 				"\n   Pass parameters as JSON to create a service non-interactively:\n" +
-				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n", cf.Name) +
+				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n", cf.Name()) +
 				"\nEXAMPLE:\n" +
-				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name) +
-				fmt.Sprintf("   %s create-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com", cf.Name),
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"\n", cf.Name()) +
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
+				fmt.Sprintf("   %s create-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()) +
+				fmt.Sprintf("   %s create-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "p", Value: "", Usage: "Parameters"},
 				cli.StringFlag{Name: "l", Value: "", Usage: "Syslog Drain Url"},
@@ -173,7 +172,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "delete",
 			ShortName:   "d",
 			Description: "Delete an app",
-			Usage:       fmt.Sprintf("%s delete -f APP", cf.Name),
+			Usage:       fmt.Sprintf("%s delete -f APP", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -184,7 +183,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-buildpack",
 			Description: "Delete a buildpack",
-			Usage:       fmt.Sprintf("%s delete-buildpack BUILDPACK", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-buildpack BUILDPACK", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
 			},
@@ -195,7 +194,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-domain",
 			Description: "Delete a domain",
-			Usage:       fmt.Sprintf("%s delete-domain DOMAIN", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-domain DOMAIN", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
 			},
@@ -206,7 +205,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-org",
 			Description: "Delete an org",
-			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -217,7 +216,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-route",
 			Description: "Delete a route",
-			Usage:       fmt.Sprintf("%s delete-route DOMAIN -n HOSTNAME", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-route DOMAIN -n HOSTNAME", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 				cli.StringFlag{Name: "n", Usage: "Hostname"},
@@ -230,7 +229,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "delete-service",
 			ShortName:   "ds",
 			Description: "Delete a service instance",
-			Usage:       fmt.Sprintf("%s delete-service SERVICE", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-service SERVICE", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -241,7 +240,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-service-auth-token",
 			Description: "Delete a service auth token",
-			Usage:       fmt.Sprintf("%s delete-service-auth-token LABEL PROVIDER", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-service-auth-token LABEL PROVIDER", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -252,7 +251,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-service-broker",
 			Description: "Delete a service broker",
-			Usage:       fmt.Sprintf("%s delete-service-broker SERVICE_BROKER", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-service-broker SERVICE_BROKER", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -263,7 +262,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-space",
 			Description: "Delete a space",
-			Usage:       fmt.Sprintf("%s delete-space SPACE", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-space SPACE", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -274,7 +273,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-user",
 			Description: "Delete a user",
-			Usage:       fmt.Sprintf("%s delete-user USERNAME", cf.Name),
+			Usage:       fmt.Sprintf("%s delete-user USERNAME", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -285,7 +284,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "domains",
 			Description: "List domains in the target org",
-			Usage:       fmt.Sprintf("%s domains", cf.Name),
+			Usage:       fmt.Sprintf("%s domains", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("domains", c)
 			},
@@ -294,7 +293,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "env",
 			ShortName:   "e",
 			Description: "Show all env variables for an app",
-			Usage:       fmt.Sprintf("%s env APP", cf.Name),
+			Usage:       fmt.Sprintf("%s env APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("env", c)
 			},
@@ -302,7 +301,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "events",
 			Description: "Show recent app events",
-			Usage:       fmt.Sprintf("%s events APP", cf.Name),
+			Usage:       fmt.Sprintf("%s events APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("events", c)
 			},
@@ -311,7 +310,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "files",
 			ShortName:   "f",
 			Description: "Print out a list of files in a directory or the contents of a specific file",
-			Usage:       fmt.Sprintf("%s files APP [PATH]", cf.Name),
+			Usage:       fmt.Sprintf("%s files APP [PATH]", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("files", c)
 			},
@@ -320,13 +319,13 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "login",
 			ShortName:   "l",
 			Description: "Log user in",
-			Usage: fmt.Sprintf("%s login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s login [-a API_URL] [-u USERNAME] [-p PASSWORD] [-o ORG] [-s SPACE]\n\n", cf.Name()) +
 				terminal.WarningColor("WARNING:\n   Providing your password as a command line option is highly discouraged\n   Your password may be visible to others and may be recorded in your shell history\n\n") +
 				"EXAMPLE:\n" +
-				fmt.Sprintf("   %s login (omit username and password to login interactively -- %s will prompt for both)\n", cf.Name, cf.Name) +
-				fmt.Sprintf("   %s login -u name@example.com -p pa55woRD (specify username and password as arguments)\n", cf.Name) +
-				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name) +
-				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name),
+				fmt.Sprintf("   %s login (omit username and password to login interactively -- %s will prompt for both)\n", cf.Name(), cf.Name()) +
+				fmt.Sprintf("   %s login -u name@example.com -p pa55woRD (specify username and password as arguments)\n", cf.Name()) +
+				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name()) +
+				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "a", Value: "", Usage: "API endpoint (for example: https://api.example.com)"},
 				cli.StringFlag{Name: "u", Value: "", Usage: "Username"},
@@ -342,7 +341,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "logout",
 			ShortName:   "lo",
 			Description: "Log user out",
-			Usage:       fmt.Sprintf("%s logout", cf.Name),
+			Usage:       fmt.Sprintf("%s logout", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("logout", c)
 			},
@@ -350,7 +349,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "logs",
 			Description: "Tail or show recent logs for an app",
-			Usage:       fmt.Sprintf("%s logs APP", cf.Name),
+			Usage:       fmt.Sprintf("%s logs APP", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "recent", Usage: "dump recent logs instead of tailing"},
 			},
@@ -362,7 +361,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "marketplace",
 			ShortName:   "m",
 			Description: "List available offerings in the marketplace",
-			Usage:       fmt.Sprintf("%s marketplace", cf.Name),
+			Usage:       fmt.Sprintf("%s marketplace", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("marketplace", c)
 			},
@@ -370,7 +369,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "map-domain",
 			Description: "Map a domain to a space",
-			Usage:       fmt.Sprintf("%s map-domain SPACE DOMAIN", cf.Name),
+			Usage:       fmt.Sprintf("%s map-domain SPACE DOMAIN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("map-domain", c)
 			},
@@ -378,7 +377,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "map-route",
 			Description: "Add a url route to an app",
-			Usage:       fmt.Sprintf("%s map-route APP DOMAIN [-n HOSTNAME]", cf.Name),
+			Usage:       fmt.Sprintf("%s map-route APP DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
@@ -389,7 +388,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "org",
 			Description: "Show org info",
-			Usage:       fmt.Sprintf("%s org ORG", cf.Name),
+			Usage:       fmt.Sprintf("%s org ORG", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("org", c)
 			},
@@ -397,7 +396,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "org-users",
 			Description: "Show org users by role",
-			Usage:       fmt.Sprintf("%s org-users ORG", cf.Name),
+			Usage:       fmt.Sprintf("%s org-users ORG", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("org-users", c)
 			},
@@ -406,7 +405,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "orgs",
 			ShortName:   "o",
 			Description: "List all orgs",
-			Usage:       fmt.Sprintf("%s orgs", cf.Name),
+			Usage:       fmt.Sprintf("%s orgs", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("orgs", c)
 			},
@@ -415,7 +414,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "passwd",
 			ShortName:   "pw",
 			Description: "Change user password",
-			Usage:       fmt.Sprintf("%s passwd", cf.Name),
+			Usage:       fmt.Sprintf("%s passwd", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("passwd", c)
 			},
@@ -424,7 +423,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push a new app or sync changes to an existing app",
-			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name) +
+			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name()) +
 				"               [-m MEMORY] [-b URL] [--no-[re]start] [--no-route] [-p PATH]\n" +
 				"               [-s STACK] [-c COMMAND]",
 			Flags: []cli.Flag{
@@ -447,7 +446,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "quotas",
 			Description: "List available usage quotas ",
-			Usage:       fmt.Sprintf("%s quotas", cf.Name),
+			Usage:       fmt.Sprintf("%s quotas", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("quotas", c)
 			},
@@ -455,7 +454,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "rename",
 			Description: "Rename an app",
-			Usage:       fmt.Sprintf("%s rename APP NEW_APP", cf.Name),
+			Usage:       fmt.Sprintf("%s rename APP NEW_APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename", c)
 			},
@@ -463,7 +462,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "rename-org",
 			Description: "Rename an org",
-			Usage:       fmt.Sprintf("%s rename-org ORG NEW_ORG", cf.Name),
+			Usage:       fmt.Sprintf("%s rename-org ORG NEW_ORG", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename-org", c)
 			},
@@ -471,7 +470,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "rename-service",
 			Description: "Rename a service instance",
-			Usage:       fmt.Sprintf("%s rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE", cf.Name),
+			Usage:       fmt.Sprintf("%s rename-service SERVICE_INSTANCE NEW_SERVICE_INSTANCE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename-service", c)
 			},
@@ -479,7 +478,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "rename-service-broker",
 			Description: "Rename a service broker",
-			Usage:       fmt.Sprintf("%s rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER", cf.Name),
+			Usage:       fmt.Sprintf("%s rename-service-broker SERVICE_BROKER NEW_SERVICE_BROKER", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename-service-broker", c)
 			},
@@ -487,7 +486,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "rename-space",
 			Description: "Rename a space",
-			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name),
+			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename-space", c)
 			},
@@ -495,7 +494,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "reserve-domain",
 			Description: "Reserve a domain on an org for later use",
-			Usage:       fmt.Sprintf("%s reserve-domain ORG DOMAIN", cf.Name),
+			Usage:       fmt.Sprintf("%s reserve-domain ORG DOMAIN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("reserve-domain", c)
 			},
@@ -503,7 +502,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "reserve-route",
 			Description: "Reserve a url route on a space for later use",
-			Usage:       fmt.Sprintf("%s reserve-route SPACE DOMAIN [-n HOSTNAME]", cf.Name),
+			Usage:       fmt.Sprintf("%s reserve-route SPACE DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
@@ -515,7 +514,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "restart",
 			ShortName:   "rs",
 			Description: "Restart an app",
-			Usage:       fmt.Sprintf("%s restart APP", cf.Name),
+			Usage:       fmt.Sprintf("%s restart APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("restart", c)
 			},
@@ -524,7 +523,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "routes",
 			ShortName:   "r",
 			Description: "List all routes",
-			Usage:       fmt.Sprintf("%s routes", cf.Name),
+			Usage:       fmt.Sprintf("%s routes", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("routes", c)
 			},
@@ -532,7 +531,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "scale",
 			Description: "Change the disk quota, instance count, and memory limit for an app",
-			Usage:       fmt.Sprintf("%s scale APP -d DISK -i INSTANCES -m MEMORY", cf.Name),
+			Usage:       fmt.Sprintf("%s scale APP -d DISK -i INSTANCES -m MEMORY", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "d", Value: "", Usage: "disk quota"},
 				cli.IntFlag{Name: "i", Value: 0, Usage: "number of instances"},
@@ -545,7 +544,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "service",
 			Description: "Show service instance info",
-			Usage:       fmt.Sprintf("%s service SERVICE_INSTANCE", cf.Name),
+			Usage:       fmt.Sprintf("%s service SERVICE_INSTANCE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("service", c)
 			},
@@ -553,7 +552,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "service-auth-tokens",
 			Description: "List service auth tokens",
-			Usage:       fmt.Sprintf("%s service-auth-tokens", cf.Name),
+			Usage:       fmt.Sprintf("%s service-auth-tokens", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("service-auth-tokens", c)
 			},
@@ -561,7 +560,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "service-brokers",
 			Description: "List service brokers",
-			Usage:       fmt.Sprintf("%s service-brokers", cf.Name),
+			Usage:       fmt.Sprintf("%s service-brokers", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("service-brokers", c)
 			},
@@ -570,7 +569,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "services",
 			ShortName:   "s",
 			Description: "List all services in the target space",
-			Usage:       fmt.Sprintf("%s services", cf.Name),
+			Usage:       fmt.Sprintf("%s services", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("services", c)
 			},
@@ -579,7 +578,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "set-env",
 			ShortName:   "se",
 			Description: "Set an env variable for an app",
-			Usage:       fmt.Sprintf("%s set-env APP NAME VALUE", cf.Name),
+			Usage:       fmt.Sprintf("%s set-env APP NAME VALUE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("set-env", c)
 			},
@@ -587,7 +586,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "set-org-role",
 			Description: "Assign an org role to a user",
-			Usage: fmt.Sprintf("%s set-org-role USERNAME ORG ROLE\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s set-org-role USERNAME ORG ROLE\n\n", cf.Name()) +
 				"ROLES:\n" +
 				"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
 				"   BillingManager - Create and manage the billing account and payment info\n" +
@@ -599,7 +598,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "set-quota",
 			Description: "Define the quota for an org",
-			Usage: fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name()) +
 				"TIP:\n" +
 				"   Allowable quotas are 'free,' 'paid,' 'runaway,' and 'trial'",
 			Action: func(c *cli.Context) {
@@ -609,7 +608,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "set-space-role",
 			Description: "Assign a space role to a user",
-			Usage: fmt.Sprintf("%s set-space-role USERNAME ORG SPACE ROLE\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s set-space-role USERNAME ORG SPACE ROLE\n\n", cf.Name()) +
 				"ROLES:\n" +
 				"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
 				"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
@@ -621,7 +620,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "share-domain",
 			Description: "Share a domain with all orgs",
-			Usage:       fmt.Sprintf("%s share-domain DOMAIN", cf.Name),
+			Usage:       fmt.Sprintf("%s share-domain DOMAIN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("share-domain", c)
 			},
@@ -629,7 +628,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "space",
 			Description: "Show target space's info",
-			Usage:       fmt.Sprintf("%s space", cf.Name),
+			Usage:       fmt.Sprintf("%s space", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("space", c)
 			},
@@ -637,7 +636,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "space-users",
 			Description: "Show space users by role",
-			Usage:       fmt.Sprintf("%s space-users ORG SPACE", cf.Name),
+			Usage:       fmt.Sprintf("%s space-users ORG SPACE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("space-users", c)
 			},
@@ -645,7 +644,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "spaces",
 			Description: "List all spaces in an org",
-			Usage:       fmt.Sprintf("%s spaces", cf.Name),
+			Usage:       fmt.Sprintf("%s spaces", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("spaces", c)
 			},
@@ -653,7 +652,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "stacks",
 			Description: "List all stacks",
-			Usage:       fmt.Sprintf("%s stacks", cf.Name),
+			Usage:       fmt.Sprintf("%s stacks", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("stacks", c)
 			},
@@ -662,7 +661,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "start",
 			ShortName:   "st",
 			Description: "Start an app",
-			Usage:       fmt.Sprintf("%s start APP", cf.Name),
+			Usage:       fmt.Sprintf("%s start APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("start", c)
 			},
@@ -671,7 +670,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "stop",
 			ShortName:   "sp",
 			Description: "Stop an app",
-			Usage:       fmt.Sprintf("%s stop APP", cf.Name),
+			Usage:       fmt.Sprintf("%s stop APP", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("stop", c)
 			},
@@ -680,7 +679,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "target",
 			ShortName:   "t",
 			Description: "Set or view the targeted org or space",
-			Usage:       fmt.Sprintf("%s target [-o ORG] [-s SPACE]", cf.Name),
+			Usage:       fmt.Sprintf("%s target [-o ORG] [-s SPACE]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "o", Value: "", Usage: "organization"},
 				cli.StringFlag{Name: "s", Value: "", Usage: "space"},
@@ -693,7 +692,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "unbind-service",
 			ShortName:   "us",
 			Description: "Unbind a service instance from an app",
-			Usage:       fmt.Sprintf("%s unbind-service APP SERVICE_INSTANCE", cf.Name),
+			Usage:       fmt.Sprintf("%s unbind-service APP SERVICE_INSTANCE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unbind-service", c)
 			},
@@ -701,7 +700,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unmap-domain",
 			Description: "Unmap a domain from a space",
-			Usage:       fmt.Sprintf("%s unmap-domain SPACE DOMAIN", cf.Name),
+			Usage:       fmt.Sprintf("%s unmap-domain SPACE DOMAIN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unmap-domain", c)
 			},
@@ -709,7 +708,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unmap-route",
 			Description: "Remove a url route from an app",
-			Usage:       fmt.Sprintf("%s unmap-route APP DOMAIN [-n HOSTNAME]", cf.Name),
+			Usage:       fmt.Sprintf("%s unmap-route APP DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
 			},
@@ -720,7 +719,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-env",
 			Description: "Remove an env variable",
-			Usage:       fmt.Sprintf("%s unset-env APP NAME", cf.Name),
+			Usage:       fmt.Sprintf("%s unset-env APP NAME", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-env", c)
 			},
@@ -728,7 +727,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-org-role",
 			Description: "Remove an org role from a user",
-			Usage:       fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE", cf.Name),
+			Usage:       fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-org-role", c)
 			},
@@ -736,7 +735,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-space-role",
 			Description: "Remove a space role from a user",
-			Usage:       fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE", cf.Name),
+			Usage:       fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-space-role", c)
 			},
@@ -744,7 +743,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-buildpack",
 			Description: "Update a buildpack",
-			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-i POSITION]", cf.Name),
+			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-i POSITION]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.IntFlag{Name: "i", Value: 0, Usage: "Buildpack position among other buildpacks"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Path to directory or zip file"},
@@ -756,7 +755,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-service-broker",
 			Description: "Update a service broker",
-			Usage:       fmt.Sprintf("%s update-service-broker SERVICE_BROKER USERNAME PASSWORD URL", cf.Name),
+			Usage:       fmt.Sprintf("%s update-service-broker SERVICE_BROKER USERNAME PASSWORD URL", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("update-service-broker", c)
 			},
@@ -764,7 +763,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-service-auth-token",
 			Description: "Update a service auth token",
-			Usage:       fmt.Sprintf("%s update-service-auth-token LABEL PROVIDER TOKEN", cf.Name),
+			Usage:       fmt.Sprintf("%s update-service-auth-token LABEL PROVIDER TOKEN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("update-service-auth-token", c)
 			},
@@ -773,11 +772,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "update-user-provided-service",
 			ShortName:   "uups",
 			Description: "Update user-provided service name value pairs",
-			Usage: fmt.Sprintf("%s update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n", cf.Name) +
+			Usage: fmt.Sprintf("%s update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n", cf.Name()) +
 				"EXAMPLE:\n" +
-				fmt.Sprintf("   %s update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name) +
-				fmt.Sprintf("   %s update-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name) +
-				fmt.Sprintf("   %s update-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com", cf.Name),
+				fmt.Sprintf("   %s update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
+				fmt.Sprintf("   %s update-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()) +
+				fmt.Sprintf("   %s update-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "p", Value: "", Usage: "Parameters"},
 				cli.StringFlag{Name: "l", Value: "", Usage: "Syslog Drain Url"},
