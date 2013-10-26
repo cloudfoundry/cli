@@ -24,6 +24,7 @@ type DomainEntity struct {
 }
 
 type DomainRepository interface {
+	FindDefaultAppDomain() (domain cf.Domain, apiResponse net.ApiResponse)
 	FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse)
@@ -42,6 +43,22 @@ type CloudControllerDomainRepository struct {
 func NewCloudControllerDomainRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerDomainRepository) {
 	repo.config = config
 	repo.gateway = gateway
+	return
+}
+
+func (repo CloudControllerDomainRepository) FindDefaultAppDomain() (domain cf.Domain, apiResponse net.ApiResponse) {
+	sharedPath := fmt.Sprintf("%s/v2/domains?inline-relations-depth=1", repo.config.Target)
+	sharedDomains, apiResponse := repo.findAllWithPath(sharedPath)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if len(sharedDomains) > 0 {
+		domain = sharedDomains[0]
+	} else {
+		apiResponse = net.NewNotFoundApiResponse("No default domain exists")
+	}
+
 	return
 }
 

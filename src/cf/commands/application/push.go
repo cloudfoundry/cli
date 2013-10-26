@@ -156,7 +156,17 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 }
 
 func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) {
-	domain, apiResponse := cmd.domainRepo.FindByNameInCurrentSpace(domainName)
+	var (
+		apiResponse net.ApiResponse
+		domain      cf.Domain
+	)
+
+	if domainName != "" {
+		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
+	} else {
+		domain, apiResponse = cmd.domainRepo.FindDefaultAppDomain()
+	}
+
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

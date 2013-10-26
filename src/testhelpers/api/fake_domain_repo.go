@@ -6,6 +6,8 @@ import (
 )
 
 type FakeDomainRepository struct {
+	DefaultAppDomain cf.Domain
+
 	FindAllInCurrentSpaceDomains []cf.Domain
 
 	FindAllByOrgOrg cf.Organization
@@ -34,6 +36,11 @@ type FakeDomainRepository struct {
 
 	DeleteDomain cf.Domain
 	DeleteApiResponse net.ApiResponse
+}
+
+func (repo *FakeDomainRepository) FindDefaultAppDomain() (domain cf.Domain, apiResponse net.ApiResponse){
+	domain = repo.DefaultAppDomain
+	return
 }
 
 func (repo *FakeDomainRepository) FindAllByOrg(org cf.Organization)(domains []cf.Domain, apiResponse net.ApiResponse){

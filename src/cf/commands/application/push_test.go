@@ -43,7 +43,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 		cf.Domain{Name: "foo.cf-app.com", Guid: "foo-domain-guid"},
 	}
 
-	domainRepo.FindByNameDomain = domains[0]
+	domainRepo.DefaultAppDomain = domains[0]
 	routeRepo.FindByHostErr = true
 	appRepo.FindByNameNotFound = true
 	stopper.StoppedApp = cf.Application{Name: "my-stopped-app"}
@@ -92,7 +92,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	}
 	route := cf.Route{Host: "my-new-app"}
 
-	domainRepo.FindByNameDomain = domains[0]
+	domainRepo.DefaultAppDomain = domains[0]
 	routeRepo.FindByHostRoute = route
 	appRepo.FindByNameNotFound = true
 
