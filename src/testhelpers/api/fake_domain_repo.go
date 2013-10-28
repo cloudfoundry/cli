@@ -21,8 +21,8 @@ type FakeDomainRepository struct {
 	FindByNameNotFound bool
 	FindByNameErr bool
 
-	ReserveDomainDomainToCreate cf.Domain
-	ReserveDomainOwningOrg cf.Organization
+	CreateDomainDomainToCreate cf.Domain
+	CreateDomainOwningOrg cf.Organization
 
 	CreateSharedDomainDomain cf.Domain
 
@@ -72,8 +72,8 @@ func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrg cf.Orga
 }
 
 func (repo *FakeDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse){
-	repo.ReserveDomainDomainToCreate = domainToCreate
-	repo.ReserveDomainOwningOrg = owningOrg
+	repo.CreateDomainDomainToCreate = domainToCreate
+	repo.CreateDomainOwningOrg = owningOrg
 	return
 }
 

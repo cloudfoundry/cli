@@ -10,25 +10,25 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type ReserveDomain struct {
+type CreateDomain struct {
 	ui         terminal.UI
 	config     *configuration.Configuration
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewReserveDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *ReserveDomain) {
-	cmd = new(ReserveDomain)
+func NewCreateDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *CreateDomain) {
+	cmd = new(CreateDomain)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
 }
 
-func (cmd *ReserveDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "reserve-domain")
+		cmd.ui.FailWithUsage(c, "create-domain")
 		return
 	}
 
@@ -40,7 +40,7 @@ func (cmd *ReserveDomain) GetRequirements(reqFactory requirements.Factory, c *cl
 	return
 }
 
-func (cmd *ReserveDomain) Run(c *cli.Context) {
+func (cmd *CreateDomain) Run(c *cli.Context) {
 	domainName := c.Args()[1]
 	owningOrg := cmd.orgReq.GetOrganization()
 

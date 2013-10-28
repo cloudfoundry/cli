@@ -93,6 +93,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "create-domain",
+			Description: "Reserves a domain on an org for later use",
+			Usage:       fmt.Sprintf("%s create-domain ORG DOMAIN", cf.Name()),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("create-domain", c)
+			},
+		},
+		{
 			Name:        "create-org",
 			ShortName:   "co",
 			Description: "Create an org",
@@ -489,14 +497,6 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename-space", c)
-			},
-		},
-		{
-			Name:        "reserve-domain",
-			Description: "Reserve a domain on an org for later use",
-			Usage:       fmt.Sprintf("%s reserve-domain ORG DOMAIN", cf.Name()),
-			Action: func(c *cli.Context) {
-				cmdRunner.RunCmdByName("reserve-domain", c)
 			},
 		},
 		{
