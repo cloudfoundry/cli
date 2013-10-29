@@ -55,5 +55,5 @@ func (cmd CreateUser) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	cmd.ui.Say("\nTIP: Assign roles with '%s set-org-role' and '%s set-space-role'", cf.Name, cf.Name)
+	cmd.ui.Say("\nTIP: Assign roles with '%s set-org-role' and '%s set-space-role'", cf.Name(), cf.Name())
 }

@@ -1,6 +1,9 @@
 package cf
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+)
 
 const (
 	Version = "6.0.0.rc1-SHA"
@@ -8,5 +11,5 @@ const (
 )
 
 func Name() string {
-	return os.Args[0]
+	return filepath.Base(os.Args[0])
 }

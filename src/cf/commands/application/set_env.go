@@ -78,5 +78,5 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name)
+	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
 }

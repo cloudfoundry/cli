@@ -79,8 +79,8 @@ func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationReposi
 	if err != nil {
 		termUI.Failed(fmt.Sprintf(
 			"Error loading config. Please reset target (%s) and log in (%s).",
-			terminal.CommandColor(fmt.Sprintf("%s target", cf.Name)),
-			terminal.CommandColor(fmt.Sprintf("%s login", cf.Name)),
+			terminal.CommandColor(fmt.Sprintf("%s target", cf.Name())),
+			terminal.CommandColor(fmt.Sprintf("%s login", cf.Name())),
 		))
 		configRepo.Delete()
 		os.Exit(1)

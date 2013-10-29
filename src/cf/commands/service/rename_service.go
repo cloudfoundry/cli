@@ -58,7 +58,7 @@ func (cmd *RenameService) Run(c *cli.Context) {
 
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
-			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiResponse.Message, cf.Name)
+			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiResponse.Message, cf.Name())
 		} else {
 			cmd.ui.Failed(apiResponse.Message)
 		}
