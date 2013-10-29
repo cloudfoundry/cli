@@ -110,6 +110,17 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "create-route",
+			Description: "Create a url route in a space for later use",
+			Usage:       fmt.Sprintf("%s create-route SPACE DOMAIN [-n HOSTNAME]", cf.Name()),
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("create-route", c)
+			},
+		},
+		{
 			Name:        "create-service",
 			ShortName:   "cs",
 			Description: "Create a service instance",
@@ -497,17 +508,6 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s rename-space SPACE NEW_SPACE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("rename-space", c)
-			},
-		},
-		{
-			Name:        "create-route",
-			Description: "Create a url route on a space for later use",
-			Usage:       fmt.Sprintf("%s create-route SPACE DOMAIN [-n HOSTNAME]", cf.Name()),
-			Flags: []cli.Flag{
-				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname"},
-			},
-			Action: func(c *cli.Context) {
-				cmdRunner.RunCmdByName("create-route", c)
 			},
 		},
 		{

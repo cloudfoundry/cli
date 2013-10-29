@@ -58,7 +58,7 @@ func TestCreateRoute(t *testing.T) {
 
 	ui := callCreateRoute(t, []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Reserving route")
+	assert.Contains(t, ui.Outputs[0], "Creating route")
 	assert.Contains(t, ui.Outputs[0], "host.example.com")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
@@ -97,7 +97,7 @@ func TestRouteCreator(t *testing.T) {
 	route, apiResponse := cmd.CreateRoute("my-host", domain, space)
 
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Contains(t, ui.Outputs[0], "Reserving route")
+	assert.Contains(t, ui.Outputs[0], "Creating route")
 	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
