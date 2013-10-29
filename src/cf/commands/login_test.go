@@ -5,6 +5,7 @@ import (
 	. "cf/commands"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	"strconv"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
@@ -152,6 +153,37 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 	assert.Equal(t, c.spaceRepo.FindByNameName, "my-space")
 
 	assert.True(t, c.ui.ShowConfigurationCalled)
+}
+
+func TestLoggingInWithTooManyOrgsDoesNotShowOrgList(t *testing.T) {
+	c := LoginTestContext{
+		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+	}
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		for i := 0; i < 50; i++ {
+			id := strconv.Itoa(i)
+			c.orgRepo.Organizations = append(
+				c.orgRepo.Organizations,
+				cf.Organization{Guid: "my-org-guid-" + id, Name: "my-org-" + id},
+			)
+		}
+		c.orgRepo.Organizations = append(
+			c.orgRepo.Organizations,
+			cf.Organization{Guid: "my-org-guid", Name: "my-org"},
+		)
+		c.spaceRepo.Spaces = []cf.Space{
+			{Guid: "my-space-guid", Name: "my-space"},
+			{Guid: "some-space-guid", Name: "some-space"},
+		}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Contains(t, c.ui.Outputs[4], "Select an org:")
+	assert.Equal(t, c.ui.Outputs[5], "")
+
+	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
 }
 
 func TestSuccessfullyLoggingInWithFlags(t *testing.T) {

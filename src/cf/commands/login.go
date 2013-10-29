@@ -150,6 +150,7 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse 
 		if len(availableOrgs) == 1 {
 			return cmd.targetOrganization(availableOrgs[0])
 		}
+
 		orgName = cmd.promptForOrgName(availableOrgs)
 	}
 
@@ -250,16 +251,22 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 	for nameIndex < 1 || nameIndex > len(names) {
 		var err error
 
+		// list header
 		cmd.ui.Say(listPrompt)
-		for i, name := range names {
-			cmd.ui.Say("%d. %s", i+1, name)
+
+		// only display list if it is shorter than 50
+		if len(names) < 50 {
+			for i, name := range names {
+				cmd.ui.Say("%d. %s", i+1, name)
+			}
 		}
+
 		nameString = cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
 		nameIndex, err = strconv.Atoi(nameString)
 
 		if err != nil {
-			nameIndex = 1
 			cmd.ui.Say("")
+			nameIndex = 1
 			return nameString
 		}
 	}
