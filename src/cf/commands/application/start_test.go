@@ -89,7 +89,7 @@ func TestStartCommandFailsWithUsage(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{}
 
-	ui := callStart([]string{}, config, reqFactory, appRepo, logRepo)
+	ui := callStart([]string{}, config, reqFactory, appRepo, logRepo) //
 	assert.True(t, ui.FailedWithUsage)
 
 	ui = callStart([]string{"my-app"}, config, reqFactory, appRepo, logRepo)
@@ -118,8 +118,8 @@ func TestStartApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
-	assert.Contains(t, ui.Outputs[4], "Started: app my-app available at http://my-app.example.com")
+	assert.Contains(t, ui.Outputs[6], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[7], "Started: app my-app available at http://my-app.example.com")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
@@ -142,7 +142,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "Started")
+	assert.Contains(t, ui.Outputs[6], "Started")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")
@@ -175,12 +175,13 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[2], "Log Line 1")
-	assert.Contains(t, ui.Outputs[3], "Log Line 2")
+	assert.Contains(t, ui.Outputs[2], "Staging")
+	assert.Contains(t, ui.Outputs[3], "Log Line 1")
+	assert.Contains(t, ui.Outputs[4], "Log Line 2")
 
-	assert.Contains(t, ui.Outputs[5], "0 of 2 instances running (1 starting, 1 down)")
-	assert.Contains(t, ui.Outputs[6], "0 of 2 instances running (2 starting)")
-	assert.Contains(t, ui.Outputs[7], "Started: app my-app available at http://my-app.example.com")
+	assert.Contains(t, ui.Outputs[6], "0 of 2 instances running (1 starting, 1 down)")
+	assert.Contains(t, ui.Outputs[7], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[8], "Started: app my-app available at http://my-app.example.com")
 }
 
 func TestStartApplicationWhenStagingFails(t *testing.T) {
@@ -193,8 +194,8 @@ func TestStartApplicationWhenStagingFails(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "FAILED")
-	assert.Contains(t, ui.Outputs[4], "Error staging app")
+	assert.Contains(t, ui.Outputs[6], "FAILED")
+	assert.Contains(t, ui.Outputs[7], "Error staging app")
 }
 
 func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
@@ -217,9 +218,9 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
-	assert.Contains(t, ui.Outputs[4], "FAILED")
-	assert.Contains(t, ui.Outputs[5], "Start unsuccessful")
+	assert.Contains(t, ui.Outputs[6], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[7], "FAILED")
+	assert.Contains(t, ui.Outputs[8], "Start unsuccessful")
 }
 
 func TestStartApplicationWhenStartTimesOut(t *testing.T) {
@@ -246,11 +247,11 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "0 of 2 instances running (2 starting)")
-	assert.Contains(t, ui.Outputs[4], "0 of 2 instances running (1 starting, 1 down)")
-	assert.Contains(t, ui.Outputs[5], "0 of 2 instances running (2 down)")
-	assert.Contains(t, ui.Outputs[6], "FAILED")
-	assert.Contains(t, ui.Outputs[7], "Start app timeout")
+	assert.Contains(t, ui.Outputs[6], "0 of 2 instances running (2 starting)")
+	assert.Contains(t, ui.Outputs[7], "0 of 2 instances running (1 starting, 1 down)")
+	assert.Contains(t, ui.Outputs[8], "0 of 2 instances running (2 down)")
+	assert.Contains(t, ui.Outputs[9], "FAILED")
+	assert.Contains(t, ui.Outputs[10], "Start app timeout")
 }
 
 func TestStartApplicationWhenStartFails(t *testing.T) {

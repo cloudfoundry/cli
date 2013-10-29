@@ -8,10 +8,10 @@ import (
 	"cf/terminal"
 	"errors"
 	"fmt"
+	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 	"strings"
 	"time"
-	"github.com/cloudfoundry/loggregatorlib/logmessage"
 )
 
 type Start struct {
@@ -75,16 +75,17 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.ui.Ok()
 
-	onConnect := func() {}
-	onMessage := func(msg *logmessage.Message) {
-		cmd.ui.Say(logMessageOutput(msg))
+	logChan := make(chan *logmessage.Message, 1000)
+	go cmd.displayLogMessages(logChan)
+
+	onConnect := func() {
+		cmd.ui.Say("\nStaging...")
 	}
 
-	go cmd.logRepo.TailLogsFor(app, onConnect, onMessage, 1)
-//	cmd.logRepo.TailLogsFor(app, onConnect, onMessage, 0)
+	stopLoggingChan := make(chan bool)
+	go cmd.logRepo.TailLogsFor(app, onConnect, logChan, stopLoggingChan, 1)
 
 	instances, apiResponse := cmd.appRepo.GetInstances(app)
-
 	for apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
@@ -94,8 +95,9 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 		cmd.ui.Wait(1 * time.Second)
 		instances, apiResponse = cmd.appRepo.GetInstances(app)
-		cmd.ui.LoadingIndication()
 	}
+
+	stopLoggingChan <- true
 
 	cmd.ui.Say("")
 
@@ -105,8 +107,13 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		cmd.ui.Wait(1 * time.Second)
 		instances, _ = cmd.appRepo.GetInstances(app)
 	}
-
 	return
+}
+
+func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
+	for msg := range logChan {
+		cmd.ui.Say(logMessageOutput(msg))
+	}
 }
 
 func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {

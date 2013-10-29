@@ -53,14 +53,15 @@ func TestRecentLogsFor(t *testing.T) {
 		connected = true
 	}
 
+	logChan := make(chan *logmessage.Message, 1000)
+	err = logsRepo.RecentLogsFor(app, onConnect, logChan)
+
 	// ordered messages we expect to receive
 	dumpedMessages := []*logmessage.Message{}
-	onMessage := func(message *logmessage.Message) {
-		dumpedMessages = append(dumpedMessages, message)
+	for msg := range logChan {
+		dumpedMessages = append(dumpedMessages, msg)
 	}
 
-	// method under test
-	err = logsRepo.RecentLogsFor(app, onConnect, onMessage)
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(dumpedMessages), 1)
@@ -108,12 +109,17 @@ func TestTailsLogsFor(t *testing.T) {
 
 	// ordered messages we expect to receive
 	tailedMessages := []*logmessage.Message{}
-	onMessage := func(message *logmessage.Message) {
-		tailedMessages = append(tailedMessages, message)
-	}
+
+	logChan := make(chan *logmessage.Message, 1000)
+
+	controlChan := make(chan bool)
 
 	// method under test
-	logsRepo.TailLogsFor(app, onConnect, onMessage, time.Duration(1))
+	logsRepo.TailLogsFor(app, onConnect, logChan, controlChan, time.Duration(1))
+
+	for msg := range logChan {
+		tailedMessages = append(tailedMessages, msg)
+	}
 
 	assert.True(t, connected)
 
@@ -169,12 +175,17 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 
 	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 
-	onMessage := func(message *logmessage.Message) {
+	logChan := make(chan *logmessage.Message, 1000)
+	controlChan := make(chan bool)
+
+	logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+
+	for msg := range logChan {
 		//assertions about the arrival times of the messages
 		timeWhenOutputtable := startTime.Add(1 * time.Second).UnixNano()
 		timeNow := time.Now().UnixNano()
 
-		switch string(message.GetLogMessage().Message) {
+		switch string(msg.GetLogMessage().Message) {
 		case "My message 1":
 			assert.True(t, (timeNow-timeWhenOutputtable) < (50*time.Millisecond).Nanoseconds())
 			assert.True(t, (timeNow-timeWhenOutputtable) > (10*time.Millisecond).Nanoseconds())
@@ -186,8 +197,6 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 			assert.True(t, (timeNow-timeWhenOutputtable) > (400*time.Millisecond).Nanoseconds())
 		}
 	}
-
-	logsRepo.TailLogsFor(app, func() {}, onMessage, time.Duration(1*time.Second))
 }
 
 func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
@@ -225,8 +234,12 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 
 	firstMessageTime := time.Now().Add(-10 * time.Second).UnixNano()
 
-	onMessage := func(message *logmessage.Message) {
-		switch string(message.GetLogMessage().Message) {
+	logChan := make(chan *logmessage.Message, 1000)
+	controlChan := make(chan bool)
+	logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+
+	for msg := range logChan {
+		switch string(msg.GetLogMessage().Message) {
 		case "My message 1":
 			firstMessageTime = time.Now().UnixNano()
 		case "My message 2":
@@ -241,8 +254,6 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 			assert.True(t, delta >= 0)
 		}
 	}
-
-	logsRepo.TailLogsFor(app, func() {}, onMessage, time.Duration(1*time.Second))
 }
 
 func marshalledLogMessageWithTime(t *testing.T, messageString string, timestamp int64) []byte {
