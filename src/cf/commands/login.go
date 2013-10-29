@@ -83,6 +83,7 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
 	api := c.String("a")
 	if api == "" {
 		api = cmd.config.Target
+		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(api))
 	}
 	if api == "" {
 		api = cmd.ui.Ask("API endpoint%s", terminal.PromptColor(">"))
