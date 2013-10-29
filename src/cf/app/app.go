@@ -94,7 +94,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "create-domain",
-			Description: "Reserves a domain on an org for later use",
+			Description: "Create a domain in an org for later use",
 			Usage:       fmt.Sprintf("%s create-domain ORG DOMAIN", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-domain", c)

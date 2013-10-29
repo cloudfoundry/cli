@@ -47,7 +47,7 @@ func TestCreateDomain(t *testing.T) {
 
 	assert.Equal(t, domainRepo.CreateDomainDomainToCreate.Name, "example.com")
 	assert.Equal(t, domainRepo.CreateDomainOwningOrg.Name, "myOrg")
-	assert.Contains(t, fakeUI.Outputs[0], "Reserving domain")
+	assert.Contains(t, fakeUI.Outputs[0], "Creating domain")
 	assert.Contains(t, fakeUI.Outputs[0], "example.com")
 	assert.Contains(t, fakeUI.Outputs[0], "myOrg")
 	assert.Contains(t, fakeUI.Outputs[0], "my-user")
