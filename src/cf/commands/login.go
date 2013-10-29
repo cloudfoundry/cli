@@ -246,7 +246,7 @@ func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
 
 func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) string {
 	nameIndex := 0
-
+	var nameString string
 	for nameIndex < 1 || nameIndex > len(names) {
 		var err error
 
@@ -254,12 +254,13 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 		for i, name := range names {
 			cmd.ui.Say("%d. %s", i+1, name)
 		}
-		nameNumber := cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
-		nameIndex, err = strconv.Atoi(nameNumber)
+		nameString = cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
+		nameIndex, err = strconv.Atoi(nameString)
 
 		if err != nil {
-			nameIndex = 0
+			nameIndex = 1
 			cmd.ui.Say("")
+			return nameString
 		}
 	}
 

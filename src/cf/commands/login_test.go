@@ -67,9 +67,10 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 	l.Run(testcmd.NewContext("login", c.Flags))
 }
 
-func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
+func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
+	OUT_OF_RANGE_CHOICE := "3"
 	c := LoginTestContext{
-		Inputs: []string{"api.example.com", "user@example.com", "password", "3", "abc", "2", "3", "abc", "1"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
@@ -90,9 +91,52 @@ func TestSuccessfullyLoggingInWithPrompts(t *testing.T) {
 	assert.Contains(t, c.ui.Outputs[5], "1. some-org")
 	assert.Contains(t, c.ui.Outputs[6], "2. my-org")
 
-	assert.Contains(t, c.ui.Outputs[14], "Select a space:")
-	assert.Contains(t, c.ui.Outputs[15], "1. my-space")
-	assert.Contains(t, c.ui.Outputs[16], "2. some-space")
+	assert.Contains(t, c.ui.Outputs[10], "Select a space:")
+	assert.Contains(t, c.ui.Outputs[11], "1. my-space")
+	assert.Contains(t, c.ui.Outputs[12], "2. some-space")
+
+	assert.Equal(t, savedConfig.Target, "api.example.com")
+	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+
+	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, c.authRepo.Email, "user@example.com")
+	assert.Equal(t, c.authRepo.Password, "password")
+
+	assert.Equal(t, c.orgRepo.FindByNameName, "my-org")
+	assert.Equal(t, c.spaceRepo.FindByNameName, "my-space")
+
+	assert.True(t, c.ui.ShowConfigurationCalled)
+}
+
+func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
+	c := LoginTestContext{
+		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+	}
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.Organizations = []cf.Organization{
+			{Guid: "some-org-guid", Name: "some-org"},
+			{Guid: "my-org-guid", Name: "my-org"},
+		}
+
+		c.spaceRepo.Spaces = []cf.Space{
+			{Guid: "my-space-guid", Name: "my-space"},
+			{Guid: "some-space-guid", Name: "some-space"},
+		}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+
+	assert.Contains(t, c.ui.Outputs[4], "Select an org:")
+	assert.Contains(t, c.ui.Outputs[5], "1. some-org")
+	assert.Contains(t, c.ui.Outputs[6], "2. my-org")
+
+	assert.Contains(t, c.ui.Outputs[8], "Select a space:")
+	assert.Contains(t, c.ui.Outputs[9], "1. my-space")
+	assert.Contains(t, c.ui.Outputs[10], "2. some-space")
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
