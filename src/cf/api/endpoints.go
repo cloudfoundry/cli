@@ -32,10 +32,6 @@ func NewEndpointRepository(config *configuration.Configuration, gateway net.Gate
 }
 
 func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse) {
-	if endpoint == repo.config.Target {
-		return
-	}
-
 	endpointMissingScheme := !strings.HasPrefix(endpoint, "https://") && !strings.HasPrefix(endpoint, "http://")
 
 	if endpointMissingScheme {
@@ -50,6 +46,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 	}
 
 	finalEndpoint = endpoint
+
 	apiResponse = repo.doUpdateEndpoint(finalEndpoint)
 
 	return
@@ -72,7 +69,10 @@ func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiRespo
 		return
 	}
 
-	repo.configRepo.ClearSession()
+	if endpoint != repo.config.Target {
+		repo.configRepo.ClearSession()
+	}
+
 	repo.config.Target = endpoint
 	repo.config.ApiVersion = serverResponse.ApiVersion
 	repo.config.AuthorizationEndpoint = serverResponse.AuthorizationEndpoint

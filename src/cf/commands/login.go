@@ -51,7 +51,7 @@ func (cmd Login) Run(c *cli.Context) {
 
 	apiResponse := cmd.setApi(c)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+		cmd.ui.Failed("Invalid api endpoint.\n%s", apiResponse.Message)
 		return
 	}
 
@@ -89,6 +89,7 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
 	}
 
 	endpoint, apiResponse := cmd.endpointRepo.UpdateEndpoint(api)
+
 	if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}

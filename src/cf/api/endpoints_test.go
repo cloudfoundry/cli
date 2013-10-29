@@ -77,10 +77,12 @@ func TestUpdateEndpointWhenUrlIsAlreadyTargeted(t *testing.T) {
 	config.Organization = org
 	config.Space = space
 
-	originalConfig := *config
 	repo.UpdateEndpoint(ts.URL)
 
-	assert.Equal(t, *config, originalConfig)
+	assert.Equal(t, config.Organization, org)
+	assert.Equal(t, config.Space, space)
+	assert.Equal(t, config.AccessToken, "some access token")
+	assert.Equal(t, config.RefreshToken, "some refresh token")
 }
 
 func TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpsEndpointExists(t *testing.T) {
