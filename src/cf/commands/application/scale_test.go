@@ -15,7 +15,7 @@ import (
 )
 
 func TestScaleRequirements(t *testing.T) {
-	args := []string{"-d", "1G", "my-app"}
+	args := []string{"-m", "1G", "my-app"}
 	reqFactory, restarter, appRepo := getScaleDependencies()
 
 	reqFactory.LoginSuccess = false
@@ -49,7 +49,7 @@ func TestScaleAll(t *testing.T) {
 	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
-	ui := callScale(t, []string{"-d", "2G", "-i", "5", "-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
+	ui := callScale(t, []string{"-i", "5", "-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Scaling")
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -58,22 +58,8 @@ func TestScaleAll(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(2048)) // in megabytes
 	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(512))
 	assert.Equal(t, appRepo.ScaledApp.Instances, 5)
-}
-
-func TestScaleOnlyDisk(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	reqFactory, restarter, appRepo := getScaleDependencies()
-	reqFactory.Application = app
-
-	callScale(t, []string{"-d", "2G", "my-app"}, reqFactory, restarter, appRepo)
-
-	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(2048)) // in megabytes
-	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(0))
-	assert.Equal(t, appRepo.ScaledApp.Instances, 0)
 }
 
 func TestScaleOnlyInstances(t *testing.T) {

@@ -530,10 +530,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "scale",
-			Description: "Change the disk quota, instance count, and memory limit for an app",
-			Usage:       fmt.Sprintf("%s scale APP -d DISK -i INSTANCES -m MEMORY", cf.Name()),
+			Description: "Change the instance count and memory limit for an app",
+			Usage:       fmt.Sprintf("%s scale APP -i INSTANCES -m MEMORY", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "d", Value: "", Usage: "disk quota"},
 				cli.IntFlag{Name: "i", Value: 0, Usage: "number of instances"},
 				cli.StringFlag{Name: "m", Value: "", Usage: "memory limit"},
 			},
