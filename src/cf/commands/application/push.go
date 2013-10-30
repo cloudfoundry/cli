@@ -144,9 +144,14 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 
 	if !c.Bool("no-route") {
 		domainName := c.String("d")
-		hostName := c.String("n")
-		if hostName == "" {
-			hostName = app.Name
+
+		var hostName string
+
+		if !c.Bool("no-hostname") {
+			hostName = c.String("n")
+			if hostName == "" {
+				hostName = app.Name
+			}
 		}
 
 		cmd.bindAppToRoute(app, hostName, domainName)
@@ -179,6 +184,7 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 
 		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
+
 		route, apiResponse = cmd.routeRepo.Create(newRoute, domain)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
@@ -187,11 +193,25 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 		cmd.ui.Ok()
 		cmd.ui.Say("")
 	} else {
-		existingUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
+		var existingUrl string
+
+		if (route.Host != "") {
+			existingUrl = fmt.Sprintf("%s.%s", route.Host, domain.Name)
+		} else {
+			existingUrl = domain.Name
+		}
+
 		cmd.ui.Say("Using route %s", terminal.EntityNameColor(existingUrl))
 	}
 
-	finalUrl := fmt.Sprintf("%s.%s", route.Host, domain.Name)
+	var finalUrl string
+
+	if route.Host != "" {
+		finalUrl = fmt.Sprintf("%s.%s", route.Host, domain.Name)
+	} else {
+		finalUrl = domain.Name
+	}
+
 	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
 	apiResponse = cmd.routeRepo.Bind(route, app)
 	if apiResponse.IsNotSuccessful() {

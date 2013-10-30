@@ -454,6 +454,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
 				cli.BoolFlag{Name: "no-restart", Usage: "Do not restart an app after pushing"},
 				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
+				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Path of app directory or zip file"},
 				cli.StringFlag{Name: "s", Value: "", Usage: "Stack to use"},
 				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command"},

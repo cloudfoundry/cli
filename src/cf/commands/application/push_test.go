@@ -176,15 +176,35 @@ func TestPushingAppWithNoRoute(t *testing.T) {
 	stackRepo.FindByNameStack = stack
 	appRepo.FindByNameNotFound = true
 
-	fakeUI := callPush(t, []string{
+	callPush(t, []string{
 		"--no-route",
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "my-new-app")
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, routeRepo.CreatedRoute.Host, "")
 	assert.Equal(t, routeRepo.CreatedRouteDomain.Guid, "")
+}
+
+func TestPushingAppWithNoHostname(t *testing.T) {
+	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+
+	domain := cf.Domain{Name: "bar.cf-app.com", Guid: "bar-domain-guid"}
+	stack := cf.Stack{Name: "customLinux", Guid: "custom-linux-guid"}
+
+	domainRepo.DefaultAppDomain = domain
+	routeRepo.FindByHostErr = true
+	stackRepo.FindByNameStack = stack
+	appRepo.FindByNameNotFound = true
+
+	callPush(t, []string{
+			"--no-hostname",
+			"my-new-app",
+		}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
+	assert.Equal(t, routeRepo.CreatedRoute.Host, "")
+	assert.Equal(t, routeRepo.CreatedRouteDomain.Guid, "bar-domain-guid")
 }
 
 func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
