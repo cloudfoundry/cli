@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
@@ -88,13 +89,15 @@ func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	assert.Contains(t, c.ui.Outputs[5], "Select an org:")
-	assert.Contains(t, c.ui.Outputs[6], "1. some-org")
-	assert.Contains(t, c.ui.Outputs[7], "2. my-org")
-
-	assert.Contains(t, c.ui.Outputs[11], "Select a space:")
-	assert.Contains(t, c.ui.Outputs[12], "1. my-space")
-	assert.Contains(t, c.ui.Outputs[13], "2. some-space")
+	expectedOutputs := []string{
+		"Select an org:",
+		"1. some-org",
+		"2. my-org",
+		"Select a space:",
+		"1. my-space",
+		"2. some-space",
+	}
+	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
@@ -131,13 +134,16 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	assert.Contains(t, c.ui.Outputs[5], "Select an org:")
-	assert.Contains(t, c.ui.Outputs[6], "1. some-org")
-	assert.Contains(t, c.ui.Outputs[7], "2. my-org")
+	expectedOutputs := []string{
+		"Select an org:",
+		"1. some-org",
+		"2. my-org",
+		"Select a space:",
+		"1. my-space",
+		"2. some-space",
+	}
 
-	assert.Contains(t, c.ui.Outputs[9], "Select a space:")
-	assert.Contains(t, c.ui.Outputs[10], "1. my-space")
-	assert.Contains(t, c.ui.Outputs[11], "2. some-space")
+	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
@@ -180,8 +186,7 @@ func TestLoggingInWithTooManyOrgsDoesNotShowOrgList(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	assert.Contains(t, c.ui.Outputs[5], "Select an org:")
-	assert.Equal(t, c.ui.Outputs[6], "")
+	assert.True(t, len(c.ui.Outputs) < 50)
 
 	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
 }
