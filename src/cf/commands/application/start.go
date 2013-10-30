@@ -79,7 +79,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	go cmd.displayLogMessages(logChan)
 
 	onConnect := func() {
-		cmd.ui.Say("\nStaging...")
+		cmd.ui.Say("\n%s",terminal.HeaderColor("Staging..."))
 	}
 
 	stopLoggingChan := make(chan bool)
@@ -112,7 +112,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 	for msg := range logChan {
-		cmd.ui.Say(logMessageOutput(msg))
+		cmd.ui.Say(simpleLogMessageOutput(msg))
 	}
 }
 
@@ -142,9 +142,9 @@ func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.Appli
 
 	if anyInstanceRunning {
 		if len(app.Urls) == 0 {
-			cmd.ui.Say("Started")
+			cmd.ui.Say(terminal.HeaderColor("Started"))
 		} else {
-			cmd.ui.Say("Started: app %s available at %s", app.Name, app.Urls[0])
+			cmd.ui.Say("Started: app %s available at %s", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(app.Urls[0]))
 		}
 		return false
 	} else {

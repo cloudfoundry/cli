@@ -14,6 +14,17 @@ const (
 	TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 )
 
+func simpleLogMessageOutput(msg *logmessage.Message) (msgText string) {
+	logMsg := msg.GetLogMessage()
+	msgText = string(logMsg.GetMessage())
+	reg, err := regexp.Compile("[\n\r]+$")
+	if err != nil {
+		return
+	}
+	msgText = reg.ReplaceAllString(msgText, "")
+	return
+}
+
 func logMessageOutput(msg *logmessage.Message) string {
 	logHeader, coloredLogHeader := extractLogHeader(msg)
 	logMsg := msg.GetLogMessage()
