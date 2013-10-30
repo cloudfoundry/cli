@@ -198,9 +198,9 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 	appRepo.FindByNameNotFound = true
 
 	callPush(t, []string{
-			"--no-hostname",
-			"my-new-app",
-		}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+		"--no-hostname",
+		"my-new-app",
+	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, appRepo.CreatedApp.Name, "my-new-app")
 	assert.Equal(t, routeRepo.CreatedRoute.Host, "")

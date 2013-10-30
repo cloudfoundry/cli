@@ -195,7 +195,7 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 	} else {
 		var existingUrl string
 
-		if (route.Host != "") {
+		if route.Host != "" {
 			existingUrl = fmt.Sprintf("%s.%s", route.Host, domain.Name)
 		} else {
 			existingUrl = domain.Name
