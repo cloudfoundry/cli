@@ -51,7 +51,7 @@ func (cmd Login) Run(c *cli.Context) {
 
 	apiResponse := cmd.setApi(c)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Invalid api endpoint.\n%s", apiResponse.Message)
+		cmd.ui.Failed("Invalid API endpoint.\n%s", apiResponse.Message)
 		return
 	}
 
