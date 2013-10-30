@@ -79,7 +79,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	go cmd.displayLogMessages(logChan)
 
 	onConnect := func() {
-		cmd.ui.Say("\n%s",terminal.HeaderColor("Staging..."))
+		cmd.ui.Say("\n%s", terminal.HeaderColor("Staging..."))
 	}
 
 	stopLoggingChan := make(chan bool)
