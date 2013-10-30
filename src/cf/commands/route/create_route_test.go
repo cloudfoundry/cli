@@ -63,7 +63,37 @@ func TestCreateRoute(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
+	assert.Contains(t, ui.Outputs[1], "OK")
 
+	assert.Equal(t, routeRepo.CreateInSpaceRoute, cf.Route{Host: "host", Domain: domain})
+	assert.Equal(t, routeRepo.CreateInSpaceDomain, domain)
+	assert.Equal(t, routeRepo.CreateInSpaceSpace, space)
+
+}
+
+func TestCreateRouteIsIdempotent(t *testing.T) {
+	space := cf.Space{Guid: "my-space-guid", Name: "my-space"}
+	domain := cf.Domain{Guid: "domain-guid", Name: "example.com"}
+	reqFactory := &testreq.FakeReqFactory{
+		LoginSuccess: true,
+		Domain:       domain,
+		Space:        space,
+	}
+	routeRepo := &testapi.FakeRouteRepository{
+		CreateInSpaceErr: true,
+		FindByHostAndDomainRoute: cf.Route{
+			Guid:   "my-route-guid",
+			Host:   "host",
+			Domain: domain,
+			Space:  space,
+		},
+	}
+
+	ui := callCreateRoute(t, []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
+
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[2], "host.example.com")
+	assert.Contains(t, ui.Outputs[2], "already exists")
 	assert.Equal(t, routeRepo.CreateInSpaceRoute, cf.Route{Host: "host", Domain: domain})
 	assert.Equal(t, routeRepo.CreateInSpaceDomain, domain)
 	assert.Equal(t, routeRepo.CreateInSpaceSpace, space)

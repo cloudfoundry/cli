@@ -78,6 +78,7 @@ type Route struct {
 	Host     string
 	Guid     string
 	Domain   Domain
+	Space    Space
 	AppNames []string
 }
 

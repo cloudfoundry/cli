@@ -29,6 +29,14 @@ var findAllRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
             "name": "cfapps.io"
           }
         },
+        "space": {
+          "metadata": {
+            "guid": "space-1-guid"
+          },
+          "entity": {
+            "name": "space-1"
+          }
+        },
         "apps": [
        	  {
        	    "metadata": {
@@ -53,6 +61,14 @@ var findAllRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
           },
           "entity": {
             "name": "example.com"
+          }
+        },
+        "space": {
+          "metadata": {
+            "guid": "space-2-guid"
+          },
+          "entity": {
+            "name": "space-2"
           }
         },
         "apps": [
@@ -99,6 +115,8 @@ func TestRoutesFindAll(t *testing.T) {
 	assert.Equal(t, route.Guid, "route-1-guid")
 	assert.Equal(t, route.Domain.Name, "cfapps.io")
 	assert.Equal(t, route.Domain.Guid, "domain-1-guid")
+	assert.Equal(t, route.Space.Name, "space-1")
+	assert.Equal(t, route.Space.Guid, "space-1-guid")
 	assert.Equal(t, route.AppNames, []string{"app-1"})
 
 	route = routes[1]

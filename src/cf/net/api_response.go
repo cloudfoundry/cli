@@ -43,6 +43,10 @@ func NewNotFoundApiResponse(message string, a ...interface{}) (apiResponse ApiRe
 	}
 }
 
+func NewSuccessfulApiResponse() (apiResponse ApiResponse) {
+	return ApiResponse{}
+}
+
 func (apiResponse ApiResponse) IsError() bool {
 	return apiResponse.isError
 }

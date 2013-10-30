@@ -77,6 +77,19 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain cf.Domain, space cf.
 
 	route, apiResponse = cmd.routeRepo.CreateInSpace(routeToCreate, domain, space)
 	if apiResponse.IsNotSuccessful() {
+		var findApiResponse net.ApiResponse
+		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
+
+		if findApiResponse.IsNotSuccessful() ||
+			route.Space.Guid != space.Guid ||
+			route.Domain.Guid != domain.Guid ||
+			route.Host != hostName {
+			return
+		}
+
+		apiResponse = net.NewSuccessfulApiResponse()
+		cmd.ui.Ok()
+		cmd.ui.Warn("Route %s already exists", route.URL())
 		return
 	}
 

@@ -23,6 +23,7 @@ type FakeRouteRepository struct {
 	CreateInSpaceDomain cf.Domain
 	CreateInSpaceSpace cf.Space
 	CreateInSpaceCreatedRoute cf.Route
+	CreateInSpaceErr bool
 
 	BoundRoute cf.Route
 	BoundApp   cf.Application
@@ -88,7 +89,12 @@ func (repo *FakeRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Doma
 	repo.CreateInSpaceDomain = domain
 	repo.CreateInSpaceSpace = space
 
-	createdRoute = repo.CreateInSpaceCreatedRoute
+	if repo.CreateInSpaceErr {
+		apiResponse = net.NewApiResponseWithMessage("Error")
+	} else {
+		createdRoute = repo.CreateInSpaceCreatedRoute
+	}
+
 	return
 }
 

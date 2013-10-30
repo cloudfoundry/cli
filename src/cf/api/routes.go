@@ -20,6 +20,7 @@ type RouteResource struct {
 type RouteEntity struct {
 	Host   string
 	Domain DomainResource
+	Space  SpaceResource
 	Apps   []Resource
 }
 
@@ -53,7 +54,7 @@ func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResp
 }
 
 func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/routes?q=host%s", repo.config.Target, "%3A"+host)
+	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1&q=host%s", repo.config.Target, "%3A"+host)
 	return repo.findOneWithPath(path)
 }
 
@@ -63,7 +64,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/routes?q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
+	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1&q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
 	route, apiResponse = repo.findOneWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -97,6 +98,7 @@ func (repo CloudControllerRouteRepository) findAllWithPath(path string) (routes 
 
 	for _, routeResponse := range routesResources.Resources {
 		domainResource := routeResponse.Entity.Domain
+		spaceResource := routeResponse.Entity.Space
 		appNames := []string{}
 
 		for _, appResource := range routeResponse.Entity.Apps {
@@ -110,6 +112,10 @@ func (repo CloudControllerRouteRepository) findAllWithPath(path string) (routes 
 				Domain: cf.Domain{
 					Name: domainResource.Entity.Name,
 					Guid: domainResource.Metadata.Guid,
+				},
+				Space: cf.Space{
+					Name: spaceResource.Entity.Name,
+					Guid: spaceResource.Metadata.Guid,
 				},
 				AppNames: appNames,
 			},

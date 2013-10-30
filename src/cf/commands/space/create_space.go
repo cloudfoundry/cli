@@ -49,7 +49,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.SPACE_EXISTS {
 			cmd.ui.Ok()
-			cmd.ui.Say("Space %s already exists", spaceName)
+			cmd.ui.Warn("Space %s already exists", spaceName)
 			return
 		}
 		cmd.ui.Failed(apiResponse.Message)
