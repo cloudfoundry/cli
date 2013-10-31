@@ -442,22 +442,22 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push a new app or sync changes to an existing app",
-			Usage: fmt.Sprintf("%s push APP [-d DOMAIN] [-n HOST] [-i NUM_INSTANCES]\n", cf.Name()) +
-				"               [-m MEMORY] [-b URL] [--no-[re]start] [--no-route] [-p PATH]\n" +
-				"               [-s STACK] [-c COMMAND]",
+			Usage: fmt.Sprintf("%s push APP [-b URL] [-c COMMAND] [-d DOMAIN] [-i NUM_INSTANCES]\n", cf.Name()) +
+				"               [-m MEMORY] [-n HOST] [-p PATH] [-s STACK]\n" +
+				"               [--no-[re]start] [--no-hostname] [--no-route]",
 			Flags: []cli.Flag{
+				cli.StringFlag{Name: "b", Value: "", Usage: "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command"},
 				cli.StringFlag{Name: "d", Value: "", Usage: "Domain (for example: example.com)"},
-				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname (for example: my-subdomain)"},
 				cli.IntFlag{Name: "i", Value: 1, Usage: "Number of instances"},
 				cli.StringFlag{Name: "m", Value: "128", Usage: "Memory limit (for example: 256, 1G, 1024M)"},
-				cli.StringFlag{Name: "b", Value: "", Usage: "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
-				cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
-				cli.BoolFlag{Name: "no-restart", Usage: "Do not restart an app after pushing"},
-				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
-				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname (for example: my-subdomain)"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Path of app directory or zip file"},
 				cli.StringFlag{Name: "s", Value: "", Usage: "Stack to use"},
-				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command"},
+				cli.BoolFlag{Name: "no-restart", Usage: "Do not restart an app after pushing"},
+				cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
+				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
+				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("push", c)
