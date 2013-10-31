@@ -73,12 +73,6 @@ func (f *FakeReqFactory) NewOrganizationRequirement(name string) requirements.Or
 	return FakeRequirement{f, true}
 }
 
-func (f *FakeReqFactory) NewRouteRequirement(host, domain string) requirements.RouteRequirement {
-	f.RouteHost = host
-	f.RouteDomain = domain
-	return FakeRequirement{f, true}
-}
-
 func (f *FakeReqFactory) NewDomainRequirement(name string) requirements.DomainRequirement {
 	f.DomainName = name
 	return FakeRequirement{f, true}

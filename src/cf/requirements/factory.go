@@ -19,7 +19,6 @@ type Factory interface {
 	NewTargetedSpaceRequirement() Requirement
 	NewTargetedOrgRequirement() TargetedOrgRequirement
 	NewOrganizationRequirement(name string) OrganizationRequirement
-	NewRouteRequirement(host, domain string) RouteRequirement
 	NewDomainRequirement(name string) DomainRequirement
 	NewUserRequirement(username string) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
@@ -91,15 +90,6 @@ func (f apiRequirementFactory) NewOrganizationRequirement(name string) Organizat
 		name,
 		f.ui,
 		f.repoLocator.GetOrganizationRepository(),
-	)
-}
-
-func (f apiRequirementFactory) NewRouteRequirement(host, domain string) RouteRequirement {
-	return newRouteRequirement(
-		host,
-		domain,
-		f.ui,
-		f.repoLocator.GetRouteRepository(),
 	)
 }
 
