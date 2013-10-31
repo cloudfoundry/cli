@@ -182,7 +182,10 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 	if apiResponse.IsNotSuccessful() {
 		newRoute := cf.Route{Host: hostName}
 
-		createdUrl := fmt.Sprintf("%s.%s", newRoute.Host, domain.Name)
+		createdUrl := domain.Name
+		if newRoute.Host != "" {
+			createdUrl = fmt.Sprintf("%s.%s", newRoute.Host, createdUrl)
+		}
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
 
 		route, apiResponse = cmd.routeRepo.Create(newRoute, domain)
