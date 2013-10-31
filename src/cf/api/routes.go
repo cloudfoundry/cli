@@ -59,7 +59,7 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Rou
 }
 
 func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route cf.Route, apiResponse net.ApiResponse) {
-	domain, apiResponse := repo.domainRepo.FindByNameInCurrentSpace(domainName)
+	domain, apiResponse := repo.domainRepo.FindByName(domainName)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

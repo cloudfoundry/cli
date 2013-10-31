@@ -51,8 +51,6 @@ func TestDeleteRouteWithConfirmation(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "Deleting route")
 	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
 
 	assert.Equal(t, routeRepo.DeleteRoute, cf.Route{Host: "my-host", Domain: domain})
 

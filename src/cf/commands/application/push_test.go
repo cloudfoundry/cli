@@ -146,7 +146,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[2], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[4], "my-hostname.bar.cf-app.com")
-	assert.Equal(t, domainRepo.FindByNameName, "bar.cf-app.com")
+	assert.Equal(t, domainRepo.FindByNameInCurrentSpaceName, "bar.cf-app.com")
 	assert.Equal(t, routeRepo.CreatedRoute.Host, "my-hostname")
 	assert.Equal(t, routeRepo.CreatedRouteDomain.Guid, "bar-domain-guid")
 	assert.Contains(t, fakeUI.Outputs[5], "OK")

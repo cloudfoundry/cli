@@ -82,7 +82,7 @@ var sharedDomainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{
     }
 ]}`}
 
-func TestFindAllByOrg(t *testing.T) {
+func TestDomainFindAllByOrg(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1",
@@ -122,7 +122,7 @@ func TestFindAllByOrg(t *testing.T) {
 	assert.True(t, domain.Shared)
 }
 
-func TestFindDefault(t *testing.T) {
+func TestDomainFindDefault(t *testing.T) {
 	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/domains",
@@ -148,7 +148,30 @@ func TestFindDefault(t *testing.T) {
 	assert.Equal(t, domain.Guid, "shared-domain-guid")
 }
 
-func TestFindByNameInCurrentSpace(t *testing.T) {
+func TestDomainFindByName(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+			{
+			  "metadata": { "guid": "domain2-guid" },
+			  "entity": { "name": "domain2.cf-app.com" }
+			}
+		]}`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
+	defer ts.Close()
+
+	domain, apiResponse := repo.FindByName("domain2.cf-app.com")
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.Equal(t, domain.Name, "domain2.cf-app.com")
+	assert.Equal(t, domain.Guid, "domain2-guid")
+}
+
+func TestDomainFindByNameInCurrentSpace(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
@@ -171,7 +194,7 @@ func TestFindByNameInCurrentSpace(t *testing.T) {
 	assert.Equal(t, domain.Guid, "domain2-guid")
 }
 
-func TestFindByNameInCurrentSpaceWhenNotFound(t *testing.T) {
+func TestDomainFindByNameInCurrentSpaceWhenNotFound(t *testing.T) {
 	spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
@@ -194,7 +217,7 @@ func TestFindByNameInCurrentSpaceWhenNotFound(t *testing.T) {
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-func TestFindByNameInCurrentSpaceWhenFoundAsSharedDomain(t *testing.T) {
+func TestDomainFindByNameInCurrentSpaceWhenFoundAsSharedDomain(t *testing.T) {
 	spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
@@ -226,7 +249,7 @@ func TestFindByNameInCurrentSpaceWhenFoundAsSharedDomain(t *testing.T) {
 	assert.Equal(t, domain.Guid, "shared-domain-guid")
 }
 
-func TestFindByNameInCurrentSpaceWhenFoundInDomainsButNotShared(t *testing.T) {
+func TestDomainFindByNameInCurrentSpaceWhenFoundInDomainsButNotShared(t *testing.T) {
 	spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
@@ -256,7 +279,7 @@ func TestFindByNameInCurrentSpaceWhenFoundInDomainsButNotShared(t *testing.T) {
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-func TestFindByNameInOrg(t *testing.T) {
+func TestDomainFindByNameInOrg(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
@@ -291,7 +314,7 @@ func TestFindByNameInOrg(t *testing.T) {
 	assert.Equal(t, domain.Spaces[0].Name, "my-space")
 }
 
-func TestFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
+func TestDomainFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
@@ -313,7 +336,7 @@ func TestFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-func TestFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
+func TestDomainFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
@@ -348,7 +371,7 @@ func TestFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
 	assert.True(t, domain.Shared)
 }
 
-func TestFindByNameInOrgWhenFoundInDomainsButNotShared(t *testing.T) {
+func TestDomainFindByNameInOrgWhenFoundInDomainsButNotShared(t *testing.T) {
 	orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",

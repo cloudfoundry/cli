@@ -28,9 +28,7 @@ func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 }
 
 func (cmd ListRoutes) Run(c *cli.Context) {
-	cmd.ui.Say("Getting routes in org %s / space %s as %s ...",
-		terminal.EntityNameColor(cmd.config.Space.Name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
+	cmd.ui.Say("Getting routes as %s ...",
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

@@ -58,11 +58,7 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.Say("Deleting route %s in org %s / space %s...",
-		terminal.EntityNameColor(url),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
-	)
+	cmd.ui.Say("Deleting route %s...", terminal.EntityNameColor(url))
 
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(host, domainName)
 	if apiResponse.IsError() {

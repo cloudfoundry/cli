@@ -17,7 +17,7 @@ func TestDomainReqExecute(t *testing.T) {
 	success := domainReq.Execute()
 
 	assert.True(t, success)
-	assert.Equal(t, domainRepo.FindByNameName, "example.com")
+	assert.Equal(t, domainRepo.FindByNameInCurrentSpaceName, "example.com")
 	assert.Equal(t, domainReq.GetDomain(), domain)
 }
 
