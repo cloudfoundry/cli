@@ -47,6 +47,7 @@ type Application struct {
 	Stack            Stack
 	EnvironmentVars  map[string]string
 	Command          string
+	Routes           []Route
 }
 
 type AppSummary struct {

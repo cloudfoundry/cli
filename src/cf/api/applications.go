@@ -87,7 +87,20 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 		Instances:       res.Entity.Instances,
 		Memory:          uint64(res.Entity.Memory),
 	}
+	for _, routeResource := range res.Entity.Routes {
+		domainResource := routeResource.Entity.Domain
 
+		route := cf.Route{
+			Guid: routeResource.Metadata.Guid,
+			Host: routeResource.Entity.Host,
+		}
+		route.Domain = cf.Domain{
+			Guid: domainResource.Metadata.Guid,
+			Name: domainResource.Entity.Name,
+		}
+
+		app.Routes = append(app.Routes, route)
+	}
 	return
 }
 
