@@ -14,12 +14,15 @@ import (
 )
 
 func TestApps(t *testing.T) {
-	app1Urls := []string{"app1.cfapps.io", "app1.example.com"}
-	app2Urls := []string{"app2.cfapps.io"}
+	app1Routes := []cf.Route{
+		{Host: "app1", Domain: cf.Domain{Name: "cfapps.io"}},
+		{Host: "app1", Domain: cf.Domain{Name: "example.com"}},
+	}
+	app2Routes := []cf.Route{{Host: "app2", Domain: cf.Domain{Name: "cfapps.io"}}}
 
 	apps := []cf.Application{
-		cf.Application{Name: "Application-1", State: "started", RunningInstances: 1, Instances: 1, Memory: 512, DiskQuota: 1024, Urls: app1Urls},
-		cf.Application{Name: "Application-2", State: "started", RunningInstances: 1, Instances: 2, Memory: 256, DiskQuota: 1024, Urls: app2Urls},
+		cf.Application{Name: "Application-1", State: "started", RunningInstances: 1, Instances: 1, Memory: 512, DiskQuota: 1024, Routes: app1Routes},
+		cf.Application{Name: "Application-2", State: "started", RunningInstances: 1, Instances: 2, Memory: 256, DiskQuota: 1024, Routes: app2Routes},
 	}
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{
 		GetSummariesInCurrentSpaceApps: apps,

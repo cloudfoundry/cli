@@ -133,7 +133,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	t.Parallel()
 
 	app := defaultAppForStart
-	app.Urls = []string{}
+	app.Routes = []cf.Route{}
 
 	instances := [][]cf.ApplicationInstance{
 		[]cf.ApplicationInstance{

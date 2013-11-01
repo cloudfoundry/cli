@@ -66,7 +66,12 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	cmd.ui.Say("\n%s %s", terminal.HeaderColor("state:"), coloredAppState(summary.App))
 	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstaces(summary.App))
 	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(summary.App.Memory*formatters.MEGABYTE), summary.App.Instances)
-	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(summary.App.Urls, ", "))
+
+	var urls []string
+	for _, route := range summary.App.Routes {
+		urls = append(urls, route.URL())
+	}
+	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(urls, ", "))
 
 	if appIsStopped {
 		return

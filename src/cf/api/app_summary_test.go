@@ -18,7 +18,6 @@ var getAppSummariesResponseBody = `
   "apps":[
     {
       "guid":"app-1-guid",
-      "urls":["app1.cfapps.io"],
       "routes":[
         {
           "guid":"route-1-guid",
@@ -39,11 +38,18 @@ var getAppSummariesResponseBody = `
       ]
     },{
       "guid":"app-2-guid",
-      "urls":["app2.cfapps.io", "foo.cfapps.io"],
       "routes":[
         {
           "guid":"route-2-guid",
           "host":"app2",
+          "domain":{
+            "guid":"domain-1-guid",
+            "name":"cfapps.io"
+          }
+        },
+        {
+          "guid":"route-2-guid",
+          "host":"foo",
           "domain":{
             "guid":"domain-1-guid",
             "name":"cfapps.io"
@@ -81,8 +87,8 @@ func TestGetAppSummariesInCurrentSpace(t *testing.T) {
 	app1 := apps[0]
 	assert.Equal(t, app1.Name, "app1")
 	assert.Equal(t, app1.Guid, "app-1-guid")
-	assert.Equal(t, len(app1.Urls), 1)
-	assert.Equal(t, app1.Urls[0], "app1.cfapps.io")
+	assert.Equal(t, len(app1.Routes), 1)
+	assert.Equal(t, app1.Routes[0].URL(), "app1.cfapps.io")
 
 	assert.Equal(t, app1.State, "started")
 	assert.Equal(t, app1.Instances, 1)
@@ -92,9 +98,9 @@ func TestGetAppSummariesInCurrentSpace(t *testing.T) {
 	app2 := apps[1]
 	assert.Equal(t, app2.Name, "app2")
 	assert.Equal(t, app2.Guid, "app-2-guid")
-	assert.Equal(t, len(app2.Urls), 2)
-	assert.Equal(t, app2.Urls[0], "app2.cfapps.io")
-	assert.Equal(t, app2.Urls[1], "foo.cfapps.io")
+	assert.Equal(t, len(app2.Routes), 2)
+	assert.Equal(t, app2.Routes[0].URL(), "app2.cfapps.io")
+	assert.Equal(t, app2.Routes[1].URL(), "foo.cfapps.io")
 
 	assert.Equal(t, app2.State, "started")
 	assert.Equal(t, app2.Instances, 3)
@@ -151,8 +157,8 @@ var appSummaryRequest = testapi.NewCloudControllerTestRequest(testnet.TestReques
 	Path:   "/v2/apps/my-cool-app-guid/summary",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
 {
-  "guid": "app1-guid",
-  "name": "App1",
+  "guid": "my-cool-app-guid",
+  "name": "my-cool-app",
   "routes": [
     {
       "guid": "route-1-guid",

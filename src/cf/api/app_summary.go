@@ -62,26 +62,39 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 		return
 	}
 
-	apps = extractApplicationsFromSummary(resource.Apps)
+	for _, appSummary := range resource.Apps {
+		app := repo.appFromSummary(appSummary)
+		apps = append(apps, app)
+	}
 
 	return
 }
 
-func extractApplicationsFromSummary(appSummaries []ApplicationSummary) (applications []cf.Application) {
-	for _, appSummary := range appSummaries {
-		app := cf.Application{
-			Name:             appSummary.Name,
-			Guid:             appSummary.Guid,
-			Urls:             appSummary.Urls,
-			State:            strings.ToLower(appSummary.State),
-			Instances:        appSummary.Instances,
-			DiskQuota:        appSummary.DiskQuota,
-			RunningInstances: appSummary.RunningInstances,
-			Memory:           appSummary.Memory,
-		}
-		applications = append(applications, app)
+func (repo CloudControllerAppSummaryRepository) appFromSummary(appSummary ApplicationSummary) (app cf.Application) {
+	app = cf.Application{
+		Name:             appSummary.Name,
+		Guid:             appSummary.Guid,
+		Routes:           repo.routesFromSummary(appSummary),
+		State:            strings.ToLower(appSummary.State),
+		Instances:        appSummary.Instances,
+		DiskQuota:        appSummary.DiskQuota,
+		RunningInstances: appSummary.RunningInstances,
+		Memory:           appSummary.Memory,
 	}
+	return
+}
 
+func (repo CloudControllerAppSummaryRepository) routesFromSummary(appSummary ApplicationSummary) (routes []cf.Route) {
+	for _, routeSummary := range appSummary.Routes {
+		routes = append(routes, cf.Route{
+			Guid: routeSummary.Guid,
+			Host: routeSummary.Host,
+			Domain: cf.Domain{
+				Guid: routeSummary.Domain.Guid,
+				Name: routeSummary.Domain.Name,
+			},
+		})
+	}
 	return
 }
 
@@ -93,22 +106,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummary(app cf.Application) (
 		return
 	}
 
-	urls := []string{}
-	// This is a little wonky but we made a concious effort
-	// to keep the domain very separate from the API repsonses
-	// to maintain flexibility.
-	domainRoute := cf.Route{}
-	for _, route := range summaryResponse.Routes {
-		domainRoute.Domain = cf.Domain{Name: route.Domain.Name}
-		domainRoute.Host = route.Host
-		urls = append(urls, domainRoute.URL())
-	}
-
-	app.Instances = summaryResponse.Instances
-	app.RunningInstances = summaryResponse.RunningInstances
-	app.Memory = summaryResponse.Memory
-	app.Urls = urls
-	app.State = strings.ToLower(summaryResponse.State)
+	app = repo.appFromSummary(*summaryResponse)
 
 	summary.App = app
 

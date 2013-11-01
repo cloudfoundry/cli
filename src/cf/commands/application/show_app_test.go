@@ -44,13 +44,16 @@ func TestAppFailsWithUsage(t *testing.T) {
 
 func TestDisplayingAppSummary(t *testing.T) {
 	reqApp := cf.Application{Name: "my-app"}
-
+	routes := []cf.Route{
+		{Host: "my-app", Domain: cf.Domain{Name: "example.com"}},
+		{Host: "foo", Domain: cf.Domain{Name: "example.com"}},
+	}
 	app := cf.Application{
 		State:            "started",
 		Instances:        2,
 		RunningInstances: 2,
 		Memory:           256,
-		Urls:             []string{"my-app.example.com", "foo.example.com"},
+		Routes:           routes,
 	}
 
 	time1, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012")
@@ -122,13 +125,16 @@ func TestDisplayingNotStagedAppSummary(t *testing.T) {
 
 func testDisplayingAppSummaryWithErrorCode(t *testing.T, errorCode string) {
 	reqApp := cf.Application{Name: "my-app"}
-
+	routes := []cf.Route{
+		{Host: "my-app", Domain: cf.Domain{Name: "example.com"}},
+		{Host: "foo", Domain: cf.Domain{Name: "example.com"}},
+	}
 	app := cf.Application{
 		State:            "stopped",
 		Instances:        2,
 		RunningInstances: 0,
 		Memory:           256,
-		Urls:             []string{"my-app.example.com", "foo.example.com"},
+		Routes:           routes,
 	}
 
 	appSummary := cf.AppSummary{App: app}

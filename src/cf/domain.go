@@ -42,7 +42,6 @@ type Application struct {
 	RunningInstances int
 	Memory           uint64 // in Megabytes
 	DiskQuota        uint64 // in Megabytes
-	Urls             []string
 	BuildpackUrl     string
 	Stack            Stack
 	EnvironmentVars  map[string]string
