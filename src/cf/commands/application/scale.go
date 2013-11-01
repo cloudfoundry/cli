@@ -30,7 +30,7 @@ func NewScale(ui terminal.UI, config *configuration.Configuration, restarter App
 
 func (cmd *Scale) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 
-	if len(c.Args()) < 1 {
+	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "scale")
 		return
