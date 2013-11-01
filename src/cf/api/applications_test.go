@@ -71,6 +71,8 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.Memory, uint64(128))
 	assert.Equal(t, app.Instances, 1)
 	assert.Equal(t, app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
+	assert.Equal(t, app.Routes[0].Host, "app1")
+	assert.Equal(t, app.Routes[0].Domain.Name, "cfapps.io")
 }
 
 func TestFindByNameWhenAppIsNotFound(t *testing.T) {

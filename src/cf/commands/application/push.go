@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
-	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
 	"strconv"
@@ -51,13 +50,37 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 }
 
 func (cmd Push) Run(c *cli.Context) {
-	var err error
+	var (
+		apiResponse net.ApiResponse
+	)
 
 	if len(c.Args()) != 1 {
 		cmd.ui.FailWithUsage(c, "push")
 		return
 	}
 
+	app, didCreate := cmd.getApp(c)
+
+	domain := cmd.domain(c)
+	hostName := cmd.hostName(app, c)
+	cmd.bindAppToRoute(app, domain, hostName, didCreate, c)
+
+	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
+
+	dir := cmd.path(c)
+	apiResponse = cmd.appBitsRepo.UploadApp(app, dir)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+
+	cmd.ui.Ok()
+	cmd.ui.Say("")
+
+	cmd.restart(app, c)
+}
+
+func (cmd Push) getApp(c *cli.Context) (app cf.Application, didCreate bool) {
 	appName := c.Args()[0]
 
 	app, apiResponse := cmd.appRepo.FindByName(appName)
@@ -68,49 +91,21 @@ func (cmd Push) Run(c *cli.Context) {
 
 	if apiResponse.IsNotFound() {
 		app, apiResponse = cmd.createApp(appName, c)
-
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
+		didCreate = true
 	}
 
-	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
-
-	dir := c.String("p")
-	if dir == "" {
-		dir, err = os.Getwd()
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-			return
-		}
-	}
-
-	apiResponse = cmd.appBitsRepo.UploadApp(app, dir)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	updatedApp, _ := cmd.stopper.ApplicationStop(app)
-
-	cmd.ui.Say("")
-
-	if !c.Bool("no-start") {
-		if c.String("b") != "" {
-			updatedApp.BuildpackUrl = c.String("b")
-		}
-		cmd.starter.ApplicationStart(updatedApp)
-	}
+	return
 }
 
 func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
 	newApp := cf.Application{
 		Name:         appName,
 		Instances:    c.Int("i"),
-		Memory:       getMemoryLimit(c.String("m")),
+		Memory:       memoryLimit(c.String("m")),
 		BuildpackUrl: c.String("b"),
 		Command:      c.String("c"),
 	}
@@ -139,32 +134,17 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
+
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-
-	if !c.Bool("no-route") {
-		domainName := c.String("d")
-
-		var hostName string
-
-		if !c.Bool("no-hostname") {
-			hostName = c.String("n")
-			if hostName == "" {
-				hostName = app.Name
-			}
-		}
-
-		cmd.bindAppToRoute(app, hostName, domainName)
-	}
 
 	return
 }
 
-func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) {
-	var (
-		apiResponse net.ApiResponse
-		domain      cf.Domain
-	)
+func (cmd Push) domain(c *cli.Context) (domain cf.Domain) {
+	var apiResponse net.ApiResponse
+
+	domainName := c.String("d")
 
 	if domainName != "" {
 		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
@@ -174,48 +154,62 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
+	}
+	return
+}
+
+func (cmd Push) hostName(app cf.Application, c *cli.Context) (hostName string) {
+	if !c.Bool("no-hostname") {
+		hostName = c.String("n")
+		if hostName == "" {
+			hostName = app.Name
+		}
+	}
+	return
+}
+
+func (cmd Push) createRoute(hostName string, domain cf.Domain) (route cf.Route) {
+	newRoute := cf.Route{Host: hostName, Domain: domain}
+
+	cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(newRoute.URL()))
+
+	route, apiResponse := cmd.routeRepo.Create(newRoute, domain)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	route, apiResponse := cmd.routeRepo.FindByHost(hostName)
+	cmd.ui.Ok()
+	cmd.ui.Say("")
 
+	return
+}
+
+func (cmd Push) bindAppToRoute(app cf.Application, domain cf.Domain, hostName string, didCreate bool, c *cli.Context) {
+	if c.Bool("no-route") {
+		return
+	}
+
+	if len(app.Routes) == 0 && didCreate == false {
+		cmd.ui.Say("App %s currently exists as a worker, skipping route creation", terminal.EntityNameColor(app.Name))
+		return
+	}
+
+	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 	if apiResponse.IsNotSuccessful() {
-		newRoute := cf.Route{Host: hostName}
+		route = cmd.createRoute(hostName, domain)
+	} else {
+		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
+	}
 
-		createdUrl := domain.Name
-		if newRoute.Host != "" {
-			createdUrl = fmt.Sprintf("%s.%s", newRoute.Host, createdUrl)
-		}
-		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(createdUrl))
-
-		route, apiResponse = cmd.routeRepo.Create(newRoute, domain)
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
+	for _, boundRoute := range app.Routes {
+		if boundRoute.Guid == route.Guid {
 			return
 		}
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-	} else {
-		var existingUrl string
-
-		if route.Host != "" {
-			existingUrl = fmt.Sprintf("%s.%s", route.Host, domain.Name)
-		} else {
-			existingUrl = domain.Name
-		}
-
-		cmd.ui.Say("Using route %s", terminal.EntityNameColor(existingUrl))
 	}
 
-	var finalUrl string
+	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(app.Name))
 
-	if route.Host != "" {
-		finalUrl = fmt.Sprintf("%s.%s", route.Host, domain.Name)
-	} else {
-		finalUrl = domain.Name
-	}
-
-	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(finalUrl), terminal.EntityNameColor(app.Name))
 	apiResponse = cmd.routeRepo.Bind(route, app)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
@@ -226,7 +220,33 @@ func (cmd Push) bindAppToRoute(app cf.Application, hostName, domainName string) 
 	cmd.ui.Say("")
 }
 
-func getMemoryLimit(arg string) (memory uint64) {
+func (cmd Push) path(c *cli.Context) (dir string) {
+	dir = c.String("p")
+	if dir == "" {
+		var err error
+		dir, err = os.Getwd()
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+			return
+		}
+	}
+	return
+}
+
+func (cmd Push) restart(app cf.Application, c *cli.Context) {
+	updatedApp, _ := cmd.stopper.ApplicationStop(app)
+
+	cmd.ui.Say("")
+
+	if !c.Bool("no-start") {
+		if c.String("b") != "" {
+			updatedApp.BuildpackUrl = c.String("b")
+		}
+		cmd.starter.ApplicationStart(updatedApp)
+	}
+}
+
+func memoryLimit(arg string) (memory uint64) {
 	var err error
 
 	switch {

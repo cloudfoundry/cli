@@ -80,6 +80,7 @@ func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (cr
 	createdRoute = cf.Route{
 		Host: newRoute.Host,
 		Guid: newRoute.Host + "-guid",
+		Domain: domain,
 	}
 	return
 }
