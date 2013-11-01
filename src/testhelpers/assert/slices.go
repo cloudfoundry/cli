@@ -3,12 +3,13 @@ package assert
 import (
 	"testing"
 	"fmt"
+	"strings"
 )
 
 func SliceContains(t *testing.T, actual []string, expected []string, msgAndArgs ...interface{}) bool{
 	expectedIndex := 0
 	for _, actualValue := range actual {
-		if actualValue == expected[expectedIndex] {
+		if strings.Contains(actualValue,expected[expectedIndex]) {
 			expectedIndex++
 			if expectedIndex == len(expected) {
 				return true
