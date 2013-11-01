@@ -85,7 +85,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	stopLoggingChan := make(chan bool)
 	go cmd.logRepo.TailLogsFor(app, onConnect, logChan, stopLoggingChan, 1)
 
-	instances, apiResponse := cmd.appRepo.GetInstances(app)
+	instances, apiResponse := cmd.appRepo.GetInstances(updatedApp)
 	for apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
@@ -94,7 +94,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		}
 
 		cmd.ui.Wait(1 * time.Second)
-		instances, apiResponse = cmd.appRepo.GetInstances(app)
+		instances, apiResponse = cmd.appRepo.GetInstances(updatedApp)
 	}
 
 	stopLoggingChan <- true
@@ -105,7 +105,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	for cmd.displayInstancesStatus(app, instances) {
 		cmd.ui.Wait(1 * time.Second)
-		instances, _ = cmd.appRepo.GetInstances(app)
+		instances, _ = cmd.appRepo.GetInstances(updatedApp)
 	}
 	return
 }
@@ -141,10 +141,10 @@ func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.Appli
 	anyInstanceRunning := runningCount > 0
 
 	if anyInstanceRunning {
-		if len(app.Urls) == 0 {
+		if len(app.Routes) == 0 {
 			cmd.ui.Say(terminal.HeaderColor("Started"))
 		} else {
-			cmd.ui.Say("Started: app %s available at %s", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(app.Urls[0]))
+			cmd.ui.Say("Started: app %s available at %s", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(app.Routes[0].URL()))
 		}
 		return false
 	} else {

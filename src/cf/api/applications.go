@@ -79,11 +79,16 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	res := appResources.Resources[0]
+	app = repo.appFromResource(res)
+	return
+}
+
+func (repo CloudControllerApplicationRepository) appFromResource(res ApplicationResource) (app cf.Application) {
 	app = cf.Application{
 		Guid:            res.Metadata.Guid,
 		Name:            res.Entity.Name,
 		EnvironmentVars: res.Entity.EnvironmentJson,
-		State:           res.Entity.State,
+		State:           strings.ToLower(res.Entity.State),
 		Instances:       res.Entity.Instances,
 		Memory:          uint64(res.Entity.Memory),
 	}
@@ -215,7 +220,7 @@ func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (updat
 }
 
 func (repo CloudControllerApplicationRepository) startOrStopApp(app cf.Application, updates map[string]interface{}) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=2", repo.config.Target, app.Guid)
 
 	updates["console"] = true
 
@@ -231,12 +236,7 @@ func (repo CloudControllerApplicationRepository) startOrStopApp(app cf.Applicati
 		return
 	}
 
-	updatedApp = cf.Application{
-		Name:  resource.Entity.Name,
-		Guid:  resource.Metadata.Guid,
-		State: strings.ToLower(resource.Entity.State),
-	}
-
+	updatedApp = repo.appFromResource(*resource)
 	return
 }
 

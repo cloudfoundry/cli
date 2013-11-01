@@ -21,7 +21,9 @@ var defaultAppForStart = cf.Application{
 	Name:      "my-app",
 	Guid:      "my-app-guid",
 	Instances: 2,
-	Urls:      []string{"http://my-app.example.com"},
+	Routes: []cf.Route{
+		{Host: "my-app", Domain: cf.Domain{Name: "example.com"}},
+	},
 }
 
 func startAppWithInstancesAndErrors(t *testing.T, app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []string) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, reqFactory *testreq.FakeReqFactory) {
@@ -121,7 +123,7 @@ func TestStartApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[6], "0 of 2 instances running (2 starting)")
 	assert.Contains(t, ui.Outputs[7], "Started")
 	assert.Contains(t, ui.Outputs[7], "my-app")
-	assert.Contains(t, ui.Outputs[7], "http://my-app.example.com")
+	assert.Contains(t, ui.Outputs[7], "my-app.example.com")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "my-app-guid")

@@ -289,7 +289,7 @@ func TestScaleApplicationMemory(t *testing.T) {
 func TestStartApplication(t *testing.T) {
 	startApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
-		Path:    "/v2/apps/my-cool-app-guid",
+		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=2",
 		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
@@ -319,7 +319,7 @@ func TestStartApplication(t *testing.T) {
 func TestStopApplication(t *testing.T) {
 	stopApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
-		Path:    "/v2/apps/my-cool-app-guid",
+		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=2",
 		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
