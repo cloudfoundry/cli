@@ -43,13 +43,16 @@ func (cmd *UpdateUserProvidedService) GetRequirements(reqFactory requirements.Fa
 }
 
 func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
+
 	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 	if !serviceInstance.IsUserProvided() {
 		cmd.ui.Failed("Service Instance is not user provided")
 		return
 	}
 
+	drainUrl := c.String("l")
 	params := c.String("p")
+
 	paramsMap := make(map[string]string)
 	if params != "" {
 
@@ -68,7 +71,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	)
 
 	serviceInstance.Params = paramsMap
-	serviceInstance.SysLogDrainUrl = c.String("l")
+	serviceInstance.SysLogDrainUrl = drainUrl
 
 	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance)
 	if apiResponse.IsNotSuccessful() {
@@ -77,4 +80,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	if params == "" && drainUrl == "" {
+		cmd.ui.Warn("No flags specified. No changes were made.")
+	}
 }

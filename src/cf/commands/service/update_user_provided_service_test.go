@@ -41,6 +41,25 @@ func TestUpdateUserProvidedServiceRequirements(t *testing.T) {
 	assert.Equal(t, reqFactory.ServiceInstanceName, "service-name")
 }
 
+func TestUpdateUserProvidedServiceWhenNoFlagsArePresent(t *testing.T) {
+	args := []string{"service-name"}
+	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
+	reqFactory := &testreq.FakeReqFactory{
+		LoginSuccess:    true,
+		ServiceInstance: serviceInstance,
+	}
+	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+	ui := callUpdateUserProvidedService(t, args, reqFactory, repo)
+
+	assert.Contains(t, ui.Outputs[0], "Updating user provided service")
+	assert.Contains(t, ui.Outputs[0], "found-service-name")
+	assert.Contains(t, ui.Outputs[0], "my-org")
+	assert.Contains(t, ui.Outputs[0], "my-space")
+	assert.Contains(t, ui.Outputs[0], "my-user")
+	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Contains(t, ui.Outputs[2], "No changes")
+}
+
 func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 	args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
 	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
