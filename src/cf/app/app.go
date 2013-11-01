@@ -175,8 +175,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				"\n   Pass parameters as JSON to create a service non-interactively:\n" +
 				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p '{\"name\":\"value\",\"name\":\"value\"}'\n", cf.Name()) +
 				"\nEXAMPLE:\n" +
-				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine \"host, port, dbname, username, password\"\n", cf.Name()) +
-				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine -p \"host, port, dbname, username, password\"\n", cf.Name()) +
+				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
 				fmt.Sprintf("   %s create-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()) +
 				fmt.Sprintf("   %s create-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com", cf.Name()),
 			Flags: []cli.Flag{
