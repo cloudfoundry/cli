@@ -85,7 +85,7 @@ func TestEventsWhenNoEventsAvailable(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "no events")
+	assert.Contains(t, ui.Outputs[3], "No events")
 	assert.Contains(t, ui.Outputs[3], "my-app")
 }
 
