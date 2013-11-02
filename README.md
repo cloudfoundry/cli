@@ -20,10 +20,10 @@ Cloning the repository
 Downloading Edge
 ========
 The latest binary builds are published to Amazon S3 buckets
-- http://go-cli.s3.amazonaws.com/go-cf-darwin-amd64.tgz
-- http://go-cli.s3.amazonaws.com/go-cf-linux-amd64.tgz
-- http://go-cli.s3.amazonaws.com/go-cf-windows-386.zip
-- http://go-cli.s3.amazonaws.com/go-cf-windows-amd64.tgz
+- http://go-cli.s3.amazonaws.com/gcf-darwin-amd64.tgz
+- http://go-cli.s3.amazonaws.com/gcf-linux-amd64.tgz
+- http://go-cli.s3.amazonaws.com/gcf-windows-386.zip
+- http://go-cli.s3.amazonaws.com/gcf-windows-amd64.tgz
 
 Building
 ========
