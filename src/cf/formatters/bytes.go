@@ -37,7 +37,7 @@ func ByteSize(bytes uint64) string {
 	}
 
 	stringValue := fmt.Sprintf("%.1f", value)
-	stringValue = strings.TrimRight(stringValue, ".0")
+	stringValue = strings.TrimSuffix(stringValue, ".0")
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
