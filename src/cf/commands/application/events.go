@@ -62,7 +62,7 @@ func (cmd *Events) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	if len(appEvents) == 0 {
-		cmd.ui.Say("No events for %s", terminal.EntityNameColor(app.Name))
+		cmd.ui.Say("No events for app %s", terminal.EntityNameColor(app.Name))
 		return
 	}
 
