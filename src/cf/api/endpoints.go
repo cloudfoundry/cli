@@ -129,6 +129,11 @@ func (repo RemoteEndpointRepository) loggregatorEndpoint() (endpoint string, api
 	re := regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
 
 	endpoint = re.ReplaceAllString(repo.config.Target, "ws${1}://loggregator.${2}")
-	endpoint = endpoint + ":4443"
+
+	if endpoint[0:3] == "wss" {
+		endpoint = endpoint + ":4443"
+	} else {
+		endpoint = endpoint + ":80"
+	}
 	return
 }
