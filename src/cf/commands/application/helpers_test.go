@@ -20,14 +20,12 @@ func TestLogMessageOutput(t *testing.T) {
 	stdout := logmessage.LogMessage_OUT
 	stderr := logmessage.LogMessage_ERR
 
-	zone, _ := time.Now().Zone()
-	date := fmt.Sprintf("2013 Sep 20 09:33:30 %s", zone)
+	date := "2013 Sep 20 09:33:30 PDT"
 	logTime, err := time.Parse("2006 Jan 2 15:04:05 MST", date)
-
 	assert.NoError(t, err)
-	expectedTZ := logTime.Format("-0700")
-
 	timestamp := logTime.UnixNano()
+
+	expectedTZ := logTime.Format("-0700")
 
 	sourceId := "0"
 
