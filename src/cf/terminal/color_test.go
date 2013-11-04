@@ -2,11 +2,13 @@ package terminal
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os"
 	"runtime"
 	"testing"
 )
 
 func TestColorize(t *testing.T) {
+	os.Setenv("CF_COLOR", "true")
 	text := "Hello World"
 	colorizedText := colorize(text, red, true)
 

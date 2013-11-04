@@ -15,6 +15,11 @@ import (
 )
 
 func main() {
+
+	if os.Getenv("CF_COLOR") == "" {
+		os.Setenv("CF_COLOR", "true")
+	}
+
 	termUI := terminal.NewUI()
 	assignTemplates()
 	configRepo := configuration.NewConfigurationDiskRepository()

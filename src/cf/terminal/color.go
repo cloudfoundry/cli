@@ -2,6 +2,7 @@ package terminal
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"runtime"
 )
@@ -20,7 +21,7 @@ const (
 )
 
 func colorize(message string, color Color, bold bool) string {
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" || os.Getenv("CF_COLOR") != "true" {
 		return message
 	}
 
