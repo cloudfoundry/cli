@@ -222,7 +222,7 @@ func TestGetEndpointForLoggregatorInsecure(t *testing.T) {
 	endpoint, apiResponse := repo.GetEndpoint(cf.LoggregatorEndpointKey)
 
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, endpoint, "ws://loggregator.run.pivotal.io:4443")
+	assert.Equal(t, endpoint, "ws://loggregator.run.pivotal.io:80")
 }
 
 func createEndpointRepoForGet(config *configuration.Configuration) (repo EndpointRepository) {
