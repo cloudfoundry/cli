@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+func TestTimestampFormat(t *testing.T) {
+	assert.Equal(t,TIMESTAMP_FORMAT,"2006-01-02T15:04:05.00-0700")
+}
+
 func TestLogMessageOutput(t *testing.T) {
 	cloud_controller := logmessage.LogMessage_CLOUD_CONTROLLER
 	router := logmessage.LogMessage_ROUTER
@@ -20,12 +24,10 @@ func TestLogMessageOutput(t *testing.T) {
 	stdout := logmessage.LogMessage_OUT
 	stderr := logmessage.LogMessage_ERR
 
-	date := "2013 Sep 20 09:33:30 PDT"
-	logTime, err := time.Parse("2006 Jan 2 15:04:05 MST", date)
-	assert.NoError(t, err)
-	timestamp := logTime.UnixNano()
 
-	expectedTZ := logTime.Format("-0700")
+
+	date := time.Now()
+	timestamp := date.UnixNano()
 
 	sourceId := "0"
 
@@ -38,43 +40,43 @@ func TestLogMessageOutput(t *testing.T) {
 	}
 
 	msg := createMessage(t, protoMessage, &cloud_controller, &stdout)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [API]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 
 	msg = createMessage(t, protoMessage, &cloud_controller, &stderr)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [API]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "1"
 	msg = createMessage(t, protoMessage, &router, &stdout)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [RTR]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &router, &stderr)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [RTR]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "2"
 	msg = createMessage(t, protoMessage, &uaa, &stdout)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [UAA]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &uaa, &stderr)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [UAA]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "3"
 	msg = createMessage(t, protoMessage, &dea, &stdout)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [DEA]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &dea, &stderr)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [DEA]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 	sourceId = "4"
 	msg = createMessage(t, protoMessage, &wardenContainer, &stdout)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [App/4]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 	msg = createMessage(t, protoMessage, &wardenContainer, &stderr)
-	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("2013-09-20T09:33:30.00%s [App/4]", expectedTZ))
+	assert.Contains(t, logMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 }
 
