@@ -47,6 +47,11 @@ func createZipFile(dir string) (zipFile *os.File, err error) {
 		return
 	}
 
+	err = InitializeDir(filepath.Dir(tempFile))
+	if err != nil {
+		return
+	}
+
 	zipFile, err = os.Create(tempFile)
 	if err != nil {
 		return

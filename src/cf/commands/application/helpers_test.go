@@ -11,7 +11,7 @@ import (
 )
 
 func TestTimestampFormat(t *testing.T) {
-	assert.Equal(t,TIMESTAMP_FORMAT,"2006-01-02T15:04:05.00-0700")
+	assert.Equal(t, TIMESTAMP_FORMAT, "2006-01-02T15:04:05.00-0700")
 }
 
 func TestLogMessageOutput(t *testing.T) {
@@ -23,8 +23,6 @@ func TestLogMessageOutput(t *testing.T) {
 
 	stdout := logmessage.LogMessage_OUT
 	stderr := logmessage.LogMessage_ERR
-
-
 
 	date := time.Now()
 	timestamp := date.UnixNano()

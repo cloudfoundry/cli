@@ -219,7 +219,7 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 }
 
 func testUploadDir(t *testing.T, app cf.Application) {
-	uploadDir, err := cf.TempDirForApp(app)
+	uploadDir, err := cf.TempDirForApp()
 	assert.NoError(t, err)
 	files, err := filepath.Glob(filepath.Join(uploadDir, "*"))
 	assert.NoError(t, err)

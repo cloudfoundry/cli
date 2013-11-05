@@ -157,7 +157,7 @@ func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Appl
 	}
 
 	// Copy files into a temporary directory and return it
-	uploadDir, err = cf.TempDirForApp(app)
+	uploadDir, err = cf.TempDirForApp()
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error creating temporary directory", err)
 		return
@@ -187,7 +187,7 @@ func fileIsZip(file string) bool {
 }
 
 func extractZip(app cf.Application, zipFile string) (destDir string, err error) {
-	destDir, err = cf.TempDirForApp(app)
+	destDir, err = cf.TempDirForApp()
 	if err != nil {
 		return
 	}
@@ -296,6 +296,12 @@ func createApplicationUploadBody(zipFile *os.File, resourcesJson []byte) (body *
 	if err != nil {
 		return
 	}
+
+	err = cf.InitializeDir(filepath.Dir(tempFile))
+	if err != nil {
+		return
+	}
+
 	body, err = os.Create(tempFile)
 	if err != nil {
 		return

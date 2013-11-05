@@ -8,6 +8,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path/filepath"
 )
 
 type BuildpackBitsRepository interface {
@@ -64,6 +65,11 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, 
 
 func createBuildpackUploadBody(zipFile *os.File) (body *os.File, boundary string, err error) {
 	tempFile, err := cf.TempFileForRequestBody()
+	if err != nil {
+		return
+	}
+
+	err = cf.InitializeDir(filepath.Dir(tempFile))
 	if err != nil {
 		return
 	}
