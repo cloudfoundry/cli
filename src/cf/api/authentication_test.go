@@ -3,8 +3,6 @@ package api
 import (
 	"cf/net"
 	"encoding/base64"
-	"errors"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -36,36 +34,17 @@ var successfulLoginRequest = testnet.TestRequest{
 } `},
 }
 
-var successfulLoginMatcher = func(request *http.Request) (err error) {
-	err = request.ParseForm()
+var successfulLoginMatcher = func(t *testing.T, request *http.Request) {
+	err := request.ParseForm()
 	if err != nil {
+		assert.Fail(t, "Failed to parse form: %s", err)
 		return
 	}
 
-	if !(request.Form.Get("username") == "foo@example.com") {
-		err = errors.New(fmt.Sprintf("Username did not match.\nExpected:%s\nActual:   %s",
-			"foo@example.com",
-			request.Form.Get("username")))
-		return
-	}
-	if !(request.Form.Get("password") == "bar") {
-		err = errors.New(fmt.Sprintf("Password did not match.\nExpected:%s\nActual:   %s",
-			"bar",
-			request.Form.Get("password")))
-		return
-	}
-	if !(request.Form.Get("grant_type") == "password") {
-		err = errors.New(fmt.Sprintf("Grant type did not match.\nExpected:%s\nActual:   %s",
-			"password",
-			request.Form.Get("grant_type")))
-		return
-	}
-	if !(request.Form.Get("scope") == "") {
-		err = errors.New(fmt.Sprintf("Scope did not match.\nExpected empty string. \nActual:   %s",
-			request.Form.Get("scope")))
-		return
-	}
-	return
+	assert.Equal(t, request.Form.Get("username"), "foo@example.com", "Username did not match.")
+	assert.Equal(t, request.Form.Get("password"), "bar", "Password did not match.")
+	assert.Equal(t, request.Form.Get("grant_type"), "password", "Grant type did not match.")
+	assert.Equal(t, request.Form.Get("scope"), "", "Scope did not mathc.")
 }
 
 func TestSuccessfullyLoggingIn(t *testing.T) {

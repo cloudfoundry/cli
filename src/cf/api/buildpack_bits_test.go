@@ -5,8 +5,6 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"errors"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"os"
@@ -30,54 +28,49 @@ var uploadBuildpackRequest = testnet.TestRequest{
 	`},
 }
 
-var buildpackContent = []string{"detect", "compile", "package"}
-var uploadBuildpackBodyMatcher = func(request *http.Request) error {
+var expectedBuildpackContent = []string{"detect", "compile", "package"}
+
+var uploadBuildpackBodyMatcher = func(t *testing.T, request *http.Request) {
 	err := request.ParseMultipartForm(4096)
-	defer request.MultipartForm.RemoveAll()
 	if err != nil {
-		return err
+		assert.Fail(t, "Failed parsing multipart form: %s", err)
+		return
+	}
+	defer request.MultipartForm.RemoveAll()
+
+	assert.Equal(t, len(request.MultipartForm.Value), 0, "Should have 0 values")
+	assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
+
+	files, ok := request.MultipartForm.File["buildpack"]
+
+	assert.True(t, ok, "Buildpack file part not present")
+	assert.Equal(t, len(files), 1, "Wrong number of files")
+
+	buildpackFile := files[0]
+	assert.Equal(t, buildpackFile.Filename, "buildpack.zip", "Wrong file name")
+
+	file, err := buildpackFile.Open()
+	if err != nil {
+		assert.Fail(t, "Cannot get multipart file: %s", err.Error())
+		return
 	}
 
-	if len(request.MultipartForm.Value) != 0 {
-		return errors.New("Should have 0 values")
+	zipReader, err := zip.NewReader(file, 4096)
+	if err != nil {
+		assert.Fail(t, "Error reading zip content: %s", err.Error())
 	}
 
-	if len(request.MultipartForm.File) != 1 {
-		return errors.New("Wrong number of files")
-	}
+	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
 
-	for k, v := range request.MultipartForm.File {
-		if k != "buildpack" && len(v) == 1 && v[0].Filename != "buildpack.zip" {
-			return errors.New("Wrong content disposition")
-		}
-		multipartFile := v[0]
-
-		file, err := multipartFile.Open()
-		if err != nil {
-			return errors.New(fmt.Sprintf("Cannot get multipart file: %s", err.Error()))
-		}
-
-		zipReader, err := zip.NewReader(file, 4096)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Error reading zip content: %s", err.Error()))
-		}
-
-		if len(zipReader.File) != 3 {
-			return errors.New("Wrong number of files in zip")
-		}
-
-	nextFile:
-		for _, f := range zipReader.File {
-			for _, expected := range buildpackContent {
-				if f.Name == expected {
-					continue nextFile
-				}
+nextFile:
+	for _, f := range zipReader.File {
+		for _, expected := range expectedBuildpackContent {
+			if f.Name == expected {
+				continue nextFile
 			}
-			return errors.New("Missing file: " + f.Name)
 		}
+		assert.Fail(t, "Missing file: "+f.Name)
 	}
-
-	return nil
 }
 
 var defaultBuildpackRequests = []testnet.TestRequest{

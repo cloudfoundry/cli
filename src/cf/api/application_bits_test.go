@@ -1,19 +1,17 @@
 package api
 
 import (
+	"archive/zip"
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
+	"strconv"
 	testapi "testhelpers/api"
-	testcf "testhelpers/cf"
 	testnet "testhelpers/net"
 	"testing"
 )
@@ -89,45 +87,64 @@ var defaultRequests = []testnet.TestRequest{
 	createProgressEndpoint("finished"),
 }
 
-var uploadBodyMatcher = func(request *http.Request) error {
-	bodyBytes, err := ioutil.ReadAll(request.Body)
+var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.yml"}
 
+var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
+	err := request.ParseMultipartForm(4096)
 	if err != nil {
-		return err
+		assert.Fail(t, "Failed parsing multipart form", err)
+		return
+	}
+	defer request.MultipartForm.RemoveAll()
+
+	// assert resource manifest is present and correct
+	assert.Equal(t, len(request.MultipartForm.Value), 1, "Should have 1 value")
+	valuePart, ok := request.MultipartForm.Value["resources"]
+	assert.True(t, ok, "Resource manifest not present")
+	assert.Equal(t, len(valuePart), 1, "Wrong number of values")
+
+	resourceManifest := valuePart[0]
+	assert.Equal(t, resourceManifest, expectedResources, "Resources do not match")
+
+	// assert zip file is present and correct
+	assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
+
+	fileHeaders, ok := request.MultipartForm.File["application"]
+	assert.True(t, ok, "Application file part not present")
+	assert.Equal(t, len(fileHeaders), 1, "Wrong number of files")
+
+	applicationFile := fileHeaders[0]
+	assert.Equal(t, applicationFile.Filename, "application.zip", "Wrong file name")
+
+	file, err := applicationFile.Open()
+	if err != nil {
+		assert.Fail(t, "Cannot get multipart file", err.Error())
+		return
 	}
 
-	bodyString := string(bodyBytes)
-	zipAttachmentContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="application"; filename="application.zip"`)
-	if !zipAttachmentContentDispositionMatches {
-		return errors.New("Zip Attachment ContentDisposition does not match")
-	}
-	zipAttachmentContentTypeMatches := strings.Contains(bodyString, `Content-Type: application/zip`)
-	if !zipAttachmentContentTypeMatches {
-		return errors.New("Zip Attachment Content Type does not match")
-	}
-	zipAttachmentContentTransferEncodingMatches := strings.Contains(bodyString, `Content-Transfer-Encoding: binary`)
-	if !zipAttachmentContentTransferEncodingMatches {
-		return errors.New("Zip Attachment Content Transfer Encoding does not match")
-	}
-	zipAttachmentContentLengthPresent := strings.Contains(bodyString, `Content-Length:`)
-	if !zipAttachmentContentLengthPresent {
-		return errors.New("Zip Attachment Content Length missing")
-	}
-	zipAttachmentContentPresent := strings.Contains(bodyString, `hello world!`)
-	if !zipAttachmentContentPresent {
-		return errors.New("Zip Attachment Content missing")
+	length, err := strconv.ParseInt(applicationFile.Header.Get("content-length"), 10, 64)
+	if err != nil {
+		assert.Fail(t, "Cannot convert content-length to int", err.Error())
+		return
 	}
 
-	resourcesContentDispositionMatches := strings.Contains(bodyString, `Content-Disposition: form-data; name="resources"`)
-	if !resourcesContentDispositionMatches {
-		return errors.New("Resources Content Disposition does not match")
-	}
-	resourcesPresent := strings.Contains(bodyString, expectedResources)
-	if !resourcesPresent {
-		return errors.New("Resources not present")
+	zipReader, err := zip.NewReader(file, length)
+	if err != nil {
+		assert.Fail(t, "Error reading zip content", err.Error())
+		return
 	}
 
-	return nil
+	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
+
+nextFile:
+	for _, f := range zipReader.File {
+		for _, expected := range expectedApplicationContent {
+			if f.Name == expected {
+				continue nextFile
+			}
+		}
+		assert.Fail(t, "Missing file: "+f.Name)
+	}
 }
 
 func createProgressEndpoint(status string) (req testnet.TestRequest) {
@@ -151,14 +168,14 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 func TestUploadWithInvalidDirectory(t *testing.T) {
 	config := &configuration.Configuration{}
 	gateway := net.NewCloudControllerGateway()
-	zipper := &testcf.FakeZipper{}
+	zipper := &cf.ApplicationZipper{}
 
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 	app := cf.Application{}
 
 	apiResponse := repo.UploadApp(app, "/foo/bar")
 	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Contains(t, apiResponse.Message, "Error listing app files")
+	assert.Contains(t, apiResponse.Message, "/foo/bar")
 }
 
 func TestUploadApp(t *testing.T) {
@@ -166,9 +183,8 @@ func TestUploadApp(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
 
-	app, apiResponse := testUploadApp(t, dir, defaultRequests)
+	_, apiResponse := testUploadApp(t, dir, defaultRequests)
 	assert.True(t, apiResponse.IsSuccessful())
-	testUploadDir(t, app)
 }
 
 func TestCreateUploadDirWithAZipFile(t *testing.T) {
@@ -176,9 +192,8 @@ func TestCreateUploadDirWithAZipFile(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app.zip")
 
-	app, apiResponse := testUploadApp(t, dir, defaultRequests)
+	_, apiResponse := testUploadApp(t, dir, defaultRequests)
 	assert.True(t, apiResponse.IsSuccessful())
-	testUploadDir(t, app)
 }
 
 func TestUploadAppFailsWhilePushingBits(t *testing.T) {
@@ -205,28 +220,13 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 		Target:      ts.URL,
 	}
 	gateway := net.NewCloudControllerGateway()
-	file, err := os.Open("../../fixtures/hello_world.txt")
-	assert.NoError(t, err)
-	zipper := &testcf.FakeZipper{ZippedFile: file}
+	zipper := cf.ApplicationZipper{}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
 	app = cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
 
 	apiResponse = repo.UploadApp(app, dir)
-
 	assert.True(t, handler.AllRequestsCalled())
+
 	return
-}
-
-func testUploadDir(t *testing.T, app cf.Application) {
-	uploadDir, err := cf.TempDirForApp()
-	assert.NoError(t, err)
-	files, err := filepath.Glob(filepath.Join(uploadDir, "*"))
-	assert.NoError(t, err)
-
-	assert.Equal(t, files, []string{
-		filepath.Join(uploadDir, "Gemfile"),
-		filepath.Join(uploadDir, "Gemfile.lock"),
-		filepath.Join(uploadDir, "manifest.yml"),
-	})
 }

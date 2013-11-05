@@ -1,15 +1,11 @@
 package cf
 
 import (
-	"crypto/rand"
 	"crypto/sha1"
 	"fmt"
 	"io"
-	"math"
-	"math/big"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
@@ -40,67 +36,6 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 			Size: size,
 		})
 	})
-	return
-}
-
-func TempDirForApp() (appDir string, err error) {
-	dir, err := baseTempDir()
-	if err != nil {
-		return
-	}
-	appDir = filepath.Join(dir, "apps", uniqueKey())
-	return
-}
-
-func TempFileForZip() (file string, err error) {
-	dir, err := baseTempDir()
-	if err != nil {
-		return
-	}
-
-	fileName := fmt.Sprintf("%s.zip", uniqueKey())
-
-	file = filepath.Join(dir, "uploads", fileName)
-	return
-}
-
-func TempFileForRequestBody() (file string, err error) {
-	dir, err := baseTempDir()
-	if err != nil {
-		return
-	}
-
-	fileName := fmt.Sprintf("%s.txt", uniqueKey())
-
-	file = filepath.Join(dir, "requests", fileName)
-	return
-}
-
-func baseTempDir() (dir string, err error) {
-	dir = filepath.Join(os.TempDir(), "cf")
-	err = os.MkdirAll(dir, os.ModeDir|os.ModeTemporary|os.ModePerm)
-	return
-}
-
-// uniqueKey creates one key per execution of the CLI
-
-var cachedUniqueKey string
-
-func uniqueKey() string {
-	if cachedUniqueKey == "" {
-		salt, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt32))
-		if err != nil {
-			salt = big.NewInt(1)
-		}
-
-		cachedUniqueKey = fmt.Sprintf("%d_%d", time.Now().Unix(), salt)
-	}
-
-	return cachedUniqueKey
-}
-
-func InitializeDir(dir string) (err error) {
-	err = os.MkdirAll(dir, os.ModeDir|os.ModeTemporary|os.ModePerm)
 	return
 }
 

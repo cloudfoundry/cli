@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -40,52 +41,81 @@ func NewCloudControllerApplicationBitsRepository(config *configuration.Configura
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse) {
-	dir, resourcesJson, apiResponse := repo.createUploadDir(app, dir)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, appDir string) (apiResponse net.ApiResponse) {
+	cf.TempDir("apps", func(uploadDir string, err error) {
+		if err != nil {
+			apiResponse = net.NewApiResponseWithMessage(err.Error())
+			return
+		}
 
-	zipFile, err := repo.zipper.Zip(dir)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error zipping application", err)
-		return
-	}
-	defer zipFile.Close()
+		var resourcesJson []byte
+		repo.sourceDir(appDir, func(sourceDir string, sourceErr error) {
+			if sourceErr != nil {
+				err = sourceErr
+				return
+			}
+			resourcesJson, err = repo.copyUploadableFiles(sourceDir, uploadDir)
+		})
 
-	apiResponse = repo.uploadBits(app, zipFile, resourcesJson)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+		if err != nil {
+			apiResponse = net.NewApiResponseWithMessage(err.Error())
+			return
+		}
 
+		cf.TempFile("uploads", func(zipFile *os.File, err error) {
+			if err != nil {
+				apiResponse = net.NewApiResponseWithMessage(err.Error())
+				return
+			}
+
+			err = repo.zipper.Zip(uploadDir, zipFile)
+			if err != nil {
+				apiResponse = net.NewApiResponseWithError("Error zipping application", err)
+				return
+			}
+
+			apiResponse = repo.uploadBits(app, zipFile, resourcesJson)
+			if apiResponse.IsNotSuccessful() {
+				return
+			}
+		})
+	})
 	return
 }
 
 func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipFile *os.File, resourcesJson []byte) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits?async=true", repo.config.Target, app.Guid)
 
-	body, boundary, err := createApplicationUploadBody(zipFile, resourcesJson)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error creating upload", err)
-		return
-	}
+	cf.TempFile("requests", func(requestFile *os.File, err error) {
+		if err != nil {
+			apiResponse = net.NewApiResponseWithError("Error creating tmp file: %s", err)
+			return
+		}
 
-	request, apiResponse := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, body)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+		boundary, err := repo.writeUploadBody(zipFile, requestFile, resourcesJson)
+		if err != nil {
+			apiResponse = net.NewApiResponseWithError("Error writing to tmp file: %s", err)
+			return
+		}
 
-	contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
-	request.HttpReq.Header.Set("Content-Type", contentType)
+		var request *net.Request
+		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, requestFile)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
 
-	response := &Resource{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
+		request.HttpReq.Header.Set("Content-Type", contentType)
 
-	jobGuid := response.Metadata.Guid
-	apiResponse = repo.pollUploadProgress(jobGuid)
+		response := &Resource{}
+		_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+
+		jobGuid := response.Metadata.Guid
+		apiResponse = repo.pollUploadProgress(jobGuid)
+	})
 
 	return
 }
@@ -132,53 +162,47 @@ func (repo CloudControllerApplicationBitsRepository) uploadProgress(jobGuid stri
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) createUploadDir(app cf.Application, appDir string) (uploadDir string, resourcesJson []byte, apiResponse net.ApiResponse) {
-	var err error
-
+func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb func(sourceDir string, err error)) {
 	// If appDir is a zip, first extract it to a temporary directory
-	if fileIsZip(appDir) {
-		appDir, err = extractZip(app, appDir)
-		if err != nil {
-			apiResponse = net.NewApiResponseWithError("Error extracting archive", err)
-			return
-		}
+	if !repo.fileIsZip(appDir) {
+		cb(appDir, nil)
+		return
 	}
 
+	cf.TempDir("unzipped-app", func(tmpDir string, err error) {
+		if err != nil {
+			cb("", err)
+			return
+		}
+
+		err = repo.extractZip(appDir, tmpDir)
+		cb(tmpDir, err)
+	})
+}
+
+func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir string, uploadDir string) (resourcesJson []byte, err error) {
 	// Find which files need to be uploaded
 	allAppFiles, err := cf.AppFilesInDir(appDir)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error listing app files", err)
 		return
 	}
 
 	appFilesToUpload, resourcesJson, apiResponse := repo.getFilesToUpload(allAppFiles)
 	if apiResponse.IsNotSuccessful() {
+		err = errors.New(apiResponse.Message)
 		return
 	}
 
 	// Copy files into a temporary directory and return it
-	uploadDir, err = cf.TempDirForApp()
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error creating temporary directory", err)
-		return
-	}
-
-	err = cf.InitializeDir(uploadDir)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error creating upload directory", err)
-		return
-	}
-
 	err = cf.CopyFiles(appFilesToUpload, appDir, uploadDir)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error copying files to temp directory", err)
 		return
 	}
 
 	return
 }
 
-func fileIsZip(file string) bool {
+func (repo CloudControllerApplicationBitsRepository) fileIsZip(file string) bool {
 	isZip := strings.HasSuffix(file, ".zip")
 	isWar := strings.HasSuffix(file, ".war")
 	isJar := strings.HasSuffix(file, ".jar")
@@ -186,18 +210,7 @@ func fileIsZip(file string) bool {
 	return isZip || isWar || isJar
 }
 
-func extractZip(app cf.Application, zipFile string) (destDir string, err error) {
-	destDir, err = cf.TempDirForApp()
-	if err != nil {
-		return
-	}
-
-	destDir = destDir + "-zip"
-	err = cf.InitializeDir(destDir)
-	if err != nil {
-		return
-	}
-
+func (repo CloudControllerApplicationBitsRepository) extractZip(zipFile string, destDir string) (err error) {
 	r, err := zip.OpenReader(zipFile)
 	if err != nil {
 		return
@@ -275,13 +288,13 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 			Sha1: file.Sha1,
 			Size: file.Size,
 		}
-		appFilesToUpload = deleteAppFile(appFilesToUpload, appFile)
+		appFilesToUpload = repo.deleteAppFile(appFilesToUpload, appFile)
 	}
 
 	return
 }
 
-func deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
+func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
 	for i, file := range appFiles {
 		if file.Path == targetFile.Path {
 			appFiles[i] = appFiles[len(appFiles)-1]
@@ -291,22 +304,7 @@ func deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
 	return appFiles
 }
 
-func createApplicationUploadBody(zipFile *os.File, resourcesJson []byte) (body *os.File, boundary string, err error) {
-	tempFile, err := cf.TempFileForRequestBody()
-	if err != nil {
-		return
-	}
-
-	err = cf.InitializeDir(filepath.Dir(tempFile))
-	if err != nil {
-		return
-	}
-
-	body, err = os.Create(tempFile)
-	if err != nil {
-		return
-	}
-
+func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, resourcesJson []byte) (boundary string, err error) {
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 

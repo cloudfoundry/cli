@@ -11,24 +11,19 @@ import (
 )
 
 type Zipper interface {
-	Zip(dirToZip string) (zipFile *os.File, err error)
+	Zip(dirToZip string, targetFile *os.File) (err error)
 }
 
 type ApplicationZipper struct{}
 
 var doNotZipExtensions = []string{".zip", ".war", ".jar"}
 
-func (zipper ApplicationZipper) Zip(dirOrZipFile string) (zipFile *os.File, err error) {
+func (zipper ApplicationZipper) Zip(dirOrZipFile string, targetFile *os.File) (err error) {
 	if shouldNotZip(filepath.Ext(dirOrZipFile)) {
-		return os.Open(dirOrZipFile)
+		err = copyZipFile(dirOrZipFile, targetFile)
+	} else {
+		err = createZipFile(dirOrZipFile, targetFile)
 	}
-
-	zipFile, err = createZipFile(dirOrZipFile)
-	if err != nil {
-		return
-	}
-
-	_, err = zipFile.Seek(0, os.SEEK_SET)
 	return
 }
 
@@ -41,22 +36,22 @@ func shouldNotZip(extension string) (result bool) {
 	return
 }
 
-func createZipFile(dir string) (zipFile *os.File, err error) {
-	tempFile, err := TempFileForZip()
+func copyZipFile(originalFilePath string, targetFile *os.File) (err error) {
+	originalFile, err := os.Open(originalFilePath)
 	if err != nil {
 		return
 	}
+	defer originalFile.Close()
 
-	err = InitializeDir(filepath.Dir(tempFile))
+	_, err = io.Copy(targetFile, originalFile)
 	if err != nil {
 		return
 	}
+	_, err = targetFile.Seek(0, os.SEEK_SET)
+	return
+}
 
-	zipFile, err = os.Create(tempFile)
-	if err != nil {
-		return
-	}
-
+func createZipFile(dir string, targetFile *os.File) (err error) {
 	isEmpty, err := IsDirEmpty(dir)
 	if err != nil {
 		return
@@ -66,8 +61,11 @@ func createZipFile(dir string) (zipFile *os.File, err error) {
 		return
 	}
 
-	writer := zip.NewWriter(zipFile)
-	defer writer.Close()
+	writer := zip.NewWriter(targetFile)
+	defer func() {
+		writer.Close()
+		targetFile.Seek(0, os.SEEK_SET)
+	}()
 
 	err = walkAppFiles(dir, func(fileName string, fullPath string) {
 		zipFile, err := writer.Create(fileName)

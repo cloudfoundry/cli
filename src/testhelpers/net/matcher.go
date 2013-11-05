@@ -1,11 +1,11 @@
 package net
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"errors"
+	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func RequestBodyMatcher(expectedBody string) RequestMatcher {
@@ -13,25 +13,17 @@ func RequestBodyMatcher(expectedBody string) RequestMatcher {
 }
 
 func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {
-	return func(request *http.Request) error {
+	return func(t *testing.T, request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
-			return err
+			assert.Fail(t,"Error reading request body: %s",err)
 		}
 
 		actualBody := string(bodyBytes)
-		bodyMatches := RemoveWhiteSpaceFromBody(actualBody) == RemoveWhiteSpaceFromBody(expectedBody)
-		if !bodyMatches {
-			return errors.New(fmt.Sprintf("\nBody did not match. Expected [%s], Actual [%s]", expectedBody, actualBody))
-		}
+		assert.Equal(t,RemoveWhiteSpaceFromBody(actualBody),RemoveWhiteSpaceFromBody(expectedBody), "Body did not match.")
 
 		actualContentType := request.Header.Get("content-type")
-		contentTypeMatches := actualContentType == expectedContentType
-		if !contentTypeMatches {
-			return errors.New(fmt.Sprintf("\nContent Type did not match. Expected [%s], Actual [%s]", expectedContentType, actualContentType))
-		}
-
-		return nil
+		assert.Equal(t,actualContentType,expectedContentType, "Content Type did not match.")
 	}
 }
 

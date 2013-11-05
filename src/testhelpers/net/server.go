@@ -16,7 +16,7 @@ type TestRequest struct {
 	Response   TestResponse
 }
 
-type RequestMatcher func (*http.Request) error
+type RequestMatcher func (*testing.T, *http.Request)
 
 type TestResponse struct {
 	Body   string
@@ -75,10 +75,7 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// match custom request matcher
 	if tester.Matcher != nil {
-		err := tester.Matcher(r)
-		if err != nil {
-			h.logError("Custom request matcher did not match:\n%s", err.Error())
-		}
+		tester.Matcher(h.T,r)
 	}
 
 	// set response headers
