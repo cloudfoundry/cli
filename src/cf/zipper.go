@@ -2,12 +2,11 @@ package cf
 
 import (
 	"archive/zip"
-	"bytes"
 	"errors"
+	"fileutils"
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 type Zipper interface {
@@ -20,9 +19,9 @@ var doNotZipExtensions = []string{".zip", ".war", ".jar"}
 
 func (zipper ApplicationZipper) Zip(dirOrZipFile string, targetFile *os.File) (err error) {
 	if shouldNotZip(filepath.Ext(dirOrZipFile)) {
-		err = copyZipFile(dirOrZipFile, targetFile)
+		err = fileutils.CopyPathToFile(dirOrZipFile, targetFile)
 	} else {
-		err = createZipFile(dirOrZipFile, targetFile)
+		err = writeZipFile(dirOrZipFile, targetFile)
 	}
 	return
 }
@@ -36,23 +35,8 @@ func shouldNotZip(extension string) (result bool) {
 	return
 }
 
-func copyZipFile(originalFilePath string, targetFile *os.File) (err error) {
-	originalFile, err := os.Open(originalFilePath)
-	if err != nil {
-		return
-	}
-	defer originalFile.Close()
-
-	_, err = io.Copy(targetFile, originalFile)
-	if err != nil {
-		return
-	}
-	_, err = targetFile.Seek(0, os.SEEK_SET)
-	return
-}
-
-func createZipFile(dir string, targetFile *os.File) (err error) {
-	isEmpty, err := IsDirEmpty(dir)
+func writeZipFile(dir string, targetFile *os.File) (err error) {
+	isEmpty, err := fileutils.IsDirEmpty(dir)
 	if err != nil {
 		return
 	}
@@ -87,78 +71,4 @@ func createZipFile(dir string, targetFile *os.File) (err error) {
 	})
 
 	return
-}
-
-func fileShouldBeIgnored(exclusions []string, relativePath string) bool {
-	for _, exclusion := range exclusions {
-		if exclusion == relativePath {
-			return true
-		}
-	}
-	return false
-}
-
-func readCfIgnore(dir string) (exclusions []string) {
-	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
-	if err != nil {
-		return
-	}
-
-	ignores := strings.Split(readFile(cfIgnore), "\n")
-	ignores = append([]string{".cfignore"}, ignores...)
-
-	for _, pattern := range ignores {
-		pattern = strings.TrimSpace(pattern)
-		if pattern == "" {
-			continue
-		}
-		pattern = filepath.Clean(pattern)
-		patternExclusions := exclusionsForPattern(dir, pattern)
-		exclusions = append(exclusions, patternExclusions...)
-	}
-
-	return
-}
-
-func exclusionsForPattern(dir string, pattern string) (exclusions []string) {
-	starting_dir := dir
-
-	findPatternMatches := func(dir string, f os.FileInfo, inErr error) (err error) {
-		err = inErr
-		if err != nil {
-			return
-		}
-
-		absolutePaths := []string{}
-		if f.IsDir() && f.Name() == pattern {
-			absolutePaths, _ = filepath.Glob(filepath.Join(dir, "*"))
-		} else {
-			absolutePaths, _ = filepath.Glob(filepath.Join(dir, pattern))
-		}
-
-		for _, p := range absolutePaths {
-			relpath, _ := filepath.Rel(starting_dir, p)
-
-			exclusions = append(exclusions, relpath)
-		}
-		return
-	}
-
-	err := filepath.Walk(dir, findPatternMatches)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func readFile(file *os.File) string {
-	buf := &bytes.Buffer{}
-	_, err := io.Copy(buf, file)
-
-	if err != nil {
-		return ""
-	}
-
-	return string(buf.Bytes())
 }
