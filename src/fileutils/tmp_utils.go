@@ -1,4 +1,4 @@
-package cf
+package fileutils
 
 import (
 	"crypto/rand"

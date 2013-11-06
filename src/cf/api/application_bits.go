@@ -8,6 +8,7 @@ import (
 	"cf/net"
 	"encoding/json"
 	"errors"
+	"fileutils"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -42,7 +43,7 @@ func NewCloudControllerApplicationBitsRepository(config *configuration.Configura
 }
 
 func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, appDir string) (apiResponse net.ApiResponse) {
-	cf.TempDir("apps", func(uploadDir string, err error) {
+	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
 			return
@@ -62,7 +63,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 			return
 		}
 
-		cf.TempFile("uploads", func(zipFile *os.File, err error) {
+		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
 			if err != nil {
 				apiResponse = net.NewApiResponseWithMessage(err.Error())
 				return
@@ -86,7 +87,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipFile *os.File, resourcesJson []byte) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits?async=true", repo.config.Target, app.Guid)
 
-	cf.TempFile("requests", func(requestFile *os.File, err error) {
+	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithError("Error creating tmp file: %s", err)
 			return
@@ -169,7 +170,7 @@ func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb
 		return
 	}
 
-	cf.TempDir("unzipped-app", func(tmpDir string, err error) {
+	fileutils.TempDir("unzipped-app", func(tmpDir string, err error) {
 		if err != nil {
 			cb("", err)
 			return

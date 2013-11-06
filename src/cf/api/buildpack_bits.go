@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"fileutils"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -28,7 +29,7 @@ func NewCloudControllerBuildpackBitsRepository(config *configuration.Configurati
 }
 
 func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.Buildpack, dir string) (apiResponse net.ApiResponse) {
-	cf.TempFile("buildpack", func(zipFile *os.File, err error) {
+	fileutils.TempFile("buildpack", func(zipFile *os.File, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
 			return
@@ -49,7 +50,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.
 func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, zipFile *os.File) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, app.Guid)
 
-	cf.TempFile("requests", func(requestFile *os.File, err error) {
+	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
 			return

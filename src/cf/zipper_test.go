@@ -3,6 +3,7 @@ package cf
 import (
 	"archive/zip"
 	"bytes"
+	"fileutils"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestZipWithDirectory(t *testing.T) {
-	TempFile("zip_test", func(zipFile *os.File, err error) {
+	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 
 		dir, err := os.Getwd()
 		assert.NoError(t, err)
@@ -55,7 +56,7 @@ func TestZipWithDirectory(t *testing.T) {
 }
 
 func TestZipWithZipFile(t *testing.T) {
-	TempFile("zip_test", func(zipFile *os.File, err error) {
+	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 		dir, err := os.Getwd()
 		assert.NoError(t, err)
 
@@ -68,7 +69,7 @@ func TestZipWithZipFile(t *testing.T) {
 }
 
 func TestZipWithWarFile(t *testing.T) {
-	TempFile("zip_test", func(zipFile *os.File, err error) {
+	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 		dir, err := os.Getwd()
 		assert.NoError(t, err)
 
@@ -81,7 +82,7 @@ func TestZipWithWarFile(t *testing.T) {
 }
 
 func TestZipWithJarFile(t *testing.T) {
-	TempFile("zip_test", func(zipFile *os.File, err error) {
+	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 		dir, err := os.Getwd()
 		assert.NoError(t, err)
 
@@ -94,7 +95,7 @@ func TestZipWithJarFile(t *testing.T) {
 }
 
 func TestZipWithInvalidFile(t *testing.T) {
-	TempFile("zip_test", func(zipFile *os.File, err error) {
+	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 		zipper := ApplicationZipper{}
 		err = zipper.Zip("/a/bogus/directory", zipFile)
 		assert.Error(t, err)
@@ -103,8 +104,8 @@ func TestZipWithInvalidFile(t *testing.T) {
 }
 
 func TestZipWithEmptyDir(t *testing.T) {
-	TempFile("zip_test", func(zipFile *os.File, err error) {
-		TempDir("zip_test", func(emptyDir string, err error) {
+	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
+		fileutils.TempDir("zip_test", func(emptyDir string, err error) {
 			zipper := ApplicationZipper{}
 			err = zipper.Zip(emptyDir, zipFile)
 			assert.Error(t, err)
