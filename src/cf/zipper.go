@@ -52,7 +52,7 @@ func writeZipFile(dir string, targetFile *os.File) (err error) {
 	}()
 
 	err = walkAppFiles(dir, func(fileName string, fullPath string) {
-		zipFile, err := writer.Create(fileName)
+		zipFilePart, err := writer.Create(fileName)
 		if err != nil {
 			return
 		}
@@ -61,8 +61,9 @@ func writeZipFile(dir string, targetFile *os.File) (err error) {
 		if err != nil {
 			return
 		}
+		defer file.Close()
 
-		_, err = io.Copy(zipFile, file)
+		_, err = io.Copy(zipFilePart, file)
 		if err != nil {
 			return
 		}
