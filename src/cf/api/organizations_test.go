@@ -149,8 +149,8 @@ func TestDeleteOrganization(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createOrganizationRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
-	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
+func createOrganizationRepo(t *testing.T, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
+	ts, handler = testnet.NewTLSServer(t, reqs)
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",

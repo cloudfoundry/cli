@@ -4,12 +4,14 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"cf/paginator"
 	"fmt"
 	"strings"
 )
 
-type PaginatedOrganizationResources struct {
+type OrganizationResources struct {
 	Resources []OrganizationResource
+	NextUrl   string
 }
 
 type OrganizationResource struct {
@@ -25,6 +27,7 @@ type OrganizationEntity struct {
 
 type OrganizationRepository interface {
 	FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse)
+	Paginator() (paginator paginator.Paginator)
 	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(org cf.Organization, name string) (apiResponse net.ApiResponse)
@@ -47,6 +50,10 @@ func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organizat
 	return repo.findAllWithPath(path)
 }
 
+func (repo CloudControllerOrganizationRepository) Paginator() paginator.Paginator {
+	return paginator.NewOrganizationPaginator(repo.config, repo.gateway)
+}
+
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
 
@@ -65,7 +72,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 }
 
 func (repo CloudControllerOrganizationRepository) findAllWithPath(path string) (orgs []cf.Organization, apiResponse net.ApiResponse) {
-	orgResources := new(PaginatedOrganizationResources)
+	orgResources := new(OrganizationResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, orgResources)
 	if apiResponse.IsNotSuccessful() {
 		return

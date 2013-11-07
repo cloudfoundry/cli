@@ -22,6 +22,7 @@ type UI interface {
 	Warn(message string, args ...interface{})
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
+	AskForChar(prompt string, args ...interface{}) (answer string)
 	Confirm(message string, args ...interface{}) bool
 	Ok()
 	Failed(message string, args ...interface{})
@@ -67,6 +68,10 @@ func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Printf(prompt+" ", args...)
 	fmt.Fscanln(stdin, &answer)
 	return
+}
+
+func (c terminalUI) AskForChar(prompt string, args ...interface{}) (answer string) {
+	return c.Ask(prompt, args...)
 }
 
 func (c terminalUI) Ok() {

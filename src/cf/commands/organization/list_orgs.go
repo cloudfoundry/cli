@@ -31,16 +31,27 @@ func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("Getting orgs as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
-	orgs, apiResponse := cmd.orgRepo.FindAll()
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
+	p := cmd.orgRepo.Paginator()
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
+	for {
+		cmd.ui.Say("")
+		orgs, apiResponse := p.Next()
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
+			return
+		}
 
-	for _, org := range orgs {
-		cmd.ui.Say(org.Name)
+		for _, orgName := range orgs {
+			cmd.ui.Say(orgName)
+		}
+
+		if !p.HasNext() {
+			break
+		}
+
+		input := cmd.ui.AskForChar("(enter for next page, 'q' and then enter to quit)\n%s", terminal.PromptColor(">"))
+		if input == "q" {
+			break
+		}
 	}
 }

@@ -3,6 +3,8 @@ package api
 import (
 	"cf"
 	"cf/net"
+	"cf/paginator"
+	testpaginator "testhelpers/paginator"
 )
 
 type FakeOrgRepository struct {
@@ -33,6 +35,14 @@ type FakeOrgRepository struct {
 func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse) {
 	orgs = repo.Organizations
 	return
+}
+
+func (repo FakeOrgRepository) Paginator() paginator.Paginator {
+	results := []string{}
+	for _, org := range repo.Organizations {
+		results = append(results,org.Name)
+	}
+	return &testpaginator.FakePaginator{TotalResults:results}
 }
 
 func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {

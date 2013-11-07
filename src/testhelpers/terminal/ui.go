@@ -35,6 +35,13 @@ func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	return
 }
 
+func (ui *FakeUI) AskForChar(prompt string, args ...interface{}) (answer string){
+	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
+	answer = ui.Inputs[0]
+	ui.Inputs = ui.Inputs[1:]
+	return
+}
+
 func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 	response := ui.Ask(prompt, args...)
 	switch strings.ToLower(response) {
