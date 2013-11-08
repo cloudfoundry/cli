@@ -54,6 +54,27 @@ func TestListAllPagesOfOrgs(t *testing.T) {
 	})
 }
 
+func TestListNoOrgs(t *testing.T) {
+	orgs := []cf.Organization{}
+	orgRepo := &testapi.FakeOrgRepository{
+		Organizations: orgs,
+	}
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+
+	tokenInfo := configuration.TokenInfo{Username: "my-user"}
+	accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(tokenInfo)
+	assert.NoError(t, err)
+	config := &configuration.Configuration{AccessToken: accessToken}
+
+	ui := callListOrgs(config, reqFactory, orgRepo)
+
+	testassert.SliceContains(t, ui.Outputs, []string{
+		"Getting orgs as my-user",
+		"No orgs found",
+	})
+}
+
 func callListOrgs(config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("orgs", []string{})

@@ -34,5 +34,9 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	p := cmd.orgRepo.Paginator()
-	paginator.ForEach(p, cmd.ui.PrintPaginator)
+	noResults := paginator.ForEach(p, cmd.ui.PrintPaginator)
+
+	if noResults {
+		cmd.ui.Say("No orgs found")
+	}
 }

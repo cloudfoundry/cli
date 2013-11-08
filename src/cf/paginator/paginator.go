@@ -10,18 +10,20 @@ type Paginator interface {
 	HasNext() bool
 }
 
-func ForEach(p Paginator, cb func([]string, error)) {
-	for {
+func ForEach(p Paginator, cb func([]string, error)) (noop bool) {
+	noop = true
+	for p.HasNext() {
 		rows, apiResponse := p.Next()
 		if apiResponse.IsNotSuccessful() {
 			cb([]string{}, errors.New(apiResponse.Message))
 			return
 		}
 
-		cb(rows, nil)
-
-		if !p.HasNext() {
-			break
+		if noop == true && len(rows) > 0 {
+			noop = false
 		}
+
+		cb(rows, nil)
 	}
+	return
 }
