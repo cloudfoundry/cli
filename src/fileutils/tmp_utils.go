@@ -10,13 +10,26 @@ import (
 	"time"
 )
 
-func TempDir(pathPrefix string, cb func (tmpDir string, err error)) {
-	var (
-		tmpDir string
-		err    error
-	)
+const dirMask = os.ModeDir | os.ModeTemporary | os.ModePerm
 
-	tmpDir, err = baseTempDir(filepath.Join(pathPrefix, uniqueKey()))
+var tmpPathPrefix = ""
+
+func SetTmpPathPrefix(path string){
+	tmpPathPrefix = path
+}
+
+func TmpPathPrefix() string{
+	return tmpPathPrefix
+}
+
+func TempDir(namePrefix string, cb func (tmpDir string, err error)) {
+	baseDir, err := baseTempDir()
+	if err != nil {
+		return
+	}
+
+	tmpDir := filepath.Join(baseDir,uniqueKey(namePrefix))
+	err = os.MkdirAll(tmpDir, dirMask)
 	defer func() {
 		os.RemoveAll(tmpDir)
 	}()
@@ -24,7 +37,7 @@ func TempDir(pathPrefix string, cb func (tmpDir string, err error)) {
 	cb(tmpDir, err)
 }
 
-func TempFile(pathPrefix string, cb func (tmpFile *os.File, err error)) {
+func TempFile(namePrefix string, cb func (tmpFile *os.File, err error)) {
 	var (
 		tmpFile     *os.File
 		tmpFilepath string
@@ -32,13 +45,13 @@ func TempFile(pathPrefix string, cb func (tmpFile *os.File, err error)) {
 		tmpDir      string
 	)
 
-	tmpDir, err = baseTempDir(pathPrefix)
+	tmpDir, err = baseTempDir()
 	if err != nil {
 		cb(tmpFile, err)
 		return
 	}
 
-	tmpFilepath = filepath.Join(tmpDir, uniqueKey())
+	tmpFilepath = filepath.Join(tmpDir, uniqueKey(namePrefix))
 	tmpFile, err = os.Create(tmpFilepath)
 	defer func() {
 		tmpFile.Close()
@@ -48,17 +61,17 @@ func TempFile(pathPrefix string, cb func (tmpFile *os.File, err error)) {
 	cb(tmpFile, err)
 }
 
-func baseTempDir(subpath string) (dir string, err error) {
-	dir = filepath.Join(os.TempDir(), "cf", subpath)
-	err = os.MkdirAll(dir, os.ModeDir | os.ModeTemporary | os.ModePerm)
+func baseTempDir() (dir string, err error) {
+	dir = filepath.Join(os.TempDir(), TmpPathPrefix())
+	err = os.MkdirAll(dir, dirMask)
 	return
 }
 
-func uniqueKey() string {
+func uniqueKey(namePrefix string) string {
 	salt, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt32))
 	if err != nil {
 		salt = big.NewInt(1)
 	}
 
-	return fmt.Sprintf("%d_%d", time.Now().Unix(), salt)
+	return fmt.Sprintf("%s_%d_%d", namePrefix, time.Now().Unix(), salt)
 }

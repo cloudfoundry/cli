@@ -12,9 +12,11 @@ import (
 	"cf/configuration"
 	"github.com/codegangsta/cli"
 	"cf/net"
+	"fileutils"
 )
 
 func main() {
+	fileutils.SetTmpPathPrefix("cf")
 
 	if os.Getenv("CF_COLOR") == "" {
 		os.Setenv("CF_COLOR", "true")
