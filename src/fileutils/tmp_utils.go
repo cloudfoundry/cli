@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TempDir(pathPrefix string, cb func(tmpDir string, err error)) {
+func TempDir(pathPrefix string, cb func (tmpDir string, err error)) {
 	var (
 		tmpDir string
 		err    error
@@ -24,7 +24,7 @@ func TempDir(pathPrefix string, cb func(tmpDir string, err error)) {
 	cb(tmpDir, err)
 }
 
-func TempFile(pathPrefix string, cb func(tmpFile *os.File, err error)) {
+func TempFile(pathPrefix string, cb func (tmpFile *os.File, err error)) {
 	var (
 		tmpFile     *os.File
 		tmpFilepath string
@@ -50,23 +50,15 @@ func TempFile(pathPrefix string, cb func(tmpFile *os.File, err error)) {
 
 func baseTempDir(subpath string) (dir string, err error) {
 	dir = filepath.Join(os.TempDir(), "cf", subpath)
-	err = os.MkdirAll(dir, os.ModeDir|os.ModeTemporary|os.ModePerm)
+	err = os.MkdirAll(dir, os.ModeDir | os.ModeTemporary | os.ModePerm)
 	return
 }
 
-// uniqueKey creates one key per execution of the CLI
-
-var cachedUniqueKey string
-
 func uniqueKey() string {
-	if cachedUniqueKey == "" {
-		salt, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt32))
-		if err != nil {
-			salt = big.NewInt(1)
-		}
-
-		cachedUniqueKey = fmt.Sprintf("%d_%d", time.Now().Unix(), salt)
+	salt, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt32))
+	if err != nil {
+		salt = big.NewInt(1)
 	}
 
-	return cachedUniqueKey
+	return fmt.Sprintf("%d_%d", time.Now().Unix(), salt)
 }
