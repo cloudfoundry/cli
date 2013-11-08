@@ -224,35 +224,27 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(zipFile string, 
 			continue
 		}
 
-		var (
-			rc       io.ReadCloser
-			destFile *os.File
-		)
+		if err != nil {
+			return
+		}
 
+		var rc io.ReadCloser
 		rc, err = f.Open()
 		if err != nil {
 			return
 		}
-		defer rc.Close()
 
 		destFilePath := filepath.Join(destDir, f.Name)
-		err = os.MkdirAll(filepath.Dir(destFilePath), os.ModePerm|os.ModeDir)
-		if err != nil {
-			return
-		}
 
-		destFile, err = os.Create(destFilePath)
-		if err != nil {
-			return
-		}
-
-		_, err = io.Copy(destFile, rc)
-		if err != nil {
-			return
-		}
+		err = fileutils.CopyReaderToPath(rc, destFilePath)
 
 		rc.Close()
+
+		if err != nil {
+			return
+		}
 	}
+
 	return
 }
 

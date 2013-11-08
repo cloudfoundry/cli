@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 )
 
-
 func CopyFilePaths(fromPath, toPath string) (err error) {
 	err = os.MkdirAll(filepath.Dir(toPath), os.ModeDir | os.ModeTemporary | os.ModePerm)
 	if err != nil {
@@ -20,7 +19,7 @@ func CopyFilePaths(fromPath, toPath string) (err error) {
 	}
 	defer dst.Close()
 
-	return CopyPathToFile(fromPath,dst)
+	return CopyPathToWriter(fromPath, dst)
 }
 
 func IsDirEmpty(dir string) (isEmpty bool, err error) {
@@ -38,28 +37,44 @@ func IsDirEmpty(dir string) (isEmpty bool, err error) {
 	return
 }
 
-func CopyPathToFile(originalFilePath string, targetFile *os.File) (err error) {
+func CopyPathToWriter(originalFilePath string, targetWriter io.Writer) (err error) {
 	originalFile, err := os.Open(originalFilePath)
 	if err != nil {
 		return
 	}
 	defer originalFile.Close()
 
-	_, err = io.Copy(targetFile, originalFile)
+	_, err = io.Copy(targetWriter, originalFile)
 	if err != nil {
 		return
 	}
-	_, err = targetFile.Seek(0, os.SEEK_SET)
+
+	return
+}
+
+func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
+	err = os.MkdirAll(filepath.Dir(targetPath), os.ModePerm | os.ModeDir)
+	if err != nil {
+		return
+	}
+
+	destFile, err := os.Create(targetPath)
+	if err != nil {
+		return
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, src)
 	return
 }
 
 func ReadFile(file *os.File) string {
 	buf := &bytes.Buffer{}
-_, err := io.Copy(buf, file)
+	_, err := io.Copy(buf, file)
 
-if err != nil {
-return ""
-}
+	if err != nil {
+		return ""
+	}
 
-return string(buf.Bytes())
+	return string(buf.Bytes())
 }

@@ -4,14 +4,13 @@ import (
 	"crypto/sha1"
 	"fileutils"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
 func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
-	err = walkAppFiles(dir, func(fileName string, fullPath string) {
+	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			return
@@ -19,12 +18,8 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 		size := fileInfo.Size()
 
 		h := sha1.New()
-		file, err := os.Open(fullPath)
-		if err != nil {
-			return
-		}
 
-		_, err = io.Copy(h, file)
+		err = fileutils.CopyPathToWriter(fullPath, h)
 		if err != nil {
 			return
 		}
@@ -37,6 +32,8 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 			Sha1: sha1,
 			Size: size,
 		})
+
+		return
 	})
 	return
 }
@@ -57,7 +54,7 @@ func CopyFiles(appFiles []AppFile, fromDir, toDir string) (err error) {
 	return
 }
 
-type walkAppFileFunc func(fileName, fullPath string)
+type walkAppFileFunc func(fileName, fullPath string) (err error)
 
 func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	exclusions := readCfIgnore(dir)
@@ -77,7 +74,7 @@ func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
-		onEachFile(fileName, fullPath)
+		err = onEachFile(fileName, fullPath)
 
 		return
 	}

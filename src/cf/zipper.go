@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"errors"
 	"fileutils"
-	"io"
 	"os"
 	"path/filepath"
 )
@@ -19,10 +18,11 @@ var doNotZipExtensions = []string{".zip", ".war", ".jar"}
 
 func (zipper ApplicationZipper) Zip(dirOrZipFile string, targetFile *os.File) (err error) {
 	if shouldNotZip(filepath.Ext(dirOrZipFile)) {
-		err = fileutils.CopyPathToFile(dirOrZipFile, targetFile)
+		err = fileutils.CopyPathToWriter(dirOrZipFile, targetFile)
 	} else {
 		err = writeZipFile(dirOrZipFile, targetFile)
 	}
+	targetFile.Seek(0, os.SEEK_SET)
 	return
 }
 
@@ -46,28 +46,11 @@ func writeZipFile(dir string, targetFile *os.File) (err error) {
 	}
 
 	writer := zip.NewWriter(targetFile)
-	defer func() {
-		writer.Close()
-		targetFile.Seek(0, os.SEEK_SET)
-	}()
+	defer writer.Close()
 
-	err = walkAppFiles(dir, func(fileName string, fullPath string) {
+	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		zipFilePart, err := writer.Create(fileName)
-		if err != nil {
-			return
-		}
-
-		file, err := os.Open(fullPath)
-		if err != nil {
-			return
-		}
-		defer file.Close()
-
-		_, err = io.Copy(zipFilePart, file)
-		if err != nil {
-			return
-		}
-
+		err = fileutils.CopyPathToWriter(fullPath, zipFilePart)
 		return
 	})
 
