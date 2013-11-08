@@ -54,20 +54,6 @@ func TestConfirmNo(t *testing.T) {
 	})
 }
 
-func TestAskForChar(t *testing.T) {
-	simulateStdin("q", func() {
-		ui := new(terminalUI)
-
-		var result string
-		out := captureOutput(func() {
-			result = ui.AskForChar("Hello %s", "World?")
-		})
-
-		assert.Equal(t, result, "q")
-		assert.Contains(t, out, "Hello World?")
-	})
-}
-
 func simulateStdin(input string, block func()) {
 	defer func() {
 		stdin = os.Stdin

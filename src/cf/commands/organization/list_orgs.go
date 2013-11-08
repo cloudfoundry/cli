@@ -3,6 +3,7 @@ package organization
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/paginator"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -30,28 +31,8 @@ func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("Getting orgs as %s...", terminal.EntityNameColor(cmd.config.Username()))
+	cmd.ui.Say("")
 
 	p := cmd.orgRepo.Paginator()
-
-	for {
-		cmd.ui.Say("")
-		orgs, apiResponse := p.Next()
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
-			return
-		}
-
-		for _, orgName := range orgs {
-			cmd.ui.Say(orgName)
-		}
-
-		if !p.HasNext() {
-			break
-		}
-
-		input := cmd.ui.AskForChar("(enter for next page, 'q' and then enter to quit)\n%s", terminal.PromptColor(">"))
-		if input == "q" {
-			break
-		}
-	}
+	paginator.ForEach(p, cmd.ui.PrintPaginator)
 }

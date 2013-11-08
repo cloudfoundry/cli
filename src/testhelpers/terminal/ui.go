@@ -17,6 +17,17 @@ type FakeUI struct {
 	ShowConfigurationCalled bool
 }
 
+func (ui *FakeUI) PrintPaginator(rows []string, err error) {
+	if err != nil {
+		ui.Failed(err.Error())
+		return
+	}
+
+	for _, row := range rows {
+		ui.Say(row)
+	}
+}
+
 func (ui *FakeUI) Say(message string, args ...interface{}) {
 	message =  fmt.Sprintf(message, args...)
 	ui.Outputs = append(ui.Outputs,message)
@@ -29,13 +40,6 @@ func (ui *FakeUI) Warn(message string, args ...interface{}) {
 }
 
 func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
-	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
-	answer = ui.Inputs[0]
-	ui.Inputs = ui.Inputs[1:]
-	return
-}
-
-func (ui *FakeUI) AskForChar(prompt string, args ...interface{}) (answer string){
 	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
 	answer = ui.Inputs[0]
 	ui.Inputs = ui.Inputs[1:]

@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -18,15 +19,15 @@ func TestListOrgsRequirements(t *testing.T) {
 	config := &configuration.Configuration{}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callListOrgs([]string{}, config, reqFactory, orgRepo)
+	callListOrgs(config, reqFactory, orgRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	callListOrgs([]string{}, config, reqFactory, orgRepo)
+	callListOrgs(config, reqFactory, orgRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
-func TestListTwoPagesOfOrgsAndQuit(t *testing.T) {
+func TestListAllPagesOfOrgs(t *testing.T) {
 	orgs := []cf.Organization{
 		cf.Organization{Name: "Organization-1"},
 		cf.Organization{Name: "Organization-2"},
@@ -43,48 +44,18 @@ func TestListTwoPagesOfOrgsAndQuit(t *testing.T) {
 	assert.NoError(t, err)
 	config := &configuration.Configuration{AccessToken: accessToken}
 
-	ui := callListOrgs([]string{" ", "q"}, config, reqFactory, orgRepo)
+	ui := callListOrgs(config, reqFactory, orgRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting orgs as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[2], "Organization-1")
-	assert.Contains(t, ui.Outputs[4], "Organization-2")
-
-	assert.Equal(t, len(ui.Outputs), 5)
-	assert.Equal(t, len(ui.Prompts), 2)
+	testassert.SliceContains(t, ui.Outputs, []string{
+		"Getting orgs as my-user",
+		"Organization-1",
+		"Organization-2",
+		"Organization-3",
+	})
 }
 
-func TestListAllPagesOfOrgs(t *testing.T) {
-	orgs := []cf.Organization{
-		cf.Organization{Name: "Organization-1"},
-		cf.Organization{Name: "Organization-2"},
-	}
-	orgRepo := &testapi.FakeOrgRepository{
-		Organizations: orgs,
-	}
-
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-
-	tokenInfo := configuration.TokenInfo{Username: "my-user"}
-	accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(tokenInfo)
-	assert.NoError(t, err)
-	config := &configuration.Configuration{AccessToken: accessToken}
-
-	ui := callListOrgs([]string{" "}, config, reqFactory, orgRepo)
-
-	assert.Contains(t, ui.Outputs[0], "Getting orgs as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[2], "Organization-1")
-	assert.Contains(t, ui.Outputs[4], "Organization-2")
-
-	assert.Equal(t, len(ui.Outputs), 5)
-	assert.Equal(t, len(ui.Prompts), 1)
-}
-
-func callListOrgs(inputs []string, config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{
-		Inputs: inputs,
-	}
+func callListOrgs(config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("orgs", []string{})
 	cmd := NewListOrgs(fakeUI, config, orgRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
