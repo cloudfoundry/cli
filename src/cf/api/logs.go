@@ -3,8 +3,8 @@ package api
 import (
 	"cf"
 	"cf/configuration"
-	"cf/net"
 	"cf/terminal"
+	"cf/trace"
 	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
 	"errors"
@@ -50,9 +50,8 @@ func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect 
 }
 
 func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf.Application, onConnect func(), outputChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) (err error) {
-	if net.TraceEnabled() {
-		fmt.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
-	}
+
+	trace.Logger.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
 
 	config, err := websocket.NewConfig(location, "http://localhost")
 	if err != nil {

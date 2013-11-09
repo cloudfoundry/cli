@@ -7,13 +7,38 @@ import (
 	"path/filepath"
 )
 
-func CopyFilePaths(fromPath, toPath string) (err error) {
-	err = os.MkdirAll(filepath.Dir(toPath), os.ModeDir | os.ModeTemporary | os.ModePerm)
+func OpenFile(path string) (file *os.File, err error){
+	err = os.MkdirAll(filepath.Dir(path), os.ModeDir | os.ModeTemporary | os.ModePerm)
 	if err != nil {
 		return
 	}
 
-	dst, err := os.Create(toPath)
+	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+}
+
+func CreateFile(path string) (file *os.File, err error){
+	err = os.MkdirAll(filepath.Dir(path), os.ModeDir | os.ModeTemporary | os.ModePerm)
+	if err != nil {
+		return
+	}
+
+	return os.Create(path)
+}
+
+func ReadFile(file *os.File) string {
+	buf := &bytes.Buffer{}
+	_, err := io.Copy(buf, file)
+
+	if err != nil {
+		return ""
+	}
+
+	return string(buf.Bytes())
+}
+
+
+func CopyFilePaths(fromPath, toPath string) (err error) {
+	dst, err := CreateFile(toPath)
 	if err != nil {
 		return
 	}
@@ -53,12 +78,7 @@ func CopyPathToWriter(originalFilePath string, targetWriter io.Writer) (err erro
 }
 
 func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
-	err = os.MkdirAll(filepath.Dir(targetPath), os.ModePerm | os.ModeDir)
-	if err != nil {
-		return
-	}
-
-	destFile, err := os.Create(targetPath)
+	destFile, err := CreateFile(targetPath)
 	if err != nil {
 		return
 	}
@@ -66,15 +86,4 @@ func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
 
 	_, err = io.Copy(destFile, src)
 	return
-}
-
-func ReadFile(file *os.File) string {
-	buf := &bytes.Buffer{}
-	_, err := io.Copy(buf, file)
-
-	if err != nil {
-		return ""
-	}
-
-	return string(buf.Bytes())
 }

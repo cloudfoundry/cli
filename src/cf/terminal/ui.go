@@ -3,6 +3,7 @@ package terminal
 import (
 	"cf"
 	"cf/configuration"
+	"cf/trace"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"io"
@@ -89,6 +90,9 @@ func (c terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	c.Say(FailureColor("FAILED"))
 	c.Say(message)
+
+	trace.Logger.Print("FAILED")
+	trace.Logger.Print(message)
 	os.Exit(1)
 }
 
