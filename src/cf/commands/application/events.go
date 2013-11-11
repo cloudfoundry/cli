@@ -45,47 +45,39 @@ func (cmd *Events) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 func (cmd *Events) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Getting events for app %s in org %s / space %s as %s...",
+	cmd.ui.Say("Getting events for app %s in org %s / space %s as %s...\n",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.Organization.Name),
 		terminal.EntityNameColor(cmd.config.Space.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	appEvents, apiStatus := cmd.eventsRepo.ListEvents(app)
+	eventChan, statusChan := cmd.eventsRepo.ListEvents(app)
+	table := cmd.ui.Table([]string{"time", "instance", "description", "exit status"})
+	noEvents := true
+
+	for events := range eventChan {
+		rows := [][]string{}
+		for i := len(events) - 1; i >= 0; i-- {
+			event := events[i]
+			rows = append(rows, []string{
+				event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
+				strconv.Itoa(event.InstanceIndex),
+				event.ExitDescription,
+				strconv.Itoa(event.ExitStatus),
+			})
+		}
+		table.Print(rows)
+		noEvents = false
+	}
+
+	apiStatus := <-statusChan
 	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed("Failed fetching events.\n%s", apiStatus.Message)
 		return
 	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	if len(appEvents) == 0 {
+	if noEvents {
 		cmd.ui.Say("No events for app %s", terminal.EntityNameColor(app.Name))
 		return
 	}
-
-	if len(appEvents) == 1 {
-		cmd.ui.Say("Showing 1 of 1 events...\n")
-	} else {
-		cmd.ui.Say("Showing all %d events...\n", len(appEvents))
-	}
-
-	table := [][]string{
-		[]string{"time", "instance", "description", "exit status"},
-	}
-
-	for i := len(appEvents) - 1; i >= 0; i-- {
-		event := appEvents[i]
-		table = append(table, []string{
-			event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
-			strconv.Itoa(event.InstanceIndex),
-			event.ExitDescription,
-			strconv.Itoa(event.ExitStatus),
-		})
-	}
-
-	cmd.ui.DisplayTable(table)
-
 }

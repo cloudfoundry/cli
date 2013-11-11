@@ -33,6 +33,7 @@ type UI interface {
 	LoadingIndication()
 	Wait(duration time.Duration)
 	DisplayTable(table [][]string)
+	Table(headers []string) Table
 }
 
 type terminalUI struct {
@@ -134,6 +135,10 @@ func (c terminalUI) LoadingIndication() {
 
 func (c terminalUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
+}
+
+func (ui terminalUI) Table(headers []string) Table {
+	return NewTable(ui, headers)
 }
 
 func (ui terminalUI) DisplayTable(table [][]string) {

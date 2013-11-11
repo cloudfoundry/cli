@@ -28,7 +28,7 @@ type EventEntity struct {
 }
 
 type AppEventsRepository interface {
-	ListEvents(app cf.Application) (events []cf.Event, apiResponse net.ApiResponse)
+	ListEvents(app cf.Application) (events chan []cf.Event, errorChan chan net.ApiResponse)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -42,28 +42,39 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (events []cf.Event, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/apps/%s/events", app.Guid)
+func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (eventChan chan []cf.Event, errorChan chan net.ApiResponse) {
 
-	for path != "" {
-		url := fmt.Sprintf("%s%s", repo.config.Target, path)
-		eventResources := &PaginatedEventResources{}
-		apiResponse = repo.gateway.GetResource(url, repo.config.AccessToken, eventResources)
-		if apiResponse.IsNotSuccessful() {
-			return
+	eventChan = make(chan []cf.Event, 4)
+	errorChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		path := fmt.Sprintf("/v2/apps/%s/events", app.Guid)
+		for path != "" {
+			url := fmt.Sprintf("%s%s", repo.config.Target, path)
+			eventResources := &PaginatedEventResources{}
+			apiResponse := repo.gateway.GetResource(url, repo.config.AccessToken, eventResources)
+			if apiResponse.IsNotSuccessful() {
+				errorChan <- apiResponse
+				close(eventChan)
+				close(errorChan)
+				return
+			}
+
+			events := []cf.Event{}
+			for _, resource := range eventResources.Resources {
+				events = append(events, cf.Event{
+					Timestamp:       resource.Entity.Timestamp,
+					ExitDescription: resource.Entity.ExitDescription,
+					ExitStatus:      resource.Entity.ExitStatus,
+					InstanceIndex:   resource.Entity.InstanceIndex,
+				})
+			}
+			eventChan <- events
+			path = eventResources.NextURL
 		}
-
-		for _, resource := range eventResources.Resources {
-			events = append(events, cf.Event{
-				Timestamp:       resource.Entity.Timestamp,
-				ExitDescription: resource.Entity.ExitDescription,
-				ExitStatus:      resource.Entity.ExitStatus,
-				InstanceIndex:   resource.Entity.InstanceIndex,
-			})
-		}
-
-		path = eventResources.NextURL
-	}
+		close(eventChan)
+		close(errorChan)
+	}()
 
 	return
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 	"cf/configuration"
 	"time"
+	term "cf/terminal"
 )
 
 type FakeUI struct {
@@ -115,3 +116,8 @@ func (ui *FakeUI) DisplayTable(table [][]string) {
 		ui.Say("%s",output)
 	}
 }
+
+func (ui *FakeUI) Table(headers []string) term.Table {
+	return term.NewTable(ui,headers)
+}
+

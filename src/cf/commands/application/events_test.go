@@ -60,20 +60,18 @@ func TestEventsSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "Showing all 2 events")
-	assert.Contains(t, ui.Outputs[4], "time")
-	assert.Contains(t, ui.Outputs[4], "instance")
-	assert.Contains(t, ui.Outputs[4], "description")
-	assert.Contains(t, ui.Outputs[4], "exit status")
-	assert.Contains(t, ui.Outputs[5], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[5], "99")
-	assert.Contains(t, ui.Outputs[5], "app instance was stopped")
-	assert.Contains(t, ui.Outputs[5], "77")
-	assert.Contains(t, ui.Outputs[6], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[6], "98")
-	assert.Contains(t, ui.Outputs[6], "app instance exited")
-	assert.Contains(t, ui.Outputs[6], "78")
+	assert.Contains(t, ui.Outputs[1], "time")
+	assert.Contains(t, ui.Outputs[1], "instance")
+	assert.Contains(t, ui.Outputs[1], "description")
+	assert.Contains(t, ui.Outputs[1], "exit status")
+	assert.Contains(t, ui.Outputs[2], timestamp.Local().Format(TIMESTAMP_FORMAT))
+	assert.Contains(t, ui.Outputs[2], "98")
+	assert.Contains(t, ui.Outputs[2], "app instance exited")
+	assert.Contains(t, ui.Outputs[2], "78")
+	assert.Contains(t, ui.Outputs[3], timestamp.Local().Format(TIMESTAMP_FORMAT))
+	assert.Contains(t, ui.Outputs[3], "99")
+	assert.Contains(t, ui.Outputs[3], "app instance was stopped")
+	assert.Contains(t, ui.Outputs[3], "77")
 }
 
 func TestEventsWhenNoEventsAvailable(t *testing.T) {
@@ -84,9 +82,8 @@ func TestEventsWhenNoEventsAvailable(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "events")
 	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "No events")
-	assert.Contains(t, ui.Outputs[3], "my-app")
+	assert.Contains(t, ui.Outputs[1], "No events")
+	assert.Contains(t, ui.Outputs[1], "my-app")
 }
 
 func getEventsDependencies() (reqFactory *testreq.FakeReqFactory, eventsRepo *testapi.FakeAppEventsRepo) {

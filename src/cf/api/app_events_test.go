@@ -4,16 +4,19 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
-	"net/http/httptest"
-	"strings"
+	testnet "testhelpers/net"
 	"testing"
 	"time"
 )
 
-var listEventsResponse = `
+var firstPageEventsRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-app-guid/events",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
 {
   "total_results": 58,
   "total_pages": 2,
@@ -30,8 +33,14 @@ var listEventsResponse = `
     }
   ]
 }
-`
-var secondPageEventsResponse = `
+`},
+}
+var secondPageEventsRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-app-guid/events",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
 {
   "total_results": 58,
   "total_pages": 2,
@@ -48,32 +57,22 @@ var secondPageEventsResponse = `
     }
   ]
 }
-`
+`},
+}
 
-var listEventsEndpoint = func(writer http.ResponseWriter, request *http.Request) {
-	methodMatches := request.Method == "GET"
-	pathMatches := request.URL.Path == "/v2/apps/my-app-guid/events"
-	isSecondPage := strings.Contains(request.URL.RawQuery, "page=2")
-
-	if !methodMatches || !pathMatches {
-		fmt.Printf("One of the matchers did not match. Method [%t] Path [%t]",
-			methodMatches, pathMatches)
-
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	writer.WriteHeader(http.StatusOK)
-	if isSecondPage {
-		fmt.Fprint(writer, secondPageEventsResponse)
-	} else {
-		fmt.Fprint(writer, listEventsResponse)
-	}
+var notFoundRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-app-guid/events",
+	Response: testnet.TestResponse{
+		Status: http.StatusNotFound,
+	},
 }
 
 func TestListEvents(t *testing.T) {
-
-	listEventsServer := httptest.NewTLSServer(http.HandlerFunc(listEventsEndpoint))
+	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{
+		firstPageEventsRequest,
+		secondPageEventsRequest,
+	})
 	defer listEventsServer.Close()
 
 	config := &configuration.Configuration{
@@ -82,7 +81,7 @@ func TestListEvents(t *testing.T) {
 	}
 	repo := NewCloudControllerAppEventsRepository(config, net.NewCloudControllerGateway())
 
-	list, apiErr := repo.ListEvents(cf.Application{Guid: "my-app-guid"})
+	eventChan, apiErr := repo.ListEvents(cf.Application{Guid: "my-app-guid"})
 
 	firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 	secondExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00")
@@ -101,7 +100,54 @@ func TestListEvents(t *testing.T) {
 		},
 	}
 
+	list := []cf.Event{}
+	for events := range eventChan {
+		list = append(list, events...)
+	}
+
+	_, open := <-apiErr
+
 	assert.NoError(t, err)
-	assert.True(t, apiErr.IsSuccessful())
+	assert.False(t, open)
 	assert.Equal(t, list, expectedEvents)
+	assert.True(t, handler.AllRequestsCalled())
+}
+
+func TestListEventsNotFound(t *testing.T) {
+
+	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{
+		firstPageEventsRequest,
+		notFoundRequest,
+	})
+	defer listEventsServer.Close()
+
+	config := &configuration.Configuration{
+		Target:      listEventsServer.URL,
+		AccessToken: "BEARER my_access_token",
+	}
+	repo := NewCloudControllerAppEventsRepository(config, net.NewCloudControllerGateway())
+
+	eventChan, apiErr := repo.ListEvents(cf.Application{Guid: "my-app-guid"})
+
+	firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
+	expectedEvents := []cf.Event{
+		{
+			InstanceIndex:   1,
+			ExitStatus:      1,
+			ExitDescription: "app instance exited",
+			Timestamp:       firstExpectedTime,
+		},
+	}
+
+	list := []cf.Event{}
+	for events := range eventChan {
+		list = append(list, events...)
+	}
+
+	apiResponse := <-apiErr
+
+	assert.NoError(t, err)
+	assert.Equal(t, list, expectedEvents)
+	assert.True(t, apiResponse.IsNotSuccessful())
+	assert.True(t, handler.AllRequestsCalled())
 }
