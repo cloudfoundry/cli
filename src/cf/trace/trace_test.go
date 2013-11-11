@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"testing"
 )
 
@@ -63,23 +64,25 @@ func TestTraceSetToFile(t *testing.T) {
 }
 
 func TestTraceSetToInvalidFile(t *testing.T) {
-	stdOut := bytes.NewBuffer([]byte{})
-	trace.SetStdout(stdOut)
+	if runtime.GOOS != "windows" {
+		stdOut := bytes.NewBuffer([]byte{})
+		trace.SetStdout(stdOut)
 
-	fileutils.TempFile("trace_test", func(file *os.File, err error) {
-		assert.NoError(t, err)
+		fileutils.TempFile("trace_test", func(file *os.File, err error) {
+			assert.NoError(t, err)
 
-		file.Chmod(0000)
+			file.Chmod(0000)
 
-		os.Setenv(trace.CF_TRACE, file.Name())
+			os.Setenv(trace.CF_TRACE, file.Name())
 
-		logger := trace.NewLogger()
-		logger.Print("hello world")
+			logger := trace.NewLogger()
+			logger.Print("hello world")
 
-		result, _ := ioutil.ReadAll(file)
-		assert.Equal(t, string(result), "")
+			result, _ := ioutil.ReadAll(file)
+			assert.Equal(t, string(result), "")
 
-		result, _ = ioutil.ReadAll(stdOut)
-		assert.Contains(t, string(result), "hello world")
-	})
+			result, _ = ioutil.ReadAll(stdOut)
+			assert.Contains(t, string(result), "hello world")
+		})
+	}
 }
