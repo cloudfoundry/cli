@@ -55,6 +55,7 @@ func TestSpacesListSpaces(t *testing.T) {
 	defer ts.Close()
 
 	stopChan := make(chan bool)
+	defer close(stopChan)
 	spacesChan, statusChan := repo.ListSpaces(stopChan)
 
 	expectedSpaces := []cf.Space{

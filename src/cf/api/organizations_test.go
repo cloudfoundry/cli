@@ -41,6 +41,7 @@ func TestOrganizationsListOrgs(t *testing.T) {
 	defer ts.Close()
 
 	stopChan := make(chan bool)
+	defer close(stopChan)
 	orgsChan, statusChan := repo.ListOrgs(stopChan)
 
 	expectedOrgs := []cf.Organization{
