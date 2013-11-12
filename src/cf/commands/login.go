@@ -192,13 +192,15 @@ func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
 
 func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiResponse) {
 	err := cmd.configRepo.SetOrganization(org)
-
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage("Error setting org %s in config file\n%s",
 			terminal.EntityNameColor(org.Name),
 			err.Error(),
 		)
+		return
 	}
+
+	cmd.ui.Say("Targeted org %s\n", terminal.EntityNameColor(org.Name))
 	return
 }
 
@@ -258,7 +260,10 @@ func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
 			terminal.EntityNameColor(space.Name),
 			err.Error(),
 		)
+		return
 	}
+
+	cmd.ui.Say("Targeted space %s\n", terminal.EntityNameColor(space.Name))
 	return
 }
 
@@ -276,13 +281,14 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 			for i, name := range names {
 				cmd.ui.Say("%d. %s", i+1, name)
 			}
+		} else {
+			cmd.ui.Say("There are too many options to display, please type in the name.")
 		}
 
 		nameString = cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
 		nameIndex, err = strconv.Atoi(nameString)
 
 		if err != nil {
-			cmd.ui.Say("")
 			nameIndex = 1
 			return nameString
 		}
