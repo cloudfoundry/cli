@@ -42,9 +42,7 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 
 	for routes := range routesChan {
 		rows := [][]string{}
-		length := len(routes)
-		for i := 0; i < length; i++ {
-			route := routes[i]
+		for _, route := range routes {
 			rows = append(rows, []string{
 				route.Host,
 				route.Domain.Name,
