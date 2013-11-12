@@ -11,18 +11,18 @@ type FakeAppEventsRepo struct{
 }
 
 
-func (repo FakeAppEventsRepo)ListEvents(app cf.Application) (events chan []cf.Event, errorChan chan net.ApiResponse) {
+func (repo FakeAppEventsRepo)ListEvents(app cf.Application) (events chan []cf.Event, statusChan chan net.ApiResponse) {
 	repo.Application = app
 
 	events = make(chan []cf.Event, 4)
-	errorChan = make(chan net.ApiResponse, 1)
+	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
 		for _, event := range repo.Events {
 			events <- []cf.Event{event}
 		}
 		close(events)
-		close(errorChan)
+		close(statusChan)
 	}()
 
 	return

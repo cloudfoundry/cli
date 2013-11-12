@@ -4,14 +4,13 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"cf/paginator"
 	"fmt"
 	"strings"
 )
 
-type OrganizationResources struct {
+type PaginatedOrganizationResources struct {
 	Resources []OrganizationResource
-	NextUrl   string
+	NextUrl   string `json:"next_url"`
 }
 
 type OrganizationResource struct {
@@ -26,8 +25,7 @@ type OrganizationEntity struct {
 }
 
 type OrganizationRepository interface {
-	FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse)
-	Paginator() (paginator paginator.Paginator)
+	ListOrgs(stop chan bool) (orgs chan []cf.Organization, statusChan chan net.ApiResponse)
 	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(org cf.Organization, name string) (apiResponse net.ApiResponse)
@@ -45,38 +43,51 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse) {
-	path := repo.config.Target + "/v2/organizations"
-	return repo.findAllWithPath(path)
-}
+func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse) {
+	orgsChan = make(chan []cf.Organization, 4)
+	statusChan = make(chan net.ApiResponse, 1)
 
-func (repo CloudControllerOrganizationRepository) Paginator() paginator.Paginator {
-	return paginator.NewOrganizationPaginator(repo.config, repo.gateway)
-}
+	go func() {
+		path := "/v2/organizations"
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations?q=name%s&inline-relations-depth=1", repo.config.Target, "%3A"+strings.ToLower(name))
+	loop:
+		for path != "" {
+			select {
+			case <-stop:
+				break loop
+			default:
+				var (
+					organizations []cf.Organization
+					apiResponse   net.ApiResponse
+				)
+				organizations, path, apiResponse = repo.findNextWithPath(path)
+				if apiResponse.IsNotSuccessful() {
+					statusChan <- apiResponse
+					close(orgsChan)
+					close(statusChan)
+					return
+				}
 
-	orgs, apiResponse := repo.findAllWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+				orgsChan <- organizations
+			}
+		}
+		close(orgsChan)
+		close(statusChan)
+		cf.WaitForClose(stop)
+	}()
 
-	if len(orgs) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Org %s not found", name)
-		return
-	}
-
-	org = orgs[0]
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) findAllWithPath(path string) (orgs []cf.Organization, apiResponse net.ApiResponse) {
-	orgResources := new(OrganizationResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, orgResources)
+func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) (orgs []cf.Organization, nextUrl string, apiResponse net.ApiResponse) {
+	orgResources := new(PaginatedOrganizationResources)
+
+	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, orgResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	nextUrl = orgResources.NextUrl
 
 	for _, r := range orgResources.Resources {
 		spaces := []cf.Space{}
@@ -96,6 +107,23 @@ func (repo CloudControllerOrganizationRepository) findAllWithPath(path string) (
 			Domains: domains,
 		})
 	}
+	return
+}
+
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("/v2/organizations?q=name%s&inline-relations-depth=1", "%3A"+strings.ToLower(name))
+
+	orgs, _, apiResponse := repo.findNextWithPath(path)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	if len(orgs) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("Org %s not found", name)
+		return
+	}
+
+	org = orgs[0]
 	return
 }
 

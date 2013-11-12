@@ -13,6 +13,7 @@ import (
 )
 
 const maxLoginTries = 3
+const maxChoices = 50
 
 type Login struct {
 	ui            terminal.UI
@@ -141,10 +142,22 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse 
 			return
 		}
 
-		// Get available orgs
-		var availableOrgs []cf.Organization
+		stopChan := make(chan bool)
+		defer close(stopChan)
 
-		availableOrgs, apiResponse = cmd.orgRepo.FindAll()
+		orgsChan, statusChan := cmd.orgRepo.ListOrgs(stopChan)
+
+		availableOrgs := []cf.Organization{}
+
+		for orgs := range orgsChan {
+			availableOrgs = append(availableOrgs, orgs...)
+			if len(availableOrgs) > maxChoices {
+				stopChan <- true
+				break
+			}
+		}
+
+		apiResponse = <-statusChan
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed("Error finding avilable orgs\n%s", apiResponse.Message)
 			return
@@ -258,8 +271,8 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 		// list header
 		cmd.ui.Say(listPrompt)
 
-		// only display list if it is shorter than 50
-		if len(names) < 50 {
+		// only display list if it is shorter than maxChoices
+		if len(names) < maxChoices {
 			for i, name := range names {
 				cmd.ui.Say("%d. %s", i+1, name)
 			}

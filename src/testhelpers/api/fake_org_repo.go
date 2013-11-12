@@ -3,14 +3,12 @@ package api
 import (
 	"cf"
 	"cf/net"
-	"cf/paginator"
-	testpaginator "testhelpers/paginator"
 )
 
 type FakeOrgRepository struct {
 	Organizations []cf.Organization
 
-	CreateName string
+	CreateName      string
 	CreateOrgExists bool
 
 	FindByNameName         string
@@ -23,26 +21,36 @@ type FakeOrgRepository struct {
 
 	DeletedOrganization cf.Organization
 
-	FindQuotaByNameName string
-	FindQuotaByNameQuota cf.Quota
+	FindQuotaByNameName     string
+	FindQuotaByNameQuota    cf.Quota
 	FindQuotaByNameNotFound bool
-	FindQuotaByNameErr bool
+	FindQuotaByNameErr      bool
 
-	UpdateQuotaOrg cf.Organization
+	UpdateQuotaOrg   cf.Organization
 	UpdateQuotaQuota cf.Quota
 }
 
-func (repo FakeOrgRepository) FindAll() (orgs []cf.Organization, apiResponse net.ApiResponse) {
-	orgs = repo.Organizations
-	return
-}
+func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse) {
+	orgsChan = make(chan []cf.Organization, 4)
+	statusChan = make(chan net.ApiResponse, 1)
 
-func (repo FakeOrgRepository) Paginator() paginator.Paginator {
-	results := []string{}
-	for _, org := range repo.Organizations {
-		results = append(results,org.Name)
-	}
-	return &testpaginator.FakePaginator{TotalResults:results}
+	go func() {
+		for _, org := range repo.Organizations {
+			select {
+			case <-stop:
+				break
+			default:
+				orgsChan <- []cf.Organization{org}
+			}
+		}
+
+		close(orgsChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
+
+	return
 }
 
 func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
@@ -54,7 +62,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, api
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Org", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
 	}
 
 	return
@@ -85,7 +93,7 @@ func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, api
 	quota = repo.FindQuotaByNameQuota
 
 	if repo.FindQuotaByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Org", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
 	}
 	if repo.FindQuotaByNameErr {
 		apiResponse = net.NewApiResponseWithMessage("Error finding quota")

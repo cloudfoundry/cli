@@ -12,15 +12,24 @@ import (
 	"testing"
 )
 
-func TestOrganizationsFindAll(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+func TestOrganizationsListOrgs(t *testing.T) {
+	firstPageOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/organizations",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+		"next_url": "/v2/organizations?page=2",
+		"resources": [
 			{
 			  "metadata": { "guid": "org1-guid" },
 			  "entity": { "name": "Org1" }
-			},
+			}
+		]}`},
+	})
+
+	secondPageOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations?page=2",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
 			{
 			  "metadata": { "guid": "org2-guid" },
 			  "entity": { "name": "Org2" }
@@ -28,21 +37,27 @@ func TestOrganizationsFindAll(t *testing.T) {
 		]}`},
 	})
 
-	ts, handler, repo := createOrganizationRepo(t, req)
+	ts, handler, repo := createOrganizationRepo(t, firstPageOrgsRequest, secondPageOrgsRequest)
 	defer ts.Close()
 
-	organizations, apiResponse := repo.FindAll()
+	stopChan := make(chan bool)
+	orgsChan, statusChan := repo.ListOrgs(stopChan)
+
+	expectedOrgs := []cf.Organization{
+		{Guid: "org1-guid", Name: "Org1", Spaces: []cf.Space{}, Domains: []cf.Domain{}},
+		{Guid: "org2-guid", Name: "Org2", Spaces: []cf.Space{}, Domains: []cf.Domain{}},
+	}
+
+	orgs := []cf.Organization{}
+	for chunk := range orgsChan {
+		orgs = append(orgs, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.Equal(t, orgs, expectedOrgs)
+	assert.True(t, apiResponse.IsSuccessful())
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 2, len(organizations))
 
-	firstOrg := organizations[0]
-	assert.Equal(t, firstOrg.Name, "Org1")
-	assert.Equal(t, firstOrg.Guid, "org1-guid")
-
-	secondOrg := organizations[1]
-	assert.Equal(t, secondOrg.Name, "Org2")
-	assert.Equal(t, secondOrg.Guid, "org2-guid")
 }
 
 func TestOrganizationsFindByName(t *testing.T) {

@@ -28,7 +28,7 @@ type EventEntity struct {
 }
 
 type AppEventsRepository interface {
-	ListEvents(app cf.Application) (events chan []cf.Event, errorChan chan net.ApiResponse)
+	ListEvents(app cf.Application) (events chan []cf.Event, statusChan chan net.ApiResponse)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -42,10 +42,10 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (eventChan chan []cf.Event, errorChan chan net.ApiResponse) {
+func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (eventChan chan []cf.Event, statusChan chan net.ApiResponse) {
 
 	eventChan = make(chan []cf.Event, 4)
-	errorChan = make(chan net.ApiResponse, 1)
+	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
 		path := fmt.Sprintf("/v2/apps/%s/events", app.Guid)
@@ -54,9 +54,9 @@ func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (e
 			eventResources := &PaginatedEventResources{}
 			apiResponse := repo.gateway.GetResource(url, repo.config.AccessToken, eventResources)
 			if apiResponse.IsNotSuccessful() {
-				errorChan <- apiResponse
+				statusChan <- apiResponse
 				close(eventChan)
-				close(errorChan)
+				close(statusChan)
 				return
 			}
 
@@ -73,7 +73,7 @@ func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (e
 			path = eventResources.NextURL
 		}
 		close(eventChan)
-		close(errorChan)
+		close(statusChan)
 	}()
 
 	return

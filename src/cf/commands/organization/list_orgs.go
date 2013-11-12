@@ -3,7 +3,6 @@ package organization
 import (
 	"cf/api"
 	"cf/configuration"
-	"cf/paginator"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -30,13 +29,33 @@ func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 }
 
 func (cmd ListOrgs) Run(c *cli.Context) {
-	cmd.ui.Say("Getting orgs as %s...", terminal.EntityNameColor(cmd.config.Username()))
-	cmd.ui.Say("")
+	cmd.ui.Say("Getting orgs as %s...\n", terminal.EntityNameColor(cmd.config.Username()))
 
-	p := cmd.orgRepo.Paginator()
-	noResults := paginator.ForEach(p, cmd.ui.PrintPaginator)
+	stopChan := make(chan bool)
+	defer close(stopChan)
 
-	if noResults {
+	orgsChan, statusChan := cmd.orgRepo.ListOrgs(stopChan)
+
+	table := cmd.ui.Table([]string{"name"})
+	noOrgs := true
+
+	for orgs := range orgsChan {
+		rows := [][]string{}
+		for i := len(orgs) - 1; i >= 0; i-- {
+			org := orgs[i]
+			rows = append(rows, []string{org.Name})
+		}
+		table.Print(rows)
+		noOrgs = false
+	}
+
+	apiStatus := <-statusChan
+	if apiStatus.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching orgs.\n%s", apiStatus.Message)
+		return
+	}
+
+	if noOrgs {
 		cmd.ui.Say("No orgs found")
 	}
 }
