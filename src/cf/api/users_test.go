@@ -248,33 +248,15 @@ func TestDeleteUserWhenNotFoundOnTheCloudController(t *testing.T) {
 }
 
 func TestSetOrgRoleToOrgManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
-		return repo.SetOrgRole(user, org, "OrgManager")
-	}
-
-	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/managers/my-user-guid",
-	)
+	testSetOrgRoleWithValidRole(t, "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
 }
 
 func TestSetOrgRoleToBillingManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
-		return repo.SetOrgRole(user, org, "BillingManager")
-	}
-
-	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/billing_managers/my-user-guid",
-	)
+	testSetOrgRoleWithValidRole(t, "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
 }
 
 func TestSetOrgRoleToOrgAuditor(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
-		return repo.SetOrgRole(user, org, "OrgAuditor")
-	}
-
-	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "PUT", "/v2/organizations/my-org-guid/auditors/my-user-guid",
-	)
+	testSetOrgRoleWithValidRole(t, "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
 }
 
 func TestSetOrgRoleWithInvalidRole(t *testing.T) {
@@ -285,34 +267,41 @@ func TestSetOrgRoleWithInvalidRole(t *testing.T) {
 	assert.Contains(t, apiResponse.Message, "Invalid Role")
 }
 
-func TestUnsetOrgRoleFromOrgManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
-		return repo.UnsetOrgRole(user, org, "OrgManager")
-	}
+func testSetOrgRoleWithValidRole(t *testing.T, role string, path string) {
 
-	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/managers/my-user-guid",
-	)
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	userReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req, userReq})
+	defer cc.Close()
+
+	user := cf.User{Guid: "my-user-guid"}
+	org := cf.Organization{Guid: "my-org-guid"}
+	apiResponse := repo.SetOrgRole(user, org, role)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func TestUnsetOrgRoleFromOrgManager(t *testing.T) {
+	testUnsetOrgRoleWithValidRole(t, "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
 }
 
 func TestUnsetOrgRoleFromBillingManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
-		return repo.UnsetOrgRole(user, org, "BillingManager")
-	}
-
-	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/billing_managers/my-user-guid",
-	)
+	testUnsetOrgRoleWithValidRole(t, "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
 }
 
 func TestUnsetOrgRoleFromOrgAuditor(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, org cf.Organization) net.ApiResponse {
-		return repo.UnsetOrgRole(user, org, "OrgAuditor")
-	}
-
-	testSetOrUnsetOrgRoleWithValidRole(
-		t, setOrUnset, "DELETE", "/v2/organizations/my-org-guid/auditors/my-user-guid",
-	)
+	testUnsetOrgRoleWithValidRole(t, "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
 }
 
 func TestUnsetOrgRoleWithInvalidRole(t *testing.T) {
@@ -323,13 +312,9 @@ func TestUnsetOrgRoleWithInvalidRole(t *testing.T) {
 	assert.Contains(t, apiResponse.Message, "Invalid Role")
 }
 
-func testSetOrUnsetOrgRoleWithValidRole(t *testing.T,
-	setOrUnset func(UserRepository, cf.User, cf.Organization) net.ApiResponse,
-	verb string,
-	path string) {
-
+func testUnsetOrgRoleWithValidRole(t *testing.T, role string, path string) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   verb,
+		Method:   "DELETE",
 		Path:     path,
 		Response: testnet.TestResponse{Status: http.StatusOK},
 	})
@@ -339,68 +324,22 @@ func testSetOrUnsetOrgRoleWithValidRole(t *testing.T,
 
 	user := cf.User{Guid: "my-user-guid"}
 	org := cf.Organization{Guid: "my-org-guid"}
-	apiResponse := setOrUnset(repo, user, org)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func testSetOrUnsetSpaceRoleWithValidRole(t *testing.T,
-	setOrUnset func(UserRepository, cf.User, cf.Space) net.ApiResponse,
-	verb string,
-	path string) {
-
-	reqs := []testnet.TestRequest{}
-
-	if verb == "PUT" {
-		addToOrgReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "PUT",
-			Path:     "/v2/organizations/my-space-org-guid/users/my-user-guid",
-			Response: testnet.TestResponse{Status: http.StatusOK},
-		})
-		reqs = append(reqs, addToOrgReq)
-	}
-
-	setOrUnsetReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   verb,
-		Path:     path,
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-	reqs = append(reqs, setOrUnsetReq)
-
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, reqs)
-	defer cc.Close()
-
-	user := cf.User{Guid: "my-user-guid"}
-	space := cf.Space{Guid: "my-space-guid", Organization: cf.Organization{Guid: "my-space-org-guid"}}
-	apiResponse := setOrUnset(repo, user, space)
+	apiResponse := repo.UnsetOrgRole(user, org, role)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestSetSpaceRoleToSpaceManager(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, space cf.Space) net.ApiResponse {
-		return repo.SetSpaceRole(user, space, "SpaceManager")
-	}
-
-	testSetOrUnsetSpaceRoleWithValidRole(t, setOrUnset, "PUT", "/v2/spaces/my-space-guid/managers/my-user-guid")
+	testSetSpaceRoleWithValidRole(t, "SpaceManager", "/v2/spaces/my-space-guid/managers/my-user-guid")
 }
 
 func TestSetSpaceRoleToSpaceDeveloper(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, space cf.Space) net.ApiResponse {
-		return repo.SetSpaceRole(user, space, "SpaceDeveloper")
-	}
-
-	testSetOrUnsetSpaceRoleWithValidRole(t, setOrUnset, "PUT", "/v2/spaces/my-space-guid/developers/my-user-guid")
+	testSetSpaceRoleWithValidRole(t, "SpaceDeveloper", "/v2/spaces/my-space-guid/developers/my-user-guid")
 }
 
 func TestSetSpaceRoleToSpaceAuditor(t *testing.T) {
-	setOrUnset := func(repo UserRepository, user cf.User, space cf.Space) net.ApiResponse {
-		return repo.SetSpaceRole(user, space, "SpaceAuditor")
-	}
-
-	testSetOrUnsetSpaceRoleWithValidRole(t, setOrUnset, "PUT", "/v2/spaces/my-space-guid/auditors/my-user-guid")
+	testSetSpaceRoleWithValidRole(t, "SpaceAuditor", "/v2/spaces/my-space-guid/auditors/my-user-guid")
 }
 
 func TestSetSpaceRoleWithInvalidRole(t *testing.T) {
@@ -409,6 +348,31 @@ func TestSetSpaceRoleWithInvalidRole(t *testing.T) {
 
 	assert.False(t, apiResponse.IsSuccessful())
 	assert.Contains(t, apiResponse.Message, "Invalid Role")
+}
+
+func testSetSpaceRoleWithValidRole(t *testing.T, role string, path string) {
+
+	addToOrgReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	setRoleReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{addToOrgReq,setRoleReq})
+	defer cc.Close()
+
+	user := cf.User{Guid: "my-user-guid"}
+	space := cf.Space{Guid: "my-space-guid", Organization: cf.Organization{Guid: "my-org-guid"}}
+	apiResponse := repo.SetSpaceRole(user, space, role)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func createUsersRepoWithoutEndpoints() (repo UserRepository) {

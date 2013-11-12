@@ -25,6 +25,7 @@ type UserEntity struct {
 }
 
 var orgRoleToPathMap = map[string]string{
+	"OrgUser":      "users",
 	"OrgManager":     "managers",
 	"BillingManager": "billing_managers",
 	"OrgAuditor":     "auditors",
@@ -254,7 +255,11 @@ func (repo CloudControllerUserRepository) Delete(user cf.User) (apiResponse net.
 }
 
 func (repo CloudControllerUserRepository) SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
-	return repo.setOrUnsetOrgRole("PUT", user, org, role)
+	apiResponse = repo.setOrUnsetOrgRole("PUT", user, org, role)
+	if (apiResponse.IsNotSuccessful()) {
+		return
+	}
+	return repo.setOrUnsetOrgRole("PUT", user, org, "OrgUser")
 }
 
 func (repo CloudControllerUserRepository) UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
