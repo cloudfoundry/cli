@@ -35,12 +35,17 @@ func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organ
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
-		for _, org := range repo.Organizations {
+		orgsCount := len(repo.Organizations)
+		for i:= 0; i < orgsCount; i += 2 {
 			select {
 			case <-stop:
 				break
 			default:
-				orgsChan <- []cf.Organization{org}
+				if orgsCount - i > 1 {
+					orgsChan <- repo.Organizations[i:i+2]
+				} else {
+					orgsChan <- repo.Organizations[i:]
+				}
 			}
 		}
 

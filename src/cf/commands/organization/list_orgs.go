@@ -41,7 +41,8 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 
 	for orgs := range orgsChan {
 		rows := [][]string{}
-		for i := len(orgs) - 1; i >= 0; i-- {
+		length := len(orgs)
+		for i := 0; i < length; i++ {
 			org := orgs[i]
 			rows = append(rows, []string{org.Name})
 		}

@@ -25,7 +25,7 @@ type OrganizationEntity struct {
 }
 
 type OrganizationRepository interface {
-	ListOrgs(stop chan bool) (orgs chan []cf.Organization, statusChan chan net.ApiResponse)
+	ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse)
 	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(org cf.Organization, name string) (apiResponse net.ApiResponse)
