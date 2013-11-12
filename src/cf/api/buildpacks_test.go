@@ -12,17 +12,14 @@ import (
 	"testing"
 )
 
-func TestBuildpacksFindAll(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+func TestBuildpacksListBuildpacks(t *testing.T) {
+	firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/buildpacks",
 		Response: testnet.TestResponse{
 			Status: http.StatusOK,
 			Body: `{
-			  "total_results": 2,
-			  "total_pages": 1,
-			  "prev_url": null,
-			  "next_url": null,
+			  "next_url": "/v2/buildpacks?page=2",
 			  "resources": [
 			    {
 			      "metadata": {
@@ -30,40 +27,64 @@ func TestBuildpacksFindAll(t *testing.T) {
 			      },
 			      "entity": {
 			        "name": "Buildpack1",
-				"position" : 1
-			      }
-			    },
-			    {
-			      "metadata": {
-			        "guid": "buildpack2-guid"
-			      },
-			      "entity": {
-			        "name": "Buildpack2",
-				"position" : 2
+					"position" : 1
 			      }
 			    }
 			  ]
 			}`},
 	})
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/buildpacks?page=2",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body: `{
+			  "resources": [
+			    {
+			      "metadata": {
+			        "guid": "buildpack2-guid"
+			      },
+			      "entity": {
+			        "name": "Buildpack2",
+					"position" : 2
+			      }
+			    }
+			  ]
+			}`},
+	})
+
+	ts, handler, repo := createBuildpackRepo(t, firstRequest, secondRequest)
 	defer ts.Close()
 
-	buildpacks, apiResponse := repo.FindAll()
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
 
+	one := 1
+	two := 2
+	expectedBuildpacks := []cf.Buildpack{
+		{
+			Guid:     "buildpack1-guid",
+			Name:     "Buildpack1",
+			Position: &one,
+		},
+		{
+			Guid:     "buildpack2-guid",
+			Name:     "Buildpack2",
+			Position: &two,
+		},
+	}
+
+	buildpacks := []cf.Buildpack{}
+	for chunk := range buildpacksChan {
+		buildpacks = append(buildpacks, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.Equal(t, buildpacks, expectedBuildpacks)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, 2, len(buildpacks))
-
-	firstBuildpack := buildpacks[0]
-	assert.Equal(t, firstBuildpack.Name, "Buildpack1")
-	assert.Equal(t, firstBuildpack.Guid, "buildpack1-guid")
-	assert.Equal(t, *firstBuildpack.Position, 1)
-
-	secondBuildpack := buildpacks[1]
-	assert.Equal(t, secondBuildpack.Name, "Buildpack2")
-	assert.Equal(t, secondBuildpack.Guid, "buildpack2-guid")
-	assert.Equal(t, *secondBuildpack.Position, 2)
 }
 
 var singleBuildpackResponse = testnet.TestResponse{
@@ -90,7 +111,7 @@ var findBuildpackRequest = testnet.TestRequest{
 func TestBuildpacksFindByName(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(findBuildpackRequest)
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createBuildpackRepo(t, req)
 	defer ts.Close()
 
 	existingBuildpack := cf.Buildpack{Guid: "buildpack1-guid", Name: "Buildpack1"}
@@ -109,7 +130,7 @@ func TestFindByNameWhenBuildpackIsNotFound(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(findBuildpackRequest)
 	req.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createBuildpackRepo(t, req)
 	defer ts.Close()
 
 	_, apiResponse := repo.FindByName("Buildpack1")
@@ -131,7 +152,7 @@ func TestBuildpackCreateRejectsImproperNames(t *testing.T) {
 			}`,
 		}}
 
-	ts, _, repo := createBuildpackRepo(t, []testnet.TestRequest{badRequest})
+	ts, _, repo := createBuildpackRepo(t, badRequest)
 	defer ts.Close()
 
 	createdBuildpack, apiResponse := repo.Create(cf.Buildpack{Name: "name with space"})
@@ -159,7 +180,7 @@ func TestCreateBuildpack(t *testing.T) {
 			}`},
 	})
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createBuildpackRepo(t, req)
 	defer ts.Close()
 
 	buildpack := cf.Buildpack{Name: "my-cool-buildpack"}
@@ -192,7 +213,7 @@ func TestCreateBuildpackWithPosition(t *testing.T) {
 			}`},
 	})
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createBuildpackRepo(t, req)
 	defer ts.Close()
 
 	position := 999
@@ -215,7 +236,7 @@ func TestDeleteBuildpack(t *testing.T) {
 			Status: http.StatusNoContent,
 		}})
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createBuildpackRepo(t, req)
 	defer ts.Close()
 
 	buildpack := cf.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
@@ -244,7 +265,7 @@ func TestUpdateBuildpack(t *testing.T) {
 				}`},
 	})
 
-	ts, handler, repo := createBuildpackRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createBuildpackRepo(t, req)
 	defer ts.Close()
 
 	position := 555
@@ -257,7 +278,7 @@ func TestUpdateBuildpack(t *testing.T) {
 	assert.Equal(t, buildpack, updated)
 }
 
-func createBuildpackRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
+func createBuildpackRepo(t *testing.T, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
 
 	config := &configuration.Configuration{

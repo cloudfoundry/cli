@@ -16,6 +16,7 @@ const (
 
 type PaginatedBuildpackResources struct {
 	Resources []BuildpackResource
+	NextUrl   string `json:"next_url"`
 }
 
 type BuildpackResource struct {
@@ -30,7 +31,7 @@ type BuildpackEntity struct {
 
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse)
-	FindAll() (instances []cf.Buildpack, apiResponse net.ApiResponse)
+	ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse)
 	Create(newBuildpack cf.Buildpack) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse)
 	Delete(buildpack cf.Buildpack) (apiResponse net.ApiResponse)
 	Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse)
@@ -47,14 +48,45 @@ func NewCloudControllerBuildpackRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) FindAll() (buildpacks []cf.Buildpack, apiResponse net.ApiResponse) {
-	path := repo.config.Target + buildpacks_path
-	return repo.findAllWithPath(path)
+func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse) {
+	buildpacksChan = make(chan []cf.Buildpack, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		path := buildpacks_path
+
+	loop:
+		for path != "" {
+			select {
+			case <-stop:
+				break loop
+			default:
+				var (
+					buildpacks  []cf.Buildpack
+					apiResponse net.ApiResponse
+				)
+				buildpacks, path, apiResponse = repo.findNextWithPath(path)
+				if apiResponse.IsNotSuccessful() {
+					statusChan <- apiResponse
+					close(buildpacksChan)
+					close(statusChan)
+					return
+				}
+
+				buildpacksChan <- buildpacks
+			}
+		}
+		close(buildpacksChan)
+		close(statusChan)
+		cf.WaitForClose(stop)
+	}()
+
+	return
 }
 
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s%s?q=name%%3A%s", repo.config.Target, buildpacks_path, url.QueryEscape(name))
-	buildpacks, apiResponse := repo.findAllWithPath(path)
+	path := fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name))
+	buildpacks, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -68,13 +100,15 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) findAllWithPath(path string) (buildpacks []cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (buildpacks []cf.Buildpack, nextUrl string, apiResponse net.ApiResponse) {
 	response := new(PaginatedBuildpackResources)
 
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, response)
+	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	nextUrl = response.NextUrl
 
 	for _, r := range response.Resources {
 		buildpacks = append(buildpacks, unmarshallBuildpack(r))

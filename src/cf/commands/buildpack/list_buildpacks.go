@@ -27,36 +27,39 @@ func (cmd ListBuildpacks) GetRequirements(reqFactory requirements.Factory, c *cl
 }
 
 func (cmd ListBuildpacks) Run(c *cli.Context) {
-	cmd.ui.Say("Getting buildpacks...")
+	cmd.ui.Say("Getting buildpacks...\n")
 
-	buildpacks, apiResponse := cmd.buildpackRepo.FindAll()
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
+	stopChan := make(chan bool)
+	defer close(stopChan)
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
+	buildpackChan, statusChan := cmd.buildpackRepo.ListBuildpacks(stopChan)
 
-	if len(buildpacks) == 0 {
-		cmd.ui.Say("No buildpacks found")
-		return
-	}
+	table := cmd.ui.Table([]string{"buildpack", "position"})
+	noBuildpacks := true
 
-	table := [][]string{
-		{"buildpack", "position"},
-	}
-
-	for _, buildpack := range buildpacks {
-		position := ""
-		if buildpack.Position != nil {
-			position = strconv.Itoa(*buildpack.Position)
+	for buildpacks := range buildpackChan {
+		rows := [][]string{}
+		for _, buildpack := range buildpacks {
+			position := ""
+			if buildpack.Position != nil {
+				position = strconv.Itoa(*buildpack.Position)
+			}
+			rows = append(rows, []string{
+				buildpack.Name,
+				position,
+			})
 		}
-		table = append(table, []string{
-			buildpack.Name,
-			position,
-		})
+		table.Print(rows)
+		noBuildpacks = false
 	}
 
-	cmd.ui.DisplayTable(table)
+	apiStatus := <-statusChan
+	if apiStatus.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiStatus.Message)
+		return
+	}
+
+	if noBuildpacks {
+		cmd.ui.Say("No buildpacks found")
+	}
 }

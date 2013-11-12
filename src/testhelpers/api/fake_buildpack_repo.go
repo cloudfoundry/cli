@@ -23,8 +23,31 @@ type FakeBuildpackRepository struct {
 	UpdateBuildpack cf.Buildpack
 }
 
-func (repo *FakeBuildpackRepository) FindAll() (buildpacks []cf.Buildpack, apiResponse net.ApiResponse) {
-	buildpacks = repo.Buildpacks
+func (repo *FakeBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse) {
+	buildpacksChan = make(chan []cf.Buildpack, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		buildpackCount := len(repo.Buildpacks)
+		for i:= 0; i < buildpackCount; i += 2 {
+			select {
+			case <-stop:
+				break
+			default:
+				if buildpackCount - i > 1 {
+					buildpacksChan <- repo.Buildpacks[i:i+2]
+				} else {
+					buildpacksChan <- repo.Buildpacks[i:]
+				}
+			}
+		}
+
+		close(buildpacksChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
+
 	return
 }
 
