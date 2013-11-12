@@ -30,20 +30,36 @@ func (cmd ListSpaces) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 }
 
 func (cmd ListSpaces) Run(c *cli.Context) {
-	cmd.ui.Say("Getting spaces in org %s as %s...",
+	cmd.ui.Say("Getting spaces in org %s as %s...\n",
 		terminal.EntityNameColor(cmd.config.Organization.Name),
 		terminal.EntityNameColor(cmd.config.Username()))
 
-	spaces, apiResponse := cmd.spaceRepo.FindAll()
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	stopChan := make(chan bool)
+	defer close(stopChan)
+
+	spacesChan, statusChan := cmd.spaceRepo.ListSpaces(stopChan)
+
+	table := cmd.ui.Table([]string{"name"})
+	noSpaces := true
+
+	for spaces := range spacesChan {
+		rows := [][]string{}
+		length := len(spaces)
+		for i := 0; i < length; i++ {
+			space := spaces[i]
+			rows = append(rows, []string{space.Name})
+		}
+		table.Print(rows)
+		noSpaces = false
+	}
+
+	apiStatus := <-statusChan
+	if apiStatus.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching spaces.\n%s", apiStatus.Message)
 		return
 	}
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	for _, space := range spaces {
-		cmd.ui.Say(space.Name)
+	if noSpaces {
+		cmd.ui.Say("No spaces found")
 	}
 }

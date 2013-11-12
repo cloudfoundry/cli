@@ -13,47 +13,78 @@ import (
 	"testing"
 )
 
-func TestSpacesFindAll(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+func TestSpacesListSpaces(t *testing.T) {
+	firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/organizations/some-org-guid/spaces",
 		Response: testnet.TestResponse{
 			Status: http.StatusOK,
-			Body: `{"resources": [
-			{
-			  "metadata": {
-				"guid": "acceptance-space-guid"
-			  },
-			  "entity": {
-				"name": "acceptance"
-			  }
-			},
-			{
-			  "metadata": {
-				"guid": "staging-space-guid"
-			  },
-			  "entity": {
-				"name": "staging"
-			  }
-			}
-		]}`}})
+			Body: `{
+			"next_url": "/v2/organizations/some-org-guid/spaces?page=2",
+			"resources": [
+				{
+			  		"metadata": {
+				  		"guid": "acceptance-space-guid"
+			  		},
+			  		"entity": {
+				  		"name": "acceptance"
+			  		}
+			  	}
+			]
+		}`}})
 
-	ts, handler, repo := createSpacesRepo(t, req)
+	secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations/some-org-guid/spaces?page=2",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body: `{
+			"resources": [
+			  	{
+			  		"metadata": {
+				      	"guid": "staging-space-guid"
+				  	},
+			    	"entity": {
+						"name": "staging"
+				    }
+				}
+			]
+		}`}})
+
+	ts, handler, repo := createSpacesRepo(t, firstPageSpacesRequest, secondPageSpacesRequest)
 	defer ts.Close()
 
-	spaces, apiResponse := repo.FindAll()
+	stopChan := make(chan bool)
+	spacesChan, statusChan := repo.ListSpaces(stopChan)
 
+	expectedSpaces := []cf.Space{
+		{
+			Guid:             "acceptance-space-guid",
+			Name:             "acceptance",
+			ServiceInstances: []cf.ServiceInstance{},
+			Organization:     cf.Organization{},
+			Applications:     []cf.Application{},
+			Domains:          []cf.Domain{},
+		},
+		{
+			Guid:             "staging-space-guid",
+			Name:             "staging",
+			ServiceInstances: []cf.ServiceInstance{},
+			Organization:     cf.Organization{},
+			Applications:     []cf.Application{},
+			Domains:          []cf.Domain{},
+		},
+	}
+
+	spaces := []cf.Space{}
+	for chunk := range spacesChan {
+		spaces = append(spaces, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.Equal(t, spaces, expectedSpaces)
+	assert.True(t, apiResponse.IsSuccessful())
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 2, len(spaces))
-
-	firstSpace := spaces[0]
-	assert.Equal(t, firstSpace.Name, "acceptance")
-	assert.Equal(t, firstSpace.Guid, "acceptance-space-guid")
-
-	secondSpace := spaces[1]
-	assert.Equal(t, secondSpace.Name, "staging")
-	assert.Equal(t, secondSpace.Guid, "staging-space-guid")
 }
 
 func TestSpacesFindByName(t *testing.T) {
@@ -263,8 +294,8 @@ func TestDeleteSpace(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func createSpacesRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
-	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
+func createSpacesRepo(t *testing.T, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
+	ts, handler = testnet.NewTLSServer(t, reqs)
 
 	config := &configuration.Configuration{
 		AccessToken:  "BEARER my_access_token",

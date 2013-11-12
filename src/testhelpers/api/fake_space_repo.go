@@ -34,10 +34,34 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) FindAll() (spaces []cf.Space, apiResponse net.ApiResponse) {
-	spaces = repo.Spaces
+func (repo FakeSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []cf.Space, statusChan chan net.ApiResponse) {
+	spacesChan = make(chan []cf.Space, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		spacesCount := len(repo.Spaces)
+		for i:= 0; i < spacesCount; i += 2 {
+			select {
+			case <-stop:
+				break
+			default:
+				if spacesCount - i > 1 {
+					spacesChan <- repo.Spaces[i:i+2]
+				} else {
+					spacesChan <- repo.Spaces[i:]
+				}
+			}
+		}
+
+		close(spacesChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
+
 	return
 }
+
 
 func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name

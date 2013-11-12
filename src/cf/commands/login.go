@@ -217,10 +217,22 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (apiResponse net.Api
 			return
 		}
 
-		// Get available spaces
+		stopChan := make(chan bool)
+		defer close(stopChan)
+
+		spacesChan, statusChan := cmd.spaceRepo.ListSpaces(stopChan)
+
 		var availableSpaces []cf.Space
 
-		availableSpaces, apiResponse = cmd.spaceRepo.FindAll()
+		for spaces := range spacesChan {
+			availableSpaces = append(availableSpaces, spaces...)
+			if len(availableSpaces) > maxChoices {
+				stopChan <- true
+				break
+			}
+		}
+
+		apiResponse = <-statusChan
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed("Error finding avilable spaces\n%s", apiResponse.Message)
 			return
