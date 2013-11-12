@@ -364,7 +364,7 @@ func testSetSpaceRoleWithValidRole(t *testing.T, role string, path string) {
 		Response: testnet.TestResponse{Status: http.StatusOK},
 	})
 
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{addToOrgReq,setRoleReq})
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{addToOrgReq, setRoleReq})
 	defer cc.Close()
 
 	user := cf.User{Guid: "my-user-guid"}

@@ -115,7 +115,7 @@ func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 		EntityNameColor(config.ApiVersion))
 
 	if !config.IsLoggedIn() {
-		ui.Say("Logged out, use '%s' to login", CommandColor(cf.Name()+" login USERNAME"))
+		ui.Say(NotLoggedInText())
 	} else {
 		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
 	}
