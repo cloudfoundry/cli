@@ -10,6 +10,7 @@ import (
 
 type PaginatedRouteResources struct {
 	Resources []RouteResource `json:"resources"`
+	NextUrl   string          `json:"next_url"`
 }
 
 type RouteResource struct {
@@ -25,7 +26,7 @@ type RouteEntity struct {
 }
 
 type RouteRepository interface {
-	FindAll() (routes []cf.Route, apiResponse net.ApiResponse)
+	ListRoutes(stop chan bool) (routesChan chan []cf.Route, statusChan chan net.ApiResponse)
 	FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse)
 	FindByHostAndDomain(host, domain string) (route cf.Route, apiResponse net.ApiResponse)
 	Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiResponse net.ApiResponse)
@@ -48,13 +49,44 @@ func NewCloudControllerRouteRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerRouteRepository) FindAll() (routes []cf.Route, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
-	return repo.findAllWithPath(path)
+func (repo CloudControllerRouteRepository) ListRoutes(stop chan bool) (routesChan chan []cf.Route, statusChan chan net.ApiResponse) {
+	routesChan = make(chan []cf.Route, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		path := fmt.Sprintf("/v2/routes?inline-relations-depth=1")
+
+	loop:
+		for path != "" {
+			select {
+			case <-stop:
+				break loop
+			default:
+				var (
+					routes      []cf.Route
+					apiResponse net.ApiResponse
+				)
+				routes, path, apiResponse = repo.findNextWithPath(path)
+				if apiResponse.IsNotSuccessful() {
+					statusChan <- apiResponse
+					close(routesChan)
+					close(statusChan)
+					return
+				}
+
+				routesChan <- routes
+			}
+		}
+		close(routesChan)
+		close(statusChan)
+		cf.WaitForClose(stop)
+	}()
+
+	return
 }
 
 func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1&q=host%s", repo.config.Target, "%3A"+host)
+	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=host%s", "%3A"+host)
 	return repo.findOneWithPath(path)
 }
 
@@ -64,7 +96,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1&q=host%%3A%s%%3Bdomain_guid%%3A%s", repo.config.Target, host, domain.Guid)
+	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=host%%3A%s%%3Bdomain_guid%%3A%s", host, domain.Guid)
 	route, apiResponse = repo.findOneWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -75,7 +107,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 }
 
 func (repo CloudControllerRouteRepository) findOneWithPath(path string) (route cf.Route, apiResponse net.ApiResponse) {
-	routes, apiResponse := repo.findAllWithPath(path)
+	routes, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -89,12 +121,14 @@ func (repo CloudControllerRouteRepository) findOneWithPath(path string) (route c
 	return
 }
 
-func (repo CloudControllerRouteRepository) findAllWithPath(path string) (routes []cf.Route, apiResponse net.ApiResponse) {
+func (repo CloudControllerRouteRepository) findNextWithPath(path string) (routes []cf.Route, nextUrl string, apiResponse net.ApiResponse) {
 	routesResources := new(PaginatedRouteResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, routesResources)
+	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, routesResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	nextUrl = routesResources.NextUrl
 
 	for _, routeResponse := range routesResources.Resources {
 		domainResource := routeResponse.Entity.Domain

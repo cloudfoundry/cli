@@ -32,17 +32,44 @@ type FakeRouteRepository struct {
 	UnboundApp   cf.Application
 
 	FindAllErr    bool
-	FindAllRoutes []cf.Route
+	AllRoutes []cf.Route
 
 	DeleteRoute cf.Route
 }
 
-func (repo *FakeRouteRepository) FindAll() (routes []cf.Route, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []cf.Route, statusChan chan net.ApiResponse) {
+	routesChan = make(chan []cf.Route, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
 	if repo.FindAllErr {
-		apiResponse = net.NewApiResponseWithMessage("Error finding all routes")
+		statusChan <- net.NewApiResponseWithMessage("Error finding all routes")
+		close(routesChan)
+		close(statusChan)
+		return
 	}
 
-	routes = repo.FindAllRoutes
+
+	go func() {
+		routesCount := len(repo.AllRoutes)
+		for i:= 0; i < routesCount; i += 2 {
+			select {
+			case <-stop:
+				break
+			default:
+				if routesCount - i > 1 {
+					routesChan <- repo.AllRoutes[i:i+2]
+				} else {
+					routesChan <- repo.AllRoutes[i:]
+				}
+			}
+		}
+
+		close(routesChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
+
 	return
 }
 

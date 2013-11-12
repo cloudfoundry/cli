@@ -28,36 +28,40 @@ func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 }
 
 func (cmd ListRoutes) Run(c *cli.Context) {
-	cmd.ui.Say("Getting routes as %s ...",
+	cmd.ui.Say("Getting routes as %s ...\n",
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	routes, apiResponse := cmd.routeRepo.FindAll()
+	stopChan := make(chan bool)
+	defer close(stopChan)
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	routesChan, statusChan := cmd.routeRepo.ListRoutes(stopChan)
+
+	table := cmd.ui.Table([]string{"host", "domain", "apps"})
+	noRoutes := true
+
+	for routes := range routesChan {
+		rows := [][]string{}
+		length := len(routes)
+		for i := 0; i < length; i++ {
+			route := routes[i]
+			rows = append(rows, []string{
+				route.Host,
+				route.Domain.Name,
+				strings.Join(route.AppNames, ", "),
+			})
+		}
+		table.Print(rows)
+		noRoutes = false
+	}
+
+	apiStatus := <-statusChan
+	if apiStatus.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching routes.\n%s", apiStatus.Message)
 		return
 	}
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	if len(routes) == 0 {
+	if noRoutes {
 		cmd.ui.Say("No routes found")
-		return
 	}
-
-	table := [][]string{
-		{"host", "domain", "apps"},
-	}
-
-	for _, route := range routes {
-		table = append(table, []string{
-			route.Host,
-			route.Domain.Name,
-			strings.Join(route.AppNames, ", "),
-		})
-	}
-
-	cmd.ui.DisplayTable(table)
 }

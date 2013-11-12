@@ -12,8 +12,9 @@ import (
 	"testing"
 )
 
-var findAllRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
+var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
+  "next_url": "/v2/routes?inline-relations-depth=1&page=2",
   "resources": [
     {
       "metadata": {
@@ -48,7 +49,13 @@ var findAllRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
        	  }
         ]
       }
-    },
+    }
+  ]
+}`}
+
+var secondPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": [
     {
       "metadata": {
         "guid": "route-2-guid"
@@ -94,34 +101,64 @@ var findAllRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-func TestRoutesFindAll(t *testing.T) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+func TestRoutesListRoutes(t *testing.T) {
+	firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
 		Path:     "/v2/routes?inline-relations-depth=1",
-		Response: findAllRoutesResponse,
+		Response: firstPageRoutesResponse,
 	})
 
-	ts, handler, repo, _ := createRoutesRepo(t, request)
+	secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/routes?inline-relations-depth=1&page=2",
+		Response: secondPageRoutesResponse,
+	})
+
+	ts, handler, repo, _ := createRoutesRepo(t, firstRequest, secondRequest)
 	defer ts.Close()
 
-	routes, apiResponse := repo.FindAll()
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	routesChan, statusChan := repo.ListRoutes(stopChan)
 
+	expectedRoutes := []cf.Route{
+		{
+			Guid: "route-1-guid",
+			Host: "route-1-host",
+			Domain: cf.Domain{
+				Name: "cfapps.io",
+				Guid: "domain-1-guid",
+			},
+			Space: cf.Space{
+				Name: "space-1",
+				Guid: "space-1-guid",
+			},
+			AppNames: []string{"app-1"},
+		},
+		{
+			Guid: "route-2-guid",
+			Host: "route-2-host",
+			Domain: cf.Domain{
+				Name: "example.com",
+				Guid: "domain-2-guid",
+			},
+			Space: cf.Space{
+				Name: "space-2",
+				Guid: "space-2-guid",
+			},
+			AppNames: []string{"app-2", "app-3"},
+		},
+	}
+
+	routes := []cf.Route{}
+	for chunk := range routesChan {
+		routes = append(routes, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.Equal(t, routes, expectedRoutes)
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, len(routes), 2)
-
-	route := routes[0]
-	assert.Equal(t, route.Host, "route-1-host")
-	assert.Equal(t, route.Guid, "route-1-guid")
-	assert.Equal(t, route.Domain.Name, "cfapps.io")
-	assert.Equal(t, route.Domain.Guid, "domain-1-guid")
-	assert.Equal(t, route.Space.Name, "space-1")
-	assert.Equal(t, route.Space.Guid, "space-1-guid")
-	assert.Equal(t, route.AppNames, []string{"app-1"})
-
-	route = routes[1]
-	assert.Equal(t, route.Guid, "route-2-guid")
-	assert.Equal(t, route.AppNames, []string{"app-2", "app-3"})
+	assert.True(t, apiResponse.IsSuccessful())
 }
 
 var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, Body: `
@@ -313,8 +350,8 @@ func TestDelete(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
-func createRoutesRepo(t *testing.T, request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo CloudControllerRouteRepository, domainRepo *testapi.FakeDomainRepository) {
-	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{request})
+func createRoutesRepo(t *testing.T, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo CloudControllerRouteRepository, domainRepo *testapi.FakeDomainRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
 
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
