@@ -113,6 +113,34 @@ func TestListEvents(t *testing.T) {
 	assert.True(t, handler.AllRequestsCalled())
 }
 
+func TestListEventsWithNoEvents(t *testing.T) {
+	emptyEventsRequest := testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/apps/my-app-guid/events",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body:   `{"resources": []}`},
+	}
+
+	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{emptyEventsRequest})
+	defer listEventsServer.Close()
+
+	config := &configuration.Configuration{
+		Target:      listEventsServer.URL,
+		AccessToken: "BEARER my_access_token",
+	}
+	repo := NewCloudControllerAppEventsRepository(config, net.NewCloudControllerGateway())
+
+	eventChan, apiErr := repo.ListEvents(cf.Application{Guid: "my-app-guid"})
+
+	_, ok := <-eventChan
+	_, open := <-apiErr
+
+	assert.False(t, ok)
+	assert.False(t, open)
+	assert.True(t, handler.AllRequestsCalled())
+}
+
 func TestListEventsNotFound(t *testing.T) {
 
 	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{

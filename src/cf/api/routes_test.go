@@ -161,6 +161,28 @@ func TestRoutesListRoutes(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestRoutesListRoutesWithNoRoutes(t *testing.T) {
+	emptyRoutesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/routes?inline-relations-depth=1",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	ts, handler, repo, _ := createRoutesRepo(t, emptyRoutesRequest)
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	routesChan, statusChan := repo.ListRoutes(stopChan)
+
+	_, ok := <-routesChan
+	apiResponse := <-statusChan
+
+	assert.False(t, ok)
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, Body: `
 { "resources": [
     {

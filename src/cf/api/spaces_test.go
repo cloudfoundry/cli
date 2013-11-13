@@ -88,6 +88,31 @@ func TestSpacesListSpaces(t *testing.T) {
 	assert.True(t, handler.AllRequestsCalled())
 }
 
+func TestSpacesListSpacesWithNoSpaces(t *testing.T) {
+	emptySpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/organizations/some-org-guid/spaces",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body:   `{"resources": []}`,
+		},
+	})
+
+	ts, handler, repo := createSpacesRepo(t, emptySpacesRequest)
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	spacesChan, statusChan := repo.ListSpaces(stopChan)
+
+	_, ok := <-spacesChan
+	apiResponse := <-statusChan
+
+	assert.False(t, ok)
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.True(t, handler.AllRequestsCalled())
+}
+
 func TestSpacesFindByName(t *testing.T) {
 	testSpacesFindByNameWithOrg(t,
 		"some-org-guid",

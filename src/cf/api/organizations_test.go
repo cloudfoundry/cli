@@ -61,6 +61,28 @@ func TestOrganizationsListOrgs(t *testing.T) {
 
 }
 
+func TestOrganizationsListOrgsWithNoOrgs(t *testing.T) {
+	emptyOrgsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/organizations",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+	})
+
+	ts, handler, repo := createOrganizationRepo(t, emptyOrgsRequest)
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	orgsChan, statusChan := repo.ListOrgs(stopChan)
+
+	_, ok := <-orgsChan
+	apiResponse := <-statusChan
+
+	assert.False(t, ok)
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.True(t, handler.AllRequestsCalled())
+}
+
 func TestOrganizationsFindByName(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",

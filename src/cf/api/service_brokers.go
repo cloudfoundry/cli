@@ -71,7 +71,9 @@ func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan 
 					return
 				}
 
-				serviceBrokersChan <- serviceBrokers
+				if len(serviceBrokers) > 0 {
+					serviceBrokersChan <- serviceBrokers
+				}
 			}
 		}
 		close(serviceBrokersChan)

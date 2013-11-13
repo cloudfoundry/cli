@@ -74,7 +74,9 @@ func (repo CloudControllerRouteRepository) ListRoutes(stop chan bool) (routesCha
 					return
 				}
 
-				routesChan <- routes
+				if len(routes) > 0 {
+					routesChan <- routes
+				}
 			}
 		}
 		close(routesChan)

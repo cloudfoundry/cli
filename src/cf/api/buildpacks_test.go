@@ -87,6 +87,31 @@ func TestBuildpacksListBuildpacks(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestBuildpacksListBuildpacksWithNoBuildpacks(t *testing.T) {
+	emptyBuildpacksRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/buildpacks",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body:   `{"resources": []}`,
+		},
+	})
+
+	ts, handler, repo := createBuildpackRepo(t, emptyBuildpacksRequest)
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
+
+	_, ok := <-buildpacksChan
+	apiResponse := <-statusChan
+
+	assert.False(t, ok)
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 var singleBuildpackResponse = testnet.TestResponse{
 	Status: http.StatusOK,
 	Body: `{"resources": [

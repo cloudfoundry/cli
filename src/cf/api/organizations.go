@@ -68,7 +68,9 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgs
 					return
 				}
 
-				orgsChan <- organizations
+				if len(organizations) > 0 {
+					orgsChan <- organizations
+				}
 			}
 		}
 		close(orgsChan)

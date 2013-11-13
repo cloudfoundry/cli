@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestServiceBrokersFindAll(t *testing.T) {
+func TestServiceBrokersListServiceBrokers(t *testing.T) {
 	firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   "/v2/service_brokers",
@@ -91,6 +91,31 @@ func TestServiceBrokersFindAll(t *testing.T) {
 	apiResponse := <-statusChan
 
 	assert.Equal(t, serviceBrokers, expectedServiceBrokers)
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func TestServiceBrokersListServiceBrokersWithNoServiceBrokers(t *testing.T) {
+	emptyServiceBrokersRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/service_brokers",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body:   `{"resources": []}`,
+		},
+	})
+
+	ts, handler, repo := createServiceBrokerRepo(t, emptyServiceBrokersRequest)
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	serviceBrokersChan, statusChan := repo.ListServiceBrokers(stopChan)
+
+	_, ok := <-serviceBrokersChan
+	apiResponse := <-statusChan
+
+	assert.False(t, ok)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }

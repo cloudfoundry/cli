@@ -69,7 +69,10 @@ func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (e
 					InstanceIndex:   resource.Entity.InstanceIndex,
 				})
 			}
-			eventChan <- events
+			if len(events) > 0 {
+				eventChan <- events
+			}
+
 			path = eventResources.NextURL
 		}
 		close(eventChan)

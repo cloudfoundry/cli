@@ -71,7 +71,9 @@ func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesCha
 					return
 				}
 
-				spacesChan <- spaces
+				if len(spaces) > 0 {
+					spacesChan <- spaces
+				}
 			}
 		}
 		close(spacesChan)

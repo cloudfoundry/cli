@@ -73,7 +73,9 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (b
 					return
 				}
 
-				buildpacksChan <- buildpacks
+				if len(buildpacks) > 0 {
+					buildpacksChan <- buildpacks
+				}
 			}
 		}
 		close(buildpacksChan)
