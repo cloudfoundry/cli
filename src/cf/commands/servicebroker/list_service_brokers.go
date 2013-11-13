@@ -26,34 +26,35 @@ func (cmd ListServiceBrokers) GetRequirements(reqFactory requirements.Factory, c
 }
 
 func (cmd ListServiceBrokers) Run(c *cli.Context) {
-	cmd.ui.Say("Getting service brokers as %s...", terminal.EntityNameColor(cmd.config.Username()))
+	cmd.ui.Say("Getting service brokers as %s...\n", terminal.EntityNameColor(cmd.config.Username()))
 
-	serviceBrokers, apiResponse := cmd.repo.FindAll()
+	stopChan := make(chan bool)
+	defer close(stopChan)
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	serviceBrokersChan, statusChan := cmd.repo.ListServiceBrokers(stopChan)
+
+	table := cmd.ui.Table([]string{"name", "url"})
+	noServiceBrokers := true
+
+	for serviceBrokers := range serviceBrokersChan {
+		rows := [][]string{}
+		for _, serviceBroker := range serviceBrokers {
+			rows = append(rows, []string{
+				serviceBroker.Name,
+				serviceBroker.Url,
+			})
+		}
+		table.Print(rows)
+		noServiceBrokers = false
+	}
+
+	apiStatus := <-statusChan
+	if apiStatus.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching service brokers.\n%s", apiStatus.Message)
 		return
 	}
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	if len(serviceBrokers) == 0 {
+	if noServiceBrokers {
 		cmd.ui.Say("No service brokers found")
-		return
 	}
-
-	table := [][]string{
-		{"Name", "URL"},
-	}
-
-	for _, serviceBroker := range serviceBrokers {
-		table = append(table, []string{
-			serviceBroker.Name,
-			serviceBroker.Url,
-		})
-	}
-
-	cmd.ui.DisplayTable(table)
-	return
 }

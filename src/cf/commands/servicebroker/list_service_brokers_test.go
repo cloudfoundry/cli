@@ -25,43 +25,49 @@ func TestListServiceBrokers(t *testing.T) {
 			Guid: "service-broker-to-list-guid-b",
 			Url:  "http://service-b-url.com",
 		},
+		cf.ServiceBroker{
+			Name: "service-broker-to-list-c",
+			Guid: "service-broker-to-list-guid-c",
+			Url:  "http://service-c-url.com",
+		},
 	}
 
 	repo := &testapi.FakeServiceBrokerRepo{
-		FindAllServiceBrokers: serviceBrokers,
+		ServiceBrokers: serviceBrokers,
 	}
 
 	ui := callListServiceBrokers(t, []string{}, repo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
 
-	assert.Contains(t, ui.Outputs[3], "Name")
-	assert.Contains(t, ui.Outputs[3], "URL")
+	assert.Contains(t, ui.Outputs[1], "name")
+	assert.Contains(t, ui.Outputs[1], "url")
 
-	assert.Contains(t, ui.Outputs[4], "service-broker-to-list-a")
-	assert.Contains(t, ui.Outputs[4], "http://service-a-url.com")
+	assert.Contains(t, ui.Outputs[2], "service-broker-to-list-a")
+	assert.Contains(t, ui.Outputs[2], "http://service-a-url.com")
 
-	assert.Contains(t, ui.Outputs[5], "service-broker-to-list-b")
-	assert.Contains(t, ui.Outputs[5], "http://service-b-url.com")
+	assert.Contains(t, ui.Outputs[3], "service-broker-to-list-b")
+	assert.Contains(t, ui.Outputs[3], "http://service-b-url.com")
+
+	assert.Contains(t, ui.Outputs[4], "service-broker-to-list-c")
+	assert.Contains(t, ui.Outputs[4], "http://service-c-url.com")
 }
 
 func TestListingServiceBrokersWhenNoneExist(t *testing.T) {
 	repo := &testapi.FakeServiceBrokerRepo{
-		FindAllServiceBrokers: []cf.ServiceBroker{},
+		ServiceBrokers: []cf.ServiceBroker{},
 	}
 
 	ui := callListServiceBrokers(t, []string{}, repo)
 
 	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "No service brokers found")
+	assert.Contains(t, ui.Outputs[1], "No service brokers found")
 }
 
 func TestListingServiceBrokersWhenFindFails(t *testing.T) {
-	repo := &testapi.FakeServiceBrokerRepo{FindAllErr: true}
+	repo := &testapi.FakeServiceBrokerRepo{ListErr: true}
 
 	ui := callListServiceBrokers(t, []string{}, repo)
 

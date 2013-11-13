@@ -32,7 +32,7 @@ func TestListingRoutes(t *testing.T) {
 		},
 	}
 
-	routeRepo := &testapi.FakeRouteRepository{AllRoutes: routes}
+	routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
@@ -58,7 +58,7 @@ func TestListingRoutes(t *testing.T) {
 
 func TestListingRoutesWhenNoneExist(t *testing.T) {
 	routes := []cf.Route{}
-	routeRepo := &testapi.FakeRouteRepository{AllRoutes: routes}
+	routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
@@ -68,7 +68,7 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 }
 
 func TestListingRoutesWhenFindFails(t *testing.T) {
-	routeRepo := &testapi.FakeRouteRepository{FindAllErr: true}
+	routeRepo := &testapi.FakeRouteRepository{ListErr: true}
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 

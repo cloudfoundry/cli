@@ -10,6 +10,7 @@ import (
 
 type PaginatedServiceBrokerResources struct {
 	ServiceBrokers []ServiceBrokerResource `json:"resources"`
+	NextUrl        string                  `json:"next_url"`
 }
 
 type ServiceBrokerResource struct {
@@ -26,7 +27,7 @@ type ServiceBrokerEntity struct {
 }
 
 type ServiceBrokerRepository interface {
-	FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse)
+	ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse)
 	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
 	Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
 	Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
@@ -45,13 +46,45 @@ func NewCloudControllerServiceBrokerRepository(config *configuration.Configurati
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse) {
-	return repo.findAllWithPath(fmt.Sprintf("%s/v2/service_brokers", repo.config.Target))
+func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse) {
+	serviceBrokersChan = make(chan []cf.ServiceBroker, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		path := "/v2/service_brokers"
+
+	loop:
+		for path != "" {
+			select {
+			case <-stop:
+				break loop
+			default:
+				var (
+					serviceBrokers []cf.ServiceBroker
+					apiResponse    net.ApiResponse
+				)
+				serviceBrokers, path, apiResponse = repo.findNextWithPath(path)
+				if apiResponse.IsNotSuccessful() {
+					statusChan <- apiResponse
+					close(serviceBrokersChan)
+					close(statusChan)
+					return
+				}
+
+				serviceBrokersChan <- serviceBrokers
+			}
+		}
+		close(serviceBrokersChan)
+		close(statusChan)
+		cf.WaitForClose(stop)
+	}()
+
+	return
 }
 
 func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_brokers?q=name%%3A%s", repo.config.Target, name)
-	serviceBrokers, apiResponse := repo.findAllWithPath(path)
+	path := fmt.Sprintf("/v2/service_brokers?q=name%%3A%s", name)
+	serviceBrokers, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -65,13 +98,15 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) findAllWithPath(path string) (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBrokerRepository) findNextWithPath(path string) (serviceBrokers []cf.ServiceBroker, nextUrl string, apiResponse net.ApiResponse) {
 	resources := new(PaginatedServiceBrokerResources)
 
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
+
+	nextUrl = resources.NextUrl
 
 	for _, resource := range resources.ServiceBrokers {
 		serviceBroker := cf.ServiceBroker{

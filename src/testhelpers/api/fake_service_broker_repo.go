@@ -15,8 +15,8 @@ type FakeServiceBrokerRepo struct {
 	RenamedServiceBroker cf.ServiceBroker
 	DeletedServiceBroker cf.ServiceBroker
 
-	FindAllServiceBrokers []cf.ServiceBroker
-	FindAllErr bool
+	ServiceBrokers []cf.ServiceBroker
+	ListErr bool
 }
 
 func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
@@ -30,12 +30,39 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.Ser
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) FindAll() (serviceBrokers []cf.ServiceBroker, apiResponse net.ApiResponse) {
-	if repo.FindAllErr {
-		apiResponse = net.NewApiResponseWithMessage("Error finding all service brokers")
+func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse) {
+	serviceBrokersChan = make(chan []cf.ServiceBroker, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	if repo.ListErr {
+		statusChan <- net.NewApiResponseWithMessage("Error finding all routes")
+		close(serviceBrokersChan)
+		close(statusChan)
+		return
 	}
 
-	serviceBrokers = repo.FindAllServiceBrokers
+
+	go func() {
+		serviceBrokersCount := len(repo.ServiceBrokers)
+		for i:= 0; i < serviceBrokersCount; i += 2 {
+			select {
+			case <-stop:
+				break
+			default:
+				if serviceBrokersCount - i > 1 {
+					serviceBrokersChan <- repo.ServiceBrokers[i:i+2]
+				} else {
+					serviceBrokersChan <- repo.ServiceBrokers[i:]
+				}
+			}
+		}
+
+		close(serviceBrokersChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
+
 	return
 }
 

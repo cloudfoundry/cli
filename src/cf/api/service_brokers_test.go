@@ -13,59 +13,86 @@ import (
 )
 
 func TestServiceBrokersFindAll(t *testing.T) {
-	responseBody := `{
-  "resources": [
-  	{
-  	  "metadata": {
-  	    "guid":"found-guid-1"
-  	  },
-  	  "entity": {
-  	    "name": "found-name-1",
-  	    "broker_url": "http://found.example.com-1",
-  	    "auth_username": "found-username-1",
-  	    "auth_password": "found-password-1"
-  	  }
-  	},
-  	{
-  	  "metadata": {
-  	    "guid":"found-guid-2"
-  	  },
-  	  "entity": {
-  	    "name": "found-name-2",
-  	    "broker_url": "http://found.example.com-2",
-  	    "auth_username": "found-username-2",
-  	    "auth_password": "found-password-2"
-  	  }
-  	}
-  ]
-}`
-
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "GET",
-		Path:     "/v2/service_brokers",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: responseBody},
+	firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/service_brokers",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body: `{
+			  "next_url": "/v2/service_brokers?page=2",
+			  "resources": [
+				{
+				  "metadata": {
+					"guid":"found-guid-1"
+				  },
+				  "entity": {
+					"name": "found-name-1",
+					"broker_url": "http://found.example.com-1",
+					"auth_username": "found-username-1",
+					"auth_password": "found-password-1"
+				  }
+				}
+			  ]
+			}`,
+		},
 	})
 
-	ts, handler, repo := createServiceBrokerRepo(t, req)
+	secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method: "GET",
+		Path:   "/v2/service_brokers?page=2",
+		Response: testnet.TestResponse{
+			Status: http.StatusOK,
+			Body: `{
+			  "resources": [
+				{
+				  "metadata": {
+					"guid":"found-guid-2"
+				  },
+				  "entity": {
+					"name": "found-name-2",
+					"broker_url": "http://found.example.com-2",
+					"auth_username": "found-username-2",
+					"auth_password": "found-password-2"
+				  }
+				}
+			  ]
+			}`,
+		},
+	})
+
+	ts, handler, repo := createServiceBrokerRepo(t, firstRequest, secondRequest)
 	defer ts.Close()
 
-	serviceBrokers, apiResponse := repo.FindAll()
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	serviceBrokersChan, statusChan := repo.ListServiceBrokers(stopChan)
 
+	expectedServiceBrokers := []cf.ServiceBroker{
+		{
+			Guid:     "found-guid-1",
+			Name:     "found-name-1",
+			Url:      "http://found.example.com-1",
+			Username: "found-username-1",
+			Password: "found-password-1",
+		},
+		{
+			Guid:     "found-guid-2",
+			Name:     "found-name-2",
+			Url:      "http://found.example.com-2",
+			Username: "found-username-2",
+			Password: "found-password-2",
+		},
+	}
+
+	serviceBrokers := []cf.ServiceBroker{}
+	for chunk := range serviceBrokersChan {
+		serviceBrokers = append(serviceBrokers, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.Equal(t, serviceBrokers, expectedServiceBrokers)
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, len(serviceBrokers), 2)
-
-	assert.Equal(t, serviceBrokers[0].Name, "found-name-1")
-	assert.Equal(t, serviceBrokers[0].Guid, "found-guid-1")
-	assert.Equal(t, serviceBrokers[0].Url, "http://found.example.com-1")
-	assert.Equal(t, serviceBrokers[0].Username, "found-username-1")
-	assert.Equal(t, serviceBrokers[0].Password, "found-password-1")
-
-	assert.Equal(t, serviceBrokers[1].Name, "found-name-2")
-	assert.Equal(t, serviceBrokers[1].Guid, "found-guid-2")
-	assert.Equal(t, serviceBrokers[1].Url, "http://found.example.com-2")
-	assert.Equal(t, serviceBrokers[1].Username, "found-username-2")
-	assert.Equal(t, serviceBrokers[1].Password, "found-password-2")
+	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestFindServiceBrokerByName(t *testing.T) {
@@ -216,8 +243,8 @@ func TestDeleteServiceBroker(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
-func createServiceBrokerRepo(t *testing.T, request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBrokerRepository) {
-	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{request})
+func createServiceBrokerRepo(t *testing.T, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBrokerRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
 
 	config := &configuration.Configuration{
 		Target:      ts.URL,
