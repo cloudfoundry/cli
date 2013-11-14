@@ -77,7 +77,7 @@ func dumpRequest(req *http.Request) {
 	shouldDisplayBody := !strings.Contains(req.Header.Get("Content-Type"), "multipart/form-data")
 	dumpedRequest, err := httputil.DumpRequest(req, shouldDisplayBody)
 	if err != nil {
-		trace.Logger.Print("Error dumping request")
+		trace.Logger.Printf("Error dumping request\n%s\n", err)
 	} else {
 		trace.Logger.Printf("\n%s\n%s\n", terminal.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
 		if !shouldDisplayBody {
@@ -89,7 +89,7 @@ func dumpRequest(req *http.Request) {
 func dumpResponse(res *http.Response) {
 	dumpedResponse, err := httputil.DumpResponse(res, true)
 	if err != nil {
-		trace.Logger.Printf("Error dumping response")
+		trace.Logger.Printf("Error dumping response\n%s\n", err)
 	} else {
 		trace.Logger.Printf("\n%s\n%s\n", terminal.HeaderColor("RESPONSE:"), Sanitize(string(dumpedResponse)))
 	}
