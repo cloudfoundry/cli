@@ -6,9 +6,11 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"code.google.com/p/gogoprotobuf/proto"
+	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -24,6 +26,28 @@ var defaultAppForStart = cf.Application{
 	Routes: []cf.Route{
 		{Host: "my-app", Domain: cf.Domain{Name: "example.com"}},
 	},
+}
+
+var defaultInstanceReponses = [][]cf.ApplicationInstance{
+	[]cf.ApplicationInstance{
+		cf.ApplicationInstance{State: cf.InstanceStarting},
+		cf.ApplicationInstance{State: cf.InstanceStarting},
+	},
+	[]cf.ApplicationInstance{
+		cf.ApplicationInstance{State: cf.InstanceRunning},
+		cf.ApplicationInstance{State: cf.InstanceStarting},
+	},
+}
+
+var defaultInstanceErrorCodes = []string{"", ""}
+
+func callStart(args []string, config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("start", args)
+
+	cmd := NewStart(ui, config, appRepo, logRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }
 
 func startAppWithInstancesAndErrors(t *testing.T, app cf.Application, instances [][]cf.ApplicationInstance, errorCodes []string) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, reqFactory *testreq.FakeReqFactory) {
@@ -101,19 +125,7 @@ func TestStartCommandFailsWithUsage(t *testing.T) {
 func TestStartApplication(t *testing.T) {
 	t.Parallel()
 
-	instances := [][]cf.ApplicationInstance{
-		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: cf.InstanceStarting},
-			cf.ApplicationInstance{State: cf.InstanceStarting},
-		},
-		[]cf.ApplicationInstance{
-			cf.ApplicationInstance{State: cf.InstanceRunning},
-			cf.ApplicationInstance{State: cf.InstanceStarting},
-		},
-	}
-
-	errorCodes := []string{"", ""}
-	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(t, defaultAppForStart, instances, errorCodes)
+	ui, appRepo, reqFactory := startAppWithInstancesAndErrors(t, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "my-org")
@@ -289,11 +301,40 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 	assert.Equal(t, appRepo.StartAppToStart.Guid, "")
 }
 
-func callStart(args []string, config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("start", args)
+func TestStartApplicationWithLoggingFailure(t *testing.T) {
+	t.Parallel()
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{Username: "my-user"})
+	assert.NoError(t, err)
+	config := &configuration.Configuration{
+		Space:                   cf.Space{Name: "my-space"},
+		Organization:            cf.Organization{Name: "my-org"},
+		AccessToken:             token,
+		ApplicationStartTimeout: 2,
+	}
+
+	appRepo := &testapi.FakeApplicationRepository{
+		FindByNameApp:          defaultAppForStart,
+		GetInstancesResponses:  defaultInstanceReponses,
+		GetInstancesErrorCodes: defaultInstanceErrorCodes,
+	}
+
+	logRepo := &testapi.FakeLogsRepository{
+		TailLogErr: errors.New("Ooops"),
+	}
+
+	reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
+
+	ui := new(testterm.FakeUI)
+
+	ctxt := testcmd.NewContext("start", []string{"my-app"})
 
 	cmd := NewStart(ui, config, appRepo, logRepo)
+
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
+
+	testassert.SliceContains(t, ui.Outputs, []string{
+		"error tailing logs",
+		"Ooops",
+	})
 }

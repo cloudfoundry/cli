@@ -54,6 +54,7 @@ func TestRecentLogsFor(t *testing.T) {
 	}
 
 	logChan := make(chan *logmessage.Message, 1000)
+
 	err = logsRepo.RecentLogsFor(app, onConnect, logChan)
 
 	// ordered messages we expect to receive
@@ -178,7 +179,7 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 	logChan := make(chan *logmessage.Message, 1000)
 	controlChan := make(chan bool)
 
-	logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+	go logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
 
 	for msg := range logChan {
 		//assertions about the arrival times of the messages

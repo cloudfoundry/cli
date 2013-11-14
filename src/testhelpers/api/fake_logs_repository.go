@@ -12,6 +12,7 @@ type FakeLogsRepository struct {
 	RecentLogs []logmessage.LogMessage
 	TailLogMessages []logmessage.LogMessage
 	TailLogStopCalled bool
+	TailLogErr error
 }
 
 func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message) (err error){
@@ -22,6 +23,11 @@ func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(),
 
 
 func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool,  printInterval time.Duration) (err error){
+	err = l.TailLogErr
+	if err != nil {
+		return
+	}
+
 	l.logsFor(app, l.TailLogMessages, onConnect, logChan, stopLoggingChan)
 	return
 }

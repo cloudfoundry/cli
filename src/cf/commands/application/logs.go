@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -45,40 +46,53 @@ func (cmd *Logs) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 
 func (cmd *Logs) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-
 	logChan := make(chan *logmessage.Message, 1000)
-	var err error
 
 	if c.Bool("recent") {
-		onConnect := func() {
-			cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
-				terminal.EntityNameColor(app.Name),
-				terminal.EntityNameColor(cmd.config.Organization.Name),
-				terminal.EntityNameColor(cmd.config.Space.Name),
-				terminal.EntityNameColor(cmd.config.Username()),
-			)
-		}
-		err = cmd.logsRepo.RecentLogsFor(app, onConnect, logChan)
+		go cmd.recentLogsFor(app, logChan)
 	} else {
-
-		onConnect := func() {
-			cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
-				terminal.EntityNameColor(app.Name),
-				terminal.EntityNameColor(cmd.config.Organization.Name),
-				terminal.EntityNameColor(cmd.config.Space.Name),
-				terminal.EntityNameColor(cmd.config.Username()),
-			)
-		}
-		// in this case we tail the logs forever, so we never send true on this channel
-		stopLoggingChan := make(chan bool)
-
-		err = cmd.logsRepo.TailLogsFor(app, onConnect, logChan, stopLoggingChan, 5*time.Second)
+		go cmd.tailLogsFor(app, logChan)
 	}
+
+	cmd.displayLogMessages(logChan)
+}
+
+func (cmd *Logs) recentLogsFor(app cf.Application, logChan chan *logmessage.Message) {
+	onConnect := func() {
+		cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
+			terminal.EntityNameColor(app.Name),
+			terminal.EntityNameColor(cmd.config.Organization.Name),
+			terminal.EntityNameColor(cmd.config.Space.Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
+	}
+
+	err := cmd.logsRepo.RecentLogsFor(app, onConnect, logChan)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
-	cmd.displayLogMessages(logChan)
+}
+
+func (cmd *Logs) tailLogsFor(app cf.Application, logChan chan *logmessage.Message) {
+	onConnect := func() {
+		cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
+			terminal.EntityNameColor(app.Name),
+			terminal.EntityNameColor(cmd.config.Organization.Name),
+			terminal.EntityNameColor(cmd.config.Space.Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
+	}
+
+	// in this case we tail the logs forever, so we never send true on this channel
+	stopLoggingChan := make(chan bool)
+	defer close(stopLoggingChan)
+
+	err := cmd.logsRepo.TailLogsFor(app, onConnect, logChan, stopLoggingChan, 5*time.Second)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+		return
+	}
 }
 
 func (cmd *Logs) displayLogMessages(logChan chan *logmessage.Message) {
