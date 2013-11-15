@@ -534,7 +534,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s scale APP -i INSTANCES -m MEMORY", cf.Name()),
 			Flags: []cli.Flag{
 				cli.IntFlag{Name: "i", Value: 0, Usage: "number of instances"},
-				cli.StringFlag{Name: "m", Value: "", Usage: "memory limit"},
+				cli.StringFlag{Name: "m", Value: "", Usage: "memory limit (e.g. 256M, 1024M, 1G)"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("scale", c)
