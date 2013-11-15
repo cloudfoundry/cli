@@ -25,7 +25,6 @@ type UserEntity struct {
 }
 
 var orgRoleToPathMap = map[string]string{
-	"OrgUser":        "users",
 	"OrgManager":     "managers",
 	"BillingManager": "billing_managers",
 	"OrgAuditor":     "auditors",
@@ -259,7 +258,7 @@ func (repo CloudControllerUserRepository) SetOrgRole(user cf.User, org cf.Organi
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
-	return repo.setOrUnsetOrgRole("PUT", user, org, "OrgUser")
+	return repo.addOrgUserRole(user.Guid, org.Guid)
 }
 
 func (repo CloudControllerUserRepository) UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
@@ -294,9 +293,7 @@ func (repo CloudControllerUserRepository) SetSpaceRole(user cf.User, space cf.Sp
 		return
 	}
 
-	// Add user to Organization before setting role on space
-	path := fmt.Sprintf("%s/v2/organizations/%s/users/%s", repo.config.Target, space.Organization.Guid, user.Guid)
-	apiResponse = repo.ccGateway.UpdateResource(path, repo.config.AccessToken, nil)
+	apiResponse = repo.addOrgUserRole(user.Guid, space.Organization.Guid)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -321,4 +318,9 @@ func (repo CloudControllerUserRepository) checkSpaceRole(user cf.User, space cf.
 
 	fullPath = fmt.Sprintf("%s/v2/spaces/%s/%s/%s", repo.config.Target, space.Guid, rolePath, user.Guid)
 	return
+}
+
+func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/organizations/%s/users/%s", repo.config.Target, orgGuid, userGuid)
+	return repo.ccGateway.UpdateResource(path, repo.config.AccessToken, nil)
 }
