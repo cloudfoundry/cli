@@ -14,6 +14,8 @@ import (
 	"time"
 )
 
+const MaxInstanceStartupPings = 60
+
 type Start struct {
 	ui        terminal.UI
 	config    *configuration.Configuration
@@ -76,27 +78,15 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	cmd.ui.Ok()
 
 	stopLoggingChan := make(chan bool, 1)
+	defer close(stopLoggingChan)
 	go cmd.tailStagingLogs(app, stopLoggingChan)
 
-	instances, apiResponse := cmd.appRepo.GetInstances(updatedApp)
-	for apiResponse.IsNotSuccessful() {
-		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
-			cmd.ui.Say("")
-			cmd.ui.Failed(apiResponse.Message)
-			return
-		}
-
-		cmd.ui.Wait(1 * time.Second)
-		instances, apiResponse = cmd.appRepo.GetInstances(updatedApp)
-	}
-
+	instances := cmd.waitForInstanceStartup(updatedApp)
 	stopLoggingChan <- true
-	close(stopLoggingChan)
 
 	cmd.ui.Say("")
 
 	cmd.startTime = time.Now()
-
 	for cmd.displayInstancesStatus(app, instances) {
 		cmd.ui.Wait(1 * time.Second)
 		instances, _ = cmd.appRepo.GetInstances(updatedApp)
@@ -124,6 +114,24 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 	for msg := range logChan {
 		cmd.ui.Say(simpleLogMessageOutput(msg))
 	}
+}
+
+func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.ApplicationInstance {
+	count := 0
+
+	instances, apiResponse := cmd.appRepo.GetInstances(app)
+	for apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings {
+		count++
+		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
+			cmd.ui.Say("")
+			cmd.ui.Failed(apiResponse.Message)
+			return []cf.ApplicationInstance{}
+		}
+
+		cmd.ui.Wait(1 * time.Second)
+		instances, apiResponse = cmd.appRepo.GetInstances(app)
+	}
+	return instances
 }
 
 func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {
