@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
 	"testing"
@@ -44,6 +45,19 @@ var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
     }
 ]`)
 
+var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
+	{
+        "fn": "app.rb",
+        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
+        "size": 51
+    },
+    {
+        "fn": "config.ru",
+        "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
+        "size": 70
+    }
+]`)
+
 var uploadApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
 	Path:    "/v2/apps/my-cool-app-guid/bits",
@@ -65,18 +79,7 @@ var matchResourceRequest = testnet.TestRequest{
 	Matcher: testnet.RequestBodyMatcher(expectedResources),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
-		Body: `[
-    {
-        "fn": "app.rb",
-        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51
-    },
-    {
-        "fn": "config.ru",
-        "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70
-    }
-]`,
+		Body:   matchedResources,
 	},
 }
 
@@ -104,7 +107,8 @@ var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
 	assert.Equal(t, len(valuePart), 1, "Wrong number of values")
 
 	resourceManifest := valuePart[0]
-	assert.Equal(t, resourceManifest, expectedResources, "Resources do not match")
+	chompedResourceManifest := strings.Replace(resourceManifest, "\n", "", -1)
+	assert.Equal(t, chompedResourceManifest, matchedResources, "Resources do not match")
 
 	// assert zip file is present and correct
 	assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
