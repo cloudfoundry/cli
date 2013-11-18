@@ -56,6 +56,7 @@ func TestRecentLogsFor(t *testing.T) {
 	logChan := make(chan *logmessage.Message, 1000)
 
 	err = logsRepo.RecentLogsFor(app, onConnect, logChan)
+	close(logChan)
 
 	// ordered messages we expect to receive
 	dumpedMessages := []*logmessage.Message{}
@@ -117,6 +118,7 @@ func TestTailsLogsFor(t *testing.T) {
 
 	// method under test
 	logsRepo.TailLogsFor(app, onConnect, logChan, controlChan, time.Duration(1))
+	close(logChan)
 
 	for msg := range logChan {
 		tailedMessages = append(tailedMessages, msg)
@@ -179,7 +181,10 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 	logChan := make(chan *logmessage.Message, 1000)
 	controlChan := make(chan bool)
 
-	go logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+	go func() {
+		defer close(logChan)
+		logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+	}()
 
 	for msg := range logChan {
 		//assertions about the arrival times of the messages
@@ -237,7 +242,11 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 
 	logChan := make(chan *logmessage.Message, 1000)
 	controlChan := make(chan bool)
-	logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+
+	go func() {
+		defer close(logChan)
+		logsRepo.TailLogsFor(app, func() {}, logChan, controlChan, time.Duration(1*time.Second))
+	}()
 
 	for msg := range logChan {
 		switch string(msg.GetLogMessage().Message) {

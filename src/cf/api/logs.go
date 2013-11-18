@@ -53,8 +53,6 @@ func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect 
 }
 
 func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf.Application, onConnect func(), outputChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) (err error) {
-	defer close(outputChan)
-
 	trace.Logger.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
 
 	config, err := websocket.NewConfig(location, "http://localhost")
@@ -75,13 +73,18 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf
 
 	inputChan := make(chan *logmessage.Message, LogBufferSize)
 	defer close(inputChan)
+	stopInputChan := make(chan bool, 1)
+
 
 	messageQueue := repo.createMessageSorter(inputChan, printTimeBuffer)
 
 	go repo.sendKeepAlive(ws)
-	go repo.listenForMessages(ws, inputChan, stopLoggingChan)
+	go func(){
+		defer close(stopInputChan)
+		repo.listenForMessages(ws, inputChan, stopInputChan)
+	}()
 
-	return repo.makeAndStartMessageSorter(messageQueue, outputChan, stopLoggingChan)
+	return repo.makeAndStartMessageSorter(messageQueue, outputChan, stopLoggingChan, stopInputChan)
 }
 
 func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logmessage.Message, printTimeBuffer time.Duration) (messageQueue *PriorityQueue) {
@@ -94,12 +97,14 @@ func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logm
 	return
 }
 
-func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *PriorityQueue, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool) (err error) {
+func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *PriorityQueue, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool, stopInputChan <-chan bool) (err error) {
 	flushLastMessages := false
 
 OutputLoop:
 	for {
 		select {
+		case <-stopInputChan:
+			flushLastMessages = true
 		case <-stopLoggingChan:
 			flushLastMessages = true
 		case <-time.After(10 * time.Millisecond):
@@ -130,9 +135,9 @@ func (repo LoggregatorLogsRepository) sendKeepAlive(ws *websocket.Conn) {
 	}
 }
 
-func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgChan chan<- *logmessage.Message, stopLoggingChan chan<- bool) {
+func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgChan chan<- *logmessage.Message, stopInputChan chan<- bool) {
 	defer func() {
-		stopLoggingChan <- true
+		stopInputChan <- true
 	}()
 
 	for {

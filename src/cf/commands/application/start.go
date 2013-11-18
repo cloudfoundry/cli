@@ -97,17 +97,22 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 	logChan := make(chan *logmessage.Message, 1000)
-	go cmd.displayLogMessages(logChan)
 
-	onConnect := func() {
-		cmd.ui.Say("\n%s", terminal.HeaderColor("Staging..."))
-	}
+	go func() {
+		defer close(logChan)
 
-	err := cmd.logRepo.TailLogsFor(app, onConnect, logChan, stopChan, 1)
-	if err != nil {
-		cmd.ui.Warn("Warning: error tailing logs")
-		cmd.ui.Say("%s", err)
-	}
+		onConnect := func() {
+			cmd.ui.Say("\n%s", terminal.HeaderColor("Staging..."))
+		}
+
+		err := cmd.logRepo.TailLogsFor(app, onConnect, logChan, stopChan, 1)
+		if err != nil {
+			cmd.ui.Warn("Warning: error tailing logs")
+			cmd.ui.Say("%s", err)
+		}
+	}()
+
+	cmd.displayLogMessages(logChan)
 }
 
 func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
@@ -117,11 +122,8 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 }
 
 func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.ApplicationInstance {
-	count := 0
-
 	instances, apiResponse := cmd.appRepo.GetInstances(app)
-	for apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings {
-		count++
+	for count := 0 ; apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings; count++ {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiResponse.Message)

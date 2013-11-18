@@ -48,11 +48,14 @@ func (cmd *Logs) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	logChan := make(chan *logmessage.Message, 1000)
 
-	if c.Bool("recent") {
-		go cmd.recentLogsFor(app, logChan)
-	} else {
-		go cmd.tailLogsFor(app, logChan)
-	}
+	go func() {
+		defer close(logChan)
+		if c.Bool("recent") {
+			cmd.recentLogsFor(app, logChan)
+		} else {
+			cmd.tailLogsFor(app, logChan)
+		}
+	}()
 
 	cmd.displayLogMessages(logChan)
 }

@@ -17,6 +17,7 @@ type FakeLogsRepository struct {
 
 func (l *FakeLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message) (err error){
 	stopLoggingChan := make(chan bool)
+	defer close(stopLoggingChan)
 	l.logsFor(app, l.RecentLogs, onConnect, logChan, stopLoggingChan)
 	return
 }
@@ -35,13 +36,12 @@ func (l *FakeLogsRepository) TailLogsFor(app cf.Application, onConnect func(), l
 func (l *FakeLogsRepository) logsFor(app cf.Application, logMessages []logmessage.LogMessage, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool) {
 	l.AppLogged = app
 	onConnect()
+
 	for _, logMsg := range logMessages{
 		data, _ := proto.Marshal(&logMsg)
 		msg, _ := logmessage.ParseMessage(data)
 		logChan <- msg
 	}
-
-	close(logChan)
 
 	go func(){
 		l.TailLogStopCalled = <- stopLoggingChan
