@@ -75,11 +75,10 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf
 	defer close(inputChan)
 	stopInputChan := make(chan bool, 1)
 
-
 	messageQueue := repo.createMessageSorter(inputChan, printTimeBuffer)
 
 	go repo.sendKeepAlive(ws)
-	go func(){
+	go func() {
 		defer close(stopInputChan)
 		repo.listenForMessages(ws, inputChan, stopInputChan)
 	}()
@@ -98,27 +97,26 @@ func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logm
 }
 
 func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *PriorityQueue, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool, stopInputChan <-chan bool) (err error) {
-	flushLastMessages := false
+	flushLastMessages := func() {
+		for {
+			msg := messageQueue.PopMessage()
+			if msg == nil {
+				break
+			}
+			outputChan <- msg
+		}
+	}
 
 OutputLoop:
 	for {
 		select {
 		case <-stopInputChan:
-			flushLastMessages = true
+			flushLastMessages()
+			break OutputLoop
 		case <-stopLoggingChan:
-			flushLastMessages = true
+			flushLastMessages()
+			break OutputLoop
 		case <-time.After(10 * time.Millisecond):
-			if flushLastMessages {
-				for {
-					msg := messageQueue.PopMessage()
-					if msg == nil {
-						break
-					}
-					outputChan <- msg
-				}
-				break OutputLoop
-			}
-
 			for messageQueue.NextTimestamp() < time.Now().UnixNano() {
 				msg := messageQueue.PopMessage()
 				outputChan <- msg

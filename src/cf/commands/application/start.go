@@ -123,7 +123,7 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 
 func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.ApplicationInstance {
 	instances, apiResponse := cmd.appRepo.GetInstances(app)
-	for count := 0 ; apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings; count++ {
+	for count := 0; apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings; count++ {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiResponse.Message)
