@@ -10,8 +10,8 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
-	Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
+	Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse)
+	Update(serviceInstanceFields cf.ServiceInstanceFields) (apiResponse net.ApiResponse)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -25,7 +25,7 @@ func NewCCUserProvidedServiceInstanceRepository(config *configuration.Configurat
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.Target)
 
 	type RequestBody struct {
@@ -35,13 +35,13 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(serviceInstance cf.Se
 		SysLogDrainUrl string            `json:"syslog_drain_url"`
 	}
 
-	reqBody := RequestBody{
-		serviceInstance.Name,
-		serviceInstance.Params,
-		repo.config.Space.Guid,
-		serviceInstance.SysLogDrainUrl,
-	}
-	jsonBytes, err := json.Marshal(reqBody)
+	jsonBytes, err := json.Marshal(RequestBody{
+		Name:           name,
+		Credentials:    params,
+		SpaceGuid:      repo.config.SpaceFields.Guid,
+		SysLogDrainUrl: drainUrl,
+	})
+
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
 		return
@@ -50,15 +50,15 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(serviceInstance cf.Se
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstance.Guid)
+func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields cf.ServiceInstanceFields) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstanceFields.Guid)
 
 	type RequestBody struct {
 		Credentials    map[string]string `json:"credentials,omitempty"`
 		SysLogDrainUrl string            `json:"syslog_drain_url,omitempty"`
 	}
 
-	reqBody := RequestBody{serviceInstance.Params, serviceInstance.SysLogDrainUrl}
+	reqBody := RequestBody{serviceInstanceFields.Params, serviceInstanceFields.SysLogDrainUrl}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error parsing response", err)

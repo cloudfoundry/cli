@@ -16,18 +16,10 @@ type FakeOrgRepository struct {
 	FindByNameNotFound     bool
 	FindByNameOrganization cf.Organization
 
-	RenameOrganization cf.Organization
+	RenameOrganizationGuid string
 	RenameNewName      string
 
-	DeletedOrganization cf.Organization
-
-	FindQuotaByNameName     string
-	FindQuotaByNameQuota    cf.Quota
-	FindQuotaByNameNotFound bool
-	FindQuotaByNameErr      bool
-
-	UpdateQuotaOrg   cf.Organization
-	UpdateQuotaQuota cf.Quota
+	DeletedOrganizationGuid string
 }
 
 func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse) {
@@ -82,33 +74,13 @@ func (repo *FakeOrgRepository) Create(name string) (apiResponse net.ApiResponse)
 	return
 }
 
-func (repo *FakeOrgRepository) Rename(org cf.Organization, newName string) (apiResponse net.ApiResponse) {
-	repo.RenameOrganization = org
-	repo.RenameNewName = newName
+func (repo *FakeOrgRepository) Rename(orgGuid string, name string) (apiResponse net.ApiResponse) {
+	repo.RenameOrganizationGuid = orgGuid
+	repo.RenameNewName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
-	repo.DeletedOrganization = org
-	return
-}
-
-func (repo *FakeOrgRepository) FindQuotaByName(name string) (quota cf.Quota, apiResponse net.ApiResponse) {
-	repo.FindQuotaByNameName = name
-	quota = repo.FindQuotaByNameQuota
-
-	if repo.FindQuotaByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
-	}
-	if repo.FindQuotaByNameErr {
-		apiResponse = net.NewApiResponseWithMessage("Error finding quota")
-	}
-
-	return
-}
-
-func (repo *FakeOrgRepository) UpdateQuota(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse) {
-	repo.UpdateQuotaOrg = org
-	repo.UpdateQuotaQuota = quota
+func (repo *FakeOrgRepository) Delete(orgGuid string) (apiResponse net.ApiResponse) {
+	repo.DeletedOrganizationGuid = orgGuid
 	return
 }

@@ -72,12 +72,7 @@ func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context)
 		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())
 	}
 
-	newBuildpack := cf.Buildpack{
-		Name:     buildpackName,
-		Position: &position,
-	}
-
-	buildpack, apiResponse = cmd.buildpackRepo.Create(newBuildpack)
+	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position)
 
 	return
 }

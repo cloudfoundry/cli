@@ -2,7 +2,7 @@ package organization_test
 
 import (
 	"cf"
-	. "cf/commands/organization"
+	"cf/commands/organization"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -46,8 +46,14 @@ func TestSetQuotaRequirements(t *testing.T) {
 }
 
 func TestSetQuota(t *testing.T) {
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
-	quota := cf.Quota{Name: "my-found-quota", Guid: "my-quota-guid"}
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
+	quota := cf.QuotaFields{}
+	quota.Name = "my-found-quota"
+	quota.Guid = "my-quota-guid"
+
 	quotaRepo := &testapi.FakeQuotaRepository{FindByNameQuota: quota}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 
@@ -60,8 +66,8 @@ func TestSetQuota(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, quotaRepo.UpdateOrg, org)
-	assert.Equal(t, quotaRepo.UpdateQuota, quota)
+	assert.Equal(t, quotaRepo.UpdateOrgGuid, "my-org-guid")
+	assert.Equal(t, quotaRepo.UpdateQuotaGuid, "my-quota-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -75,13 +81,19 @@ func callSetQuota(t *testing.T, args []string, reqFactory *testreq.FakeReqFactor
 	})
 	assert.NoError(t, err)
 
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
-	cmd := NewSetQuota(ui, config, quotaRepo)
+	cmd := organization.NewSetQuota(ui, config, quotaRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

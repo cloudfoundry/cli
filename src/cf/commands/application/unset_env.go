@@ -48,8 +48,8 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	cmd.ui.Say("Removing env variable %s from app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(varName),
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -63,7 +63,7 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 
 	delete(envVars, varName)
 
-	apiResponse := cmd.appRepo.SetEnv(app, envVars)
+	apiResponse := cmd.appRepo.SetEnv(app.Guid, envVars)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

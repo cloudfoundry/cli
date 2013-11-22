@@ -20,7 +20,7 @@ func SOCKS5(network, addr string, auth *Auth, forward Dialer) (Dialer, error) {
 		forward: forward,
 	}
 	if auth != nil {
-		s.user = auth.User
+		s.user = auth.UserFields
 		s.password = auth.Password
 	}
 

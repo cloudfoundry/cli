@@ -46,8 +46,8 @@ func TestPasswordCanBeChanged(t *testing.T) {
 	updatedConfig, err := configRepo.Get()
 	assert.NoError(t, err)
 	assert.Empty(t, updatedConfig.AccessToken)
-	assert.Equal(t, updatedConfig.Organization, cf.Organization{})
-	assert.Equal(t, updatedConfig.Space, cf.Space{})
+	assert.Equal(t, updatedConfig.OrganizationFields, cf.OrganizationFields{})
+	assert.Equal(t, updatedConfig.SpaceFields, cf.SpaceFields{})
 }
 
 func TestPasswordVerification(t *testing.T) {

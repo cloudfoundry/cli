@@ -46,18 +46,18 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming space %s to %s in org %s as %s...",
 		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(newName),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.spaceRepo.Rename(space, newName)
+	apiResponse := cmd.spaceRepo.Rename(space.Guid, newName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	if cmd.config.Space.Guid == space.Guid {
-		cmd.config.Space.Name = newName
+	if cmd.config.SpaceFields.Guid == space.Guid {
+		cmd.config.SpaceFields.Name = newName
 		cmd.configRepo.Save()
 	}
 

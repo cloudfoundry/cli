@@ -96,7 +96,7 @@ func envVarFound(varName string, existingEnvVars map[string]string) (found bool)
 	return
 }
 
-func coloredAppState(app cf.Application) string {
+func coloredAppState(app cf.ApplicationFields) string {
 	appState := strings.ToLower(app.State)
 
 	if app.RunningInstances == 0 {
@@ -107,15 +107,15 @@ func coloredAppState(app cf.Application) string {
 		}
 	}
 
-	if app.RunningInstances < app.Instances {
+	if app.RunningInstances < app.InstanceCount {
 		return terminal.WarningColor(appState)
 	}
 
 	return appState
 }
 
-func coloredAppInstaces(app cf.Application) string {
-	healthString := fmt.Sprintf("%d/%d", app.RunningInstances, app.Instances)
+func coloredAppInstaces(app cf.ApplicationFields) string {
+	healthString := fmt.Sprintf("%d/%d", app.RunningInstances, app.InstanceCount)
 
 	if app.RunningInstances == 0 {
 		if strings.ToLower(app.State) == "stopped" {
@@ -125,14 +125,14 @@ func coloredAppInstaces(app cf.Application) string {
 		}
 	}
 
-	if app.RunningInstances < app.Instances {
+	if app.RunningInstances < app.InstanceCount {
 		return terminal.WarningColor(healthString)
 	}
 
 	return healthString
 }
 
-func coloredInstanceState(instance cf.ApplicationInstance) (colored string) {
+func coloredInstanceState(instance cf.AppInstanceFields) (colored string) {
 	state := string(instance.State)
 	switch state {
 	case "started", "running":

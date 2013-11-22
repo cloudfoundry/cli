@@ -116,7 +116,7 @@ Sec-WebSocket-Protocol: chat
 	config.Protocol = append(config.Protocol, "superchat")
 	config.Version = ProtocolVersionHybi13
 	config.Header = http.Header(make(map[string][]string))
-	config.Header.Add("User-Agent", "test")
+	config.Header.Add("UserFields-Agent", "test")
 
 	config.handshakeData = map[string]string{
 		"key": "dGhlIHNhbXBsZSBub25jZQ==",
@@ -148,7 +148,7 @@ Sec-WebSocket-Protocol: chat
 		"Origin":                 config.Origin.String(),
 		"Sec-Websocket-Protocol": "chat, superchat",
 		"Sec-Websocket-Version":  fmt.Sprintf("%d", ProtocolVersionHybi13),
-		"User-Agent":             "test",
+		"UserFields-Agent":             "test",
 	}
 	for k, v := range expectedHeader {
 		if req.Header.Get(k) != v {

@@ -18,21 +18,45 @@ type SpaceResource struct {
 	Entity   SpaceEntity
 }
 
+func (resource SpaceResource) ToFields() (fields cf.SpaceFields) {
+	fields.Guid = resource.Metadata.Guid
+	fields.Name = resource.Entity.Name
+	return
+}
+
+func (resource SpaceResource) ToModel() (space cf.Space) {
+	space.SpaceFields = resource.ToFields()
+	for _, app := range resource.Entity.Applications {
+		space.Applications = append(space.Applications, app.ToFields())
+	}
+
+	for _, domainResource := range resource.Entity.Domains {
+		space.Domains = append(space.Domains, domainResource.ToFields())
+	}
+
+	for _, serviceResource := range resource.Entity.ServiceInstances {
+		space.ServiceInstances = append(space.ServiceInstances, serviceResource.ToFields())
+	}
+
+	space.Organization = resource.Entity.Organization.ToFields()
+	return
+}
+
 type SpaceEntity struct {
 	Name             string
-	Organization     Resource
-	Applications     []Resource `json:"apps"`
-	Domains          []Resource
-	ServiceInstances []Resource `json:"service_instances"`
+	Organization     OrganizationResource
+	Applications     []ApplicationResource `json:"apps"`
+	Domains          []DomainResource
+	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
 }
 
 type SpaceRepository interface {
 	ListSpaces(stop chan bool) (spacesChan chan []cf.Space, statusChan chan net.ApiResponse)
 	FindByName(name string) (space cf.Space, apiResponse net.ApiResponse)
-	FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse)
+	FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
-	Rename(space cf.Space, newName string) (apiResponse net.ApiResponse)
-	Delete(space cf.Space) (apiResponse net.ApiResponse)
+	Rename(spaceGuid, newName string) (apiResponse net.ApiResponse)
+	Delete(spaceGuid string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -51,7 +75,7 @@ func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesCha
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
-		path := fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.Organization.Guid)
+		path := fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields.Guid)
 
 	loop:
 		for path != "" {
@@ -85,11 +109,11 @@ func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesCha
 }
 
 func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
-	return repo.FindByNameInOrg(name, repo.config.Organization)
+	return repo.FindByNameInOrg(name, repo.config.OrganizationFields.Guid)
 }
 
-func (repo CloudControllerSpaceRepository) FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3A%s&inline-relations-depth=1", org.Guid, strings.ToLower(name))
+func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3A%s&inline-relations-depth=1", orgGuid, strings.ToLower(name))
 
 	spaces, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
@@ -115,50 +139,24 @@ func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces
 	nextUrl = resources.NextUrl
 
 	for _, r := range resources.Resources {
-		apps := []cf.Application{}
-		for _, app := range r.Entity.Applications {
-			apps = append(apps, cf.Application{Name: app.Entity.Name, Guid: app.Metadata.Guid})
-		}
-
-		domains := []cf.Domain{}
-		for _, domain := range r.Entity.Domains {
-			domains = append(domains, cf.Domain{Name: domain.Entity.Name, Guid: domain.Metadata.Guid})
-		}
-
-		services := []cf.ServiceInstance{}
-		for _, service := range r.Entity.ServiceInstances {
-			services = append(services, cf.ServiceInstance{Name: service.Entity.Name, Guid: service.Metadata.Guid})
-		}
-		space := cf.Space{
-			Name: r.Entity.Name,
-			Guid: r.Metadata.Guid,
-			Organization: cf.Organization{
-				Name: r.Entity.Organization.Entity.Name,
-				Guid: r.Entity.Organization.Metadata.Guid,
-			},
-			Applications:     apps,
-			Domains:          domains,
-			ServiceInstances: services,
-		}
-
-		spaces = append(spaces, space)
+		spaces = append(spaces, r.ToModel())
 	}
 	return
 }
 
 func (repo CloudControllerSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
-	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.Organization.Guid)
+	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.OrganizationFields.Guid)
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerSpaceRepository) Rename(space cf.Space, newName string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, space.Guid)
+func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.Target, spaceGuid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerSpaceRepository) Delete(space cf.Space) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, space.Guid)
+func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.Target, spaceGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }

@@ -43,7 +43,8 @@ func TestUpdateUserProvidedServiceRequirements(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWhenNoFlagsArePresent(t *testing.T) {
 	args := []string{"service-name"}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "found-service-name"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -62,7 +63,8 @@ func TestUpdateUserProvidedServiceWhenNoFlagsArePresent(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 	args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "found-service-name"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -85,7 +87,8 @@ func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithoutJson(t *testing.T) {
 	args := []string{"-l", "syslog://example.com", "service-name"}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "found-service-name"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -98,7 +101,8 @@ func TestUpdateUserProvidedServiceWithoutJson(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
 	args := []string{"-p", `{"foo":"ba`, "service-name"}
-	serviceInstance := cf.ServiceInstance{Name: "found-service-name"}
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "found-service-name"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -115,12 +119,12 @@ func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
 
 func TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided(t *testing.T) {
 	args := []string{"-p", `{"foo":"bar"}`, "service-name"}
-	serviceInstance := cf.ServiceInstance{
-		Name: "found-service-name",
-		ServicePlan: cf.ServicePlan{
-			Guid: "my-plan-guid",
-		},
-	}
+	plan := cf.ServicePlanFields{}
+	plan.Guid = "my-plan-guid"
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "found-service-name"
+	serviceInstance.ServicePlan = plan
+
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:    true,
 		ServiceInstance: serviceInstance,
@@ -143,11 +147,14 @@ func callUpdateUserProvidedService(t *testing.T, args []string, reqFactory *test
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewUpdateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)

@@ -134,7 +134,11 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse 
 	if orgName == "" {
 		// If the user is changing, clear out the org
 		if userChanged {
-			cmd.config.Organization = cf.Organization{}
+			err := cmd.configRepo.SetOrganization(cf.OrganizationFields{})
+			if err != nil {
+				apiResponse = net.NewApiResponseWithError("%s", err)
+				return
+			}
 		}
 
 		// Reuse org in config
@@ -191,7 +195,7 @@ func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
 }
 
 func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiResponse) {
-	err := cmd.configRepo.SetOrganization(org)
+	err := cmd.configRepo.SetOrganization(org.OrganizationFields)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage("Error setting org %s in config file\n%s",
 			terminal.EntityNameColor(org.Name),
@@ -210,7 +214,11 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (apiResponse net.Api
 	if spaceName == "" {
 		// If user is changing, clear the space
 		if userChanged {
-			cmd.config.Space = cf.Space{}
+			err := cmd.configRepo.SetSpace(cf.SpaceFields{})
+			if err != nil {
+				apiResponse = net.NewApiResponseWithError("%s", err)
+				return
+			}
 		}
 		// Reuse space in config
 		if cmd.config.HasSpace() && !userChanged {
@@ -266,7 +274,7 @@ func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
 }
 
 func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
-	err := cmd.configRepo.SetSpace(space)
+	err := cmd.configRepo.SetSpace(space.SpaceFields)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage("Error setting space %s in config file\n%s",
 			terminal.EntityNameColor(space.Name),

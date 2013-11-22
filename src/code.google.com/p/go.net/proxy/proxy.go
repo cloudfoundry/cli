@@ -21,7 +21,7 @@ type Dialer interface {
 
 // Auth contains authentication parameters that specific Dialers may require.
 type Auth struct {
-	User, Password string
+	UserFields, Password string
 }
 
 // FromEnvironment returns the dialer specified by the proxy related variables in
@@ -69,10 +69,10 @@ func RegisterDialerType(scheme string, f func(*url.URL, Dialer) (Dialer, error))
 // Dialer for it to make network requests.
 func FromURL(u *url.URL, forward Dialer) (Dialer, error) {
 	var auth *Auth
-	if u.User != nil {
+	if u.UserFields != nil {
 		auth = new(Auth)
-		auth.User = u.User.Username()
-		if p, ok := u.User.Password(); ok {
+		auth.UserFields = u.UserFields.Username()
+		if p, ok := u.UserFields.Password(); ok {
 			auth.Password = p
 		}
 	}

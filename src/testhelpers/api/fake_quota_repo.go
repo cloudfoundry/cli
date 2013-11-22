@@ -6,18 +6,24 @@ import (
 )
 
 type FakeQuotaRepository struct {
+	FindAllQuotas []cf.QuotaFields
+
 	FindByNameName     string
-	FindByNameQuota    cf.Quota
+	FindByNameQuota    cf.QuotaFields
 	FindByNameNotFound bool
 	FindByNameErr      bool
 
-	FindAllQuotas []cf.Quota
-
-	UpdateOrg   cf.Organization
-	UpdateQuota cf.Quota
+	UpdateOrgGuid   string
+	UpdateQuotaGuid string
 }
 
-func (repo *FakeQuotaRepository) FindByName(name string) (quota cf.Quota, apiResponse net.ApiResponse) {
+func (repo *FakeQuotaRepository) FindAll() (quotas []cf.QuotaFields, apiResponse net.ApiResponse) {
+	quotas = repo.FindAllQuotas
+
+	return
+}
+
+func (repo *FakeQuotaRepository) FindByName(name string) (quota cf.QuotaFields, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	quota = repo.FindByNameQuota
 
@@ -31,14 +37,8 @@ func (repo *FakeQuotaRepository) FindByName(name string) (quota cf.Quota, apiRes
 	return
 }
 
-func (repo *FakeQuotaRepository) Update(org cf.Organization, quota cf.Quota) (apiResponse net.ApiResponse) {
-	repo.UpdateOrg = org
-	repo.UpdateQuota = quota
-	return
-}
-
-func (repo *FakeQuotaRepository) FindAll() (quotas []cf.Quota, apiResponse net.ApiResponse) {
-	quotas = repo.FindAllQuotas
-
+func (repo *FakeQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse net.ApiResponse) {
+	repo.UpdateOrgGuid = orgGuid
+	repo.UpdateQuotaGuid = quotaGuid
 	return
 }

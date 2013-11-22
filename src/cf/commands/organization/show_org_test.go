@@ -25,7 +25,9 @@ func TestShowOrgRequirements(t *testing.T) {
 }
 
 func TestShowOrgFailsWithUsage(t *testing.T) {
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
 	reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 	args := []string{"my-org"}
@@ -38,16 +40,19 @@ func TestShowOrgFailsWithUsage(t *testing.T) {
 }
 
 func TestRunWhenOrganizationExists(t *testing.T) {
-	development := cf.Space{Name: "development"}
-	staging := cf.Space{Name: "staging"}
-	domain := cf.Domain{Name: "cfapps.io"}
-	cfAppDomain := cf.Domain{Name: "cf-app.com"}
-	org := cf.Organization{
-		Name:    "my-org",
-		Guid:    "my-org-guid",
-		Spaces:  []cf.Space{development, staging},
-		Domains: []cf.Domain{domain, cfAppDomain},
-	}
+	developmentSpaceFields := cf.SpaceFields{}
+	developmentSpaceFields.Name = "development"
+	stagingSpaceFields := cf.SpaceFields{}
+	stagingSpaceFields.Name = "staging"
+	domainFields := cf.DomainFields{}
+	domainFields.Name = "cfapps.io"
+	cfAppDomainFields := cf.DomainFields{}
+	cfAppDomainFields.Name = "cf-app.com"
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+	org.Spaces = []cf.SpaceFields{developmentSpaceFields, stagingSpaceFields}
+	org.Domains = []cf.DomainFields{domainFields, cfAppDomainFields}
 
 	reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
@@ -76,11 +81,16 @@ func callShowOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
 
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
 	cmd := NewShowOrg(ui, config)

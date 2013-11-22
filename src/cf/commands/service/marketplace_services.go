@@ -6,7 +6,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type MarketplaceServices struct {
@@ -29,8 +28,8 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	if cmd.config.HasSpace() {
 		cmd.ui.Say("Getting services from marketplace in org %s / space %s as %s...",
-			terminal.EntityNameColor(cmd.config.Organization.Name),
-			terminal.EntityNameColor(cmd.config.Space.Name),
+			terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+			terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 			terminal.EntityNameColor(cmd.config.Username()),
 		)
 	} else {
@@ -52,14 +51,14 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 	}
 
 	for _, offering := range serviceOfferings {
-		var planNames []string
+		planNames := ""
 		for _, plan := range offering.Plans {
-			planNames = append(planNames, plan.Name)
+			planNames = planNames + ", " + plan.Name
 		}
 
 		table = append(table, []string{
 			offering.Label,
-			strings.Join(planNames, ", "),
+			planNames,
 			offering.Description,
 		})
 	}

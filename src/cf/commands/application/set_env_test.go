@@ -15,7 +15,9 @@ import (
 )
 
 func TestSetEnvRequirements(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	appRepo := &testapi.FakeApplicationRepository{}
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 
@@ -35,7 +37,10 @@ func TestSetEnvRequirements(t *testing.T) {
 }
 
 func TestRunWhenApplicationExists(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"foo": "bar"}}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	app.EnvironmentVars = map[string]string{"foo": "bar"}
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{}
 
@@ -51,7 +56,7 @@ func TestRunWhenApplicationExists(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.SetEnvApp, app)
+	assert.Equal(t, appRepo.SetEnvAppGuid, app.Guid)
 	assert.Equal(t, appRepo.SetEnvVars, map[string]string{
 		"DATABASE_URL": "mysql://example.com/my-db",
 		"foo":          "bar",
@@ -59,7 +64,10 @@ func TestRunWhenApplicationExists(t *testing.T) {
 }
 
 func TestSetEnvWhenItAlreadyExists(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid", EnvironmentVars: map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{}
 
@@ -76,7 +84,9 @@ func TestSetEnvWhenItAlreadyExists(t *testing.T) {
 }
 
 func TestRunWhenSettingTheEnvFails(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{
 		FindByNameApp: app,
@@ -92,7 +102,9 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 }
 
 func TestSetEnvFailsWithUsage(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 
@@ -121,11 +133,14 @@ func callSetEnv(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory,
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewSetEnv(ui, config, appRepo)

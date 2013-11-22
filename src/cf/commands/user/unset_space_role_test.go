@@ -49,22 +49,27 @@ func TestUnsetSpaceRoleRequirements(t *testing.T) {
 }
 
 func TestUnsetSpaceRole(t *testing.T) {
-	user := cf.User{Username: "some-user", Guid: "some-user-guid"}
-	org := cf.Organization{Name: "some-org", Guid: "some-org-guid"}
+	user := cf.UserFields{}
+	user.Username = "some-user"
+	user.Guid = "some-user-guid"
+	org := cf.Organization{}
+	org.Name = "some-org"
+	org.Guid = "some-org-guid"
 
 	reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 	reqFactory.LoginSuccess = true
-	reqFactory.User = user
+	reqFactory.UserFields = user
 	reqFactory.Organization = org
-
-	spaceRepo.FindByNameInOrgSpace = cf.Space{Name: "some-space"}
+	spaceRepo.FindByNameInOrgSpace = cf.Space{}
+	spaceRepo.FindByNameInOrgSpace.Name = "some-space"
+	spaceRepo.FindByNameInOrgSpace.Guid = "some-space-guid"
 
 	args := []string{"my-username", "my-org", "my-space", "my-role"}
 
 	ui := callUnsetSpaceRole(t, args, spaceRepo, userRepo, reqFactory)
 
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "my-space")
-	assert.Equal(t, spaceRepo.FindByNameInOrgOrg, reqFactory.Organization)
+	assert.Equal(t, spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
 
 	assert.Contains(t, ui.Outputs[0], "Removing role ")
 	assert.Contains(t, ui.Outputs[0], "my-role")
@@ -74,8 +79,8 @@ func TestUnsetSpaceRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.UnsetSpaceRoleRole, "my-role")
-	assert.Equal(t, userRepo.UnsetSpaceRoleUser, user)
-	assert.Equal(t, userRepo.UnsetSpaceRoleSpace, spaceRepo.FindByNameInOrgSpace)
+	assert.Equal(t, userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
+	assert.Equal(t, userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -95,11 +100,14 @@ func callUnsetSpaceRole(t *testing.T, args []string, spaceRepo *testapi.FakeSpac
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-
+	space2 := cf.SpaceFields{}
+	space2.Name = "my-space"
+	org2 := cf.OrganizationFields{}
+	org2.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space2,
+		OrganizationFields: org2,
+		AccessToken:        token,
 	}
 
 	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)

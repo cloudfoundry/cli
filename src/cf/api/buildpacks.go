@@ -32,8 +32,8 @@ type BuildpackEntity struct {
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse)
 	ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse)
-	Create(newBuildpack cf.Buildpack) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse)
-	Delete(buildpack cf.Buildpack) (apiResponse net.ApiResponse)
+	Create(name string, position *int) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse)
+	Delete(buildpackGuid string) (apiResponse net.ApiResponse)
 	Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse)
 }
 
@@ -119,9 +119,9 @@ func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (bu
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Create(newBuildpack cf.Buildpack) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) Create(name string, position *int) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := repo.config.Target + buildpacks_path
-	entity := BuildpackEntity{Name: newBuildpack.Name, Position: newBuildpack.Position}
+	entity := BuildpackEntity{Name: name, Position: position}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize information", err)
@@ -138,8 +138,8 @@ func (repo CloudControllerBuildpackRepository) Create(newBuildpack cf.Buildpack)
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Delete(buildpack cf.Buildpack) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
+func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpackGuid)
 	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
 	return
 }

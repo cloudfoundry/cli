@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -46,9 +45,7 @@ func (cmd *ShareDomain) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	domain := cf.Domain{Name: domainName}
-
-	apiResponse := cmd.domainRepo.CreateSharedDomain(domain)
+	apiResponse := cmd.domainRepo.CreateSharedDomain(domainName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

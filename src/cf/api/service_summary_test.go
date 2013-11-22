@@ -65,10 +65,10 @@ func TestServiceSummaryGetSummariesInCurrentSpace(t *testing.T) {
 	instance1 := serviceInstances[0]
 	assert.Equal(t, instance1.Name, "my-service-instance")
 	assert.Equal(t, instance1.ServicePlan.Name, "spark")
-	assert.Equal(t, instance1.ServiceOffering().Label, "cleardb")
-	assert.Equal(t, instance1.ServicePlan.ServiceOffering.Label, "cleardb")
-	assert.Equal(t, instance1.ServicePlan.ServiceOffering.Provider, "cleardb-provider")
-	assert.Equal(t, instance1.ServicePlan.ServiceOffering.Version, "n/a")
+	assert.Equal(t, instance1.ServiceOffering.Label, "cleardb")
+	assert.Equal(t, instance1.ServiceOffering.Label, "cleardb")
+	assert.Equal(t, instance1.ServiceOffering.Provider, "cleardb-provider")
+	assert.Equal(t, instance1.ServiceOffering.Version, "n/a")
 	assert.Equal(t, len(instance1.ApplicationNames), 2)
 	assert.Equal(t, instance1.ApplicationNames[0], "app1")
 	assert.Equal(t, instance1.ApplicationNames[1], "app2")
@@ -76,11 +76,12 @@ func TestServiceSummaryGetSummariesInCurrentSpace(t *testing.T) {
 
 func createServiceSummaryRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceSummaryRepository) {
 	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
-
+	space := cf.SpaceFields{}
+	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
+		SpaceFields: space,
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerServiceSummaryRepository(config, gateway)

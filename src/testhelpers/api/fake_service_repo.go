@@ -9,14 +9,8 @@ type FakeServiceRepo struct {
 	ServiceOfferings []cf.ServiceOffering
 
 	CreateServiceInstanceName string
-	CreateServiceInstancePlan cf.ServicePlan
+	CreateServiceInstancePlanGuid string
 	CreateServiceAlreadyExists bool
-
-	CreateUserProvidedServiceInstanceName string
-	CreateUserProvidedServiceInstanceParameters map[string]string
-
-	UpdateUserProvidedServiceInstanceServiceInstance cf.ServiceInstance
-	UpdateUserProvidedServiceInstanceParameters map[string]string
 
 	FindInstanceByNameName string
 	FindInstanceByNameServiceInstance cf.ServiceInstance
@@ -34,23 +28,11 @@ func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOfferi
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
 	repo.CreateServiceInstanceName = name
-	repo.CreateServiceInstancePlan = plan
+	repo.CreateServiceInstancePlanGuid = planGuid
 	identicalAlreadyExists = repo.CreateServiceAlreadyExists
 
-	return
-}
-
-func (repo *FakeServiceRepo) CreateUserProvidedServiceInstance(name string, params map[string]string) (apiResponse net.ApiResponse) {
-	repo.CreateUserProvidedServiceInstanceName = name
-	repo.CreateUserProvidedServiceInstanceParameters = params
-	return
-}
-
-func (repo *FakeServiceRepo) UpdateUserProvidedServiceInstance(serviceInstance cf.ServiceInstance, params map[string]string) (apiResponse net.ApiResponse) {
-	repo.UpdateUserProvidedServiceInstanceServiceInstance = serviceInstance
-	repo.UpdateUserProvidedServiceInstanceParameters = params
 	return
 }
 

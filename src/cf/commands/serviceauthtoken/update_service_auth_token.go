@@ -9,20 +9,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type UpdateServiceAuthToken struct {
+type UpdateServiceAuthTokenFields struct {
 	ui            terminal.UI
 	config        *configuration.Configuration
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewUpdateServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd UpdateServiceAuthToken) {
+func NewUpdateServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd UpdateServiceAuthTokenFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
 }
 
-func (cmd UpdateServiceAuthToken) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd UpdateServiceAuthTokenFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 3 {
 		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c, "update-service-auth-token")
@@ -35,7 +35,7 @@ func (cmd UpdateServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 	return
 }
 
-func (cmd UpdateServiceAuthToken) Run(c *cli.Context) {
+func (cmd UpdateServiceAuthTokenFields) Run(c *cli.Context) {
 	cmd.ui.Say("Updating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
 	serviceAuthToken, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])

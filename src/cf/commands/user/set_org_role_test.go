@@ -47,10 +47,16 @@ func TestSetOrgRoleRequirements(t *testing.T) {
 }
 
 func TestSetOrgRole(t *testing.T) {
+	org := cf.Organization{}
+	org.Guid = "my-org-guid"
+	org.Name = "my-org"
+	user := cf.UserFields{}
+	user.Guid = "my-user-guid"
+	user.Username = "my-user"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess: true,
-		User:         cf.User{Guid: "my-user-guid", Username: "my-user"},
-		Organization: cf.Organization{Guid: "my-org-guid", Name: "my-org"},
+		UserFields:   user,
+		Organization: org,
 	}
 	userRepo := &testapi.FakeUserRepository{}
 
@@ -62,8 +68,8 @@ func TestSetOrgRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
-	assert.Equal(t, userRepo.SetOrgRoleUser, reqFactory.User)
-	assert.Equal(t, userRepo.SetOrgRoleOrganization, reqFactory.Organization)
+	assert.Equal(t, userRepo.SetOrgRoleUserGuid, "my-user-guid")
+	assert.Equal(t, userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
 	assert.Equal(t, userRepo.SetOrgRoleRole, "some-role")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -77,11 +83,14 @@ func callSetOrgRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFact
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-
+	org2 := cf.OrganizationFields{}
+	org2.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org2,
+		AccessToken:        token,
 	}
 
 	cmd := NewSetOrgRole(ui, config, userRepo)

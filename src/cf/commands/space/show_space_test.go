@@ -13,37 +13,45 @@ import (
 )
 
 func TestShowSpaceRequirements(t *testing.T) {
-	config := &configuration.Configuration{}
+	args := []string{"my-space"}
 
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	callShowSpace(t, []string{}, reqFactory, config)
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	callShowSpace(t, args, reqFactory)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-	callShowSpace(t, []string{}, reqFactory, config)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-	callShowSpace(t, []string{}, reqFactory, config)
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+	callShowSpace(t, args, reqFactory)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestShowSpaceInfoSuccess(t *testing.T) {
-	org := cf.Organization{Name: "org1"}
-	apps := []cf.Application{
-		cf.Application{Name: "app1", Guid: "app1-guid"},
-	}
-	domains := []cf.Domain{
-		cf.Domain{Name: "domain1", Guid: "domain1-guid"},
-	}
-	services := []cf.ServiceInstance{
-		cf.ServiceInstance{Name: "service1", Guid: "service1-guid"},
-	}
-	space := cf.Space{Name: "space1", Organization: org, Applications: apps, Domains: domains, ServiceInstances: services}
-	config := &configuration.Configuration{Space: space}
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	ui := callShowSpace(t, []string{}, reqFactory, config)
+	app := cf.ApplicationFields{}
+	app.Name = "app1"
+	app.Guid = "app1-guid"
+	apps := []cf.ApplicationFields{app}
+
+	domain := cf.DomainFields{}
+	domain.Name = "domain1"
+	domain.Guid = "domain1-guid"
+	domains := []cf.DomainFields{domain}
+
+	serviceInstance := cf.ServiceInstanceFields{}
+	serviceInstance.Name = "service1"
+	serviceInstance.Guid = "service1-guid"
+	services := []cf.ServiceInstanceFields{serviceInstance}
+
+	space := cf.Space{}
+	space.Name = "space1"
+	space.Organization = org
+	space.Applications = apps
+	space.Domains = domains
+	space.ServiceInstances = services
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Space: space}
+	ui := callShowSpace(t, []string{"space1"}, reqFactory)
 	assert.Contains(t, ui.Outputs[0], "Getting info for space")
 	assert.Contains(t, ui.Outputs[0], "space1")
 	assert.Contains(t, ui.Outputs[0], "my-org")
@@ -51,7 +59,7 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "space1")
 	assert.Contains(t, ui.Outputs[3], "Org")
-	assert.Contains(t, ui.Outputs[3], "org1")
+	assert.Contains(t, ui.Outputs[3], "my-org")
 	assert.Contains(t, ui.Outputs[4], "Apps")
 	assert.Contains(t, ui.Outputs[4], "app1")
 	assert.Contains(t, ui.Outputs[5], "Domains")
@@ -60,7 +68,7 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	assert.Contains(t, ui.Outputs[6], "service1")
 }
 
-func callShowSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration) (ui *testterm.FakeUI) {
+func callShowSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("space", args)
 
@@ -68,9 +76,12 @@ func callShowSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFacto
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
-	config.Organization = cf.Organization{Name: "my-org"}
-	config.AccessToken = token
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	config := &configuration.Configuration{
+		AccessToken:        token,
+		OrganizationFields: org,
+	}
 
 	cmd := NewShowSpace(ui, config)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

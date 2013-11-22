@@ -17,23 +17,41 @@ type DomainResource struct {
 	Entity DomainEntity
 }
 
+func (resource DomainResource) ToFields() (fields cf.DomainFields) {
+	fields.Name = resource.Entity.Name
+	fields.Guid = resource.Metadata.Guid
+	fields.OwningOrganizationGuid = resource.Entity.OwningOrganizationGuid
+	fields.Shared = fields.OwningOrganizationGuid == ""
+	return
+}
+
+func (resource DomainResource) ToModel() (domain cf.Domain) {
+	domain.DomainFields = resource.ToFields()
+
+	for _, spaceResource := range resource.Entity.Spaces {
+		domain.Spaces = append(domain.Spaces, spaceResource.ToFields())
+	}
+
+	return
+}
+
 type DomainEntity struct {
 	Name                   string
 	OwningOrganizationGuid string `json:"owning_organization_guid"`
-	Spaces                 []Resource
+	Spaces                 []SpaceResource
 }
 
 type DomainRepository interface {
 	FindDefaultAppDomain() (domain cf.Domain, apiResponse net.ApiResponse)
-	FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse)
+	FindAllByOrg(orgGuid string) (domains []cf.Domain, apiResponse net.ApiResponse)
 	FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse)
-	FindByNameInOrg(name string, owningOrg cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse)
-	Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse)
-	CreateSharedDomain(domainToShare cf.Domain) (apiResponse net.ApiResponse)
-	Delete(domain cf.Domain) (apiResponse net.ApiResponse)
-	Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
-	Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse)
+	FindByNameInOrg(name string, owningOrgGuid string) (domain cf.Domain, apiResponse net.ApiResponse)
+	Create(domainName string, owningOrgGuid string) (createdDomain cf.DomainFields, apiResponse net.ApiResponse)
+	CreateSharedDomain(domainName string) (apiResponse net.ApiResponse)
+	Delete(domainGuid string) (apiResponse net.ApiResponse)
+	Map(domainGuid string, spaceGuid string) (apiResponse net.ApiResponse)
+	Unmap(domainGuid string, spaceGuid string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerDomainRepository struct {
@@ -63,34 +81,23 @@ func (repo CloudControllerDomainRepository) FindDefaultAppDomain() (domain cf.Do
 	return
 }
 
-func (repo CloudControllerDomainRepository) FindAllByOrg(org cf.Organization) (domains []cf.Domain, apiResponse net.ApiResponse) {
-	scopedPath := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1", repo.config.Target, org.Guid)
-	domains, apiResponse = repo.findAllWithPath(scopedPath)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
+func (repo CloudControllerDomainRepository) FindAllByOrg(orgGuid string) (domains []cf.Domain, apiResponse net.ApiResponse) {
 	sharedPath := fmt.Sprintf("%s/v2/domains?inline-relations-depth=1", repo.config.Target)
-	sharedDomains, apiResponse := repo.findAllWithPath(sharedPath)
+	allDomains, apiResponse := repo.findAllWithPath(sharedPath)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	var domainIsNotIncluded = func(domain cf.Domain) bool {
-		for _, d := range domains {
-			if d.Guid == domain.Guid {
-				return false
-			}
-		}
-		return true
-	}
-
-	for _, d := range sharedDomains {
-		if domainIsNotIncluded(d) {
+	for _, d := range allDomains {
+		if repo.isOrgDomain(orgGuid, d.DomainFields) {
 			domains = append(domains, d)
 		}
 	}
 	return
+}
+
+func (repo CloudControllerDomainRepository) isOrgDomain(orgGuid string, domain cf.DomainFields) bool {
+	return orgGuid == domain.OwningOrganizationGuid || domain.Shared
 }
 
 func (repo CloudControllerDomainRepository) findAllWithPath(path string) (domains []cf.Domain, apiResponse net.ApiResponse) {
@@ -101,19 +108,7 @@ func (repo CloudControllerDomainRepository) findAllWithPath(path string) (domain
 	}
 
 	for _, r := range domainResources.Resources {
-		domain := cf.Domain{
-			Name: r.Entity.Name,
-			Guid: r.Metadata.Guid,
-		}
-		domain.Shared = r.Entity.OwningOrganizationGuid == ""
-
-		for _, space := range r.Entity.Spaces {
-			domain.Spaces = append(domain.Spaces, cf.Space{
-				Name: space.Entity.Name,
-				Guid: space.Metadata.Guid,
-			})
-		}
-		domains = append(domains, domain)
+		domains = append(domains, r.ToModel())
 	}
 
 	return
@@ -135,12 +130,12 @@ func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.D
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	spacePath := fmt.Sprintf("%s/v2/spaces/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, repo.config.Space.Guid, name)
+	spacePath := fmt.Sprintf("%s/v2/spaces/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, repo.config.SpaceFields.Guid, name)
 	return repo.findOneWithPaths(spacePath, name)
 }
 
-func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, org cf.Organization) (domain cf.Domain, apiResponse net.ApiResponse) {
-	orgPath := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, org.Guid, name)
+func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain cf.Domain, apiResponse net.ApiResponse) {
+	orgPath := fmt.Sprintf("%s/v2/organizations/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.Target, orgGuid, name)
 	return repo.findOneWithPaths(orgPath, name)
 }
 
@@ -167,40 +162,39 @@ func (repo CloudControllerDomainRepository) findOneWithPaths(scopedPath, name st
 	return
 }
 
-func (repo CloudControllerDomainRepository) Create(domainToCreate cf.Domain, owningOrg cf.Organization) (createdDomain cf.Domain, apiResponse net.ApiResponse) {
+func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain cf.DomainFields, apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
 	data := fmt.Sprintf(
-		`{"name":"%s","wildcard":true,"owning_organization_guid":"%s"}`, domainToCreate.Name, owningOrg.Guid,
+		`{"name":"%s","wildcard":true,"owning_organization_guid":"%s"}`, domainName, owningOrgGuid,
 	)
 
-	resource := new(Resource)
+	resource := new(DomainResource)
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	createdDomain.Guid = resource.Metadata.Guid
-	createdDomain.Name = resource.Entity.Name
+	createdDomain = resource.ToFields()
 	return
 }
 
-func (repo CloudControllerDomainRepository) CreateSharedDomain(domain cf.Domain) (apiResponse net.ApiResponse) {
+func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
-	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domain.Name)
+	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domainName)
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
 }
 
-func (repo CloudControllerDomainRepository) Delete(domain cf.Domain) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domain.Guid)
+func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domainGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
 
-func (repo CloudControllerDomainRepository) Map(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
+func (repo CloudControllerDomainRepository) Map(domainGuid string, spaceGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, spaceGuid, domainGuid)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, nil)
 }
 
-func (repo CloudControllerDomainRepository) Unmap(domain cf.Domain, space cf.Space) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, space.Guid, domain.Guid)
+func (repo CloudControllerDomainRepository) Unmap(domainGuid string, spaceGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/spaces/%s/domains/%s", repo.config.Target, spaceGuid, domainGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }

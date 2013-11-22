@@ -48,7 +48,7 @@ func (cmd *RenameOrg) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.orgRepo.Rename(org, newName)
+	apiResponse := cmd.orgRepo.Rename(org.Guid, newName)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

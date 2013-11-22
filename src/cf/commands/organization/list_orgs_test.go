@@ -2,7 +2,7 @@ package organization_test
 
 import (
 	"cf"
-	. "cf/commands/organization"
+	"cf/commands/organization"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -28,13 +28,17 @@ func TestListOrgsRequirements(t *testing.T) {
 }
 
 func TestListAllPagesOfOrgs(t *testing.T) {
-	orgs := []cf.Organization{
-		cf.Organization{Name: "Organization-1"},
-		cf.Organization{Name: "Organization-2"},
-		cf.Organization{Name: "Organization-3"},
-	}
+	org1 := cf.Organization{}
+	org1.Name = "Organization-1"
+
+	org2 := cf.Organization{}
+	org2.Name = "Organization-2"
+
+	org3 := cf.Organization{}
+	org3.Name = "Organization-3"
+
 	orgRepo := &testapi.FakeOrgRepository{
-		Organizations: orgs,
+		Organizations: []cf.Organization{org1, org2, org3},
 	}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
@@ -78,7 +82,7 @@ func TestListNoOrgs(t *testing.T) {
 func callListOrgs(config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("orgs", []string{})
-	cmd := NewListOrgs(fakeUI, config, orgRepo)
+	cmd := organization.NewListOrgs(fakeUI, config, orgRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

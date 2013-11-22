@@ -71,7 +71,7 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 		return
 	}
 
-	apiResponse = cmd.routeRepo.Delete(route)
+	apiResponse = cmd.routeRepo.Delete(route.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

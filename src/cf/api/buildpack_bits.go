@@ -47,8 +47,8 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(app cf.Buildpack, zipFile *os.File) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, app.Guid)
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack cf.Buildpack, zipFile *os.File) (apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, buildpack.Guid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {

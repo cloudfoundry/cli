@@ -29,11 +29,13 @@ func TestListServiceAuthTokensRequirements(t *testing.T) {
 func TestListServiceAuthTokens(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	authTokenRepo := &testapi.FakeAuthTokenRepo{}
-
-	authTokenRepo.FindAllAuthTokens = []cf.ServiceAuthToken{
-		cf.ServiceAuthToken{Label: "a label", Provider: "a provider"},
-		cf.ServiceAuthToken{Label: "a second label", Provider: "a second provider"},
-	}
+	authToken := cf.ServiceAuthTokenFields{}
+	authToken.Label = "a label"
+	authToken.Provider = "a provider"
+	authToken2 := cf.ServiceAuthTokenFields{}
+	authToken2.Label = "a second label"
+	authToken2.Provider = "a second provider"
+	authTokenRepo.FindAllAuthTokens = []cf.ServiceAuthTokenFields{authToken, authToken2}
 
 	ui := callListServiceAuthTokens(t, reqFactory, authTokenRepo)
 	assert.Contains(t, ui.Outputs[0], "Getting service auth tokens as")
@@ -57,11 +59,14 @@ func callListServiceAuthTokens(t *testing.T, reqFactory *testreq.FakeReqFactory,
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewListServiceAuthTokens(ui, config, authTokenRepo)

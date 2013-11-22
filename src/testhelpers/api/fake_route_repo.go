@@ -16,25 +16,25 @@ type FakeRouteRepository struct {
 	FindByHostAndDomainErr      bool
 	FindByHostAndDomainNotFound bool
 
-	CreatedRoute       cf.Route
-	CreatedRouteDomain cf.Domain
+	CreatedHost       string
+	CreatedDomainGuid string
 
-	CreateInSpaceRoute cf.Route
-	CreateInSpaceDomain cf.Domain
-	CreateInSpaceSpace cf.Space
-	CreateInSpaceCreatedRoute cf.Route
+	CreateInSpaceHost string
+	CreateInSpaceDomainGuid string
+	CreateInSpaceSpaceGuid string
+	CreateInSpaceCreatedRoute cf.RouteFields
 	CreateInSpaceErr bool
 
-	BoundRoute cf.Route
-	BoundApp   cf.Application
+	BoundRouteGuid string
+	BoundAppGuid   string
 
-	UnboundRoute cf.Route
-	UnboundApp   cf.Application
+	UnboundRouteGuid string
+	UnboundAppGuid   string
 
 	ListErr    bool
 	Routes []cf.Route
 
-	DeleteRoute cf.Route
+	DeleteRouteGuid string
 }
 
 func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []cf.Route, statusChan chan net.ApiResponse) {
@@ -100,22 +100,19 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	return
 }
 
-func (repo *FakeRouteRepository) Create(newRoute cf.Route, domain cf.Domain) (createdRoute cf.Route, apiResponse net.ApiResponse) {
-	repo.CreatedRoute = newRoute
-	repo.CreatedRouteDomain = domain
+func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse) {
+	repo.CreatedHost = host
+	repo.CreatedDomainGuid = domainGuid
 
-	createdRoute = cf.Route{
-		Host: newRoute.Host,
-		Guid: newRoute.Host + "-guid",
-		Domain: domain,
-	}
+	createdRoute.Guid = host + "-route-guid"
+
 	return
 }
 
-func (repo *FakeRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Domain, space cf.Space) (createdRoute cf.Route, apiResponse net.ApiResponse) {
-	repo.CreateInSpaceRoute = newRoute
-	repo.CreateInSpaceDomain = domain
-	repo.CreateInSpaceSpace = space
+func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse) {
+	repo.CreateInSpaceHost = host
+	repo.CreateInSpaceDomainGuid = domainGuid
+	repo.CreateInSpaceSpaceGuid = spaceGuid
 
 	if repo.CreateInSpaceErr {
 		apiResponse = net.NewApiResponseWithMessage("Error")
@@ -126,19 +123,19 @@ func (repo *FakeRouteRepository) CreateInSpace(newRoute cf.Route, domain cf.Doma
 	return
 }
 
-func (repo *FakeRouteRepository) Bind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
-	repo.BoundRoute = route
-	repo.BoundApp = app
+func (repo *FakeRouteRepository) Bind(routeGuid, appGuid string) (apiResponse net.ApiResponse) {
+	repo.BoundRouteGuid = routeGuid
+	repo.BoundAppGuid = appGuid
 	return
 }
 
-func (repo *FakeRouteRepository) Unbind(route cf.Route, app cf.Application) (apiResponse net.ApiResponse) {
-	repo.UnboundRoute = route
-	repo.UnboundApp = app
+func (repo *FakeRouteRepository) Unbind(routeGuid, appGuid string) (apiResponse net.ApiResponse) {
+	repo.UnboundRouteGuid = routeGuid
+	repo.UnboundAppGuid = appGuid
 	return
 }
 
-func (repo *FakeRouteRepository) Delete(route cf.Route) (apiResponse net.ApiResponse) {
-	repo.DeleteRoute = route
+func (repo *FakeRouteRepository) Delete(routeGuid string) (apiResponse net.ApiResponse) {
+	repo.DeleteRouteGuid = routeGuid
 	return
 }

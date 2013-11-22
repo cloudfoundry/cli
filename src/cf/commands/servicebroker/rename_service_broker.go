@@ -47,9 +47,9 @@ func (cmd RenameServiceBroker) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	serviceBroker.Name = c.Args()[1]
+	newName := c.Args()[1]
 
-	apiResponse = cmd.repo.Rename(serviceBroker)
+	apiResponse = cmd.repo.Rename(serviceBroker.Guid, newName)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

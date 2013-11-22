@@ -41,7 +41,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
 	cmd.ui.Say("Creating space %s in org %s as %s...",
 		terminal.EntityNameColor(spaceName),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

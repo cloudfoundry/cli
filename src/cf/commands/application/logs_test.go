@@ -40,7 +40,9 @@ func TestLogsRequirements(t *testing.T) {
 }
 
 func TestLogsOutputsRecentLogs(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
@@ -73,7 +75,7 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 	ui := callLogs(t, []string{"--recent", "my-app"}, reqFactory, logsRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, app, logsRepo.AppLogged)
+	assert.Equal(t, app.Guid, logsRepo.AppLoggedGuid)
 	assert.Equal(t, len(ui.Outputs), 3)
 	assert.Contains(t, ui.Outputs[0], "Connected, dumping recent logs for app")
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -85,7 +87,9 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 }
 
 func TestLogsTailsTheAppLogs(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
@@ -109,7 +113,7 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	ui := callLogs(t, []string{"my-app"}, reqFactory, logsRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, app, logsRepo.AppLogged)
+	assert.Equal(t, app.Guid, logsRepo.AppLoggedGuid)
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Outputs[0], "Connected, tailing logs for app")
 	assert.Contains(t, ui.Outputs[0], "my-app")
@@ -133,11 +137,14 @@ func callLogs(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, l
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewLogs(ui, config, logsRepo)

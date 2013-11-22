@@ -17,7 +17,7 @@ type FakeBuildpackRepository struct {
 	CreateBuildpack       cf.Buildpack
 	CreateApiResponse     net.ApiResponse
 
-	DeleteBuildpack   cf.Buildpack
+	DeleteBuildpackGuid   string
 	DeleteApiResponse net.ApiResponse
 
 	UpdateBuildpack cf.Buildpack
@@ -62,7 +62,7 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack cf.Build
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(newBuildpack cf.Buildpack) (cf.Buildpack, net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Create(name string, position *int) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, net.NewApiResponse("Buildpack already exists", cf.BUILDPACK_EXISTS, 400)
 	}
@@ -70,8 +70,8 @@ func (repo *FakeBuildpackRepository) Create(newBuildpack cf.Buildpack) (cf.Build
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
-func (repo *FakeBuildpackRepository) Delete(buildpack cf.Buildpack) (apiResponse net.ApiResponse) {
-	repo.DeleteBuildpack = buildpack
+func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiResponse net.ApiResponse) {
+	repo.DeleteBuildpackGuid = buildpackGuid
 	apiResponse = repo.DeleteApiResponse
 	return
 }

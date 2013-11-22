@@ -10,20 +10,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type DeleteServiceAuthToken struct {
+type DeleteServiceAuthTokenFields struct {
 	ui            terminal.UI
 	config        *configuration.Configuration
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewDeleteServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd DeleteServiceAuthToken) {
+func NewDeleteServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd DeleteServiceAuthTokenFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo
 	return
 }
 
-func (cmd DeleteServiceAuthToken) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd DeleteServiceAuthTokenFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect usage")
 		cmd.ui.FailWithUsage(c, "delete-service-auth-token")
@@ -34,7 +34,7 @@ func (cmd DeleteServiceAuthToken) GetRequirements(reqFactory requirements.Factor
 	return
 }
 
-func (cmd DeleteServiceAuthToken) Run(c *cli.Context) {
+func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
 	tokenLabel := c.Args()[0]
 	tokenProvider := c.Args()[1]
 

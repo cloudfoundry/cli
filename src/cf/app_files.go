@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
+func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
@@ -27,7 +27,7 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 		sha1Bytes := h.Sum(nil)
 		sha1 := fmt.Sprintf("%x", sha1Bytes)
 
-		appFiles = append(appFiles, AppFile{
+		appFiles = append(appFiles, AppFileFields{
 			Path: fileName,
 			Sha1: sha1,
 			Size: size,
@@ -38,7 +38,7 @@ func AppFilesInDir(dir string) (appFiles []AppFile, err error) {
 	return
 }
 
-func CopyFiles(appFiles []AppFile, fromDir, toDir string) (err error) {
+func CopyFiles(appFiles []AppFileFields, fromDir, toDir string) (err error) {
 	if err != nil {
 		return
 	}

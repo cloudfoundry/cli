@@ -12,7 +12,7 @@ import (
 )
 
 type RouteCreator interface {
-	CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse)
+	CreateRoute(hostName string, domain cf.DomainFields, space cf.SpaceFields) (route cf.Route, apiResponse net.ApiResponse)
 }
 
 type CreateRoute struct {
@@ -58,24 +58,22 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
 
-	_, apiResponse := cmd.CreateRoute(hostName, domain, space)
+	_, apiResponse := cmd.CreateRoute(hostName, domain.DomainFields, space.SpaceFields)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, domain cf.Domain, space cf.Space) (route cf.Route, apiResponse net.ApiResponse) {
-	routeToCreate := cf.Route{Host: hostName, Domain: domain}
-
+func (cmd *CreateRoute) CreateRoute(hostName string, domain cf.DomainFields, space cf.SpaceFields) (route cf.Route, apiResponse net.ApiResponse) {
 	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
-		terminal.EntityNameColor(routeToCreate.URL()),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(domain.UrlForHost(hostName)),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	route, apiResponse = cmd.routeRepo.CreateInSpace(routeToCreate, domain, space)
+	_, apiResponse = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
 	if apiResponse.IsNotSuccessful() {
 		var findApiResponse net.ApiResponse
 		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)

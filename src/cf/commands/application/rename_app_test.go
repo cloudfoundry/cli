@@ -35,8 +35,9 @@ func TestRenameRequirements(t *testing.T) {
 
 func TestRenameRun(t *testing.T) {
 	appRepo := &testapi.FakeApplicationRepository{}
-
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	ui := callRename(t, []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
@@ -46,7 +47,7 @@ func TestRenameRun(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Equal(t, appRepo.RenameApp, app)
+	assert.Equal(t, appRepo.RenameAppGuid, app.Guid)
 	assert.Equal(t, appRepo.RenameNewName, "my-new-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -59,11 +60,14 @@ func callRename(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory,
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewRenameApp(ui, config, appRepo)

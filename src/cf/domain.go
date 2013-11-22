@@ -14,88 +14,120 @@ const (
 	InstanceDown                   = "down"
 )
 
+type BasicFields struct {
+	Guid string
+	Name string
+}
+
+func (model BasicFields) String() string {
+	return model.Name
+}
+
+type OrganizationFields struct {
+	BasicFields
+}
+
 type Organization struct {
-	Name    string
-	Guid    string
-	Spaces  []Space
-	Domains []Domain
+	OrganizationFields
+	Spaces  []SpaceFields
+	Domains []DomainFields
+}
+
+type SpaceFields struct {
+	BasicFields
 }
 
 type Space struct {
-	Name             string
-	Guid             string
-	Applications     []Application
-	ServiceInstances []ServiceInstance
-	Organization     Organization
-	Domains          []Domain
+	SpaceFields
+	Organization     OrganizationFields
+	Applications     []ApplicationFields
+	ServiceInstances []ServiceInstanceFields
+	Domains          []DomainFields
 }
 
-func (space Space) String() string {
-	return space.Name
-}
-
-type Application struct {
-	Name             string
-	Guid             string
+type ApplicationFields struct {
+	BasicFields
 	State            string
-	Instances        int
+	Command          string
+	BuildpackUrl     string
+	InstanceCount    int
 	RunningInstances int
 	Memory           uint64 // in Megabytes
 	DiskQuota        uint64 // in Megabytes
-	BuildpackUrl     string
-	Stack            Stack
 	EnvironmentVars  map[string]string
-	Command          string
-	Routes           []Route
+}
+
+type Application struct {
+	ApplicationFields
+	Stack  Stack
+	Routes []RouteSummary
 }
 
 type AppSummary struct {
-	App       Application
-	Instances []ApplicationInstance
+	ApplicationFields
+	RouteSummaries []RouteSummary
 }
 
-type AppFile struct {
+type AppFileFields struct {
 	Path string
 	Sha1 string
 	Size int64
 }
 
-type Domain struct {
-	Name   string
-	Guid   string
-	Shared bool
-	Spaces []Space
+type DomainFields struct {
+	BasicFields
+	OwningOrganizationGuid string
+	Shared                 bool
 }
 
-type Event struct {
+func (model DomainFields) UrlForHost(host string) string {
+	if host == "" {
+		return model.Name
+	}
+	return fmt.Sprintf("%s.%s", host, model.Name)
+}
+
+type Domain struct {
+	DomainFields
+	Spaces []SpaceFields
+}
+
+type EventFields struct {
 	InstanceIndex   int
 	Timestamp       time.Time
 	ExitDescription string
 	ExitStatus      int
 }
 
-type Route struct {
-	Host     string
-	Guid     string
-	Domain   Domain
-	Space    Space
-	AppNames []string
+type RouteFields struct {
+	Guid string
+	Host string
 }
 
-func (r Route) URL() string {
-	if r.Host == "" {
-		return r.Domain.Name
+type Route struct {
+	RouteSummary
+	Space SpaceFields
+	Apps  []ApplicationFields
+}
+
+type RouteSummary struct {
+	RouteFields
+	Domain DomainFields
+}
+
+func (model RouteSummary) URL() string {
+	if model.Host == "" {
+		return model.Domain.Name
 	}
-	return fmt.Sprintf("%s.%s", r.Host, r.Domain.Name)
+	return fmt.Sprintf("%s.%s", model.Host, model.Domain.Name)
 }
 
 type Stack struct {
-	Name        string
-	Guid        string
+	BasicFields
 	Description string
 }
 
-type ApplicationInstance struct {
+type AppInstanceFields struct {
 	State     InstanceState
 	Since     time.Time
 	CpuUsage  float64 // percentage
@@ -105,53 +137,59 @@ type ApplicationInstance struct {
 	MemUsage  uint64
 }
 
-type ServicePlan struct {
-	Name            string
-	Guid            string
-	ServiceOffering ServiceOffering
+type ServicePlanFields struct {
+	BasicFields
 }
 
-type ServiceOffering struct {
+type ServicePlan struct {
+	ServicePlanFields
+	ServiceOffering ServiceOfferingFields
+}
+
+type ServiceOfferingFields struct {
 	Guid             string
 	Label            string
 	Provider         string
 	Version          string
 	Description      string
 	DocumentationUrl string
-	Plans            []ServicePlan
+}
+
+type ServiceOffering struct {
+	ServiceOfferingFields
+	Plans []ServicePlanFields
+}
+
+type ServiceInstanceFields struct {
+	BasicFields
+	SysLogDrainUrl   string
+	ApplicationNames []string
+	Params           map[string]string
 }
 
 type ServiceInstance struct {
-	Name             string
-	Guid             string
-	ServiceBindings  []ServiceBinding
-	ServicePlan      ServicePlan
-	ApplicationNames []string
-	Params           map[string]string
-	SysLogDrainUrl   string
+	ServiceInstanceFields
+	ServiceBindings []ServiceBindingFields
+	ServicePlan     ServicePlanFields
+	ServiceOffering ServiceOfferingFields
 }
 
 func (inst ServiceInstance) IsUserProvided() bool {
 	return inst.ServicePlan.Guid == ""
 }
 
-func (inst ServiceInstance) ServiceOffering() ServiceOffering {
-	return inst.ServicePlan.ServiceOffering
-}
-
-type ServiceBinding struct {
+type ServiceBindingFields struct {
 	Guid    string
 	Url     string
 	AppGuid string
 }
 
-type Quota struct {
-	Guid        string
-	Name        string
+type QuotaFields struct {
+	BasicFields
 	MemoryLimit uint64 // in Megabytes
 }
 
-type ServiceAuthToken struct {
+type ServiceAuthTokenFields struct {
 	Guid     string
 	Label    string
 	Provider string
@@ -159,14 +197,13 @@ type ServiceAuthToken struct {
 }
 
 type ServiceBroker struct {
-	Guid     string
-	Name     string
+	BasicFields
 	Username string
 	Password string
 	Url      string
 }
 
-type User struct {
+type UserFields struct {
 	Guid     string
 	Username string
 	Password string
@@ -174,7 +211,6 @@ type User struct {
 }
 
 type Buildpack struct {
-	Guid     string
-	Name     string
+	BasicFields
 	Position *int
 }

@@ -41,10 +41,11 @@ func TestSetOrganization(t *testing.T) {
 	config := repo.loadDefaultConfig(t)
 	defer repo.restoreConfig(t)
 
-	config.Space = cf.Space{Guid: "my-space-guid"}
-	config.Organization = cf.Organization{}
+	config.OrganizationFields = cf.OrganizationFields{}
 
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
 	err := repo.SetOrganization(org)
 	assert.NoError(t, err)
 
@@ -52,16 +53,17 @@ func TestSetOrganization(t *testing.T) {
 
 	savedConfig, err := repo.Get()
 	assert.NoError(t, err)
-	assert.Equal(t, savedConfig.Organization, org)
-	assert.Equal(t, savedConfig.Space, cf.Space{})
+	assert.Equal(t, savedConfig.OrganizationFields, org)
+	assert.Equal(t, savedConfig.SpaceFields, cf.SpaceFields{})
 }
 
 func TestSetSpace(t *testing.T) {
 	repo := NewConfigurationDiskRepository()
 	repo.loadDefaultConfig(t)
 	defer repo.restoreConfig(t)
-
-	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 	err := repo.SetSpace(space)
 	assert.NoError(t, err)
 
@@ -69,12 +71,14 @@ func TestSetSpace(t *testing.T) {
 
 	savedConfig, err := repo.Get()
 	assert.NoError(t, err)
-	assert.Equal(t, savedConfig.Space, space)
+	assert.Equal(t, savedConfig.SpaceFields, space)
 }
 
 func TestClearTokens(t *testing.T) {
-	org := cf.Organization{Name: "my-org"}
-	space := cf.Space{Name: "my-space"}
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 
 	repo := NewConfigurationDiskRepository()
 	config := repo.loadDefaultConfig(t)
@@ -83,8 +87,8 @@ func TestClearTokens(t *testing.T) {
 	config.Target = "http://api.example.com"
 	config.RefreshToken = "some old refresh token"
 	config.AccessToken = "some old access token"
-	config.Organization = org
-	config.Space = space
+	config.OrganizationFields = org
+	config.SpaceFields = space
 	repo.Save()
 
 	err := repo.ClearTokens()
@@ -97,8 +101,8 @@ func TestClearTokens(t *testing.T) {
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
-	assert.Equal(t, savedConfig.Organization, org)
-	assert.Equal(t, savedConfig.Space, space)
+	assert.Equal(t, savedConfig.OrganizationFields, org)
+	assert.Equal(t, savedConfig.SpaceFields, space)
 }
 
 func TestClearSession(t *testing.T) {
@@ -109,8 +113,10 @@ func TestClearSession(t *testing.T) {
 	config.Target = "http://api.example.com"
 	config.RefreshToken = "some old refresh token"
 	config.AccessToken = "some old access token"
-	config.Organization = cf.Organization{Name: "my-org"}
-	config.Space = cf.Space{Name: "my-space"}
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	repo.Save()
 
 	err := repo.ClearSession()
@@ -123,8 +129,8 @@ func TestClearSession(t *testing.T) {
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
-	assert.Equal(t, savedConfig.Organization, cf.Organization{})
-	assert.Equal(t, savedConfig.Space, cf.Space{})
+	assert.Equal(t, savedConfig.OrganizationFields, cf.OrganizationFields{})
+	assert.Equal(t, savedConfig.SpaceFields, cf.SpaceFields{})
 }
 
 func (repo ConfigurationDiskRepository) loadDefaultConfig(t *testing.T) (config *Configuration) {

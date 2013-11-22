@@ -22,7 +22,8 @@ type FakeReqFactory struct {
 	Space     cf.Space
 
 	OrganizationName string
-	Organization     cf.Organization
+	Organization cf.Organization
+	OrganizationFields cf.OrganizationFields
 
 	RouteHost   string
 	RouteDomain string
@@ -32,7 +33,7 @@ type FakeReqFactory struct {
 	Domain     cf.Domain
 
 	UserUsername string
-	User         cf.User
+	UserFields         cf.UserFields
 
 	Buildpack     cf.Buildpack
 }
@@ -113,6 +114,10 @@ func (r FakeRequirement) GetOrganization() cf.Organization {
 	return r.factory.Organization
 }
 
+func (r FakeRequirement) GetOrganizationFields() cf.OrganizationFields {
+	return r.factory.OrganizationFields
+}
+
 func (r FakeRequirement) GetRoute() cf.Route {
 	return r.factory.Route
 }
@@ -121,8 +126,8 @@ func (r FakeRequirement) GetDomain() cf.Domain {
 	return r.factory.Domain
 }
 
-func (r FakeRequirement) GetUser() cf.User {
-	return r.factory.User
+func (r FakeRequirement) GetUser() cf.UserFields {
+	return r.factory.UserFields
 }
 
 func (r FakeRequirement) GetBuildpack() cf.Buildpack {

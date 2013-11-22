@@ -39,13 +39,17 @@ func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 
 	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
 
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
-	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 
 	config, _ := configRepo.Get()
-	config.Organization = org
-	config.Space = space
+	config.OrganizationFields = org
+	config.SpaceFields = space
 
 	repo.UpdateEndpoint(ts.URL)
 
@@ -67,20 +71,25 @@ func TestUpdateEndpointWhenUrlIsAlreadyTargeted(t *testing.T) {
 	ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
 	defer ts.Close()
 
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
-	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 
 	config, _ := configRepo.Get()
 	config.Target = ts.URL
 	config.AccessToken = "some access token"
 	config.RefreshToken = "some refresh token"
-	config.Organization = org
-	config.Space = space
+	config.OrganizationFields = org
+	config.SpaceFields = space
 
 	repo.UpdateEndpoint(ts.URL)
 
-	assert.Equal(t, config.Organization, org)
-	assert.Equal(t, config.Space, space)
+	assert.Equal(t, config.OrganizationFields, org)
+	assert.Equal(t, config.SpaceFields, space)
 	assert.Equal(t, config.AccessToken, "some access token")
 	assert.Equal(t, config.RefreshToken, "some refresh token")
 }
@@ -182,8 +191,6 @@ func makeRepo(configRepo testconfig.FakeConfigRepository) (repo EndpointReposito
 	return NewEndpointRepository(config, gateway, configRepo)
 }
 
-// Tests for GetEndpoint
-
 func TestGetEndpointForCloudController(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	config := &configuration.Configuration{
@@ -212,7 +219,7 @@ func TestGetEndpointForLoggregatorSecure(t *testing.T) {
 }
 
 func TestGetEndpointForLoggregatorInsecure(t *testing.T) {
-	//This is current behavior, which will probably need to be changed to properly support unsecure websocket connections (SH)
+
 	config := &configuration.Configuration{
 		Target: "http://bar.run.pivotal.io",
 	}

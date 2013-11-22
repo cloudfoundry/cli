@@ -12,6 +12,45 @@ type ServiceInstancesSummaries struct {
 	ServiceInstances []ServiceInstanceSummary `json:"services"`
 }
 
+func (resource ServiceInstancesSummaries) ToModels() (instances []cf.ServiceInstance) {
+	for _, instanceSummary := range resource.ServiceInstances {
+		applicationNames := resource.findApplicationNamesForInstance(instanceSummary.Name)
+
+		planSummary := instanceSummary.ServicePlan
+		servicePlan := cf.ServicePlanFields{}
+		servicePlan.Name = planSummary.Name
+		servicePlan.Guid = planSummary.Guid
+
+		offeringSummary := planSummary.ServiceOffering
+		serviceOffering := cf.ServiceOfferingFields{}
+		serviceOffering.Label = offeringSummary.Label
+		serviceOffering.Provider = offeringSummary.Provider
+		serviceOffering.Version = offeringSummary.Version
+
+		instance := cf.ServiceInstance{}
+		instance.Name = instanceSummary.Name
+		instance.ApplicationNames = applicationNames
+		instance.ServicePlan = servicePlan
+		instance.ServiceOffering = serviceOffering
+
+		instances = append(instances, instance)
+	}
+
+	return
+}
+
+func (resource ServiceInstancesSummaries) findApplicationNamesForInstance(instanceName string) (applicationNames []string) {
+	for _, app := range resource.Apps {
+		for _, name := range app.ServiceNames {
+			if name == instanceName {
+				applicationNames = append(applicationNames, app.Name)
+			}
+		}
+	}
+
+	return
+}
+
 type ServiceInstanceSummaryApp struct {
 	Name         string
 	ServiceNames []string `json:"service_names"`
@@ -50,58 +89,15 @@ func NewCloudControllerServiceSummaryRepository(config *configuration.Configurat
 }
 
 func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []cf.ServiceInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.Space.Guid)
-	response := new(ServiceInstancesSummaries)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.SpaceFields.Guid)
+	resource := new(ServiceInstancesSummaries)
 
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, response)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	instances = extractServiceInstancesFromSummary(response.ServiceInstances, response.Apps)
-
-	return
-}
-
-func extractServiceInstancesFromSummary(instanceSummaries []ServiceInstanceSummary, apps []ServiceInstanceSummaryApp) (instances []cf.ServiceInstance) {
-	for _, instanceSummary := range instanceSummaries {
-		applicationNames := findApplicationNamesForInstance(instanceSummary.Name, apps)
-
-		planSummary := instanceSummary.ServicePlan
-		offeringSummary := planSummary.ServiceOffering
-
-		serviceOffering := cf.ServiceOffering{
-			Label:    offeringSummary.Label,
-			Provider: offeringSummary.Provider,
-			Version:  offeringSummary.Version,
-		}
-
-		servicePlan := cf.ServicePlan{
-			Name:            planSummary.Name,
-			Guid:            planSummary.Guid,
-			ServiceOffering: serviceOffering,
-		}
-
-		instance := cf.ServiceInstance{
-			Name:             instanceSummary.Name,
-			ServicePlan:      servicePlan,
-			ApplicationNames: applicationNames,
-		}
-
-		instances = append(instances, instance)
-	}
-
-	return
-}
-
-func findApplicationNamesForInstance(instanceName string, apps []ServiceInstanceSummaryApp) (applicationNames []string) {
-	for _, app := range apps {
-		for _, name := range app.ServiceNames {
-			if name == instanceName {
-				applicationNames = append(applicationNames, app.Name)
-			}
-		}
-	}
+	instances = resource.ToModels()
 
 	return
 }

@@ -6,7 +6,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ListRoutes struct {
@@ -43,10 +42,14 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 	for routes := range routesChan {
 		rows := [][]string{}
 		for _, route := range routes {
+			appNames := ""
+			for _, app := range route.Apps {
+				appNames = appNames + ", " + app.Name
+			}
 			rows = append(rows, []string{
 				route.Host,
 				route.Domain.Name,
-				strings.Join(route.AppNames, ", "),
+				appNames,
 			})
 		}
 		table.Print(rows)

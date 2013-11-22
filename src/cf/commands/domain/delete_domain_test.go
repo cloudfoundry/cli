@@ -2,7 +2,7 @@ package domain_test
 
 import (
 	"cf"
-	. "cf/commands/domain"
+	"cf/commands/domain"
 	"cf/configuration"
 	"cf/net"
 	"github.com/stretchr/testify/assert"
@@ -31,14 +31,17 @@ func TestGetRequirements(t *testing.T) {
 }
 
 func TestDeleteDomainSuccess(t *testing.T) {
+	domain := cf.Domain{}
+	domain.Name = "foo.com"
+	domain.Guid = "foo-guid"
 	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
+		FindByNameInOrgDomain: domain,
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
 	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "foo.com")
@@ -50,14 +53,17 @@ func TestDeleteDomainSuccess(t *testing.T) {
 }
 
 func TestDeleteDomainNoConfirmation(t *testing.T) {
+	domain := cf.Domain{}
+	domain.Name = "foo.com"
+	domain.Guid = "foo-guid"
 	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
+		FindByNameInOrgDomain: domain,
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
 	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"no"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "")
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "foo.com")
@@ -76,7 +82,7 @@ func TestDeleteDomainNotFound(t *testing.T) {
 
 	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
@@ -93,7 +99,7 @@ func TestDeleteDomainFindError(t *testing.T) {
 
 	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
@@ -103,15 +109,18 @@ func TestDeleteDomainFindError(t *testing.T) {
 }
 
 func TestDeleteDomainDeleteError(t *testing.T) {
+	domain := cf.Domain{}
+	domain.Name = "foo.com"
+	domain.Guid = "foo-guid"
 	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
+		FindByNameInOrgDomain: domain,
 		DeleteApiResponse:     net.NewApiResponseWithMessage("failed badly"),
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
 	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
@@ -121,14 +130,18 @@ func TestDeleteDomainDeleteError(t *testing.T) {
 }
 
 func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
+	domain := cf.Domain{}
+	domain.Name = "foo.com"
+	domain.Guid = "foo-guid"
+	domain.Shared = true
 	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com", Shared: true},
+		FindByNameInOrgDomain: domain,
 	}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
 	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
 	assert.Contains(t, ui.Prompts[0], "shared")
 	assert.Contains(t, ui.Prompts[0], "foo.com")
@@ -140,12 +153,17 @@ func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
 
 func TestDeleteDomainForceFlagSkipsConfirmation(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+
+	domain := cf.Domain{}
+	domain.Name = "foo.com"
+	domain.Guid = "foo-guid"
+	domain.Shared = true
 	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com", Shared: true},
+		FindByNameInOrgDomain: domain,
 	}
 	ui := callDeleteDomain(t, []string{"-f", "foo.com"}, []string{}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.DeleteDomain.Name, "foo.com")
+	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Contains(t, ui.Outputs[0], "Deleting domain")
@@ -164,13 +182,18 @@ func callDeleteDomain(t *testing.T, args []string, inputs []string, reqFactory *
 	})
 	assert.NoError(t, err)
 
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
-	cmd := NewDeleteDomain(ui, config, domainRepo)
+	cmd := domain.NewDeleteDomain(ui, config, domainRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

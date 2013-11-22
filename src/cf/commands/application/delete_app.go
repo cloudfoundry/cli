@@ -51,8 +51,8 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(appName),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -69,7 +69,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 		return
 	}
 
-	apiResponse = cmd.appRepo.Delete(app)
+	apiResponse = cmd.appRepo.Delete(app.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

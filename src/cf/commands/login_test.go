@@ -15,13 +15,10 @@ import (
 )
 
 type LoginTestContext struct {
-
-	// test-specific setup
 	Flags  []string
 	Inputs []string
 	Config configuration.Configuration
 
-	// fakes created by callLogin
 	configRepo   testconfig.FakeConfigRepository
 	ui           *testterm.FakeUI
 	authRepo     *testapi.FakeAuthenticationRepository
@@ -30,12 +27,10 @@ type LoginTestContext struct {
 	spaceRepo    *testapi.FakeSpaceRepository
 }
 
-// pass defaultBeforeBlock to callLogin instead of nil
 func defaultBeforeBlock(*LoginTestContext) {}
 
 func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestContext)) {
 
-	// setup test fakes
 	c.configRepo = testconfig.FakeConfigRepository{}
 	c.ui = &testterm.FakeUI{
 		Inputs: c.Inputs,
@@ -46,25 +41,31 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 		ConfigRepo:   c.configRepo,
 	}
 	c.endpointRepo = &testapi.FakeEndpointRepo{}
+
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
 	c.orgRepo = &testapi.FakeOrgRepository{
-		FindByNameOrganization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
+		FindByNameOrganization: org,
 	}
+
+	space := cf.Space{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 
 	c.spaceRepo = &testapi.FakeSpaceRepository{
-		FindByNameSpace: cf.Space{Name: "my-space", Guid: "my-space-guid"},
+		FindByNameSpace: space,
 	}
 
-	// initialize config
 	c.configRepo.Delete()
 	config, _ := c.configRepo.Get()
 	config.Target = c.Config.Target
-	config.Organization = c.Config.Organization
-	config.Space = c.Config.Space
+	config.OrganizationFields = c.Config.OrganizationFields
+	config.SpaceFields = c.Config.SpaceFields
 
-	// run any test-specific setup
 	beforeBlock(c)
 
-	// run login command
 	l := NewLogin(c.ui, c.configRepo, c.authRepo, c.endpointRepo, c.orgRepo, c.spaceRepo)
 	l.Run(testcmd.NewContext("login", c.Flags))
 }
@@ -75,16 +76,25 @@ func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
 		Inputs: []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"},
 	}
 
-	callLogin(t, &c, func(c *LoginTestContext) {
-		c.orgRepo.Organizations = []cf.Organization{
-			{Guid: "some-org-guid", Name: "some-org"},
-			{Guid: "my-org-guid", Name: "my-org"},
-		}
+	org1 := cf.Organization{}
+	org1.Guid = "some-org-guid"
+	org1.Name = "some-org"
 
-		c.spaceRepo.Spaces = []cf.Space{
-			{Guid: "my-space-guid", Name: "my-space"},
-			{Guid: "some-space-guid", Name: "some-space"},
-		}
+	org2 := cf.Organization{}
+	org2.Guid = "my-org-guid"
+	org2.Name = "my-org"
+
+	space1 := cf.Space{}
+	space1.Guid = "my-space-guid"
+	space1.Name = "my-space"
+
+	space2 := cf.Space{}
+	space2.Guid = "some-space-guid"
+	space2.Name = "some-space"
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.Organizations = []cf.Organization{org1, org2}
+		c.spaceRepo.Spaces = []cf.Space{space1, space2}
 	})
 
 	savedConfig := testconfig.SavedConfiguration
@@ -100,8 +110,8 @@ func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
 	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -120,16 +130,25 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
 	}
 
-	callLogin(t, &c, func(c *LoginTestContext) {
-		c.orgRepo.Organizations = []cf.Organization{
-			{Guid: "some-org-guid", Name: "some-org"},
-			{Guid: "my-org-guid", Name: "my-org"},
-		}
+	org1 := cf.Organization{}
+	org1.Guid = "some-org-guid"
+	org1.Name = "some-org"
 
-		c.spaceRepo.Spaces = []cf.Space{
-			{Guid: "my-space-guid", Name: "my-space"},
-			{Guid: "some-space-guid", Name: "some-space"},
-		}
+	org2 := cf.Organization{}
+	org2.Guid = "my-org-guid"
+	org2.Name = "my-org"
+
+	space1 := cf.Space{}
+	space1.Guid = "my-space-guid"
+	space1.Name = "my-space"
+
+	space2 := cf.Space{}
+	space2.Guid = "some-space-guid"
+	space2.Name = "some-space"
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.Organizations = []cf.Organization{org1, org2}
+		c.spaceRepo.Spaces = []cf.Space{space1, space2}
 	})
 
 	savedConfig := testconfig.SavedConfiguration
@@ -146,8 +165,8 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -163,32 +182,37 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 
 func TestLoggingInWithTooManyOrgsDoesNotShowOrgList(t *testing.T) {
 	c := LoginTestContext{
-		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
+		Inputs: []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
-		for i := 0; i < 50; i++ {
+		for i := 0; i < 60; i++ {
 			id := strconv.Itoa(i)
-			c.orgRepo.Organizations = append(
-				c.orgRepo.Organizations,
-				cf.Organization{Guid: "my-org-guid-" + id, Name: "my-org-" + id},
-			)
+			org := cf.Organization{}
+			org.Guid = "my-org-guid-" + id
+			org.Name = "my-org-" + id
+			c.orgRepo.Organizations = append(c.orgRepo.Organizations, org)
 		}
-		c.orgRepo.Organizations = append(
-			c.orgRepo.Organizations,
-			cf.Organization{Guid: "my-org-guid", Name: "my-org"},
-		)
-		c.spaceRepo.Spaces = []cf.Space{
-			{Guid: "my-space-guid", Name: "my-space"},
-			{Guid: "some-space-guid", Name: "some-space"},
-		}
+
+		c.orgRepo.FindByNameOrganization = c.orgRepo.Organizations[1]
+
+		space1 := cf.Space{}
+		space1.Guid = "my-space-guid"
+		space1.Name = "my-space"
+
+		space2 := cf.Space{}
+		space2.Guid = "some-space-guid"
+		space2.Name = "some-space"
+
+		c.spaceRepo.Spaces = []cf.Space{space1, space2}
 	})
 
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.True(t, len(c.ui.Outputs) < 50)
 
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
+	assert.Equal(t, c.orgRepo.FindByNameName, "my-org-1")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid-1")
 }
 
 func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
@@ -201,8 +225,8 @@ func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -229,8 +253,8 @@ func TestSuccessfullyLoggingInWithEndpointSetInConfig(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -242,9 +266,11 @@ func TestSuccessfullyLoggingInWithEndpointSetInConfig(t *testing.T) {
 }
 
 func TestSuccessfullyLoggingInWithOrgSetInConfig(t *testing.T) {
-	existingConfig := configuration.Configuration{
-		Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
-	}
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
+	existingConfig := configuration.Configuration{OrganizationFields: org}
 
 	c := LoginTestContext{
 		Flags:  []string{"-s", "my-space"},
@@ -259,8 +285,8 @@ func TestSuccessfullyLoggingInWithOrgSetInConfig(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -272,9 +298,17 @@ func TestSuccessfullyLoggingInWithOrgSetInConfig(t *testing.T) {
 }
 
 func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
+	space := cf.SpaceFields{}
+	space.Guid = "my-space-guid"
+	space.Name = "my-space"
+
 	existingConfig := configuration.Configuration{
-		Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
-		Space:        cf.Space{Name: "my-space", Guid: "my-space-guid"},
+		OrganizationFields: org,
+		SpaceFields:        space,
 	}
 
 	c := LoginTestContext{
@@ -290,8 +324,8 @@ func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -303,6 +337,10 @@ func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
 }
 
 func TestSuccessfullyLoggingInWithOnlyOneOrg(t *testing.T) {
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
 	c := LoginTestContext{
 		Flags:  []string{"-s", "my-space"},
 		Inputs: []string{"http://api.example.com", "user@example.com", "password"},
@@ -310,16 +348,14 @@ func TestSuccessfullyLoggingInWithOnlyOneOrg(t *testing.T) {
 
 	callLogin(t, &c, func(c *LoginTestContext) {
 		c.orgRepo.FindByNameOrganization = cf.Organization{}
-		c.orgRepo.Organizations = []cf.Organization{
-			{Guid: "my-org-guid", Name: "my-org"},
-		}
+		c.orgRepo.Organizations = []cf.Organization{org}
 	})
 
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -331,22 +367,24 @@ func TestSuccessfullyLoggingInWithOnlyOneOrg(t *testing.T) {
 }
 
 func TestSuccessfullyLoggingInWithOnlyOneSpace(t *testing.T) {
+	space := cf.Space{}
+	space.Guid = "my-space-guid"
+	space.Name = "my-space"
+
 	c := LoginTestContext{
 		Flags:  []string{"-o", "my-org"},
 		Inputs: []string{"http://api.example.com", "user@example.com", "password"},
 	}
 
 	callLogin(t, &c, func(c *LoginTestContext) {
-		c.spaceRepo.Spaces = []cf.Space{
-			{Guid: "my-space-guid", Name: "my-space"},
-		}
+		c.spaceRepo.Spaces = []cf.Space{space}
 	})
 
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "http://api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Equal(t, savedConfig.Space.Guid, "my-space-guid")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "my-space-guid")
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -370,8 +408,8 @@ func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
-	assert.Empty(t, savedConfig.Organization.Guid)
-	assert.Empty(t, savedConfig.Space.Guid)
+	assert.Empty(t, savedConfig.OrganizationFields.Guid)
+	assert.Empty(t, savedConfig.SpaceFields.Guid)
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
 
@@ -391,8 +429,8 @@ func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Empty(t, savedConfig.Target)
-	assert.Empty(t, savedConfig.Organization.Guid)
-	assert.Empty(t, savedConfig.Space.Guid)
+	assert.Empty(t, savedConfig.OrganizationFields.Guid)
+	assert.Empty(t, savedConfig.SpaceFields.Guid)
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
 
@@ -413,8 +451,8 @@ func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
-	assert.Empty(t, savedConfig.Organization.Guid)
-	assert.Empty(t, savedConfig.Space.Guid)
+	assert.Empty(t, savedConfig.OrganizationFields.Guid)
+	assert.Empty(t, savedConfig.SpaceFields.Guid)
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
@@ -435,8 +473,8 @@ func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
 	savedConfig := testconfig.SavedConfiguration
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
-	assert.Equal(t, savedConfig.Organization.Guid, "my-org-guid")
-	assert.Empty(t, savedConfig.Space.Guid)
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
+	assert.Empty(t, savedConfig.SpaceFields.Guid)
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 

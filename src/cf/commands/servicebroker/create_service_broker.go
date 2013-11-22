@@ -1,7 +1,6 @@
 package servicebroker
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -37,18 +36,17 @@ func (cmd CreateServiceBroker) GetRequirements(reqFactory requirements.Factory, 
 }
 
 func (cmd CreateServiceBroker) Run(c *cli.Context) {
-	serviceBroker := cf.ServiceBroker{
-		Name:     c.Args()[0],
-		Username: c.Args()[1],
-		Password: c.Args()[2],
-		Url:      c.Args()[3],
-	}
+	name := c.Args()[0]
+	username := c.Args()[1]
+	password := c.Args()[2]
+	url := c.Args()[3]
+
 	cmd.ui.Say("Creating service broker %s as %s...",
-		terminal.EntityNameColor(serviceBroker.Name),
+		terminal.EntityNameColor(name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.serviceBrokerRepo.Create(serviceBroker)
+	apiResponse := cmd.serviceBrokerRepo.Create(name, url, username, password)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

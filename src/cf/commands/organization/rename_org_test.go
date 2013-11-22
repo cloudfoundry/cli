@@ -2,7 +2,7 @@ package organization_test
 
 import (
 	"cf"
-	. "cf/commands/organization"
+	"cf/commands/organization"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -36,7 +36,9 @@ func TestRenameOrgRequirements(t *testing.T) {
 func TestRenameOrgRun(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 	ui := callRenameOrg(t, []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
 
@@ -44,7 +46,7 @@ func TestRenameOrgRun(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-new-org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Equal(t, orgRepo.RenameOrganization, org)
+	assert.Equal(t, orgRepo.RenameOrganizationGuid, "my-org-guid")
 	assert.Equal(t, orgRepo.RenameNewName, "my-new-org")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -58,13 +60,19 @@ func callRenameOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFacto
 	})
 	assert.NoError(t, err)
 
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
-	cmd := NewRenameOrg(ui, config, orgRepo)
+	cmd := organization.NewRenameOrg(ui, config, orgRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

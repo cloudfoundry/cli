@@ -32,7 +32,11 @@ func TestFindQuotaByName(t *testing.T) {
 	quota, apiResponse := repo.FindByName("my-quota")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, quota, cf.Quota{Guid: "my-quota-guid", Name: "my-remote-quota", MemoryLimit: 1024})
+	expectedQuota := cf.QuotaFields{}
+	expectedQuota.Guid = "my-quota-guid"
+	expectedQuota.Name = "my-remote-quota"
+	expectedQuota.MemoryLimit = 1024
+	assert.Equal(t, quota, expectedQuota)
 }
 
 func TestUpdateQuota(t *testing.T) {
@@ -46,9 +50,7 @@ func TestUpdateQuota(t *testing.T) {
 	ts, handler, repo := createQuotaRepo(t, req)
 	defer ts.Close()
 
-	quota := cf.Quota{Guid: "my-quota-guid"}
-	org := cf.Organization{Guid: "my-org-guid"}
-	apiResponse := repo.Update(org, quota)
+	apiResponse := repo.Update("my-org-guid", "my-quota-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

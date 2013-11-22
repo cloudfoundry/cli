@@ -9,7 +9,9 @@ import (
 )
 
 func TestDomainReqExecute(t *testing.T) {
-	domain := cf.Domain{Name: "example.com", Guid: "domain-guid"}
+	domain := cf.Domain{}
+	domain.Name = "example.com"
+	domain.Guid = "domain-guid"
 	domainRepo := &testapi.FakeDomainRepository{FindByNameDomain: domain}
 	ui := new(testterm.FakeUI)
 

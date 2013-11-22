@@ -15,12 +15,15 @@ import (
 )
 
 func TestCreateService(t *testing.T) {
-	serviceOfferings := []cf.ServiceOffering{
-		cf.ServiceOffering{Label: "cleardb", Plans: []cf.ServicePlan{
-			cf.ServicePlan{Name: "spark", Guid: "cleardb-spark-guid"},
-		}},
-		cf.ServiceOffering{Label: "postgres"},
-	}
+	offering := cf.ServiceOffering{}
+	offering.Label = "cleardb"
+	plan := cf.ServicePlanFields{}
+	plan.Name = "spark"
+	plan.Guid = "cleardb-spark-guid"
+	offering.Plans = []cf.ServicePlanFields{plan}
+	offering2 := cf.ServiceOffering{}
+	offering2.Label = "postgres"
+	serviceOfferings := []cf.ServiceOffering{offering, offering2}
 	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 	fakeUI := callCreateService(t,
 		[]string{"cleardb", "spark", "my-cleardb-service"},
@@ -34,17 +37,20 @@ func TestCreateService(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-space")
 	assert.Contains(t, fakeUI.Outputs[0], "my-user")
 	assert.Equal(t, serviceRepo.CreateServiceInstanceName, "my-cleardb-service")
-	assert.Equal(t, serviceRepo.CreateServiceInstancePlan, cf.ServicePlan{Name: "spark", Guid: "cleardb-spark-guid"})
+	assert.Equal(t, serviceRepo.CreateServiceInstancePlanGuid, "cleardb-spark-guid")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
-	serviceOfferings := []cf.ServiceOffering{
-		cf.ServiceOffering{Label: "cleardb", Plans: []cf.ServicePlan{
-			cf.ServicePlan{Name: "spark", Guid: "cleardb-spark-guid"},
-		}},
-		cf.ServiceOffering{Label: "postgres"},
-	}
+	offering := cf.ServiceOffering{}
+	offering.Label = "cleardb"
+	plan := cf.ServicePlanFields{}
+	plan.Name = "spark"
+	plan.Guid = "cleardb-spark-guid"
+	offering.Plans = []cf.ServicePlanFields{plan}
+	offering2 := cf.ServiceOffering{}
+	offering2.Label = "postgres"
+	serviceOfferings := []cf.ServiceOffering{offering, offering2}
 	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
 	fakeUI := callCreateService(t,
 		[]string{"cleardb", "spark", "my-cleardb-service"},
@@ -55,7 +61,7 @@ func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "Creating service")
 	assert.Contains(t, fakeUI.Outputs[0], "my-cleardb-service")
 	assert.Equal(t, serviceRepo.CreateServiceInstanceName, "my-cleardb-service")
-	assert.Equal(t, serviceRepo.CreateServiceInstancePlan, cf.ServicePlan{Name: "spark", Guid: "cleardb-spark-guid"})
+	assert.Equal(t, serviceRepo.CreateServiceInstancePlanGuid, "cleardb-spark-guid")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-cleardb-service")
 	assert.Contains(t, fakeUI.Outputs[2], "already exists")
@@ -69,11 +75,14 @@ func callCreateService(t *testing.T, args []string, inputs []string, serviceRepo
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewCreateService(fakeUI, config, serviceRepo)

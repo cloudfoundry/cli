@@ -9,7 +9,9 @@ import (
 )
 
 func TestBuildpackReqExecute(t *testing.T) {
-	buildpack := cf.Buildpack{Name: "my-buildpack", Guid: "my-buildpack-guid"}
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-buildpack"
+	buildpack.Guid = "my-buildpack-guid"
 	buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameBuildpack: buildpack}
 	ui := new(testterm.FakeUI)
 

@@ -57,13 +57,10 @@ func TestCreateServiceBroker(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-broker")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	expectedServiceBroker := cf.ServiceBroker{
-		Name:     "my-broker",
-		Username: "my username",
-		Password: "my password",
-		Url:      "http://example.com",
-	}
-	assert.Equal(t, serviceBrokerRepo.CreatedServiceBroker, expectedServiceBroker)
+	assert.Equal(t, serviceBrokerRepo.CreateName, "my-broker")
+	assert.Equal(t, serviceBrokerRepo.CreateUrl, "http://example.com")
+	assert.Equal(t, serviceBrokerRepo.CreateUsername, "my username")
+	assert.Equal(t, serviceBrokerRepo.CreatePassword, "my password")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -76,11 +73,14 @@ func callCreateServiceBroker(t *testing.T, args []string, reqFactory *testreq.Fa
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewCreateServiceBroker(ui, config, serviceBrokerRepo)

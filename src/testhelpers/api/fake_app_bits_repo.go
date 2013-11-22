@@ -1,19 +1,18 @@
 package api
 
 import (
-	"cf"
 	"cf/net"
 )
 
 type FakeApplicationBitsRepository struct {
-	UploadedApp cf.Application
+	UploadedAppGuid string
 	UploadedDir string
 	UploadAppErr bool
 }
 
-func (repo *FakeApplicationBitsRepository) UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse) {
+func (repo *FakeApplicationBitsRepository) UploadApp(appGuid, dir string) (apiResponse net.ApiResponse) {
 	repo.UploadedDir = dir
-	repo.UploadedApp = app
+	repo.UploadedAppGuid = appGuid
 
 	if repo.UploadAppErr {
 		apiResponse = net.NewApiResponseWithMessage("Error uploading app")

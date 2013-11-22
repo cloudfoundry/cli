@@ -26,7 +26,7 @@ type AppFileResource struct {
 }
 
 type ApplicationBitsRepository interface {
-	UploadApp(app cf.Application, dir string) (apiResponse net.ApiResponse)
+	UploadApp(appGuid, dir string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -42,7 +42,7 @@ func NewCloudControllerApplicationBitsRepository(config *configuration.Configura
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Application, appDir string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string) (apiResponse net.ApiResponse) {
 	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
@@ -75,7 +75,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 				return
 			}
 
-			apiResponse = repo.uploadBits(app, zipFile, presentResourcesJson)
+			apiResponse = repo.uploadBits(appGuid, zipFile, presentResourcesJson)
 			if apiResponse.IsNotSuccessful() {
 				return
 			}
@@ -84,8 +84,8 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(app cf.Applicatio
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) uploadBits(app cf.Application, zipFile *os.File, presentResourcesJson []byte) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/apps/%s/bits?async=true", repo.config.Target, app.Guid)
+func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s/v2/apps/%s/bits?async=true", repo.config.Target, appGuid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
@@ -248,7 +248,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(zipFile string, 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []cf.AppFile) (appFilesToUpload []cf.AppFile, presentResourcesJson []byte, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []cf.AppFileFields) (appFilesToUpload []cf.AppFileFields, presentResourcesJson []byte, apiResponse net.ApiResponse) {
 	appFilesRequest := []AppFileResource{}
 	for _, file := range allAppFiles {
 		appFilesRequest = append(appFilesRequest, AppFileResource{
@@ -280,10 +280,10 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 		return
 	}
 
-	appFilesToUpload = make([]cf.AppFile, len(allAppFiles))
+	appFilesToUpload = make([]cf.AppFileFields, len(allAppFiles))
 	copy(appFilesToUpload, allAppFiles)
 	for _, file := range fileResource {
-		appFile := cf.AppFile{
+		appFile := cf.AppFileFields{
 			Path: file.Path,
 			Sha1: file.Sha1,
 			Size: file.Size,
@@ -294,7 +294,7 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []cf.AppFile, targetFile cf.AppFile) []cf.AppFile {
+func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []cf.AppFileFields, targetFile cf.AppFileFields) []cf.AppFileFields {
 	for i, file := range appFiles {
 		if file.Path == targetFile.Path {
 			appFiles[i] = appFiles[len(appFiles)-1]

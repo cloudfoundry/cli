@@ -26,8 +26,8 @@ func TestCreateUserProvidedServiceWithParameterList(t *testing.T) {
 	assert.Contains(t, fakeUI.Prompts[1], "bar")
 	assert.Contains(t, fakeUI.Prompts[2], "baz")
 
-	assert.Equal(t, repo.CreateServiceInstance.Name, "my-custom-service")
-	assert.Equal(t, repo.CreateServiceInstance.Params, map[string]string{
+	assert.Equal(t, repo.CreateName, "my-custom-service")
+	assert.Equal(t, repo.CreateParams, map[string]string{
 		"foo": "foo value",
 		"bar": "bar value",
 		"baz": "baz value",
@@ -51,8 +51,8 @@ func TestCreateUserProvidedServiceWithJson(t *testing.T) {
 
 	assert.Empty(t, fakeUI.Prompts)
 
-	assert.Equal(t, repo.CreateServiceInstance.Name, "my-custom-service")
-	assert.Equal(t, repo.CreateServiceInstance.Params, map[string]string{
+	assert.Equal(t, repo.CreateName, "my-custom-service")
+	assert.Equal(t, repo.CreateParams, map[string]string{
 		"foo": "foo value",
 		"bar": "bar value",
 		"baz": "baz value",
@@ -82,7 +82,7 @@ func TestCreateUserProvidedServiceWithSyslogDrain(t *testing.T) {
 		[]string{},
 		repo,
 	)
-	assert.Equal(t, repo.CreateServiceInstance.SysLogDrainUrl, "syslog://example.com")
+	assert.Equal(t, repo.CreateDrainUrl, "syslog://example.com")
 	assert.Contains(t, fakeUI.Outputs[0], "Creating user provided service")
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
@@ -96,11 +96,14 @@ func callCreateUserProvidedService(t *testing.T, args []string, inputs []string,
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewCreateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)

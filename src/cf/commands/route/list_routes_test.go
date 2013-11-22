@@ -14,23 +14,39 @@ import (
 )
 
 func TestListingRoutes(t *testing.T) {
-	routes := []cf.Route{
-		cf.Route{
-			Host:     "hostname-1",
-			Domain:   cf.Domain{Name: "example.com"},
-			AppNames: []string{"dora", "dora2"},
-		},
-		cf.Route{
-			Host:     "hostname-2",
-			Domain:   cf.Domain{Name: "cfapps.com"},
-			AppNames: []string{"my-app", "my-app2"},
-		},
-		cf.Route{
-			Host:     "hostname-3",
-			Domain:   cf.Domain{Name: "another-example.com"},
-			AppNames: []string{"july", "june"},
-		},
-	}
+	domain := cf.DomainFields{}
+	domain.Name = "example.com"
+	domain2 := cf.DomainFields{}
+	domain2.Name = "cfapps.com"
+	domain3 := cf.DomainFields{}
+	domain3.Name = "another-example.com"
+
+	app1 := cf.ApplicationFields{}
+	app1.Name = "dora"
+	app2 := cf.ApplicationFields{}
+	app2.Name = "dora2"
+
+	app3 := cf.ApplicationFields{}
+	app3.Name = "my-app"
+	app4 := cf.ApplicationFields{}
+	app4.Name = "my-app2"
+
+	app5 := cf.ApplicationFields{}
+	app5.Name = "july"
+
+	route := cf.Route{}
+	route.Host = "hostname-1"
+	route.Domain = domain
+	route.Apps = []cf.ApplicationFields{app1, app2}
+	route2 := cf.Route{}
+	route2.Host = "hostname-2"
+	route2.Domain = domain2
+	route2.Apps = []cf.ApplicationFields{app3, app4}
+	route3 := cf.Route{}
+	route3.Host = "hostname-3"
+	route3.Domain = domain3
+	route3.Apps = []cf.ApplicationFields{app5}
+	routes := []cf.Route{route, route2, route3}
 
 	routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
@@ -53,7 +69,7 @@ func TestListingRoutes(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[4], "hostname-3")
 	assert.Contains(t, ui.Outputs[4], "another-example.com")
-	assert.Contains(t, ui.Outputs[4], "july, june")
+	assert.Contains(t, ui.Outputs[4], "july")
 }
 
 func TestListingRoutesWhenNoneExist(t *testing.T) {
@@ -86,11 +102,14 @@ func callListRoutes(t *testing.T, args []string, reqFactory *testreq.FakeReqFact
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewListRoutes(ui, config, routeRepo)

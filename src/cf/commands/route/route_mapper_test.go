@@ -39,15 +39,21 @@ func TestRouteMapperRequirements(t *testing.T) {
 }
 
 func TestRouteMapperWhenBinding(t *testing.T) {
-	route := cf.Route{
-		Guid:   "my-route-guid",
-		Host:   "foo",
-		Domain: cf.Domain{Guid: "my-domain-guid", Name: "example.com"},
-	}
-	app := cf.Application{Guid: "my-app-guid", Name: "my-app"}
+
+	domain := cf.Domain{}
+	domain.Guid = "my-domain-guid"
+	domain.Name = "example.com"
+	route := cf.Route{}
+	route.Guid = "my-route-guid"
+	route.Host = "foo"
+	route.Domain = domain.DomainFields
+
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "my-app"
 
 	routeRepo := &testapi.FakeRouteRepository{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
 	routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
 
 	ui := callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator, true)
@@ -59,22 +65,28 @@ func TestRouteMapperWhenBinding(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, route, routeRepo.BoundRoute)
-	assert.Equal(t, app, routeRepo.BoundApp)
+	assert.Equal(t, routeRepo.BoundRouteGuid, "my-route-guid")
+	assert.Equal(t, routeRepo.BoundAppGuid, "my-app-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestRouteMapperWhenUnbinding(t *testing.T) {
-	route := cf.Route{
-		Guid:   "my-route-guid",
-		Host:   "foo",
-		Domain: cf.Domain{Guid: "my-domain-guid", Name: "example.com"},
-	}
-	app := cf.Application{Guid: "my-app-guid", Name: "my-app"}
+	domain := cf.Domain{}
+	domain.Guid = "my-domain-guid"
+	domain.Name = "example.com"
+
+	route := cf.Route{}
+	route.Guid = "my-route-guid"
+	route.Host = "foo"
+	route.Domain = domain.DomainFields
+
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "my-app"
 
 	routeRepo := &testapi.FakeRouteRepository{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
 	routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
 
 	ui := callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator, false)
@@ -86,16 +98,22 @@ func TestRouteMapperWhenUnbinding(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, route, routeRepo.UnboundRoute)
-	assert.Equal(t, app, routeRepo.UnboundApp)
+	assert.Equal(t, routeRepo.UnboundRouteGuid, "my-route-guid")
+	assert.Equal(t, routeRepo.UnboundAppGuid, "my-app-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestRouteMapperWhenRouteNotReserved(t *testing.T) {
-	domain := cf.Domain{Name: "my-domain.com"}
-	route := cf.Route{Guid: "my-app-guid", Host: "my-host", Domain: domain}
-	app := cf.Application{Guid: "my-app-guid", Name: "my-app"}
+	domain := cf.DomainFields{}
+	domain.Name = "my-domain.com"
+	route := cf.Route{}
+	route.Guid = "my-app-guid"
+	route.Host = "my-host"
+	route.Domain = domain
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "my-app"
 
 	routeRepo := &testapi.FakeRouteRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
@@ -119,11 +137,14 @@ func callRouteMapper(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewRouteMapper(ui, config, routeRepo, createRoute, bind)

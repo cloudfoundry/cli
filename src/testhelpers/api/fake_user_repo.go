@@ -7,99 +7,101 @@ import (
 
 type FakeUserRepository struct {
 	FindByUsernameUsername string
-	FindByUsernameUser cf.User
+	FindByUsernameUserFields cf.UserFields
 	FindByUsernameNotFound bool
 
-	FindAllInOrgByRoleOrganization cf.Organization
-	FindAllInOrgByRoleUsersByRole map[string][]cf.User
+	FindAllInOrgByRoleOrganizationGuid string
+	FindAllInOrgByRoleUsersByRole map[string][]cf.UserFields
 
-	FindAllInSpaceByRoleSpace cf.Space
-	FindAllInSpaceByRoleUsersByRole map[string][]cf.User
+	FindAllInSpaceByRoleSpaceGuid string
+	FindAllInSpaceByRoleUsersByRole map[string][]cf.UserFields
 
-	CreateUserUser cf.User
+	CreateUserUsername string
+	CreateUserPassword string
 	CreateUserExists bool
 
-	DeleteUser cf.User
+	DeleteUserGuid string
 
-	SetOrgRoleUser cf.User
-	SetOrgRoleOrganization cf.Organization
+	SetOrgRoleUserGuid string
+	SetOrgRoleOrganizationGuid string
 	SetOrgRoleRole string
 
-	UnsetOrgRoleUser cf.User
-	UnsetOrgRoleOrganization cf.Organization
+	UnsetOrgRoleUserGuid string
+	UnsetOrgRoleOrganizationGuid string
 	UnsetOrgRoleRole string
 
-	SetSpaceRoleUser cf.User
-	SetSpaceRoleSpace cf.Space
+	SetSpaceRoleUserGuid string
+	SetSpaceRoleSpaceGuid string
 	SetSpaceRoleRole string
 
-	UnsetSpaceRoleUser cf.User
-	UnsetSpaceRoleSpace cf.Space
+	UnsetSpaceRoleUserGuid string
+	UnsetSpaceRoleSpaceGuid string
 	UnsetSpaceRoleRole string
 }
 
-func (repo *FakeUserRepository) FindByUsername(username string) (user cf.User, apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) FindByUsername(username string) (user cf.UserFields, apiResponse net.ApiResponse) {
 	repo.FindByUsernameUsername = username
-	user = repo.FindByUsernameUser
+	user = repo.FindByUsernameUserFields
 
 	if repo.FindByUsernameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("User not found")
+		apiResponse = net.NewNotFoundApiResponse("UserFields not found")
 	}
 
 	return
 }
 
-func (repo *FakeUserRepository) FindAllInOrgByRole(org cf.Organization) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
-	repo.FindAllInOrgByRoleOrganization = org
+func (repo *FakeUserRepository) FindAllInOrgByRole(orgGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse) {
+	repo.FindAllInOrgByRoleOrganizationGuid = orgGuid
 	usersByRole = repo.FindAllInOrgByRoleUsersByRole
 	return
 }
 
-func (repo *FakeUserRepository) FindAllInSpaceByRole(space cf.Space) (usersByRole map[string][]cf.User, apiResponse net.ApiResponse) {
-	repo.FindAllInSpaceByRoleSpace = space
+func (repo *FakeUserRepository) FindAllInSpaceByRole(spaceGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse) {
+	repo.FindAllInSpaceByRoleSpaceGuid = spaceGuid
 	usersByRole = repo.FindAllInSpaceByRoleUsersByRole
 	return
 }
 
-func (repo *FakeUserRepository) Create(user cf.User) (apiResponse net.ApiResponse) {
-	repo.CreateUserUser = user
+func (repo *FakeUserRepository) Create(username, password string) (apiResponse net.ApiResponse) {
+	repo.CreateUserUsername = username
+	repo.CreateUserPassword = password
 
 	if repo.CreateUserExists {
-		apiResponse = net.NewApiResponse("User already exists", cf.USER_EXISTS, 400)
+		apiResponse = net.NewApiResponse("UserFields already exists", cf.USER_EXISTS, 400)
 	}
 
 	return
 }
 
-func (repo *FakeUserRepository) Delete(user cf.User) (apiResponse net.ApiResponse) {
-	repo.DeleteUser = user
+func (repo *FakeUserRepository) Delete(userGuid string) (apiResponse net.ApiResponse) {
+	repo.DeleteUserGuid = userGuid
 	return
 }
 
-func (repo *FakeUserRepository) SetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
-	repo.SetOrgRoleUser = user
-	repo.SetOrgRoleOrganization = org
+func (repo *FakeUserRepository) SetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+	repo.SetOrgRoleUserGuid = userGuid
+	repo.SetOrgRoleOrganizationGuid = orgGuid
 	repo.SetOrgRoleRole = role
 	return
 }
 
-func (repo *FakeUserRepository) UnsetOrgRole(user cf.User, org cf.Organization, role string) (apiResponse net.ApiResponse) {
-	repo.UnsetOrgRoleUser = user
-	repo.UnsetOrgRoleOrganization = org
+func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+	repo.UnsetOrgRoleUserGuid = userGuid
+	repo.UnsetOrgRoleOrganizationGuid = orgGuid
 	repo.UnsetOrgRoleRole = role
 	return
 }
 
-func (repo *FakeUserRepository) SetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
-	repo.SetSpaceRoleUser = user
-	repo.SetSpaceRoleSpace = space
+func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+	repo.SetSpaceRoleUserGuid = userGuid
+	repo.SetSpaceRoleSpaceGuid = spaceGuid
 	repo.SetSpaceRoleRole = role
 	return
 }
 
-func (repo *FakeUserRepository) UnsetSpaceRole(user cf.User, space cf.Space, role string) (apiResponse net.ApiResponse) {
-	repo.UnsetSpaceRoleUser = user
-	repo.UnsetSpaceRoleSpace = space
+func (repo *FakeUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse net.ApiResponse) {
+	repo.UnsetSpaceRoleUserGuid = userGuid
+	repo.UnsetSpaceRoleSpaceGuid = spaceGuid
 	repo.UnsetSpaceRoleRole = role
 	return
 }

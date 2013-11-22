@@ -2,7 +2,7 @@ package buildpack_test
 
 import (
 	"cf"
-	. "cf/commands/buildpack"
+	"cf/commands/buildpack"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
@@ -24,13 +24,16 @@ func TestListBuildpacksRequirements(t *testing.T) {
 }
 
 func TestListBuildpacks(t *testing.T) {
-	position5 := 5
-	position10 := 10
-	position15 := 15
+	buildpackBuilder := func(name string, position int) (buildpack cf.Buildpack) {
+		buildpack.Name = name
+		buildpack.Position = &position
+		return
+	}
+
 	buildpacks := []cf.Buildpack{
-		{Name: "Buildpack-1", Position: &position5},
-		{Name: "Buildpack-2", Position: &position10},
-		{Name: "Buildpack-3", Position: &position15},
+		buildpackBuilder("Buildpack-1", 5),
+		buildpackBuilder("Buildpack-2", 10),
+		buildpackBuilder("Buildpack-3", 15),
 	}
 
 	buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -73,7 +76,7 @@ func TestListingBuildpacksWhenNoneExist(t *testing.T) {
 func callListBuildpacks(reqFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("buildpacks", []string{})
-	cmd := NewListBuildpacks(fakeUI, buildpackRepo)
+	cmd := buildpack.NewListBuildpacks(fakeUI, buildpackRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

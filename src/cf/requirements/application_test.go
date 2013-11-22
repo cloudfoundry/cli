@@ -9,7 +9,9 @@ import (
 )
 
 func TestApplicationReqExecute(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	ui := new(testterm.FakeUI)
 

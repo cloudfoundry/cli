@@ -15,7 +15,9 @@ import (
 )
 
 func TestStopCommandFailsWithUsage(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 
@@ -27,7 +29,9 @@ func TestStopCommandFailsWithUsage(t *testing.T) {
 }
 
 func TestStopApplication(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	args := []string{"my-app"}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
@@ -41,11 +45,13 @@ func TestStopApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StopAppToStop.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StopAppGuid, "my-app-guid")
 }
 
 func TestStopApplicationWhenStopFails(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app, StopAppErr: true}
 	args := []string{"my-app"}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
@@ -54,11 +60,14 @@ func TestStopApplicationWhenStopFails(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
 	assert.Contains(t, ui.Outputs[2], "Error stopping application")
-	assert.Equal(t, appRepo.StopAppToStop.Guid, "my-app-guid")
+	assert.Equal(t, appRepo.StopAppGuid, "my-app-guid")
 }
 
 func TestStopApplicationIsAlreadyStopped(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "stopped"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	app.State = "stopped"
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 	args := []string{"my-app"}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
@@ -66,12 +75,18 @@ func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "is already stopped")
-	assert.Equal(t, appRepo.StopAppToStop.Guid, "")
+	assert.Equal(t, appRepo.StopAppGuid, "")
 }
 
 func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
-	appToStop := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "started"}
-	expectedStoppedApp := cf.Application{Name: "my-stopped-app", Guid: "my-stopped-app-guid", State: "stopped"}
+	appToStop := cf.Application{}
+	appToStop.Name = "my-app"
+	appToStop.Guid = "my-app-guid"
+	appToStop.State = "started"
+	expectedStoppedApp := cf.Application{}
+	expectedStoppedApp.Name = "my-stopped-app"
+	expectedStoppedApp.Guid = "my-stopped-app-guid"
+	expectedStoppedApp.State = "stopped"
 
 	appRepo := &testapi.FakeApplicationRepository{StopUpdatedApp: expectedStoppedApp}
 	config := &configuration.Configuration{}
@@ -83,7 +98,10 @@ func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
 }
 
 func TestApplicationStopReturnsUpdatedAppWhenAppIsAlreadyStopped(t *testing.T) {
-	appToStop := cf.Application{Name: "my-app", Guid: "my-app-guid", State: "stopped"}
+	appToStop := cf.Application{}
+	appToStop.Name = "my-app"
+	appToStop.Guid = "my-app-guid"
+	appToStop.State = "stopped"
 	appRepo := &testapi.FakeApplicationRepository{}
 	config := &configuration.Configuration{}
 	stopper := NewStop(new(testterm.FakeUI), config, appRepo)
@@ -101,11 +119,14 @@ func callStop(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, a
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewStop(ui, config, appRepo)

@@ -14,35 +14,42 @@ import (
 )
 
 func TestMarketplaceServices(t *testing.T) {
-	serviceOfferings := []cf.ServiceOffering{
-		cf.ServiceOffering{
-			Label:       "my-service-offering-1",
-			Description: "service offering 1 description",
-			Plans: []cf.ServicePlan{
-				cf.ServicePlan{Name: "service-plan-a"},
-				cf.ServicePlan{Name: "service-plan-b"},
-			},
-		},
-		cf.ServiceOffering{
-			Label:       "my-service-offering-2",
-			Description: "service offering 2 description",
-			Plans: []cf.ServicePlan{
-				cf.ServicePlan{Name: "service-plan-c"},
-				cf.ServicePlan{Name: "service-plan-d"},
-			},
-		},
-	}
+	plan := cf.ServicePlanFields{}
+	plan.Name = "service-plan-a"
+	plan2 := cf.ServicePlanFields{}
+	plan2.Name = "service-plan-b"
+	plan3 := cf.ServicePlanFields{}
+	plan3.Name = "service-plan-c"
+	plan4 := cf.ServicePlanFields{}
+	plan4.Name = "service-plan-d"
+
+	offering := cf.ServiceOffering{}
+	offering.Label = "my-service-offering-1"
+	offering.Description = "service offering 1 description"
+	offering.Plans = []cf.ServicePlanFields{plan, plan2}
+
+	offering2 := cf.ServiceOffering{}
+	offering2.Label = "my-service-offering-2"
+	offering2.Description = "service offering 2 description"
+	offering2.Plans = []cf.ServicePlanFields{plan3, plan4}
+
+	serviceOfferings := []cf.ServiceOffering{offering, offering2}
 	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space", Guid: "my-space-guid"},
-		Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	ui := callMarketplaceServices(t, config, serviceRepo)

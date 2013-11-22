@@ -121,42 +121,15 @@ func TestRoutesListRoutes(t *testing.T) {
 	defer close(stopChan)
 	routesChan, statusChan := repo.ListRoutes(stopChan)
 
-	expectedRoutes := []cf.Route{
-		{
-			Guid: "route-1-guid",
-			Host: "route-1-host",
-			Domain: cf.Domain{
-				Name: "cfapps.io",
-				Guid: "domain-1-guid",
-			},
-			Space: cf.Space{
-				Name: "space-1",
-				Guid: "space-1-guid",
-			},
-			AppNames: []string{"app-1"},
-		},
-		{
-			Guid: "route-2-guid",
-			Host: "route-2-host",
-			Domain: cf.Domain{
-				Name: "example.com",
-				Guid: "domain-2-guid",
-			},
-			Space: cf.Space{
-				Name: "space-2",
-				Guid: "space-2-guid",
-			},
-			AppNames: []string{"app-2", "app-3"},
-		},
-	}
-
 	routes := []cf.Route{}
 	for chunk := range routesChan {
 		routes = append(routes, chunk...)
 	}
 	apiResponse := <-statusChan
 
-	assert.Equal(t, routes, expectedRoutes)
+	assert.Equal(t, len(routes), 2)
+	assert.Equal(t, routes[0].Guid, "route-1-guid")
+	assert.Equal(t, routes[1].Guid, "route-2-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
@@ -239,7 +212,10 @@ func TestFindByHostAndDomain(t *testing.T) {
 	ts, handler, repo, domainRepo := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
+	domain := cf.Domain{}
+	domain.Guid = "my-domain-guid"
+	domainRepo.FindByNameDomain = domain
+
 	route, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -247,7 +223,7 @@ func TestFindByHostAndDomain(t *testing.T) {
 	assert.Equal(t, domainRepo.FindByNameName, "my-domain.com")
 	assert.Equal(t, route.Host, "my-cool-app")
 	assert.Equal(t, route.Guid, "my-route-guid")
-	assert.Equal(t, route.Domain, domainRepo.FindByNameDomain)
+	assert.Equal(t, route.Domain.Guid, domain.Guid)
 }
 
 func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
@@ -260,7 +236,10 @@ func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
 	ts, handler, repo, domainRepo := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	domainRepo.FindByNameDomain = cf.Domain{Guid: "my-domain-guid"}
+	domain := cf.Domain{}
+	domain.Guid = "my-domain-guid"
+	domainRepo.FindByNameDomain = domain
+
 	_, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
 	assert.True(t, handler.AllRequestsCalled())
@@ -283,15 +262,11 @@ func TestCreateInSpace(t *testing.T) {
 	ts, handler, repo, _ := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	domain := cf.Domain{Guid: "my-domain-guid"}
-	newRoute := cf.Route{Host: "my-cool-app"}
-	space := cf.Space{Guid: "my-space-guid"}
+	createdRoute, apiResponse := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
 
-	createdRoute, apiResponse := repo.CreateInSpace(newRoute, domain, space)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-
-	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domain})
+	assert.Equal(t, createdRoute.Guid, "my-route-guid")
 }
 
 func TestCreateRoute(t *testing.T) {
@@ -309,14 +284,11 @@ func TestCreateRoute(t *testing.T) {
 	ts, handler, repo, _ := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	domain := cf.Domain{Guid: "my-domain-guid"}
-	newRoute := cf.Route{Host: "my-cool-app"}
-
-	createdRoute, apiResponse := repo.Create(newRoute, domain)
+	createdRoute, apiResponse := repo.Create("my-cool-app", "my-domain-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 
-	assert.Equal(t, createdRoute, cf.Route{Host: "my-cool-app", Guid: "my-route-guid", Domain: domain})
+	assert.Equal(t, createdRoute.Guid, "my-route-guid")
 }
 
 func TestBind(t *testing.T) {
@@ -329,10 +301,7 @@ func TestBind(t *testing.T) {
 	ts, handler, repo, _ := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	route := cf.Route{Guid: "my-cool-route-guid"}
-	app := cf.Application{Guid: "my-cool-app-guid"}
-
-	apiResponse := repo.Bind(route, app)
+	apiResponse := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -347,10 +316,7 @@ func TestUnbind(t *testing.T) {
 	ts, handler, repo, _ := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	route := cf.Route{Guid: "my-cool-route-guid"}
-	app := cf.Application{Guid: "my-cool-app-guid"}
-
-	apiResponse := repo.Unbind(route, app)
+	apiResponse := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -365,20 +331,19 @@ func TestDelete(t *testing.T) {
 	ts, handler, repo, _ := createRoutesRepo(t, request)
 	defer ts.Close()
 
-	route := cf.Route{Guid: "my-cool-route-guid"}
-
-	apiResponse := repo.Delete(route)
+	apiResponse := repo.Delete("my-cool-route-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func createRoutesRepo(t *testing.T, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo CloudControllerRouteRepository, domainRepo *testapi.FakeDomainRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-
+	space := cf.SpaceFields{}
+	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
-		Space:       cf.Space{Guid: "my-space-guid"},
+		SpaceFields: space,
 	}
 
 	gateway := net.NewCloudControllerGateway()

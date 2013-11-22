@@ -2,7 +2,7 @@ package organization_test
 
 import (
 	"cf"
-	. "cf/commands/organization"
+	"cf/commands/organization"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -26,8 +26,11 @@ func TestListQuotasRequirements(t *testing.T) {
 }
 
 func TestListQuotas(t *testing.T) {
-	quotas := []cf.Quota{{Name: "quota-name", MemoryLimit: 1024}}
-	quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: quotas}
+	quota := cf.QuotaFields{}
+	quota.Name = "quota-name"
+	quota.MemoryLimit = 1024
+
+	quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []cf.QuotaFields{quota}}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	ui := callListQuotas(t, reqFactory, quotaRepo)
 
@@ -49,13 +52,19 @@ func callListQuotas(t *testing.T, reqFactory *testreq.FakeReqFactory, quotaRepo 
 	})
 	assert.NoError(t, err)
 
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
-	cmd := NewListQuotas(fakeUI, config, quotaRepo)
+	cmd := organization.NewListQuotas(fakeUI, config, quotaRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

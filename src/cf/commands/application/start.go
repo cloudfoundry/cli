@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -17,23 +18,26 @@ import (
 const MaxInstanceStartupPings = 60
 
 type Start struct {
-	ui        terminal.UI
-	config    *configuration.Configuration
-	appRepo   api.ApplicationRepository
-	logRepo   api.LogsRepository
-	startTime time.Time
-	appReq    requirements.ApplicationRequirement
+	ui               terminal.UI
+	config           *configuration.Configuration
+	appRepo          api.ApplicationRepository
+	appInstancesRepo api.AppInstancesRepository
+	logRepo          api.LogsRepository
+	startTime        time.Time
+	appReq           requirements.ApplicationRequirement
 }
 
 type ApplicationStarter interface {
-	ApplicationStart(cf.Application) (startedApp cf.Application, err error)
+	ApplicationStart(app cf.Application) (updatedApp cf.Application, err error)
+	ApplicationStartWithBuildpack(app cf.Application, buildpackUrl string) (startedApp cf.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository, logRepo api.LogsRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appRepo = appRepo
+	cmd.appInstancesRepo = appInstancesRepo
 	cmd.logRepo = logRepo
 
 	return
@@ -57,6 +61,14 @@ func (cmd *Start) Run(c *cli.Context) {
 }
 
 func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
+	return cmd.applicationStartWithOptions(app, "")
+}
+
+func (cmd *Start) ApplicationStartWithBuildpack(app cf.Application, buildpackUrl string) (updatedApp cf.Application, err error) {
+	return cmd.applicationStartWithOptions(app, buildpackUrl)
+}
+
+func (cmd *Start) applicationStartWithOptions(app cf.Application, buildpackUrl string) (updatedApp cf.Application, err error) {
 	if app.State == "started" {
 		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already started"))
 		return
@@ -64,12 +76,18 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	updatedApp, apiResponse := cmd.appRepo.Start(app)
+	var apiResponse net.ApiResponse
+	if buildpackUrl == "" {
+		updatedApp, apiResponse = cmd.appRepo.Start(app.Guid)
+	} else {
+		updatedApp, apiResponse = cmd.appRepo.StartWithDifferentBuildpack(app.Guid, buildpackUrl)
+	}
+
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -87,9 +105,10 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	cmd.ui.Say("")
 
 	cmd.startTime = time.Now()
+
 	for cmd.displayInstancesStatus(app, instances) {
 		cmd.ui.Wait(1 * time.Second)
-		instances, _ = cmd.appRepo.GetInstances(updatedApp)
+		instances, _ = cmd.appInstancesRepo.GetInstances(updatedApp.Guid)
 	}
 
 	return
@@ -105,7 +124,7 @@ func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 			cmd.ui.Say("\n%s", terminal.HeaderColor("Staging..."))
 		}
 
-		err := cmd.logRepo.TailLogsFor(app, onConnect, logChan, stopChan, 1)
+		err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, logChan, stopChan, 1)
 		if err != nil {
 			cmd.ui.Warn("Warning: error tailing logs")
 			cmd.ui.Say("%s", err)
@@ -121,22 +140,22 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 	}
 }
 
-func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.ApplicationInstance {
-	instances, apiResponse := cmd.appRepo.GetInstances(app)
+func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.AppInstanceFields {
+	instances, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
 	for count := 0; apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings; count++ {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiResponse.Message)
-			return []cf.ApplicationInstance{}
+			return []cf.AppInstanceFields{}
 		}
 
 		cmd.ui.Wait(1 * time.Second)
-		instances, apiResponse = cmd.appRepo.GetInstances(app)
+		instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
 	}
 	return instances
 }
 
-func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.ApplicationInstance) (notFinished bool) {
+func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.AppInstanceFields) (notFinished bool) {
 	totalCount := len(instances)
 	runningCount, startingCount, flappingCount, downCount := 0, 0, 0, 0
 

@@ -52,7 +52,7 @@ func TestDeleteUserWhenConfirmingWithY(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
-	assert.Equal(t, userRepo.DeleteUser.Guid, "my-found-user-guid")
+	assert.Equal(t, userRepo.DeleteUserGuid, "my-found-user-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -68,7 +68,7 @@ func TestDeleteUserWhenConfirmingWithYes(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
-	assert.Equal(t, userRepo.DeleteUser.Guid, "my-found-user-guid")
+	assert.Equal(t, userRepo.DeleteUserGuid, "my-found-user-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -80,12 +80,13 @@ func TestDeleteUserWhenNotConfirming(t *testing.T) {
 	assert.Contains(t, ui.Prompts[0], "Really delete")
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "")
-	assert.Equal(t, userRepo.DeleteUser.Guid, "")
+	assert.Equal(t, userRepo.DeleteUserGuid, "")
 }
 
 func TestDeleteUserWithForceOption(t *testing.T) {
-	foundUser := cf.User{Guid: "my-found-user-guid"}
-	userRepo := &testapi.FakeUserRepository{FindByUsernameUser: foundUser}
+	foundUserFields := cf.UserFields{}
+	foundUserFields.Guid = "my-found-user-guid"
+	userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: foundUserFields}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 	ui := callDeleteUser(t, []string{"-f", "my-user"}, userRepo, reqFactory)
@@ -96,7 +97,7 @@ func TestDeleteUserWithForceOption(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
-	assert.Equal(t, userRepo.DeleteUser.Guid, "my-found-user-guid")
+	assert.Equal(t, userRepo.DeleteUserGuid, "my-found-user-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -113,7 +114,7 @@ func TestDeleteUserWhenUserNotFound(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
-	assert.Equal(t, userRepo.DeleteUser.Guid, "")
+	assert.Equal(t, userRepo.DeleteUserGuid, "")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 	assert.Contains(t, ui.Outputs[2], "does not exist")
@@ -126,11 +127,14 @@ func callDeleteUser(t *testing.T, args []string, userRepo *testapi.FakeUserRepos
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewDeleteUser(ui, config, userRepo)
@@ -143,20 +147,25 @@ func deleteWithConfirmation(t *testing.T, confirmation string) (ui *testterm.Fak
 	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
-
+	user2 := cf.UserFields{}
+	user2.Username = "my-found-user"
+	user2.Guid = "my-found-user-guid"
 	userRepo = &testapi.FakeUserRepository{
-		FindByUsernameUser: cf.User{Username: "my-found-user", Guid: "my-found-user-guid"},
+		FindByUsernameUserFields: user2,
 	}
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-
+	org2 := cf.OrganizationFields{}
+	org2.Name = "my-org"
+	space2 := cf.SpaceFields{}
+	space2.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space2,
+		OrganizationFields: org2,
+		AccessToken:        token,
 	}
 
 	cmd := NewDeleteUser(ui, config, userRepo)

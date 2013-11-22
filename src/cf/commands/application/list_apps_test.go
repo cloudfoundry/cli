@@ -14,16 +14,50 @@ import (
 )
 
 func TestApps(t *testing.T) {
-	app1Routes := []cf.Route{
-		{Host: "app1", Domain: cf.Domain{Name: "cfapps.io"}},
-		{Host: "app1", Domain: cf.Domain{Name: "example.com"}},
-	}
-	app2Routes := []cf.Route{{Host: "app2", Domain: cf.Domain{Name: "cfapps.io"}}}
+	domain := cf.DomainFields{}
+	domain.Name = "cfapps.io"
+	domain2 := cf.DomainFields{}
+	domain2.Name = "example.com"
 
-	apps := []cf.Application{
-		cf.Application{Name: "Application-1", State: "started", RunningInstances: 1, Instances: 1, Memory: 512, DiskQuota: 1024, Routes: app1Routes},
-		cf.Application{Name: "Application-2", State: "started", RunningInstances: 1, Instances: 2, Memory: 256, DiskQuota: 1024, Routes: app2Routes},
-	}
+	route1 := cf.RouteSummary{}
+	route1.Host = "app1"
+	route1.Domain = domain
+
+	route2 := cf.RouteSummary{}
+	route2.Host = "app1"
+	route2.Domain = domain2
+
+	app1Routes := []cf.RouteSummary{route1, route2}
+
+	domain3 := cf.DomainFields{}
+	domain3.Name = "cfapps.io"
+
+	route3 := cf.RouteSummary{}
+	route3.Host = "app2"
+	route3.Domain = domain3
+
+	app2Routes := []cf.RouteSummary{route3}
+
+	app := cf.AppSummary{}
+	app.Name = "Application-1"
+	app.State = "started"
+	app.RunningInstances = 1
+	app.InstanceCount = 1
+	app.Memory = 512
+	app.DiskQuota = 1024
+	app.RouteSummaries = app1Routes
+
+	app2 := cf.AppSummary{}
+	app2.Name = "Application-2"
+	app2.State = "started"
+	app2.RunningInstances = 1
+	app2.InstanceCount = 2
+	app2.Memory = 256
+	app2.DiskQuota = 1024
+	app2.RouteSummaries = app2Routes
+
+	apps := []cf.AppSummary{app, app2}
+
 	appSummaryRepo := &testapi.FakeAppSummaryRepo{
 		GetSummariesInCurrentSpaceApps: apps,
 	}
@@ -80,10 +114,14 @@ func callApps(t *testing.T, appSummaryRepo *testapi.FakeAppSummaryRepo, reqFacto
 	})
 	assert.NoError(t, err)
 
+	space := cf.SpaceFields{}
+	space.Name = "development"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "development"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	ctxt := testcmd.NewContext("apps", []string{})

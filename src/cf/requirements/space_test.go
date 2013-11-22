@@ -9,7 +9,9 @@ import (
 )
 
 func TestSpaceReqExecute(t *testing.T) {
-	space := cf.Space{Name: "my-space", Guid: "my-space-guid"}
+	space := cf.Space{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
 	ui := new(testterm.FakeUI)
 

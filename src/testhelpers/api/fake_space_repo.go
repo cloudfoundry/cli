@@ -16,7 +16,7 @@ type FakeSpaceRepository struct {
 	FindByNameNotFound bool
 
 	FindByNameInOrgName string
-	FindByNameInOrgOrg cf.Organization
+	FindByNameInOrgOrgGuid string
 	FindByNameInOrgSpace cf.Space
 
 	SummarySpace cf.Space
@@ -24,10 +24,10 @@ type FakeSpaceRepository struct {
 	CreateSpaceName string
 	CreateSpaceExists bool
 
-	RenameSpace cf.Space
+	RenameSpaceGuid string
 	RenameNewName string
 
-	DeletedSpace cf.Space
+	DeletedSpaceGuid string
 }
 
 func (repo FakeSpaceRepository) GetCurrentSpace() (space cf.Space) {
@@ -78,9 +78,9 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiRes
 	return
 }
 
-func (repo *FakeSpaceRepository) FindByNameInOrg(name string, org cf.Organization) (space cf.Space, apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
 	repo.FindByNameInOrgName = name
-	repo.FindByNameInOrgOrg = org
+	repo.FindByNameInOrgOrgGuid = orgGuid
 	space = repo.FindByNameInOrgSpace
 	return
 }
@@ -99,13 +99,13 @@ func (repo *FakeSpaceRepository) Create(name string) (apiResponse net.ApiRespons
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(space cf.Space, newName string) (apiResponse net.ApiResponse) {
-	repo.RenameSpace = space
+func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiResponse net.ApiResponse) {
+	repo.RenameSpaceGuid = spaceGuid
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(space cf.Space) (apiResponse net.ApiResponse) {
-	repo.DeletedSpace = space
+func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiResponse net.ApiResponse) {
+	repo.DeletedSpaceGuid = spaceGuid
 	return
 }

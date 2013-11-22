@@ -7,18 +7,18 @@ import (
 )
 
 type FakeServiceBindingRepo struct {
-	CreateServiceInstance cf.ServiceInstance
-	CreateApplication cf.Application
+	CreateServiceInstanceGuid string
+	CreateApplicationGuid string
 	CreateErrorCode string
 
 	DeleteServiceInstance cf.ServiceInstance
-	DeleteApplication cf.Application
+	DeleteApplicationGuid string
 	DeleteBindingNotFound bool
 }
 
-func (repo *FakeServiceBindingRepo) Create(instance cf.ServiceInstance, app cf.Application) (apiResponse net.ApiResponse) {
-	repo.CreateServiceInstance = instance
-	repo.CreateApplication = app
+func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiResponse net.ApiResponse) {
+	repo.CreateServiceInstanceGuid = instanceGuid
+	repo.CreateApplicationGuid = appGuid
 
 	if repo.CreateErrorCode != "" {
 		apiResponse = net.NewApiResponse("Error binding service", repo.CreateErrorCode, http.StatusBadRequest)
@@ -27,9 +27,9 @@ func (repo *FakeServiceBindingRepo) Create(instance cf.ServiceInstance, app cf.A
 	return
 }
 
-func (repo *FakeServiceBindingRepo) Delete(instance cf.ServiceInstance, app cf.Application) (found bool, apiResponse net.ApiResponse) {
+func (repo *FakeServiceBindingRepo) Delete(instance cf.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse) {
 	repo.DeleteServiceInstance = instance
-	repo.DeleteApplication = app
+	repo.DeleteApplicationGuid = appGuid
 	found = !repo.DeleteBindingNotFound
 	return
 }

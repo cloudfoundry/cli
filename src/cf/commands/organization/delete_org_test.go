@@ -14,21 +14,25 @@ import (
 )
 
 func TestDeleteOrgConfirmingWithY(t *testing.T) {
-	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
+	org := cf.Organization{}
+	org.Name = "org-to-delete"
+	org.Guid = "org-to-delete-guid"
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
-	ui := deleteOrg(t, "y", []string{"org-to-delete"}, orgRepo)
+	ui := deleteOrg(t, "y", []string{org.Name}, orgRepo)
 
 	assert.Contains(t, ui.Prompts[0], "Really delete")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
-	assert.Equal(t, orgRepo.DeletedOrganization, orgRepo.FindByNameOrganization)
+	assert.Equal(t, orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteOrgConfirmingWithYes(t *testing.T) {
-	org := cf.Organization{Name: "org-to-delete", Guid: "org-to-delete-guid"}
+	org := cf.Organization{}
+	org.Name = "org-to-delete"
+	org.Guid = "org-to-delete-guid"
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
 	ui := deleteOrg(t, "Yes", []string{"org-to-delete"}, orgRepo)
@@ -39,36 +43,52 @@ func TestDeleteOrgConfirmingWithYes(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "org-to-delete")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
-	assert.Equal(t, orgRepo.DeletedOrganization, orgRepo.FindByNameOrganization)
+	assert.Equal(t, orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteTargetedOrganizationClearsConfig(t *testing.T) {
 	configRepo := &testconfig.FakeConfigRepository{}
 	config, _ := configRepo.Get()
-	config.Organization = cf.Organization{Name: "org-to-delete", Guid: "org-to-delete-guid"}
-	config.Space = cf.Space{Name: "space-to-delete"}
+
+	organizationFields := cf.OrganizationFields{}
+	organizationFields.Name = "org-to-delete"
+	organizationFields.Guid = "org-to-delete-guid"
+	config.OrganizationFields = organizationFields
+
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "space-to-delete"
+	config.SpaceFields = spaceFields
 	configRepo.Save()
 
-	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
+	org := cf.Organization{}
+	org.OrganizationFields = organizationFields
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 	deleteOrg(t, "Yes", []string{"org-to-delete"}, orgRepo)
 
 	updatedConfig, err := configRepo.Get()
 	assert.NoError(t, err)
 
-	assert.Equal(t, updatedConfig.Organization, cf.Organization{})
-	assert.Equal(t, updatedConfig.Space, cf.Space{})
+	assert.Equal(t, updatedConfig.OrganizationFields, cf.OrganizationFields{})
+	assert.Equal(t, updatedConfig.SpaceFields, cf.SpaceFields{})
 }
 
 func TestDeleteUntargetedOrganizationDoesNotClearConfig(t *testing.T) {
-	org := cf.Organization{Name: "org-to-dellete", Guid: "org-to-delete-guid"}
+	org := cf.Organization{}
+	org.Name = "org-to-delete"
+	org.Guid = "org-to-delete-guid"
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
 	configRepo := &testconfig.FakeConfigRepository{}
 	config, _ := configRepo.Get()
-	config.Organization = cf.Organization{Name: "some-other-org", Guid: "some-other-org-guid"}
-	config.Space = cf.Space{Name: "some-other-space"}
+	otherOrgFields := cf.OrganizationFields{}
+	otherOrgFields.Guid = "some-other-org-guid"
+	otherOrgFields.Name = "some-other-org"
+	config.OrganizationFields = otherOrgFields
+
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "some-other-space"
+	config.SpaceFields = spaceFields
 	configRepo.Save()
 
 	deleteOrg(t, "Yes", []string{"org-to-delete"}, orgRepo)
@@ -76,12 +96,14 @@ func TestDeleteUntargetedOrganizationDoesNotClearConfig(t *testing.T) {
 	updatedConfig, err := configRepo.Get()
 	assert.NoError(t, err)
 
-	assert.Equal(t, updatedConfig.Organization.Name, "some-other-org")
-	assert.Equal(t, updatedConfig.Space.Name, "some-other-space")
+	assert.Equal(t, updatedConfig.OrganizationFields.Name, "some-other-org")
+	assert.Equal(t, updatedConfig.SpaceFields.Name, "some-other-space")
 }
 
 func TestDeleteOrgWithForceOption(t *testing.T) {
-	org := cf.Organization{Name: "org-to-delete", Guid: "org-to-delete-guid"}
+	org := cf.Organization{}
+	org.Name = "org-to-delete"
+	org.Guid = "org-to-delete-guid"
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 
 	ui := deleteOrg(t, "Yes", []string{"-f", "org-to-delete"}, orgRepo)
@@ -90,7 +112,7 @@ func TestDeleteOrgWithForceOption(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Contains(t, ui.Outputs[0], "org-to-delete")
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
-	assert.Equal(t, orgRepo.DeletedOrganization, orgRepo.FindByNameOrganization)
+	assert.Equal(t, orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
@@ -130,10 +152,15 @@ func deleteOrg(t *testing.T, confirmation string, args []string, orgRepo *testap
 	})
 	assert.NoError(t, err)
 
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
 	cmd := NewDeleteOrg(ui, config, orgRepo, configRepo)

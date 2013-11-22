@@ -17,7 +17,7 @@ func TestDeleteConfirmingWithY(t *testing.T) {
 	ui, _, appRepo := deleteApp(t, "y", []string{"app-to-delete"})
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
-	assert.Equal(t, appRepo.DeletedApp.Name, "app-to-delete")
+	assert.Equal(t, appRepo.DeletedAppGuid, "app-to-delete-guid")
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Prompts[0], "Really delete")
 	assert.Contains(t, ui.Outputs[0], "Deleting")
@@ -32,7 +32,7 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 	ui, _, appRepo := deleteApp(t, "Yes", []string{"app-to-delete"})
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
-	assert.Equal(t, appRepo.DeletedApp.Name, "app-to-delete")
+	assert.Equal(t, appRepo.DeletedAppGuid, "app-to-delete-guid")
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Prompts[0], "Really delete")
 	assert.Contains(t, ui.Outputs[0], "Deleting")
@@ -44,7 +44,10 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 }
 
 func TestDeleteWithForceOption(t *testing.T) {
-	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
+	app := cf.Application{}
+	app.Name = "app-to-delete"
+	app.Guid = "app-to-delete-guid"
+
 	reqFactory := &testreq.FakeReqFactory{}
 	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
 
@@ -55,7 +58,7 @@ func TestDeleteWithForceOption(t *testing.T) {
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
-	assert.Equal(t, appRepo.DeletedApp, app)
+	assert.Equal(t, appRepo.DeletedAppGuid, "app-to-delete-guid")
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Contains(t, ui.Outputs[0], "Deleting")
@@ -74,7 +77,7 @@ func TestDeleteAppThatDoesNotExist(t *testing.T) {
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	assert.Equal(t, appRepo.FindByNameName, "app-to-delete")
-	assert.Equal(t, appRepo.DeletedApp.Name, "")
+	assert.Equal(t, appRepo.DeletedAppGuid, "")
 	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Contains(t, ui.Outputs[0], "app-to-delete")
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -91,7 +94,11 @@ func TestDeleteCommandFailsWithUsage(t *testing.T) {
 }
 
 func deleteApp(t *testing.T, confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) {
-	app := cf.Application{Name: "app-to-delete", Guid: "app-to-delete-guid"}
+
+	app := cf.Application{}
+	app.Name = "app-to-delete"
+	app.Guid = "app-to-delete-guid"
+
 	reqFactory = &testreq.FakeReqFactory{}
 	appRepo = &testapi.FakeApplicationRepository{FindByNameApp: app}
 	ui = &testterm.FakeUI{
@@ -103,10 +110,14 @@ func deleteApp(t *testing.T, confirmation string, args []string) (ui *testterm.F
 	})
 	assert.NoError(t, err)
 
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	ctxt := testcmd.NewContext("delete", args)

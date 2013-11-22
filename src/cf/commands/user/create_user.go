@@ -10,20 +10,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type CreateUser struct {
+type CreateUserFields struct {
 	ui       terminal.UI
 	config   *configuration.Configuration
 	userRepo api.UserRepository
 }
 
-func NewCreateUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd CreateUser) {
+func NewCreateUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd CreateUserFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
 
-func (cmd CreateUser) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd CreateUserFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "create-user")
@@ -34,7 +34,7 @@ func (cmd CreateUser) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 	return
 }
 
-func (cmd CreateUser) Run(c *cli.Context) {
+func (cmd CreateUserFields) Run(c *cli.Context) {
 	username := c.Args()[0]
 	password := c.Args()[1]
 
@@ -43,11 +43,7 @@ func (cmd CreateUser) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	user := cf.User{
-		Username: username,
-		Password: password,
-	}
-	apiResponse := cmd.userRepo.Create(user)
+	apiResponse := cmd.userRepo.Create(username, password)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error creating user %s.\n%s", terminal.EntityNameColor(username), apiResponse.Message)
 		return

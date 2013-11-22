@@ -33,8 +33,8 @@ func (cmd ListApps) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Say("Getting apps in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -52,18 +52,18 @@ func (cmd ListApps) Run(c *cli.Context) {
 		[]string{"name", "state", "instances", "memory", "disk", "urls"},
 	}
 
-	for _, app := range apps {
+	for _, appSummary := range apps {
 		var urls []string
-		for _, route := range app.Routes {
+		for _, route := range appSummary.RouteSummaries {
 			urls = append(urls, route.URL())
 		}
 
 		table = append(table, []string{
-			app.Name,
-			coloredAppState(app),
-			coloredAppInstaces(app),
-			formatters.ByteSize(app.Memory * formatters.MEGABYTE),
-			formatters.ByteSize(app.DiskQuota * formatters.MEGABYTE),
+			appSummary.Name,
+			coloredAppState(appSummary.ApplicationFields),
+			coloredAppInstaces(appSummary.ApplicationFields),
+			formatters.ByteSize(appSummary.Memory * formatters.MEGABYTE),
+			formatters.ByteSize(appSummary.DiskQuota * formatters.MEGABYTE),
 			strings.Join(urls, ", "),
 		})
 	}

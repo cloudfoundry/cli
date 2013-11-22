@@ -52,12 +52,12 @@ func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application,
 
 	cmd.ui.Say("Stopping app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	updatedApp, apiResponse := cmd.appRepo.Stop(app)
+	updatedApp, apiResponse := cmd.appRepo.Stop(app.Guid)
 	if apiResponse.IsNotSuccessful() {
 		err = errors.New(apiResponse.Message)
 		cmd.ui.Failed(apiResponse.Message)

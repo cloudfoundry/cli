@@ -1,7 +1,6 @@
 package service
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -37,6 +36,7 @@ func (cmd CreateUserProvidedService) GetRequirements(reqFactory requirements.Fac
 
 func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 	name := c.Args()[0]
+	drainUrl := c.String("l")
 
 	params := c.String("p")
 	params = strings.Trim(params, `"`)
@@ -49,18 +49,12 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating user provided service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	serviceInstance := cf.ServiceInstance{
-		Name:           name,
-		Params:         paramsMap,
-		SysLogDrainUrl: c.String("l"),
-	}
-
-	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(serviceInstance)
+	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, paramsMap)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

@@ -2,7 +2,7 @@ package domain_test
 
 import (
 	"cf"
-	. "cf/commands/domain"
+	"cf/commands/domain"
 	"cf/configuration"
 	"cf/net"
 	"errors"
@@ -40,8 +40,8 @@ func TestMapDomainSuccess(t *testing.T) {
 	reqFactory, domainRepo := getDomainMapperDeps()
 	ui := callDomainMapper(t, true, []string{"my-space", "foo.com"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.MapDomain.Name, "foo.com")
-	assert.Equal(t, domainRepo.MapSpace.Name, "my-space")
+	assert.Equal(t, domainRepo.MapDomainGuid, "foo-guid")
+	assert.Equal(t, domainRepo.MapSpaceGuid, "my-space-guid")
 	assert.Contains(t, ui.Outputs[0], "Mapping domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
 	assert.Contains(t, ui.Outputs[0], "my-org")
@@ -82,8 +82,8 @@ func TestUnmapDomainSuccess(t *testing.T) {
 	reqFactory, domainRepo := getDomainMapperDeps()
 	ui := callDomainMapper(t, false, []string{"my-space", "foo.com"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.UnmapDomain.Name, "foo.com")
-	assert.Equal(t, domainRepo.UnmapSpace.Name, "my-space")
+	assert.Equal(t, domainRepo.UnmapDomainGuid, "foo-guid")
+	assert.Equal(t, domainRepo.UnmapSpaceGuid, "my-space-guid")
 	assert.Contains(t, ui.Outputs[0], "Unmapping domain")
 	assert.Contains(t, ui.Outputs[0], "foo.com")
 	assert.Contains(t, ui.Outputs[0], "my-org")
@@ -93,15 +93,26 @@ func TestUnmapDomainSuccess(t *testing.T) {
 }
 
 func getDomainMapperDeps() (reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) {
+	domain := cf.Domain{}
+	domain.Name = "foo.com"
+	domain.Guid = "foo-guid"
 	domainRepo = &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: cf.Domain{Name: "foo.com"},
+		FindByNameInOrgDomain: domain,
 	}
+
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
+
+	space := cf.Space{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 
 	reqFactory = &testreq.FakeReqFactory{
 		LoginSuccess:       true,
 		TargetedOrgSuccess: true,
-		Organization:       cf.Organization{Name: "my-org", Guid: "my-org-guid"},
-		Space:              cf.Space{Name: "my-space"},
+		Organization:       org,
+		Space:              space,
 	}
 	return
 }
@@ -120,13 +131,19 @@ func callDomainMapper(t *testing.T, shouldMap bool, args []string, reqFactory *t
 	})
 	assert.NoError(t, err)
 
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
-	cmd := NewDomainMapper(ui, config, domainRepo, shouldMap)
+	cmd := domain.NewDomainMapper(ui, config, domainRepo, shouldMap)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -15,8 +15,12 @@ import (
 )
 
 func TestBindCommand(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "my-service"
+	serviceInstance.Guid = "my-service-guid"
 	reqFactory := &testreq.FakeReqFactory{
 		Application:     app,
 		ServiceInstance: serviceInstance,
@@ -34,8 +38,8 @@ func TestBindCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-space")
 	assert.Contains(t, fakeUI.Outputs[0], "my-user")
 
-	assert.Equal(t, serviceBindingRepo.CreateServiceInstance, serviceInstance)
-	assert.Equal(t, serviceBindingRepo.CreateApplication, app)
+	assert.Equal(t, serviceBindingRepo.CreateServiceInstanceGuid, "my-service-guid")
+	assert.Equal(t, serviceBindingRepo.CreateApplicationGuid, "my-app-guid")
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "TIP")
@@ -43,8 +47,12 @@ func TestBindCommand(t *testing.T) {
 }
 
 func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "my-service"
+	serviceInstance.Guid = "my-service-guid"
 	reqFactory := &testreq.FakeReqFactory{
 		Application:     app,
 		ServiceInstance: serviceInstance,
@@ -82,11 +90,14 @@ func callBindService(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewBindService(fakeUI, config, serviceBindingRepo)

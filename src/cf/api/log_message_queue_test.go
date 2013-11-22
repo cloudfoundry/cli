@@ -49,14 +49,13 @@ func TestNextTimestamp(t *testing.T) {
 	pq.PushMessage(msg1)
 
 	allowedDelta := (20 * time.Microsecond).Nanoseconds()
-	//check that NextTimestamp returns insertion time (+5 seconds) of the message with the earlier timestamp
+
 	timeWhenOutputtable := time.Now().Add(5 * time.Second).UnixNano()
 	assert.True(t, pq.NextTimestamp()-timeWhenOutputtable < allowedDelta)
 	assert.True(t, pq.NextTimestamp()-timeWhenOutputtable > -allowedDelta)
 
 	pq.PopMessage()
 
-	//check that NextTimestamp returns insertion time (+5 seconds) of the last remaining message
 	timeWhenOutputtable = timeNowWhenInsertingMessage1.Add(5 * time.Second).UnixNano()
 	assert.True(t, pq.NextTimestamp()-timeWhenOutputtable < allowedDelta)
 	assert.True(t, pq.NextTimestamp()-timeWhenOutputtable > -allowedDelta)

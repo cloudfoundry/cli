@@ -6,19 +6,23 @@ import (
 )
 
 func TestRouteURL(t *testing.T) {
-	route := Route{
-		Host:   "foo",
-		Domain: Domain{Name: "example.com"},
-	}
+	route := Route{}
+	route.Host = "foo"
+
+	domain := DomainFields{}
+	domain.Name = "example.com"
+	route.Domain = domain
 
 	assert.Equal(t, route.URL(), "foo.example.com")
 }
 
 func TestRouteURLWithoutHost(t *testing.T) {
-	route := Route{
-		Host:   "",
-		Domain: Domain{Name: "example.com"},
-	}
+	route := Route{}
+	route.Host = ""
+
+	domain := DomainFields{}
+	domain.Name = "example.com"
+	route.Domain = domain
 
 	assert.Equal(t, route.URL(), "example.com")
 }

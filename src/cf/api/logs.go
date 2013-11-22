@@ -16,8 +16,8 @@ import (
 const LogBufferSize = 1024
 
 type LogsRepository interface {
-	RecentLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message) (err error)
-	TailLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printInterval time.Duration) (err error)
+	RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error)
+	TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printInterval time.Duration) (err error)
 }
 
 type LoggregatorLogsRepository struct {
@@ -31,28 +31,30 @@ func NewLoggregatorLogsRepository(config *configuration.Configuration, endpointR
 	return
 }
 
-func (repo LoggregatorLogsRepository) RecentLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message) (err error) {
+func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
 	host, apiResponse := repo.endpointRepo.GetEndpoint(cf.LoggregatorEndpointKey)
 	if apiResponse.IsNotSuccessful() {
 		err = errors.New(apiResponse.Message)
 		return
 	}
-	location := host + fmt.Sprintf("/dump/?app=%s", app.Guid)
+
+	location := host + fmt.Sprintf("/dump/?app=%s", appGuid)
 	stopLoggingChan := make(chan bool)
 	defer close(stopLoggingChan)
-	return repo.connectToWebsocket(location, app, onConnect, logChan, stopLoggingChan, 0*time.Nanosecond)
+
+	return repo.connectToWebsocket(location, onConnect, logChan, stopLoggingChan, 0*time.Nanosecond)
 }
 
-func (repo LoggregatorLogsRepository) TailLogsFor(app cf.Application, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) error {
+func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) error {
 	host, apiResponse := repo.endpointRepo.GetEndpoint(cf.LoggregatorEndpointKey)
 	if apiResponse.IsNotSuccessful() {
 		return errors.New(apiResponse.Message)
 	}
-	location := host + fmt.Sprintf("/tail/?app=%s", app.Guid)
-	return repo.connectToWebsocket(location, app, onConnect, logChan, stopLoggingChan, printTimeBuffer)
+	location := host + fmt.Sprintf("/tail/?app=%s", appGuid)
+	return repo.connectToWebsocket(location, onConnect, logChan, stopLoggingChan, printTimeBuffer)
 }
 
-func (repo LoggregatorLogsRepository) connectToWebsocket(location string, app cf.Application, onConnect func(), outputChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) (err error) {
+func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConnect func(), outputChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) (err error) {
 	trace.Logger.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
 
 	config, err := websocket.NewConfig(location, "http://localhost")

@@ -22,8 +22,11 @@ func TestServiceAuthCreate(t *testing.T) {
 
 	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
-
-	apiResponse := repo.Create(cf.ServiceAuthToken{Label: "a label", Provider: "a provider", Token: "a token"})
+	authToken := cf.ServiceAuthTokenFields{}
+	authToken.Label = "a label"
+	authToken.Provider = "a provider"
+	authToken.Token = "a token"
+	apiResponse := repo.Create(authToken)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -97,7 +100,11 @@ func TestServiceAuthFindByLabelAndProvider(t *testing.T) {
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, serviceAuthToken, cf.ServiceAuthToken{Guid: "mysql-core-guid", Label: "mysql", Provider: "mysql-core"})
+	authToken2 := cf.ServiceAuthTokenFields{}
+	authToken2.Guid = "mysql-core-guid"
+	authToken2.Label = "mysql"
+	authToken2.Provider = "mysql-core"
+	assert.Equal(t, serviceAuthToken, authToken2)
 }
 
 func TestServiceAuthFindByLabelAndProviderWhenNotFound(t *testing.T) {
@@ -129,8 +136,10 @@ func TestServiceAuthUpdate(t *testing.T) {
 
 	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
-
-	apiResponse := repo.Update(cf.ServiceAuthToken{Guid: "mysql-core-guid", Token: "a value"})
+	authToken3 := cf.ServiceAuthTokenFields{}
+	authToken3.Guid = "mysql-core-guid"
+	authToken3.Token = "a value"
+	apiResponse := repo.Update(authToken3)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -145,8 +154,9 @@ func TestServiceAuthDelete(t *testing.T) {
 
 	ts, handler, repo := createServiceAuthTokenRepo(t, req)
 	defer ts.Close()
-
-	apiResponse := repo.Delete(cf.ServiceAuthToken{Guid: "mysql-core-guid"})
+	authToken4 := cf.ServiceAuthTokenFields{}
+	authToken4.Guid = "mysql-core-guid"
+	apiResponse := repo.Delete(authToken4)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())

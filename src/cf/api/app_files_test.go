@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/net"
 	"fmt"
@@ -56,8 +55,7 @@ func TestListFiles(t *testing.T) {
 
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerAppFilesRepository(config, gateway)
-
-	list, err := repo.ListFiles(cf.Application{Guid: "my-app-guid"}, "some/path")
+	list, err := repo.ListFiles("my-app-guid", "some/path")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, err.IsNotSuccessful())

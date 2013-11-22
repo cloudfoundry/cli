@@ -36,9 +36,11 @@ func TestEventsSuccess(t *testing.T) {
 	assert.NoError(t, err)
 
 	reqFactory, eventsRepo := getEventsDependencies()
-	reqFactory.Application = cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	reqFactory.Application = app
 
-	eventsRepo.Events = []cf.Event{
+	eventsRepo.Events = []cf.EventFields{
 		{
 			InstanceIndex:   98,
 			Timestamp:       timestamp,
@@ -76,7 +78,9 @@ func TestEventsSuccess(t *testing.T) {
 
 func TestEventsWhenNoEventsAvailable(t *testing.T) {
 	reqFactory, eventsRepo := getEventsDependencies()
-	reqFactory.Application = cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	reqFactory.Application = app
 
 	ui := callEvents(t, []string{"my-app"}, reqFactory, eventsRepo)
 
@@ -100,11 +104,14 @@ func callEvents(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory,
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewEvents(ui, config, eventsRepo)

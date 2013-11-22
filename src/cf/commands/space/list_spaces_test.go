@@ -32,19 +32,25 @@ func TestSpacesRequirements(t *testing.T) {
 }
 
 func TestListingSpaces(t *testing.T) {
+	space := cf.Space{}
+	space.Name = "space1"
+	space2 := cf.Space{}
+	space2.Name = "space2"
+	space3 := cf.Space{}
+	space3.Name = "space3"
 	spaceRepo := &testapi.FakeSpaceRepository{
-		Spaces: []cf.Space{
-			cf.Space{Name: "space1"}, cf.Space{Name: "space2"}, cf.Space{Name: "space3"},
-		},
+		Spaces: []cf.Space{space, space2, space3},
 	}
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
 	})
 
 	assert.NoError(t, err)
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
@@ -66,9 +72,11 @@ func TestListingSpacesWhenNoSpaces(t *testing.T) {
 	})
 
 	assert.NoError(t, err)
+	org2 := cf.OrganizationFields{}
+	org2.Name = "my-org"
 	config := &configuration.Configuration{
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		OrganizationFields: org2,
+		AccessToken:        token,
 	}
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}

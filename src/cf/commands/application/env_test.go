@@ -78,11 +78,14 @@ func callEnv(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (u
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewEnv(ui, config)
@@ -92,6 +95,8 @@ func callEnv(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (u
 }
 
 func getEnvDependencies() (reqFactory *testreq.FakeReqFactory) {
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, Application: cf.Application{Name: "my-app"}}
+	app := cf.Application{}
+	app.Name = "my-app"
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	return
 }

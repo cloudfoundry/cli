@@ -40,12 +40,20 @@ func TestOrgUsersRequirements(t *testing.T) {
 }
 
 func TestOrgUsers(t *testing.T) {
-	org := cf.Organization{Name: "Found Org"}
+	org := cf.Organization{}
+	org.Name = "Found Org"
+	org.Guid = "found-org-guid"
 
 	userRepo := &testapi.FakeUserRepository{}
-	userRepo.FindAllInOrgByRoleUsersByRole = map[string][]cf.User{
-		"MANAGER": []cf.User{cf.User{Username: "user1"}, cf.User{Username: "user2"}},
-		"DEV":     []cf.User{cf.User{Username: "user3"}},
+	user := cf.UserFields{}
+	user.Username = "user1"
+	user2 := cf.UserFields{}
+	user2.Username = "user2"
+	user3 := cf.UserFields{}
+	user3.Username = "user3"
+	userRepo.FindAllInOrgByRoleUsersByRole = map[string][]cf.UserFields{
+		"MANAGER": []cf.UserFields{user, user2},
+		"DEV":     []cf.UserFields{user3},
 	}
 
 	reqFactory := &testreq.FakeReqFactory{
@@ -59,7 +67,7 @@ func TestOrgUsers(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Found Org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, org, userRepo.FindAllInOrgByRoleOrganization)
+	assert.Equal(t, userRepo.FindAllInOrgByRoleOrganizationGuid, "found-org-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 
@@ -78,11 +86,14 @@ func callOrgUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactor
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org3 := cf.OrganizationFields{}
+	org3.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org3,
+		AccessToken:        token,
 	}
 
 	cmd := NewOrgUsers(ui, config, userRepo)

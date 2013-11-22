@@ -9,14 +9,14 @@ import (
 
 type UserRequirement interface {
 	Requirement
-	GetUser() cf.User
+	GetUser() cf.UserFields
 }
 
 type userApiRequirement struct {
 	username string
 	ui       terminal.UI
 	userRepo api.UserRepository
-	user     cf.User
+	user     cf.UserFields
 }
 
 func newUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *userApiRequirement) {
@@ -39,6 +39,6 @@ func (req *userApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *userApiRequirement) GetUser() cf.User {
+func (req *userApiRequirement) GetUser() cf.UserFields {
 	return req.user
 }

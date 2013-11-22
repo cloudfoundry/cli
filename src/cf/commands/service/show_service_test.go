@@ -38,22 +38,24 @@ func TestShowServiceFailsWithUsage(t *testing.T) {
 }
 
 func TestShowServiceOutput(t *testing.T) {
+	offering := cf.ServiceOfferingFields{}
+	offering.Label = "mysql"
+	offering.DocumentationUrl = "http://documentation.url"
+	offering.Description = "the-description"
+
+	plan := cf.ServicePlanFields{}
+	plan.Guid = "plan-guid"
+	plan.Name = "plan-name"
+
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "service1"
+	serviceInstance.Guid = "service1-guid"
+	serviceInstance.ServicePlan = plan
+	serviceInstance.ServiceOffering = offering
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:         true,
 		TargetedSpaceSuccess: true,
-		ServiceInstance: cf.ServiceInstance{
-			Name: "service1",
-			Guid: "service1-guid",
-			ServicePlan: cf.ServicePlan{
-				Guid: "plan-guid",
-				Name: "plan-name",
-				ServiceOffering: cf.ServiceOffering{
-					Label:            "mysql",
-					DocumentationUrl: "http://documentation.url",
-					Description:      "the-description",
-				},
-			},
-		},
+		ServiceInstance:      serviceInstance,
 	}
 	ui := callShowService([]string{"service1"}, reqFactory)
 
@@ -71,13 +73,13 @@ func TestShowServiceOutput(t *testing.T) {
 }
 
 func TestShowUserProvidedServiceOutput(t *testing.T) {
+	serviceInstance2 := cf.ServiceInstance{}
+	serviceInstance2.Name = "service1"
+	serviceInstance2.Guid = "service1-guid"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess:         true,
 		TargetedSpaceSuccess: true,
-		ServiceInstance: cf.ServiceInstance{
-			Name: "service1",
-			Guid: "service1-guid",
-		},
+		ServiceInstance:      serviceInstance2,
 	}
 	ui := callShowService([]string{"service1"}, reqFactory)
 

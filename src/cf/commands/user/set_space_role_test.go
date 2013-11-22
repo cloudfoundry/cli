@@ -53,15 +53,21 @@ func TestSetSpaceRole(t *testing.T) {
 	reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
 	reqFactory.LoginSuccess = true
-	reqFactory.User = cf.User{Guid: "my-user-guid", Username: "my-user"}
-	reqFactory.Organization = cf.Organization{Guid: "my-org-guid", Name: "my-org"}
 
-	spaceRepo.FindByNameInOrgSpace = cf.Space{Guid: "my-space-guid", Name: "my-space"}
+	reqFactory.UserFields = cf.UserFields{}
+	reqFactory.UserFields.Guid = "my-user-guid"
+	reqFactory.UserFields.Username = "my-user"
+	reqFactory.Organization = cf.Organization{}
+	reqFactory.Organization.Guid = "my-org-guid"
+	reqFactory.Organization.Name = "my-org"
+	spaceRepo.FindByNameInOrgSpace = cf.Space{}
+	spaceRepo.FindByNameInOrgSpace.Guid = "my-space-guid"
+	spaceRepo.FindByNameInOrgSpace.Name = "my-space"
 
 	ui := callSetSpaceRole(t, args, reqFactory, spaceRepo, userRepo)
 
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "some-space")
-	assert.Equal(t, spaceRepo.FindByNameInOrgOrg, reqFactory.Organization)
+	assert.Equal(t, spaceRepo.FindByNameInOrgOrgGuid, "my-org-guid")
 
 	assert.Contains(t, ui.Outputs[0], "Assigning role ")
 	assert.Contains(t, ui.Outputs[0], "some-role")
@@ -70,8 +76,8 @@ func TestSetSpaceRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
-	assert.Equal(t, userRepo.SetSpaceRoleUser, reqFactory.User)
-	assert.Equal(t, userRepo.SetSpaceRoleSpace, spaceRepo.FindByNameInOrgSpace)
+	assert.Equal(t, userRepo.SetSpaceRoleUserGuid, "my-user-guid")
+	assert.Equal(t, userRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
 	assert.Equal(t, userRepo.SetSpaceRoleRole, "some-role")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -92,11 +98,14 @@ func callSetSpaceRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFa
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-
+	space2 := cf.SpaceFields{}
+	space2.Name = "my-space"
+	org2 := cf.OrganizationFields{}
+	org2.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space2,
+		OrganizationFields: org2,
+		AccessToken:        token,
 	}
 
 	cmd := NewSetSpaceRole(ui, config, spaceRepo, userRepo)

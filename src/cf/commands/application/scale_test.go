@@ -45,7 +45,9 @@ func TestScaleFailsWithUsage(t *testing.T) {
 }
 
 func TestScaleAll(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
@@ -59,11 +61,13 @@ func TestScaleAll(t *testing.T) {
 
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
 	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(512))
-	assert.Equal(t, appRepo.ScaledApp.Instances, 5)
+	assert.Equal(t, appRepo.ScaledApp.InstanceCount, 5)
 }
 
 func TestScaleOnlyInstances(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
@@ -72,11 +76,13 @@ func TestScaleOnlyInstances(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
 	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(0))
 	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(0))
-	assert.Equal(t, appRepo.ScaledApp.Instances, 5)
+	assert.Equal(t, appRepo.ScaledApp.InstanceCount, 5)
 }
 
 func TestScaleOnlyMemory(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
 	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
@@ -85,7 +91,7 @@ func TestScaleOnlyMemory(t *testing.T) {
 	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
 	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(0))
 	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(512))
-	assert.Equal(t, appRepo.ScaledApp.Instances, 0)
+	assert.Equal(t, appRepo.ScaledApp.InstanceCount, 0)
 }
 
 func getScaleDependencies() (reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo *testapi.FakeApplicationRepository) {
@@ -103,11 +109,14 @@ func callScale(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, 
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewScale(ui, config, restarter, appRepo)

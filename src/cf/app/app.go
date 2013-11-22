@@ -626,8 +626,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "space",
-			Description: "Show target space's info",
-			Usage:       fmt.Sprintf("%s space", cf.Name()),
+			Description: "Show space info",
+			Usage:       fmt.Sprintf("%s space SPACE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("space", c)
 			},

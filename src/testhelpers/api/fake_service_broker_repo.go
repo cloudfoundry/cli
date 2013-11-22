@@ -6,17 +6,22 @@ import (
 )
 
 type FakeServiceBrokerRepo struct {
-	FindByNameName string
+	FindByNameName          string
 	FindByNameServiceBroker cf.ServiceBroker
-	FindByNameNotFound bool
+	FindByNameNotFound      bool
 
-	CreatedServiceBroker cf.ServiceBroker
-	UpdatedServiceBroker cf.ServiceBroker
-	RenamedServiceBroker cf.ServiceBroker
-	DeletedServiceBroker cf.ServiceBroker
+	CreateName     string
+	CreateUrl      string
+	CreateUsername string
+	CreatePassword string
+
+	UpdatedServiceBroker     cf.ServiceBroker
+	RenamedServiceBrokerGuid string
+	RenamedServiceBrokerName string
+	DeletedServiceBrokerGuid string
 
 	ServiceBrokers []cf.ServiceBroker
-	ListErr bool
+	ListErr        bool
 }
 
 func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
@@ -24,7 +29,7 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.Ser
 	serviceBroker = repo.FindByNameServiceBroker
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Service Broker", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service Broker", name)
 	}
 
 	return
@@ -44,13 +49,13 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBr
 
 	go func() {
 		serviceBrokersCount := len(repo.ServiceBrokers)
-		for i:= 0; i < serviceBrokersCount; i += 2 {
+		for i := 0; i < serviceBrokersCount; i += 2 {
 			select {
 			case <-stop:
 				break
 			default:
 				if serviceBrokersCount - i > 1 {
-					serviceBrokersChan <- repo.ServiceBrokers[i:i+2]
+					serviceBrokersChan <- repo.ServiceBrokers[i:i + 2]
 				} else {
 					serviceBrokersChan <- repo.ServiceBrokers[i:]
 				}
@@ -66,8 +71,11 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBr
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	repo.CreatedServiceBroker = serviceBroker
+func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiResponse net.ApiResponse) {
+	repo.CreateName = name
+	repo.CreateUrl = url
+	repo.CreateUsername = username
+	repo.CreatePassword = password
 	return
 }
 
@@ -76,12 +84,13 @@ func (repo *FakeServiceBrokerRepo) Update(serviceBroker cf.ServiceBroker) (apiRe
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	repo.RenamedServiceBroker = serviceBroker
+func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiResponse net.ApiResponse) {
+	repo.RenamedServiceBrokerGuid = guid
+	repo.RenamedServiceBrokerName = name
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	repo.DeletedServiceBroker = serviceBroker
+func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiResponse net.ApiResponse) {
+	repo.DeletedServiceBrokerGuid = guid
 	return
 }

@@ -99,9 +99,9 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 		return
 	}
 
-	err = cmd.configRepo.SetOrganization(org)
+	err = cmd.configRepo.SetOrganization(org.OrganizationFields)
 	if err != nil {
-		cmd.ui.Failed("Error setting org in config file.\n%s", apiResponse.Message)
+		cmd.ui.Failed("Error setting org in config file.\n%s", err)
 		return
 	}
 	return
@@ -125,8 +125,11 @@ func (cmd Target) setSpace(spaceName string) (err error) {
 		return
 	}
 
-	cmd.config.Space = space
-	cmd.saveConfig()
+	err = cmd.configRepo.SetSpace(space.SpaceFields)
+	if err != nil {
+		cmd.ui.Failed("Error setting space in config file.\n%s", err)
+		return
+	}
 	return
 }
 

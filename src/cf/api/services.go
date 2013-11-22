@@ -17,6 +17,27 @@ type ServiceOfferingResource struct {
 	Entity   ServiceOfferingEntity
 }
 
+func (resource ServiceOfferingResource) ToFields() (fields cf.ServiceOfferingFields) {
+	fields.Label = resource.Entity.Label
+	fields.Version = resource.Entity.Version
+	fields.Provider = resource.Entity.Provider
+	fields.Description = resource.Entity.Description
+	fields.Guid = resource.Metadata.Guid
+	fields.DocumentationUrl = resource.Entity.DocumentationUrl
+	return
+}
+
+func (resource ServiceOfferingResource) ToModel() (offering cf.ServiceOffering) {
+	offering.ServiceOfferingFields = resource.ToFields()
+	for _, p := range resource.Entity.ServicePlans {
+		servicePlan := cf.ServicePlanFields{}
+		servicePlan.Name = p.Entity.Name
+		servicePlan.Guid = p.Metadata.Guid
+		offering.Plans = append(offering.Plans, servicePlan)
+	}
+	return offering
+}
+
 type ServiceOfferingEntity struct {
 	Label            string
 	Version          string
@@ -29,6 +50,12 @@ type ServiceOfferingEntity struct {
 type ServicePlanResource struct {
 	Metadata Metadata
 	Entity   ServicePlanEntity
+}
+
+func (resource ServicePlanResource) ToFields() (fields cf.ServicePlanFields) {
+	fields.Guid = resource.Metadata.Guid
+	fields.Name = resource.Entity.Name
+	return
 }
 
 type ServicePlanEntity struct {
@@ -45,6 +72,24 @@ type ServiceInstanceResource struct {
 	Entity   ServiceInstanceEntity
 }
 
+func (resource ServiceInstanceResource) ToFields() (fields cf.ServiceInstanceFields) {
+	fields.Guid = resource.Metadata.Guid
+	fields.Name = resource.Entity.Name
+	return
+}
+
+func (resource ServiceInstanceResource) ToModel() (instance cf.ServiceInstance) {
+	instance.ServiceInstanceFields = resource.ToFields()
+	instance.ServicePlan = resource.Entity.ServicePlan.ToFields()
+	instance.ServiceOffering = resource.Entity.ServicePlan.Entity.ServiceOffering.ToFields()
+
+	instance.ServiceBindings = []cf.ServiceBindingFields{}
+	for _, bindingResource := range resource.Entity.ServiceBindings {
+		instance.ServiceBindings = append(instance.ServiceBindings, bindingResource.ToFields())
+	}
+	return
+}
+
 type ServiceInstanceEntity struct {
 	Name            string
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
@@ -56,6 +101,13 @@ type ServiceBindingResource struct {
 	Entity   ServiceBindingEntity
 }
 
+func (resource ServiceBindingResource) ToFields() (fields cf.ServiceBindingFields) {
+	fields.Url = resource.Metadata.Url
+	fields.Guid = resource.Metadata.Guid
+	fields.AppGuid = resource.Entity.AppGuid
+	return
+}
+
 type ServiceBindingEntity struct {
 	AppGuid string `json:"app_guid"`
 }
@@ -63,7 +115,7 @@ type ServiceBindingEntity struct {
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
-	CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
+	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 	DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse)
 }
@@ -81,7 +133,7 @@ func NewCloudControllerServiceRepository(config *configuration.Configuration, ga
 
 func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.Target)
-	spaceGuid := repo.config.Space.Guid
+	spaceGuid := repo.config.SpaceFields.Guid
 
 	if spaceGuid != "" {
 		path = fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.Target, spaceGuid)
@@ -94,25 +146,14 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []
 	}
 
 	for _, r := range resources.Resources {
-		plans := []cf.ServicePlan{}
-		for _, p := range r.Entity.ServicePlans {
-			plans = append(plans, cf.ServicePlan{Name: p.Entity.Name, Guid: p.Metadata.Guid})
-		}
-		offerings = append(offerings, cf.ServiceOffering{
-			Label:       r.Entity.Label,
-			Version:     r.Entity.Version,
-			Provider:    r.Entity.Provider,
-			Description: r.Entity.Description,
-			Guid:        r.Metadata.Guid,
-			Plans:       plans,
-		})
+		offerings = append(offerings, r.ToModel())
 	}
 
 	return
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.SpaceFields.Guid, "%3A"+name)
 
 	resources := new(PaginatedServiceInstanceResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
@@ -126,38 +167,15 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	resource := resources.Resources[0]
-	serviceOfferingEntity := resource.Entity.ServicePlan.Entity.ServiceOffering.Entity
-	instance.Guid = resource.Metadata.Guid
-	instance.Name = resource.Entity.Name
-
-	instance.ServicePlan = cf.ServicePlan{
-		Name: resource.Entity.ServicePlan.Entity.Name,
-		Guid: resource.Entity.ServicePlan.Metadata.Guid,
-	}
-
-	instance.ServicePlan.ServiceOffering.Label = serviceOfferingEntity.Label
-	instance.ServicePlan.ServiceOffering.DocumentationUrl = serviceOfferingEntity.DocumentationUrl
-	instance.ServicePlan.ServiceOffering.Description = serviceOfferingEntity.Description
-
-	instance.ServiceBindings = []cf.ServiceBinding{}
-
-	for _, bindingResource := range resource.Entity.ServiceBindings {
-		newBinding := cf.ServiceBinding{
-			Url:     bindingResource.Metadata.Url,
-			Guid:    bindingResource.Metadata.Guid,
-			AppGuid: bindingResource.Entity.AppGuid,
-		}
-		instance.ServiceBindings = append(instance.ServiceBindings, newBinding)
-	}
-
+	instance = resource.ToModel()
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, plan cf.ServicePlan) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
-		name, plan.Guid, repo.config.Space.Guid,
+		name, planGuid, repo.config.SpaceFields.Guid,
 	)
 
 	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
@@ -167,7 +185,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name string, 
 		serviceInstance, findInstanceApiResponse := repo.FindInstanceByName(name)
 
 		if !findInstanceApiResponse.IsNotSuccessful() &&
-			serviceInstance.ServicePlan.Guid == plan.Guid {
+			serviceInstance.ServicePlan.Guid == planGuid {
 			apiResponse = net.ApiResponse{}
 			identicalAlreadyExists = true
 			return

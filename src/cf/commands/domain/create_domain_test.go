@@ -2,7 +2,7 @@ package domain_test
 
 import (
 	"cf"
-	. "cf/commands/domain"
+	"cf/commands/domain"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -41,12 +41,15 @@ func TestCreateDomainFailsWithUsage(t *testing.T) {
 }
 
 func TestCreateDomain(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: cf.Organization{Name: "myOrg", Guid: "myOrg-guid"}}
+	org := cf.Organization{}
+	org.Name = "myOrg"
+	org.Guid = "myOrg-guid"
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 	domainRepo := &testapi.FakeDomainRepository{}
 	fakeUI := callCreateDomain(t, []string{"myOrg", "example.com"}, reqFactory, domainRepo)
 
-	assert.Equal(t, domainRepo.CreateDomainDomainToCreate.Name, "example.com")
-	assert.Equal(t, domainRepo.CreateDomainOwningOrg.Name, "myOrg")
+	assert.Equal(t, domainRepo.CreateDomainName, "example.com")
+	assert.Equal(t, domainRepo.CreateDomainOwningOrgGuid, "myOrg-guid")
 	assert.Contains(t, fakeUI.Outputs[0], "Creating domain")
 	assert.Contains(t, fakeUI.Outputs[0], "example.com")
 	assert.Contains(t, fakeUI.Outputs[0], "myOrg")
@@ -67,7 +70,7 @@ func callCreateDomain(t *testing.T, args []string, reqFactory *testreq.FakeReqFa
 		AccessToken: token,
 	}
 
-	cmd := NewCreateDomain(fakeUI, config, domainRepo)
+	cmd := domain.NewCreateDomain(fakeUI, config, domainRepo)
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return

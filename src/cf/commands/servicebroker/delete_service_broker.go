@@ -66,7 +66,7 @@ func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 		return
 	}
 
-	apiResponse = cmd.repo.Delete(broker)
+	apiResponse = cmd.repo.Delete(broker.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

@@ -44,7 +44,7 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 
-	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org)
+	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 	}
@@ -55,8 +55,7 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	cmd.userRepo.FindAllInSpaceByRole(space)
-	usersByRole, apiResponse := cmd.userRepo.FindAllInSpaceByRole(space)
+	usersByRole, apiResponse := cmd.userRepo.FindAllInSpaceByRole(space.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 	}

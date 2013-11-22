@@ -44,9 +44,9 @@ func (cmd *ShowService) Run(c *cli.Context) {
 	if serviceInstance.IsUserProvided() {
 		cmd.ui.Say("Service: %s", terminal.EntityNameColor("user-provided"))
 	} else {
-		cmd.ui.Say("Service: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering().Label))
+		cmd.ui.Say("Service: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Label))
 		cmd.ui.Say("Plan: %s", terminal.EntityNameColor(serviceInstance.ServicePlan.Name))
-		cmd.ui.Say("Description: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering().Description))
-		cmd.ui.Say("Documentation url: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering().DocumentationUrl))
+		cmd.ui.Say("Description: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.Description))
+		cmd.ui.Say("Documentation url: %s", terminal.EntityNameColor(serviceInstance.ServiceOffering.DocumentationUrl))
 	}
 }

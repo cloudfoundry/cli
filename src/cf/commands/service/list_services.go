@@ -28,8 +28,8 @@ func (cmd ListServices) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd ListServices) Run(c *cli.Context) {
 	cmd.ui.Say("Getting services in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -53,7 +53,7 @@ func (cmd ListServices) Run(c *cli.Context) {
 		if instance.IsUserProvided() {
 			serviceColumn = "user-provided"
 		} else {
-			serviceColumn = instance.ServiceOffering().Label
+			serviceColumn = instance.ServiceOffering.Label
 		}
 
 		table = append(table, []string{

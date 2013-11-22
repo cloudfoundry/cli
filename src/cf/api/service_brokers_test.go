@@ -67,30 +67,15 @@ func TestServiceBrokersListServiceBrokers(t *testing.T) {
 	defer close(stopChan)
 	serviceBrokersChan, statusChan := repo.ListServiceBrokers(stopChan)
 
-	expectedServiceBrokers := []cf.ServiceBroker{
-		{
-			Guid:     "found-guid-1",
-			Name:     "found-name-1",
-			Url:      "http://found.example.com-1",
-			Username: "found-username-1",
-			Password: "found-password-1",
-		},
-		{
-			Guid:     "found-guid-2",
-			Name:     "found-name-2",
-			Url:      "http://found.example.com-2",
-			Username: "found-username-2",
-			Password: "found-password-2",
-		},
-	}
-
 	serviceBrokers := []cf.ServiceBroker{}
 	for chunk := range serviceBrokersChan {
 		serviceBrokers = append(serviceBrokers, chunk...)
 	}
 	apiResponse := <-statusChan
 
-	assert.Equal(t, serviceBrokers, expectedServiceBrokers)
+	assert.Equal(t, len(serviceBrokers), 2)
+	assert.Equal(t, serviceBrokers[0].Guid, "found-guid-1")
+	assert.Equal(t, serviceBrokers[1].Guid, "found-guid-2")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 }
@@ -147,13 +132,12 @@ func TestFindServiceBrokerByName(t *testing.T) {
 	defer ts.Close()
 
 	foundBroker, apiResponse := repo.FindByName("my-broker")
-	expectedBroker := cf.ServiceBroker{
-		Name:     "found-name",
-		Url:      "http://found.example.com",
-		Username: "found-username",
-		Password: "found-password",
-		Guid:     "found-guid",
-	}
+	expectedBroker := cf.ServiceBroker{}
+	expectedBroker.Name = "found-name"
+	expectedBroker.Url = "http://found.example.com"
+	expectedBroker.Username = "found-username"
+	expectedBroker.Password = "found-password"
+	expectedBroker.Guid = "found-guid"
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -190,13 +174,7 @@ func TestCreateServiceBroker(t *testing.T) {
 	ts, handler, repo := createServiceBrokerRepo(t, req)
 	defer ts.Close()
 
-	serviceBroker := cf.ServiceBroker{
-		Name:     "foobroker",
-		Url:      "http://example.com",
-		Username: "foouser",
-		Password: "password",
-	}
-	apiResponse := repo.Create(serviceBroker)
+	apiResponse := repo.Create("foobroker", "http://example.com", "foouser", "password")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -214,14 +192,13 @@ func TestUpdateServiceBroker(t *testing.T) {
 
 	ts, handler, repo := createServiceBrokerRepo(t, req)
 	defer ts.Close()
+	serviceBroker := cf.ServiceBroker{}
+	serviceBroker.Guid = "my-guid"
+	serviceBroker.Name = "foobroker"
+	serviceBroker.Url = "http://update.example.com"
+	serviceBroker.Username = "update-foouser"
+	serviceBroker.Password = "update-password"
 
-	serviceBroker := cf.ServiceBroker{
-		Guid:     "my-guid",
-		Name:     "foobroker",
-		Url:      "http://update.example.com",
-		Username: "update-foouser",
-		Password: "update-password",
-	}
 	apiResponse := repo.Update(serviceBroker)
 
 	assert.True(t, handler.AllRequestsCalled())
@@ -239,11 +216,7 @@ func TestRenameServiceBroker(t *testing.T) {
 	ts, handler, repo := createServiceBrokerRepo(t, req)
 	defer ts.Close()
 
-	serviceBroker := cf.ServiceBroker{
-		Guid: "my-guid",
-		Name: "update-foobroker",
-	}
-	apiResponse := repo.Rename(serviceBroker)
+	apiResponse := repo.Rename("my-guid", "update-foobroker")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -259,10 +232,7 @@ func TestDeleteServiceBroker(t *testing.T) {
 	ts, handler, repo := createServiceBrokerRepo(t, req)
 	defer ts.Close()
 
-	serviceBroker := cf.ServiceBroker{
-		Guid: "my-guid",
-	}
-	apiResponse := repo.Delete(serviceBroker)
+	apiResponse := repo.Delete("my-guid")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())

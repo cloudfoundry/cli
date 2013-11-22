@@ -39,10 +39,16 @@ func TestDeleteRouteFailsWithUsage(t *testing.T) {
 }
 
 func TestDeleteRouteWithConfirmation(t *testing.T) {
-	domain := cf.Domain{Guid: "domain-guid", Name: "example.com"}
+	domain := cf.DomainFields{}
+	domain.Guid = "domain-guid"
+	domain.Name = "example.com"
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	route := cf.Route{}
+	route.Guid = "route-guid"
+	route.Host = "my-host"
+	route.Domain = domain
 	routeRepo := &testapi.FakeRouteRepository{
-		FindByHostAndDomainRoute: cf.Route{Host: "my-host", Domain: domain},
+		FindByHostAndDomainRoute: route,
 	}
 
 	ui := callDeleteRoute(t, "y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
@@ -51,17 +57,22 @@ func TestDeleteRouteWithConfirmation(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "Deleting route")
 	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
-
-	assert.Equal(t, routeRepo.DeleteRoute, cf.Route{Host: "my-host", Domain: domain})
+	assert.Equal(t, routeRepo.DeleteRouteGuid, "route-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteRouteWithForce(t *testing.T) {
-	domain := cf.Domain{Guid: "domain-guid", Name: "example.com"}
+	domain := cf.DomainFields{}
+	domain.Guid = "domain-guid"
+	domain.Name = "example.com"
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	route := cf.Route{}
+	route.Guid = "route-guid"
+	route.Host = "my-host"
+	route.Domain = domain
 	routeRepo := &testapi.FakeRouteRepository{
-		FindByHostAndDomainRoute: cf.Route{Host: "my-host", Domain: domain},
+		FindByHostAndDomainRoute: route,
 	}
 
 	ui := callDeleteRoute(t, "", []string{"-f", "-n", "my-host", "example.com"}, reqFactory, routeRepo)
@@ -70,8 +81,7 @@ func TestDeleteRouteWithForce(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
-
-	assert.Equal(t, routeRepo.DeleteRoute, cf.Route{Host: "my-host", Domain: domain})
+	assert.Equal(t, routeRepo.DeleteRouteGuid, "route-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -102,11 +112,14 @@ func callDeleteRoute(t *testing.T, confirmation string, args []string, reqFactor
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewDeleteRoute(ui, config, routeRepo)

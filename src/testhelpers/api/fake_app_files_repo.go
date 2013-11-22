@@ -1,19 +1,18 @@
 package api
 
 import (
-	"cf"
 	"cf/net"
 )
 
 type FakeAppFilesRepo struct{
-	Application cf.Application
+	AppGuid string
 	Path string
 	FileList string
 }
 
 
-func (repo *FakeAppFilesRepo)ListFiles(app cf.Application, path string) (files string, apiResponse net.ApiResponse) {
-	repo.Application = app
+func (repo *FakeAppFilesRepo)ListFiles(appGuid, path string) (files string, apiResponse net.ApiResponse) {
+	repo.AppGuid= appGuid
 	repo.Path = path
 
 	files = repo.FileList

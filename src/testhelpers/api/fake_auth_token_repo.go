@@ -6,44 +6,44 @@ import (
 )
 
 type FakeAuthTokenRepo struct {
-	CreatedServiceAuthToken cf.ServiceAuthToken
+	CreatedServiceAuthTokenFields cf.ServiceAuthTokenFields
 	
-	FindAllAuthTokens []cf.ServiceAuthToken
+	FindAllAuthTokens []cf.ServiceAuthTokenFields
 
 	FindByLabelAndProviderLabel string
 	FindByLabelAndProviderProvider string
-	FindByLabelAndProviderServiceAuthToken cf.ServiceAuthToken
+	FindByLabelAndProviderServiceAuthTokenFields cf.ServiceAuthTokenFields
 	FindByLabelAndProviderApiResponse net.ApiResponse
 
-	UpdatedServiceAuthToken cf.ServiceAuthToken
+	UpdatedServiceAuthTokenFields cf.ServiceAuthTokenFields
 
-	DeletedServiceAuthToken cf.ServiceAuthToken
+	DeletedServiceAuthTokenFields cf.ServiceAuthTokenFields
 }
 
-func (repo *FakeAuthTokenRepo) Create(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	repo.CreatedServiceAuthToken = authToken
+func (repo *FakeAuthTokenRepo) Create(authToken cf.ServiceAuthTokenFields) (apiResponse net.ApiResponse) {
+	repo.CreatedServiceAuthTokenFields = authToken
 	return
 }
 
-func (repo *FakeAuthTokenRepo) FindAll() (authTokens []cf.ServiceAuthToken, apiResponse net.ApiResponse) {
+func (repo *FakeAuthTokenRepo) FindAll() (authTokens []cf.ServiceAuthTokenFields, apiResponse net.ApiResponse) {
 	authTokens = repo.FindAllAuthTokens
 	return
 }
-func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthToken, apiResponse net.ApiResponse) {
+func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (authToken cf.ServiceAuthTokenFields, apiResponse net.ApiResponse) {
 	repo.FindByLabelAndProviderLabel = label
 	repo.FindByLabelAndProviderProvider = provider
 
-	authToken = repo.FindByLabelAndProviderServiceAuthToken
+	authToken = repo.FindByLabelAndProviderServiceAuthTokenFields
 	apiResponse = repo.FindByLabelAndProviderApiResponse
 	return
 }
 
-func (repo  *FakeAuthTokenRepo) Delete(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	repo.DeletedServiceAuthToken = authToken
+func (repo  *FakeAuthTokenRepo) Delete(authToken cf.ServiceAuthTokenFields) (apiResponse net.ApiResponse) {
+	repo.DeletedServiceAuthTokenFields = authToken
 	return
 }
 
-func (repo *FakeAuthTokenRepo) Update(authToken cf.ServiceAuthToken) (apiResponse net.ApiResponse) {
-	repo.UpdatedServiceAuthToken = authToken
+func (repo *FakeAuthTokenRepo) Update(authToken cf.ServiceAuthTokenFields) (apiResponse net.ApiResponse) {
+	repo.UpdatedServiceAuthTokenFields = authToken
 	return
 }

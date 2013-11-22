@@ -23,7 +23,7 @@ func TestDeleteSpaceConfirmingWithY(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "space-to-delete")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Equal(t, spaceRepo.DeletedSpace, spaceRepo.FindByNameSpace)
+	assert.Equal(t, spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
@@ -37,12 +37,14 @@ func TestDeleteSpaceConfirmingWithYes(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "space-to-delete")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Equal(t, spaceRepo.DeletedSpace, spaceRepo.FindByNameSpace)
+	assert.Equal(t, spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteSpaceWithForceOption(t *testing.T) {
-	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
+	space := cf.Space{}
+	space.Name = "space-to-delete"
+	space.Guid = "space-to-delete-guid"
 	reqFactory := &testreq.FakeReqFactory{}
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
 	configRepo := &testconfig.FakeConfigRepository{}
@@ -58,7 +60,7 @@ func TestDeleteSpaceWithForceOption(t *testing.T) {
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Contains(t, ui.Outputs[0], "Deleting")
 	assert.Contains(t, ui.Outputs[0], "space-to-delete")
-	assert.Equal(t, spaceRepo.DeletedSpace, spaceRepo.FindByNameSpace)
+	assert.Equal(t, spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
@@ -81,13 +83,15 @@ func TestDeleteSpaceWhenSpaceDoesNotExist(t *testing.T) {
 }
 
 func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {
-	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
+	space := cf.SpaceFields{}
+	space.Name = "space-to-delete"
+	space.Guid = "space-to-delete-guid"
 	reqFactory := &testreq.FakeReqFactory{}
-	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
+	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: cf.Space{SpaceFields: space}}
 	configRepo := &testconfig.FakeConfigRepository{}
 
 	config, _ := configRepo.Get()
-	config.Space = space
+	config.SpaceFields = space
 	configRepo.Save()
 
 	ui := &testterm.FakeUI{}
@@ -101,13 +105,18 @@ func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {
 }
 
 func TestDeleteSpaceWhenSpaceNotTargeted(t *testing.T) {
-	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
+	space := cf.Space{}
+	space.Name = "space-to-delete"
+	space.Guid = "space-to-delete-guid"
 	reqFactory := &testreq.FakeReqFactory{}
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
 	configRepo := &testconfig.FakeConfigRepository{}
 
 	config, _ := configRepo.Get()
-	config.Space = cf.Space{Name: "do-not-delete", Guid: "do-not-delete-guid"}
+	otherSpace := cf.SpaceFields{}
+	otherSpace.Name = "do-not-delete"
+	otherSpace.Guid = "do-not-delete-guid"
+	config.SpaceFields = otherSpace
 	configRepo.Save()
 
 	ui := &testterm.FakeUI{}
@@ -137,7 +146,9 @@ func TestDeleteSpaceCommandFailsWithUsage(t *testing.T) {
 }
 
 func deleteSpace(t *testing.T, confirmation string, args []string) (ui *testterm.FakeUI, spaceRepo *testapi.FakeSpaceRepository) {
-	space := cf.Space{Name: "space-to-delete", Guid: "space-to-delete-guid"}
+	space := cf.Space{}
+	space.Name = "space-to-delete"
+	space.Guid = "space-to-delete-guid"
 	reqFactory := &testreq.FakeReqFactory{}
 	spaceRepo = &testapi.FakeSpaceRepository{FindByNameSpace: space}
 	configRepo := &testconfig.FakeConfigRepository{}
@@ -151,11 +162,14 @@ func deleteSpace(t *testing.T, confirmation string, args []string) (ui *testterm
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space8 := cf.SpaceFields{}
+	space8.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space8,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewDeleteSpace(ui, config, spaceRepo, configRepo)

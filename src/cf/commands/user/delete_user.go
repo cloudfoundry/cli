@@ -9,20 +9,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type DeleteUser struct {
+type DeleteUserFields struct {
 	ui       terminal.UI
 	config   *configuration.Configuration
 	userRepo api.UserRepository
 }
 
-func NewDeleteUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd DeleteUser) {
+func NewDeleteUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd DeleteUserFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
 
-func (cmd DeleteUser) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd DeleteUserFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Invalid usage")
 		cmd.ui.FailWithUsage(c, "delete-user")
@@ -34,7 +34,7 @@ func (cmd DeleteUser) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 	return
 }
 
-func (cmd DeleteUser) Run(c *cli.Context) {
+func (cmd DeleteUserFields) Run(c *cli.Context) {
 	username := c.Args()[0]
 	force := c.Bool("f")
 
@@ -57,11 +57,11 @@ func (cmd DeleteUser) Run(c *cli.Context) {
 	}
 	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
-		cmd.ui.Warn("User %s does not exist.", username)
+		cmd.ui.Warn("UserFields %s does not exist.", username)
 		return
 	}
 
-	apiResponse = cmd.userRepo.Delete(user)
+	apiResponse = cmd.userRepo.Delete(user.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

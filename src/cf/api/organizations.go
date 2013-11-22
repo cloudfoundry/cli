@@ -18,18 +18,42 @@ type OrganizationResource struct {
 	Entity OrganizationEntity
 }
 
+func (resource OrganizationResource) ToFields() (fields cf.OrganizationFields) {
+	fields.Name = resource.Entity.Name
+	fields.Guid = resource.Metadata.Guid
+	return
+}
+
+func (resource OrganizationResource) ToModel() (org cf.Organization) {
+	org.OrganizationFields = resource.ToFields()
+
+	spaces := []cf.SpaceFields{}
+	for _, s := range resource.Entity.Spaces {
+		spaces = append(spaces, s.ToFields())
+	}
+	org.Spaces = spaces
+
+	domains := []cf.DomainFields{}
+	for _, d := range resource.Entity.Domains {
+		domains = append(domains, d.ToFields())
+	}
+	org.Domains = domains
+
+	return
+}
+
 type OrganizationEntity struct {
 	Name    string
-	Spaces  []Resource
-	Domains []Resource
+	Spaces  []SpaceResource
+	Domains []DomainResource
 }
 
 type OrganizationRepository interface {
 	ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse)
 	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
-	Rename(org cf.Organization, name string) (apiResponse net.ApiResponse)
-	Delete(org cf.Organization) (apiResponse net.ApiResponse)
+	Rename(orgGuid string, name string) (apiResponse net.ApiResponse)
+	Delete(orgGuid string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -92,22 +116,7 @@ func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) 
 	nextUrl = orgResources.NextUrl
 
 	for _, r := range orgResources.Resources {
-		spaces := []cf.Space{}
-		for _, s := range r.Entity.Spaces {
-			spaces = append(spaces, cf.Space{Name: s.Entity.Name, Guid: s.Metadata.Guid})
-		}
-
-		domains := []cf.Domain{}
-		for _, d := range r.Entity.Domains {
-			domains = append(domains, cf.Domain{Name: d.Entity.Name, Guid: d.Metadata.Guid})
-		}
-
-		orgs = append(orgs, cf.Organization{
-			Name:    r.Entity.Name,
-			Guid:    r.Metadata.Guid,
-			Spaces:  spaces,
-			Domains: domains,
-		})
+		orgs = append(orgs, r.ToModel())
 	}
 	return
 }
@@ -135,13 +144,13 @@ func (repo CloudControllerOrganizationRepository) Create(name string) (apiRespon
 	return repo.gateway.CreateResource(url, repo.config.AccessToken, strings.NewReader(data))
 }
 
-func (repo CloudControllerOrganizationRepository) Rename(org cf.Organization, name string) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, org.Guid)
+func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, orgGuid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
 	return repo.gateway.UpdateResource(url, repo.config.AccessToken, strings.NewReader(data))
 }
 
-func (repo CloudControllerOrganizationRepository) Delete(org cf.Organization) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, org.Guid)
+func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.Target, orgGuid)
 	return repo.gateway.DeleteResource(url, repo.config.AccessToken)
 }

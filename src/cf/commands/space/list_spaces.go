@@ -31,7 +31,7 @@ func (cmd ListSpaces) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd ListSpaces) Run(c *cli.Context) {
 	cmd.ui.Say("Getting spaces in org %s as %s...\n",
-		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()))
 
 	stopChan := make(chan bool)

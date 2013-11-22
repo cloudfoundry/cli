@@ -49,8 +49,11 @@ func TestUpdateServiceBrokerRequirements(t *testing.T) {
 
 func TestUpdateServiceBroker(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	broker := cf.ServiceBroker{}
+	broker.Name = "my-found-broker"
+	broker.Guid = "my-found-broker-guid"
 	repo := &testapi.FakeServiceBrokerRepo{
-		FindByNameServiceBroker: cf.ServiceBroker{Name: "my-found-broker", Guid: "my-found-broker-guid"},
+		FindByNameServiceBroker: broker,
 	}
 	args := []string{"my-broker", "new-username", "new-password", "new-url"}
 
@@ -61,14 +64,12 @@ func TestUpdateServiceBroker(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Updating service broker")
 	assert.Contains(t, ui.Outputs[0], "my-found-broker")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-
-	expectedServiceBroker := cf.ServiceBroker{
-		Name:     "my-found-broker",
-		Username: "new-username",
-		Password: "new-password",
-		Url:      "new-url",
-		Guid:     "my-found-broker-guid",
-	}
+	expectedServiceBroker := cf.ServiceBroker{}
+	expectedServiceBroker.Name = "my-found-broker"
+	expectedServiceBroker.Username = "new-username"
+	expectedServiceBroker.Password = "new-password"
+	expectedServiceBroker.Url = "new-url"
+	expectedServiceBroker.Guid = "my-found-broker-guid"
 
 	assert.Equal(t, repo.UpdatedServiceBroker, expectedServiceBroker)
 
@@ -82,11 +83,14 @@ func callUpdateServiceBroker(t *testing.T, args []string, reqFactory *testreq.Fa
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewUpdateServiceBroker(ui, config, repo)

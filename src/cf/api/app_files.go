@@ -1,14 +1,13 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/net"
 	"fmt"
 )
 
 type AppFilesRepository interface {
-	ListFiles(app cf.Application, path string) (files string, apiResponse net.ApiResponse)
+	ListFiles(appGuid, path string) (files string, apiResponse net.ApiResponse)
 }
 
 type CloudControllerAppFilesRepository struct {
@@ -22,8 +21,8 @@ func NewCloudControllerAppFilesRepository(config *configuration.Configuration, g
 	return
 }
 
-func (repo CloudControllerAppFilesRepository) ListFiles(app cf.Application, path string) (files string, apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/apps/%s/instances/0/files/%s", repo.config.Target, app.Guid, path)
+func (repo CloudControllerAppFilesRepository) ListFiles(appGuid, path string) (files string, apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s/v2/apps/%s/instances/0/files/%s", repo.config.Target, appGuid, path)
 	request, apiResponse := repo.gateway.NewRequest("GET", url, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
 		return

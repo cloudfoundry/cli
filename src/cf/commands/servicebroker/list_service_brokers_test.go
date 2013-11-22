@@ -14,23 +14,19 @@ import (
 )
 
 func TestListServiceBrokers(t *testing.T) {
-	serviceBrokers := []cf.ServiceBroker{
-		cf.ServiceBroker{
-			Name: "service-broker-to-list-a",
-			Guid: "service-broker-to-list-guid-a",
-			Url:  "http://service-a-url.com",
-		},
-		cf.ServiceBroker{
-			Name: "service-broker-to-list-b",
-			Guid: "service-broker-to-list-guid-b",
-			Url:  "http://service-b-url.com",
-		},
-		cf.ServiceBroker{
-			Name: "service-broker-to-list-c",
-			Guid: "service-broker-to-list-guid-c",
-			Url:  "http://service-c-url.com",
-		},
-	}
+	broker := cf.ServiceBroker{}
+	broker.Name = "service-broker-to-list-a"
+	broker.Guid = "service-broker-to-list-guid-a"
+	broker.Url = "http://service-a-url.com"
+	broker2 := cf.ServiceBroker{}
+	broker2.Name = "service-broker-to-list-b"
+	broker2.Guid = "service-broker-to-list-guid-b"
+	broker2.Url = "http://service-b-url.com"
+	broker3 := cf.ServiceBroker{}
+	broker3.Name = "service-broker-to-list-c"
+	broker3.Guid = "service-broker-to-list-guid-c"
+	broker3.Url = "http://service-c-url.com"
+	serviceBrokers := []cf.ServiceBroker{broker, broker2, broker3}
 
 	repo := &testapi.FakeServiceBrokerRepo{
 		ServiceBrokers: serviceBrokers,
@@ -83,11 +79,14 @@ func callListServiceBrokers(t *testing.T, args []string, serviceBrokerRepo *test
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	ctxt := testcmd.NewContext("service-brokers", args)

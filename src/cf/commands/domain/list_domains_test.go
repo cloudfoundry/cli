@@ -38,16 +38,33 @@ func TestListDomainsFailsWithUsage(t *testing.T) {
 }
 
 func TestListDomains(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Organization: cf.Organization{Name: "my-org", Guid: "my-org-guid"}}
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+	orgFields.Guid = "my-org-guid"
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+	domain1 := cf.Domain{}
+	domain1.Shared = true
+	domain1.Name = "Domain1"
+
+	domain2 := cf.Domain{}
+	domain2.Shared = false
+	domain2.Name = "Domain2"
+
+	space1 := cf.SpaceFields{}
+	space1.Name = "my-space"
+
+	space2 := cf.SpaceFields{}
+	space2.Name = "my-space-2"
+
+	domain2.Spaces = []cf.SpaceFields{space1, space2}
+
+	domain3 := cf.Domain{}
+	domain3.Shared = false
+	domain3.Name = "Domain3"
+
 	domainRepo := &testapi.FakeDomainRepository{
-		FindAllByOrgDomains: []cf.Domain{
-			{Name: "Domain1", Shared: true, Spaces: []cf.Space{}},
-			{Name: "Domain2", Shared: false, Spaces: []cf.Space{
-				{Name: "my-space"},
-				{Name: "my-other-space"},
-			}},
-			{Name: "Domain3", Shared: false, Spaces: []cf.Space{}},
-		},
+		FindAllByOrgDomains: []cf.Domain{domain1, domain2, domain3},
 	}
 	fakeUI := callListDomains(t, []string{}, reqFactory, domainRepo)
 
@@ -61,7 +78,7 @@ func TestListDomains(t *testing.T) {
 
 	assert.Contains(t, fakeUI.Outputs[5], "Domain2")
 	assert.Contains(t, fakeUI.Outputs[5], "owned")
-	assert.Contains(t, fakeUI.Outputs[5], "my-space, my-other-space")
+	assert.Contains(t, fakeUI.Outputs[5], "my-space, my-space-2")
 
 	assert.Contains(t, fakeUI.Outputs[6], "Domain3")
 	assert.Contains(t, fakeUI.Outputs[6], "reserved")
@@ -76,10 +93,16 @@ func callListDomains(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 	})
 	assert.NoError(t, err)
 
+	spaceFields := cf.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        spaceFields,
+		OrganizationFields: orgFields,
+		AccessToken:        token,
 	}
 
 	cmd := NewListDomains(fakeUI, config, domainRepo)

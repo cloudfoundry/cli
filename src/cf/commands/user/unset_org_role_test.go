@@ -49,12 +49,15 @@ func TestUnsetOrgRoleRequirements(t *testing.T) {
 
 func TestUnsetOrgRole(t *testing.T) {
 	userRepo := &testapi.FakeUserRepository{}
-
-	user := cf.User{Username: "some-user", Guid: "some-user-guid"}
-	org := cf.Organization{Name: "some-org", Guid: "some-org-guid"}
+	user := cf.UserFields{}
+	user.Username = "some-user"
+	user.Guid = "some-user-guid"
+	org := cf.Organization{}
+	org.Name = "some-org"
+	org.Guid = "some-org-guid"
 	reqFactory := &testreq.FakeReqFactory{
 		LoginSuccess: true,
-		User:         user,
+		UserFields:   user,
 		Organization: org,
 	}
 	args := []string{"my-username", "my-org", "my-role"}
@@ -68,8 +71,8 @@ func TestUnsetOrgRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.UnsetOrgRoleRole, "my-role")
-	assert.Equal(t, userRepo.UnsetOrgRoleUser, user)
-	assert.Equal(t, userRepo.UnsetOrgRoleOrganization, org)
+	assert.Equal(t, userRepo.UnsetOrgRoleUserGuid, "some-user-guid")
+	assert.Equal(t, userRepo.UnsetOrgRoleOrganizationGuid, "some-org-guid")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
@@ -82,11 +85,14 @@ func callUnsetOrgRole(t *testing.T, args []string, userRepo *testapi.FakeUserRep
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-
+	org2 := cf.OrganizationFields{}
+	org2.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org2,
+		AccessToken:        token,
 	}
 
 	cmd := NewUnsetOrgRole(ui, config, userRepo)

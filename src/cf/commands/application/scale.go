@@ -50,14 +50,13 @@ func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()
 	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(currentApp.Name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	changedApp := cf.Application{
-		Guid: currentApp.Guid,
-	}
+	changedAppFields := cf.ApplicationFields{}
+	changedAppFields.Guid = currentApp.Guid
 
 	memory, err := extractMegaBytes(c.String("m"))
 	if err != nil {
@@ -65,10 +64,10 @@ func (cmd *Scale) Run(c *cli.Context) {
 		cmd.ui.FailWithUsage(c, "scale")
 		return
 	}
-	changedApp.Memory = memory
-	changedApp.Instances = c.Int("i")
+	changedAppFields.Memory = memory
+	changedAppFields.InstanceCount = c.Int("i")
 
-	apiResponse := cmd.appRepo.Scale(changedApp)
+	apiResponse := cmd.appRepo.Scale(changedAppFields)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

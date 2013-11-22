@@ -15,8 +15,12 @@ import (
 )
 
 func TestUnbindCommand(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "my-service"
+	serviceInstance.Guid = "my-service-guid"
 	reqFactory := &testreq.FakeReqFactory{
 		Application:     app,
 		ServiceInstance: serviceInstance,
@@ -35,14 +39,18 @@ func TestUnbindCommand(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-user")
 
 	assert.Equal(t, serviceBindingRepo.DeleteServiceInstance, serviceInstance)
-	assert.Equal(t, serviceBindingRepo.DeleteApplication, app)
+	assert.Equal(t, serviceBindingRepo.DeleteApplicationGuid, "my-app-guid")
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
-	app := cf.Application{Name: "my-app", Guid: "my-app-guid"}
-	serviceInstance := cf.ServiceInstance{Name: "my-service", Guid: "my-service-guid"}
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+	serviceInstance := cf.ServiceInstance{}
+	serviceInstance.Name = "my-service"
+	serviceInstance.Guid = "my-service-guid"
 	reqFactory := &testreq.FakeReqFactory{
 		Application:     app,
 		ServiceInstance: serviceInstance,
@@ -58,7 +66,7 @@ func TestUnbindCommandWhenBindingIsNonExistent(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[0], "my-app")
 
 	assert.Equal(t, serviceBindingRepo.DeleteServiceInstance, serviceInstance)
-	assert.Equal(t, serviceBindingRepo.DeleteApplication, app)
+	assert.Equal(t, serviceBindingRepo.DeleteApplicationGuid, "my-app-guid")
 
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 	assert.Contains(t, fakeUI.Outputs[2], "my-service")
@@ -88,11 +96,14 @@ func callUnbindService(t *testing.T, args []string, reqFactory *testreq.FakeReqF
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewUnbindService(fakeUI, config, serviceBindingRepo)

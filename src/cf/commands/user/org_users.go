@@ -46,7 +46,7 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	usersByRole, apiResponse := cmd.userRepo.FindAllInOrgByRole(org)
+	usersByRole, apiResponse := cmd.userRepo.FindAllInOrgByRole(org.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

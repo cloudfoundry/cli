@@ -12,8 +12,8 @@ type Configuration struct {
 	AuthorizationEndpoint   string
 	AccessToken             string
 	RefreshToken            string
-	Organization            cf.Organization
-	Space                   cf.Space
+	OrganizationFields      cf.OrganizationFields
+	SpaceFields             cf.SpaceFields
 	ApplicationStartTimeout time.Duration // will be used as seconds
 }
 
@@ -34,11 +34,11 @@ func (c Configuration) IsLoggedIn() bool {
 }
 
 func (c Configuration) HasOrganization() bool {
-	return c.Organization.Guid != "" && c.Organization.Name != ""
+	return c.OrganizationFields.Guid != "" && c.OrganizationFields.Name != ""
 }
 
 func (c Configuration) HasSpace() bool {
-	return c.Space.Guid != "" && c.Space.Name != ""
+	return c.SpaceFields.Guid != "" && c.SpaceFields.Name != ""
 }
 
 type TokenInfo struct {

@@ -56,7 +56,7 @@ func (cmd *SetOrgRole) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userRepo.SetOrgRole(user, org, role)
+	apiResponse := cmd.userRepo.SetOrgRole(user.Guid, org.Guid, role)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

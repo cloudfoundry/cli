@@ -28,7 +28,7 @@ type EventEntity struct {
 }
 
 type AppEventsRepository interface {
-	ListEvents(app cf.Application) (events chan []cf.Event, statusChan chan net.ApiResponse)
+	ListEvents(appGuid string) (events chan []cf.EventFields, statusChan chan net.ApiResponse)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -42,13 +42,13 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (eventChan chan []cf.Event, statusChan chan net.ApiResponse) {
+func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string) (eventChan chan []cf.EventFields, statusChan chan net.ApiResponse) {
 
-	eventChan = make(chan []cf.Event, 4)
+	eventChan = make(chan []cf.EventFields, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
-		path := fmt.Sprintf("/v2/apps/%s/events", app.Guid)
+		path := fmt.Sprintf("/v2/apps/%s/events", appGuid)
 		for path != "" {
 			url := fmt.Sprintf("%s%s", repo.config.Target, path)
 			eventResources := &PaginatedEventResources{}
@@ -60,9 +60,9 @@ func (repo CloudControllerAppEventsRepository) ListEvents(app cf.Application) (e
 				return
 			}
 
-			events := []cf.Event{}
+			events := []cf.EventFields{}
 			for _, resource := range eventResources.Resources {
-				events = append(events, cf.Event{
+				events = append(events, cf.EventFields{
 					Timestamp:       resource.Entity.Timestamp,
 					ExitDescription: resource.Entity.ExitDescription,
 					ExitStatus:      resource.Entity.ExitStatus,

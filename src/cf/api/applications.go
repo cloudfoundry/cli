@@ -9,9 +9,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"strconv"
 	"strings"
-	"time"
 )
 
 type PaginatedApplicationResources struct {
@@ -21,6 +19,26 @@ type PaginatedApplicationResources struct {
 type ApplicationResource struct {
 	Resource
 	Entity ApplicationEntity
+}
+
+func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
+	app.Guid = resource.Metadata.Guid
+	app.Name = resource.Entity.Name
+	app.EnvironmentVars = resource.Entity.EnvironmentJson
+	app.State = strings.ToLower(resource.Entity.State)
+	app.InstanceCount = resource.Entity.Instances
+	app.Memory = uint64(resource.Entity.Memory)
+
+	return
+}
+
+func (resource ApplicationResource) ToModel() (app cf.Application) {
+	app.ApplicationFields = resource.ToFields()
+
+	for _, routeResource := range resource.Entity.Routes {
+		app.Routes = append(app.Routes, routeResource.ToModel())
+	}
+	return
 }
 
 type ApplicationEntity struct {
@@ -37,6 +55,19 @@ type AppRouteResource struct {
 	Entity AppRouteEntity
 }
 
+func (resource AppRouteResource) ToFields() (route cf.RouteFields) {
+	route.Guid = resource.Metadata.Guid
+	route.Host = resource.Entity.Host
+	return
+}
+
+func (resource AppRouteResource) ToModel() (route cf.RouteSummary) {
+	route.RouteFields = resource.ToFields()
+	route.Domain.Guid = resource.Entity.Domain.Metadata.Guid
+	route.Domain.Name = resource.Entity.Domain.Entity.Name
+	return
+}
+
 type AppRouteEntity struct {
 	Host   string
 	Domain Resource
@@ -44,14 +75,14 @@ type AppRouteEntity struct {
 
 type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, apiResponse net.ApiResponse)
-	SetEnv(app cf.Application, envVars map[string]string) (apiResponse net.ApiResponse)
-	Create(newApp cf.Application) (createdApp cf.Application, apiResponse net.ApiResponse)
-	Delete(app cf.Application) (apiResponse net.ApiResponse)
-	Rename(app cf.Application, newName string) (apiResponse net.ApiResponse)
-	Scale(app cf.Application) (apiResponse net.ApiResponse)
-	Start(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse)
-	Stop(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse)
-	GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiResponse net.ApiResponse)
+	SetEnv(appGuid string, envVars map[string]string) (apiResponse net.ApiResponse)
+	Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse)
+	Delete(appGuid string) (apiResponse net.ApiResponse)
+	Rename(appGuid string, newName string) (apiResponse net.ApiResponse)
+	Scale(app cf.ApplicationFields) (apiResponse net.ApiResponse)
+	Start(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
+	StartWithDifferentBuildpack(appGuid, buildpack string) (updatedApp cf.Application, apiResponse net.ApiResponse)
+	Stop(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -66,7 +97,7 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 }
 
 func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.Space.Guid, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.SpaceFields.Guid, "%3A"+name)
 	appResources := new(PaginatedApplicationResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, appResources)
 	if apiResponse.IsNotSuccessful() {
@@ -79,38 +110,11 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	}
 
 	res := appResources.Resources[0]
-	app = repo.appFromResource(res)
+	app = res.ToModel()
 	return
 }
-
-func (repo CloudControllerApplicationRepository) appFromResource(res ApplicationResource) (app cf.Application) {
-	app = cf.Application{
-		Guid:            res.Metadata.Guid,
-		Name:            res.Entity.Name,
-		EnvironmentVars: res.Entity.EnvironmentJson,
-		State:           strings.ToLower(res.Entity.State),
-		Instances:       res.Entity.Instances,
-		Memory:          uint64(res.Entity.Memory),
-	}
-	for _, routeResource := range res.Entity.Routes {
-		domainResource := routeResource.Entity.Domain
-
-		route := cf.Route{
-			Guid: routeResource.Metadata.Guid,
-			Host: routeResource.Entity.Host,
-		}
-		route.Domain = cf.Domain{
-			Guid: domainResource.Metadata.Guid,
-			Name: domainResource.Entity.Name,
-		}
-
-		app.Routes = append(app.Routes, route)
-	}
-	return
-}
-
-func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envVars map[string]string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) SetEnv(appGuid string, envVars map[string]string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, appGuid)
 
 	type setEnvReqBody struct {
 		EnvJson map[string]string `json:"environment_json"`
@@ -128,52 +132,57 @@ func (repo CloudControllerApplicationRepository) SetEnv(app cf.Application, envV
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(newApp cf.Application) (createdApp cf.Application, apiResponse net.ApiResponse) {
-	apiResponse = validateApplication(newApp)
+func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
+	apiResponse = validateApplicationName(name)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	buildpackUrl := stringOrNull(newApp.BuildpackUrl)
-	stackGuid := stringOrNull(newApp.Stack.Guid)
-	command := stringOrNull(newApp.Command)
-
 	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
 	data := fmt.Sprintf(
-		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"command":null,"memory":%d,"stack_guid":%s,"command":%s}`,
-		repo.config.Space.Guid, newApp.Name, newApp.Instances, buildpackUrl, newApp.Memory, stackGuid, command,
+		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"memory":%d,"stack_guid":%s,"command":%s}`,
+		repo.config.SpaceFields.Guid,
+		name,
+		instances,
+		stringOrNull(buildpackUrl),
+		memory,
+		stringOrNull(stackGuid),
+		stringOrNull(command),
 	)
 
-	resource := new(Resource)
+	resource := new(ApplicationResource)
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	createdApp.Guid = resource.Metadata.Guid
-	createdApp.Name = resource.Entity.Name
+	createdApp = resource.ToModel()
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Delete(app cf.Application) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, appGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }
 
-func (repo CloudControllerApplicationRepository) Rename(app cf.Application, newName string) (apiResponse net.ApiResponse) {
-	app.Name = newName
+func (repo CloudControllerApplicationRepository) Rename(appGuid, newName string) (apiResponse net.ApiResponse) {
+	apiResponse = validateApplicationName(newName)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
 	data := fmt.Sprintf(`{"name":"%s"}`, newName)
-	apiResponse = repo.updateApp(app, strings.NewReader(data))
+	apiResponse = repo.updateApp(appGuid, strings.NewReader(data))
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Scale(app cf.ApplicationFields) (apiResponse net.ApiResponse) {
 	values := map[string]interface{}{}
 	if app.DiskQuota > 0 {
 		values["disk_quota"] = app.DiskQuota
 	}
-	if app.Instances > 0 {
-		values["instances"] = app.Instances
+	if app.InstanceCount > 0 {
+		values["instances"] = app.InstanceCount
 	}
 	if app.Memory > 0 {
 		values["memory"] = app.Memory
@@ -184,43 +193,42 @@ func (repo CloudControllerApplicationRepository) Scale(app cf.Application) (apiR
 		return net.NewApiResponseWithError("Error generating body", err)
 	}
 
-	apiResponse = repo.updateApp(app, bytes.NewReader(bodyBytes))
+	apiResponse = repo.updateApp(app.Guid, bytes.NewReader(bodyBytes))
 	return
 }
 
-func (repo CloudControllerApplicationRepository) updateApp(app cf.Application, body io.ReadSeeker) (apiResponse net.ApiResponse) {
-	apiResponse = validateApplication(app)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) updateApp(appGuid string, body io.ReadSeeker) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, appGuid)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, body)
 }
 
-func validateApplication(app cf.Application) (apiResponse net.ApiResponse) {
+func validateApplicationName(name string) (apiResponse net.ApiResponse) {
 	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-	if !reg.MatchString(app.Name) {
+	if !reg.MatchString(name) {
 		apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
 	}
 
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Start(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	updates := map[string]interface{}{"state": "STARTED"}
-	if app.BuildpackUrl != "" {
-		updates["buildpack"] = app.BuildpackUrl
+func (repo CloudControllerApplicationRepository) Start(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	return repo.startOrStopApp(appGuid, map[string]interface{}{"state": "STARTED"})
+}
+
+func (repo CloudControllerApplicationRepository) StartWithDifferentBuildpack(appGuid, buildpack string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	updates := map[string]interface{}{
+		"state":     "STARTED",
+		"buildpack": buildpack,
 	}
-	return repo.startOrStopApp(app, updates)
+	return repo.startOrStopApp(appGuid, updates)
 }
 
-func (repo CloudControllerApplicationRepository) Stop(app cf.Application) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	return repo.startOrStopApp(app, map[string]interface{}{"state": "STOPPED"})
+func (repo CloudControllerApplicationRepository) Stop(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	return repo.startOrStopApp(appGuid, map[string]interface{}{"state": "STOPPED"})
 }
 
-func (repo CloudControllerApplicationRepository) startOrStopApp(app cf.Application, updates map[string]interface{}) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=2", repo.config.Target, app.Guid)
+func (repo CloudControllerApplicationRepository) startOrStopApp(appGuid string, updates map[string]interface{}) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=2", repo.config.Target, appGuid)
 
 	updates["console"] = true
 
@@ -236,42 +244,6 @@ func (repo CloudControllerApplicationRepository) startOrStopApp(app cf.Applicati
 		return
 	}
 
-	updatedApp = repo.appFromResource(*resource)
-	return
-}
-
-type InstancesApiResponse map[string]InstanceApiResponse
-
-type InstanceApiResponse struct {
-	State string
-	Since float64
-}
-
-func (repo CloudControllerApplicationRepository) GetInstances(app cf.Application) (instances []cf.ApplicationInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.Target, app.Guid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	instancesResponse := InstancesApiResponse{}
-
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &instancesResponse)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	instances = make([]cf.ApplicationInstance, len(instancesResponse), len(instancesResponse))
-	for k, v := range instancesResponse {
-		index, err := strconv.Atoi(k)
-		if err != nil {
-			continue
-		}
-
-		instances[index] = cf.ApplicationInstance{
-			State: cf.InstanceState(strings.ToLower(v.State)),
-			Since: time.Unix(int64(v.Since), 0),
-		}
-	}
+	updatedApp = resource.ToModel()
 	return
 }

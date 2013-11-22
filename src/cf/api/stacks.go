@@ -16,6 +16,13 @@ type StackResource struct {
 	Entity StackEntity
 }
 
+func (resource StackResource) ToFields() (fields cf.Stack) {
+	fields.Guid = resource.Metadata.Guid
+	fields.Name = resource.Entity.Name
+	fields.Description = resource.Entity.Description
+	return
+}
+
 type StackEntity struct {
 	Name        string
 	Description string
@@ -66,7 +73,7 @@ func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks 
 	}
 
 	for _, r := range resources.Resources {
-		stacks = append(stacks, cf.Stack{Guid: r.Metadata.Guid, Name: r.Entity.Name, Description: r.Entity.Description})
+		stacks = append(stacks, r.ToFields())
 	}
 	return
 }

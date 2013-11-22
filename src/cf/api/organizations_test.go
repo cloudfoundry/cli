@@ -22,6 +22,10 @@ func TestOrganizationsListOrgs(t *testing.T) {
 			{
 			  "metadata": { "guid": "org1-guid" },
 			  "entity": { "name": "Org1" }
+			},
+			{
+			  "metadata": { "guid": "org2-guid" },
+			  "entity": { "name": "Org2" }
 			}
 		]}`},
 	})
@@ -31,8 +35,8 @@ func TestOrganizationsListOrgs(t *testing.T) {
 		Path:   "/v2/organizations?page=2",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
 			{
-			  "metadata": { "guid": "org2-guid" },
-			  "entity": { "name": "Org2" }
+			  "metadata": { "guid": "org3-guid" },
+			  "entity": { "name": "Org3" }
 			}
 		]}`},
 	})
@@ -44,18 +48,16 @@ func TestOrganizationsListOrgs(t *testing.T) {
 	defer close(stopChan)
 	orgsChan, statusChan := repo.ListOrgs(stopChan)
 
-	expectedOrgs := []cf.Organization{
-		{Guid: "org1-guid", Name: "Org1", Spaces: []cf.Space{}, Domains: []cf.Domain{}},
-		{Guid: "org2-guid", Name: "Org2", Spaces: []cf.Space{}, Domains: []cf.Domain{}},
-	}
-
 	orgs := []cf.Organization{}
 	for chunk := range orgsChan {
 		orgs = append(orgs, chunk...)
 	}
 	apiResponse := <-statusChan
 
-	assert.Equal(t, orgs, expectedOrgs)
+	assert.Equal(t, len(orgs), 3)
+	assert.Equal(t, orgs[0].Guid, "org1-guid")
+	assert.Equal(t, orgs[1].Guid, "org2-guid")
+	assert.Equal(t, orgs[2].Guid, "org3-guid")
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.True(t, handler.AllRequestsCalled())
 
@@ -105,8 +107,9 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
-
-	existingOrg := cf.Organization{Guid: "org1-guid", Name: "Org1"}
+	existingOrg := cf.Organization{}
+	existingOrg.Guid = "org1-guid"
+	existingOrg.Name = "Org1"
 
 	org, apiResponse := repo.FindByName("Org1")
 	assert.True(t, handler.AllRequestsCalled())
@@ -165,8 +168,7 @@ func TestRenameOrganization(t *testing.T) {
 	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
-	org := cf.Organization{Guid: "my-org-guid"}
-	apiResponse := repo.Rename(org, "my-new-org")
+	apiResponse := repo.Rename("my-org-guid", "my-new-org")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -181,8 +183,7 @@ func TestDeleteOrganization(t *testing.T) {
 	ts, handler, repo := createOrganizationRepo(t, req)
 	defer ts.Close()
 
-	org := cf.Organization{Guid: "my-org-guid"}
-	apiResponse := repo.Delete(org)
+	apiResponse := repo.Delete("my-org-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

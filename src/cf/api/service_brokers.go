@@ -18,6 +18,15 @@ type ServiceBrokerResource struct {
 	Entity ServiceBrokerEntity
 }
 
+func (resource ServiceBrokerResource) ToFields() (fields cf.ServiceBroker) {
+	fields.Name = resource.Entity.Name
+	fields.Guid = resource.Metadata.Guid
+	fields.Url = resource.Entity.Url
+	fields.Username = resource.Entity.Username
+	fields.Password = resource.Entity.Password
+	return
+}
+
 type ServiceBrokerEntity struct {
 	Guid     string
 	Name     string
@@ -29,10 +38,10 @@ type ServiceBrokerEntity struct {
 type ServiceBrokerRepository interface {
 	ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse)
 	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
-	Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
+	Create(name, url, username, password string) (apiResponse net.ApiResponse)
 	Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
-	Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
-	Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
+	Rename(guid, name string) (apiResponse net.ApiResponse)
+	Delete(guid string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceBrokerRepository struct {
@@ -111,24 +120,15 @@ func (repo CloudControllerServiceBrokerRepository) findNextWithPath(path string)
 	nextUrl = resources.NextUrl
 
 	for _, resource := range resources.ServiceBrokers {
-		serviceBroker := cf.ServiceBroker{
-			Name:     resource.Entity.Name,
-			Guid:     resource.Metadata.Guid,
-			Url:      resource.Entity.Url,
-			Username: resource.Entity.Username,
-			Password: resource.Entity.Password,
-		}
-
-		serviceBrokers = append(serviceBrokers, serviceBroker)
+		serviceBrokers = append(serviceBrokers, resource.ToFields())
 	}
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) Create(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, password string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_brokers", repo.config.Target)
 	body := fmt.Sprintf(
-		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,
-		serviceBroker.Name, serviceBroker.Url, serviceBroker.Username, serviceBroker.Password,
+		`{"name":"%s","broker_url":"%s","auth_username":"%s","auth_password":"%s"}`, name, url, username, password,
 	)
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
@@ -142,13 +142,13 @@ func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker cf.Servi
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceBrokerRepository) Rename(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
-	body := fmt.Sprintf(`{"name":"%s"}`, serviceBroker.Name)
+func (repo CloudControllerServiceBrokerRepository) Rename(guid, name string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, guid)
+	body := fmt.Sprintf(`{"name":"%s"}`, name)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceBrokerRepository) Delete(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
+func (repo CloudControllerServiceBrokerRepository) Delete(guid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, guid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
 }

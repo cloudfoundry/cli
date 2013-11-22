@@ -6,17 +6,21 @@ import (
 )
 
 type FakeUserProvidedServiceInstanceRepo struct {
-	CreateServiceInstance cf.ServiceInstance
+	CreateName string
+	CreateDrainUrl string
+	CreateParams map[string]string
 
-	UpdateServiceInstance cf.ServiceInstance
+	UpdateServiceInstance cf.ServiceInstanceFields
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Create(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
-	repo.CreateServiceInstance = serviceInstance
+func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse) {
+	repo.CreateName = name
+	repo.CreateDrainUrl = drainUrl
+	repo.CreateParams = params
 	return
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance cf.ServiceInstanceFields) (apiResponse net.ApiResponse) {
 	repo.UpdateServiceInstance = serviceInstance
 	return
 }

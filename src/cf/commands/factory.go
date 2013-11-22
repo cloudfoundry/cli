@@ -29,7 +29,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName = make(map[string]Command)
 
 	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
-	factory.cmdsByName["app"] = application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository())
+	factory.cmdsByName["app"] = application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository(), repoLocator.GetAppInstancesRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["auth"] = NewAuthenticate(ui, configRepo, repoLocator.GetAuthenticationRepository())
 	factory.cmdsByName["bind-service"] = service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
@@ -102,7 +102,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, true)
 	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, false)
 
-	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository(), repoLocator.GetLogsRepository())
+	start := application.NewStart(ui, config, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, start, stop)
 

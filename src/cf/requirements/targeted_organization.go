@@ -9,7 +9,7 @@ import (
 
 type TargetedOrgRequirement interface {
 	Requirement
-	GetOrganization() cf.Organization
+	GetOrganizationFields() cf.OrganizationFields
 }
 
 type targetedOrgApiRequirement struct {
@@ -32,6 +32,6 @@ func (req targetedOrgApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req targetedOrgApiRequirement) GetOrganization() (org cf.Organization) {
-	return req.config.Organization
+func (req targetedOrgApiRequirement) GetOrganizationFields() (org cf.OrganizationFields) {
+	return req.config.OrganizationFields
 }

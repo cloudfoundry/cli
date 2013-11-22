@@ -53,8 +53,8 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(serviceName),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

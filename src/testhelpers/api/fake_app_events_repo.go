@@ -6,20 +6,20 @@ import (
 )
 
 type FakeAppEventsRepo struct{
-	Application cf.Application
-	Events []cf.Event
+	AppGuid string
+	Events []cf.EventFields
 }
 
 
-func (repo FakeAppEventsRepo)ListEvents(app cf.Application) (events chan []cf.Event, statusChan chan net.ApiResponse) {
-	repo.Application = app
+func (repo FakeAppEventsRepo)ListEvents(appGuid string) (events chan []cf.EventFields, statusChan chan net.ApiResponse) {
+	repo.AppGuid = appGuid
 
-	events = make(chan []cf.Event, 4)
+	events = make(chan []cf.EventFields, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
 		for _, event := range repo.Events {
-			events <- []cf.Event{event}
+			events <- []cf.EventFields{event}
 		}
 		close(events)
 		close(statusChan)

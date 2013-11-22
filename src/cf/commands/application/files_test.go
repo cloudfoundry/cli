@@ -41,7 +41,10 @@ func TestFilesFailsWithUsage(t *testing.T) {
 }
 
 func TestListingDirectoryEntries(t *testing.T) {
-	app := cf.Application{Name: "my-found-app", Guid: "my-app-guid"}
+	app := cf.Application{}
+	app.Name = "my-found-app"
+	app.Guid = "my-app-guid"
+
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
 	appFilesRepo := &testapi.FakeAppFilesRepo{FileList: "file 1\nfile 2"}
 
@@ -52,7 +55,7 @@ func TestListingDirectoryEntries(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Equal(t, appFilesRepo.Application.Guid, "my-app-guid")
+	assert.Equal(t, appFilesRepo.AppGuid, "my-app-guid")
 	assert.Equal(t, appFilesRepo.Path, "/foo")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
@@ -67,11 +70,14 @@ func callFiles(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, 
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewFiles(ui, config, appFilesRepo)

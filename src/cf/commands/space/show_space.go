@@ -4,13 +4,15 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
 )
 
 type ShowSpace struct {
-	ui     terminal.UI
-	config *configuration.Configuration
+	ui       terminal.UI
+	config   *configuration.Configuration
+	spaceReq requirements.SpaceRequirement
 }
 
 func NewShowSpace(ui terminal.UI, config *configuration.Configuration) (cmd *ShowSpace) {
@@ -21,19 +23,25 @@ func NewShowSpace(ui terminal.UI, config *configuration.Configuration) (cmd *Sho
 }
 
 func (cmd *ShowSpace) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) != 1 {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "space")
+		return
+	}
 
+	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
-		reqFactory.NewTargetedSpaceRequirement(),
+		cmd.spaceReq,
 	}
 	return
 }
 
 func (cmd *ShowSpace) Run(c *cli.Context) {
-	space := cmd.config.Space
+	space := cmd.spaceReq.GetSpace()
 	cmd.ui.Say("Getting info for space %s in org %s as %s...",
 		terminal.EntityNameColor(space.Name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
+		terminal.EntityNameColor(space.Organization.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 	cmd.ui.Ok()

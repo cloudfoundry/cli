@@ -51,7 +51,7 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganization())
+	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
 	if apiResponse.IsError() {
 		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Message)
 		return
@@ -75,7 +75,7 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 		}
 	}
 
-	apiResponse = cmd.domainRepo.Delete(domain)
+	apiResponse = cmd.domainRepo.Delete(domain.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiResponse.Message)
 		return

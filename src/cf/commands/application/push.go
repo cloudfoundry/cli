@@ -68,7 +68,7 @@ func (cmd Push) Run(c *cli.Context) {
 	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
 	dir := cmd.path(c)
-	apiResponse = cmd.appBitsRepo.UploadApp(app, dir)
+	apiResponse = cmd.appBitsRepo.UploadApp(app.Guid, dir)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -102,34 +102,31 @@ func (cmd Push) getApp(c *cli.Context) (app cf.Application, didCreate bool) {
 }
 
 func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
-	newApp := cf.Application{
-		Name:         appName,
-		Instances:    c.Int("i"),
-		Memory:       memoryLimit(c.String("m")),
-		BuildpackUrl: c.String("b"),
-		Command:      c.String("c"),
-	}
-
+	buildpackUrl := c.String("b")
+	instances := c.Int("i")
+	memory := memoryLimit(c.String("m"))
+	command := c.String("c")
 	stackName := c.String("s")
+
+	var stack cf.Stack
 	if stackName != "" {
-		var stack cf.Stack
 		stack, apiResponse = cmd.stackRepo.FindByName(stackName)
 
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
-		newApp.Stack = stack
 		cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stack.Name))
 	}
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(appName),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
-	app, apiResponse = cmd.appRepo.Create(newApp)
+
+	app, apiResponse = cmd.appRepo.Create(appName, buildpackUrl, stack.Guid, command, memory, instances)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -168,12 +165,10 @@ func (cmd Push) hostName(app cf.Application, c *cli.Context) (hostName string) {
 	return
 }
 
-func (cmd Push) createRoute(hostName string, domain cf.Domain) (route cf.Route) {
-	newRoute := cf.Route{Host: hostName, Domain: domain}
+func (cmd Push) createRoute(hostName string, domain cf.Domain) (route cf.RouteFields) {
+	cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
 
-	cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(newRoute.URL()))
-
-	route, apiResponse := cmd.routeRepo.Create(newRoute, domain)
+	route, apiResponse := cmd.routeRepo.Create(hostName, domain.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -195,22 +190,24 @@ func (cmd Push) bindAppToRoute(app cf.Application, domain cf.Domain, hostName st
 		return
 	}
 
+	routeGuid := ""
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 	if apiResponse.IsNotSuccessful() {
-		route = cmd.createRoute(hostName, domain)
+		routeGuid = cmd.createRoute(hostName, domain).Guid
 	} else {
+		routeGuid = route.Guid
 		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
 	}
 
 	for _, boundRoute := range app.Routes {
-		if boundRoute.Guid == route.Guid {
+		if boundRoute.Guid == routeGuid {
 			return
 		}
 	}
 
-	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(route.URL()), terminal.EntityNameColor(app.Name))
+	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
 
-	apiResponse = cmd.routeRepo.Bind(route, app)
+	apiResponse = cmd.routeRepo.Bind(routeGuid, app.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -239,10 +236,11 @@ func (cmd Push) restart(app cf.Application, c *cli.Context) {
 	cmd.ui.Say("")
 
 	if !c.Bool("no-start") {
-		if c.String("b") != "" {
-			updatedApp.BuildpackUrl = c.String("b")
+		if buildpackUrl := c.String("b"); buildpackUrl == "" {
+			cmd.starter.ApplicationStart(updatedApp)
+		} else {
+			cmd.starter.ApplicationStartWithBuildpack(updatedApp, buildpackUrl)
 		}
-		cmd.starter.ApplicationStart(updatedApp)
 	}
 }
 

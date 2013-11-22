@@ -13,12 +13,16 @@ import (
 )
 
 func TestStacks(t *testing.T) {
-	stacks := []cf.Stack{
-		cf.Stack{Name: "Stack-1", Description: "Stack 1 Description"},
-		cf.Stack{Name: "Stack-2", Description: "Stack 2 Description"},
-	}
+	stack1 := cf.Stack{}
+	stack1.Name = "Stack-1"
+	stack1.Description = "Stack 1 Description"
+
+	stack2 := cf.Stack{}
+	stack2.Name = "Stack-2"
+	stack2.Description = "Stack 2 Description"
+
 	stackRepo := &testapi.FakeStackRepository{
-		FindAllStacks: stacks,
+		FindAllStacks: []cf.Stack{stack1, stack2},
 	}
 
 	ui := callStacks(t, stackRepo)
@@ -45,10 +49,16 @@ func callStacks(t *testing.T, stackRepo *testapi.FakeStackRepository) (ui *testt
 	})
 	assert.NoError(t, err)
 
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+
 	config := &configuration.Configuration{
-		Space:        cf.Space{Name: "my-space"},
-		Organization: cf.Organization{Name: "my-org"},
-		AccessToken:  token,
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
 	}
 
 	cmd := NewStacks(ui, config, stackRepo)

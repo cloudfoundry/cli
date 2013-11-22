@@ -9,7 +9,9 @@ import (
 )
 
 func TestOrgReqExecute(t *testing.T) {
-	org := cf.Organization{Name: "my-org", Guid: "my-org-guid"}
+	org := cf.Organization{}
+	org.Name = "my-org"
+	org.Guid = "my-org-guid"
 	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
 	ui := new(testterm.FakeUI)
 

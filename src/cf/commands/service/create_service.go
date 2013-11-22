@@ -41,8 +41,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.Organization.Name),
-		terminal.EntityNameColor(cmd.config.Space.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -65,7 +65,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 
 	var identicalAlreadyExists bool
-	identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan)
+	identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -89,7 +89,7 @@ func findOffering(offerings []cf.ServiceOffering, name string) (offering cf.Serv
 	return
 }
 
-func findPlan(plans []cf.ServicePlan, name string) (plan cf.ServicePlan, err error) {
+func findPlan(plans []cf.ServicePlanFields, name string) (plan cf.ServicePlanFields, err error) {
 	for _, plan := range plans {
 		if name == plan.Name {
 			return plan, nil

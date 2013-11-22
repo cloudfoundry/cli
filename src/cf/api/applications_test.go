@@ -69,7 +69,7 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.Name, "App1")
 	assert.Equal(t, app.Guid, "app1-guid")
 	assert.Equal(t, app.Memory, uint64(128))
-	assert.Equal(t, app.Instances, 1)
+	assert.Equal(t, app.InstanceCount, 1)
 	assert.Equal(t, app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
 	assert.Equal(t, app.Routes[0].Host, "app1")
 	assert.Equal(t, app.Routes[0].Domain.Name, "cfapps.io")
@@ -99,9 +99,7 @@ func TestSetEnv(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	app := cf.Application{Guid: "app1-guid", Name: "App1"}
-
-	apiResponse := repo.SetEnv(app, map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
+	apiResponse := repo.SetEnv("app1-guid", map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -120,7 +118,7 @@ var createApplicationResponse = `
 var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "POST",
 	Path:    "/v2/apps",
-	Matcher: testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","command":null,"memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+	Matcher: testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusCreated,
 		Body:   createApplicationResponse},
@@ -130,42 +128,28 @@ func TestCreateApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
 	defer ts.Close()
 
-	newApp := cf.Application{
-		Name:         "my-cool-app",
-		Instances:    3,
-		Memory:       2048,
-		BuildpackUrl: "buildpack-url",
-		Stack:        cf.Stack{Guid: "some-stack-guid"},
-		Command:      "some-command",
-	}
+	createdApp, apiResponse := repo.Create("my-cool-app", "buildpack-url", "some-stack-guid", "some-command", 2048, 3)
 
-	createdApp, apiResponse := repo.Create(newApp)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-
-	assert.Equal(t, createdApp, cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"})
+	app := cf.Application{}
+	app.Name = "my-cool-app"
+	app.Guid = "my-cool-app-guid"
+	assert.Equal(t, createdApp, app)
 }
 
 func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/apps",
-		Matcher:  testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"command":null,"memory":128,"stack_guid":null,"command":null}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"stack_guid":null,"command":null}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	})
 
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	newApp := cf.Application{
-		Name:         "my-cool-app",
-		Memory:       128,
-		Instances:    1,
-		BuildpackUrl: "",
-		Stack:        cf.Stack{},
-	}
-
-	_, apiResponse := repo.Create(newApp)
+	_, apiResponse := repo.Create("my-cool-app", "", "", "", 128, 1)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -185,17 +169,17 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	ts, _, repo := createAppRepo(t, requests)
 	defer ts.Close()
 
-	createdApp, apiResponse := repo.Create(cf.Application{Name: "name with space"})
+	createdApp, apiResponse := repo.Create("name with space", "", "", "", 0, 0)
 	assert.Equal(t, createdApp, cf.Application{})
 	assert.Contains(t, apiResponse.Message, "App name is invalid")
 
-	_, apiResponse = repo.Create(cf.Application{Name: "name-with-inv@lid-chars!"})
+	_, apiResponse = repo.Create("name-with-inv@lid-chars!", "", "", "", 0, 0)
 	assert.True(t, apiResponse.IsNotSuccessful())
 
-	_, apiResponse = repo.Create(cf.Application{Name: "Valid-Name"})
+	_, apiResponse = repo.Create("Valid-Name", "", "", "", 0, 0)
 	assert.True(t, apiResponse.IsSuccessful())
 
-	_, apiResponse = repo.Create(cf.Application{Name: "name_with_numbers_2"})
+	_, apiResponse = repo.Create("name_with_numbers_2", "", "", "", 0, 0)
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -209,9 +193,7 @@ func TestDeleteApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{deleteApplicationRequest})
 	defer ts.Close()
 
-	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-
-	apiResponse := repo.Delete(app)
+	apiResponse := repo.Delete("my-cool-app-guid")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -228,14 +210,13 @@ func TestRename(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{renameApplicationRequest})
 	defer ts.Close()
 
-	org := cf.Application{Guid: "my-app-guid"}
-	apiResponse := repo.Rename(org, "my-new-app")
+	apiResponse := repo.Rename("my-app-guid", "my-new-app")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func testScale(t *testing.T, app cf.Application, expectedBody string) {
+func testScale(t *testing.T, app cf.ApplicationFields, expectedBody string) {
 	scaleApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/apps/my-app-guid",
@@ -253,36 +234,36 @@ func testScale(t *testing.T, app cf.Application, expectedBody string) {
 }
 
 func TestScaleAll(t *testing.T) {
-	app := cf.Application{
-		Guid:      "my-app-guid",
-		DiskQuota: 1024,
-		Instances: 5,
-		Memory:    512,
-	}
+	app := cf.ApplicationFields{}
+	app.Guid = "my-app-guid"
+	app.DiskQuota = 1024
+	app.InstanceCount = 5
+	app.Memory = 512
+
 	testScale(t, app, `{"disk_quota":1024,"instances":5,"memory":512}`)
 }
 
 func TestScaleApplicationDiskQuota(t *testing.T) {
-	app := cf.Application{
-		Guid:      "my-app-guid",
-		DiskQuota: 1024,
-	}
+	app := cf.ApplicationFields{}
+	app.Guid = "my-app-guid"
+	app.DiskQuota = 1024
+
 	testScale(t, app, `{"disk_quota":1024}`)
 }
 
 func TestScaleApplicationInstances(t *testing.T) {
-	app := cf.Application{
-		Guid:      "my-app-guid",
-		Instances: 5,
-	}
+	app := cf.ApplicationFields{}
+	app.Guid = "my-app-guid"
+	app.InstanceCount = 5
+
 	testScale(t, app, `{"instances":5}`)
 }
 
 func TestScaleApplicationMemory(t *testing.T) {
-	app := cf.Application{
-		Guid:   "my-app-guid",
-		Memory: 512,
-	}
+	app := cf.ApplicationFields{}
+	app.Guid = "my-app-guid"
+	app.Memory = 512
+
 	testScale(t, app, `{"memory":512}`)
 }
 
@@ -306,8 +287,7 @@ func TestStartApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{startApplicationRequest})
 	defer ts.Close()
 
-	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-	updatedApp, apiResponse := repo.Start(app)
+	updatedApp, apiResponse := repo.Start("my-cool-app-guid")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -336,8 +316,7 @@ func TestStopApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{stopApplicationRequest})
 	defer ts.Close()
 
-	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-	updatedApp, apiResponse := repo.Stop(app)
+	updatedApp, apiResponse := repo.Stop("my-cool-app-guid")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -346,41 +325,15 @@ func TestStopApplication(t *testing.T) {
 	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
 }
 
-func TestGetInstances(t *testing.T) {
-	getInstancesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/apps/my-cool-app-guid/instances",
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-{
-  "1": {
-    "state": "STARTING"
-  },
-  "0": {
-    "state": "RUNNING"
-  }
-}`},
-	})
-
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{getInstancesRequest})
-	defer ts.Close()
-
-	app := cf.Application{Name: "my-cool-app", Guid: "my-cool-app-guid"}
-	instances, apiResponse := repo.GetInstances(app)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, len(instances), 2)
-	assert.Equal(t, instances[0].State, "running")
-	assert.Equal(t, instances[1].State, "starting")
-}
-
 func createAppRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 		Target:      ts.URL,
-		Space:       cf.Space{Name: "my-space", Guid: "my-space-guid"},
+		SpaceFields: space,
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerApplicationRepository(config, gateway)

@@ -32,10 +32,11 @@ func TestDeleteBuildpackGetRequirements(t *testing.T) {
 
 func TestDeleteBuildpackSuccess(t *testing.T) {
 	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-buildpack"
+	buildpack.Guid = "my-buildpack-guid"
 	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: cf.Buildpack{
-			Name: "my-buildpack",
-		},
+		FindByNameBuildpack: buildpack,
 	}
 	cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
@@ -44,7 +45,7 @@ func TestDeleteBuildpackSuccess(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpack.Name, "my-buildpack")
+	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "my-buildpack")
@@ -56,10 +57,11 @@ func TestDeleteBuildpackSuccess(t *testing.T) {
 
 func TestDeleteBuildpackNoConfirmation(t *testing.T) {
 	ui := &testterm.FakeUI{Inputs: []string{"no"}}
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-buildpack"
+	buildpack.Guid = "my-buildpack-guid"
 	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: cf.Buildpack{
-			Name: "my-buildpack",
-		},
+		FindByNameBuildpack: buildpack,
 	}
 	cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
@@ -68,7 +70,7 @@ func TestDeleteBuildpackNoConfirmation(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpack.Name, "")
+	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "")
 
 	assert.Contains(t, ui.Prompts[0], "delete")
 	assert.Contains(t, ui.Prompts[0], "my-buildpack")
@@ -76,9 +78,12 @@ func TestDeleteBuildpackNoConfirmation(t *testing.T) {
 
 func TestDeleteBuildpackThatDoesNotExist(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-buildpack"
+	buildpack.Guid = "my-buildpack-guid"
 	buildpackRepo := &testapi.FakeBuildpackRepository{
 		FindByNameNotFound:  true,
-		FindByNameBuildpack: cf.Buildpack{Name: "my-buildpack"},
+		FindByNameBuildpack: buildpack,
 	}
 
 	ui := &testterm.FakeUI{}
@@ -98,8 +103,11 @@ func TestDeleteBuildpackThatDoesNotExist(t *testing.T) {
 
 func TestDeleteBuildpackDeleteError(t *testing.T) {
 	ui := &testterm.FakeUI{Inputs: []string{"y"}}
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-buildpack"
+	buildpack.Guid = "my-buildpack-guid"
 	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: cf.Buildpack{Name: "my-buildpack"},
+		FindByNameBuildpack: buildpack,
 		DeleteApiResponse:   net.NewApiResponseWithMessage("failed badly"),
 	}
 
@@ -110,7 +118,7 @@ func TestDeleteBuildpackDeleteError(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpack.Name, "my-buildpack")
+	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
 	assert.Contains(t, ui.Outputs[0], "Deleting buildpack")
 	assert.Contains(t, ui.Outputs[0], "my-buildpack")
@@ -121,8 +129,11 @@ func TestDeleteBuildpackDeleteError(t *testing.T) {
 
 func TestDeleteBuildpackForceFlagSkipsConfirmation(t *testing.T) {
 	ui := &testterm.FakeUI{}
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-buildpack"
+	buildpack.Guid = "my-buildpack-guid"
 	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: cf.Buildpack{Name: "my-buildpack"},
+		FindByNameBuildpack: buildpack,
 	}
 
 	cmd := NewDeleteBuildpack(ui, buildpackRepo)
@@ -132,7 +143,7 @@ func TestDeleteBuildpackForceFlagSkipsConfirmation(t *testing.T) {
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpack.Name, "my-buildpack")
+	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Contains(t, ui.Outputs[0], "Deleting buildpack")
