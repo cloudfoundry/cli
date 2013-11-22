@@ -49,34 +49,44 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	domains, apiResponse := cmd.domainRepo.FindAllByOrg(org.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	stopChan := make(chan bool)
+	defer close(stopChan)
+
+	domainsChan, statusChan := cmd.domainRepo.ListDomainsForOrg(org.Guid, stopChan)
+
+	table := cmd.ui.Table([]string{"name", "status", "spaces"})
+	noDomains := true
+
+	for domains := range domainsChan {
+		rows := [][]string{}
+		for _, domain := range domains {
+
+			var status string
+			if domain.Shared {
+				status = "shared"
+			} else if len(domain.Spaces) == 0 {
+				status = "reserved"
+			} else {
+				status = "owned"
+			}
+
+			rows = append(rows, []string{
+				domain.Name,
+				status,
+				strings.Join(formatters.MapStr(domain.Spaces), ", "),
+			})
+		}
+		table.Print(rows)
+		noDomains = false
+	}
+
+	apiStatus := <-statusChan
+	if apiStatus.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching domains.\n%s", apiStatus.Message)
 		return
 	}
 
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	table := [][]string{
-		[]string{"name", "status", "spaces"},
+	if noDomains {
+		cmd.ui.Say("No domains found")
 	}
-	for _, domain := range domains {
-		var status string
-		if domain.Shared {
-			status = "shared"
-		} else if len(domain.Spaces) == 0 {
-			status = "reserved"
-		} else {
-			status = "owned"
-		}
-
-		table = append(table, []string{
-			domain.Name,
-			status,
-			strings.Join(formatters.MapStr(domain.Spaces), ", "),
-		})
-	}
-
-	cmd.ui.DisplayTable(table)
 }

@@ -2,7 +2,7 @@ package domain_test
 
 import (
 	"cf"
-	. "cf/commands/domain"
+	"cf/commands/domain"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -64,24 +64,25 @@ func TestListDomains(t *testing.T) {
 	domain3.Name = "Domain3"
 
 	domainRepo := &testapi.FakeDomainRepository{
-		FindAllByOrgDomains: []cf.Domain{domain1, domain2, domain3},
+		ListDomainsForOrgDomains: []cf.Domain{domain1, domain2, domain3},
 	}
 	fakeUI := callListDomains(t, []string{}, reqFactory, domainRepo)
+
+	assert.Equal(t, domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
 
 	assert.Contains(t, fakeUI.Outputs[0], "Getting domains in org")
 	assert.Contains(t, fakeUI.Outputs[0], "my-org")
 	assert.Contains(t, fakeUI.Outputs[0], "my-user")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
 
-	assert.Contains(t, fakeUI.Outputs[4], "Domain1")
-	assert.Contains(t, fakeUI.Outputs[4], "shared")
+	assert.Contains(t, fakeUI.Outputs[2], "Domain1")
+	assert.Contains(t, fakeUI.Outputs[2], "shared")
 
-	assert.Contains(t, fakeUI.Outputs[5], "Domain2")
-	assert.Contains(t, fakeUI.Outputs[5], "owned")
-	assert.Contains(t, fakeUI.Outputs[5], "my-space, my-space-2")
+	assert.Contains(t, fakeUI.Outputs[3], "Domain2")
+	assert.Contains(t, fakeUI.Outputs[3], "owned")
+	assert.Contains(t, fakeUI.Outputs[3], "my-space, my-space-2")
 
-	assert.Contains(t, fakeUI.Outputs[6], "Domain3")
-	assert.Contains(t, fakeUI.Outputs[6], "reserved")
+	assert.Contains(t, fakeUI.Outputs[4], "Domain3")
+	assert.Contains(t, fakeUI.Outputs[4], "reserved")
 }
 
 func callListDomains(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
@@ -105,7 +106,7 @@ func callListDomains(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 		AccessToken:        token,
 	}
 
-	cmd := NewListDomains(fakeUI, config, domainRepo)
+	cmd := domain.NewListDomains(fakeUI, config, domainRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

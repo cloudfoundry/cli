@@ -10,8 +10,8 @@ type FakeDomainRepository struct {
 
 	FindAllInCurrentSpaceDomains []cf.Domain
 
-	FindAllByOrgOrgGuid string
-	FindAllByOrgDomains []cf.Domain
+	ListDomainsForOrgDomainsGuid string
+	ListDomainsForOrgDomains []cf.Domain
 
 	FindByNameInOrgDomain cf.Domain
 	FindByNameInOrgApiResponse net.ApiResponse
@@ -45,9 +45,32 @@ func (repo *FakeDomainRepository) FindDefaultAppDomain() (domain cf.Domain, apiR
 	return
 }
 
-func (repo *FakeDomainRepository) FindAllByOrg(orgGuid string)(domains []cf.Domain, apiResponse net.ApiResponse){
-	repo.FindAllByOrgOrgGuid = orgGuid
-	domains = repo.FindAllByOrgDomains
+func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse){
+	repo.ListDomainsForOrgDomainsGuid = orgGuid
+
+	domainsChan = make(chan []cf.Domain, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		domainsCount := len(repo.ListDomainsForOrgDomains)
+		for i:= 0; i < domainsCount; i += 2 {
+			select {
+			case <-stop:
+				break
+			default:
+				if domainsCount - i > 1 {
+					domainsChan <- repo.ListDomainsForOrgDomains[i:i+2]
+				} else {
+					domainsChan <- repo.ListDomainsForOrgDomains[i:]
+				}
+			}
+		}
+
+		close(domainsChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
 
 	return
 }

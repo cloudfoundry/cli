@@ -12,10 +12,15 @@ import (
 	"testing"
 )
 
-var domainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/domains?inline-relations-depth=1",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+		"next_url": "/v2/domains?inline-relations-depth=1&page=2",
+		"resources": [
 	{
       "metadata": {
-        "guid": "my-domain-guid"
+        "guid": "domain1-guid"
       },
       "entity": {
         "name": "example.com",
@@ -31,7 +36,7 @@ var domainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"resou
     },
     {
       "metadata": {
-        "guid": "some-shared-domain-guid"
+        "guid": "domain2-guid"
       },
       "entity": {
         "name": "some-shared.example.com",
@@ -44,46 +49,92 @@ var domainsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `{"resou
           }
         ]
       }
-    },
+    }
+		]}`},
+})
+
+var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/domains?inline-relations-depth=1&page=2",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
     {
       "metadata": {
-        "guid": "another-domain-guid"
+        "guid": "not-in-my-org-domain-guid"
       },
       "entity": {
         "name": "example.com",
-        "owning_organization_guid": "not-in-my-org-guid",
+        "owning_organization_guid": "not-my-org-guid",
         "wildcard": true,
         "spaces": []
       }
+    },
+	{
+      "metadata": {
+        "guid": "domain3-guid"
+      },
+      "entity": {
+        "name": "example.com",
+        "owning_organization_guid": "my-org-guid",
+        "wildcard": true,
+        "spaces": [
+          {
+            "metadata": { "guid": "my-space-guid" },
+            "entity": { "name": "my-space" }
+          }
+        ]
+      }
     }
-]}`}
+		]}`},
+})
 
-func TestDomainFindAllByOrg(t *testing.T) {
-	domainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "GET",
-		Path:     "/v2/domains?inline-relations-depth=1",
-		Response: domainsResponse,
-	})
-
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{domainsReq})
+func TestDomainListDomainsForOrg(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
 	defer ts.Close()
 
-	domains, apiResponse := repo.FindAllByOrg("my-org-guid")
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	domainsChan, statusChan := repo.ListDomainsForOrg("my-org-guid", stopChan)
 
-	assert.True(t, handler.AllRequestsCalled())
+	domains := []cf.Domain{}
+	for chunk := range domainsChan {
+		domains = append(domains, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.Equal(t, len(domains), 3)
+	assert.Equal(t, domains[0].Guid, "domain1-guid")
+	assert.Equal(t, domains[1].Guid, "domain2-guid")
+	assert.Equal(t, domains[2].Guid, "domain3-guid")
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, len(domains), 2)
+	assert.True(t, handler.AllRequestsCalled())
 
-	domain := domains[0]
-	assert.Equal(t, domain.Name, "example.com")
-	assert.Equal(t, domain.Guid, "my-domain-guid")
-	assert.False(t, domain.Shared)
-	assert.Equal(t, domain.Spaces[0].Name, "my-space")
+}
 
-	domain = domains[1]
-	assert.Equal(t, domain.Name, "some-shared.example.com")
-	assert.Equal(t, domain.Guid, "some-shared-domain-guid")
-	assert.True(t, domain.Shared)
+func TestDomainListDomainsForOrgWithNoDomains(t *testing.T) {
+	emptyDomainsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/domains?inline-relations-depth=1",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [] }`},
+	})
+
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{emptyDomainsRequest})
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	domainsChan, statusChan := repo.ListDomainsForOrg("my-org-guid", stopChan)
+
+	domains := []cf.Domain{}
+	for chunk := range domainsChan {
+		domains = append(domains, chunk...)
+	}
+
+	_, ok := <-domainsChan
+	apiResponse := <-statusChan
+
+	assert.False(t, ok)
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.True(t, handler.AllRequestsCalled())
 }
 
 func TestDomainFindDefault(t *testing.T) {
