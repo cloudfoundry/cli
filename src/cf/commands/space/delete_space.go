@@ -34,6 +34,12 @@ func (cmd *DeleteSpace) GetRequirements(reqFactory requirements.Factory, c *cli.
 		return
 	}
 
+	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedOrgRequirement(),
+		cmd.spaceReq,
+	}
 	return
 }
 
@@ -47,18 +53,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	space, apiResponse := cmd.spaceRepo.FindByName(spaceName)
-
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	if apiResponse.IsNotFound() {
-		cmd.ui.Ok()
-		cmd.ui.Warn("Space %s does not exist.", spaceName)
-		return
-	}
+	space := cmd.spaceReq.GetSpace()
 
 	if !force {
 		response := cmd.ui.Confirm(
@@ -71,7 +66,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 		}
 	}
 
-	apiResponse = cmd.spaceRepo.Delete(space.Guid)
+	apiResponse := cmd.spaceRepo.Delete(space.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
