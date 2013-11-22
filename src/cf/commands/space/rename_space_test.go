@@ -27,7 +27,15 @@ func TestRenameSpaceFailsWithUsage(t *testing.T) {
 func TestRenameSpaceRequirements(t *testing.T) {
 	spaceRepo := &testapi.FakeSpaceRepository{}
 
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+	callRenameSpace(t, []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
+	assert.False(t, testcmd.CommandDidPassRequirements)
+
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+	callRenameSpace(t, []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
+	assert.False(t, testcmd.CommandDidPassRequirements)
+
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	callRenameSpace(t, []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.SpaceName, "my-space")
@@ -38,7 +46,7 @@ func TestRenameSpaceRun(t *testing.T) {
 	space := cf.Space{}
 	space.Name = "my-space"
 	space.Guid = "my-space-guid"
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Space: space}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
 	ui := callRenameSpace(t, []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Renaming space")

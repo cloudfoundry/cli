@@ -35,6 +35,7 @@ func (cmd *RenameSpace) GetRequirements(reqFactory requirements.Factory, c *cli.
 	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 	}
 	return

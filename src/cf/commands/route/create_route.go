@@ -47,6 +47,7 @@ func (cmd *CreateRoute) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 		cmd.domainReq,
 	}

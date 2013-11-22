@@ -15,13 +15,17 @@ import (
 func TestShowSpaceRequirements(t *testing.T) {
 	args := []string{"my-space"}
 
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callShowSpace(t, args, reqFactory)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 	callShowSpace(t, args, reqFactory)
 	assert.False(t, testcmd.CommandDidPassRequirements)
+
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+	callShowSpace(t, args, reqFactory)
+	assert.False(t, testcmd.CommandDidPassRequirements)
+
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	callShowSpace(t, args, reqFactory)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestShowSpaceInfoSuccess(t *testing.T) {
@@ -50,7 +54,7 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 	space.Domains = domains
 	space.ServiceInstances = services
 
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Space: space}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
 	ui := callShowSpace(t, []string{"space1"}, reqFactory)
 	assert.Contains(t, ui.Outputs[0], "Getting info for space")
 	assert.Contains(t, ui.Outputs[0], "space1")

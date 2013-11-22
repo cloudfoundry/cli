@@ -32,6 +32,7 @@ func (cmd *ShowSpace) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 	cmd.spaceReq = reqFactory.NewSpaceRequirement(c.Args()[0])
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedOrgRequirement(),
 		cmd.spaceReq,
 	}
 	return

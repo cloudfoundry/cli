@@ -14,20 +14,23 @@ import (
 )
 
 func TestCreateRouteRequirements(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	callCreateRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 	callCreateRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
+
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+	callCreateRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+	assert.False(t, testcmd.CommandDidPassRequirements)
+
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+	callCreateRoute(t, []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestCreateRouteFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	routeRepo := &testapi.FakeRouteRepository{}
 
 	ui := callCreateRoute(t, []string{""}, reqFactory, routeRepo)
@@ -54,9 +57,10 @@ func TestCreateRoute(t *testing.T) {
 	domain.Guid = "domain-guid"
 	domain.Name = "example.com"
 	reqFactory := &testreq.FakeReqFactory{
-		LoginSuccess: true,
-		Domain:       cf.Domain{DomainFields: domain},
-		Space:        cf.Space{SpaceFields: space},
+		LoginSuccess:       true,
+		TargetedOrgSuccess: true,
+		Domain:             cf.Domain{DomainFields: domain},
+		Space:              cf.Space{SpaceFields: space},
 	}
 	routeRepo := &testapi.FakeRouteRepository{}
 
@@ -83,9 +87,10 @@ func TestCreateRouteIsIdempotent(t *testing.T) {
 	domain.Guid = "domain-guid"
 	domain.Name = "example.com"
 	reqFactory := &testreq.FakeReqFactory{
-		LoginSuccess: true,
-		Domain:       cf.Domain{DomainFields: domain},
-		Space:        cf.Space{SpaceFields: space},
+		LoginSuccess:       true,
+		TargetedOrgSuccess: true,
+		Domain:             cf.Domain{DomainFields: domain},
+		Space:              cf.Space{SpaceFields: space},
 	}
 
 	route := cf.Route{}
