@@ -24,22 +24,28 @@ type UserEntity struct {
 	Admin bool
 }
 
+var OrgRoles []string
+var SpaceRoles []string
+
+func init() {
+	for role, _ := range orgRoleToPathMap {
+		OrgRoles = append(OrgRoles, role)
+	}
+	for role, _ := range spaceRoleToPathMap {
+		SpaceRoles = append(SpaceRoles, role)
+	}
+}
+
 var orgRoleToPathMap = map[string]string{
-	"OrgManager":     "managers",
-	"BillingManager": "billing_managers",
-	"OrgAuditor":     "auditors",
+	cf.ORG_MANAGER:     "managers",
+	cf.BILLING_MANAGER: "billing_managers",
+	cf.ORG_AUDITOR:     "auditors",
 }
 
 var spaceRoleToPathMap = map[string]string{
-	"SpaceManager":   "managers",
-	"SpaceDeveloper": "developers",
-	"SpaceAuditor":   "auditors",
-}
-
-var orgPathToDisplayNameMap = map[string]string{
-	"managers":         "ORG MANAGER",
-	"billing_managers": "BILLING MANAGER",
-	"auditors":         "ORG AUDITOR",
+	cf.SPACE_MANAGER:   "managers",
+	cf.SPACE_DEVELOPER: "developers",
+	cf.SPACE_AUDITOR:   "auditors",
 }
 
 var spacePathToDisplayNameMap = map[string]string{
@@ -50,7 +56,7 @@ var spacePathToDisplayNameMap = map[string]string{
 
 type UserRepository interface {
 	FindByUsername(username string) (user cf.UserFields, apiResponse net.ApiResponse)
-	FindAllInOrgByRole(orgGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse)
+	ListUsersInOrgForRole(orgGuid string, role string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse)
 	FindAllInSpaceByRole(spaceGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse)
 	Create(username, password string) (apiResponse net.ApiResponse)
 	Delete(userGuid string) (apiResponse net.ApiResponse)
@@ -94,19 +100,41 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 	return
 }
 
-func (repo CloudControllerUserRepository) FindAllInOrgByRole(orgGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse) {
-	usersByRole = make(map[string][]cf.UserFields)
+func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
+	usersChan = make(chan []cf.UserFields, 4)
+	statusChan = make(chan net.ApiResponse, 1)
 
-	for rolePath, displayName := range orgPathToDisplayNameMap {
-		var users []cf.UserFields
+	go func() {
+		path := fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, orgRoleToPathMap[roleName])
+	loop:
+		for path != "" {
+			select {
+			case <-stop:
+				break loop
+			default:
+				var (
+					users       []cf.UserFields
+					apiResponse net.ApiResponse
+				)
 
-		path := fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, rolePath)
-		users, apiResponse = repo.findAllWithPath(path)
-		if apiResponse.IsNotSuccessful() {
-			return
+				users, path, apiResponse = repo.findNextWithPath(path)
+				if apiResponse.IsNotSuccessful() {
+					statusChan <- apiResponse
+					close(usersChan)
+					close(statusChan)
+					return
+				}
+
+				if len(users) > 0 {
+					usersChan <- users
+				}
+			}
 		}
-		usersByRole[displayName] = users
-	}
+		close(usersChan)
+		close(statusChan)
+		cf.WaitForClose(stop)
+	}()
+
 	return
 }
 
@@ -117,7 +145,7 @@ func (repo CloudControllerUserRepository) FindAllInSpaceByRole(spaceGuid string)
 		var users []cf.UserFields
 
 		path := fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, rolePath)
-		users, apiResponse = repo.findAllWithPath(path)
+		users, _, apiResponse = repo.findNextWithPath(path)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
@@ -126,23 +154,17 @@ func (repo CloudControllerUserRepository) FindAllInSpaceByRole(spaceGuid string)
 	return
 }
 
-func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []cf.UserFields, apiResponse net.ApiResponse) {
-	allUserResources := []UserResource{}
+func (repo CloudControllerUserRepository) findNextWithPath(path string) (users []cf.UserFields, nextUrl string, apiResponse net.ApiResponse) {
+	paginatedResources := new(PaginatedUserResources)
 
-	for path != "" {
-		paginatedResources := new(PaginatedUserResources)
-		url := fmt.Sprintf("%s%s", repo.config.Target, path)
-
-		apiResponse = repo.ccGateway.GetResource(url, repo.config.AccessToken, paginatedResources)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-
-		allUserResources = append(allUserResources, paginatedResources.Resources...)
-		path = paginatedResources.NextUrl
+	apiResponse = repo.ccGateway.GetResource(repo.config.Target+path, repo.config.AccessToken, paginatedResources)
+	if apiResponse.IsNotSuccessful() {
+		return
 	}
 
-	if len(allUserResources) == 0 {
+	nextUrl = paginatedResources.NextUrl
+
+	if len(paginatedResources.Resources) == 0 {
 		return
 	}
 
@@ -152,7 +174,7 @@ func (repo CloudControllerUserRepository) findAllWithPath(path string) (users []
 	}
 
 	guidFilters := []string{}
-	for _, r := range allUserResources {
+	for _, r := range paginatedResources.Resources {
 		users = append(users, cf.UserFields{Guid: r.Metadata.Guid, IsAdmin: r.Entity.Admin})
 		guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, r.Metadata.Guid))
 	}

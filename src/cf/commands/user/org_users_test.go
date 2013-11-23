@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -51,9 +52,12 @@ func TestOrgUsers(t *testing.T) {
 	user2.Username = "user2"
 	user3 := cf.UserFields{}
 	user3.Username = "user3"
-	userRepo.FindAllInOrgByRoleUsersByRole = map[string][]cf.UserFields{
-		"MANAGER": []cf.UserFields{user, user2},
-		"DEV":     []cf.UserFields{user3},
+	user4 := cf.UserFields{}
+	user4.Username = "user4"
+	userRepo.ListUsersByRole = map[string][]cf.UserFields{
+		cf.ORG_MANAGER:     []cf.UserFields{user, user2},
+		cf.BILLING_MANAGER: []cf.UserFields{user4},
+		cf.ORG_AUDITOR:     []cf.UserFields{user3},
 	}
 
 	reqFactory := &testreq.FakeReqFactory{
@@ -63,20 +67,21 @@ func TestOrgUsers(t *testing.T) {
 
 	ui := callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
 
+	assert.Equal(t, userRepo.ListUsersOrganizationGuid, "found-org-guid")
+
 	assert.Contains(t, ui.Outputs[0], "Getting users in org")
 	assert.Contains(t, ui.Outputs[0], "Found Org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, userRepo.FindAllInOrgByRoleOrganizationGuid, "found-org-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[3], "MANAGER")
-	assert.Contains(t, ui.Outputs[4], "user1")
-	assert.Contains(t, ui.Outputs[5], "user2")
-
-	assert.Contains(t, ui.Outputs[7], "DEV")
-	assert.Contains(t, ui.Outputs[8], "user3")
+	testassert.SliceContains(t, ui.Outputs, []string{
+		"ORG MANAGER",
+		"user1",
+		"user2",
+		"BILLING MANAGER",
+		"user4",
+		"ORG AUDITOR",
+		"user3",
+	})
 }
 
 func callOrgUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {

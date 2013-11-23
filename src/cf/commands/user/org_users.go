@@ -1,6 +1,7 @@
 package user
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -8,6 +9,14 @@ import (
 	"errors"
 	"github.com/codegangsta/cli"
 )
+
+var orgRoles = []string{cf.ORG_MANAGER, cf.BILLING_MANAGER, cf.ORG_AUDITOR}
+
+var orgRoleToDisplayName = map[string]string{
+	cf.ORG_MANAGER:     "ORG MANAGER",
+	cf.BILLING_MANAGER: "BILLING MANAGER",
+	cf.ORG_AUDITOR:     "ORG AUDITOR",
+}
 
 type OrgUsers struct {
 	ui       terminal.UI
@@ -46,20 +55,27 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	usersByRole, apiResponse := cmd.userRepo.FindAllInOrgByRole(org.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
+	for _, role := range orgRoles {
+		stopChan := make(chan bool)
+		defer close(stopChan)
 
-	cmd.ui.Ok()
+		displayName := orgRoleToDisplayName[role]
 
-	for role, users := range usersByRole {
+		usersChan, statusChan := cmd.userRepo.ListUsersInOrgForRole(org.Guid, role, stopChan)
+
 		cmd.ui.Say("")
-		cmd.ui.Say("%s", terminal.HeaderColor(role))
+		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
 
-		for _, user := range users {
-			cmd.ui.Say("  %s", user.Username)
+		for users := range usersChan {
+			for _, user := range users {
+				cmd.ui.Say("  %s", user.Username)
+			}
+		}
+
+		apiStatus := <-statusChan
+		if apiStatus.IsNotSuccessful() {
+			cmd.ui.Failed("Failed fetching org-users for role %s.\n%s", apiStatus.Message, displayName)
+			return
 		}
 	}
 }

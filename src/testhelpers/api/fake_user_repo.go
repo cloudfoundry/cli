@@ -10,8 +10,8 @@ type FakeUserRepository struct {
 	FindByUsernameUserFields cf.UserFields
 	FindByUsernameNotFound bool
 
-	FindAllInOrgByRoleOrganizationGuid string
-	FindAllInOrgByRoleUsersByRole map[string][]cf.UserFields
+	ListUsersOrganizationGuid string
+	ListUsersByRole map[string][]cf.UserFields
 
 	FindAllInSpaceByRoleSpaceGuid string
 	FindAllInSpaceByRoleUsersByRole map[string][]cf.UserFields
@@ -50,9 +50,33 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user cf.UserFie
 	return
 }
 
-func (repo *FakeUserRepository) FindAllInOrgByRole(orgGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse) {
-	repo.FindAllInOrgByRoleOrganizationGuid = orgGuid
-	usersByRole = repo.FindAllInOrgByRoleUsersByRole
+func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
+	repo.ListUsersOrganizationGuid = orgGuid
+
+	usersChan = make(chan []cf.UserFields, 4)
+	statusChan = make(chan net.ApiResponse, 1)
+
+	go func() {
+		usersCount := len(repo.ListUsersByRole[roleName])
+		for i:= 0; i < usersCount; i += 2 {
+			select {
+			case <-stop:
+				break
+			default:
+				if usersCount - i > 1 {
+					usersChan <- repo.ListUsersByRole[roleName][i:i+2]
+				} else {
+					usersChan <- repo.ListUsersByRole[roleName][i:]
+				}
+			}
+		}
+
+		close(usersChan)
+		close(statusChan)
+
+		cf.WaitForClose(stop)
+	}()
+
 	return
 }
 
