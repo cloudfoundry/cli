@@ -36,16 +36,10 @@ var spaceRoleToPathMap = map[string]string{
 	cf.SPACE_AUDITOR:   "auditors",
 }
 
-var spacePathToDisplayNameMap = map[string]string{
-	"managers":   "SPACE MANAGER",
-	"developers": "SPACE DEVELOPER",
-	"auditors":   "SPACE AUDITOR",
-}
-
 type UserRepository interface {
 	FindByUsername(username string) (user cf.UserFields, apiResponse net.ApiResponse)
 	ListUsersInOrgForRole(orgGuid string, role string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse)
-	FindAllInSpaceByRole(spaceGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse)
+	ListUsersInSpaceForRole(spaceGuid string, role string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse)
 	Create(username, password string) (apiResponse net.ApiResponse)
 	Delete(userGuid string) (apiResponse net.ApiResponse)
 	SetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse)
@@ -89,11 +83,20 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 }
 
 func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
+	path := fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, orgRoleToPathMap[roleName])
+	return repo.listUsersForRole(path, roleName, stop)
+}
+
+func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
+	path := fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, spaceRoleToPathMap[roleName])
+	return repo.listUsersForRole(path, roleName, stop)
+}
+
+func (repo CloudControllerUserRepository) listUsersForRole(path string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
 	usersChan = make(chan []cf.UserFields, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
-		path := fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, orgRoleToPathMap[roleName])
 	loop:
 		for path != "" {
 			select {
@@ -123,22 +126,6 @@ func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, 
 		cf.WaitForClose(stop)
 	}()
 
-	return
-}
-
-func (repo CloudControllerUserRepository) FindAllInSpaceByRole(spaceGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse) {
-	usersByRole = make(map[string][]cf.UserFields)
-
-	for rolePath, displayName := range spacePathToDisplayNameMap {
-		var users []cf.UserFields
-
-		path := fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, rolePath)
-		users, _, apiResponse = repo.findNextWithPath(path)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-		usersByRole[displayName] = users
-	}
 	return
 }
 

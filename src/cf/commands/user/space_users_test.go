@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -55,17 +56,21 @@ func TestSpaceUsers(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameInOrgSpace: space}
+	userRepo := &testapi.FakeUserRepository{}
 
-	usersByRole := map[string][]cf.UserFields{
-		"SPACE MANAGER": []cf.UserFields{
-			{Username: "My UserFields 1"},
-			{Username: "My UserFields 2"},
-		},
-		"SPACE DEV": []cf.UserFields{
-			{Username: "My UserFields 3"},
-		},
+	user := cf.UserFields{}
+	user.Username = "user1"
+	user2 := cf.UserFields{}
+	user2.Username = "user2"
+	user3 := cf.UserFields{}
+	user3.Username = "user3"
+	user4 := cf.UserFields{}
+	user4.Username = "user4"
+	userRepo.ListUsersByRole = map[string][]cf.UserFields{
+		cf.SPACE_MANAGER:   []cf.UserFields{user, user2},
+		cf.SPACE_DEVELOPER: []cf.UserFields{user4},
+		cf.SPACE_AUDITOR:   []cf.UserFields{user3},
 	}
-	userRepo := &testapi.FakeUserRepository{FindAllInSpaceByRoleUsersByRole: usersByRole}
 
 	ui := callSpaceUsers(t, []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 
@@ -77,16 +82,17 @@ func TestSpaceUsers(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Space1")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, userRepo.FindAllInSpaceByRoleSpaceGuid, "space1-guid")
+	assert.Equal(t, userRepo.ListUsersSpaceGuid, "space1-guid")
 
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[3], "SPACE MANAGER")
-	assert.Contains(t, ui.Outputs[4], "My UserFields 1")
-	assert.Contains(t, ui.Outputs[5], "My UserFields 2")
-
-	assert.Contains(t, ui.Outputs[7], "SPACE DEV")
-	assert.Contains(t, ui.Outputs[8], "My UserFields 3")
+	testassert.SliceContains(t, ui.Outputs, []string{
+		"SPACE MANAGER",
+		"user1",
+		"user2",
+		"SPACE DEVELOPER",
+		"user4",
+		"SPACE AUDITOR",
+		"user3",
+	})
 }
 
 func callSpaceUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {

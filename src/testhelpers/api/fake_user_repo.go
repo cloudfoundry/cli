@@ -11,10 +11,8 @@ type FakeUserRepository struct {
 	FindByUsernameNotFound bool
 
 	ListUsersOrganizationGuid string
+	ListUsersSpaceGuid string
 	ListUsersByRole map[string][]cf.UserFields
-
-	FindAllInSpaceByRoleSpaceGuid string
-	FindAllInSpaceByRoleUsersByRole map[string][]cf.UserFields
 
 	CreateUserUsername string
 	CreateUserPassword string
@@ -52,7 +50,15 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user cf.UserFie
 
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
 	repo.ListUsersOrganizationGuid = orgGuid
+	return repo.listUsersForRole(roleName,stop)
+}
 
+func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse){
+	repo.ListUsersSpaceGuid = spaceGuid
+	return repo.listUsersForRole(roleName,stop)
+}
+
+func (repo *FakeUserRepository) listUsersForRole(roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse){
 	usersChan = make(chan []cf.UserFields, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
@@ -77,12 +83,6 @@ func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName s
 		cf.WaitForClose(stop)
 	}()
 
-	return
-}
-
-func (repo *FakeUserRepository) FindAllInSpaceByRole(spaceGuid string) (usersByRole map[string][]cf.UserFields, apiResponse net.ApiResponse) {
-	repo.FindAllInSpaceByRoleSpaceGuid = spaceGuid
-	usersByRole = repo.FindAllInSpaceByRoleUsersByRole
 	return
 }
 

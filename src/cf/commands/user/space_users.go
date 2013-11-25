@@ -1,6 +1,7 @@
 package user
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -8,6 +9,14 @@ import (
 	"errors"
 	"github.com/codegangsta/cli"
 )
+
+var spaceRoles = []string{cf.SPACE_MANAGER, cf.SPACE_DEVELOPER, cf.SPACE_AUDITOR}
+
+var spaceRoleToDisplayName = map[string]string{
+	cf.SPACE_MANAGER:   "SPACE MANAGER",
+	cf.SPACE_DEVELOPER: "SPACE DEVELOPER",
+	cf.SPACE_AUDITOR:   "SPACE AUDITOR",
+}
 
 type SpaceUsers struct {
 	ui        terminal.UI
@@ -55,19 +64,27 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	usersByRole, apiResponse := cmd.userRepo.FindAllInSpaceByRole(space.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-	}
+	for _, role := range spaceRoles {
+		stopChan := make(chan bool)
+		defer close(stopChan)
 
-	cmd.ui.Ok()
+		displayName := spaceRoleToDisplayName[role]
 
-	for role, users := range usersByRole {
+		usersChan, statusChan := cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role, stopChan)
+
 		cmd.ui.Say("")
-		cmd.ui.Say("%s", terminal.HeaderColor(role))
+		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
 
-		for _, user := range users {
-			cmd.ui.Say("  %s", user.Username)
+		for users := range usersChan {
+			for _, user := range users {
+				cmd.ui.Say("  %s", user.Username)
+			}
+		}
+
+		apiStatus := <-statusChan
+		if apiStatus.IsNotSuccessful() {
+			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiStatus.Message, displayName)
+			return
 		}
 	}
 }

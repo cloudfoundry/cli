@@ -14,53 +14,7 @@ import (
 	"testing"
 )
 
-func createUsersByRoleEndpoints(rolePaths []string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {
-	roleResponses := []string{
-		`{"resources": [ {"metadata": {"guid": "user-1-guid"}, "entity": {}} ] }`,
-		`{"resources": [
-	  		{"metadata": {"guid": "user-2-guid"}, "entity": {}},
-	  		{"metadata": {"guid": "user-3-guid"}, "entity": {}}
-		]}`,
-		`{"resources": [] }`,
-	}
-
-	for index, resp := range roleResponses {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "GET",
-			Path:     rolePaths[index],
-			Response: testnet.TestResponse{Status: http.StatusOK, Body: resp},
-		})
-		ccReqs = append(ccReqs, req)
-	}
-
-	uaaRoleResponses := []string{
-		`{ "resources": [ { "id": "user-1-guid", "userName": "Super user 1" }]}`,
-		`{ "resources": [
-          { "id": "user-2-guid", "userName": "Super user 2" },
-          { "id": "user-3-guid", "userName": "Super user 3" }
-        ]}`,
-	}
-	filters := []string{
-		`Id eq "user-1-guid"`,
-		`Id eq "user-2-guid" or Id eq "user-3-guid"`,
-	}
-
-	for index, resp := range uaaRoleResponses {
-		path := fmt.Sprintf(
-			"/Users?attributes=id,userName&filter=%s",
-			url.QueryEscape(filters[index]),
-		)
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "GET",
-			Path:     path,
-			Response: testnet.TestResponse{Status: http.StatusOK, Body: resp},
-		})
-		uaaReqs = append(uaaReqs, req)
-	}
-	return
-}
-
-func createUsersByRoleEndpointsForListOrgUsers(rolePath string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {
+func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {
 	nextUrl := rolePath + "?page=2"
 
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -116,7 +70,7 @@ func createUsersByRoleEndpointsForListOrgUsers(rolePath string) (ccReqs []testne
 }
 
 func TestListUsersInOrgForRole(t *testing.T) {
-	ccReqs, uaaReqs := createUsersByRoleEndpointsForListOrgUsers("/v2/organizations/my-org-guid/managers")
+	ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
 	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
 	defer cc.Close()
@@ -124,7 +78,7 @@ func TestListUsersInOrgForRole(t *testing.T) {
 
 	stopChan := make(chan bool)
 	defer close(stopChan)
-	usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", "OrgManager", stopChan)
+	usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", cf.ORG_MANAGER, stopChan)
 
 	users := []cf.UserFields{}
 	for chunk := range usersChan {
@@ -143,32 +97,32 @@ func TestListUsersInOrgForRole(t *testing.T) {
 	assert.Equal(t, users[1].Username, "Super user 2")
 }
 
-func TestFindAllInSpaceByRole(t *testing.T) {
-	rolePaths := []string{
-		"/v2/spaces/my-space-guid/managers",
-		"/v2/spaces/my-space-guid/developers",
-		"/v2/spaces/my-space-guid/auditors",
-	}
-	ccReqs, uaaReqs := createUsersByRoleEndpoints(rolePaths)
+func TestListUsersInSpaceForRole(t *testing.T) {
+	ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/spaces/my-space-guid/managers")
 
 	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
 	defer cc.Close()
 	defer uaa.Close()
 
-	usersByRole, apiResponse := repo.FindAllInSpaceByRole("my-space-guid")
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	usersChan, statusChan := repo.ListUsersInSpaceForRole("my-space-guid", cf.SPACE_MANAGER, stopChan)
+
+	users := []cf.UserFields{}
+	for chunk := range usersChan {
+		users = append(users, chunk...)
+	}
+	apiResponse := <-statusChan
 
 	assert.True(t, ccHandler.AllRequestsCalled())
 	assert.True(t, uaaHandler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 
-	assert.Equal(t, len(usersByRole["SPACE MANAGER"]), 1)
-	assert.Equal(t, usersByRole["SPACE MANAGER"][0].Guid, "user-1-guid")
-
-	assert.Equal(t, len(usersByRole["SPACE DEVELOPER"]), 2)
-	assert.Equal(t, usersByRole["SPACE DEVELOPER"][0].Guid, "user-2-guid")
-	assert.Equal(t, usersByRole["SPACE DEVELOPER"][1].Guid, "user-3-guid")
-
-	assert.Equal(t, len(usersByRole["SPACE AUDITOR"]), 0)
+	assert.Equal(t, len(users), 3)
+	assert.Equal(t, users[0].Guid, "user-1-guid")
+	assert.Equal(t, users[0].Username, "Super user 1")
+	assert.Equal(t, users[1].Guid, "user-2-guid")
+	assert.Equal(t, users[1].Username, "Super user 2")
 }
 
 func TestFindByUsername(t *testing.T) {
