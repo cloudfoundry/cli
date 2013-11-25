@@ -117,7 +117,7 @@ func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 	if !config.IsLoggedIn() {
 		ui.Say(NotLoggedInText())
 	} else {
-		ui.Say("UserFields:         %s", EntityNameColor(config.UserEmail()))
+		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
 	}
 
 	if config.HasOrganization() {
@@ -125,7 +125,7 @@ func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 	}
 
 	if config.HasSpace() {
-		ui.Say("SpaceFields:        %s", EntityNameColor(config.SpaceFields.Name))
+		ui.Say("Space:        %s", EntityNameColor(config.SpaceFields.Name))
 	}
 }
 
