@@ -49,7 +49,7 @@ func TestSetSpaceRoleRequirements(t *testing.T) {
 }
 
 func TestSetSpaceRole(t *testing.T) {
-	args := []string{"some-user", "some-org", "some-space", "some-role"}
+	args := []string{"some-user", "some-org", "some-space", "SpaceManager"}
 	reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
 	reqFactory.LoginSuccess = true
@@ -70,7 +70,7 @@ func TestSetSpaceRole(t *testing.T) {
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrgGuid, "my-org-guid")
 
 	assert.Contains(t, ui.Outputs[0], "Assigning role ")
-	assert.Contains(t, ui.Outputs[0], "some-role")
+	assert.Contains(t, ui.Outputs[0], "SpaceManager")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
@@ -78,7 +78,7 @@ func TestSetSpaceRole(t *testing.T) {
 
 	assert.Equal(t, userRepo.SetSpaceRoleUserGuid, "my-user-guid")
 	assert.Equal(t, userRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-	assert.Equal(t, userRepo.SetSpaceRoleRole, "some-role")
+	assert.Equal(t, userRepo.SetSpaceRoleRole, cf.SPACE_MANAGER)
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }

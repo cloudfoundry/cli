@@ -70,7 +70,7 @@ func TestSetOrgRole(t *testing.T) {
 
 	assert.Equal(t, userRepo.SetOrgRoleUserGuid, "my-user-guid")
 	assert.Equal(t, userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
-	assert.Equal(t, userRepo.SetOrgRoleRole, "OrgManager")
+	assert.Equal(t, userRepo.SetOrgRoleRole, cf.ORG_MANAGER)
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }

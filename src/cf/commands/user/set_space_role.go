@@ -1,6 +1,7 @@
 package user
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -47,7 +48,7 @@ func (cmd *SetSpaceRole) GetRequirements(reqFactory requirements.Factory, c *cli
 
 func (cmd *SetSpaceRole) Run(c *cli.Context) {
 	spaceName := c.Args()[2]
-	role := c.Args()[3]
+	role := cf.UserInputToSpaceRole[c.Args()[3]]
 
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()

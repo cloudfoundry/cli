@@ -70,7 +70,7 @@ func TestUnsetOrgRole(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "OrgManager")
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
-	assert.Equal(t, userRepo.UnsetOrgRoleRole, "OrgManager")
+	assert.Equal(t, userRepo.UnsetOrgRoleRole, cf.ORG_MANAGER)
 	assert.Equal(t, userRepo.UnsetOrgRoleUserGuid, "some-user-guid")
 	assert.Equal(t, userRepo.UnsetOrgRoleOrganizationGuid, "some-org-guid")
 

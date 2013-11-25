@@ -64,7 +64,7 @@ func TestUnsetSpaceRole(t *testing.T) {
 	spaceRepo.FindByNameInOrgSpace.Name = "some-space"
 	spaceRepo.FindByNameInOrgSpace.Guid = "some-space-guid"
 
-	args := []string{"my-username", "my-org", "my-space", "my-role"}
+	args := []string{"my-username", "my-org", "my-space", "SpaceManager"}
 
 	ui := callUnsetSpaceRole(t, args, spaceRepo, userRepo, reqFactory)
 
@@ -72,13 +72,13 @@ func TestUnsetSpaceRole(t *testing.T) {
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
 
 	assert.Contains(t, ui.Outputs[0], "Removing role ")
-	assert.Contains(t, ui.Outputs[0], "my-role")
+	assert.Contains(t, ui.Outputs[0], "SpaceManager")
 	assert.Contains(t, ui.Outputs[0], "some-user")
 	assert.Contains(t, ui.Outputs[0], "some-org")
 	assert.Contains(t, ui.Outputs[0], "some-space")
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
-	assert.Equal(t, userRepo.UnsetSpaceRoleRole, "my-role")
+	assert.Equal(t, userRepo.UnsetSpaceRoleRole, cf.SPACE_MANAGER)
 	assert.Equal(t, userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
 	assert.Equal(t, userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
 
