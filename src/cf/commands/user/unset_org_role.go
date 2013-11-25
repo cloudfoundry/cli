@@ -1,6 +1,7 @@
 package user
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -46,7 +47,7 @@ func (cmd *UnsetOrgRole) GetRequirements(reqFactory requirements.Factory, c *cli
 }
 
 func (cmd *UnsetOrgRole) Run(c *cli.Context) {
-	role := c.Args()[2]
+	role := cf.UserInputToOrgRole[c.Args()[2]]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 

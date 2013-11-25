@@ -60,17 +60,17 @@ func TestSetOrgRole(t *testing.T) {
 	}
 	userRepo := &testapi.FakeUserRepository{}
 
-	ui := callSetOrgRole(t, []string{"some-user", "some-org", "some-role"}, reqFactory, userRepo)
+	ui := callSetOrgRole(t, []string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
 
 	assert.Contains(t, ui.Outputs[0], "Assigning role ")
-	assert.Contains(t, ui.Outputs[0], "some-role")
+	assert.Contains(t, ui.Outputs[0], "OrgManager")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
 	assert.Equal(t, userRepo.SetOrgRoleUserGuid, "my-user-guid")
 	assert.Equal(t, userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
-	assert.Equal(t, userRepo.SetOrgRoleRole, "some-role")
+	assert.Equal(t, userRepo.SetOrgRoleRole, "OrgManager")
 
 	assert.Contains(t, ui.Outputs[1], "OK")
 }

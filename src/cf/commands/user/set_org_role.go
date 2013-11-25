@@ -1,6 +1,7 @@
 package user
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -47,7 +48,7 @@ func (cmd *SetOrgRole) GetRequirements(reqFactory requirements.Factory, c *cli.C
 func (cmd *SetOrgRole) Run(c *cli.Context) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
-	role := c.Args()[2]
+	role := cf.UserInputToOrgRole[c.Args()[2]]
 
 	cmd.ui.Say("Assigning role %s to user %s in org %s as %s...",
 		terminal.EntityNameColor(role),

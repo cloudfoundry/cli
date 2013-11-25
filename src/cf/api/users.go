@@ -24,18 +24,6 @@ type UserEntity struct {
 	Admin bool
 }
 
-var OrgRoles []string
-var SpaceRoles []string
-
-func init() {
-	for role, _ := range orgRoleToPathMap {
-		OrgRoles = append(OrgRoles, role)
-	}
-	for role, _ := range spaceRoleToPathMap {
-		SpaceRoles = append(SpaceRoles, role)
-	}
-}
-
 var orgRoleToPathMap = map[string]string{
 	cf.ORG_MANAGER:     "managers",
 	cf.BILLING_MANAGER: "billing_managers",

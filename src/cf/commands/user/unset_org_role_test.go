@@ -60,17 +60,17 @@ func TestUnsetOrgRole(t *testing.T) {
 		UserFields:   user,
 		Organization: org,
 	}
-	args := []string{"my-username", "my-org", "my-role"}
+	args := []string{"my-username", "my-org", "OrgManager"}
 
 	ui := callUnsetOrgRole(t, args, userRepo, reqFactory)
 
 	assert.Contains(t, ui.Outputs[0], "Removing role ")
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-username")
-	assert.Contains(t, ui.Outputs[0], "my-role")
+	assert.Contains(t, ui.Outputs[0], "OrgManager")
 	assert.Contains(t, ui.Outputs[0], "current-user")
 
-	assert.Equal(t, userRepo.UnsetOrgRoleRole, "my-role")
+	assert.Equal(t, userRepo.UnsetOrgRoleRole, "OrgManager")
 	assert.Equal(t, userRepo.UnsetOrgRoleUserGuid, "some-user-guid")
 	assert.Equal(t, userRepo.UnsetOrgRoleOrganizationGuid, "some-org-guid")
 
