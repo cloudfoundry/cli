@@ -64,12 +64,16 @@ func (t *PrintableTable) printRow(row []string) {
 		} else {
 			value = TableContentColor(value)
 		}
+
 		output = output + t.cellValue(col, value)
 	}
 	t.ui.Say(output)
 }
 
 func (t *PrintableTable) cellValue(col int, value string) string {
-	padding := strings.Repeat(" ", t.maxSizes[col]-len(decolorize(value)))
+	padding := ""
+	if col < len(t.header)-1 {
+		padding = strings.Repeat(" ", t.maxSizes[col]-len(decolorize(value)))
+	}
 	return fmt.Sprintf("%s%s   ", value, padding)
 }
