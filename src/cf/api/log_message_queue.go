@@ -13,30 +13,18 @@ type Item struct {
 	index                    int
 }
 
-type PriorityQueue struct {
+type SortedMessageQueue struct {
 	items           []*Item
 	printTimeBuffer time.Duration
 }
 
-func (pq PriorityQueue) Len() int { return len(pq.items) }
-
-func (pq PriorityQueue) Less(i, j int) bool {
-	return *pq.items[i].message.GetLogMessage().Timestamp < *pq.items[j].message.GetLogMessage().Timestamp
-}
-
-func (pq PriorityQueue) Swap(i, j int) {
-	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
-	pq.items[i].index = i
-	pq.items[j].index = j
-}
-
-func (pq *PriorityQueue) PushMessage(message *logmessage.Message) {
+func (pq *SortedMessageQueue) PushMessage(message *logmessage.Message) {
 	item := &Item{message: message, timestampWhenOutputtable: time.Now().Add(pq.printTimeBuffer).UnixNano()}
 	pq.items = append(pq.items, item)
-	insertionSort(*pq, 0, len(pq.items))
+	pq.insertionSort()
 }
 
-func (pq *PriorityQueue) PopMessage() *logmessage.Message {
+func (pq *SortedMessageQueue) PopMessage() *logmessage.Message {
 	if len(pq.items) == 0 {
 		return nil
 	}
@@ -48,7 +36,7 @@ func (pq *PriorityQueue) PopMessage() *logmessage.Message {
 	return item.message
 }
 
-func (pq *PriorityQueue) NextTimestamp() int64 {
+func (pq *SortedMessageQueue) NextTimestamp() int64 {
 	currentQueue := pq.items
 	n := len(currentQueue)
 	if n == 0 {
@@ -58,14 +46,20 @@ func (pq *PriorityQueue) NextTimestamp() int64 {
 	return item.timestampWhenOutputtable
 }
 
-func NewPriorityMessageQueue(printTimeBuffer time.Duration) *PriorityQueue {
-	return &PriorityQueue{printTimeBuffer: printTimeBuffer}
+func (pq SortedMessageQueue) less(i, j int) bool {
+	return *pq.items[i].message.GetLogMessage().Timestamp < *pq.items[j].message.GetLogMessage().Timestamp
 }
 
-func insertionSort(data PriorityQueue, a, b int) {
-	for i := a + 1; i < b; i++ {
-		for j := i; j > a && data.Less(j, j-1); j-- {
-			data.Swap(j, j-1)
+func (pq SortedMessageQueue) swap(i, j int) {
+	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
+	pq.items[i].index = i
+	pq.items[j].index = j
+}
+
+func (pq SortedMessageQueue) insertionSort() {
+	for i := 0 + 1; i < len(pq.items); i++ {
+		for j := i; j > 0 && pq.less(j, j-1); j-- {
+			pq.swap(j, j-1)
 		}
 	}
 }

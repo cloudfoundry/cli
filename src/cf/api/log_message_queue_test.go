@@ -11,7 +11,7 @@ import (
 )
 
 func TestPriorityQueue(t *testing.T) {
-	pq := NewPriorityMessageQueue(10 * time.Millisecond)
+	pq := newSortedMessageQueue(10 * time.Millisecond)
 
 	msg3 := logMessageWithTime(t, "message 3", int64(130))
 	pq.PushMessage(msg3)
@@ -29,7 +29,7 @@ func TestPriorityQueue(t *testing.T) {
 }
 
 func TestPopOnEmptyQueue(t *testing.T) {
-	pq := NewPriorityMessageQueue(10 * time.Millisecond)
+	pq := newSortedMessageQueue(10 * time.Millisecond)
 
 	var msg *logmessage.Message
 	msg = nil
@@ -37,7 +37,7 @@ func TestPopOnEmptyQueue(t *testing.T) {
 }
 
 func TestNextTimestamp(t *testing.T) {
-	pq := NewPriorityMessageQueue(5 * time.Second)
+	pq := newSortedMessageQueue(5 * time.Second)
 
 	assert.Equal(t, pq.NextTimestamp(), MAX_INT64)
 
@@ -64,7 +64,7 @@ func TestNextTimestamp(t *testing.T) {
 }
 
 func TestStableSort(t *testing.T) {
-	pq := NewPriorityMessageQueue(10 * time.Millisecond)
+	pq := newSortedMessageQueue(10 * time.Millisecond)
 
 	msg1 := logMessageWithTime(t, "message first", int64(109))
 	pq.PushMessage(msg1)
@@ -87,7 +87,7 @@ func TestStableSort(t *testing.T) {
 
 func BenchmarkPushMessages(b *testing.B) {
 	r := rand.New(rand.NewSource(99))
-	pq := NewPriorityMessageQueue(10 * time.Millisecond)
+	pq := newSortedMessageQueue(10 * time.Millisecond)
 	for i := 0; i < b.N; i++ {
 		msg := logMessageForBenchmark(b, fmt.Sprintf("message %s", i), r.Int63())
 		pq.PushMessage(msg)
@@ -123,4 +123,8 @@ func generateMessage(messageString string, timestamp int64) *logmessage.LogMessa
 
 func getMsgString(message *logmessage.Message) string {
 	return string(message.GetLogMessage().GetMessage())
+}
+
+func newSortedMessageQueue(printTimeBuffer time.Duration) *SortedMessageQueue {
+	return &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
 }

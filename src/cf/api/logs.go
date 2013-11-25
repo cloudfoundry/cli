@@ -88,8 +88,8 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 	return repo.makeAndStartMessageSorter(messageQueue, outputChan, stopLoggingChan, stopInputChan)
 }
 
-func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logmessage.Message, printTimeBuffer time.Duration) (messageQueue *PriorityQueue) {
-	messageQueue = NewPriorityMessageQueue(printTimeBuffer)
+func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logmessage.Message, printTimeBuffer time.Duration) (messageQueue *SortedMessageQueue) {
+	messageQueue = &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
 	go func() {
 		for msg := range inputChan {
 			messageQueue.PushMessage(msg)
@@ -98,7 +98,7 @@ func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logm
 	return
 }
 
-func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *PriorityQueue, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool, stopInputChan <-chan bool) (err error) {
+func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *SortedMessageQueue, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool, stopInputChan <-chan bool) (err error) {
 	flushLastMessages := func() {
 		for {
 			msg := messageQueue.PopMessage()
