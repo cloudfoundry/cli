@@ -1,8 +1,8 @@
 package api
 
 import (
-	"container/heap"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"sort"
 	"time"
 )
 
@@ -12,13 +12,6 @@ type Item struct {
 	message                  *logmessage.Message
 	timestampWhenOutputtable int64
 	index                    int
-}
-
-func NewPriorityMessageQueue(printTimeBuffer time.Duration) *PriorityQueue {
-	pq := &PriorityQueue{printTimeBuffer: printTimeBuffer}
-	heap.Init(pq)
-
-	return pq
 }
 
 type PriorityQueue struct {
@@ -40,14 +33,19 @@ func (pq PriorityQueue) Swap(i, j int) {
 
 func (pq *PriorityQueue) PushMessage(message *logmessage.Message) {
 	item := &Item{message: message, timestampWhenOutputtable: time.Now().Add(pq.printTimeBuffer).UnixNano()}
-	heap.Push(pq, item)
+	pq.items = append(pq.items, item)
+	sort.Sort(pq)
 }
 
 func (pq *PriorityQueue) PopMessage() *logmessage.Message {
 	if len(pq.items) == 0 {
 		return nil
 	}
-	item := heap.Pop(pq).(*Item)
+
+	var item *Item
+	item = pq.items[0]
+	pq.items = pq.items[1:len(pq.items)]
+
 	return item.message
 }
 
@@ -61,18 +59,6 @@ func (pq *PriorityQueue) NextTimestamp() int64 {
 	return item.timestampWhenOutputtable
 }
 
-func (pq *PriorityQueue) Push(x interface{}) {
-	n := len(pq.items)
-	item := x.(*Item)
-	item.index = n
-	pq.items = append(pq.items, item)
-}
-
-func (pq *PriorityQueue) Pop() interface{} {
-	old := pq.items
-	n := len(old)
-	item := old[n-1]
-	item.index = -1
-	pq.items = old[0 : n-1]
-	return item
+func NewPriorityMessageQueue(printTimeBuffer time.Duration) *PriorityQueue {
+	return &PriorityQueue{printTimeBuffer: printTimeBuffer}
 }

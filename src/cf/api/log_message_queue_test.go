@@ -20,10 +20,10 @@ func TestPriorityQueue(t *testing.T) {
 	msg1 := logMessageWithTime(t, "message 1", int64(110))
 	pq.PushMessage(msg1)
 
-	assert.Equal(t, pq.PopMessage(), msg1)
-	assert.Equal(t, pq.PopMessage(), msg2)
-	assert.Equal(t, pq.PopMessage(), msg3)
-	assert.Equal(t, pq.PopMessage(), msg4)
+	assert.Equal(t, getMsgString(pq.PopMessage()), getMsgString(msg1))
+	assert.Equal(t, getMsgString(pq.PopMessage()), getMsgString(msg2))
+	assert.Equal(t, getMsgString(pq.PopMessage()), getMsgString(msg3))
+	assert.Equal(t, getMsgString(pq.PopMessage()), getMsgString(msg4))
 }
 
 func TestPopOnEmptyQueue(t *testing.T) {
@@ -61,21 +61,54 @@ func TestNextTimestamp(t *testing.T) {
 	assert.True(t, pq.NextTimestamp()-timeWhenOutputtable > -allowedDelta)
 }
 
+func TestStableSort(t *testing.T) {
+	pq := NewPriorityMessageQueue(10 * time.Millisecond)
+
+	msg1 := logMessageWithTime(t, "message 1", int64(110))
+	pq.PushMessage(msg1)
+	msg4 := logMessageWithTime(t, "message 4", int64(130))
+	pq.PushMessage(msg4)
+	msg5 := logMessageWithTime(t, "message 5", int64(150))
+	pq.PushMessage(msg5)
+	msg2 := logMessageWithTime(t, "message 2", int64(110))
+	pq.PushMessage(msg2)
+	msg3 := logMessageWithTime(t, "message 3", int64(110))
+	pq.PushMessage(msg3)
+
+	assert.Equal(t, pq.PopMessage(), msg1)
+	assert.Equal(t, pq.PopMessage(), msg2)
+	assert.Equal(t, pq.PopMessage(), msg3)
+	assert.Equal(t, pq.PopMessage(), msg4)
+	assert.Equal(t, pq.PopMessage(), msg5)
+}
+
 func logMessageWithTime(t *testing.T, messageString string, timestamp int64) *logmessage.Message {
+	data, err := proto.Marshal(generateMessage(messageString, timestamp))
+	assert.NoError(t, err)
+	message, err := logmessage.ParseMessage(data)
+	assert.NoError(t, err)
+
+	return message
+}
+
+func logMessageForBenchmark(b *testing.B, messageString string, timestamp int64) *logmessage.Message {
+	data, _ := proto.Marshal(generateMessage(messageString, timestamp))
+	message, _ := logmessage.ParseMessage(data)
+	return message
+}
+
+func generateMessage(messageString string, timestamp int64) *logmessage.LogMessage {
 	messageType := logmessage.LogMessage_OUT
 	sourceType := logmessage.LogMessage_DEA
-	logMessage := &logmessage.LogMessage{
+	return &logmessage.LogMessage{
 		Message:     []byte(messageString),
 		AppId:       proto.String("my-app-guid"),
 		MessageType: &messageType,
 		SourceType:  &sourceType,
 		Timestamp:   proto.Int64(timestamp),
 	}
+}
 
-	data, err := proto.Marshal(logMessage)
-	assert.NoError(t, err)
-	message, err := logmessage.ParseMessage(data)
-	assert.NoError(t, err)
-
-	return message
+func getMsgString(message *logmessage.Message) string {
+	return string(message.GetLogMessage().GetMessage())
 }
