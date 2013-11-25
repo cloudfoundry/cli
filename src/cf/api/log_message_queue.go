@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"sort"
 	"time"
 )
 
@@ -34,7 +33,7 @@ func (pq PriorityQueue) Swap(i, j int) {
 func (pq *PriorityQueue) PushMessage(message *logmessage.Message) {
 	item := &Item{message: message, timestampWhenOutputtable: time.Now().Add(pq.printTimeBuffer).UnixNano()}
 	pq.items = append(pq.items, item)
-	sort.Sort(pq)
+	insertionSort(*pq, 0, len(pq.items))
 }
 
 func (pq *PriorityQueue) PopMessage() *logmessage.Message {
@@ -61,4 +60,12 @@ func (pq *PriorityQueue) NextTimestamp() int64 {
 
 func NewPriorityMessageQueue(printTimeBuffer time.Duration) *PriorityQueue {
 	return &PriorityQueue{printTimeBuffer: printTimeBuffer}
+}
+
+func insertionSort(data PriorityQueue, a, b int) {
+	for i := a + 1; i < b; i++ {
+		for j := i; j > a && data.Less(j, j-1); j-- {
+			data.Swap(j, j-1)
+		}
+	}
 }

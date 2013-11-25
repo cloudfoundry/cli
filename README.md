@@ -41,6 +41,10 @@ NOTE: Currently only development on OSX 10.8 is supported
 1. Make test pass.
 1. Submit a pull request.
 
+If you want to run the benchmark tests
+
+    ./bin/go test -bench . -benchmem cf/...
+
 Releasing
 =========
 

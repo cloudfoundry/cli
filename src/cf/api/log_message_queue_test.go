@@ -2,8 +2,10 @@ package api
 
 import (
 	"code.google.com/p/gogoprotobuf/proto"
+	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
+	"math/rand"
 	"testing"
 	"time"
 )
@@ -64,22 +66,32 @@ func TestNextTimestamp(t *testing.T) {
 func TestStableSort(t *testing.T) {
 	pq := NewPriorityMessageQueue(10 * time.Millisecond)
 
-	msg1 := logMessageWithTime(t, "message 1", int64(110))
+	msg1 := logMessageWithTime(t, "message first", int64(109))
 	pq.PushMessage(msg1)
-	msg4 := logMessageWithTime(t, "message 4", int64(130))
-	pq.PushMessage(msg4)
-	msg5 := logMessageWithTime(t, "message 5", int64(150))
-	pq.PushMessage(msg5)
-	msg2 := logMessageWithTime(t, "message 2", int64(110))
-	pq.PushMessage(msg2)
-	msg3 := logMessageWithTime(t, "message 3", int64(110))
-	pq.PushMessage(msg3)
 
-	assert.Equal(t, pq.PopMessage(), msg1)
-	assert.Equal(t, pq.PopMessage(), msg2)
-	assert.Equal(t, pq.PopMessage(), msg3)
-	assert.Equal(t, pq.PopMessage(), msg4)
-	assert.Equal(t, pq.PopMessage(), msg5)
+	for i := 1; i < 1000; i++ {
+		msg := logMessageWithTime(t, fmt.Sprintf("message %s", i), int64(110))
+		pq.PushMessage(msg)
+	}
+	msg2 := logMessageWithTime(t, "message last", int64(111))
+	pq.PushMessage(msg2)
+
+	assert.Equal(t, getMsgString(pq.PopMessage()), "message first")
+
+	for i := 1; i < 1000; i++ {
+		assert.Equal(t, getMsgString(pq.PopMessage()), fmt.Sprintf("message %s", i))
+	}
+
+	assert.Equal(t, getMsgString(pq.PopMessage()), "message last")
+}
+
+func BenchmarkPushMessages(b *testing.B) {
+	r := rand.New(rand.NewSource(99))
+	pq := NewPriorityMessageQueue(10 * time.Millisecond)
+	for i := 0; i < b.N; i++ {
+		msg := logMessageForBenchmark(b, fmt.Sprintf("message %s", i), r.Int63())
+		pq.PushMessage(msg)
+	}
 }
 
 func logMessageWithTime(t *testing.T, messageString string, timestamp int64) *logmessage.Message {
