@@ -5,12 +5,12 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"fileutils"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	testapi "testhelpers/api"
@@ -46,14 +46,23 @@ var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
     }
 ]`)
 
+var permissionsToSet os.FileMode
 var expectedPermissionBits os.FileMode
 
 func init() {
-	if runtime.GOOS == "windows" {
-		expectedPermissionBits = 0666
-	} else {
-		expectedPermissionBits = 0645
-	}
+	permissionsToSet = 0467
+	fileutils.TempFile("permissionedFile", func(file *os.File, err error) {
+		if err != nil {
+			panic("could not create tmp file")
+		}
+
+		fileInfo, err := file.Stat()
+		if err != nil {
+			panic("could not stat tmp file")
+		}
+
+		expectedPermissionBits = fileInfo.Mode() | (permissionsToSet & 0111)
+	})
 }
 
 var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
@@ -195,7 +204,7 @@ func TestUploadApp(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
-	err = os.Chmod(filepath.Join(dir, "Gemfile"), 0467)
+	err = os.Chmod(filepath.Join(dir, "Gemfile"), permissionsToSet)
 
 	assert.NoError(t, err)
 
