@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	testapi "testhelpers/api"
@@ -61,7 +62,10 @@ func init() {
 			panic("could not stat tmp file")
 		}
 
-		expectedPermissionBits = fileInfo.Mode() | (permissionsToSet & 0111)
+		expectedPermissionBits = fileInfo.Mode()
+		if runtime.GOOS != "windows" {
+			expectedPermissionBits |= permissionsToSet & 0111
+		}
 	})
 }
 
