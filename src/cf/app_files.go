@@ -50,6 +50,8 @@ func CopyFiles(appFiles []AppFileFields, fromDir, toDir string) (err error) {
 		if err != nil {
 			return
 		}
+
+		fileutils.SetExecutableBitsWithPaths(toPath, fromPath)
 	}
 	return
 }

@@ -44,17 +44,6 @@ func CopyFilePaths(fromPath, toPath string) (err error) {
 	}
 	defer dst.Close()
 
-	fileStat, err := os.Stat(fromPath)
-
-	if err != nil {
-		return
-	}
-
-    err = dst.Chmod(fileStat.Mode())
-	if err != nil {
-		return
-	}
-
 	return CopyPathToWriter(fromPath, dst)
 }
 
@@ -97,4 +86,23 @@ func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
 
 	_, err = io.Copy(destFile, src)
 	return
+}
+
+func SetExecutableBits(dest string, fileInfoToCopy os.FileInfo) (err error) {
+	destFileInfo, err := os.Stat(dest)
+	if err != nil {
+		return
+	}
+
+	err = os.Chmod(dest, destFileInfo.Mode() | (fileInfoToCopy.Mode() & 0111))
+	return
+}
+
+func SetExecutableBitsWithPaths(dest string, src string) (err error) {
+	fileToCopyInfo, err := os.Stat(src)
+	if err != nil {
+		return
+	}
+
+	return SetExecutableBits(dest, fileToCopyInfo)
 }
