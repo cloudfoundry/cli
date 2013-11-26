@@ -61,7 +61,7 @@ var uploadBuildpackBodyMatcher = func(t *testing.T, request *http.Request) {
 	}
 
 	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
-	assert.Equal(t, zipReader.File[1].Mode(), uint32(0777))
+	assert.Equal(t, zipReader.File[1].Mode(), uint32(os.ModePerm))
 
 nextFile:
 	for _, f := range zipReader.File {
@@ -94,7 +94,7 @@ func TestUploadBuildpack(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-buildpack")
-	err = os.Chmod(filepath.Join(dir, "detect"), 0777)
+	err = os.Chmod(filepath.Join(dir, "detect"), os.ModePerm)
 	assert.NoError(t, err)
 
 	_, apiResponse := testUploadBuildpack(t, dir, defaultBuildpackRequests)

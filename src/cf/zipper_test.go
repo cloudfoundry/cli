@@ -18,7 +18,7 @@ func TestZipWithDirectory(t *testing.T) {
 		assert.NoError(t, err)
 
 		dir := filepath.Join(workingDir, "../fixtures/zip/")
-		err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), 0777)
+		err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), os.ModePerm)
 		assert.NoError(t, err)
 
 		zipper := ApplicationZipper{}
@@ -55,7 +55,7 @@ func TestZipWithDirectory(t *testing.T) {
 		name, contents = readFileInZip(1)
 		assert.Equal(t, name, filepath.Clean("subDir/bar.txt"))
 		assert.Equal(t, contents, "I am in a subdirectory.")
-		assert.Equal(t, reader.File[1].FileInfo().Mode(), uint32(0777))
+		assert.Equal(t, reader.File[1].FileInfo().Mode(), uint32(os.ModePerm))
 	})
 }
 
