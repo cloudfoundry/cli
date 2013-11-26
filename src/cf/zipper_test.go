@@ -14,12 +14,15 @@ import (
 func TestZipWithDirectory(t *testing.T) {
 	fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 
-		dir, err := os.Getwd()
+		workingDir, err := os.Getwd()
+		assert.NoError(t, err)
+
+		dir := filepath.Join(workingDir, "../fixtures/zip/")
+		err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), 0777)
 		assert.NoError(t, err)
 
 		zipper := ApplicationZipper{}
-
-		err = zipper.Zip(filepath.Join(dir, "../fixtures/zip/"), zipFile)
+		err = zipper.Zip(dir, zipFile)
 		assert.NoError(t, err)
 
 		offset, err := zipFile.Seek(0, os.SEEK_CUR)
@@ -52,6 +55,7 @@ func TestZipWithDirectory(t *testing.T) {
 		name, contents = readFileInZip(1)
 		assert.Equal(t, name, filepath.Clean("subDir/bar.txt"))
 		assert.Equal(t, contents, "I am in a subdirectory.")
+		assert.Equal(t, reader.File[1].FileInfo().Mode(), uint32(0777))
 	})
 }
 

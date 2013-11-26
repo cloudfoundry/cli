@@ -49,7 +49,18 @@ func writeZipFile(dir string, targetFile *os.File) (err error) {
 	defer writer.Close()
 
 	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
-		zipFilePart, err := writer.Create(fileName)
+		fileInfo, err := os.Stat(fullPath)
+		if err != nil {
+			return err
+		}
+
+		header, err := zip.FileInfoHeader(fileInfo)
+		header.Name = fileName
+		if err != nil {
+			return err
+		}
+
+		zipFilePart, err := writer.CreateHeader(header)
 		err = fileutils.CopyPathToWriter(fullPath, zipFilePart)
 		return
 	})

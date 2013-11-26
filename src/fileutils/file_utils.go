@@ -44,6 +44,17 @@ func CopyFilePaths(fromPath, toPath string) (err error) {
 	}
 	defer dst.Close()
 
+	fileStat, err := os.Stat(fromPath)
+
+	if err != nil {
+		return
+	}
+
+    err = dst.Chmod(fileStat.Mode())
+	if err != nil {
+		return
+	}
+
 	return CopyPathToWriter(fromPath, dst)
 }
 

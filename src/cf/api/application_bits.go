@@ -219,35 +219,40 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(zipFile string, 
 	defer r.Close()
 
 	for _, f := range r.File {
-		// Don't try to extract directories
-		if f.FileInfo().IsDir() {
-			continue
-		}
+		func() {
+			// Don't try to extract directories
+			if f.FileInfo().IsDir() {
+				return
+			}
 
-		if err != nil {
-			return
-		}
+			if err != nil {
+				return
+			}
 
-		var rc io.ReadCloser
-		rc, err = f.Open()
-		if err != nil {
-			return
-		}
+			var rc io.ReadCloser
+			rc, err = f.Open()
+			if err != nil {
+				return
+			}
 
-		destFilePath := filepath.Join(destDir, f.Name)
+			defer rc.Close()
 
-		err = fileutils.CopyReaderToPath(rc, destFilePath)
+			destFilePath := filepath.Join(destDir, f.Name)
 
-		rc.Close()
+			err = fileutils.CopyReaderToPath(rc, destFilePath)
+			if err != nil {
+				return
+			}
 
-		if err != nil {
-			return
-		}
+			err = os.Chmod(destFilePath, f.FileInfo().Mode())
+			if err != nil {
+				return
+			}
+		}()
 	}
 
 	return
 }
-
 func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []cf.AppFileFields) (appFilesToUpload []cf.AppFileFields, presentResourcesJson []byte, apiResponse net.ApiResponse) {
 	appFilesRequest := []AppFileResource{}
 	for _, file := range allAppFiles {
