@@ -137,7 +137,7 @@ var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
 	}
 
 	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
-	assert.Equal(t, zipReader.File[0].Mode(), uint32(os.ModePerm))
+	assert.Equal(t, zipReader.File[0].Mode(), uint32(0666))
 
 nextFile:
 	for _, f := range zipReader.File {
@@ -184,7 +184,7 @@ func TestUploadApp(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
-	err = os.Chmod(filepath.Join(dir, "Gemfile"), os.ModePerm)
+	err = os.Chmod(filepath.Join(dir, "Gemfile"), 0666)
 
 	assert.NoError(t, err)
 
