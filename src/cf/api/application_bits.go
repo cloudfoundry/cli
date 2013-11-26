@@ -244,7 +244,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(zipFile string, 
 				return
 			}
 
-			err = os.Chmod(destFilePath, f.FileInfo().Mode())
+			err = fileutils.SetExecutableBits(destFilePath, f.FileInfo())
 			if err != nil {
 				return
 			}

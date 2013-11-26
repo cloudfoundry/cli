@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	testapi "testhelpers/api"
@@ -44,6 +45,16 @@ var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
         "size": 111
     }
 ]`)
+
+var expectedPermissionBits os.FileMode
+
+func init() {
+	if runtime.GOOS == "windows" {
+		expectedPermissionBits = 0666
+	} else {
+		expectedPermissionBits = 0645
+	}
+}
 
 var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
 	{
@@ -137,7 +148,7 @@ var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
 	}
 
 	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
-	assert.Equal(t, zipReader.File[0].Mode(), uint32(0666))
+	assert.Equal(t, zipReader.File[0].Mode(), uint32(expectedPermissionBits))
 
 nextFile:
 	for _, f := range zipReader.File {
@@ -184,7 +195,7 @@ func TestUploadApp(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-app")
-	err = os.Chmod(filepath.Join(dir, "Gemfile"), 0666)
+	err = os.Chmod(filepath.Join(dir, "Gemfile"), 0467)
 
 	assert.NoError(t, err)
 
