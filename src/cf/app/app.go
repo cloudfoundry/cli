@@ -450,7 +450,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command"},
 				cli.StringFlag{Name: "d", Value: "", Usage: "Domain (for example: example.com)"},
 				cli.IntFlag{Name: "i", Value: 1, Usage: "Number of instances"},
-				cli.StringFlag{Name: "m", Value: "128", Usage: "Memory limit (for example: 256, 1G, 1024M)"},
+				cli.StringFlag{Name: "m", Value: "128M", Usage: "Memory limit (e.g. 256M, 1024M, 1G)"},
 				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname (for example: my-subdomain)"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Path of app directory or zip file"},
 				cli.StringFlag{Name: "s", Value: "", Usage: "Stack to use"},
