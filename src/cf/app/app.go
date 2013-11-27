@@ -773,8 +773,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage: fmt.Sprintf("%s update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n", cf.Name()) +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
-				fmt.Sprintf("   %s update-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()) +
-				fmt.Sprintf("   %s update-user-provided-service my-drain-service -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}' -l syslog://example.com", cf.Name()),
+				fmt.Sprintf("   %s update-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "p", Value: "", Usage: "Parameters"},
 				cli.StringFlag{Name: "l", Value: "", Usage: "Syslog Drain Url"},
