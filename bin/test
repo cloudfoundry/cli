@@ -1,31 +1,30 @@
 #!/bin/bash
 
-result=0
+set -e
+
+function printStatus {
+    if [ $? -eq 0 ]; then
+        echo -e "\nSUITE SUCCESS"
+    else
+        echo -e "\nSUITE FAILURE"
+    fi
+}
+
+trap printStatus EXIT
 
 echo -e "\n Formatting packages..."
 $(dirname $0)/go fmt cf/...
-let "result+=$?"
 
 echo -e "\n Installing package dependencies..."
 $(dirname $0)/go test -i cf/...
-let "result+=$?"
 
 echo -e "\n Testing packages:"
 $(dirname $0)/go test cf/... -parallel 4$@
-let "result+=$?"
 
 echo -e "\n Vetting packages for potential issues..."
 $(dirname $0)/go vet cf/...
-let "result+=$?"
 
 echo -e "\n Running build script to confirm everything compiles..."
 $(dirname $0)/build
-let "result+=$?"
 
-if [ $result -eq 0 ]; then
-	echo -e "\nSUITE SUCCESS"
-else
-	echo -e "\nSUITE FAILURE"
-fi
 
-exit $result
