@@ -99,14 +99,15 @@ func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	expectedOutputs := []string{
-		"Select an org:",
-		"1. some-org",
-		"2. my-org",
-		"Select a space:",
-		"1. my-space",
-		"2. some-space",
+	expectedOutputs := testassert.Lines{
+		testassert.Line{"Select an org:"},
+		testassert.Line{"1. some-org"},
+		testassert.Line{"2. my-org"},
+		testassert.Line{"Select a space:"},
+		testassert.Line{"1. my-space"},
+		testassert.Line{"2. some-space"},
 	}
+
 	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
@@ -153,13 +154,13 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	expectedOutputs := []string{
-		"Select an org:",
-		"1. some-org",
-		"2. my-org",
-		"Select a space:",
-		"1. my-space",
-		"2. some-space",
+	expectedOutputs := testassert.Lines{
+		testassert.Line{"Select an org:"},
+		testassert.Line{"1. some-org"},
+		testassert.Line{"2. my-org"},
+		testassert.Line{"Select a space:"},
+		testassert.Line{"1. my-space"},
+		testassert.Line{"2. some-space"},
 	}
 
 	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)

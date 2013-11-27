@@ -84,14 +84,14 @@ func TestSpaceUsers(t *testing.T) {
 
 	assert.Equal(t, userRepo.ListUsersSpaceGuid, "space1-guid")
 
-	testassert.SliceContains(t, ui.Outputs, []string{
-		"SPACE MANAGER",
-		"user1",
-		"user2",
-		"SPACE DEVELOPER",
-		"user4",
-		"SPACE AUDITOR",
-		"user3",
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		testassert.Line{"SPACE MANAGER"},
+		testassert.Line{"user1"},
+		testassert.Line{"user2"},
+		testassert.Line{"SPACE DEVELOPER"},
+		testassert.Line{"user4"},
+		testassert.Line{"SPACE AUDITOR"},
+		testassert.Line{"user3"},
 	})
 }
 

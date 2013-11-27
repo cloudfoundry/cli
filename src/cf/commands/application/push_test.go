@@ -470,10 +470,10 @@ func TestPushingAppWhenItAlreadyExistsWithoutARouteAndARouteIsNotProvided(t *tes
 
 	fakeUI := callPush(t, []string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	testassert.SliceContains(t, fakeUI.Outputs, []string{
-		"skipping route creation",
-		"Uploading",
-		"OK",
+	testassert.SliceContains(t, fakeUI.Outputs, testassert.Lines{
+		testassert.Line{"skipping route creation"},
+		testassert.Line{"Uploading"},
+		testassert.Line{"OK"},
 	})
 
 	assert.Equal(t, routeRepo.FindByHostAndDomainDomain, "")
@@ -488,7 +488,10 @@ func TestPushingAppWithInvalidPath(t *testing.T) {
 
 	fakeUI := callPush(t, []string{"app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	testassert.SliceContains(t, fakeUI.Outputs, []string{"Uploading", "FAILED"})
+	testassert.SliceContains(t, fakeUI.Outputs, testassert.Lines{
+		{"Uploading"},
+		{"FAILED"},
+	})
 }
 
 func getPushDependencies() (starter *testcmd.FakeAppStarter,

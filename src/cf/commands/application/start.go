@@ -120,11 +120,7 @@ func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 	go func() {
 		defer close(logChan)
 
-		onConnect := func() {
-			cmd.ui.Say("\n%s", terminal.HeaderColor("Staging..."))
-		}
-
-		err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, logChan, stopChan, 1)
+		err := cmd.logRepo.TailLogsFor(app.Guid, func() {}, logChan, stopChan, 1)
 		if err != nil {
 			cmd.ui.Warn("Warning: error tailing logs")
 			cmd.ui.Say("%s", err)

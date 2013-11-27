@@ -50,11 +50,11 @@ func TestListAllPagesOfOrgs(t *testing.T) {
 
 	ui := callListOrgs(config, reqFactory, orgRepo)
 
-	testassert.SliceContains(t, ui.Outputs, []string{
-		"Getting orgs as my-user",
-		"Organization-1",
-		"Organization-2",
-		"Organization-3",
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting orgs as my-user"},
+		{"Organization-1"},
+		{"Organization-2"},
+		{"Organization-3"},
 	})
 }
 
@@ -73,9 +73,9 @@ func TestListNoOrgs(t *testing.T) {
 
 	ui := callListOrgs(config, reqFactory, orgRepo)
 
-	testassert.SliceContains(t, ui.Outputs, []string{
-		"Getting orgs as my-user",
-		"No orgs found",
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting orgs as my-user"},
+		{"No orgs found"},
 	})
 }
 

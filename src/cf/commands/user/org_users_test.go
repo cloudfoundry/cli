@@ -73,14 +73,14 @@ func TestOrgUsers(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "Found Org")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	testassert.SliceContains(t, ui.Outputs, []string{
-		"ORG MANAGER",
-		"user1",
-		"user2",
-		"BILLING MANAGER",
-		"user4",
-		"ORG AUDITOR",
-		"user3",
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		testassert.Line{"ORG MANAGER"},
+		testassert.Line{"user1"},
+		testassert.Line{"user2"},
+		testassert.Line{"BILLING MANAGER"},
+		testassert.Line{"user4"},
+		testassert.Line{"ORG AUDITOR"},
+		testassert.Line{"user3"},
 	})
 }
 
