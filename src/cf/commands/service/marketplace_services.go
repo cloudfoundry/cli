@@ -6,6 +6,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
+	"strings"
 )
 
 type MarketplaceServices struct {
@@ -52,9 +53,15 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 
 	for _, offering := range serviceOfferings {
 		planNames := ""
+
 		for _, plan := range offering.Plans {
+			if plan.Name == "" {
+				continue
+			}
 			planNames = planNames + ", " + plan.Name
 		}
+
+		planNames = strings.TrimPrefix(planNames, ", ")
 
 		table = append(table, []string{
 			offering.Label,
