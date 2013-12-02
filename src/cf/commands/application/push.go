@@ -4,13 +4,13 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/formatters"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
 	"github.com/codegangsta/cli"
 	"os"
-	"strconv"
-	"strings"
 )
 
 type Push struct {
@@ -42,6 +42,12 @@ func NewPush(ui terminal.UI, config *configuration.Configuration, starter Applic
 }
 
 func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	if len(c.Args()) != 1 {
+		cmd.ui.FailWithUsage(c, "push")
+		err = errors.New("Incorrect Usage")
+		return
+	}
+
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedSpaceRequirement(),
@@ -50,25 +56,13 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 }
 
 func (cmd Push) Run(c *cli.Context) {
-	var (
-		apiResponse net.ApiResponse
-	)
+	app, didCreate := cmd.app(c)
 
-	if len(c.Args()) != 1 {
-		cmd.ui.FailWithUsage(c, "push")
-		return
-	}
-
-	app, didCreate := cmd.getApp(c)
-
-	domain := cmd.domain(c)
-	hostName := cmd.hostName(app, c)
-	cmd.bindAppToRoute(app, domain, hostName, didCreate, c)
+	cmd.bindAppToRoute(app, didCreate, c)
 
 	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
-	dir := cmd.path(c)
-	apiResponse = cmd.appBitsRepo.UploadApp(app.Guid, dir)
+	apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, cmd.path(c))
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -80,7 +74,125 @@ func (cmd Push) Run(c *cli.Context) {
 	cmd.restart(app, c)
 }
 
-func (cmd Push) getApp(c *cli.Context) (app cf.Application, didCreate bool) {
+func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
+	if c.Bool("no-route") {
+		return
+	}
+
+	if len(app.Routes) > 0 && !cmd.routeFlagsPresent(c) {
+		return
+	}
+
+	if len(app.Routes) == 0 && didCreateApp == false && !cmd.routeFlagsPresent(c) {
+		cmd.ui.Say("App %s currently exists as a worker, skipping route creation", terminal.EntityNameColor(app.Name))
+		return
+	}
+
+	hostName := cmd.hostname(c, app.Name)
+	domain := cmd.domain(c)
+	route := cmd.route(hostName, domain.DomainFields)
+
+	for _, boundRoute := range app.Routes {
+		if boundRoute.Guid == route.Guid {
+			return
+		}
+	}
+
+	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
+
+	apiResponse := cmd.routeRepo.Bind(route.Guid, app.Guid)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+
+	cmd.ui.Ok()
+	cmd.ui.Say("")
+}
+
+func (cmd Push) restart(app cf.Application, c *cli.Context) {
+	updatedApp, _ := cmd.stopper.ApplicationStop(app)
+
+	cmd.ui.Say("")
+
+	if !c.Bool("no-start") {
+		if buildpackUrl := c.String("b"); buildpackUrl == "" {
+			cmd.starter.ApplicationStart(updatedApp)
+		} else {
+			cmd.starter.ApplicationStartWithBuildpack(updatedApp, buildpackUrl)
+		}
+	}
+}
+
+func (cmd Push) routeFlagsPresent(c *cli.Context) bool {
+	return c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
+}
+
+func (cmd Push) route(hostName string, domain cf.DomainFields) (routeFields cf.RouteFields) {
+	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
+
+		routeFields, apiResponse = cmd.routeRepo.Create(hostName, domain.Guid)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
+			return
+		}
+
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+	} else {
+		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
+		routeFields = route.RouteFields
+	}
+
+	return
+}
+
+func (cmd Push) domain(c *cli.Context) cf.Domain {
+	var (
+		apiResponse net.ApiResponse
+		domain      cf.Domain
+		domainName  = c.String("d")
+	)
+
+	if domainName != "" {
+		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
+	} else {
+		domain, apiResponse = cmd.domainRepo.FindDefaultAppDomain()
+	}
+
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+	}
+
+	return domain
+}
+
+func (cmd Push) hostname(c *cli.Context, defaultName string) (hostName string) {
+	if !c.Bool("no-hostname") {
+		hostName = c.String("n")
+		if hostName == "" {
+			hostName = defaultName
+		}
+	}
+	return
+}
+
+func (cmd Push) path(c *cli.Context) (dir string) {
+	dir = c.String("p")
+	if dir == "" {
+		var err error
+		dir, err = os.Getwd()
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+			return
+		}
+	}
+	return
+}
+
+func (cmd Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
 	appName := c.Args()[0]
 
 	app, apiResponse := cmd.appRepo.FindByName(appName)
@@ -104,7 +216,7 @@ func (cmd Push) getApp(c *cli.Context) (app cf.Application, didCreate bool) {
 func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
 	buildpackUrl := c.String("b")
 	instances := c.Int("i")
-	memory := memoryLimit(c.String("m"))
+	memory := cmd.memoryLimit(c.String("m"))
 	command := c.String("c")
 	stackName := c.String("s")
 
@@ -138,127 +250,10 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 	return
 }
 
-func (cmd Push) domain(c *cli.Context) (domain cf.Domain) {
-	var apiResponse net.ApiResponse
-
-	domainName := c.String("d")
-
-	if domainName != "" {
-		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
-	} else {
-		domain, apiResponse = cmd.domainRepo.FindDefaultAppDomain()
-	}
-
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-	}
-	return
-}
-
-func (cmd Push) hostName(app cf.Application, c *cli.Context) (hostName string) {
-	if !c.Bool("no-hostname") {
-		hostName = c.String("n")
-		if hostName == "" {
-			hostName = app.Name
-		}
-	}
-	return
-}
-
-func (cmd Push) createRoute(hostName string, domain cf.Domain) (route cf.RouteFields) {
-	cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
-
-	route, apiResponse := cmd.routeRepo.Create(hostName, domain.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	return
-}
-
-func (cmd Push) bindAppToRoute(app cf.Application, domain cf.Domain, hostName string, didCreate bool, c *cli.Context) {
-	if c.Bool("no-route") {
-		return
-	}
-
-	if len(app.Routes) == 0 && didCreate == false {
-		cmd.ui.Say("App %s currently exists as a worker, skipping route creation", terminal.EntityNameColor(app.Name))
-		return
-	}
-
-	routeGuid := ""
-	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
-	if apiResponse.IsNotSuccessful() {
-		routeGuid = cmd.createRoute(hostName, domain).Guid
-	} else {
-		routeGuid = route.Guid
-		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
-	}
-
-	for _, boundRoute := range app.Routes {
-		if boundRoute.Guid == routeGuid {
-			return
-		}
-	}
-
-	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
-
-	apiResponse = cmd.routeRepo.Bind(routeGuid, app.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
-}
-
-func (cmd Push) path(c *cli.Context) (dir string) {
-	dir = c.String("p")
-	if dir == "" {
-		var err error
-		dir, err = os.Getwd()
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-			return
-		}
-	}
-	return
-}
-
-func (cmd Push) restart(app cf.Application, c *cli.Context) {
-	updatedApp, _ := cmd.stopper.ApplicationStop(app)
-
-	cmd.ui.Say("")
-
-	if !c.Bool("no-start") {
-		if buildpackUrl := c.String("b"); buildpackUrl == "" {
-			cmd.starter.ApplicationStart(updatedApp)
-		} else {
-			cmd.starter.ApplicationStartWithBuildpack(updatedApp, buildpackUrl)
-		}
-	}
-}
-
-func memoryLimit(arg string) (memory uint64) {
+func (cmd Push) memoryLimit(s string) (memory uint64) {
 	var err error
 
-	switch {
-	case strings.HasSuffix(arg, "M"):
-		trimmedArg := arg[:len(arg)-1]
-		memory, err = strconv.ParseUint(trimmedArg, 10, 0)
-	case strings.HasSuffix(arg, "G"):
-		trimmedArg := arg[:len(arg)-1]
-		memory, err = strconv.ParseUint(trimmedArg, 10, 0)
-		memory = memory * 1024
-	default:
-		memory, err = strconv.ParseUint(arg, 10, 0)
-	}
-
+	memory, err = formatters.MegabytesFromString(s)
 	if err != nil {
 		memory = 128
 	}
