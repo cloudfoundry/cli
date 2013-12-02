@@ -28,6 +28,14 @@ type FakeDomainRepository struct {
 
 	CreateSharedDomainName string
 
+	MapDomainGuid string
+	MapSpaceGuid string
+	MapApiResponse net.ApiResponse
+
+	UnmapDomainGuid string
+	UnmapSpaceGuid string
+	UnmapApiResponse net.ApiResponse
+
 	DeleteDomainGuid string
 	DeleteApiResponse net.ApiResponse
 }
@@ -116,5 +124,19 @@ func (repo *FakeDomainRepository) CreateSharedDomain(domainName string) (apiResp
 func (repo *FakeDomainRepository) Delete(domainGuid string) (apiResponse net.ApiResponse) {
 	repo.DeleteDomainGuid = domainGuid
 	apiResponse = repo.DeleteApiResponse
+	return
+}
+
+func (repo *FakeDomainRepository) Map(domainGuid , spaceGuid string) (apiResponse net.ApiResponse) {
+	repo.MapDomainGuid = domainGuid
+	repo.MapSpaceGuid = spaceGuid
+	apiResponse = repo.MapApiResponse
+	return
+}
+
+func (repo *FakeDomainRepository) Unmap(domainGuid, spaceGuid string) (apiResponse net.ApiResponse) {
+	repo.UnmapDomainGuid = domainGuid
+	repo.UnmapSpaceGuid = spaceGuid
+	apiResponse = repo.UnmapApiResponse
 	return
 }
