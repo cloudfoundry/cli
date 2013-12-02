@@ -185,6 +185,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "domains"),
 					newCmdPresenter(app, maxNameLen, "create-domain"),
 					newCmdPresenter(app, maxNameLen, "share-domain"),
+					newCmdPresenter(app, maxNameLen, "map-domain"),
+					newCmdPresenter(app, maxNameLen, "unmap-domain"),
 					newCmdPresenter(app, maxNameLen, "delete-domain"),
 				},
 			},
