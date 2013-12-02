@@ -11,20 +11,31 @@ import (
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
-const MaxInstanceStartupPings = 60
+const (
+	DefaultStagingTimeout = 20 * time.Minute
+	DefaultStartupTimeout = 5 * time.Minute
+	DefaultPingerThrottle = 5 * time.Second
+)
 
 type Start struct {
 	ui               terminal.UI
 	config           *configuration.Configuration
+	appReq           requirements.ApplicationRequirement
 	appRepo          api.ApplicationRepository
 	appInstancesRepo api.AppInstancesRepository
 	logRepo          api.LogsRepository
-	startTime        time.Time
-	appReq           requirements.ApplicationRequirement
+	startupStartTime time.Time
+	stagingStartTime time.Time
+
+	StartupTimeout time.Duration
+	StagingTimeout time.Duration
+	PingerThrottle time.Duration
 }
 
 type ApplicationStarter interface {
@@ -39,6 +50,28 @@ func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.A
 	cmd.appRepo = appRepo
 	cmd.appInstancesRepo = appInstancesRepo
 	cmd.logRepo = logRepo
+
+	cmd.PingerThrottle = DefaultPingerThrottle
+
+	if os.Getenv("CF_STAGING_TIMEOUT") != "" {
+		duration, err := strconv.ParseInt(os.Getenv("CF_STAGING_TIMEOUT"), 10, 64)
+		if err != nil {
+			cmd.ui.Failed("invalid value for env var CF_STAGING_TIMEOUT\n%s", err)
+		}
+		cmd.StagingTimeout = time.Duration(duration) * time.Minute
+	} else {
+		cmd.StagingTimeout = DefaultStagingTimeout
+	}
+
+	if os.Getenv("CF_STARTUP_TIMEOUT") != "" {
+		duration, err := strconv.ParseInt(os.Getenv("CF_STARTUP_TIMEOUT"), 10, 64)
+		if err != nil {
+			cmd.ui.Failed("invalid value for env var CF_STARTUP_TIMEOUT\n%s", err)
+		}
+		cmd.StartupTimeout = time.Duration(duration) * time.Minute
+	} else {
+		cmd.StartupTimeout = DefaultStartupTimeout
+	}
 
 	return
 }
@@ -104,10 +137,9 @@ func (cmd *Start) applicationStartWithOptions(app cf.Application, buildpackUrl s
 
 	cmd.ui.Say("")
 
-	cmd.startTime = time.Now()
-
+	cmd.startupStartTime = time.Now()
 	for cmd.displayInstancesStatus(app, instances) {
-		cmd.ui.Wait(1 * time.Second)
+		cmd.ui.Wait(cmd.PingerThrottle)
 		instances, _ = cmd.appInstancesRepo.GetInstances(updatedApp.Guid)
 	}
 
@@ -137,15 +169,16 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 }
 
 func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.AppInstanceFields {
+	cmd.stagingStartTime = time.Now()
 	instances, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
-	for count := 0; apiResponse.IsNotSuccessful() && count < MaxInstanceStartupPings; count++ {
+	for apiResponse.IsNotSuccessful() && time.Since(cmd.stagingStartTime) < cmd.StagingTimeout {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiResponse.Message)
 			return []cf.AppInstanceFields{}
 		}
 
-		cmd.ui.Wait(1 * time.Second)
+		cmd.ui.Wait(cmd.PingerThrottle)
 		instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
 	}
 	return instances
@@ -187,7 +220,7 @@ func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.AppIn
 		cmd.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
 	}
 
-	if time.Since(cmd.startTime) > cmd.config.ApplicationStartTimeout*time.Second {
+	if time.Since(cmd.startupStartTime) > cmd.StartupTimeout {
 		cmd.ui.Failed("Start app timeout")
 		return false
 	}

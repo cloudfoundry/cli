@@ -9,6 +9,7 @@ import (
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
+	"os"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -62,6 +63,10 @@ func callStart(args []string, config *configuration.Configuration, reqFactory *t
 	ctxt := testcmd.NewContext("start", args)
 
 	cmd := NewStart(ui, config, appRepo, appInstancesRepo, logRepo)
+	cmd.StagingTimeout = 2 * time.Second
+	cmd.StartupTimeout = 2 * time.Second
+	cmd.PingerThrottle = 1 * time.Second
+
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
@@ -121,6 +126,27 @@ func startAppWithInstancesAndErrors(t *testing.T, app cf.Application, instances 
 	reqFactory = &testreq.FakeReqFactory{Application: app}
 	ui = callStart(args, config, reqFactory, appRepo, appInstancesRepo, logRepo)
 	return
+}
+
+func TestStartCommandDefaultTimeouts(t *testing.T) {
+	cmd := NewStart(new(testterm.FakeUI), &configuration.Configuration{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+	assert.Equal(t, cmd.StagingTimeout, 20*time.Minute)
+	assert.Equal(t, cmd.StartupTimeout, 5*time.Minute)
+}
+
+func TestStartCommandSetsTimeoutsFromEnv(t *testing.T) {
+	oldStaging := os.Getenv("CF_STAGING_TIMEOUT")
+	oldStart := os.Getenv("CF_STARTUP_TIMEOUT")
+	defer func() {
+		os.Setenv("CF_STAGING_TIMEOUT", oldStaging)
+		os.Setenv("CF_STARTUP_TIMEOUT", oldStart)
+	}()
+
+	os.Setenv("CF_STAGING_TIMEOUT", "6")
+	os.Setenv("CF_STARTUP_TIMEOUT", "3")
+	cmd := NewStart(new(testterm.FakeUI), &configuration.Configuration{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+	assert.Equal(t, cmd.StagingTimeout, 6*time.Minute)
+	assert.Equal(t, cmd.StartupTimeout, 3*time.Minute)
 }
 
 func TestStartCommandFailsWithUsage(t *testing.T) {
@@ -374,13 +400,7 @@ func TestStartApplicationWithLoggingFailure(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
 
-	ui := new(testterm.FakeUI)
-
-	ctxt := testcmd.NewContext("start", []string{"my-app"})
-
-	cmd := NewStart(ui, config, appRepo, appInstancesRepo, logRepo)
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	ui := callStart([]string{"my-app"}, config, reqFactory, appRepo, appInstancesRepo, logRepo)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		testassert.Line{"error tailing logs"},
