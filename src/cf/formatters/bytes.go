@@ -73,7 +73,7 @@ func MegabytesFromString(s string) (megabytes uint64, err error) {
 		return 0, nil
 	}
 
-	if  strings.ContainsAny(string(s[len(s)-1]),"0123456789"){
+	if strings.ContainsAny(string(s[len(s)-1]), "0123456789") {
 		return strconv.ParseUint(s, 10, 0)
 	}
 
