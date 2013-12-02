@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+
+rm ./trace.log
+CF_TRACE=trace.log $(dirname $0)/go run src/main/cf.go $*
