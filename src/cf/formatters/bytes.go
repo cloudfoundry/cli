@@ -67,3 +67,24 @@ func BytesFromString(s string) (bytes uint64, err error) {
 
 	return
 }
+
+func MegabytesFromString(s string) (megabytes uint64, err error) {
+	if s == "" {
+		return 0, nil
+	}
+
+	if  strings.ContainsAny(string(s[len(s)-1]),"0123456789"){
+		return strconv.ParseUint(s, 10, 0)
+	}
+
+	var bytes uint64
+
+	bytes, err = BytesFromString(s)
+	if err != nil {
+		return
+	}
+
+	megabytes = bytes / MEGABYTE
+
+	return
+}
