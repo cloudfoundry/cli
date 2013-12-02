@@ -25,8 +25,11 @@ var appHelpTemplate = `{{.Title "NAME:"}}
    {{range .Flags}}{{.}}
    {{end}}
 {{.Title "ENVIRONMENT VARIABLES:"}}
-   CF_TRACE=true - will output HTTP requests and responses during command
-   HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
+   CF_STAGING_TIMEOUT=20 max wait time for buildpack staging, in minutes
+   CF_STARTUP_TIMEOUT=5 max wait time for app instance startup, in minutes
+   CF_TRACE=true - print API request diagnostics to stdout
+   CF_TRACE=path/to/trace.log - append API request diagnostics to a log file
+   HTTP_PROXY=http://proxy.example.com:8080 - enable http proxying for API requests
 `
 
 type groupedCommands struct {
