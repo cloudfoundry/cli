@@ -385,14 +385,6 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
-			Name:        "map-domain",
-			Description: "Map a domain to a space",
-			Usage:       fmt.Sprintf("%s map-domain SPACE DOMAIN", cf.Name()),
-			Action: func(c *cli.Context) {
-				cmdRunner.RunCmdByName("map-domain", c)
-			},
-		},
-		{
 			Name:        "map-route",
 			Description: "Add a url route to an app",
 			Usage:       fmt.Sprintf("%s map-route APP DOMAIN [-n HOSTNAME]", cf.Name()),
@@ -693,14 +685,6 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s unbind-service APP SERVICE_INSTANCE", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unbind-service", c)
-			},
-		},
-		{
-			Name:        "unmap-domain",
-			Description: "Unmap a domain from a space",
-			Usage:       fmt.Sprintf("%s unmap-domain SPACE DOMAIN", cf.Name()),
-			Action: func(c *cli.Context) {
-				cmdRunner.RunCmdByName("unmap-domain", c)
 			},
 		},
 		{
