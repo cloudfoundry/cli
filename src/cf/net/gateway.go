@@ -136,7 +136,7 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 
 	request.Header.Set("accept", "application/json")
 	request.Header.Set("content-type", "application/json")
-	request.Header.Set("UserFields-Agent", "go-cli "+cf.Version+" / "+runtime.GOOS)
+	request.Header.Set("User-Agent ", "go-cli "+cf.Version+" / "+runtime.GOOS)
 
 	if body != nil {
 		switch v := body.(type) {
