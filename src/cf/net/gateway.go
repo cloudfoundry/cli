@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -54,6 +55,7 @@ type Request struct {
 type Gateway struct {
 	authenticator   tokenRefresher
 	errHandler      errorHandler
+	PollingEnabled  bool
 	PollingThrottle time.Duration
 }
 
@@ -94,7 +96,7 @@ func (gateway Gateway) UpdateResourceForResponse(url, accessToken string, body i
 }
 
 func (gateway Gateway) DeleteResource(url, accessToken string) (apiResponse ApiResponse) {
-	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, nil)
+	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, &AsyncResponse{})
 }
 
 func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.ReadSeeker, resource interface{}) (apiResponse ApiResponse) {
@@ -103,12 +105,18 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken strin
 		return
 	}
 
-	if resource != nil {
+	if resource == nil {
+		return gateway.PerformRequest(request)
+	}
+
+	if gateway.PollingEnabled {
+		_, apiResponse = gateway.PerformPollingRequestForJSONResponse(request, resource)
+		return
+	} else {
 		_, apiResponse = gateway.PerformRequestForJSONResponse(request, resource)
 		return
 	}
 
-	return gateway.PerformRequest(request)
 }
 
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiResponse ApiResponse) {
@@ -177,6 +185,10 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 		return
 	}
 
+	if apiResponse.StatusCode > 203 || strings.TrimSpace(string(bytes)) == "" {
+		return
+	}
+
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)
@@ -194,19 +206,34 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 		return
 	}
 
+	if apiResponse.StatusCode > 203 || strings.TrimSpace(string(bytes)) == "" {
+		return
+	}
+
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)
+		return
 	}
 
 	asyncResponse := &AsyncResponse{}
+
 	err = json.Unmarshal(bytes, &asyncResponse)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Invalid async response from server", err)
+		return
 	}
 
-	jobUrl := fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResponse.Metadata.Url)
+	jobUrl := asyncResponse.Metadata.Url
+	if jobUrl == "" {
+		return
+	}
 
+	if !strings.Contains(jobUrl, "/jobs/") {
+		return
+	}
+
+	jobUrl = fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResponse.Metadata.Url)
 	apiResponse = gateway.waitForJob(jobUrl, request.HttpReq.Header.Get("Authorization"))
 
 	return
@@ -220,8 +247,6 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string) (apiResponse ApiRe
 
 		_, apiResponse = gateway.PerformRequestForJSONResponse(request, response)
 		if apiResponse.IsNotSuccessful() {
-			println("OH NOES")
-			println(apiResponse.Message)
 			return
 		}
 
@@ -302,6 +327,8 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 			errorResponse.Description,
 		)
 		apiResponse = NewApiResponse(message, errorResponse.Code, rawResponse.StatusCode)
+	} else {
+		apiResponse = NewApiResponseWithStatusCode(rawResponse.StatusCode)
 	}
 	return
 }
