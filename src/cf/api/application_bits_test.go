@@ -17,6 +17,7 @@ import (
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
 	"testing"
+	"time"
 )
 
 var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
@@ -91,7 +92,8 @@ var uploadApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		Body: `
 {
 	"metadata":{
-		"guid": "my-job-guid"
+		"guid": "my-job-guid",
+		"url": "/v2/jobs/my-job-guid"
 	}
 }
 	`},
@@ -213,6 +215,7 @@ func TestUploadApp(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, apiResponse := testUploadApp(t, dir, defaultRequests)
+	println(apiResponse.Message)
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -249,6 +252,7 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 		Target:      ts.URL,
 	}
 	gateway := net.NewCloudControllerGateway()
+	gateway.PollingThrottle = time.Duration(0)
 	zipper := cf.ApplicationZipper{}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 

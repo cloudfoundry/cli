@@ -30,5 +30,6 @@ func NewCloudControllerGateway() Gateway {
 		return errorResponse{Code: code, Description: ccResp.Description}
 	}
 
-	return newGateway(errorHandler)
+	gateway := newGateway(errorHandler)
+	return gateway
 }
