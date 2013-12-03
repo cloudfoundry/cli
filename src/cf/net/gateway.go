@@ -9,9 +9,31 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"time"
 )
 
-const INVALID_TOKEN_CODE = "GATEWAY INVALID TOKEN CODE"
+const (
+	INVALID_TOKEN_CODE       = "GATEWAY INVALID TOKEN CODE"
+	JOB_FINISHED             = "finished"
+	JOB_FAILED               = "failed"
+	DEFAULT_POLLING_THROTTLE = 5 * time.Second
+)
+
+type JobEntity struct {
+	Status string
+}
+
+type JobResponse struct {
+	Entity JobEntity
+}
+
+type AsyncMetadata struct {
+	Url string
+}
+
+type AsyncResponse struct {
+	Metadata AsyncMetadata
+}
 
 type errorResponse struct {
 	Code        string
@@ -30,12 +52,14 @@ type Request struct {
 }
 
 type Gateway struct {
-	authenticator tokenRefresher
-	errHandler    errorHandler
+	authenticator   tokenRefresher
+	errHandler      errorHandler
+	PollingThrottle time.Duration
 }
 
 func newGateway(errHandler errorHandler) (gateway Gateway) {
 	gateway.errHandler = errHandler
+	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	return
 }
 
@@ -157,6 +181,77 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)
 	}
+	return
+}
+
+func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiResponse ApiResponse) {
+	query := request.HttpReq.URL.Query()
+	query.Add("async", "true")
+	request.HttpReq.URL.RawQuery = query.Encode()
+
+	bytes, headers, apiResponse := gateway.PerformRequestForResponseBytes(request)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	err := json.Unmarshal(bytes, &response)
+	if err != nil {
+		apiResponse = NewApiResponseWithError("Invalid JSON response from server", err)
+	}
+
+	asyncResponse := &AsyncResponse{}
+	err = json.Unmarshal(bytes, &asyncResponse)
+	if err != nil {
+		apiResponse = NewApiResponseWithError("Invalid async response from server", err)
+	}
+
+	jobUrl := fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResponse.Metadata.Url)
+
+	apiResponse = gateway.waitForJob(jobUrl, request.HttpReq.Header.Get("Authorization"))
+
+	return
+}
+
+func (gateway Gateway) waitForJob(jobUrl, accessToken string) (apiResponse ApiResponse) {
+	for true {
+		var request *Request
+		request, apiResponse = gateway.NewRequest("GET", jobUrl, accessToken, nil)
+		response := &JobResponse{}
+
+		_, apiResponse = gateway.PerformRequestForJSONResponse(request, response)
+		if apiResponse.IsNotSuccessful() {
+			println("OH NOES")
+			println(apiResponse.Message)
+			return
+		}
+
+		switch response.Entity.Status {
+		case JOB_FINISHED:
+			return
+		case JOB_FAILED:
+			apiResponse = NewApiResponseWithMessage("Failed to complete upload.")
+			return
+		}
+
+		accessToken = request.HttpReq.Header.Get("Authorization")
+
+		time.Sleep(gateway.PollingThrottle)
+	}
+	return
+}
+
+func (gateway Gateway) pollJob(jobUrl, accessToken string) (finished bool, apiResponse ApiResponse) {
+	request, apiResponse := gateway.NewRequest("GET", jobUrl, accessToken, nil)
+	response := &JobResponse{}
+	_, apiResponse = gateway.PerformRequestForJSONResponse(request, response)
+
+	switch response.Entity.Status {
+	case JOB_FINISHED:
+		finished = true
+	case JOB_FAILED:
+		apiResponse = NewApiResponseWithMessage("Failed to complete upload.")
+	}
+
 	return
 }
 

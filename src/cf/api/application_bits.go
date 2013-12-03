@@ -16,7 +16,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type AppFileResource struct {
@@ -85,7 +84,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 }
 
 func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/apps/%s/bits?async=true", repo.config.Target, appGuid)
+	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, appGuid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
@@ -109,56 +108,11 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 		request.HttpReq.Header.Set("Content-Type", contentType)
 
 		response := &Resource{}
-		_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
+		_, apiResponse = repo.gateway.PerformPollingRequestForJSONResponse(request, response)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
-
-		jobGuid := response.Metadata.Guid
-		apiResponse = repo.pollUploadProgress(jobGuid)
 	})
-
-	return
-}
-
-const (
-	uploadStatusFinished = "finished"
-	uploadStatusFailed   = "failed"
-)
-
-type UploadProgressEntity struct {
-	Status string
-}
-
-type UploadProgressResponse struct {
-	Metadata Metadata
-	Entity   UploadProgressEntity
-}
-
-func (repo CloudControllerApplicationBitsRepository) pollUploadProgress(jobGuid string) (apiResponse net.ApiResponse) {
-	finished := false
-	for !finished {
-		finished, apiResponse = repo.uploadProgress(jobGuid)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-		time.Sleep(time.Second)
-	}
-	return
-}
-
-func (repo CloudControllerApplicationBitsRepository) uploadProgress(jobGuid string) (finished bool, apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/jobs/%s", repo.config.Target, jobGuid)
-	request, apiResponse := repo.gateway.NewRequest("GET", url, repo.config.AccessToken, nil)
-	response := &UploadProgressResponse{}
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, response)
-
-	switch response.Entity.Status {
-	case uploadStatusFinished:
-		finished = true
-	case uploadStatusFailed:
-		apiResponse = net.NewApiResponseWithMessage("Failed to complete upload.")
-	}
 
 	return
 }

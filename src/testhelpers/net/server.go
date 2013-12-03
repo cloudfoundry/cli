@@ -31,7 +31,15 @@ type TestHandler struct {
 }
 
 func (h *TestHandler) AllRequestsCalled() bool {
-	return h.CallCount == len(h.Requests)
+	if h.CallCount == len(h.Requests) {
+		return true
+	}
+	fmt.Print("Failed to call requests:\n")
+	for i := h.CallCount; i < len(h.Requests); i++ {
+		fmt.Printf("%#v\n",h.Requests[i])
+	}
+	fmt.Print("\n\n")
+	return false
 }
 
 func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
