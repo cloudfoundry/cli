@@ -31,5 +31,6 @@ func NewCloudControllerGateway() Gateway {
 	}
 
 	gateway := newGateway(errorHandler)
+	gateway.PollingEnabled = true
 	return gateway
 }

@@ -194,7 +194,6 @@ func TestDeleteApplication(t *testing.T) {
 	defer ts.Close()
 
 	apiResponse := repo.Delete("my-cool-app-guid")
-
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }

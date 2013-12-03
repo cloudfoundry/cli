@@ -22,6 +22,12 @@ func NewApiResponse(message string, errorCode string, statusCode int) (apiRespon
 	}
 }
 
+func NewApiResponseWithStatusCode(statusCode int) (apiResponse ApiResponse) {
+	return ApiResponse{
+		StatusCode: statusCode,
+	}
+}
+
 func NewApiResponseWithMessage(message string, a ...interface{}) (apiResponse ApiResponse) {
 	return ApiResponse{
 		Message: fmt.Sprintf(message, a...),
