@@ -26,6 +26,7 @@ const (
 type Start struct {
 	ui               terminal.UI
 	config           *configuration.Configuration
+	appDisplayer     ApplicationDisplayer
 	appReq           requirements.ApplicationRequirement
 	appRepo          api.ApplicationRepository
 	appInstancesRepo api.AppInstancesRepository
@@ -43,10 +44,11 @@ type ApplicationStarter interface {
 	ApplicationStartWithBuildpack(app cf.Application, buildpackUrl string) (startedApp cf.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config *configuration.Configuration, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
+	cmd.appDisplayer = appDisplayer
 	cmd.appRepo = appRepo
 	cmd.appInstancesRepo = appInstancesRepo
 	cmd.logRepo = logRepo
@@ -143,6 +145,7 @@ func (cmd *Start) applicationStartWithOptions(app cf.Application, buildpackUrl s
 		instances, _ = cmd.appInstancesRepo.GetInstances(updatedApp.Guid)
 	}
 
+	cmd.appDisplayer.ShowApp(app)
 	return
 }
 

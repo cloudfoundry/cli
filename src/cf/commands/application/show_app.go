@@ -21,6 +21,10 @@ type ShowApp struct {
 	appReq           requirements.ApplicationRequirement
 }
 
+type ApplicationDisplayer interface {
+	ShowApp(app cf.Application)
+}
+
 func NewShowApp(ui terminal.UI, config *configuration.Configuration, appSummaryRepo api.AppSummaryRepository, appInstancesRepo api.AppInstancesRepository) (cmd *ShowApp) {
 	cmd = new(ShowApp)
 	cmd.ui = ui
@@ -49,6 +53,11 @@ func (cmd *ShowApp) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd *ShowApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
+	cmd.ShowApp(app)
+}
+
+func (cmd *ShowApp) ShowApp(app cf.Application) {
+
 	cmd.ui.Say("Showing health and status for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
