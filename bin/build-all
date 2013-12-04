@@ -2,6 +2,8 @@
 
 set -e
 
+echo "TIP: Make sure bin/compile has already been run"
+
 mkdir -p release
 echo "Created release dir."
 
@@ -17,14 +19,14 @@ function build-architecture {
   GOARCH=${1#*/}
   printf "Creating $GOOS $GOARCH binary..."
 
-  GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build" >/dev/null 2>&1
+  GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build" 
   cd out
 
   if [ $GOOS == windows ]; then
     mv gcf gcf.exe
-    zip ../release/gcf-$GOOS-$GOARCH.zip gcf.exe >/dev/null 2>&1
+    zip ../release/gcf-$GOOS-$GOARCH.zip gcf.exe
   else
-    tar cvzf ../release/gcf-$GOOS-$GOARCH.tgz gcf >/dev/null 2>&1
+    tar cvzf ../release/gcf-$GOOS-$GOARCH.tgz gcf
   fi
 
   cd ..
