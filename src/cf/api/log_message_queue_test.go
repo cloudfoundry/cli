@@ -70,7 +70,7 @@ func TestStableSort(t *testing.T) {
 	pq.PushMessage(msg1)
 
 	for i := 1; i < 1000; i++ {
-		msg := logMessageWithTime(t, fmt.Sprintf("message %s", i), int64(110))
+		msg := logMessageWithTime(t, fmt.Sprintf("message %d", i), int64(110))
 		pq.PushMessage(msg)
 	}
 	msg2 := logMessageWithTime(t, "message last", int64(111))
@@ -79,7 +79,7 @@ func TestStableSort(t *testing.T) {
 	assert.Equal(t, getMsgString(pq.PopMessage()), "message first")
 
 	for i := 1; i < 1000; i++ {
-		assert.Equal(t, getMsgString(pq.PopMessage()), fmt.Sprintf("message %s", i))
+		assert.Equal(t, getMsgString(pq.PopMessage()), fmt.Sprintf("message %d", i))
 	}
 
 	assert.Equal(t, getMsgString(pq.PopMessage()), "message last")
@@ -89,7 +89,7 @@ func BenchmarkPushMessages(b *testing.B) {
 	r := rand.New(rand.NewSource(99))
 	pq := newSortedMessageQueue(10 * time.Millisecond)
 	for i := 0; i < b.N; i++ {
-		msg := logMessageForBenchmark(b, fmt.Sprintf("message %s", i), r.Int63())
+		msg := logMessageForBenchmark(b, fmt.Sprintf("message %d", i), r.Int63())
 		pq.PushMessage(msg)
 	}
 }
