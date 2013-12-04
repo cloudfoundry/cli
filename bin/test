@@ -22,7 +22,7 @@ echo -e "\n Testing packages:"
 $(dirname $0)/go test cf/... -parallel 4$@
 
 echo -e "\n Vetting packages for potential issues..."
-$(dirname $0)/go vet cf/...
+$(dirname $0)/go tool vet src/cf/.
 
 echo -e "\n Running build script to confirm everything compiles..."
 $(dirname $0)/build
