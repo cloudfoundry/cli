@@ -80,7 +80,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Equal(t, appBitsRepo.UploadedDir, expectedAppDir)
 	assert.Contains(t, fakeUI.Outputs[10], "OK")
 
-	assert.Equal(t, stopper.AppToStop.Guid, "my-new-app-guid")
+	assert.Equal(t, stopper.AppToStop.Guid, "")
 	assert.Equal(t, starter.AppToStart.Guid, "my-new-app-guid")
 }
 

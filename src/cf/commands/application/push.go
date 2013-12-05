@@ -69,9 +69,7 @@ func (cmd Push) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("")
-
-	cmd.restart(app, c)
+	cmd.restart(app, didCreate, c)
 }
 
 func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
@@ -110,16 +108,19 @@ func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Con
 	cmd.ui.Say("")
 }
 
-func (cmd Push) restart(app cf.Application, c *cli.Context) {
-	updatedApp, _ := cmd.stopper.ApplicationStop(app)
+func (cmd Push) restart(app cf.Application, didCreate bool, c *cli.Context) {
+	if !didCreate {
+		cmd.ui.Say("")
+		app, _ = cmd.stopper.ApplicationStop(app)
+	}
 
 	cmd.ui.Say("")
 
 	if !c.Bool("no-start") {
 		if buildpackUrl := c.String("b"); buildpackUrl == "" {
-			cmd.starter.ApplicationStart(updatedApp)
+			cmd.starter.ApplicationStart(app)
 		} else {
-			cmd.starter.ApplicationStartWithBuildpack(updatedApp, buildpackUrl)
+			cmd.starter.ApplicationStartWithBuildpack(app, buildpackUrl)
 		}
 	}
 }
