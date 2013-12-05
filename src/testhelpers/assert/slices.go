@@ -18,7 +18,7 @@ func SliceContains(t *testing.T, actual []string, expected Lines, msgAndArgs ...
 	for _, actualValue := range actual {
 		allStringsFound := true
 		for _, expectedValue := range expected[expectedIndex] {
-			allStringsFound = allStringsFound && strings.Contains(actualValue, expectedValue)
+			allStringsFound = allStringsFound && strings.Contains(strings.ToLower(actualValue), strings.ToLower(expectedValue))
 		}
 
 		if allStringsFound {
