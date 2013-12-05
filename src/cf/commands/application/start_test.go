@@ -54,6 +54,7 @@ func init() {
 
 	defaultInstanceReponses = [][]cf.AppInstanceFields{
 		[]cf.AppInstanceFields{instance1, instance2},
+		[]cf.AppInstanceFields{instance1, instance2},
 		[]cf.AppInstanceFields{instance3, instance4},
 	}
 }
@@ -63,9 +64,9 @@ func callStart(args []string, config *configuration.Configuration, reqFactory *t
 	ctxt := testcmd.NewContext("start", args)
 
 	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
-	cmd.StagingTimeout = 2 * time.Second
-	cmd.StartupTimeout = 2 * time.Second
-	cmd.PingerThrottle = 1 * time.Second
+	cmd.StagingTimeout = 50 * time.Millisecond
+	cmd.StartupTimeout = 50 * time.Millisecond
+	cmd.PingerThrottle = 5 * time.Millisecond
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
@@ -178,11 +179,12 @@ func TestStartApplication(t *testing.T) {
 	displayApp := &testcmd.FakeAppDisplayer{}
 	ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes)
 
+	println(ui.DumpOutputs())
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app", "my-org", "my-space", "my-user"},
 		{"OK"},
-		{"0 of 2 instances running (2 starting)"},
-		{"Started", "my-app", "my-app.example.com"},
+		{"0 of 2 instances running", "2 starting"},
+		{"Started"},
 	})
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
@@ -248,8 +250,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Log Line 1"},
 		{"Log Line 2"},
-		{"0 of 2 instances running (1 starting, 1 down)"},
-		{"0 of 2 instances running (2 starting)"},
+		{"0 of 2 instances running", "2 starting"},
 	})
 }
 
@@ -294,7 +295,7 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app"},
 		{"OK"},
-		{"0 of 2 instances running (2 starting)"},
+		{"0 of 2 instances running", "1 starting", "1 failing"},
 		{"FAILED"},
 		{"Start unsuccessful"},
 	})
@@ -329,9 +330,8 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app"},
 		{"OK"},
-		{"0 of 2 instances running (2 starting)"},
-		{"0 of 2 instances running (1 starting, 1 down)"},
-		{"0 of 2 instances running (2 down)"},
+		{"0 of 2 instances running", "1 starting", "1 down"},
+		{"0 of 2 instances running", "2 down"},
 		{"FAILED"},
 		{"Start app timeout"},
 	})

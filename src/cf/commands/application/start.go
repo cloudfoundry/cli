@@ -31,8 +31,6 @@ type Start struct {
 	appRepo          api.ApplicationRepository
 	appInstancesRepo api.AppInstancesRepository
 	logRepo          api.LogsRepository
-	startupStartTime time.Time
-	stagingStartTime time.Time
 
 	StartupTimeout time.Duration
 	StagingTimeout time.Duration
@@ -134,16 +132,13 @@ func (cmd *Start) applicationStartWithOptions(app cf.Application, buildpackUrl s
 	defer close(stopLoggingChan)
 	go cmd.tailStagingLogs(app, stopLoggingChan)
 
-	instances := cmd.waitForInstanceStartup(updatedApp)
+	cmd.waitForInstancesToStage(updatedApp)
 	stopLoggingChan <- true
 
 	cmd.ui.Say("")
 
-	cmd.startupStartTime = time.Now()
-	for cmd.displayInstancesStatus(app, instances) {
-		cmd.ui.Wait(cmd.PingerThrottle)
-		instances, _ = cmd.appInstancesRepo.GetInstances(updatedApp.Guid)
-	}
+	cmd.waitForOneRunningInstance(app.Guid)
+	cmd.ui.Say(terminal.HeaderColor("\nApp started\n"))
 
 	cmd.appDisplayer.ShowApp(app)
 	return
@@ -171,68 +166,65 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 	}
 }
 
-func (cmd Start) waitForInstanceStartup(app cf.Application) []cf.AppInstanceFields {
-	cmd.stagingStartTime = time.Now()
-	instances, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
-	for apiResponse.IsNotSuccessful() && time.Since(cmd.stagingStartTime) < cmd.StagingTimeout {
+func (cmd Start) waitForInstancesToStage(app cf.Application) {
+	stagingStartTime := time.Now()
+	_, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
+
+	for apiResponse.IsNotSuccessful() && time.Since(stagingStartTime) < cmd.StagingTimeout {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(apiResponse.Message)
-			return []cf.AppInstanceFields{}
+			return
 		}
-
 		cmd.ui.Wait(cmd.PingerThrottle)
-		instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
+		_, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
 	}
-	return instances
+	return
 }
 
-func (cmd Start) displayInstancesStatus(app cf.Application, instances []cf.AppInstanceFields) (notFinished bool) {
-	totalCount := len(instances)
-	runningCount, startingCount, flappingCount, downCount := 0, 0, 0, 0
+func (cmd Start) waitForOneRunningInstance(appGuid string) {
+	var runningCount, startingCount, flappingCount, downCount int
+	startupStartTime := time.Now()
 
-	for _, inst := range instances {
-		switch inst.State {
-		case cf.InstanceRunning:
-			runningCount++
-		case cf.InstanceStarting:
-			startingCount++
-		case cf.InstanceFlapping:
-			flappingCount++
-		case cf.InstanceDown:
-			downCount++
+	for runningCount == 0 {
+		cmd.ui.Wait(cmd.PingerThrottle)
+		instances, apiResponse := cmd.appInstancesRepo.GetInstances(appGuid)
+		if apiResponse.IsNotSuccessful() {
+			continue
+		}
+
+		totalCount := len(instances)
+		runningCount, startingCount, flappingCount, downCount = 0, 0, 0, 0
+
+		for _, inst := range instances {
+			switch inst.State {
+			case cf.InstanceRunning:
+				runningCount++
+			case cf.InstanceStarting:
+				startingCount++
+			case cf.InstanceFlapping:
+				flappingCount++
+			case cf.InstanceDown:
+				downCount++
+			}
+		}
+
+		cmd.ui.Say(instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount))
+
+		if flappingCount > 0 {
+			cmd.ui.Failed("Start unsuccessful")
+			return
+		}
+
+		if time.Since(startupStartTime) > cmd.StartupTimeout {
+			cmd.ui.Failed("Start app timeout")
+			return
 		}
 	}
-
-	if flappingCount > 0 {
-		cmd.ui.Failed("Start unsuccessful")
-		return false
-	}
-
-	anyInstanceRunning := runningCount > 0
-
-	if anyInstanceRunning {
-		if len(app.Routes) == 0 {
-			cmd.ui.Say(terminal.HeaderColor("Started"))
-		} else {
-			cmd.ui.Say("Started: app %s available at %s", terminal.EntityNameColor(app.Name), terminal.EntityNameColor(app.Routes[0].URL()))
-		}
-		return false
-	} else {
-		details := instancesDetails(runningCount, startingCount, downCount)
-		cmd.ui.Say("%d of %d instances running (%s)", runningCount, totalCount, details)
-	}
-
-	if time.Since(cmd.startupStartTime) > cmd.StartupTimeout {
-		cmd.ui.Failed("Start app timeout")
-		return false
-	}
-
-	return totalCount > runningCount
 }
 
-func instancesDetails(runningCount int, startingCount int, downCount int) string {
-	details := []string{}
+func instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount int) string {
+	details := []string{fmt.Sprintf("%d of %d instances running", runningCount, totalCount)}
 
 	if startingCount > 0 {
 		details = append(details, fmt.Sprintf("%d starting", startingCount))
@@ -240,6 +232,10 @@ func instancesDetails(runningCount int, startingCount int, downCount int) string
 
 	if downCount > 0 {
 		details = append(details, fmt.Sprintf("%d down", downCount))
+	}
+
+	if flappingCount > 0 {
+		details = append(details, fmt.Sprintf("%d failing", flappingCount))
 	}
 
 	return strings.Join(details, ", ")
