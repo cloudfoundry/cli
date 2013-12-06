@@ -71,7 +71,7 @@ func TestFindByName(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{findAppRequest})
 	defer ts.Close()
 
-	app, apiResponse := repo.FindByName("App1")
+	app, apiResponse := repo.Read("App1")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, app.Name, "App1")
@@ -91,7 +91,7 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	_, apiResponse := repo.FindByName("App1")
+	_, apiResponse := repo.Read("App1")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())
@@ -108,7 +108,9 @@ func TestSetEnv(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	apiResponse := repo.SetEnv("app1-guid", map[string]string{"DATABASE_URL": "mysql://example.com/my-db"})
+	params := cf.NewAppParams()
+	params.EnvironmentVars["DATABASE_URL"] = "mysql://example.com/my-db"
+	_, apiResponse := repo.Update("app1-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -127,7 +129,7 @@ var createApplicationResponse = `
 var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "POST",
 	Path:    "/v2/apps",
-	Matcher: testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusCreated,
 		Body:   createApplicationResponse},
@@ -151,7 +153,7 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/apps",
-		Matcher:  testnet.RequestBodyMatcher(`{"space_guid":"my-space-guid","name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"stack_guid":null,"command":null}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"stack_guid":null,"command":null}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	})
 
@@ -215,22 +217,21 @@ func TestUpdateApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{updateApplicationRequest})
 	defer ts.Close()
 
-	updatedApp := cf.ApplicationFields{}
-	updatedApp.Guid = "my-app-guid"
-	updatedApp.Name = "my-cool-app"
-	updatedApp.BuildpackUrl = "buildpack-url"
-	updatedApp.Command = "some-command"
-	updatedApp.Memory = 2048
-	updatedApp.InstanceCount = 3
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "my-cool-app"
+	app.BuildpackUrl = "buildpack-url"
+	app.Command = "some-command"
+	app.Memory = 2048
+	app.InstanceCount = 3
+	app.Stack.Guid = "some-stack-guid"
 
-	updated, apiResponse := repo.Update(updatedApp, "some-stack-guid")
+	updatedApp, apiResponse := repo.Update(app.Guid, app.ToParams())
 
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	app := cf.Application{}
-	app.Name = "my-cool-app"
-	app.Guid = "my-cool-app-guid"
-	assert.Equal(t, updated, app)
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, updatedApp.Name, "my-cool-app")
+	assert.Equal(t, updatedApp.Guid, "my-cool-app-guid")
 }
 
 func TestUpdateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
@@ -244,12 +245,13 @@ func TestUpdateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	updatedApp := cf.ApplicationFields{}
-	updatedApp.Guid = "my-app-guid"
-	updatedApp.Name = "my-cool-app"
-	updatedApp.Memory = 128
-	updatedApp.InstanceCount = 1
-	_, apiResponse := repo.Update(updatedApp, "")
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "my-cool-app"
+	app.Memory = 128
+	app.InstanceCount = 1
+
+	_, apiResponse := repo.Update(app.Guid, app.ToParams())
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -265,11 +267,12 @@ func TestUpdateApplicationSetCommandToNull(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	updatedApp := cf.ApplicationFields{}
-	updatedApp.Guid = "my-app-guid"
-	updatedApp.Name = "my-cool-app"
-	updatedApp.Command = "null"
-	_, apiResponse := repo.Update(updatedApp, "")
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "my-cool-app"
+	app.Command = "null"
+
+	_, apiResponse := repo.Update(app.Guid, app.ToParams())
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -289,24 +292,24 @@ func TestUpdateRejectsInproperNames(t *testing.T) {
 	ts, _, repo := createAppRepo(t, requests)
 	defer ts.Close()
 
-	updatedApp := cf.ApplicationFields{}
-	updatedApp.Guid = "my-app-guid"
+	app := cf.Application{}
+	app.Guid = "my-app-guid"
+	app.Name = "name with space"
 
-	updatedApp.Name = "name with space"
-	createdApp, apiResponse := repo.Update(updatedApp, "")
+	createdApp, apiResponse := repo.Update(app.Guid, app.ToParams())
 	assert.Equal(t, createdApp, cf.Application{})
 	assert.Contains(t, apiResponse.Message, "App name is invalid")
 
-	updatedApp.Name = "name-with-inv@lid-chars!"
-	_, apiResponse = repo.Update(updatedApp, "")
+	app.Name = "name-with-inv@lid-chars!"
+	_, apiResponse = repo.Update(app.Guid, app.ToParams())
 	assert.True(t, apiResponse.IsNotSuccessful())
 
-	updatedApp.Name = "Valid-Name"
-	_, apiResponse = repo.Update(updatedApp, "")
+	app.Name = "Valid-Name"
+	_, apiResponse = repo.Update(app.Guid, app.ToParams())
 	assert.True(t, apiResponse.IsSuccessful())
 
-	updatedApp.Name = "name_with_numbers_2"
-	_, apiResponse = repo.Update(updatedApp, "")
+	app.Name = "name_with_numbers_2"
+	_, apiResponse = repo.Update(app.Guid, app.ToParams())
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -336,13 +339,15 @@ func TestRename(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{renameApplicationRequest})
 	defer ts.Close()
 
-	apiResponse := repo.Rename("my-app-guid", "my-new-app")
+	params := cf.NewAppParams()
+	params.Fields["name"] = "my-new-app"
+	_, apiResponse := repo.Update("my-app-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func testScale(t *testing.T, app cf.ApplicationFields, expectedBody string) {
+func testScale(t *testing.T, app cf.Application, expectedBody string) {
 	scaleApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/apps/my-app-guid",
@@ -353,14 +358,14 @@ func testScale(t *testing.T, app cf.ApplicationFields, expectedBody string) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{scaleApplicationRequest})
 	defer ts.Close()
 
-	apiResponse := repo.Scale(app)
+	_, apiResponse := repo.Update(app.Guid, app.ToParams())
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
 func TestScaleAll(t *testing.T) {
-	app := cf.ApplicationFields{}
+	app := cf.Application{}
 	app.Guid = "my-app-guid"
 	app.DiskQuota = 1024
 	app.InstanceCount = 5
@@ -370,7 +375,7 @@ func TestScaleAll(t *testing.T) {
 }
 
 func TestScaleApplicationDiskQuota(t *testing.T) {
-	app := cf.ApplicationFields{}
+	app := cf.Application{}
 	app.Guid = "my-app-guid"
 	app.DiskQuota = 1024
 
@@ -378,7 +383,7 @@ func TestScaleApplicationDiskQuota(t *testing.T) {
 }
 
 func TestScaleApplicationInstances(t *testing.T) {
-	app := cf.ApplicationFields{}
+	app := cf.Application{}
 	app.Guid = "my-app-guid"
 	app.InstanceCount = 5
 
@@ -386,7 +391,7 @@ func TestScaleApplicationInstances(t *testing.T) {
 }
 
 func TestScaleApplicationMemory(t *testing.T) {
-	app := cf.ApplicationFields{}
+	app := cf.Application{}
 	app.Guid = "my-app-guid"
 	app.Memory = 512
 
@@ -396,7 +401,7 @@ func TestScaleApplicationMemory(t *testing.T) {
 func TestStartApplication(t *testing.T) {
 	startApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
-		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=2",
+		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=1",
 		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
@@ -413,7 +418,9 @@ func TestStartApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{startApplicationRequest})
 	defer ts.Close()
 
-	updatedApp, apiResponse := repo.Start("my-cool-app-guid")
+	params := cf.NewAppParams()
+	params.Fields["state"] = "STARTED"
+	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -425,7 +432,7 @@ func TestStartApplication(t *testing.T) {
 func TestStopApplication(t *testing.T) {
 	stopApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
-		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=2",
+		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=1",
 		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
@@ -442,7 +449,9 @@ func TestStopApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{stopApplicationRequest})
 	defer ts.Close()
 
-	updatedApp, apiResponse := repo.Stop("my-cool-app-guid")
+	params := cf.NewAppParams()
+	params.Fields["state"] = "STOPPED"
+	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())

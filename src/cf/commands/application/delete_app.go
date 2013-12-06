@@ -56,7 +56,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiResponse := cmd.appRepo.FindByName(appName)
+	app, apiResponse := cmd.appRepo.Read(appName)
 
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)

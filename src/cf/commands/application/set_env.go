@@ -54,23 +54,20 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	var envVars map[string]string
+	appParams := app.ToParams()
 
-	if app.EnvironmentVars != nil {
-		envVars = app.EnvironmentVars
-	} else {
-		envVars = map[string]string{}
-	}
-
-	if envVarFound(varName, envVars) {
+	if envVarFound(varName, appParams.EnvironmentVars) {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Env var %s was already set.", varName)
 		return
 	}
 
-	envVars[varName] = varValue
+	appParams.EnvironmentVars[varName] = varValue
 
-	apiResponse := cmd.appRepo.SetEnv(app.Guid, envVars)
+	envParams := cf.NewAppParams()
+	envParams.EnvironmentVars = appParams.EnvironmentVars
+
+	_, apiResponse := cmd.appRepo.Update(app.Guid, envParams)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

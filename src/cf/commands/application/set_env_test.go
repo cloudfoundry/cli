@@ -56,11 +56,9 @@ func TestRunWhenApplicationExists(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.SetEnvAppGuid, app.Guid)
-	assert.Equal(t, appRepo.SetEnvVars, map[string]string{
-		"DATABASE_URL": "mysql://example.com/my-db",
-		"foo":          "bar",
-	})
+	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
+	assert.Equal(t, appRepo.UpdateParams.EnvironmentVars["DATABASE_URL"], "mysql://example.com/my-db")
+	assert.Equal(t, appRepo.UpdateParams.EnvironmentVars["foo"], "bar")
 }
 
 func TestSetEnvWhenItAlreadyExists(t *testing.T) {
@@ -89,8 +87,8 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	app.Guid = "my-app-guid"
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{
-		FindByNameApp: app,
-		SetEnvErr:     true,
+		ReadApp:   app,
+		UpdateErr: true,
 	}
 
 	args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
@@ -98,7 +96,7 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "Setting env variable")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Failed setting env")
+	assert.Contains(t, ui.Outputs[2], "Error updating app.")
 }
 
 func TestSetEnvFailsWithUsage(t *testing.T) {
@@ -106,7 +104,7 @@ func TestSetEnvFailsWithUsage(t *testing.T) {
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 
 	args := []string{"my-app", "DATABASE_URL", "..."}
 	ui := callSetEnv(t, args, reqFactory, appRepo)

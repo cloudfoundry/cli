@@ -18,7 +18,7 @@ func TestStopCommandFailsWithUsage(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 
 	ui := callStop(t, []string{}, reqFactory, appRepo)
@@ -32,7 +32,7 @@ func TestStopApplication(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 	args := []string{"my-app"}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
@@ -45,22 +45,22 @@ func TestStopApplication(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StopAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 }
 
 func TestStopApplicationWhenStopFails(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app, StopAppErr: true}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
 	args := []string{"my-app"}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Error stopping application")
-	assert.Equal(t, appRepo.StopAppGuid, "my-app-guid")
+	assert.Contains(t, ui.Outputs[2], "Error updating app.")
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 }
 
 func TestStopApplicationIsAlreadyStopped(t *testing.T) {
@@ -68,14 +68,14 @@ func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
 	app.State = "stopped"
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 	args := []string{"my-app"}
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
 
 	assert.Contains(t, ui.Outputs[0], "my-app")
 	assert.Contains(t, ui.Outputs[0], "is already stopped")
-	assert.Equal(t, appRepo.StopAppGuid, "")
+	assert.Equal(t, appRepo.UpdateAppGuid, "")
 }
 
 func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
@@ -88,7 +88,7 @@ func TestApplicationStopReturnsUpdatedApp(t *testing.T) {
 	expectedStoppedApp.Guid = "my-stopped-app-guid"
 	expectedStoppedApp.State = "stopped"
 
-	appRepo := &testapi.FakeApplicationRepository{StopUpdatedApp: expectedStoppedApp}
+	appRepo := &testapi.FakeApplicationRepository{UpdateAppResult: expectedStoppedApp}
 	config := &configuration.Configuration{}
 	stopper := NewStop(new(testterm.FakeUI), config, appRepo)
 	actualStoppedApp, err := stopper.ApplicationStop(appToStop)

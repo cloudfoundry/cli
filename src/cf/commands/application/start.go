@@ -4,7 +4,6 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -107,9 +106,10 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	var apiResponse net.ApiResponse
+	params := cf.NewAppParams()
+	params.Fields["state"] = "STARTED"
 
-	updatedApp, apiResponse = cmd.appRepo.Start(app.Guid)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

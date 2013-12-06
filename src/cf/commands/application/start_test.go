@@ -88,8 +88,8 @@ func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplaye
 	}
 
 	appRepo = &testapi.FakeApplicationRepository{
-		FindByNameApp:   app,
-		StartUpdatedApp: app,
+		ReadApp:         app,
+		UpdateAppResult: app,
 	}
 	appInstancesRepo = &testapi.FakeAppInstancesRepo{
 		GetInstancesResponses:  instances,
@@ -167,7 +167,7 @@ func TestStartApplication(t *testing.T) {
 	})
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StartAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 	assert.Equal(t, displayApp.AppToDisplay, defaultAppForStart)
 }
 
@@ -177,8 +177,8 @@ func TestStartApplicationOnlyShowsCurrentStagingLogs(t *testing.T) {
 	displayApp := &testcmd.FakeAppDisplayer{}
 	reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
 	appRepo := &testapi.FakeApplicationRepository{
-		FindByNameApp:   defaultAppForStart,
-		StartUpdatedApp: defaultAppForStart,
+		ReadApp:         defaultAppForStart,
+		UpdateAppResult: defaultAppForStart,
 	}
 	appInstancesRepo := &testapi.FakeAppInstancesRepo{
 		GetInstancesResponses:  defaultInstanceReponses,
@@ -232,7 +232,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	})
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.StartAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 }
 
 func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
@@ -363,7 +363,7 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app, StartAppErr: true}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
 	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 	logRepo := &testapi.FakeLogsRepository{}
 	args := []string{"my-app"}
@@ -373,9 +373,9 @@ func TestStartApplicationWhenStartFails(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app"},
 		{"FAILED"},
-		{"Error starting application"},
+		{"Error updating app."},
 	})
-	assert.Equal(t, appRepo.StartAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 }
 
 func TestStartApplicationIsAlreadyStarted(t *testing.T) {
@@ -387,7 +387,7 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
 	app.State = "started"
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 	logRepo := &testapi.FakeLogsRepository{}
 
@@ -400,7 +400,7 @@ func TestStartApplicationIsAlreadyStarted(t *testing.T) {
 		{"my-app", "is already started"},
 	})
 
-	assert.Equal(t, appRepo.StartAppGuid, "")
+	assert.Equal(t, appRepo.UpdateAppGuid, "")
 }
 
 func TestStartApplicationWithLoggingFailure(t *testing.T) {
@@ -421,7 +421,7 @@ func TestStartApplicationWithLoggingFailure(t *testing.T) {
 
 	displayApp := &testcmd.FakeAppDisplayer{}
 
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: defaultAppForStart}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: defaultAppForStart}
 	appInstancesRepo := &testapi.FakeAppInstancesRepo{
 		GetInstancesResponses:  defaultInstanceReponses,
 		GetInstancesErrorCodes: defaultInstanceErrorCodes,

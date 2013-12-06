@@ -59,9 +59,9 @@ func TestScaleAll(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
 
-	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(512))
-	assert.Equal(t, appRepo.ScaledApp.InstanceCount, 5)
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateParams.Fields["memory"], uint64(512))
+	assert.Equal(t, appRepo.UpdateParams.Fields["instances"], 5)
 }
 
 func TestScaleOnlyInstances(t *testing.T) {
@@ -73,10 +73,12 @@ func TestScaleOnlyInstances(t *testing.T) {
 
 	callScale(t, []string{"-i", "5", "my-app"}, reqFactory, restarter, appRepo)
 
-	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(0))
-	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(0))
-	assert.Equal(t, appRepo.ScaledApp.InstanceCount, 5)
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateParams.Fields["instances"], 5)
+	_, ok := appRepo.UpdateParams.Fields["disk_quota"]
+	assert.False(t, ok)
+	_, ok = appRepo.UpdateParams.Fields["memory"]
+	assert.False(t, ok)
 }
 
 func TestScaleOnlyMemory(t *testing.T) {
@@ -88,10 +90,12 @@ func TestScaleOnlyMemory(t *testing.T) {
 
 	callScale(t, []string{"-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
-	assert.Equal(t, appRepo.ScaledApp.Guid, "my-app-guid")
-	assert.Equal(t, appRepo.ScaledApp.DiskQuota, uint64(0))
-	assert.Equal(t, appRepo.ScaledApp.Memory, uint64(512))
-	assert.Equal(t, appRepo.ScaledApp.InstanceCount, 0)
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateParams.Fields["memory"], uint64(512))
+	_, ok := appRepo.UpdateParams.Fields["disk_quota"]
+	assert.False(t, ok)
+	_, ok = appRepo.UpdateParams.Fields["instances"]
+	assert.False(t, ok)
 }
 
 func getScaleDependencies() (reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo *testapi.FakeApplicationRepository) {

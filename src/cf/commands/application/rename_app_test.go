@@ -47,8 +47,8 @@ func TestRenameRun(t *testing.T) {
 	assert.Contains(t, ui.Outputs[0], "my-org")
 	assert.Contains(t, ui.Outputs[0], "my-space")
 	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Equal(t, appRepo.RenameAppGuid, app.Guid)
-	assert.Equal(t, appRepo.RenameNewName, "my-new-app")
+	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
+	assert.Equal(t, appRepo.UpdateParams.Fields["name"], "my-new-app")
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -41,6 +42,7 @@ func (cmd *RenameApp) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 func (cmd *RenameApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	new_name := c.Args()[1]
+
 	cmd.ui.Say("Renaming app %s to %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(new_name),
@@ -49,7 +51,10 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.appRepo.Rename(app.Guid, new_name)
+	params := cf.NewAppParams()
+	params.Fields["name"] = new_name
+
+	_, apiResponse := cmd.appRepo.Update(app.Guid, params)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

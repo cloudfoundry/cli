@@ -55,23 +55,28 @@ func (cmd *Scale) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	changedAppFields := cf.ApplicationFields{}
-	changedAppFields.Guid = currentApp.Guid
+	params := cf.NewAppParams()
 
-	memory, err := extractMegaBytes(c.String("m"))
-	if err != nil {
-		cmd.ui.Say("Invalid value for memory")
-		cmd.ui.FailWithUsage(c, "scale")
-		return
+	if c.String("m") != "" {
+		memory, err := extractMegaBytes(c.String("m"))
+		if err != nil {
+			cmd.ui.Say("Invalid value for memory")
+			cmd.ui.FailWithUsage(c, "scale")
+			return
+		}
+		params.Fields["memory"] = memory
 	}
-	changedAppFields.Memory = memory
-	changedAppFields.InstanceCount = c.Int("i")
 
-	apiResponse := cmd.appRepo.Scale(changedAppFields)
+	if c.Int("i") != -1 {
+		params.Fields["instances"] = c.Int("i")
+	}
+
+	_, apiResponse := cmd.appRepo.Update(currentApp.Guid, params)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
+
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 }

@@ -195,7 +195,7 @@ func (cmd Push) path(c *cli.Context) (dir string) {
 func (cmd Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
 	appName := c.Args()[0]
 
-	app, apiResponse := cmd.appRepo.FindByName(appName)
+	app, apiResponse := cmd.appRepo.Read(appName)
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -245,22 +245,6 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 }
 
 func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.Application) {
-	buildpackUrl, stackGuid, command, memoryString, instanceCount := cmd.userAppFields(c)
-
-	updatedApp = app
-	if buildpackUrl != "" {
-		updatedApp.BuildpackUrl = buildpackUrl
-	}
-	if command != "" {
-		updatedApp.Command = command
-	}
-	if instanceCount != -1 {
-		updatedApp.InstanceCount = instanceCount
-	}
-	if memoryString != "" {
-		updatedApp.Memory = cmd.memoryLimit(memoryString)
-	}
-
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -268,7 +252,26 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	updatedApp, apiResponse := cmd.appRepo.Update(updatedApp.ApplicationFields, stackGuid)
+	buildpackUrl, stackGuid, command, memoryString, instanceCount := cmd.userAppFields(c)
+	params := app.ToParams()
+
+	if buildpackUrl != "" {
+		params.Fields["buildpack"] = buildpackUrl
+	}
+	if command != "" {
+		params.Fields["command"] = command
+	}
+	if instanceCount != -1 {
+		params.Fields["instances"] = instanceCount
+	}
+	if memoryString != "" {
+		params.Fields["memory"] = cmd.memoryLimit(memoryString)
+	}
+	if stackGuid != "" {
+		params.Fields["stack_guid"] = stackGuid
+	}
+
+	updatedApp, apiResponse := cmd.appRepo.Update(updatedApp.Guid, params)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

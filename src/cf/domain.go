@@ -47,14 +47,14 @@ type Space struct {
 
 type ApplicationFields struct {
 	BasicFields
-	State            string
-	Command          string
 	BuildpackUrl     string
-	InstanceCount    int
-	RunningInstances int
-	Memory           uint64 // in Megabytes
+	Command          string
 	DiskQuota        uint64 // in Megabytes
 	EnvironmentVars  map[string]string
+	InstanceCount    int
+	Memory           uint64 // in Megabytes
+	RunningInstances int
+	State            string
 }
 
 type Application struct {
@@ -63,9 +63,44 @@ type Application struct {
 	Routes []RouteSummary
 }
 
+func (model Application) ToParams() (params AppParams) {
+	params = NewAppParams()
+	params.Fields["guid"] = model.Guid
+	params.Fields["name"] = model.Name
+	params.Fields["buildpack"] = model.BuildpackUrl
+	params.Fields["command"] = model.Command
+	params.Fields["disk_quota"] = model.DiskQuota
+	for key, val := range model.EnvironmentVars {
+		params.EnvironmentVars[key] = val
+	}
+	params.Fields["instances"] = model.InstanceCount
+	params.Fields["memory"] = model.Memory
+	params.Fields["state"] = model.State
+	params.Fields["stack_guid"] = model.Stack.Guid
+	return
+}
+
 type AppSummary struct {
 	ApplicationFields
 	RouteSummaries []RouteSummary
+}
+
+type ParamMap map[string]interface{}
+
+func (params ParamMap) IsEmpty() bool {
+	return len(params) == 0
+}
+
+type AppParams struct {
+	Fields          ParamMap
+	EnvironmentVars ParamMap
+}
+
+func NewAppParams() AppParams {
+	params := AppParams{}
+	params.Fields = ParamMap{}
+	params.EnvironmentVars = ParamMap{}
+	return params
 }
 
 type AppFileFields struct {

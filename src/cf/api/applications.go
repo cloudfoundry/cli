@@ -1,13 +1,10 @@
 package api
 
 import (
-	"bytes"
 	"cf"
 	"cf/configuration"
 	"cf/net"
-	"encoding/json"
 	"fmt"
-	"io"
 	"regexp"
 	"strings"
 )
@@ -76,15 +73,10 @@ type AppRouteEntity struct {
 }
 
 type ApplicationRepository interface {
-	FindByName(name string) (app cf.Application, apiResponse net.ApiResponse)
-	SetEnv(appGuid string, envVars map[string]string) (apiResponse net.ApiResponse)
 	Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse)
-	Update(app cf.ApplicationFields, stackGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
+	Read(name string) (app cf.Application, apiResponse net.ApiResponse)
+	Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse)
 	Delete(appGuid string) (apiResponse net.ApiResponse)
-	Rename(appGuid string, newName string) (apiResponse net.ApiResponse)
-	Scale(app cf.ApplicationFields) (apiResponse net.ApiResponse)
-	Start(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
-	Stop(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -98,7 +90,32 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
+	params := cf.NewAppParams()
+	params.Fields["name"] = name
+	params.Fields["buildpack"] = buildpackUrl
+	params.Fields["command"] = command
+	params.Fields["instances"] = instances
+	params.Fields["memory"] = memory
+	params.Fields["stack_guid"] = stackGuid
+
+	data, apiResponse := repo.formatAppJSON(params)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
+	resource := new(ApplicationResource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	createdApp = resource.ToModel()
+	return
+}
+
+func (repo CloudControllerApplicationRepository) Read(name string) (app cf.Application, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.SpaceFields.Guid, "%3A"+name)
 	appResources := new(PaginatedApplicationResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, appResources)
@@ -115,77 +132,14 @@ func (repo CloudControllerApplicationRepository) FindByName(name string) (app cf
 	app = res.ToModel()
 	return
 }
-func (repo CloudControllerApplicationRepository) SetEnv(appGuid string, envVars map[string]string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, appGuid)
 
-	type setEnvReqBody struct {
-		EnvJson map[string]string `json:"environment_json"`
-	}
-
-	body := setEnvReqBody{EnvJson: envVars}
-
-	jsonBytes, err := json.Marshal(body)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error creating json", err)
-		return
-	}
-
-	apiResponse = repo.gateway.UpdateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
-	return
-}
-
-func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
-	data, apiResponse := repo.formatAppJSON(name, buildpackUrl, stackGuid, repo.config.SpaceFields.Guid, command, memory, instances)
+func (repo CloudControllerApplicationRepository) Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	data, apiResponse := repo.formatAppJSON(params)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
-	resource := new(ApplicationResource)
-	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	createdApp = resource.ToModel()
-	return
-}
-func (repo CloudControllerApplicationRepository) formatAppJSON(name, buildpackUrl, stackGuid, spaceGuid, command string, memory uint64, instances int) (data string, apiResponse net.ApiResponse) {
-	apiResponse = validateApplicationName(name)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if command == "null" {
-		command = "\"\""
-	} else {
-		command = stringOrNull(command)
-	}
-
-	data = "{"
-	if spaceGuid != "" {
-		data += fmt.Sprintf(`"space_guid":"%s",`, spaceGuid)
-	}
-	data += fmt.Sprintf(
-		`"name":"%s","instances":%d,"buildpack":%s,"memory":%d,"stack_guid":%s,"command":%s`,
-		name,
-		instances,
-		stringOrNull(buildpackUrl),
-		memory,
-		stringOrNull(stackGuid),
-		command,
-	)
-	data += "}"
-	return
-}
-
-func (repo CloudControllerApplicationRepository) Update(app cf.ApplicationFields, stackGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	data, apiResponse := repo.formatAppJSON(app.Name, app.BuildpackUrl, stackGuid, "", app.Command, app.Memory, app.InstanceCount)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.Target, app.Guid)
+	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.Target, appGuid)
 	resource := new(ApplicationResource)
 	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
@@ -196,90 +150,51 @@ func (repo CloudControllerApplicationRepository) Update(app cf.ApplicationFields
 	return
 }
 
+func (repo CloudControllerApplicationRepository) formatAppJSON(params cf.AppParams) (data string, apiResponse net.ApiResponse) {
+	delete(params.Fields, "guid")
+
+	command, ok := params.Fields["command"]
+	if ok && command.(string) == "null" {
+		params.Fields["command"] = ""
+	} else if ok {
+		params.Fields["command"] = stringOrNull(command.(string))
+	}
+
+	buildpack, ok := params.Fields["buildpack"]
+	if ok {
+		params.Fields["buildpack"] = stringOrNull(buildpack.(string))
+	}
+
+	stackGuid, ok := params.Fields["stack_guid"]
+	if ok {
+		params.Fields["stack_guid"] = stringOrNull(stackGuid.(string))
+	}
+
+	name, ok := params.Fields["name"]
+	if ok {
+		reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
+		if !reg.MatchString(name.(string)) {
+			apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
+			return
+		}
+	}
+
+	vals := []string{}
+
+	if !params.Fields.IsEmpty() {
+		vals = append(vals, mapToJsonValues(params.Fields)...)
+	}
+
+	if !params.EnvironmentVars.IsEmpty() {
+		envVal := fmt.Sprintf(`"environment_json":{%s}`, strings.Join(mapToJsonValues(params.EnvironmentVars), ","))
+		vals = append(vals, envVal)
+	}
+
+	data = fmt.Sprintf("{%s}", strings.Join(vals, ","))
+	return
+}
+
 func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, appGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
-}
-
-func (repo CloudControllerApplicationRepository) Rename(appGuid, newName string) (apiResponse net.ApiResponse) {
-	apiResponse = validateApplicationName(newName)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	data := fmt.Sprintf(`{"name":"%s"}`, newName)
-	apiResponse = repo.updateApp(appGuid, strings.NewReader(data))
-	return
-}
-
-func (repo CloudControllerApplicationRepository) Scale(app cf.ApplicationFields) (apiResponse net.ApiResponse) {
-	values := map[string]interface{}{}
-	if app.DiskQuota > 0 {
-		values["disk_quota"] = app.DiskQuota
-	}
-	if app.InstanceCount > 0 {
-		values["instances"] = app.InstanceCount
-	}
-	if app.Memory > 0 {
-		values["memory"] = app.Memory
-	}
-
-	bodyBytes, err := json.Marshal(values)
-	if err != nil {
-		return net.NewApiResponseWithError("Error generating body", err)
-	}
-
-	apiResponse = repo.updateApp(app.Guid, bytes.NewReader(bodyBytes))
-	return
-}
-
-func (repo CloudControllerApplicationRepository) updateApp(appGuid string, body io.ReadSeeker) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, appGuid)
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken, body)
-}
-
-func validateApplicationName(name string) (apiResponse net.ApiResponse) {
-	reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-	if !reg.MatchString(name) {
-		apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
-	}
-
-	return
-}
-
-func (repo CloudControllerApplicationRepository) Start(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	return repo.startOrStopApp(appGuid, map[string]interface{}{"state": "STARTED"})
-}
-
-func (repo CloudControllerApplicationRepository) StartWithDifferentBuildpack(appGuid, buildpack string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	updates := map[string]interface{}{
-		"state":     "STARTED",
-		"buildpack": buildpack,
-	}
-	return repo.startOrStopApp(appGuid, updates)
-}
-
-func (repo CloudControllerApplicationRepository) Stop(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	return repo.startOrStopApp(appGuid, map[string]interface{}{"state": "STOPPED"})
-}
-
-func (repo CloudControllerApplicationRepository) startOrStopApp(appGuid string, updates map[string]interface{}) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=2", repo.config.Target, appGuid)
-
-	updates["console"] = true
-
-	body, err := json.Marshal(updates)
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Could not serialize app updates.", err)
-		return
-	}
-
-	resource := new(ApplicationResource)
-	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, bytes.NewReader(body), resource)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	updatedApp = resource.ToModel()
-	return
 }
