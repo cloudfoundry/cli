@@ -99,7 +99,7 @@ func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplaye
 
 	currentTime := time.Now()
 	messageType := logmessage.LogMessage_ERR
-	sourceType := logmessage.LogMessage_DEA
+	sourceType := logmessage.LogMessage_STG
 	logMessage1 := logmessage.LogMessage{
 		Message:     []byte("Log Line 1"),
 		AppId:       proto.String(app.Guid),
@@ -179,7 +179,6 @@ func TestStartApplication(t *testing.T) {
 	displayApp := &testcmd.FakeAppDisplayer{}
 	ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes)
 
-	println(ui.DumpOutputs())
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app", "my-org", "my-space", "my-user"},
 		{"OK"},
@@ -190,6 +189,76 @@ func TestStartApplication(t *testing.T) {
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.StartAppGuid, "my-app-guid")
 	assert.Equal(t, displayApp.AppToDisplay, defaultAppForStart)
+}
+
+func TestStartApplicationOnlyShowsCurrentStagingLogs(t *testing.T) {
+	t.Parallel()
+
+	displayApp := &testcmd.FakeAppDisplayer{}
+	reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
+	appRepo := &testapi.FakeApplicationRepository{
+		FindByNameApp:   defaultAppForStart,
+		StartUpdatedApp: defaultAppForStart,
+	}
+	appInstancesRepo := &testapi.FakeAppInstancesRepo{
+		GetInstancesResponses:  defaultInstanceReponses,
+		GetInstancesErrorCodes: defaultInstanceErrorCodes,
+	}
+
+	currentTime := time.Now()
+	oldenTime := currentTime.UnixNano() - int64(time.Minute)
+	messageType := logmessage.LogMessage_ERR
+	wrongSourceType := logmessage.LogMessage_DEA
+	correctSourceType := logmessage.LogMessage_STG
+
+	logMessage1 := logmessage.LogMessage{
+		Message:     []byte("Log Line 1"),
+		AppId:       proto.String(defaultAppForStart.Guid),
+		MessageType: &messageType,
+		SourceType:  &correctSourceType,
+		Timestamp:   proto.Int64(oldenTime),
+	}
+
+	logMessage2 := logmessage.LogMessage{
+		Message:     []byte("Log Line 2"),
+		AppId:       proto.String(defaultAppForStart.Guid),
+		MessageType: &messageType,
+		SourceType:  &correctSourceType,
+		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	}
+	logMessage3 := logmessage.LogMessage{
+		Message:     []byte("Log Line 3"),
+		AppId:       proto.String(defaultAppForStart.Guid),
+		MessageType: &messageType,
+		SourceType:  &correctSourceType,
+		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	}
+	logMessage4 := logmessage.LogMessage{
+		Message:     []byte("Log Line 4"),
+		AppId:       proto.String(defaultAppForStart.Guid),
+		MessageType: &messageType,
+		SourceType:  &wrongSourceType,
+		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	}
+	logRepo := &testapi.FakeLogsRepository{
+		TailLogMessages: []logmessage.LogMessage{
+			logMessage1,
+			logMessage2,
+			logMessage3,
+			logMessage4,
+		},
+	}
+
+	ui := callStart([]string{"my-app"}, &configuration.Configuration{}, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Log Line 2"},
+		{"Log Line 3"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"Log Line 1"},
+		{"Log Line 4"},
+	})
 }
 
 func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
