@@ -105,12 +105,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 	}
 
 	for _, resource := range resources.Apps {
-		var app cf.AppSummary
-		app, apiResponse = repo.createSummary(&resource)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-		apps = append(apps, app)
+		apps = append(apps, resource.ToModel())
 	}
 	return
 }
@@ -123,10 +118,6 @@ func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summ
 		return
 	}
 
-	return repo.createSummary(summaryResponse)
-}
-
-func (repo CloudControllerAppSummaryRepository) createSummary(resource *ApplicationFromSummary) (summary cf.AppSummary, apiResponse net.ApiResponse) {
-	summary = resource.ToModel()
+	summary = summaryResponse.ToModel()
 	return
 }
