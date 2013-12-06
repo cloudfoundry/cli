@@ -82,7 +82,6 @@ type ApplicationRepository interface {
 	Rename(appGuid string, newName string) (apiResponse net.ApiResponse)
 	Scale(app cf.ApplicationFields) (apiResponse net.ApiResponse)
 	Start(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
-	StartWithDifferentBuildpack(appGuid, buildpack string) (updatedApp cf.Application, apiResponse net.ApiResponse)
 	Stop(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
 }
 
