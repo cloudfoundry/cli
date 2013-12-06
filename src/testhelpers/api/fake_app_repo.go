@@ -125,15 +125,6 @@ func (repo *FakeApplicationRepository) Start(appGuid string) (updatedApp cf.Appl
 	return
 }
 
-func (repo *FakeApplicationRepository) StartWithDifferentBuildpack(appGuid, buildpack string) (updatedApp cf.Application, apiResponse net.ApiResponse){
-	repo.StartAppGuid = appGuid
-	if repo.StartAppErr {
-		apiResponse = net.NewApiResponseWithMessage("Error starting application")
-	}
-	updatedApp = repo.StartUpdatedApp
-	return
-}
-
 func (repo *FakeApplicationRepository) Stop(appGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
 	repo.StopAppGuid = appGuid
 	if repo.StopAppErr {

@@ -39,7 +39,6 @@ type Start struct {
 
 type ApplicationStarter interface {
 	ApplicationStart(app cf.Application) (updatedApp cf.Application, err error)
-	ApplicationStartWithBuildpack(app cf.Application, buildpackUrl string) (startedApp cf.Application, err error)
 }
 
 func NewStart(ui terminal.UI, config *configuration.Configuration, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
@@ -94,14 +93,6 @@ func (cmd *Start) Run(c *cli.Context) {
 }
 
 func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
-	return cmd.applicationStartWithOptions(app, "")
-}
-
-func (cmd *Start) ApplicationStartWithBuildpack(app cf.Application, buildpackUrl string) (updatedApp cf.Application, err error) {
-	return cmd.applicationStartWithOptions(app, buildpackUrl)
-}
-
-func (cmd *Start) applicationStartWithOptions(app cf.Application, buildpackUrl string) (updatedApp cf.Application, err error) {
 	if app.State == "started" {
 		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already started"))
 		return
@@ -115,11 +106,8 @@ func (cmd *Start) applicationStartWithOptions(app cf.Application, buildpackUrl s
 	)
 
 	var apiResponse net.ApiResponse
-	if buildpackUrl == "" {
-		updatedApp, apiResponse = cmd.appRepo.Start(app.Guid)
-	} else {
-		updatedApp, apiResponse = cmd.appRepo.StartWithDifferentBuildpack(app.Guid, buildpackUrl)
-	}
+
+	updatedApp, apiResponse = cmd.appRepo.Start(app.Guid)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
