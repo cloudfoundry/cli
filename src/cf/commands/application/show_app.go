@@ -102,7 +102,7 @@ func (cmd *ShowApp) ShowApp(app cf.Application) {
 			fmt.Sprintf("#%d", index),
 			coloredInstanceState(instance),
 			instance.Since.Format("2006-01-02 03:04:05 PM"),
-			fmt.Sprintf("%.1f%%", instance.CpuUsage),
+			fmt.Sprintf("%.1f%%", instance.CpuUsage*100),
 			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.MemUsage), formatters.ByteSize(instance.MemQuota)),
 			fmt.Sprintf("%s of %s", formatters.ByteSize(instance.DiskUsage), formatters.ByteSize(instance.DiskQuota)),
 		})

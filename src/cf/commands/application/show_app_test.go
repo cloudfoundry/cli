@@ -115,7 +115,7 @@ func TestDisplayingAppSummary(t *testing.T) {
 	assert.Contains(t, ui.Outputs[7], "#0")
 	assert.Contains(t, ui.Outputs[7], "running")
 	assert.Contains(t, ui.Outputs[7], "2012-01-02 03:04:05 PM")
-	assert.Contains(t, ui.Outputs[7], "1.0%")
+	assert.Contains(t, ui.Outputs[7], "100.0%")
 	assert.Contains(t, ui.Outputs[7], "13 of 64M")
 	assert.Contains(t, ui.Outputs[7], "32M of 1G")
 
