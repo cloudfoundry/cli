@@ -15,7 +15,7 @@ func newValidAccessTokenRequirement(ui terminal.UI, appRepo api.ApplicationRepos
 }
 
 func (req ValidAccessTokenRequirement) Execute() (success bool) {
-	_, apiResponse := req.appRepo.FindByName("checking_for_valid_access_token")
+	_, apiResponse := req.appRepo.Read("checking_for_valid_access_token")
 
 	if apiResponse.IsNotSuccessful() && apiResponse.StatusCode == 401 {
 		req.ui.Say(terminal.NotLoggedInText())

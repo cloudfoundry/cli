@@ -105,7 +105,7 @@ func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logCont
 	return
 }
 
-func envVarFound(varName string, existingEnvVars map[string]string) (found bool) {
+func envVarFound(varName string, existingEnvVars cf.ParamMap) (found bool) {
 	for name, _ := range existingEnvVars {
 		if name == varName {
 			found = true

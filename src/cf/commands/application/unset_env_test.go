@@ -54,8 +54,8 @@ func TestUnsetEnvWhenApplicationExists(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-	assert.Equal(t, appRepo.SetEnvAppGuid, "my-app-guid")
-	assert.Equal(t, appRepo.SetEnvVars, map[string]string{"foo": "bar"})
+	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
+	assert.Equal(t, appRepo.UpdateParams.EnvironmentVars["foo"], "bar")
 }
 
 func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
@@ -65,8 +65,8 @@ func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 	app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{
-		FindByNameApp: app,
-		SetEnvErr:     true,
+		ReadApp:   app,
+		UpdateErr: true,
 	}
 
 	args := []string{"does-not-exist", "DATABASE_URL"}
@@ -74,7 +74,7 @@ func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[0], "Removing env variable")
 	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Failed setting env")
+	assert.Contains(t, ui.Outputs[2], "Error updating app.")
 }
 
 func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
@@ -99,7 +99,7 @@ func TestUnsetEnvFailsWithUsage(t *testing.T) {
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-	appRepo := &testapi.FakeApplicationRepository{FindByNameApp: app}
+	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 
 	args := []string{"my-app", "DATABASE_URL"}
 	ui := callUnsetEnv(t, args, reqFactory, appRepo)

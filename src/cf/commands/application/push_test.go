@@ -46,7 +46,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	domainRepo.DefaultAppDomain = domains[0]
 	routeRepo.FindByHostAndDomainErr = true
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	fakeUI := callPush(t, []string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
@@ -102,7 +102,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 
 	domainRepo.DefaultAppDomain = domain1
 	routeRepo.FindByHostAndDomainRoute = route
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	fakeUI := callPush(t, []string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
@@ -129,7 +129,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	domainRepo.FindByNameDomain = domain
 	routeRepo.FindByHostAndDomainErr = true
 	stackRepo.FindByNameStack = stack
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	fakeUI := callPush(t, []string{
 		"-c", "unicorn -c config/unicorn.rb -D",
@@ -184,7 +184,7 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 	existingApp.Guid = "existing-app-guid"
 	existingApp.Command = "unicorn -c config/unicorn.rb -D"
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 
 	args := []string{
 		"-c", "null",
@@ -192,7 +192,7 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 	}
 	_ = callPush(t, args, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.UpdatedApp.Command, "null")
+	assert.Equal(t, appRepo.UpdateParams.Fields["command"], "null")
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {
@@ -207,7 +207,7 @@ func TestPushingAppWithNoRoute(t *testing.T) {
 	domainRepo.FindByNameDomain = domain
 	routeRepo.FindByHostErr = true
 	stackRepo.FindByNameStack = stack
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	callPush(t, []string{
 		"--no-route",
@@ -231,7 +231,7 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 	domainRepo.DefaultAppDomain = domain
 	routeRepo.FindByHostAndDomainErr = true
 	stackRepo.FindByNameStack = stack
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	callPush(t, []string{
 		"--no-hostname",
@@ -249,7 +249,7 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	domain.Name = "bar.cf-app.com"
 	domain.Guid = "bar-domain-guid"
 	domainRepo.FindByNameDomain = domain
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	callPush(t, []string{
 		"-m", "256M",
@@ -265,7 +265,7 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 	domain.Name = "bar.cf-app.com"
 	domain.Guid = "bar-domain-guid"
 	domainRepo.FindByNameDomain = domain
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	callPush(t, []string{
 		"-m", "512",
@@ -281,7 +281,7 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 	domain.Name = "bar.cf-app.com"
 	domain.Guid = "bar-domain-guid"
 	domainRepo.FindByNameDomain = domain
-	appRepo.FindByNameNotFound = true
+	appRepo.ReadNotFound = true
 
 	ui := callPush(t, []string{
 		"-m", "abcM",
@@ -306,7 +306,7 @@ func TestPushingAppWhenItAlreadyExistsAndNothingIsSpecified(t *testing.T) {
 	existingApp.Guid = "existing-app-guid"
 	existingApp.Routes = []cf.RouteSummary{existingRoute}
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 	domain := cf.DomainFields{}
 	domain.Name = "example.com"
@@ -333,7 +333,7 @@ func TestPushingAppWhenItAlreadyExistsAndChangingOptions(t *testing.T) {
 	existingApp.Guid = "existing-app-guid"
 	existingApp.Routes = []cf.RouteSummary{existingRoute}
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 
 	domain := cf.DomainFields{}
 	domain.Name = "example.com"
@@ -359,11 +359,11 @@ func TestPushingAppWhenItAlreadyExistsAndChangingOptions(t *testing.T) {
 	}
 	_ = callPush(t, args, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.UpdatedApp.Command, "different start command")
-	assert.Equal(t, appRepo.UpdatedApp.InstanceCount, 10)
-	assert.Equal(t, appRepo.UpdatedApp.Memory, uint64(1024))
-	assert.Equal(t, appRepo.UpdatedApp.BuildpackUrl, "https://github.com/heroku/heroku-buildpack-different.git")
-	assert.Equal(t, appRepo.UpdatedStackGuid, "differentStack-guid")
+	assert.Equal(t, appRepo.UpdateParams.Fields["command"], "different start command")
+	assert.Equal(t, appRepo.UpdateParams.Fields["instances"], 10)
+	assert.Equal(t, appRepo.UpdateParams.Fields["memory"], uint64(1024))
+	assert.Equal(t, appRepo.UpdateParams.Fields["buildpack"], "https://github.com/heroku/heroku-buildpack-different.git")
+	assert.Equal(t, appRepo.UpdateParams.Fields["stack_guid"], "differentStack-guid")
 }
 
 func TestPushingAppWhenItAlreadyExistsAndDomainIsSpecifiedIsAlreadyBound(t *testing.T) {
@@ -386,7 +386,7 @@ func TestPushingAppWhenItAlreadyExistsAndDomainIsSpecifiedIsAlreadyBound(t *test
 	foundRoute.RouteFields = existingRoute.RouteFields
 	foundRoute.Domain = existingRoute.Domain
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 	routeRepo.FindByHostAndDomainRoute = foundRoute
 
@@ -417,7 +417,7 @@ func TestPushingAppWhenItAlreadyExistsAndDomainSpecifiedIsNotBound(t *testing.T)
 	foundDomain.Guid = "domain-guid"
 	foundDomain.Name = "newdomain.com"
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 	routeRepo.FindByHostAndDomainNotFound = true
 	domainRepo.FindByNameDomain = foundDomain
@@ -453,7 +453,7 @@ func TestPushingAppWithNoFlagsWhenAppIsAlreadyBoundToDomain(t *testing.T) {
 	existingApp.Guid = "existing-app-guid"
 	existingApp.Routes = []cf.RouteSummary{existingRoute}
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 
 	_ = callPush(t, []string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -482,7 +482,7 @@ func TestPushingAppWhenItAlreadyExistsAndHostIsSpecified(t *testing.T) {
 	existingApp.Guid = "existing-app-guid"
 	existingApp.Routes = []cf.RouteSummary{existingRoute}
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 	routeRepo.FindByHostAndDomainNotFound = true
 	domainRepo.DefaultAppDomain = cf.Domain{DomainFields: domain}
@@ -507,7 +507,7 @@ func TestPushingAppWhenItAlreadyExistsAndNoRouteFlagIsPresent(t *testing.T) {
 	existingApp.Name = "existing-app"
 	existingApp.Guid = "existing-app-guid"
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 
 	ui := callPush(t, []string{"--no-route", "existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -541,7 +541,7 @@ func TestPushingAppWhenItAlreadyExistsAndNoHostFlagIsPresent(t *testing.T) {
 	existingApp.Guid = "existing-app-guid"
 	existingApp.Routes = []cf.RouteSummary{existingRoute}
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 	routeRepo.FindByHostAndDomainNotFound = true
 	domainRepo.DefaultAppDomain = cf.Domain{DomainFields: domain}
@@ -568,7 +568,7 @@ func TestPushingAppWhenItAlreadyExistsWithoutARouteAndARouteIsNotProvided(t *tes
 	existingApp.Name = "existing-app"
 	existingApp.Guid = "existing-app-guid"
 
-	appRepo.FindByNameApp = existingApp
+	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
 
 	fakeUI := callPush(t, []string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)

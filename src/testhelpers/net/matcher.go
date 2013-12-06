@@ -6,10 +6,27 @@ import (
 	"strings"
 	"testing"
 	"github.com/stretchr/testify/assert"
+	"encoding/json"
 )
 
+type JSONRequest map[string]interface{}
+
 func RequestBodyMatcher(expectedBody string) RequestMatcher {
-	return RequestBodyMatcherWithContentType(expectedBody, "application/json")
+	return func(t *testing.T, request *http.Request) {
+		bodyBytes, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			assert.Fail(t,"Error reading request body: %s",err)
+		}
+
+		actualBody := &JSONRequest{}
+		json.Unmarshal(bodyBytes,actualBody)
+		expectedBody := &JSONRequest{}
+		json.Unmarshal(bodyBytes,expectedBody)
+
+		assert.Equal(t,actualBody,expectedBody)
+
+		assert.Equal(t,request.Header.Get("content-type"), "application/json", "Content Type was not application/json.")
+	}
 }
 
 func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {

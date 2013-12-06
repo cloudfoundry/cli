@@ -10,7 +10,7 @@ import (
 func TestValidAccessRequirement(t *testing.T) {
 	ui := new(testterm.FakeUI)
 	appRepo := &testapi.FakeApplicationRepository{
-		FindByNameAuthErr: true,
+		ReadAuthErr: true,
 	}
 
 	req := newValidAccessTokenRequirement(ui, appRepo)
@@ -18,7 +18,7 @@ func TestValidAccessRequirement(t *testing.T) {
 	assert.False(t, success)
 	assert.Contains(t, ui.Outputs[0], "Not logged in.")
 
-	appRepo.FindByNameAuthErr = false
+	appRepo.ReadAuthErr = false
 
 	req = newValidAccessTokenRequirement(ui, appRepo)
 	success = req.Execute()

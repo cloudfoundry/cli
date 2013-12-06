@@ -29,7 +29,7 @@ func newApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRe
 
 func (req *applicationApiRequirement) Execute() (success bool) {
 	var apiResponse net.ApiResponse
-	req.application, apiResponse = req.appRepo.FindByName(req.name)
+	req.application, apiResponse = req.appRepo.Read(req.name)
 
 	if apiResponse.IsNotSuccessful() {
 		req.ui.Failed(apiResponse.Message)

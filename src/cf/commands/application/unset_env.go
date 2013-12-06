@@ -53,17 +53,19 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	envVars := app.EnvironmentVars
+	appParams := app.ToParams()
 
-	if !envVarFound(varName, envVars) {
+	if !envVarFound(varName, appParams.EnvironmentVars) {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Env variable %s was not set.", varName)
 		return
 	}
 
-	delete(envVars, varName)
+	envParams := cf.NewAppParams()
+	envParams.EnvironmentVars = appParams.EnvironmentVars
+	delete(envParams.EnvironmentVars, varName)
 
-	apiResponse := cmd.appRepo.SetEnv(app.Guid, envVars)
+	_, apiResponse := cmd.appRepo.Update(app.Guid, envParams)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
