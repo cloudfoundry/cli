@@ -30,3 +30,18 @@ func SliceContains(t *testing.T, actual []string, expected Lines, msgAndArgs ...
 	}
 	return Fail(t, fmt.Sprintf("\"%s\" not found", expected[expectedIndex]), msgAndArgs...)
 }
+
+func SliceDoesNotContain(t *testing.T, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+	for i, actualValue := range actual {
+		for _, expectedLine := range expected {
+			allStringsFound := true
+			for _, expectedValue := range expectedLine {
+				allStringsFound = allStringsFound && strings.Contains(strings.ToLower(actualValue), strings.ToLower(expectedValue))
+			}
+			if allStringsFound  {
+				return Fail(t, fmt.Sprintf("\"%s\" found on line %d", expectedLine, i), msgAndArgs...)
+			}
+		}
+	}
+	return true
+}
