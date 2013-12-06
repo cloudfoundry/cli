@@ -77,6 +77,7 @@ type ApplicationRepository interface {
 	FindByName(name string) (app cf.Application, apiResponse net.ApiResponse)
 	SetEnv(appGuid string, envVars map[string]string) (apiResponse net.ApiResponse)
 	Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse)
+	Update(app cf.ApplicationFields, stackGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse)
 	Delete(appGuid string) (apiResponse net.ApiResponse)
 	Rename(appGuid string, newName string) (apiResponse net.ApiResponse)
 	Scale(app cf.ApplicationFields) (apiResponse net.ApiResponse)
@@ -133,23 +134,12 @@ func (repo CloudControllerApplicationRepository) SetEnv(appGuid string, envVars 
 }
 
 func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
-	apiResponse = validateApplicationName(name)
+	data, apiResponse := repo.formatAppJSON(name, buildpackUrl, stackGuid, repo.config.SpaceFields.Guid, command, memory, instances)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
-	data := fmt.Sprintf(
-		`{"space_guid":"%s","name":"%s","instances":%d,"buildpack":%s,"memory":%d,"stack_guid":%s,"command":%s}`,
-		repo.config.SpaceFields.Guid,
-		name,
-		instances,
-		stringOrNull(buildpackUrl),
-		memory,
-		stringOrNull(stackGuid),
-		stringOrNull(command),
-	)
-
 	resource := new(ApplicationResource)
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
@@ -157,6 +147,45 @@ func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, stac
 	}
 
 	createdApp = resource.ToModel()
+	return
+}
+func (repo CloudControllerApplicationRepository) formatAppJSON(name, buildpackUrl, stackGuid, spaceGuid, command string, memory uint64, instances int) (data string, apiResponse net.ApiResponse) {
+	apiResponse = validateApplicationName(name)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	data = "{"
+	if spaceGuid != "" {
+		data += fmt.Sprintf(`"space_guid":"%s",`, spaceGuid)
+	}
+	data += fmt.Sprintf(
+		`"name":"%s","instances":%d,"buildpack":%s,"memory":%d,"stack_guid":%s,"command":%s`,
+		name,
+		instances,
+		stringOrNull(buildpackUrl),
+		memory,
+		stringOrNull(stackGuid),
+		stringOrNull(command),
+	)
+	data += "}"
+	return
+}
+
+func (repo CloudControllerApplicationRepository) Update(app cf.ApplicationFields, stackGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	data, apiResponse := repo.formatAppJSON(app.Name, app.BuildpackUrl, stackGuid, "", app.Command, app.Memory, app.InstanceCount)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+	resource := new(ApplicationResource)
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	updatedApp = resource.ToModel()
 	return
 }
 

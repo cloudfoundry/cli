@@ -31,7 +31,6 @@ type FakeApplicationRepository struct {
 	SetEnvValue string
 	SetEnvErr   bool
 
-	CreatedApp  cf.Application
 	CreateName string
 	CreateBuildpackUrl string
 	CreateStackGuid string
@@ -39,6 +38,9 @@ type FakeApplicationRepository struct {
 	CreateMemory uint64
 	CreateInstances int
 
+	UpdatedApp cf.ApplicationFields
+	UpdatedStackGuid string
+	UpdateAppResult cf.Application
 
 	RenameAppGuid     string
 	RenameNewName string
@@ -88,6 +90,13 @@ func (repo *FakeApplicationRepository) Create(name, buildpackUrl, stackGuid, com
 	resultApp.Memory = memory
 	resultApp.InstanceCount = instances
 
+	return
+}
+
+func (repo *FakeApplicationRepository) Update(app cf.ApplicationFields, stackGuid string) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+	repo.UpdatedApp = app
+	repo.UpdatedStackGuid = stackGuid
+	updatedApp = repo.UpdateAppResult
 	return
 }
 

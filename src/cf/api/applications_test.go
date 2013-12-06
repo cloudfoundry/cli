@@ -183,6 +183,104 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+var updateApplicationResponse = `
+{
+    "metadata": {
+        "guid": "my-cool-app-guid"
+    },
+    "entity": {
+        "name": "my-cool-app"
+    }
+}`
+
+var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:  "PUT",
+	Path:    "/v2/apps/my-app-guid",
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   updateApplicationResponse},
+})
+
+func TestUpdateApplication(t *testing.T) {
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{updateApplicationRequest})
+	defer ts.Close()
+
+	updatedApp := cf.ApplicationFields{}
+	updatedApp.Guid = "my-app-guid"
+	updatedApp.Name = "my-cool-app"
+	updatedApp.BuildpackUrl = "buildpack-url"
+	updatedApp.Command = "some-command"
+	updatedApp.Memory = 2048
+	updatedApp.InstanceCount = 3
+
+	updated, apiResponse := repo.Update(updatedApp, "some-stack-guid")
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+	app := cf.Application{}
+	app.Name = "my-cool-app"
+	app.Guid = "my-cool-app-guid"
+	assert.Equal(t, updated, app)
+}
+
+func TestUpdateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
+	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/apps/my-app-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"stack_guid":null,"command":null}`),
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
+	})
+
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
+	defer ts.Close()
+
+	updatedApp := cf.ApplicationFields{}
+	updatedApp.Guid = "my-app-guid"
+	updatedApp.Name = "my-cool-app"
+	updatedApp.Memory = 128
+	updatedApp.InstanceCount = 1
+	_, apiResponse := repo.Update(updatedApp, "")
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestUpdateRejectsInproperNames(t *testing.T) {
+	baseRequest := testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/apps/my-app-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: "{}"},
+	}
+
+	requests := []testnet.TestRequest{
+		baseRequest,
+		baseRequest,
+	}
+
+	ts, _, repo := createAppRepo(t, requests)
+	defer ts.Close()
+
+	updatedApp := cf.ApplicationFields{}
+	updatedApp.Guid = "my-app-guid"
+
+	updatedApp.Name = "name with space"
+	createdApp, apiResponse := repo.Update(updatedApp, "")
+	assert.Equal(t, createdApp, cf.Application{})
+	assert.Contains(t, apiResponse.Message, "App name is invalid")
+
+	updatedApp.Name = "name-with-inv@lid-chars!"
+	_, apiResponse = repo.Update(updatedApp, "")
+	assert.True(t, apiResponse.IsNotSuccessful())
+
+	updatedApp.Name = "Valid-Name"
+	_, apiResponse = repo.Update(updatedApp, "")
+	assert.True(t, apiResponse.IsSuccessful())
+
+	updatedApp.Name = "name_with_numbers_2"
+	_, apiResponse = repo.Update(updatedApp, "")
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 func TestDeleteApplication(t *testing.T) {
 	deleteApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "DELETE",
