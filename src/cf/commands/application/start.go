@@ -134,7 +134,6 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 	logChan := make(chan *logmessage.Message, 1000)
-
 	go func() {
 		defer close(logChan)
 
@@ -149,7 +148,14 @@ func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 }
 
 func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
+	startTime := time.Now().UnixNano() - int64(time.Second)
 	for msg := range logChan {
+		if msg.GetLogMessage().GetTimestamp() <= startTime {
+			continue
+		}
+		if msg.GetLogMessage().GetSourceType() != logmessage.LogMessage_STG {
+			continue
+		}
 		cmd.ui.Say(simpleLogMessageOutput(msg))
 	}
 }
