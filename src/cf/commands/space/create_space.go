@@ -14,12 +14,14 @@ type CreateSpace struct {
 	ui        terminal.UI
 	config    *configuration.Configuration
 	spaceRepo api.SpaceRepository
+	userRepo  api.UserRepository
 }
 
-func NewCreateSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd CreateSpace) {
+func NewCreateSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd CreateSpace) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
+	cmd.userRepo = userRepo
 	return
 }
 
@@ -45,7 +47,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.spaceRepo.Create(spaceName)
+	space, apiResponse := cmd.spaceRepo.Create(spaceName, cmd.config.OrganizationFields.Guid)
 	if apiResponse.IsNotSuccessful() {
 		if apiResponse.ErrorCode == cf.SPACE_EXISTS {
 			cmd.ui.Ok()
@@ -55,7 +57,29 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
-
 	cmd.ui.Ok()
+
+	cmd.ui.Say("Binding %s to space %s as %s...",
+		terminal.EntityNameColor(cmd.config.Username()),
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]),
+	)
+	apiResponse = cmd.userRepo.SetSpaceRole(cmd.config.UserGuid(), space.Guid, cmd.config.OrganizationFields.Guid, cf.SPACE_MANAGER)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+	}
+	cmd.ui.Ok()
+
+	cmd.ui.Say("Binding %s to space %s as %s...",
+		terminal.EntityNameColor(cmd.config.Username()),
+		terminal.EntityNameColor(space.Name),
+		terminal.EntityNameColor(cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]),
+	)
+	apiResponse = cmd.userRepo.SetSpaceRole(cmd.config.UserGuid(), space.Guid, cmd.config.OrganizationFields.Guid, cf.SPACE_DEVELOPER)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+	}
+	cmd.ui.Ok()
+
 	cmd.ui.Say("\nTIP: Use '%s' to target new space", terminal.CommandColor(cf.Name()+" target -s "+spaceName))
 }
