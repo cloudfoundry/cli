@@ -54,7 +54,7 @@ type SpaceRepository interface {
 	ListSpaces(stop chan bool) (spacesChan chan []cf.Space, statusChan chan net.ApiResponse)
 	FindByName(name string) (space cf.Space, apiResponse net.ApiResponse)
 	FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse)
-	Create(name string) (apiResponse net.ApiResponse)
+	Create(name string, orgGuid string) (space cf.Space, apiResponse net.ApiResponse)
 	Rename(spaceGuid, newName string) (apiResponse net.ApiResponse)
 	Delete(spaceGuid string) (apiResponse net.ApiResponse)
 }
@@ -144,10 +144,16 @@ func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
-	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, repo.config.OrganizationFields.Guid)
-	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
+	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
+	resource := new(SpaceResource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(body), resource)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+	space = resource.ToModel()
+	return
 }
 
 func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiResponse net.ApiResponse) {
