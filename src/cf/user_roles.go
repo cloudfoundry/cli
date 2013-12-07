@@ -20,3 +20,9 @@ var UserInputToSpaceRole = map[string]string{
 	"SpaceDeveloper": SPACE_DEVELOPER,
 	"SpaceAuditor":   SPACE_AUDITOR,
 }
+
+var SpaceRoleToUserInput = map[string]string{
+	SPACE_MANAGER:   "SpaceManager",
+	SPACE_DEVELOPER: "SpaceDeveloper",
+	SPACE_AUDITOR:   "SpaceAuditor",
+}
