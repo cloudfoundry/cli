@@ -245,7 +245,7 @@ func TestWithTwoProtocol(t *testing.T) {
 func TestWithBadProtocol(t *testing.T) {
 	_, err := testWithProtocol(t, []string{"test"})
 	if err != ErrBadStatus {
-		t.Errorf("SubProto: expected %q, got %q", ErrBadStatus)
+		t.Errorf("SubProto: expected %v, got %v", ErrBadStatus, err)
 	}
 }
 
@@ -283,6 +283,20 @@ func TestTrailingSpaces(t *testing.T) {
 			break
 		}
 		ws.Close()
+	}
+}
+
+func TestDialConfigBadVersion(t *testing.T) {
+	once.Do(startServer)
+	config := newConfig(t, "/echo")
+	config.Version = 1234
+
+	_, err := DialConfig(config)
+
+	if dialerr, ok := err.(*DialError); ok {
+		if dialerr.Err != ErrBadProtocolVersion {
+			t.Errorf("dial expected err %q but got %q", ErrBadProtocolVersion, dialerr.Err)
+		}
 	}
 }
 

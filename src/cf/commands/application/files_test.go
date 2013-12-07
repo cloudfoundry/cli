@@ -51,8 +51,8 @@ func TestListingDirectoryEntries(t *testing.T) {
 
 	ui := callFiles(t, []string{"my-app", "/foo"}, reqFactory, appFilesRepo)
 
-	testassert.SliceContains(t,ui.Outputs,testassert.Lines{
-		{"Getting files for app","my-found-app","my-org","my-space","my-user"},
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
 		{"OK"},
 		{"file 1\nfile 2"},
 	})
@@ -71,7 +71,7 @@ func TestListingFilesWithTemplateTokens(t *testing.T) {
 
 	ui := callFiles(t, []string{"my-app", "/foo"}, reqFactory, appFilesRepo)
 
-	testassert.SliceContains(t,ui.Outputs,testassert.Lines{
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"%s %d %i"},
 	})
 }
