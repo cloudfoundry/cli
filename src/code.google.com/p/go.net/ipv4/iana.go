@@ -53,7 +53,7 @@ const (
 	ianaProtocolEMCON          = 14  // EMCON
 	ianaProtocolXNET           = 15  // Cross Net Debugger
 	ianaProtocolCHAOS          = 16  // Chaos
-	ianaProtocolUDP            = 17  // UserFields Datagram
+	ianaProtocolUDP            = 17  // User Datagram
 	ianaProtocolMUX            = 18  // Multiplexing
 	ianaProtocolDCNMEAS        = 19  // DCN Measurement Subsystems
 	ianaProtocolHMP            = 20  // Host Monitoring
@@ -159,7 +159,7 @@ const (
 	ianaProtocolISIS           = 124 // ISIS over IPv4
 	ianaProtocolFIRE           = 125 // FIRE
 	ianaProtocolCRTP           = 126 // Combat Radio Transport Protocol
-	ianaProtocolCRUDP          = 127 // Combat Radio UserFields Datagram
+	ianaProtocolCRUDP          = 127 // Combat Radio User Datagram
 	ianaProtocolSSCOPMCE       = 128 // SSCOPMCE
 	ianaProtocolIPLT           = 129 // IPLT
 	ianaProtocolSPS            = 130 // Secure Packet Shield

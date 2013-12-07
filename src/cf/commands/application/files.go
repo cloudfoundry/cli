@@ -64,5 +64,5 @@ func (cmd *Files) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-	cmd.ui.Say("%s",list)
+	cmd.ui.Say("%s", list)
 }

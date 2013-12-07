@@ -27,7 +27,7 @@ func TestNewRequest(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, request.HttpReq.Header.Get("Authorization"), "BEARER my-access-token")
 	assert.Equal(t, request.HttpReq.Header.Get("accept"), "application/json")
-	assert.Equal(t, request.HttpReq.Header.Get("User-Agent "), "go-cli "+cf.Version+" / "+runtime.GOOS)
+	assert.Equal(t, request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
 }
 
 func TestNewRequestWithAFileBody(t *testing.T) {

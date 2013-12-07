@@ -3,7 +3,7 @@
 
 package ipv6
 
-// Internet Control Message Protocol version 6 (ICMPv6) Parameters, Updated: 2012-11-12
+// Internet Control Message Protocol version 6 (ICMPv6) Parameters, Updated: 2013-07-03
 const (
 	ICMPTypeDestinationUnreachable                ICMPType = 1   // Destination Unreachable
 	ICMPTypePacketTooBig                          ICMPType = 2   // Packet Too Big
@@ -41,7 +41,7 @@ const (
 	ICMPTypeDuplicateAddressConfirmation          ICMPType = 158 // Duplicate Address Confirmation
 )
 
-// Internet Control Message Protocol version 6 (ICMPv6) Parameters, Updated: 2012-11-12
+// Internet Control Message Protocol version 6 (ICMPv6) Parameters, Updated: 2013-07-03
 var icmpTypes = map[ICMPType]string{
 	1:   "destination unreachable",
 	2:   "packet too big",
@@ -98,7 +98,7 @@ const (
 	ianaProtocolEMCON          = 14  // EMCON
 	ianaProtocolXNET           = 15  // Cross Net Debugger
 	ianaProtocolCHAOS          = 16  // Chaos
-	ianaProtocolUDP            = 17  // UserFields Datagram
+	ianaProtocolUDP            = 17  // User Datagram
 	ianaProtocolMUX            = 18  // Multiplexing
 	ianaProtocolDCNMEAS        = 19  // DCN Measurement Subsystems
 	ianaProtocolHMP            = 20  // Host Monitoring
@@ -204,7 +204,7 @@ const (
 	ianaProtocolISIS           = 124 // ISIS over IPv4
 	ianaProtocolFIRE           = 125 // FIRE
 	ianaProtocolCRTP           = 126 // Combat Radio Transport Protocol
-	ianaProtocolCRUDP          = 127 // Combat Radio UserFields Datagram
+	ianaProtocolCRUDP          = 127 // Combat Radio User Datagram
 	ianaProtocolSSCOPMCE       = 128 // SSCOPMCE
 	ianaProtocolIPLT           = 129 // IPLT
 	ianaProtocolSPS            = 130 // Secure Packet Shield
