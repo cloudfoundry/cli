@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -50,16 +51,29 @@ func TestListingDirectoryEntries(t *testing.T) {
 
 	ui := callFiles(t, []string{"my-app", "/foo"}, reqFactory, appFilesRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting files for app")
-	assert.Contains(t, ui.Outputs[0], "my-found-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t,ui.Outputs,testassert.Lines{
+		{"Getting files for app","my-found-app","my-org","my-space","my-user"},
+		{"OK"},
+		{"file 1\nfile 2"},
+	})
+
 	assert.Equal(t, appFilesRepo.AppGuid, "my-app-guid")
 	assert.Equal(t, appFilesRepo.Path, "/foo")
+}
 
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "file 1\nfile 2")
+func TestListingFilesWithTemplateTokens(t *testing.T) {
+	app := cf.Application{}
+	app.Name = "my-found-app"
+	app.Guid = "my-app-guid"
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: app}
+	appFilesRepo := &testapi.FakeAppFilesRepo{FileList: "%s %d %i"}
+
+	ui := callFiles(t, []string{"my-app", "/foo"}, reqFactory, appFilesRepo)
+
+	testassert.SliceContains(t,ui.Outputs,testassert.Lines{
+		{"%s %d %i"},
+	})
 }
 
 func callFiles(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, appFilesRepo *testapi.FakeAppFilesRepo) (ui *testterm.FakeUI) {
