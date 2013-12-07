@@ -244,20 +244,30 @@ func testSpacesDidNotFindByNameWithOrg(t *testing.T, orgGuid string, findByName 
 	assert.True(t, apiResponse.IsNotFound())
 }
 
+var defaultCreateSpaceResponse = `{
+  "metadata": {
+	"guid": "space-guid"
+  },
+  "entity": {
+	"name": "space-name"
+  }
+}`
+
 func TestCreateSpace(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/spaces",
 		Matcher:  testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated},
+		Response: testnet.TestResponse{Status: http.StatusCreated, Body: defaultCreateSpaceResponse},
 	})
 
 	ts, handler, repo := createSpacesRepo(t, request)
 	defer ts.Close()
 
-	apiResponse := repo.Create("space-name")
+	space, apiResponse := repo.Create("space-name", "some-org-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.Equal(t, space.Guid, "space-guid")
 }
 
 func TestRenameSpace(t *testing.T) {

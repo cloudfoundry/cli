@@ -29,6 +29,7 @@ type FakeUserRepository struct {
 	UnsetOrgRoleRole string
 
 	SetSpaceRoleUserGuid string
+	SetSpaceRoleOrgGuid string
 	SetSpaceRoleSpaceGuid string
 	SetSpaceRoleRole string
 
@@ -118,6 +119,7 @@ func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (ap
 
 func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
 	repo.SetSpaceRoleUserGuid = userGuid
+	repo.SetSpaceRoleOrgGuid = orgGuid
 	repo.SetSpaceRoleSpaceGuid = spaceGuid
 	repo.SetSpaceRoleRole = role
 	return

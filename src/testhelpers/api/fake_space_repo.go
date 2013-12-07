@@ -23,6 +23,7 @@ type FakeSpaceRepository struct {
 
 	CreateSpaceName string
 	CreateSpaceExists bool
+	CreateSpaceSpace cf.Space
 
 	RenameSpaceGuid string
 	RenameNewName string
@@ -90,12 +91,13 @@ func (repo *FakeSpaceRepository) GetSummary() (space cf.Space, apiResponse net.A
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string) (apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
 	if repo.CreateSpaceExists {
 		apiResponse = net.NewApiResponse("Space already exists", cf.SPACE_EXISTS, 400)
 		return
 	}
 	repo.CreateSpaceName = name
+	space = repo.CreateSpaceSpace
 	return
 }
 
