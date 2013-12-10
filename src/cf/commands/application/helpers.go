@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/terminal"
+	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"regexp"
@@ -13,6 +14,24 @@ import (
 const (
 	TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 )
+
+func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) (msg *logmessage.Message) {
+	messageType := logmessage.LogMessage_ERR
+	sourceType := logmessage.LogMessage_UNKNOWN
+
+	logMsg := logmessage.LogMessage{
+		Message:     []byte(msgText),
+		AppId:       proto.String(appGuid),
+		MessageType: &messageType,
+		SourceType:  &sourceType,
+		SourceName:  proto.String(sourceName),
+		Timestamp:   proto.Int64(timestamp.UnixNano()),
+	}
+	data, _ := proto.Marshal(&logMsg)
+	msg, _ = logmessage.ParseMessage(data)
+
+	return
+}
 
 func simpleLogMessageOutput(msg *logmessage.Message) (msgText string) {
 	logMsg := msg.GetLogMessage()

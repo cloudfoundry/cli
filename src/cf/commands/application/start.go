@@ -23,6 +23,8 @@ const (
 	DefaultPingerThrottle = 5 * time.Second
 )
 
+const LogMessageTypeStaging = "STG"
+
 type Start struct {
 	ui               terminal.UI
 	config           *configuration.Configuration
@@ -153,7 +155,7 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 		if msg.GetLogMessage().GetTimestamp() <= startTime {
 			continue
 		}
-		if msg.GetLogMessage().GetSourceType() != logmessage.LogMessage_STG {
+		if msg.GetShortSourceTypeName() != LogMessageTypeStaging {
 			continue
 		}
 		cmd.ui.Say(simpleLogMessageOutput(msg))
