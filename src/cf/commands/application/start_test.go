@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
-	"code.google.com/p/gogoprotobuf/proto"
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
@@ -97,29 +96,10 @@ func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplaye
 		GetInstancesErrorCodes: errorCodes,
 	}
 
-	currentTime := time.Now()
-	messageType := logmessage.LogMessage_ERR
-	sourceType := logmessage.LogMessage_STG
-	logMessage1 := logmessage.LogMessage{
-		Message:     []byte("Log Line 1"),
-		AppId:       proto.String(app.Guid),
-		MessageType: &messageType,
-		SourceType:  &sourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
-
-	logMessage2 := logmessage.LogMessage{
-		Message:     []byte("Log Line 2"),
-		AppId:       proto.String(app.Guid),
-		MessageType: &messageType,
-		SourceType:  &sourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
-
 	logRepo := &testapi.FakeLogsRepository{
-		TailLogMessages: []logmessage.LogMessage{
-			logMessage1,
-			logMessage2,
+		TailLogMessages: []*logmessage.Message{
+			NewLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
+			NewLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
 		},
 	}
 
@@ -206,46 +186,16 @@ func TestStartApplicationOnlyShowsCurrentStagingLogs(t *testing.T) {
 	}
 
 	currentTime := time.Now()
-	oldenTime := currentTime.UnixNano() - int64(time.Minute)
-	messageType := logmessage.LogMessage_ERR
-	wrongSourceType := logmessage.LogMessage_DEA
-	correctSourceType := logmessage.LogMessage_STG
+	oldenTime := currentTime.Add(-time.Minute)
+	wrongSourceName := "DEA"
+	correctSourceName := "STG"
 
-	logMessage1 := logmessage.LogMessage{
-		Message:     []byte("Log Line 1"),
-		AppId:       proto.String(defaultAppForStart.Guid),
-		MessageType: &messageType,
-		SourceType:  &correctSourceType,
-		Timestamp:   proto.Int64(oldenTime),
-	}
-
-	logMessage2 := logmessage.LogMessage{
-		Message:     []byte("Log Line 2"),
-		AppId:       proto.String(defaultAppForStart.Guid),
-		MessageType: &messageType,
-		SourceType:  &correctSourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
-	logMessage3 := logmessage.LogMessage{
-		Message:     []byte("Log Line 3"),
-		AppId:       proto.String(defaultAppForStart.Guid),
-		MessageType: &messageType,
-		SourceType:  &correctSourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
-	logMessage4 := logmessage.LogMessage{
-		Message:     []byte("Log Line 4"),
-		AppId:       proto.String(defaultAppForStart.Guid),
-		MessageType: &messageType,
-		SourceType:  &wrongSourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
 	logRepo := &testapi.FakeLogsRepository{
-		TailLogMessages: []logmessage.LogMessage{
-			logMessage1,
-			logMessage2,
-			logMessage3,
-			logMessage4,
+		TailLogMessages: []*logmessage.Message{
+			NewLogMessage("Log Line 1", defaultAppForStart.Guid, correctSourceName, oldenTime),
+			NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
+			NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
+			NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
 		},
 	}
 

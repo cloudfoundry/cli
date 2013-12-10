@@ -3,13 +3,12 @@ package api
 import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"time"
-	"code.google.com/p/gogoprotobuf/proto"
 )
 
 type FakeLogsRepository struct {
 	AppLoggedGuid string
-	RecentLogs []logmessage.LogMessage
-	TailLogMessages []logmessage.LogMessage
+	RecentLogs []*logmessage.Message
+	TailLogMessages []*logmessage.Message
 	TailLogStopCalled bool
 	TailLogErr error
 }
@@ -32,14 +31,12 @@ func (l *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func(), logCh
 	return
 }
 
-func (l *FakeLogsRepository) logsFor(appGuid string, logMessages []logmessage.LogMessage, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool) {
+func (l *FakeLogsRepository) logsFor(appGuid string, logMessages []*logmessage.Message, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool) {
 	l.AppLoggedGuid = appGuid
 	onConnect()
 
 	for _, logMsg := range logMessages{
-		data, _ := proto.Marshal(&logMsg)
-		msg, _ := logmessage.ParseMessage(data)
-		logChan <- msg
+		logChan <- logMsg
 	}
 
 	go func(){

@@ -4,7 +4,6 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
-	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -45,27 +44,10 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 	app.Guid = "my-app-guid"
 
 	currentTime := time.Now()
-	messageType := logmessage.LogMessage_ERR
-	sourceType := logmessage.LogMessage_DEA
-	logMessage1 := logmessage.LogMessage{
-		Message:     []byte("Log Line 1"),
-		AppId:       proto.String("my-app"),
-		MessageType: &messageType,
-		SourceType:  &sourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
 
-	logMessage2 := logmessage.LogMessage{
-		Message:     []byte("Log Line 2"),
-		AppId:       proto.String("my-app"),
-		MessageType: &messageType,
-		SourceType:  &sourceType,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
-	}
-
-	recentLogs := []logmessage.LogMessage{
-		logMessage1,
-		logMessage2,
+	recentLogs := []*logmessage.Message{
+		NewLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
+		NewLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
 	}
 
 	reqFactory, logsRepo := getLogsDependencies()
@@ -91,20 +73,9 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
 
-	currentTime := time.Now()
-	messageType := logmessage.LogMessage_ERR
-	deaSourceType := logmessage.LogMessage_DEA
-	deaSourceId := "42"
-	deaLogMessage := logmessage.LogMessage{
-		Message:     []byte("Log Line 1"),
-		AppId:       proto.String("my-app"),
-		MessageType: &messageType,
-		SourceType:  &deaSourceType,
-		SourceId:    &deaSourceId,
-		Timestamp:   proto.Int64(currentTime.UnixNano()),
+	logs := []*logmessage.Message{
+		NewLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
 	}
-
-	logs := []logmessage.LogMessage{deaLogMessage}
 
 	reqFactory, logsRepo := getLogsDependencies()
 	reqFactory.Application = app
