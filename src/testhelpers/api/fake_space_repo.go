@@ -22,6 +22,7 @@ type FakeSpaceRepository struct {
 	SummarySpace cf.Space
 
 	CreateSpaceName string
+	CreateSpaceOrgGuid string
 	CreateSpaceExists bool
 	CreateSpaceSpace cf.Space
 
@@ -97,6 +98,7 @@ func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space cf.S
 		return
 	}
 	repo.CreateSpaceName = name
+	repo.CreateSpaceOrgGuid = orgGuid
 	space = repo.CreateSpaceSpace
 	return
 }
