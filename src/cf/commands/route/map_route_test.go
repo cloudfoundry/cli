@@ -14,31 +14,31 @@ import (
 	"testing"
 )
 
-func TestRouteMapperFailsWithUsage(t *testing.T) {
+func TestMapRouteFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	fakeUI := callRouteMapper(t, []string{}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{}, true)
+	fakeUI := callMapRoute(t, []string{}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callRouteMapper(t, []string{"foo"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{}, true)
+	fakeUI = callMapRoute(t, []string{"foo"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
 	assert.True(t, fakeUI.FailedWithUsage)
 
-	fakeUI = callRouteMapper(t, []string{"foo", "bar"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{}, true)
+	fakeUI = callMapRoute(t, []string{"foo", "bar"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
 	assert.False(t, fakeUI.FailedWithUsage)
 }
 
-func TestRouteMapperRequirements(t *testing.T) {
+func TestMapRouteRequirements(t *testing.T) {
 	routeRepo := &testapi.FakeRouteRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{}, true)
+	callMapRoute(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.DomainName, "my-domain.com")
 }
 
-func TestRouteMapperWhenBinding(t *testing.T) {
+func TestMapRouteWhenBinding(t *testing.T) {
 
 	domain := cf.Domain{}
 	domain.Guid = "my-domain-guid"
@@ -56,7 +56,7 @@ func TestRouteMapperWhenBinding(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
 	routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
 
-	ui := callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator, true)
+	ui := callMapRoute(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator)
 
 	assert.Contains(t, ui.Outputs[0], "Adding route")
 	assert.Contains(t, ui.Outputs[0], "foo.example.com")
@@ -71,40 +71,7 @@ func TestRouteMapperWhenBinding(t *testing.T) {
 	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
-func TestRouteMapperWhenUnbinding(t *testing.T) {
-	domain := cf.Domain{}
-	domain.Guid = "my-domain-guid"
-	domain.Name = "example.com"
-
-	route := cf.Route{}
-	route.Guid = "my-route-guid"
-	route.Host = "foo"
-	route.Domain = domain.DomainFields
-
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.Name = "my-app"
-
-	routeRepo := &testapi.FakeRouteRepository{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}
-	routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
-
-	ui := callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator, false)
-
-	assert.Contains(t, ui.Outputs[0], "Removing route")
-	assert.Contains(t, ui.Outputs[0], "foo.example.com")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
-	assert.Equal(t, routeRepo.UnboundRouteGuid, "my-route-guid")
-	assert.Equal(t, routeRepo.UnboundAppGuid, "my-app-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
-}
-
-func TestRouteMapperWhenRouteNotReserved(t *testing.T) {
+func TestMapRouteWhenRouteNotReserved(t *testing.T) {
 	domain := cf.DomainFields{}
 	domain.Name = "my-domain.com"
 	route := cf.Route{}
@@ -119,24 +86,20 @@ func TestRouteMapperWhenRouteNotReserved(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	routeCreator := &testcmd.FakeRouteCreator{ReservedRoute: route}
 
-	callRouteMapper(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator, true)
+	callMapRoute(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator)
 
 	assert.Equal(t, routeCreator.ReservedRoute, route)
 }
 
-func callRouteMapper(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, createRoute *testcmd.FakeRouteCreator, bind bool) (ui *testterm.FakeUI) {
+func callMapRoute(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository, createRoute *testcmd.FakeRouteCreator) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-	var ctxt *cli.Context
-	if bind {
-		ctxt = testcmd.NewContext("map-route", args)
-	} else {
-		ctxt = testcmd.NewContext("unmap-route", args)
-	}
+	var ctxt *cli.Context = testcmd.NewContext("map-route", args)
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
+
 	space := cf.SpaceFields{}
 	space.Name = "my-space"
 	org := cf.OrganizationFields{}
@@ -147,7 +110,7 @@ func callRouteMapper(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 		AccessToken:        token,
 	}
 
-	cmd := NewRouteMapper(ui, config, routeRepo, createRoute, bind)
+	cmd := NewMapRoute(ui, config, routeRepo, createRoute)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -96,8 +96,8 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 
 	createRoute := route.NewCreateRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["create-route"] = createRoute
-	factory.cmdsByName["map-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, true)
-	factory.cmdsByName["unmap-route"] = route.NewRouteMapper(ui, config, repoLocator.GetRouteRepository(), createRoute, false)
+	factory.cmdsByName["map-route"] = route.NewMapRoute(ui, config, repoLocator.GetRouteRepository(), createRoute)
+	factory.cmdsByName["unmap-route"] = route.NewUnmapRoute(ui, config, repoLocator.GetRouteRepository())
 
 	displayApp := application.NewShowApp(ui, config, repoLocator.GetAppSummaryRepository(), repoLocator.GetAppInstancesRepository())
 	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsRepository())
