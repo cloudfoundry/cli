@@ -150,11 +150,7 @@ func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 }
 
 func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
-	startTime := time.Now().UnixNano() - int64(time.Second)
 	for msg := range logChan {
-		if msg.GetLogMessage().GetTimestamp() <= startTime {
-			continue
-		}
 		if msg.GetShortSourceTypeName() != LogMessageTypeStaging {
 			continue
 		}
