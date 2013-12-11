@@ -446,7 +446,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				"               [--no-hostname] [--no-route] [--no-start]",
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "b", Value: "", Usage: "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
-				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command"},
+				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command, set to null to reset to default start command"},
 				cli.StringFlag{Name: "d", Value: "", Usage: "Domain (for example: example.com)"},
 				cli.IntFlag{Name: "i", Value: -1, Usage: "Number of instances"},
 				cli.StringFlag{Name: "m", Value: "", Usage: "Memory limit (e.g. 256M, 1024M, 1G)"},
