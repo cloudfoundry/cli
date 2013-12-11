@@ -186,13 +186,12 @@ func TestStartApplicationOnlyShowsCurrentStagingLogs(t *testing.T) {
 	}
 
 	currentTime := time.Now()
-	oldenTime := currentTime.Add(-time.Minute)
 	wrongSourceName := "DEA"
 	correctSourceName := "STG"
 
 	logRepo := &testapi.FakeLogsRepository{
 		TailLogMessages: []*logmessage.Message{
-			NewLogMessage("Log Line 1", defaultAppForStart.Guid, correctSourceName, oldenTime),
+			NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
 			NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
 			NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
 			NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
