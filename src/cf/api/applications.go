@@ -183,7 +183,7 @@ func (repo CloudControllerApplicationRepository) Update(app cf.ApplicationFields
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/apps/%s", repo.config.Target, app.Guid)
+	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.Target, app.Guid)
 	resource := new(ApplicationResource)
 	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
