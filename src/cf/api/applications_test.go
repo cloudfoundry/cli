@@ -195,7 +195,7 @@ var updateApplicationResponse = `
 
 var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
-	Path:    "/v2/apps/my-app-guid",
+	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
 	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
