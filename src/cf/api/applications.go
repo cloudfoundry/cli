@@ -34,6 +34,7 @@ func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
 
 func (resource ApplicationResource) ToModel() (app cf.Application) {
 	app.ApplicationFields = resource.ToFields()
+	app.Stack = resource.Entity.Stack.ToFields()
 
 	for _, routeResource := range resource.Entity.Routes {
 		app.Routes = append(app.Routes, routeResource.ToModel())
@@ -46,6 +47,7 @@ type ApplicationEntity struct {
 	State           string
 	Instances       int
 	Memory          int
+	Stack           StackResource
 	Routes          []AppRouteResource
 	EnvironmentJson map[string]string `json:"environment_json"`
 }

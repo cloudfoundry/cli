@@ -30,6 +30,14 @@ var singleAppResponse = testnet.TestResponse{
         "memory": 128,
         "instances": 1,
         "state": "STOPPED",
+        "stack": {
+			"metadata": {
+				  "guid": "app1-route-guid"
+				},
+			"entity": {
+			  "name": "awesome-stacks-ahoy"
+			  }
+        },
         "routes": [
       	  {
       	    "metadata": {
@@ -73,6 +81,7 @@ func TestFindByName(t *testing.T) {
 	assert.Equal(t, app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
 	assert.Equal(t, app.Routes[0].Host, "app1")
 	assert.Equal(t, app.Routes[0].Domain.Name, "cfapps.io")
+	assert.Equal(t, app.Stack.Name, "awesome-stacks-ahoy")
 }
 
 func TestFindByNameWhenAppIsNotFound(t *testing.T) {
