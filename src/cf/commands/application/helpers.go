@@ -133,7 +133,7 @@ func coloredAppState(app cf.ApplicationFields) string {
 	return appState
 }
 
-func coloredAppInstaces(app cf.ApplicationFields) string {
+func coloredAppInstances(app cf.ApplicationFields) string {
 	healthString := fmt.Sprintf("%d/%d", app.RunningInstances, app.InstanceCount)
 
 	if app.RunningInstances == 0 {

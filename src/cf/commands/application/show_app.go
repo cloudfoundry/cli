@@ -80,7 +80,7 @@ func (cmd *ShowApp) ShowApp(app cf.Application) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("\n%s %s", terminal.HeaderColor("state:"), coloredAppState(appSummary.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstaces(appSummary.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstances(appSummary.ApplicationFields))
 	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(appSummary.Memory*formatters.MEGABYTE), appSummary.InstanceCount)
 
 	var urls []string
