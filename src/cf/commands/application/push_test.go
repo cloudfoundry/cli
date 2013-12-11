@@ -176,6 +176,25 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, starter.AppToStart.Name, "")
 }
 
+func TestPushingAppToResetStartCommand(t *testing.T) {
+	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+
+	existingApp := cf.Application{}
+	existingApp.Name = "existing-app"
+	existingApp.Guid = "existing-app-guid"
+	existingApp.Command = "unicorn -c config/unicorn.rb -D"
+
+	appRepo.FindByNameApp = existingApp
+
+	args := []string{
+		"-c", "null",
+		"existing-app",
+	}
+	_ = callPush(t, args, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	assert.Equal(t, appRepo.UpdatedApp.Command, "null")
+}
+
 func TestPushingAppWithNoRoute(t *testing.T) {
 	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 	domain := cf.Domain{}

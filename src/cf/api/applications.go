@@ -154,6 +154,12 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(name, buildpackUr
 		return
 	}
 
+	if command == "null" {
+		command = "\"\""
+	} else {
+		command = stringOrNull(command)
+	}
+
 	data = "{"
 	if spaceGuid != "" {
 		data += fmt.Sprintf(`"space_guid":"%s",`, spaceGuid)
@@ -165,7 +171,7 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(name, buildpackUr
 		stringOrNull(buildpackUrl),
 		memory,
 		stringOrNull(stackGuid),
-		stringOrNull(command),
+		command,
 	)
 	data += "}"
 	return

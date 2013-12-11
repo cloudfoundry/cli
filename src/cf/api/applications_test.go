@@ -245,6 +245,26 @@ func TestUpdateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
+func TestUpdateApplicationSetCommandToNull(t *testing.T) {
+	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/apps/my-app-guid",
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":0,"buildpack":null,"memory":0,"stack_guid":null,"command":""}`),
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
+	})
+
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
+	defer ts.Close()
+
+	updatedApp := cf.ApplicationFields{}
+	updatedApp.Guid = "my-app-guid"
+	updatedApp.Name = "my-cool-app"
+	updatedApp.Command = "null"
+	_, apiResponse := repo.Update(updatedApp, "")
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
 func TestUpdateRejectsInproperNames(t *testing.T) {
 	baseRequest := testnet.TestRequest{
 		Method:   "PUT",
