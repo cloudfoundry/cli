@@ -74,15 +74,14 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain cf.DomainFields, spa
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	_, apiResponse = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
+	route, apiResponse = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
 	if apiResponse.IsNotSuccessful() {
 		var findApiResponse net.ApiResponse
 		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 
 		if findApiResponse.IsNotSuccessful() ||
 			route.Space.Guid != space.Guid ||
-			route.Domain.Guid != domain.Guid ||
-			route.Host != hostName {
+			route.Domain.Guid != domain.Guid {
 			return
 		}
 

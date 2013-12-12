@@ -44,8 +44,8 @@ type RouteRepository interface {
 	ListRoutes(stop chan bool) (routesChan chan []cf.Route, statusChan chan net.ApiResponse)
 	FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse)
 	FindByHostAndDomain(host, domain string) (route cf.Route, apiResponse net.ApiResponse)
-	Create(host, domainGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse)
-	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse)
+	Create(host, domainGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse)
+	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse)
 	Bind(routeGuid, appGuid string) (apiResponse net.ApiResponse)
 	Unbind(routeGuid, appGuid string) (apiResponse net.ApiResponse)
 	Delete(routeGuid string) (apiResponse net.ApiResponse)
@@ -153,12 +153,12 @@ func (repo CloudControllerRouteRepository) findNextWithPath(path string) (routes
 	return
 }
 
-func (repo CloudControllerRouteRepository) Create(host, domainGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerRouteRepository) Create(host, domainGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse) {
 	return repo.CreateInSpace(host, domainGuid, repo.config.SpaceFields.Guid)
 }
 
-func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/routes", repo.config.Target)
+func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.Target)
 	data := fmt.Sprintf(`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`, host, domainGuid, spaceGuid)
 
 	resource := new(RouteResource)
@@ -167,7 +167,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, space
 		return
 	}
 
-	createdRoute = resource.ToFields()
+	createdRoute = resource.ToModel()
 	return
 }
 

@@ -22,7 +22,7 @@ type FakeRouteRepository struct {
 	CreateInSpaceHost string
 	CreateInSpaceDomainGuid string
 	CreateInSpaceSpaceGuid string
-	CreateInSpaceCreatedRoute cf.RouteFields
+	CreateInSpaceCreatedRoute cf.Route
 	CreateInSpaceErr bool
 
 	BoundRouteGuid string
@@ -100,7 +100,7 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	return
 }
 
-func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse) {
 	repo.CreatedHost = host
 	repo.CreatedDomainGuid = domainGuid
 
@@ -109,7 +109,7 @@ func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute c
 	return
 }
 
-func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.RouteFields, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse) {
 	repo.CreateInSpaceHost = host
 	repo.CreateInSpaceDomainGuid = domainGuid
 	repo.CreateInSpaceSpaceGuid = spaceGuid

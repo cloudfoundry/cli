@@ -250,7 +250,7 @@ func TestFindByHostAndDomainWhenRouteIsNotFound(t *testing.T) {
 func TestCreateInSpace(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
-		Path:    "/v2/routes",
+		Path:    "/v2/routes?inline-relations-depth=1",
 		Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
@@ -272,7 +272,7 @@ func TestCreateInSpace(t *testing.T) {
 func TestCreateRoute(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
-		Path:    "/v2/routes",
+		Path:    "/v2/routes?inline-relations-depth=1",
 		Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
