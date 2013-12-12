@@ -128,12 +128,12 @@ func (cmd Push) routeFlagsPresent(c *cli.Context) bool {
 	return c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
 }
 
-func (cmd Push) route(hostName string, domain cf.DomainFields) (routeFields cf.RouteFields) {
+func (cmd Push) route(hostName string, domain cf.DomainFields) (route cf.Route) {
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
 
-		routeFields, apiResponse = cmd.routeRepo.Create(hostName, domain.Guid)
+		route, apiResponse = cmd.routeRepo.Create(hostName, domain.Guid)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
@@ -143,7 +143,6 @@ func (cmd Push) route(hostName string, domain cf.DomainFields) (routeFields cf.R
 		cmd.ui.Say("")
 	} else {
 		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
-		routeFields = route.RouteFields
 	}
 
 	return

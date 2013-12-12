@@ -122,7 +122,7 @@ func TestRouteCreator(t *testing.T) {
 	domain.Guid = "domain-guid"
 	domain.Name = "example.com"
 
-	createdRoute := cf.RouteFields{}
+	createdRoute := cf.Route{}
 	createdRoute.Host = "my-host"
 	createdRoute.Guid = "my-route-guid"
 	routeRepo := &testapi.FakeRouteRepository{
@@ -142,7 +142,9 @@ func TestRouteCreator(t *testing.T) {
 	}
 
 	cmd := NewCreateRoute(ui, config, routeRepo)
-	_, apiResponse := cmd.CreateRoute("my-host", domain, space)
+	route, apiResponse := cmd.CreateRoute("my-host", domain, space)
+
+	assert.Equal(t, route.Guid, createdRoute.Guid)
 
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Contains(t, ui.Outputs[0], "Creating route")
