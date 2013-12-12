@@ -49,7 +49,7 @@ func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	table := [][]string{
-		[]string{"name", "state", "instances", "memory", "disk", "urls"},
+		[]string{"name", "requested state", "instances", "memory", "disk", "urls"},
 	}
 
 	for _, appSummary := range apps {
