@@ -149,24 +149,40 @@ func (cmd Push) route(hostName string, domain cf.DomainFields) (routeFields cf.R
 	return
 }
 
-func (cmd Push) domain(c *cli.Context) cf.Domain {
+func (cmd Push) domain(c *cli.Context) (domain cf.Domain) {
 	var (
 		apiResponse net.ApiResponse
-		domain      cf.Domain
 		domainName  = c.String("d")
 	)
 
 	if domainName != "" {
 		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
+		}
 	} else {
-		domain, apiResponse = cmd.domainRepo.FindDefaultAppDomain()
+		stopChan := make(chan bool, 1)
+		domainsChan, statusChan := cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields.Guid, stopChan)
+
+		for domainsChunk := range domainsChan {
+			for _, d := range domainsChunk {
+				if d.Shared {
+					domain = d
+					stopChan <- true
+					break
+				}
+			}
+		}
+
+		apiResponse, ok := <-statusChan
+		if (domain.Guid == "") && ok && apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
+		} else if domain.Guid == "" {
+			cmd.ui.Failed("No default domain exists")
+		}
 	}
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-	}
-
-	return domain
+	return
 }
 
 func (cmd Push) hostname(c *cli.Context, defaultName string) (hostName string) {

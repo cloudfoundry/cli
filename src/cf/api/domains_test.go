@@ -137,32 +137,6 @@ func TestDomainListDomainsForOrgWithNoDomains(t *testing.T) {
 	assert.True(t, handler.AllRequestsCalled())
 }
 
-func TestDomainFindDefault(t *testing.T) {
-	sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/domains",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "shared-domain-guid" },
-			  "entity": {
-			    "name": "shared-domain.cf-app.com",
-				"owning_organization_guid": null
-			  }
-			}
-		]}`},
-	})
-
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{sharedDomainsReq})
-	defer ts.Close()
-
-	domain, apiResponse := repo.FindDefaultAppDomain()
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-
-	assert.Equal(t, domain.Name, "shared-domain.cf-app.com")
-	assert.Equal(t, domain.Guid, "shared-domain-guid")
-}
-
 func TestDomainFindByName(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
