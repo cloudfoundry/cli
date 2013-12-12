@@ -29,6 +29,7 @@ type ApplicationFromSummary struct {
 	DiskQuota        uint64 `json:"disk_quota"`
 	Urls             []string
 	State            string
+	SpaceGuid        string `json:"space_guid"`
 }
 
 func (resource ApplicationFromSummary) ToFields() (app cf.ApplicationFields) {
@@ -40,6 +41,7 @@ func (resource ApplicationFromSummary) ToFields() (app cf.ApplicationFields) {
 	app.DiskQuota = resource.DiskQuota
 	app.RunningInstances = resource.RunningInstances
 	app.Memory = resource.Memory
+	app.SpaceGuid = resource.SpaceGuid
 
 	return
 }

@@ -9,44 +9,9 @@ import (
 	"strings"
 )
 
-type PaginatedApplicationResources struct {
-	Resources []ApplicationResource
-}
-
-type ApplicationResource struct {
-	Resource
-	Entity ApplicationEntity
-}
-
-func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
-	app.Guid = resource.Metadata.Guid
-	app.Name = resource.Entity.Name
-	app.EnvironmentVars = resource.Entity.EnvironmentJson
-	app.State = strings.ToLower(resource.Entity.State)
-	app.InstanceCount = resource.Entity.Instances
-	app.Memory = uint64(resource.Entity.Memory)
-
-	return
-}
-
-func (resource ApplicationResource) ToModel() (app cf.Application) {
-	app.ApplicationFields = resource.ToFields()
-	app.Stack = resource.Entity.Stack.ToFields()
-
-	for _, routeResource := range resource.Entity.Routes {
-		app.Routes = append(app.Routes, routeResource.ToModel())
-	}
-	return
-}
-
-type ApplicationEntity struct {
-	Name            string
-	State           string
-	Instances       int
-	Memory          int
-	Stack           StackResource
-	Routes          []AppRouteResource
-	EnvironmentJson map[string]string `json:"environment_json"`
+type AppRouteEntity struct {
+	Host   string
+	Domain Resource
 }
 
 type AppRouteResource struct {
@@ -67,13 +32,49 @@ func (resource AppRouteResource) ToModel() (route cf.RouteSummary) {
 	return
 }
 
-type AppRouteEntity struct {
-	Host   string
-	Domain Resource
+type ApplicationEntity struct {
+	Name            string
+	State           string
+	SpaceGuid       string `json:"space_guid"`
+	Instances       int
+	Memory          int
+	Stack           StackResource
+	Routes          []AppRouteResource
+	EnvironmentJson map[string]string `json:"environment_json"`
+}
+
+type ApplicationResource struct {
+	Resource
+	Entity ApplicationEntity
+}
+
+func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
+	app.Guid = resource.Metadata.Guid
+	app.Name = resource.Entity.Name
+	app.EnvironmentVars = resource.Entity.EnvironmentJson
+	app.State = strings.ToLower(resource.Entity.State)
+	app.InstanceCount = resource.Entity.Instances
+	app.Memory = uint64(resource.Entity.Memory)
+	app.SpaceGuid = resource.Entity.SpaceGuid
+	return
+}
+
+func (resource ApplicationResource) ToModel() (app cf.Application) {
+	app.ApplicationFields = resource.ToFields()
+	app.Stack = resource.Entity.Stack.ToFields()
+
+	for _, routeResource := range resource.Entity.Routes {
+		app.Routes = append(app.Routes, routeResource.ToModel())
+	}
+	return
+}
+
+type PaginatedApplicationResources struct {
+	Resources []ApplicationResource
 }
 
 type ApplicationRepository interface {
-	Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse)
+	Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse)
 	Read(name string) (app cf.Application, apiResponse net.ApiResponse)
 	Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse)
 	Delete(appGuid string) (apiResponse net.ApiResponse)
@@ -90,13 +91,14 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
 	params := cf.NewAppParams()
 	params.Fields["name"] = name
 	params.Fields["buildpack"] = buildpackUrl
 	params.Fields["command"] = command
 	params.Fields["instances"] = instances
 	params.Fields["memory"] = memory
+	params.Fields["space_guid"] = spaceGuid
 	params.Fields["stack_guid"] = stackGuid
 
 	data, apiResponse := repo.formatAppJSON(params)
@@ -153,27 +155,27 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params c
 func (repo CloudControllerApplicationRepository) formatAppJSON(params cf.AppParams) (data string, apiResponse net.ApiResponse) {
 	delete(params.Fields, "guid")
 
-	command, ok := params.Fields["command"]
-	if ok && command.(string) == "null" {
+	if params.Fields.Has("command") && params.Fields["command"].(string) == "null" {
 		params.Fields["command"] = ""
-	} else if ok {
-		params.Fields["command"] = stringOrNull(command.(string))
+	} else if params.Fields.Has("command") {
+		params.Fields["command"] = stringOrNull(params.Fields["command"])
 	}
 
-	buildpack, ok := params.Fields["buildpack"]
-	if ok {
-		params.Fields["buildpack"] = stringOrNull(buildpack.(string))
+	if params.Fields.Has("buildpack") {
+		params.Fields["buildpack"] = stringOrNull(params.Fields["buildpack"])
 	}
 
-	stackGuid, ok := params.Fields["stack_guid"]
-	if ok {
-		params.Fields["stack_guid"] = stringOrNull(stackGuid.(string))
+	if params.Fields.Has("stack_guid") {
+		params.Fields["stack_guid"] = stringOrNull(params.Fields["stack_guid"])
 	}
 
-	name, ok := params.Fields["name"]
-	if ok {
+	if params.Fields.Has("state") {
+		params.Fields["state"] = strings.ToUpper(params.Fields["state"].(string))
+	}
+
+	if params.Fields.Has("name") {
 		reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-		if !reg.MatchString(name.(string)) {
+		if !reg.MatchString(params.Fields["name"].(string)) {
 			apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
 			return
 		}

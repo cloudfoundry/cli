@@ -5,12 +5,17 @@ import (
 	"fmt"
 )
 
-func stringOrNull(s string) string {
-	if s == "" {
-		return "null"
-	}
+func stringOrNull(s interface{}) string {
+	switch s := s.(type) {
+	case string:
+		if s == "" {
+			return "null"
+		}
 
-	return fmt.Sprintf(`%s`, s)
+		return fmt.Sprintf(`%s`, s)
+	default:
+		return fmt.Sprintf(`%s`, s)
+	}
 }
 
 func mapToJsonValues(params cf.ParamMap) (vals []string) {
