@@ -254,7 +254,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string) (apiResponse ApiRe
 		case JOB_FINISHED:
 			return
 		case JOB_FAILED:
-			apiResponse = NewApiResponseWithMessage("Failed to complete upload.")
+			apiResponse = NewApiResponse("Internal Server Error", "", 500)
 			return
 		}
 
@@ -262,21 +262,6 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string) (apiResponse ApiRe
 
 		time.Sleep(gateway.PollingThrottle)
 	}
-	return
-}
-
-func (gateway Gateway) pollJob(jobUrl, accessToken string) (finished bool, apiResponse ApiResponse) {
-	request, apiResponse := gateway.NewRequest("GET", jobUrl, accessToken, nil)
-	response := &JobResponse{}
-	_, apiResponse = gateway.PerformRequestForJSONResponse(request, response)
-
-	switch response.Entity.Status {
-	case JOB_FINISHED:
-		finished = true
-	case JOB_FAILED:
-		apiResponse = NewApiResponseWithMessage("Failed to complete upload.")
-	}
-
 	return
 }
 
