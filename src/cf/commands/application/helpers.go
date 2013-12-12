@@ -159,11 +159,13 @@ func coloredInstanceState(instance cf.AppInstanceFields) (colored string) {
 	case "stopped":
 		colored = terminal.StoppedColor("stopped")
 	case "flapping":
-		colored = terminal.WarningColor("crashing")
+		colored = terminal.CrashedColor("crashing")
+	case "down":
+		colored = terminal.CrashedColor("down")
 	case "starting":
 		colored = terminal.AdvisoryColor("starting")
 	default:
-		colored = terminal.FailureColor(state)
+		colored = terminal.WarningColor(state)
 	}
 
 	return

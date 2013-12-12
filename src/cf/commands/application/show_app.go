@@ -94,7 +94,7 @@ func (cmd *ShowApp) ShowApp(app cf.Application) {
 	}
 
 	table := [][]string{
-		[]string{"", "status", "since", "cpu", "memory", "disk"},
+		[]string{"", "state", "since", "cpu", "memory", "disk"},
 	}
 
 	for index, instance := range instances {
