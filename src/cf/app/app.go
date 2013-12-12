@@ -345,7 +345,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name()) +
 				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "a", Value: "", Usage: "API endpoint (for example: https://api.example.com)"},
+				cli.StringFlag{Name: "a", Value: "", Usage: "API endpoint (e.g. https://api.example.com)"},
 				cli.StringFlag{Name: "u", Value: "", Usage: "Username"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Password"},
 				cli.StringFlag{Name: "o", Value: "", Usage: "Org"},
@@ -445,12 +445,12 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				"               [-m MEMORY] [-n HOST] [-p PATH] [-s STACK]\n" +
 				"               [--no-hostname] [--no-route] [--no-start]",
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "b", Value: "", Usage: "Custom buildpack URL (for example: https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.StringFlag{Name: "b", Value: "", Usage: "Custom buildpack URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"},
 				cli.StringFlag{Name: "c", Value: "", Usage: "Startup command, set to null to reset to default start command"},
-				cli.StringFlag{Name: "d", Value: "", Usage: "Domain (for example: example.com)"},
+				cli.StringFlag{Name: "d", Value: "", Usage: "Domain (e.g. example.com)"},
 				cli.IntFlag{Name: "i", Value: -1, Usage: "Number of instances"},
 				cli.StringFlag{Name: "m", Value: "", Usage: "Memory limit (e.g. 256M, 1024M, 1G)"},
-				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname (for example: my-subdomain)"},
+				cli.StringFlag{Name: "n", Value: "", Usage: "Hostname (e.g. my-subdomain)"},
 				cli.StringFlag{Name: "p", Value: "", Usage: "Path of app directory or zip file"},
 				cli.StringFlag{Name: "s", Value: "", Usage: "Stack to use"},
 				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
