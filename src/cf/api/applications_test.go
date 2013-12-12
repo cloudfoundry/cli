@@ -129,7 +129,7 @@ var createApplicationResponse = `
 var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "POST",
 	Path:    "/v2/apps",
-	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"space_guid":"some-space-guid","stack_guid":"some-stack-guid","command":"some-command"}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusCreated,
 		Body:   createApplicationResponse},
@@ -139,7 +139,7 @@ func TestCreateApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
 	defer ts.Close()
 
-	createdApp, apiResponse := repo.Create("my-cool-app", "buildpack-url", "some-stack-guid", "some-command", 2048, 3)
+	createdApp, apiResponse := repo.Create("my-cool-app", "buildpack-url", "some-space-guid", "some-stack-guid", "some-command", 2048, 3)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -153,14 +153,14 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/apps",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"stack_guid":null,"command":null}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"space_guid":"some-space-guid","stack_guid":null,"command":null}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	})
 
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	_, apiResponse := repo.Create("my-cool-app", "", "", "", 128, 1)
+	_, apiResponse := repo.Create("my-cool-app", "", "some-space-guid", "", "", 128, 1)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -180,17 +180,17 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	ts, _, repo := createAppRepo(t, requests)
 	defer ts.Close()
 
-	createdApp, apiResponse := repo.Create("name with space", "", "", "", 0, 0)
+	createdApp, apiResponse := repo.Create("name with space", "", "some-space-guid", "", "", 0, 0)
 	assert.Equal(t, createdApp, cf.Application{})
 	assert.Contains(t, apiResponse.Message, "App name is invalid")
 
-	_, apiResponse = repo.Create("name-with-inv@lid-chars!", "", "", "", 0, 0)
+	_, apiResponse = repo.Create("name-with-inv@lid-chars!", "", "some-space-guid", "", "", 0, 0)
 	assert.True(t, apiResponse.IsNotSuccessful())
 
-	_, apiResponse = repo.Create("Valid-Name", "", "", "", 0, 0)
+	_, apiResponse = repo.Create("Valid-Name", "", "some-space-guid", "", "", 0, 0)
 	assert.True(t, apiResponse.IsSuccessful())
 
-	_, apiResponse = repo.Create("name_with_numbers_2", "", "", "", 0, 0)
+	_, apiResponse = repo.Create("name_with_numbers_2", "", "some-space-guid", "", "", 0, 0)
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -207,7 +207,7 @@ var updateApplicationResponse = `
 var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
 	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
-	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"stack_guid":"some-stack-guid","command":"some-command"}`),
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"space_guid":"some-space-guid","stack_guid":"some-stack-guid","command":"some-command"}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body:   updateApplicationResponse},
@@ -238,7 +238,7 @@ func TestUpdateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/apps/my-app-guid",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"stack_guid":null,"command":null}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"space_guid":"some-space-guid","stack_guid":null,"command":null}`),
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
 	})
 
@@ -260,7 +260,7 @@ func TestUpdateApplicationSetCommandToNull(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/apps/my-app-guid",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":0,"buildpack":null,"memory":0,"stack_guid":null,"command":""}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":0,"buildpack":null,"memory":0,"space_guid":"some-space-guid","stack_guid":null,"command":""}`),
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
 	})
 
@@ -402,7 +402,7 @@ func TestStartApplication(t *testing.T) {
 	startApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
 		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=1",
-		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STARTED"}`),
+		Matcher: testnet.RequestBodyMatcher(`{"state":"STARTED"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {
@@ -433,7 +433,7 @@ func TestStopApplication(t *testing.T) {
 	stopApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
 		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=1",
-		Matcher: testnet.RequestBodyMatcher(`{"console":true,"state":"STOPPED"}`),
+		Matcher: testnet.RequestBodyMatcher(`{"state":"STOPPED"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 {
   "metadata": {

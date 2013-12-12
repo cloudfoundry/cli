@@ -46,7 +46,7 @@ func (repo *FakeApplicationRepository) Read(name string) (app cf.Application, ap
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(name, buildpackUrl, stackGuid, command string, memory uint64, instances int) (resultApp cf.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (resultApp cf.Application, apiResponse net.ApiResponse) {
 	repo.CreateName = name
 	repo.CreateBuildpackUrl = buildpackUrl
 	repo.CreateStackGuid = stackGuid
@@ -57,6 +57,7 @@ func (repo *FakeApplicationRepository) Create(name, buildpackUrl, stackGuid, com
 	resultApp.Name = name
 	resultApp.Guid = name+"-guid"
 	resultApp.BuildpackUrl = buildpackUrl
+	resultApp.SpaceGuid = spaceGuid
 	resultApp.Stack = cf.Stack{}
 	resultApp.Stack.Guid = stackGuid
 	resultApp.Command = command

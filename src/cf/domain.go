@@ -2,6 +2,7 @@ package cf
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -55,6 +56,7 @@ type ApplicationFields struct {
 	Memory           uint64 // in Megabytes
 	RunningInstances int
 	State            string
+	SpaceGuid        string
 }
 
 type Application struct {
@@ -75,8 +77,9 @@ func (model Application) ToParams() (params AppParams) {
 	}
 	params.Fields["instances"] = model.InstanceCount
 	params.Fields["memory"] = model.Memory
-	params.Fields["state"] = model.State
+	params.Fields["state"] = strings.ToUpper(model.State)
 	params.Fields["stack_guid"] = model.Stack.Guid
+	params.Fields["space_guid"] = model.SpaceGuid
 	return
 }
 
@@ -89,6 +92,11 @@ type ParamMap map[string]interface{}
 
 func (params ParamMap) IsEmpty() bool {
 	return len(params) == 0
+}
+
+func (params ParamMap) Has(key interface{}) bool {
+	_, ok := params[key.(string)]
+	return ok
 }
 
 type AppParams struct {

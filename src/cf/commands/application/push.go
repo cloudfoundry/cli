@@ -247,7 +247,7 @@ func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, a
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiResponse = cmd.appRepo.Create(appName, buildpackUrl, stackGuid, command, memory, instances)
+	app, apiResponse = cmd.appRepo.Create(appName, buildpackUrl, cmd.config.SpaceFields.Guid, stackGuid, command, memory, instances)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -268,7 +268,7 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 	)
 
 	buildpackUrl, stackGuid, command, memoryString, instanceCount := cmd.userAppFields(c)
-	params := app.ToParams()
+	params := cf.NewAppParams()
 
 	if buildpackUrl != "" {
 		params.Fields["buildpack"] = buildpackUrl
@@ -286,7 +286,7 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 		params.Fields["stack_guid"] = stackGuid
 	}
 
-	updatedApp, apiResponse := cmd.appRepo.Update(updatedApp.Guid, params)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
