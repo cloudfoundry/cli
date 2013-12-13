@@ -72,7 +72,7 @@ func (cmd Push) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.restart(app, didCreate, c)
+	cmd.restart(app, c)
 }
 
 func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
@@ -111,8 +111,8 @@ func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Con
 	cmd.ui.Say("")
 }
 
-func (cmd Push) restart(app cf.Application, didCreate bool, c *cli.Context) {
-	if !didCreate {
+func (cmd Push) restart(app cf.Application, c *cli.Context) {
+	if app.State != "stopped" {
 		cmd.ui.Say("")
 		app, _ = cmd.stopper.ApplicationStop(app)
 	}

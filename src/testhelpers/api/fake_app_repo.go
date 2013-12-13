@@ -63,6 +63,7 @@ func (repo *FakeApplicationRepository) Create(name, buildpackUrl, spaceGuid, sta
 	resultApp.Command = command
 	resultApp.Memory = memory
 	resultApp.InstanceCount = instances
+	resultApp.State = "stopped"
 
 	return
 }
