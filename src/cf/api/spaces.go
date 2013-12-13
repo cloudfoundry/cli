@@ -145,7 +145,7 @@ func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces
 }
 
 func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces", repo.config.Target)
+	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(SpaceResource)
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(body), resource)
