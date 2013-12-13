@@ -3,3 +3,4 @@
 ignoredDir
 /lastDir/*
 /fooDir/**/baz.txt
+/otherDir/

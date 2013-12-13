@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+var DefaultIgnoreFiles = []string{
+	".cfignore",
+	".git",
+	".svn",
+	"_darcs",
+}
+
 func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		fileInfo, err := os.Lstat(fullPath)
@@ -101,7 +108,7 @@ func readCfIgnore(dir string) (exclusions []string) {
 	}
 
 	ignores := strings.Split(fileutils.ReadFile(cfIgnore), "\n")
-	ignores = append([]string{".cfignore"}, ignores...)
+	ignores = append(DefaultIgnoreFiles, ignores...)
 
 	for _, pattern := range ignores {
 		pattern = strings.TrimSpace(pattern)
