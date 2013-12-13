@@ -11,6 +11,7 @@ import (
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -305,28 +306,26 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 func TestPushingAppWhenItAlreadyExistsAndNothingIsSpecified(t *testing.T) {
 	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 
-	existingRoute := cf.RouteSummary{}
-	existingRoute.Host = "existing-app"
-
-	existingApp := cf.Application{}
-	existingApp.Name = "existing-app"
-	existingApp.Guid = "existing-app-guid"
-	existingApp.Routes = []cf.RouteSummary{existingRoute}
-
+	existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
 	appRepo.ReadApp = existingApp
 	appRepo.UpdateAppResult = existingApp
-	domain := cf.DomainFields{}
-	domain.Name = "example.com"
 
-	foundRoute := cf.Route{}
-	foundRoute.RouteFields = existingRoute.RouteFields
-	foundRoute.Domain = domain
-
-	routeRepo.FindByHostAndDomainRoute = foundRoute
 	_ = callPush(t, []string{"existing-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, stopper.AppToStop.Name, "existing-app")
-	assert.Equal(t, appBitsRepo.UploadedAppGuid, "existing-app-guid")
+	assert.Equal(t, stopper.AppToStop.Guid, existingApp.Guid)
+	assert.Equal(t, appBitsRepo.UploadedAppGuid, existingApp.Guid)
+}
+
+func TestPushingAppWhenItIsStopped(t *testing.T) {
+	starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+	stoppedApp := maker.NewApp(maker.Overrides{"state": "stopped", "name": "stopped-app"})
+
+	appRepo.ReadApp = stoppedApp
+	appRepo.UpdateAppResult = stoppedApp
+
+	_ = callPush(t, []string{"stopped-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	assert.Equal(t, stopper.AppToStop.Guid, "")
 }
 
 func TestPushingAppWhenItAlreadyExistsAndChangingOptions(t *testing.T) {
