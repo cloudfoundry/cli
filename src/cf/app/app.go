@@ -128,7 +128,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s create-service cleardb spark clear-db-mine\n\n", cf.Name()) +
 				"TIP:\n" +
-				"   Use 'cf create-user-provided-service' to make user-provided services available to cf apps",
+				"   Use '" + cf.Name() + " create-user-provided-service' to make user-provided services available to cf apps",
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-service", c)
 			},

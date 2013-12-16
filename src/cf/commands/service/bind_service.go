@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -67,5 +68,5 @@ func (cmd *BindService) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("TIP: Use 'cf push' to ensure your env variable changes take effect")
+	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
 }
