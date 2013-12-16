@@ -10,25 +10,28 @@ func init() {
 	appGuid = guidGenerator("app")
 }
 
-func NewApp(overrides Overrides) (app cf.Application) {
+func NewAppFields(overrides Overrides) (app cf.ApplicationFields) {
 	app.Name = "app-name"
 	app.Guid = appGuid()
 	app.State = "started"
 
-	guid, ok := overrides["guid"]
-	if ok {
-		app.Guid = guid.(string)
+	if overrides.Has("guid") {
+		app.Guid = overrides.Get("guid").(string)
 	}
 
-	name, ok := overrides["name"]
-	if ok {
-		app.Name = name.(string)
+	if overrides.Has("name") {
+		app.Name = overrides.Get("name").(string)
 	}
 
-	state, ok := overrides["state"]
-	if ok {
-		app.State = state.(string)
+	if overrides.Has("state") {
+		app.State = overrides.Get("state").(string)
 	}
+
+	return
+}
+
+func NewApp(overrides Overrides) (app cf.Application) {
+	app.ApplicationFields = NewAppFields(overrides)
 
 	return
 }
