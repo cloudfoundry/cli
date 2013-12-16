@@ -96,7 +96,7 @@ func callListRoutes(t *testing.T, args []string, reqFactory *testreq.FakeReqFact
 
 	ui = &testterm.FakeUI{}
 
-	ctxt := testcmd.NewContext("list-routes", args)
+	ctxt := testcmd.NewContext("routes", args)
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
