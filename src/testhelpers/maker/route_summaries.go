@@ -2,24 +2,22 @@ package maker
 
 import "cf"
 
-var routeGuid func () string
+var routeSummaryGuid func () string
 
 func init() {
-	routeGuid = guidGenerator("route-summary")
+	routeSummaryGuid = guidGenerator("route-summary")
 }
 
 func NewRouteSummary(overrides Overrides) (routeSummary cf.RouteSummary) {
-	routeSummary.Guid = routeGuid()
+	routeSummary.Guid = routeSummaryGuid()
 	routeSummary.Host = "route-host"
 
-	guid, ok := overrides["guid"]
-	if ok {
-		routeSummary.Guid = guid.(string)
+	if overrides.Has("guid") {
+		routeSummary.Guid = overrides.Get("guid").(string)
 	}
 
-	host, ok := overrides["host"]
-	if ok {
-		routeSummary.Host = host.(string)
+	if overrides.Has("host") {
+		routeSummary.Host = overrides.Get("host").(string)
 	}
 
 	return
