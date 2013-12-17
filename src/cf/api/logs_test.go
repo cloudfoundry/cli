@@ -65,7 +65,7 @@ func TestRecentLogsFor(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, len(dumpedMessages), 1)
-	assert.Equal(t, dumpedMessages[0].GetShortSourceTypeName(), expectedMessage.GetShortSourceTypeName())
+	assert.Equal(t, dumpedMessages[0].GetLogMessage().GetSourceName(), expectedMessage.GetLogMessage().GetSourceName())
 	assert.Equal(t, dumpedMessages[0].GetLogMessage().GetMessage(), expectedMessage.GetLogMessage().GetMessage())
 	assert.Equal(t, dumpedMessages[0].GetLogMessage().GetMessageType(), expectedMessage.GetLogMessage().GetMessageType())
 }
@@ -261,12 +261,12 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 
 func marshalledLogMessageWithTime(t *testing.T, messageString string, timestamp int64) []byte {
 	messageType := logmessage.LogMessage_OUT
-	sourceType := logmessage.LogMessage_DEA
+	sourceName := "DEA"
 	protoMessage := &logmessage.LogMessage{
 		Message:     []byte(messageString),
 		AppId:       proto.String("my-app-guid"),
 		MessageType: &messageType,
-		SourceType:  &sourceType,
+		SourceName:  &sourceName,
 		Timestamp:   proto.Int64(timestamp),
 	}
 
