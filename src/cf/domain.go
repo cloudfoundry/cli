@@ -67,20 +67,20 @@ type Application struct {
 }
 
 func (model Application) ToParams() (params AppParams) {
-	params = NewEmptyAppParams()
-	params.Fields["guid"] = model.Guid
-	params.Fields["name"] = model.Name
-	params.Fields["buildpack"] = model.BuildpackUrl
-	params.Fields["command"] = model.Command
-	params.Fields["disk_quota"] = model.DiskQuota
-	for key, val := range model.EnvironmentVars {
-		params.EnvironmentVars[key] = val
-	}
-	params.Fields["instances"] = model.InstanceCount
-	params.Fields["memory"] = model.Memory
-	params.Fields["state"] = strings.ToUpper(model.State)
-	params.Fields["stack_guid"] = model.Stack.Guid
-	params.Fields["space_guid"] = model.SpaceGuid
+	params = NewAppParams(map[interface{}]interface{}{
+		"guid":       model.Guid,
+		"name":       model.Name,
+		"buildpack":  model.BuildpackUrl,
+		"command":    model.Command,
+		"disk_quota": model.DiskQuota,
+		"instances":  model.InstanceCount,
+		"memory":     model.Memory,
+		"state":      strings.ToUpper(model.State),
+		"stack_guid": model.Stack.Guid,
+		"space_guid": model.SpaceGuid,
+		"env_vars":   generic.NewMap(model.EnvironmentVars),
+	})
+
 	return
 }
 
@@ -90,22 +90,30 @@ type AppSummary struct {
 }
 
 type AppParams struct {
-	Fields          generic.Map
-	EnvironmentVars generic.Map
+	generic.Map
 }
 
-func (app AppParams) Name() string {
-	if !app.Fields.Has("name") {
-		return ""
-	}
-	return app.Fields.Get("name").(string)
+func (app AppParams) ToMap() generic.Map {
+	return app.Map
 }
 
-func NewAppParams(appValues generic.Map) (params AppParams) {
+func NewAppParams(data interface{}) (params AppParams) {
 	params = AppParams{}
-	params.Fields = appValues
-	params.EnvironmentVars = generic.NewEmptyMap()
+
+	switch data := data.(type) {
+	case map[interface{}]interface{}:
+		params.Map = generic.NewMap(data)
+	case generic.Map:
+		params.Map = data
+	default:
+		panic(fmt.Sprintf("AppParams initialized with unexpected type: %T", data))
+	}
+
 	return
+}
+
+func NewEmptyAppParams() AppParams {
+	return NewAppParams(generic.NewEmptyMap())
 }
 
 type AppSet []AppParams
@@ -121,10 +129,6 @@ func NewAppSet(apps interface{}) (set AppSet) {
 		set = append(set, NewAppParams(app))
 	}
 	return
-}
-
-func NewEmptyAppParams() AppParams {
-	return NewAppParams(generic.NewEmptyMap())
 }
 
 type AppFileFields struct {

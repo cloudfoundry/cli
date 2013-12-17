@@ -7,6 +7,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"generic"
 	"github.com/codegangsta/cli"
 )
 
@@ -55,19 +56,20 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	)
 
 	appParams := app.ToParams()
+	envParams := appParams.Get("env_vars").(generic.Map)
 
-	if envVarFound(varName, appParams.EnvironmentVars) {
+	if envParams.Has(varName) {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Env var %s was already set.", varName)
 		return
 	}
 
-	appParams.EnvironmentVars[varName] = varValue
+	envParams.Set(varName, varValue)
 
-	envParams := cf.NewEmptyAppParams()
-	envParams.EnvironmentVars = appParams.EnvironmentVars
+	updateParams := cf.NewEmptyAppParams()
+	updateParams.Set("env_vars", envParams)
 
-	_, apiResponse := cmd.appRepo.Update(app.Guid, envParams)
+	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

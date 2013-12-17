@@ -11,8 +11,7 @@ func stringOrNull(s interface{}) string {
 		if s == "" {
 			return "null"
 		}
-
-		return fmt.Sprintf(`%s`, s)
+		return s
 	default:
 		return fmt.Sprintf(`%s`, s)
 	}

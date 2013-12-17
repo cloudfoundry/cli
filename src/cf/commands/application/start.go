@@ -107,7 +107,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	)
 
 	params := cf.NewEmptyAppParams()
-	params.Fields["state"] = "STARTED"
+	params.Set("state", "STARTED")
 
 	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
 
