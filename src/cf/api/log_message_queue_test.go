@@ -111,12 +111,12 @@ func logMessageForBenchmark(b *testing.B, messageString string, timestamp int64)
 
 func generateMessage(messageString string, timestamp int64) *logmessage.LogMessage {
 	messageType := logmessage.LogMessage_OUT
-	sourceType := logmessage.LogMessage_DEA
+	sourceName := "DEA"
 	return &logmessage.LogMessage{
 		Message:     []byte(messageString),
 		AppId:       proto.String("my-app-guid"),
 		MessageType: &messageType,
-		SourceType:  &sourceType,
+		SourceName:  &sourceName,
 		Timestamp:   proto.Int64(timestamp),
 	}
 }

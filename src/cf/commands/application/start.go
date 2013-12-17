@@ -151,7 +151,7 @@ func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
 
 func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 	for msg := range logChan {
-		if msg.GetShortSourceTypeName() != LogMessageTypeStaging {
+		if msg.GetLogMessage().GetSourceName() != "STG" {
 			continue
 		}
 		cmd.ui.Say(simpleLogMessageOutput(msg))
