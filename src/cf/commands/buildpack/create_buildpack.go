@@ -72,7 +72,13 @@ func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context)
 		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())
 	}
 
-	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position)
+	var enabled *bool
+	if c.String("enabled") != "" {
+		val := c.Bool("enabled")
+		enabled = &val
+	}
+
+	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position, enabled)
 
 	return
 }

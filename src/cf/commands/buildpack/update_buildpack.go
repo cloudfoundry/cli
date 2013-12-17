@@ -53,6 +53,19 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 		buildpack.Position = &val
 		updateBuildpack = true
 	}
+	
+	if c.String("e") != "" {
+		val := c.Bool("e")
+		buildpack.Enabled = &val
+		updateBuildpack = true
+	}
+	
+
+	if c.String("enabled") != "" {
+		val := c.Bool("enabled")
+		buildpack.Enabled = &val
+		updateBuildpack = true
+	}
 
 	if updateBuildpack {
 		buildpack, apiResponse := cmd.buildpackRepo.Update(buildpack)

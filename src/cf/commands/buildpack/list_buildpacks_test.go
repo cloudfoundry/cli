@@ -24,16 +24,17 @@ func TestListBuildpacksRequirements(t *testing.T) {
 }
 
 func TestListBuildpacks(t *testing.T) {
-	buildpackBuilder := func(name string, position int) (buildpack cf.Buildpack) {
+	buildpackBuilder := func(name string, position int, enabled bool) (buildpack cf.Buildpack) {
 		buildpack.Name = name
 		buildpack.Position = &position
+		buildpack.Enabled = &enabled
 		return
 	}
 
 	buildpacks := []cf.Buildpack{
-		buildpackBuilder("Buildpack-1", 5),
-		buildpackBuilder("Buildpack-2", 10),
-		buildpackBuilder("Buildpack-3", 15),
+		buildpackBuilder("Buildpack-1", 5, true),
+		buildpackBuilder("Buildpack-2", 10, false),
+		buildpackBuilder("Buildpack-3", 15, true),
 	}
 
 	buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -51,12 +52,15 @@ func TestListBuildpacks(t *testing.T) {
 
 	assert.Contains(t, ui.Outputs[2], "Buildpack-1")
 	assert.Contains(t, ui.Outputs[2], "5")
+	assert.Contains(t, ui.Outputs[2], "true")
 
 	assert.Contains(t, ui.Outputs[3], "Buildpack-2")
 	assert.Contains(t, ui.Outputs[3], "10")
+	assert.Contains(t, ui.Outputs[3], "false")
 
 	assert.Contains(t, ui.Outputs[4], "Buildpack-3")
 	assert.Contains(t, ui.Outputs[4], "15")
+	assert.Contains(t, ui.Outputs[4], "true")
 }
 
 func TestListingBuildpacksWhenNoneExist(t *testing.T) {
