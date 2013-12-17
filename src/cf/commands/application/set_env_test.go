@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"generic"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
@@ -57,8 +58,10 @@ func TestRunWhenApplicationExists(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
-	assert.Equal(t, appRepo.UpdateParams.EnvironmentVars["DATABASE_URL"], "mysql://example.com/my-db")
-	assert.Equal(t, appRepo.UpdateParams.EnvironmentVars["foo"], "bar")
+
+	envParams := appRepo.UpdateParams.Get("env_vars").(generic.Map)
+	assert.Equal(t, envParams.Get("DATABASE_URL").(string), "mysql://example.com/my-db")
+	assert.Equal(t, envParams.Get("foo").(string), "bar")
 }
 
 func TestSetEnvWhenItAlreadyExists(t *testing.T) {

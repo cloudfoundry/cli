@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"generic"
 	"regexp"
 	"strings"
 )
@@ -74,7 +75,7 @@ type PaginatedApplicationResources struct {
 }
 
 type ApplicationRepository interface {
-	Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse)
+	Create(params cf.AppParams) (createdApp cf.Application, apiResponse net.ApiResponse)
 	Read(name string) (app cf.Application, apiResponse net.ApiResponse)
 	Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse)
 	Delete(appGuid string) (apiResponse net.ApiResponse)
@@ -91,16 +92,7 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
-	params := cf.NewEmptyAppParams()
-	params.Fields["name"] = name
-	params.Fields["buildpack"] = buildpackUrl
-	params.Fields["command"] = command
-	params.Fields["instances"] = instances
-	params.Fields["memory"] = memory
-	params.Fields["space_guid"] = spaceGuid
-	params.Fields["stack_guid"] = stackGuid
-
+func (repo CloudControllerApplicationRepository) Create(params cf.AppParams) (createdApp cf.Application, apiResponse net.ApiResponse) {
 	data, apiResponse := repo.formatAppJSON(params)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -153,29 +145,29 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params c
 }
 
 func (repo CloudControllerApplicationRepository) formatAppJSON(params cf.AppParams) (data string, apiResponse net.ApiResponse) {
-	delete(params.Fields, "guid")
+	params.Delete("guid")
 
-	if params.Fields.Has("command") && params.Fields["command"].(string) == "null" {
-		params.Fields["command"] = ""
-	} else if params.Fields.Has("command") {
-		params.Fields["command"] = stringOrNull(params.Fields["command"])
+	if params.Has("command") && params.Get("command").(string) == "null" {
+		params.Set("command", "")
+	} else if params.Has("command") {
+		params.Set("command", stringOrNull(params.Get("command")))
 	}
 
-	if params.Fields.Has("buildpack") {
-		params.Fields["buildpack"] = stringOrNull(params.Fields["buildpack"])
+	if params.Has("buildpack") {
+		params.Set("buildpack", stringOrNull(params.Get("buildpack")))
 	}
 
-	if params.Fields.Has("stack_guid") {
-		params.Fields["stack_guid"] = stringOrNull(params.Fields["stack_guid"])
+	if params.Has("stack_guid") {
+		params.Set("stack_guid", stringOrNull(params.Get("stack_guid")))
 	}
 
-	if params.Fields.Has("state") {
-		params.Fields["state"] = strings.ToUpper(params.Fields["state"].(string))
+	if params.Has("state") {
+		params.Set("state", strings.ToUpper(params.Get("state").(string)))
 	}
 
-	if params.Fields.Has("name") {
+	if params.Has("name") {
 		reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-		if !reg.MatchString(params.Fields["name"].(string)) {
+		if !reg.MatchString(params.Get("name").(string)) {
 			apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
 			return
 		}
@@ -183,15 +175,17 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(params cf.AppPara
 
 	vals := []string{}
 
-	if !params.Fields.IsEmpty() {
-		vals = append(vals, mapToJsonValues(params.Fields)...)
+	if !params.IsEmpty() {
+		vals = append(vals, mapToJsonValues(params.ToMap())...)
 	}
 
-	if !params.EnvironmentVars.IsEmpty() {
-		envVal := fmt.Sprintf(`"environment_json":{%s}`, strings.Join(mapToJsonValues(params.EnvironmentVars), ","))
-		vals = append(vals, envVal)
+	if params.Has("env_vars") {
+		envVars := params.Get("env_vars").(generic.Map)
+		if !envVars.IsEmpty() {
+			envVal := fmt.Sprintf(`"environment_json":{%s}`, strings.Join(mapToJsonValues(envVars), ","))
+			vals = append(vals, envVal)
+		}
 	}
-
 	data = fmt.Sprintf("{%s}", strings.Join(vals, ","))
 	return
 }

@@ -58,7 +58,7 @@ func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application,
 	)
 
 	params := cf.NewEmptyAppParams()
-	params.Fields["state"] = "STOPPED"
+	params.Set("state", "STOPPED")
 
 	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
 	if apiResponse.IsNotSuccessful() {

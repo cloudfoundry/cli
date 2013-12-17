@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"generic"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testcmd "testhelpers/commands"
@@ -55,7 +56,9 @@ func TestUnsetEnvWhenApplicationExists(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
-	assert.Equal(t, appRepo.UpdateParams.EnvironmentVars["foo"], "bar")
+
+	envParams := appRepo.UpdateParams.Get("env_vars").(generic.Map)
+	assert.Equal(t, envParams.Get("foo").(string), "bar")
 }
 
 func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {

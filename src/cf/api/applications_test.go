@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"generic"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -108,8 +109,12 @@ func TestSetEnv(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
+	envParams := generic.NewEmptyMap()
+	envParams.Set("DATABASE_URL", "mysql://example.com/my-db")
+
 	params := cf.NewEmptyAppParams()
-	params.EnvironmentVars["DATABASE_URL"] = "mysql://example.com/my-db"
+	params.Set("env_vars", envParams)
+
 	_, apiResponse := repo.Update("app1-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
@@ -139,7 +144,16 @@ func TestCreateApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
 	defer ts.Close()
 
-	createdApp, apiResponse := repo.Create("my-cool-app", "buildpack-url", "some-space-guid", "some-stack-guid", "some-command", 2048, 3)
+	params := cf.NewEmptyAppParams()
+	params.Set("name", "my-cool-app")
+	params.Set("buildpack", "buildpack-url")
+	params.Set("space_guid", "some-space-guid")
+	params.Set("stack_guid", "some-stack-guid")
+	params.Set("command", "some-command")
+	params.Set("memory", 2048)
+	params.Set("instances", 3)
+
+	createdApp, apiResponse := repo.Create(params)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -160,7 +174,13 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	_, apiResponse := repo.Create("my-cool-app", "", "some-space-guid", "", "", 128, 1)
+	params := cf.NewEmptyAppParams()
+	params.Set("name", "my-cool-app")
+	params.Set("space_guid", "some-space-guid")
+	params.Set("memory", 128)
+	params.Set("instances", 1)
+
+	_, apiResponse := repo.Create(params)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -180,17 +200,30 @@ func TestCreateRejectsInproperNames(t *testing.T) {
 	ts, _, repo := createAppRepo(t, requests)
 	defer ts.Close()
 
-	createdApp, apiResponse := repo.Create("name with space", "", "some-space-guid", "", "", 0, 0)
+	params := cf.NewEmptyAppParams()
+	params.Set("name", "name with space")
+	params.Set("space_guid", "some-space-guid")
+
+	createdApp, apiResponse := repo.Create(params)
 	assert.Equal(t, createdApp, cf.Application{})
 	assert.Contains(t, apiResponse.Message, "App name is invalid")
 
-	_, apiResponse = repo.Create("name-with-inv@lid-chars!", "", "some-space-guid", "", "", 0, 0)
+	params = cf.NewEmptyAppParams()
+	params.Set("name", "name-with-inv@lid-chars!")
+	params.Set("space_guid", "some-space-guid")
+	_, apiResponse = repo.Create(params)
 	assert.True(t, apiResponse.IsNotSuccessful())
 
-	_, apiResponse = repo.Create("Valid-Name", "", "some-space-guid", "", "", 0, 0)
+	params = cf.NewEmptyAppParams()
+	params.Set("name", "Valid-Name")
+	params.Set("space_guid", "some-space-guid")
+	_, apiResponse = repo.Create(params)
 	assert.True(t, apiResponse.IsSuccessful())
 
-	_, apiResponse = repo.Create("name_with_numbers_2", "", "some-space-guid", "", "", 0, 0)
+	params = cf.NewEmptyAppParams()
+	params.Set("name", "name_with_numbers_2")
+	params.Set("space_guid", "some-space-guid")
+	_, apiResponse = repo.Create(params)
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -340,7 +373,7 @@ func TestRename(t *testing.T) {
 	defer ts.Close()
 
 	params := cf.NewEmptyAppParams()
-	params.Fields["name"] = "my-new-app"
+	params.Set("name", "my-new-app")
 	_, apiResponse := repo.Update("my-app-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
@@ -419,7 +452,7 @@ func TestStartApplication(t *testing.T) {
 	defer ts.Close()
 
 	params := cf.NewEmptyAppParams()
-	params.Fields["state"] = "STARTED"
+	params.Set("state", "STARTED")
 	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())
@@ -450,7 +483,7 @@ func TestStopApplication(t *testing.T) {
 	defer ts.Close()
 
 	params := cf.NewEmptyAppParams()
-	params.Fields["state"] = "STOPPED"
+	params.Set("state", "STOPPED")
 	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
 
 	assert.True(t, handler.AllRequestsCalled())

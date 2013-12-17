@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/net"
+	"generic"
 )
 
 type FakeApplicationRepository struct {
@@ -14,15 +15,10 @@ type FakeApplicationRepository struct {
 	ReadAuthErr   bool
 	ReadNotFound  bool
 
-	CreateName string
-	CreateBuildpackUrl string
-	CreateStackGuid string
-	CreateCommand string
-	CreateMemory uint64
-	CreateInstances int
+	CreateAppParams    cf.AppParams
 
-	UpdateParams cf.AppParams
-	UpdateAppGuid string
+	UpdateParams    cf.AppParams
+	UpdateAppGuid   string
 	UpdateAppResult cf.Application
 	UpdateErr       bool
 
@@ -40,31 +36,43 @@ func (repo *FakeApplicationRepository) Read(name string) (app cf.Application, ap
 		apiResponse = net.NewApiResponse("Authentication failed.", "1000", 401)
 	}
 	if repo.ReadNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found","App", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "App", name)
 	}
 
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (resultApp cf.Application, apiResponse net.ApiResponse) {
-	repo.CreateName = name
-	repo.CreateBuildpackUrl = buildpackUrl
-	repo.CreateStackGuid = stackGuid
-	repo.CreateCommand = command
-	repo.CreateMemory = memory
-	repo.CreateInstances = instances
+func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf.Application, apiResponse net.ApiResponse) {
+	repo.CreateAppParams = params
 
-	resultApp.Name = name
-	resultApp.Guid = name+"-guid"
-	resultApp.BuildpackUrl = buildpackUrl
-	resultApp.SpaceGuid = spaceGuid
-	resultApp.Stack = cf.Stack{}
-	resultApp.Stack.Guid = stackGuid
-	resultApp.Command = command
-	resultApp.Memory = memory
-	resultApp.InstanceCount = instances
+	resultApp.Guid = params.Get("name").(string) + "-guid"
+	resultApp.Name = params.Get("name").(string)
 	resultApp.State = "stopped"
 
+	if params.Has("space_guid") {
+		resultApp.SpaceGuid = params.Get("space_guid").(string)
+	}
+	if params.Has("buildpack") {
+		resultApp.BuildpackUrl = params.Get("buildpack").(string)
+	}
+	if params.Has("command") {
+		resultApp.Command = params.Get("command").(string)
+	}
+	if params.Has("disk_quota") {
+		resultApp.DiskQuota = params.Get("disk_quota").(uint64)
+	}
+	if params.Has("instances") {
+		resultApp.InstanceCount = params.Get("instances").(int)
+	}
+	if params.Has("memory") {
+		resultApp.Memory = params.Get("memory").(uint64)
+	}
+
+	if params.Has("env_vars") {
+		for key, val := range params.Get("env_vars").(generic.Map) {
+			resultApp.EnvironmentVars[key.(string)] = val.(string)
+		}
+	}
 	return
 }
 

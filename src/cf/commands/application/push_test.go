@@ -58,10 +58,8 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	fakeUI := callPush(t, []string{"my-new-app"}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateName, "my-new-app")
-	assert.Equal(t, appRepo.CreateInstances, 1)
-	assert.Equal(t, appRepo.CreateMemory, uint64(128))
-	assert.Equal(t, appRepo.CreateBuildpackUrl, "")
+	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
+	assert.Equal(t, appRepo.CreateAppParams.Get("space_guid").(string), "my-space-guid")
 
 	assert.Equal(t, routeRepo.FindByHostAndDomainHost, "my-new-app")
 	assert.Equal(t, routeRepo.CreatedHost, "my-new-app")
@@ -154,12 +152,12 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, stackRepo.FindByNameName, "customLinux")
 
 	assert.Contains(t, fakeUI.Outputs[1], "my-new-app")
-	assert.Equal(t, appRepo.CreateName, "my-new-app")
-	assert.Equal(t, appRepo.CreateCommand, "unicorn -c config/unicorn.rb -D")
-	assert.Equal(t, appRepo.CreateInstances, 3)
-	assert.Equal(t, appRepo.CreateMemory, uint64(2048))
-	assert.Equal(t, appRepo.CreateStackGuid, "custom-linux-guid")
-	assert.Equal(t, appRepo.CreateBuildpackUrl, "https://github.com/heroku/heroku-buildpack-play.git")
+	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
+	assert.Equal(t, appRepo.CreateAppParams.Get("command").(string), "unicorn -c config/unicorn.rb -D")
+	assert.Equal(t, appRepo.CreateAppParams.Get("instances").(int), 3)
+	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(2048))
+	assert.Equal(t, appRepo.CreateAppParams.Get("stack_guid"), "custom-linux-guid")
+	assert.Equal(t, appRepo.CreateAppParams.Get("buildpack"), "https://github.com/heroku/heroku-buildpack-play.git")
 	assert.Contains(t, fakeUI.Outputs[2], "OK")
 
 	assert.Contains(t, fakeUI.Outputs[4], "my-hostname.bar.cf-app.com")
@@ -198,7 +196,7 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 	}
 	_ = callPush(t, args, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.UpdateParams.Fields["command"], "null")
+	assert.Equal(t, appRepo.UpdateParams.Get("command"), "null")
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {
@@ -220,7 +218,7 @@ func TestPushingAppWithNoRoute(t *testing.T) {
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateName, "my-new-app")
+	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
 	assert.Equal(t, routeRepo.CreatedHost, "")
 	assert.Equal(t, routeRepo.CreatedDomainGuid, "")
 }
@@ -246,7 +244,7 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateName, "my-new-app")
+	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
 	assert.Equal(t, routeRepo.CreatedHost, "")
 	assert.Equal(t, routeRepo.CreatedDomainGuid, "bar-domain-guid")
 }
@@ -264,7 +262,7 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateMemory, uint64(256))
+	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(256))
 }
 
 func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
@@ -280,7 +278,7 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 		"my-new-app",
 	}, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateMemory, uint64(512))
+	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(512))
 }
 
 func TestPushingAppWithInvalidMemory(t *testing.T) {
@@ -300,7 +298,6 @@ func TestPushingAppWithInvalidMemory(t *testing.T) {
 		{"FAILED"},
 		{"invalid", "memory"},
 	})
-	assert.Equal(t, appRepo.CreateMemory, uint64(0))
 }
 
 func TestPushingAppWhenItAlreadyExistsAndNothingIsSpecified(t *testing.T) {
@@ -365,11 +362,11 @@ func TestPushingAppWhenItAlreadyExistsAndChangingOptions(t *testing.T) {
 	}
 	_ = callPush(t, args, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.UpdateParams.Fields["command"], "different start command")
-	assert.Equal(t, appRepo.UpdateParams.Fields["instances"], 10)
-	assert.Equal(t, appRepo.UpdateParams.Fields["memory"], uint64(1024))
-	assert.Equal(t, appRepo.UpdateParams.Fields["buildpack"], "https://github.com/heroku/heroku-buildpack-different.git")
-	assert.Equal(t, appRepo.UpdateParams.Fields["stack_guid"], "differentStack-guid")
+	assert.Equal(t, appRepo.UpdateParams.Get("command"), "different start command")
+	assert.Equal(t, appRepo.UpdateParams.Get("instances"), 10)
+	assert.Equal(t, appRepo.UpdateParams.Get("memory"), uint64(1024))
+	assert.Equal(t, appRepo.UpdateParams.Get("buildpack"), "https://github.com/heroku/heroku-buildpack-different.git")
+	assert.Equal(t, appRepo.UpdateParams.Get("stack_guid"), "differentStack-guid")
 }
 
 func TestPushingAppWhenItAlreadyExistsAndDomainIsSpecifiedIsAlreadyBound(t *testing.T) {
@@ -646,6 +643,8 @@ func callPush(t *testing.T,
 	org.Guid = "my-org-guid"
 	space := cf.SpaceFields{}
 	space.Name = "my-space"
+	space.Guid = "my-space-guid"
+
 	config := &configuration.Configuration{
 		SpaceFields:        space,
 		OrganizationFields: org,

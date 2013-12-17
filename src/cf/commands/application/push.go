@@ -217,7 +217,7 @@ func (cmd Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
 	}
 
 	if apiResponse.IsNotFound() {
-		app, apiResponse = cmd.createApp(appName, c)
+		app, apiResponse = cmd.createApp(c)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
@@ -228,26 +228,18 @@ func (cmd Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
 	return
 }
 
-func (cmd Push) createApp(appName string, c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
-	buildpackUrl, stackGuid, command, memoryString, instances := cmd.userAppFields(c)
-
-	if memoryString == "" {
-		memoryString = "128M"
-	}
-	memory := cmd.memoryLimit(memoryString)
-
-	if instances == -1 {
-		instances = 1
-	}
+func (cmd Push) createApp(c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
+	appParams := cmd.userAppFields(c)
+	appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(appName),
+		terminal.EntityNameColor(appParams.Get("name").(string)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiResponse = cmd.appRepo.Create(appName, buildpackUrl, cmd.config.SpaceFields.Guid, stackGuid, command, memory, instances)
+	app, apiResponse = cmd.appRepo.Create(appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -267,26 +259,8 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	buildpackUrl, stackGuid, command, memoryString, instanceCount := cmd.userAppFields(c)
-	params := cf.NewEmptyAppParams()
-
-	if buildpackUrl != "" {
-		params.Fields["buildpack"] = buildpackUrl
-	}
-	if command != "" {
-		params.Fields["command"] = command
-	}
-	if instanceCount != -1 {
-		params.Fields["instances"] = instanceCount
-	}
-	if memoryString != "" {
-		params.Fields["memory"] = cmd.memoryLimit(memoryString)
-	}
-	if stackGuid != "" {
-		params.Fields["stack_guid"] = stackGuid
-	}
-
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
+	appParams := cmd.userAppFields(c)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -298,11 +272,22 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 	return
 }
 
-func (cmd Push) userAppFields(c *cli.Context) (buildpackUrl, stackGuid, command, memoryString string, instances int) {
-	buildpackUrl = c.String("b")
-	memoryString = c.String("m")
-	command = c.String("c")
-	instances = c.Int("i")
+func (cmd Push) userAppFields(c *cli.Context) (appParams cf.AppParams) {
+	appParams = cf.NewEmptyAppParams()
+	appParams.Set("name", c.Args()[0])
+
+	if c.String("b") != "" {
+		appParams.Set("buildpack", c.String("b"))
+	}
+	if c.String("m") != "" {
+		appParams.Set("memory", cmd.memoryLimit(c.String("m")))
+	}
+	if c.String("c") != "" {
+		appParams.Set("command", c.String("c"))
+	}
+	if c.Int("i") != -1 {
+		appParams.Set("instances", c.Int("i"))
+	}
 
 	stackName := c.String("s")
 	var (
@@ -317,7 +302,7 @@ func (cmd Push) userAppFields(c *cli.Context) (buildpackUrl, stackGuid, command,
 			return
 		}
 		cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stack.Name))
-		stackGuid = stack.Guid
+		appParams.Set("stack_guid", stack.Guid)
 	}
 
 	return

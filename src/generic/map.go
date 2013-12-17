@@ -25,12 +25,22 @@ func (data Map) Set(key interface{}, value interface{}) {
 	data[canonicalKey(key)] = value
 }
 
+func (data Map) Delete(key interface{}) {
+	delete(data,canonicalKey(key))
+}
+
 func NewEmptyMap() Map {
 	return Map{}
 }
 
 func NewMap(data interface {}) Map {
 	switch data := data.(type){
+	case map[string]string:
+		stringMap := NewEmptyMap()
+		for key, val := range data {
+			stringMap.Set(key,val)
+		}
+		return stringMap
 	case map[interface {}]interface{}:
 		return Map(data)
 	default:
