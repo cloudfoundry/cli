@@ -55,7 +55,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 
 	if c.String("m") != "" {
 		memory, err := extractMegaBytes(c.String("m"))

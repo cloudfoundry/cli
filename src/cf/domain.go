@@ -2,6 +2,7 @@ package cf
 
 import (
 	"fmt"
+	"generic"
 	"strings"
 	"time"
 )
@@ -66,7 +67,7 @@ type Application struct {
 }
 
 func (model Application) ToParams() (params AppParams) {
-	params = NewAppParams()
+	params = NewEmptyAppParams()
 	params.Fields["guid"] = model.Guid
 	params.Fields["name"] = model.Name
 	params.Fields["buildpack"] = model.BuildpackUrl
@@ -88,27 +89,42 @@ type AppSummary struct {
 	RouteSummaries []RouteSummary
 }
 
-type ParamMap map[string]interface{}
-
-func (params ParamMap) IsEmpty() bool {
-	return len(params) == 0
-}
-
-func (params ParamMap) Has(key interface{}) bool {
-	_, ok := params[key.(string)]
-	return ok
-}
-
 type AppParams struct {
-	Fields          ParamMap
-	EnvironmentVars ParamMap
+	Fields          generic.Map
+	EnvironmentVars generic.Map
 }
 
-func NewAppParams() AppParams {
-	params := AppParams{}
-	params.Fields = ParamMap{}
-	params.EnvironmentVars = ParamMap{}
-	return params
+func (app AppParams) Name() string {
+	if !app.Fields.Has("name") {
+		return ""
+	}
+	return app.Fields.Get("name").(string)
+}
+
+func NewAppParams(appValues generic.Map) (params AppParams) {
+	params = AppParams{}
+	params.Fields = appValues
+	params.EnvironmentVars = generic.NewEmptyMap()
+	return
+}
+
+type AppSet []AppParams
+
+func NewEmptyAppSet() AppSet {
+	return NewAppSet(make([]interface{}, 0))
+}
+
+func NewAppSet(apps interface{}) (set AppSet) {
+	set = AppSet{}
+	for _, val := range apps.([]interface{}) {
+		app := generic.NewMap(val)
+		set = append(set, NewAppParams(app))
+	}
+	return
+}
+
+func NewEmptyAppParams() AppParams {
+	return NewAppParams(generic.NewEmptyMap())
 }
 
 type AppFileFields struct {

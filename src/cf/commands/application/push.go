@@ -268,7 +268,7 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 	)
 
 	buildpackUrl, stackGuid, command, memoryString, instanceCount := cmd.userAppFields(c)
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 
 	if buildpackUrl != "" {
 		params.Fields["buildpack"] = buildpackUrl

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"fmt"
+	"generic"
 )
 
 func stringOrNull(s interface{}) string {
@@ -18,7 +18,7 @@ func stringOrNull(s interface{}) string {
 	}
 }
 
-func mapToJsonValues(params cf.ParamMap) (vals []string) {
+func mapToJsonValues(params generic.Map) (vals []string) {
 	for key, val := range params {
 		switch val := val.(type) {
 		case string:

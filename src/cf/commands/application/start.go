@@ -106,7 +106,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.Fields["state"] = "STARTED"
 
 	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)

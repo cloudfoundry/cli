@@ -64,7 +64,7 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 
 	appParams.EnvironmentVars[varName] = varValue
 
-	envParams := cf.NewAppParams()
+	envParams := cf.NewEmptyAppParams()
 	envParams.EnvironmentVars = appParams.EnvironmentVars
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, envParams)

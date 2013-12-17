@@ -108,7 +108,7 @@ func TestSetEnv(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.EnvironmentVars["DATABASE_URL"] = "mysql://example.com/my-db"
 	_, apiResponse := repo.Update("app1-guid", params)
 
@@ -339,7 +339,7 @@ func TestRename(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{renameApplicationRequest})
 	defer ts.Close()
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.Fields["name"] = "my-new-app"
 	_, apiResponse := repo.Update("my-app-guid", params)
 
@@ -418,7 +418,7 @@ func TestStartApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{startApplicationRequest})
 	defer ts.Close()
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.Fields["state"] = "STARTED"
 	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
 
@@ -449,7 +449,7 @@ func TestStopApplication(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{stopApplicationRequest})
 	defer ts.Close()
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.Fields["state"] = "STOPPED"
 	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
 
