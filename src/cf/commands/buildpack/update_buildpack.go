@@ -6,6 +6,7 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
+	"strconv"
 )
 
 type UpdateBuildpack struct {
@@ -48,9 +49,32 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 
 	updateBuildpack := false
 
-	if c.String("i") != "" {
-		val := c.Int("i")
-		buildpack.Position = &val
+	pos := c.String("i")
+	if  pos != "" {
+		position, err := strconv.Atoi(pos)
+		if err != nil {
+			cmd.ui.Failed("Invalid position: %s.\n%s", pos, err.Error())
+			return
+		}
+
+		buildpack.Position = &position
+		updateBuildpack = true
+	}
+
+	enabled := c.Bool("enabled")
+	disabled := c.Bool("disabled")
+	if enabled && disabled {
+		cmd.ui.Failed("Cannot specify both enabled and disabled options.")
+		return
+	}
+
+	if enabled {
+		buildpack.Enabled = &enabled
+		updateBuildpack = true
+	}
+	if disabled {
+		disabled = false
+		buildpack.Enabled = &disabled
 		updateBuildpack = true
 	}
 

@@ -68,6 +68,40 @@ func TestCreateBuildpackWithPosition(t *testing.T) {
 	})
 }
 
+func TestCreateBuildpackEnabled(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo, bitsRepo := getRepositories()
+	fakeUI := callCreateBuildpack([]string{"-enabled", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+
+	assert.NotNil(t, repo.CreateBuildpack.Enabled)
+	assert.Equal(t, *repo.CreateBuildpack.Enabled, true)
+
+	assert.Equal(t, len(fakeUI.Outputs), 5)
+	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
+	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
+	assert.Contains(t, fakeUI.Outputs[3], "my-buildpack")
+	assert.Contains(t, fakeUI.Outputs[4], "OK")
+}
+
+func TestCreateBuildpackNoEnableFlag(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo, bitsRepo := getRepositories()
+	callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+
+	assert.Nil(t, repo.CreateBuildpack.Enabled)
+}
+
+func TestCreateBuildpackDisabled(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+	repo, bitsRepo := getRepositories()
+	callCreateBuildpack([]string{"-disabled", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+
+	assert.NotNil(t, repo.CreateBuildpack.Enabled)
+	assert.Equal(t, *repo.CreateBuildpack.Enabled, false)
+}
+
 func TestCreateBuildpackWithInvalidPath(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
