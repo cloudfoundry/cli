@@ -5,6 +5,7 @@ import (
 	"cf/terminal"
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
+	"generic"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"regexp"
 	"strings"
@@ -105,7 +106,7 @@ func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logCont
 	return
 }
 
-func envVarFound(varName string, existingEnvVars cf.ParamMap) (found bool) {
+func envVarFound(varName string, existingEnvVars generic.Map) (found bool) {
 	for name, _ := range existingEnvVars {
 		if name == varName {
 			found = true

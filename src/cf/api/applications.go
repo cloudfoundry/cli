@@ -92,7 +92,7 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 }
 
 func (repo CloudControllerApplicationRepository) Create(name, buildpackUrl, spaceGuid, stackGuid, command string, memory uint64, instances int) (createdApp cf.Application, apiResponse net.ApiResponse) {
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.Fields["name"] = name
 	params.Fields["buildpack"] = buildpackUrl
 	params.Fields["command"] = command

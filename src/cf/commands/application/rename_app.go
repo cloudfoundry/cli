@@ -51,7 +51,7 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := cf.NewAppParams()
+	params := cf.NewEmptyAppParams()
 	params.Fields["name"] = new_name
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, params)

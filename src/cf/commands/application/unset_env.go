@@ -61,7 +61,7 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 		return
 	}
 
-	envParams := cf.NewAppParams()
+	envParams := cf.NewEmptyAppParams()
 	envParams.EnvironmentVars = appParams.EnvironmentVars
 	delete(envParams.EnvironmentVars, varName)
 
