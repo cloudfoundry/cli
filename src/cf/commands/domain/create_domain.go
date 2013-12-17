@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -56,4 +57,6 @@ func (cmd *CreateDomain) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+
+	cmd.ui.Say("TIP: Use '%s' to assign it to a space", terminal.CommandColor(cf.Name()+" map-domain"))
 }
