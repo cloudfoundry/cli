@@ -15,11 +15,11 @@ func TestTimestampFormat(t *testing.T) {
 }
 
 func TestLogMessageOutput(t *testing.T) {
-	cloud_controller := logmessage.LogMessage_CLOUD_CONTROLLER
-	router := logmessage.LogMessage_ROUTER
-	uaa := logmessage.LogMessage_UAA
-	dea := logmessage.LogMessage_DEA
-	wardenContainer := logmessage.LogMessage_WARDEN_CONTAINER
+	cloud_controller := "API"
+	router := "RTR"
+	uaa := "UAA"
+	dea := "DEA"
+	wardenContainer := "App"
 
 	stdout := logmessage.LogMessage_OUT
 	stderr := logmessage.LogMessage_ERR
@@ -78,8 +78,8 @@ func TestLogMessageOutput(t *testing.T) {
 	assert.Contains(t, logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 }
 
-func createMessage(t *testing.T, protoMsg *logmessage.LogMessage, sourceType *logmessage.LogMessage_SourceType, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
-	protoMsg.SourceType = sourceType
+func createMessage(t *testing.T, protoMsg *logmessage.LogMessage, sourceName *string, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
+	protoMsg.SourceName = sourceName
 	protoMsg.MessageType = msgType
 
 	data, err := proto.Marshal(protoMsg)
