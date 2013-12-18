@@ -272,4 +272,5 @@ type UserFields struct {
 type Buildpack struct {
 	BasicFields
 	Position *int
+	Enabled  *bool
 }

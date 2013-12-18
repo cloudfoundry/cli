@@ -54,6 +54,20 @@ func TestUpdateBuildpackPosition(t *testing.T) {
 	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
+func TestUpdateBuildpackEnabled(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+	repo, bitsRepo := getRepositories()
+
+	fakeUI := callUpdateBuildpack([]string{"-enabled", "my-buildpack"}, reqFactory, repo, bitsRepo)
+
+	assert.NotNil(t, repo.UpdateBuildpack.Enabled)
+	assert.Equal(t, *repo.UpdateBuildpack.Enabled, true)
+
+	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
+	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
+	assert.Contains(t, fakeUI.Outputs[1], "OK")
+}
+
 func TestUpdateBuildpackPath(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
