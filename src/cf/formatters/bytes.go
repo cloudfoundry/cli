@@ -68,7 +68,19 @@ func BytesFromString(s string) (bytes uint64, err error) {
 	return
 }
 
-func MegabytesFromString(s string) (megabytes uint64, err error) {
+func ToMegabytes(val interface{}) (megabytes uint64, err error) {
+	var s string
+	switch val := val.(type) {
+	case string:
+		s = val
+	case uint64:
+		megabytes = val
+		return
+	default:
+		err = errors.New(fmt.Sprintf("Cannot parse memory size from input:\n%#v", val))
+		return
+	}
+
 	if s == "" {
 		return 0, nil
 	}

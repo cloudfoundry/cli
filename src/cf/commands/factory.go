@@ -13,6 +13,7 @@ import (
 	"cf/commands/space"
 	"cf/commands/user"
 	"cf/configuration"
+	"cf/manifest"
 	"cf/terminal"
 	"errors"
 )
@@ -25,7 +26,7 @@ type ConcreteFactory struct {
 	cmdsByName map[string]Command
 }
 
-func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
+func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo configuration.ConfigurationRepository, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
 	factory.cmdsByName = make(map[string]Command)
 
 	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
@@ -108,7 +109,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["start"] = start
 	factory.cmdsByName["stop"] = stop
 	factory.cmdsByName["restart"] = restart
-	factory.cmdsByName["push"] = application.NewPush(ui, config, start, stop, repoLocator.GetApplicationRepository(), repoLocator.GetDomainRepository(), repoLocator.GetRouteRepository(), repoLocator.GetStackRepository(), repoLocator.GetApplicationBitsRepository())
+	factory.cmdsByName["push"] = application.NewPush(ui, config, manifestRepo, start, stop, repoLocator.GetApplicationRepository(), repoLocator.GetDomainRepository(), repoLocator.GetRouteRepository(), repoLocator.GetStackRepository(), repoLocator.GetApplicationBitsRepository())
 	factory.cmdsByName["scale"] = application.NewScale(ui, config, restart, repoLocator.GetApplicationRepository())
 
 	spaceRoleSetter := user.NewSetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
