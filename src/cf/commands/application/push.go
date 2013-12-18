@@ -5,32 +5,37 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/formatters"
+	"cf/manifest"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
 )
 
 type Push struct {
-	ui          terminal.UI
-	config      *configuration.Configuration
-	starter     ApplicationStarter
-	stopper     ApplicationStopper
-	appRepo     api.ApplicationRepository
-	domainRepo  api.DomainRepository
-	routeRepo   api.RouteRepository
-	stackRepo   api.StackRepository
-	appBitsRepo api.ApplicationBitsRepository
+	ui           terminal.UI
+	appParams    cf.AppParams
+	config       *configuration.Configuration
+	manifestRepo manifest.ManifestRepository
+	starter      ApplicationStarter
+	stopper      ApplicationStopper
+	appRepo      api.ApplicationRepository
+	domainRepo   api.DomainRepository
+	routeRepo    api.RouteRepository
+	stackRepo    api.StackRepository
+	appBitsRepo  api.ApplicationBitsRepository
 }
 
-func NewPush(ui terminal.UI, config *configuration.Configuration, starter ApplicationStarter, stopper ApplicationStopper,
+func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository, starter ApplicationStarter, stopper ApplicationStopper,
 	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository,
-	appBitsRepo api.ApplicationBitsRepository) (cmd Push) {
-
+	appBitsRepo api.ApplicationBitsRepository) (cmd *Push) {
+	cmd = &Push{}
 	cmd.ui = ui
 	cmd.config = config
+	cmd.manifestRepo = manifestRepo
 	cmd.starter = starter
 	cmd.stopper = stopper
 	cmd.appRepo = aR
@@ -41,12 +46,27 @@ func NewPush(ui terminal.UI, config *configuration.Configuration, starter Applic
 	return
 }
 
-func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) != 1 {
+func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	path := cmd.path(c)
+	m, err := cmd.manifestRepo.ReadManifest(path)
+	if err != nil {
+		cmd.ui.Failed("Error reading manifest from path:%s/n%s", path, err)
+		return
+	}
+
+	appFields, err := NewAppParamsFromContext(c, m)
+	if err != nil {
+		cmd.ui.Failed("Error: %s", err)
+		return
+	}
+
+	if !appFields.Has("name") {
 		cmd.ui.FailWithUsage(c, "push")
 		err = errors.New("Incorrect Usage")
 		return
 	}
+
+	cmd.appParams = appFields
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
@@ -55,7 +75,9 @@ func (cmd Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context)
 	return
 }
 
-func (cmd Push) Run(c *cli.Context) {
+func (cmd *Push) Run(c *cli.Context) {
+	cmd.fetchStackGuid()
+
 	app, didCreate := cmd.app(c)
 	if !didCreate {
 		app = cmd.updateApp(app, c)
@@ -75,7 +97,25 @@ func (cmd Push) Run(c *cli.Context) {
 	cmd.restart(app, c)
 }
 
-func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
+func (cmd *Push) fetchStackGuid() {
+	if !cmd.appParams.Has("stack") {
+		return
+	}
+	stackName := cmd.appParams.Get("stack").(string)
+
+	cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stackName))
+
+	stack, apiResponse := cmd.stackRepo.FindByName(stackName)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+	cmd.ui.Ok()
+
+	cmd.appParams.Set("stack_guid", stack.Guid)
+}
+
+func (cmd *Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
 	if c.Bool("no-route") {
 		return
 	}
@@ -111,7 +151,7 @@ func (cmd Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Con
 	cmd.ui.Say("")
 }
 
-func (cmd Push) restart(app cf.Application, c *cli.Context) {
+func (cmd *Push) restart(app cf.Application, c *cli.Context) {
 	if app.State != "stopped" {
 		cmd.ui.Say("")
 		app, _ = cmd.stopper.ApplicationStop(app)
@@ -124,11 +164,11 @@ func (cmd Push) restart(app cf.Application, c *cli.Context) {
 	}
 }
 
-func (cmd Push) routeFlagsPresent(c *cli.Context) bool {
+func (cmd *Push) routeFlagsPresent(c *cli.Context) bool {
 	return c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
 }
 
-func (cmd Push) route(hostName string, domain cf.DomainFields) (route cf.Route) {
+func (cmd *Push) route(hostName string, domain cf.DomainFields) (route cf.Route) {
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
@@ -148,7 +188,7 @@ func (cmd Push) route(hostName string, domain cf.DomainFields) (route cf.Route) 
 	return
 }
 
-func (cmd Push) domain(c *cli.Context) (domain cf.Domain) {
+func (cmd *Push) domain(c *cli.Context) (domain cf.Domain) {
 	var (
 		apiResponse net.ApiResponse
 		domainName  = c.String("d")
@@ -184,7 +224,7 @@ func (cmd Push) domain(c *cli.Context) (domain cf.Domain) {
 	return
 }
 
-func (cmd Push) hostname(c *cli.Context, defaultName string) (hostName string) {
+func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) {
 	if !c.Bool("no-hostname") {
 		hostName = c.String("n")
 		if hostName == "" {
@@ -194,7 +234,7 @@ func (cmd Push) hostname(c *cli.Context, defaultName string) (hostName string) {
 	return
 }
 
-func (cmd Push) path(c *cli.Context) (dir string) {
+func (cmd *Push) path(c *cli.Context) (dir string) {
 	dir = c.String("p")
 	if dir == "" {
 		var err error
@@ -207,10 +247,8 @@ func (cmd Push) path(c *cli.Context) (dir string) {
 	return
 }
 
-func (cmd Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
-	appName := c.Args()[0]
-
-	app, apiResponse := cmd.appRepo.Read(appName)
+func (cmd *Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
+	app, apiResponse := cmd.appRepo.Read(cmd.appParams.Get("name").(string))
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -228,18 +266,17 @@ func (cmd Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
 	return
 }
 
-func (cmd Push) createApp(c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
-	appParams := cmd.userAppFields(c)
-	appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
+func (cmd *Push) createApp(c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
+	cmd.appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(appParams.Get("name").(string)),
+		terminal.EntityNameColor(cmd.appParams.Get("name").(string)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiResponse = cmd.appRepo.Create(appParams)
+	app, apiResponse = cmd.appRepo.Create(cmd.appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -251,7 +288,7 @@ func (cmd Push) createApp(c *cli.Context) (app cf.Application, apiResponse net.A
 	return
 }
 
-func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.Application) {
+func (cmd *Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.Application) {
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -259,8 +296,7 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	appParams := cmd.userAppFields(c)
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, appParams)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, cmd.appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -272,15 +308,28 @@ func (cmd Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.App
 	return
 }
 
-func (cmd Push) userAppFields(c *cli.Context) (appParams cf.AppParams) {
+func NewAppParamsFromContext(c *cli.Context, m *manifest.Manifest) (appParams cf.AppParams, err error) {
 	appParams = cf.NewEmptyAppParams()
-	appParams.Set("name", c.Args()[0])
+
+	if m != nil && len(m.Applications) > 0 {
+		appParams = m.Applications[0]
+	}
+
+	if len(c.Args()) > 0 {
+		appParams.Set("name", c.Args()[0])
+	}
 
 	if c.String("b") != "" {
 		appParams.Set("buildpack", c.String("b"))
 	}
 	if c.String("m") != "" {
-		appParams.Set("memory", cmd.memoryLimit(c.String("m")))
+		var memory uint64
+		memory, err = formatters.ToMegabytes(c.String("m"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid memory param: %s\n%s", c.String("m"), err))
+			return
+		}
+		appParams.Set("memory", memory)
 	}
 	if c.String("c") != "" {
 		appParams.Set("command", c.String("c"))
@@ -288,32 +337,8 @@ func (cmd Push) userAppFields(c *cli.Context) (appParams cf.AppParams) {
 	if c.Int("i") != -1 {
 		appParams.Set("instances", c.Int("i"))
 	}
-
-	stackName := c.String("s")
-	var (
-		stack       cf.Stack
-		apiResponse net.ApiResponse
-	)
-	if stackName != "" {
-		stack, apiResponse = cmd.stackRepo.FindByName(stackName)
-
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
-			return
-		}
-		cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stack.Name))
-		appParams.Set("stack_guid", stack.Guid)
-	}
-
-	return
-}
-
-func (cmd Push) memoryLimit(s string) (memory uint64) {
-	var err error
-
-	memory, err = formatters.MegabytesFromString(s)
-	if err != nil {
-		cmd.ui.Failed("Invalid memory param: %s\n%s", s, err)
+	if c.String("s") != "" {
+		appParams.Set("stack", c.String("s"))
 	}
 
 	return

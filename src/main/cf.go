@@ -13,6 +13,7 @@ import (
 	"github.com/codegangsta/cli"
 	"cf/net"
 	"fileutils"
+	"cf/manifest"
 )
 
 func main() {
@@ -23,17 +24,16 @@ func main() {
 	}
 
 	termUI := terminal.NewUI()
-	assignTemplates()
 	configRepo := configuration.NewConfigurationDiskRepository()
 	config := loadConfig(termUI, configRepo)
-
+	manifestRepo := manifest.NewManifestDiskRepository()
 	repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
 		"auth": net.NewUAAGateway(),
 		"cloud-controller": net.NewCloudControllerGateway(),
 		"uaa": net.NewUAAGateway(),
 	})
 
-	cmdFactory := commands.NewFactory(termUI, config, configRepo, repoLocator)
+	cmdFactory := commands.NewFactory(termUI, config, configRepo, manifestRepo,repoLocator)
 	reqFactory := requirements.NewFactory(termUI, config, repoLocator)
 	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
 
@@ -44,7 +44,7 @@ func main() {
 	app.Run(os.Args)
 }
 
-func assignTemplates() {
+func init() {
 	cli.AppHelpTemplate = `NAME:
    {{.Name}} - {{.Usage}}
 

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"strings"
 	testconfig "testhelpers/configuration"
+	testmanifest "testhelpers/manifest"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 	"testing"
@@ -48,6 +49,7 @@ func TestCommands(t *testing.T) {
 		ui := &testterm.FakeUI{}
 		config := &configuration.Configuration{}
 		configRepo := testconfig.FakeConfigRepository{}
+		manifestRepo := &testmanifest.FakeManifestRepository{}
 
 		repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
 			"auth":             net.NewUAAGateway(),
@@ -55,7 +57,7 @@ func TestCommands(t *testing.T) {
 			"uaa":              net.NewUAAGateway(),
 		})
 
-		cmdFactory := commands.NewFactory(ui, config, configRepo, repoLocator)
+		cmdFactory := commands.NewFactory(ui, config, configRepo, manifestRepo, repoLocator)
 		cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: t}
 		app, _ := NewApp(cmdRunner)
 		app.Run([]string{"", cmdName})
