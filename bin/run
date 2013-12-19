@@ -1,5 +1,5 @@
 #!/bin/bash
 
 set -e
-
+export CF_MANIFEST=true
 $(dirname $0)/go run src/main/cf.go $*

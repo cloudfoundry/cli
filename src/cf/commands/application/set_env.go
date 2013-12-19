@@ -56,7 +56,7 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	)
 
 	appParams := app.ToParams()
-	envParams := appParams.Get("env_vars").(generic.Map)
+	envParams := appParams.Get("env").(generic.Map)
 
 	if envParams.Has(varName) {
 		cmd.ui.Ok()
@@ -67,7 +67,7 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	envParams.Set(varName, varValue)
 
 	updateParams := cf.NewEmptyAppParams()
-	updateParams.Set("env_vars", envParams)
+	updateParams.Set("env", envParams)
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)
 

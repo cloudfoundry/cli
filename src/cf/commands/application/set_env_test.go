@@ -59,7 +59,7 @@ func TestRunWhenApplicationExists(t *testing.T) {
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
 
-	envParams := appRepo.UpdateParams.Get("env_vars").(generic.Map)
+	envParams := appRepo.UpdateParams.Get("env").(generic.Map)
 	assert.Equal(t, envParams.Get("DATABASE_URL").(string), "mysql://example.com/my-db")
 	assert.Equal(t, envParams.Get("foo").(string), "bar")
 }

@@ -82,7 +82,7 @@ func (model Application) ToParams() (params AppParams) {
 		"state":      strings.ToUpper(model.State),
 		"stack_guid": model.Stack.Guid,
 		"space_guid": model.SpaceGuid,
-		"env_vars":   generic.NewMap(model.EnvironmentVars),
+		"env":        generic.NewMap(model.EnvironmentVars),
 	})
 
 	return

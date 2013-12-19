@@ -53,7 +53,7 @@ func (data *ConcreteMap) Has(key interface{}) bool {
 }
 
 func (data *ConcreteMap) Keys() (keys []interface{}) {
-	keys = make([]interface{}, data.Count())
+	keys = make([]interface{}, 0, data.Count())
 	for key := range *data {
 		keys = append(keys, key)
 	}

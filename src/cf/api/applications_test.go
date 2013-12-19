@@ -113,7 +113,7 @@ func TestSetEnv(t *testing.T) {
 	envParams.Set("DATABASE_URL", "mysql://example.com/my-db")
 
 	params := cf.NewEmptyAppParams()
-	params.Set("env_vars", envParams)
+	params.Set("env", envParams)
 
 	_, apiResponse := repo.Update("app1-guid", params)
 
@@ -140,11 +140,8 @@ var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		Body:   createApplicationResponse},
 })
 
-func TestCreateApplication(t *testing.T) {
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
-	defer ts.Close()
-
-	params := cf.NewEmptyAppParams()
+func defaultAppParams() (params cf.AppParams) {
+	params = cf.NewEmptyAppParams()
 	params.Set("name", "my-cool-app")
 	params.Set("buildpack", "buildpack-url")
 	params.Set("space_guid", "some-space-guid")
@@ -152,22 +149,41 @@ func TestCreateApplication(t *testing.T) {
 	params.Set("command", "some-command")
 	params.Set("memory", 2048)
 	params.Set("instances", 3)
+	return
+}
 
+func TestCreateApplication(t *testing.T) {
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
+	defer ts.Close()
+
+	params := defaultAppParams()
 	createdApp, apiResponse := repo.Create(params)
 
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
+
 	app := cf.Application{}
 	app.Name = "my-cool-app"
 	app.Guid = "my-cool-app-guid"
 	assert.Equal(t, createdApp, app)
 }
 
+func TestCreateApplicationWhitelistsKeys(t *testing.T) {
+	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{createApplicationRequest})
+	defer ts.Close()
+
+	params := defaultAppParams()
+	params.Set("foo", "bar")
+	_, apiResponse := repo.Create(params)
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/apps",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"space_guid":"some-space-guid","stack_guid":null,"command":null}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"memory":128,"space_guid":"some-space-guid"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 	})
 
@@ -240,7 +256,7 @@ var updateApplicationResponse = `
 var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
 	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
-	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"space_guid":"some-space-guid","stack_guid":"some-stack-guid","command":"some-command"}`),
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"space_guid":"some-space-guid","state":"STARTED","stack_guid":"some-stack-guid","command":"some-command"}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body:   updateApplicationResponse},
@@ -258,6 +274,8 @@ func TestUpdateApplication(t *testing.T) {
 	app.Memory = 2048
 	app.InstanceCount = 3
 	app.Stack.Guid = "some-stack-guid"
+	app.SpaceGuid = "some-space-guid"
+	app.State = "started"
 
 	updatedApp, apiResponse := repo.Update(app.Guid, app.ToParams())
 
@@ -267,45 +285,21 @@ func TestUpdateApplication(t *testing.T) {
 	assert.Equal(t, updatedApp.Guid, "my-cool-app-guid")
 }
 
-func TestUpdateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/apps/my-app-guid",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"buildpack":null,"memory":128,"space_guid":"some-space-guid","stack_guid":null,"command":null}`),
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
-	})
-
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
-	defer ts.Close()
-
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.Name = "my-cool-app"
-	app.Memory = 128
-	app.InstanceCount = 1
-
-	_, apiResponse := repo.Update(app.Guid, app.ToParams())
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
 func TestUpdateApplicationSetCommandToNull(t *testing.T) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/apps/my-app-guid",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":0,"buildpack":null,"memory":0,"space_guid":"some-space-guid","stack_guid":null,"command":""}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"command":""}`),
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
 	})
 
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.Name = "my-cool-app"
-	app.Command = "null"
+	app := cf.NewEmptyAppParams()
+	app.Set("command", "null")
 
-	_, apiResponse := repo.Update(app.Guid, app.ToParams())
+	_, apiResponse := repo.Update("my-app-guid", app)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
@@ -359,138 +353,6 @@ func TestDeleteApplication(t *testing.T) {
 	apiResponse := repo.Delete("my-cool-app-guid")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func TestRename(t *testing.T) {
-	renameApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/apps/my-app-guid",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-new-app"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated},
-	})
-
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{renameApplicationRequest})
-	defer ts.Close()
-
-	params := cf.NewEmptyAppParams()
-	params.Set("name", "my-new-app")
-	_, apiResponse := repo.Update("my-app-guid", params)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func testScale(t *testing.T, app cf.Application, expectedBody string) {
-	scaleApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/apps/my-app-guid",
-		Matcher:  testnet.RequestBodyMatcher(expectedBody),
-		Response: testnet.TestResponse{Status: http.StatusCreated},
-	})
-
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{scaleApplicationRequest})
-	defer ts.Close()
-
-	_, apiResponse := repo.Update(app.Guid, app.ToParams())
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func TestScaleAll(t *testing.T) {
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.DiskQuota = 1024
-	app.InstanceCount = 5
-	app.Memory = 512
-
-	testScale(t, app, `{"disk_quota":1024,"instances":5,"memory":512}`)
-}
-
-func TestScaleApplicationDiskQuota(t *testing.T) {
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.DiskQuota = 1024
-
-	testScale(t, app, `{"disk_quota":1024}`)
-}
-
-func TestScaleApplicationInstances(t *testing.T) {
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.InstanceCount = 5
-
-	testScale(t, app, `{"instances":5}`)
-}
-
-func TestScaleApplicationMemory(t *testing.T) {
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.Memory = 512
-
-	testScale(t, app, `{"memory":512}`)
-}
-
-func TestStartApplication(t *testing.T) {
-	startApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:  "PUT",
-		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=1",
-		Matcher: testnet.RequestBodyMatcher(`{"state":"STARTED"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-{
-  "metadata": {
-    "guid": "my-updated-app-guid"
-  },
-  "entity": {
-    "name": "cli1",
-    "state": "STARTED"
-  }
-}`},
-	})
-
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{startApplicationRequest})
-	defer ts.Close()
-
-	params := cf.NewEmptyAppParams()
-	params.Set("state", "STARTED")
-	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, "cli1", updatedApp.Name)
-	assert.Equal(t, "started", updatedApp.State)
-	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
-}
-
-func TestStopApplication(t *testing.T) {
-	stopApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:  "PUT",
-		Path:    "/v2/apps/my-cool-app-guid?inline-relations-depth=1",
-		Matcher: testnet.RequestBodyMatcher(`{"state":"STOPPED"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-{
-  "metadata": {
-    "guid": "my-updated-app-guid"
-  },
-  "entity": {
-    "name": "cli1",
-    "state": "STOPPED"
-  }
-}`},
-	})
-
-	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{stopApplicationRequest})
-	defer ts.Close()
-
-	params := cf.NewEmptyAppParams()
-	params.Set("state", "STOPPED")
-	updatedApp, apiResponse := repo.Update("my-cool-app-guid", params)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, "cli1", updatedApp.Name)
-	assert.Equal(t, "stopped", updatedApp.State)
-	assert.Equal(t, "my-updated-app-guid", updatedApp.Guid)
 }
 
 func createAppRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
