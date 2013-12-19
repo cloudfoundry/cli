@@ -18,7 +18,7 @@ func stringOrNull(s interface{}) string {
 }
 
 func mapToJsonValues(params generic.Map) (vals []string) {
-	for key, val := range params {
+	generic.Each(params, func(key, val interface{}) {
 		switch val := val.(type) {
 		case string:
 			if val != "null" {
@@ -32,6 +32,6 @@ func mapToJsonValues(params generic.Map) (vals []string) {
 		default:
 			vals = append(vals, fmt.Sprintf(`"%s":%s`, key, val))
 		}
-	}
+	})
 	return
 }
