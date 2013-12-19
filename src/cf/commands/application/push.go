@@ -4,16 +4,14 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
-	"cf/formatters"
 	"cf/manifest"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
-	"fmt"
+	"generic"
 	"github.com/codegangsta/cli"
 	"os"
-	"strconv"
 )
 
 type Push struct {
@@ -55,11 +53,18 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 		return
 	}
 
-	appFields, err := NewAppParamsFromContext(c, m)
+	manifestParams := cf.NewEmptyAppParams()
+	if len(m.Applications) > 0 {
+		manifestParams = m.Applications[0]
+	}
+
+	contextParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
 	}
+
+	appFields := cf.NewAppParams(generic.Merge(manifestParams, contextParams))
 
 	if !appFields.Has("name") {
 		cmd.ui.FailWithUsage(c, "push")
@@ -305,48 +310,6 @@ func (cmd *Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.Ap
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-
-	return
-}
-
-func NewAppParamsFromContext(c *cli.Context, m *manifest.Manifest) (appParams cf.AppParams, err error) {
-	appParams = cf.NewEmptyAppParams()
-
-	if m != nil && len(m.Applications) > 0 {
-		appParams = m.Applications[0]
-	}
-
-	if len(c.Args()) > 0 {
-		appParams.Set("name", c.Args()[0])
-	}
-
-	if c.String("b") != "" {
-		appParams.Set("buildpack", c.String("b"))
-	}
-	if c.String("m") != "" {
-		var memory uint64
-		memory, err = formatters.ToMegabytes(c.String("m"))
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Invalid memory param: %s\n%s", c.String("m"), err))
-			return
-		}
-		appParams.Set("memory", memory)
-	}
-	if c.String("c") != "" {
-		appParams.Set("command", c.String("c"))
-	}
-	if c.String("i") != "" {
-		var instances int
-		instances, err = strconv.Atoi(c.String("i"))
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Invalid instances param: %s\n%s", c.String("i"), err))
-			return
-		}
-		appParams.Set("instances", instances)
-	}
-	if c.String("s") != "" {
-		appParams.Set("stack", c.String("s"))
-	}
 
 	return
 }

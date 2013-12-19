@@ -69,9 +69,10 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 	}
 
 	if params.Has("env_vars") {
-		for key, val := range params.Get("env_vars").(generic.Map) {
+		envVars := params.Get("env_vars").(generic.Map)
+		generic.Each(envVars,func(key,val interface {}){
 			resultApp.EnvironmentVars[key.(string)] = val.(string)
-		}
+		})
 	}
 	return
 }

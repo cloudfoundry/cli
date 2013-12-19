@@ -2,8 +2,11 @@ package cf
 
 import (
 	"cf/formatters"
+	"errors"
 	"fmt"
 	"generic"
+	"github.com/codegangsta/cli"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -98,6 +101,10 @@ func (app AppParams) ToMap() generic.Map {
 	return app.Map
 }
 
+func NewEmptyAppParams() AppParams {
+	return NewAppParams(generic.NewEmptyMap())
+}
+
 func NewAppParams(data interface{}) (params AppParams) {
 	params = AppParams{}
 
@@ -120,8 +127,42 @@ func NewAppParams(data interface{}) (params AppParams) {
 	return
 }
 
-func NewEmptyAppParams() AppParams {
-	return NewAppParams(generic.NewEmptyMap())
+func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
+	appParams = NewEmptyAppParams()
+
+	if len(c.Args()) > 0 {
+		appParams.Set("name", c.Args()[0])
+	}
+
+	if c.String("b") != "" {
+		appParams.Set("buildpack", c.String("b"))
+	}
+	if c.String("m") != "" {
+		var memory uint64
+		memory, err = formatters.ToMegabytes(c.String("m"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid memory param: %s\n%s", c.String("m"), err))
+			return
+		}
+		appParams.Set("memory", memory)
+	}
+	if c.String("c") != "" {
+		appParams.Set("command", c.String("c"))
+	}
+	if c.String("i") != "" {
+		var instances int
+		instances, err = strconv.Atoi(c.String("i"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid instances param: %s\n%s", c.String("i"), err))
+			return
+		}
+		appParams.Set("instances", instances)
+	}
+	if c.String("s") != "" {
+		appParams.Set("stack", c.String("s"))
+	}
+
+	return
 }
 
 type AppSet []AppParams
