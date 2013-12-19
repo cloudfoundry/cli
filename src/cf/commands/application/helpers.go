@@ -17,13 +17,11 @@ const (
 
 func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) (msg *logmessage.Message) {
 	messageType := logmessage.LogMessage_ERR
-	sourceType := logmessage.LogMessage_UNKNOWN
 
 	logMsg := logmessage.LogMessage{
 		Message:     []byte(msgText),
 		AppId:       proto.String(appGuid),
 		MessageType: &messageType,
-		SourceType:  &sourceType,
 		SourceName:  proto.String(sourceName),
 		Timestamp:   proto.Int64(timestamp.UnixNano()),
 	}
@@ -54,17 +52,17 @@ func logMessageOutput(msg *logmessage.Message) string {
 
 func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader string) {
 	logMsg := msg.GetLogMessage()
-	sourceType := msg.GetShortSourceTypeName()
-	sourceId := logMsg.GetSourceId()
+	sourceName := logMsg.GetSourceName()
+	sourceID := logMsg.GetSourceId()
 	t := time.Unix(0, logMsg.GetTimestamp())
 	timeFormat := TIMESTAMP_FORMAT
 	timeString := t.Format(timeFormat)
 
-	logHeader = fmt.Sprintf("%s [%s]", timeString, sourceType)
+	logHeader = fmt.Sprintf("%s [%s]", timeString, sourceName)
 	coloredLogHeader = terminal.LogSysHeaderColor(logHeader)
 
-	if logMsg.GetSourceType() == logmessage.LogMessage_WARDEN_CONTAINER {
-		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceType, sourceId)
+	if sourceName == "App" {
+		logHeader = fmt.Sprintf("%s [%s/%s]", timeString, sourceName, sourceID)
 		coloredLogHeader = terminal.LogAppHeaderColor(logHeader)
 	}
 
