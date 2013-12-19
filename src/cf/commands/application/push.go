@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
+	"strconv"
 )
 
 type Push struct {
@@ -334,8 +335,14 @@ func NewAppParamsFromContext(c *cli.Context, m *manifest.Manifest) (appParams cf
 	if c.String("c") != "" {
 		appParams.Set("command", c.String("c"))
 	}
-	if c.Int("i") != -1 {
-		appParams.Set("instances", c.Int("i"))
+	if c.String("i") != "" {
+		var instances int
+		instances, err = strconv.Atoi(c.String("i"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid instances param: %s\n%s", c.String("i"), err))
+			return
+		}
+		appParams.Set("instances", instances)
 	}
 	if c.String("s") != "" {
 		appParams.Set("stack", c.String("s"))
