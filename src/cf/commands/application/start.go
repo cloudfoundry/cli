@@ -99,6 +99,15 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		return
 	}
 
+	stopLoggingChan := make(chan bool, 1)
+	defer close(stopLoggingChan)
+	loggingStartedChan := make(chan bool)
+	defer close(loggingStartedChan)
+
+	go cmd.tailStagingLogs(app, loggingStartedChan, stopLoggingChan)
+
+	<-loggingStartedChan
+
 	cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -118,10 +127,6 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.ui.Ok()
 
-	stopLoggingChan := make(chan bool, 1)
-	defer close(stopLoggingChan)
-	go cmd.tailStagingLogs(app, stopLoggingChan)
-
 	cmd.waitForInstancesToStage(updatedApp)
 	stopLoggingChan <- true
 
@@ -134,15 +139,20 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 	return
 }
 
-func (cmd Start) tailStagingLogs(app cf.Application, stopChan chan bool) {
+func (cmd Start) tailStagingLogs(app cf.Application, startChan chan bool, stopChan chan bool) {
 	logChan := make(chan *logmessage.Message, 1000)
 	go func() {
 		defer close(logChan)
 
-		err := cmd.logRepo.TailLogsFor(app.Guid, func() {}, logChan, stopChan, 1)
+		onConnect := func() {
+			startChan <- true
+		}
+
+		err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, logChan, stopChan, 1)
 		if err != nil {
 			cmd.ui.Warn("Warning: error tailing logs")
 			cmd.ui.Say("%s", err)
+			startChan <- true
 		}
 	}()
 
