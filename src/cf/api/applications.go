@@ -144,8 +144,24 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params c
 	return
 }
 
-func (repo CloudControllerApplicationRepository) formatAppJSON(params cf.AppParams) (data string, apiResponse net.ApiResponse) {
-	params.Delete("guid")
+var allowedAppKeys = []string{
+	"buildpack",
+	"command",
+	"instances",
+	"memory",
+	"name",
+	"space_guid",
+	"stack_guid",
+	"state",
+}
+
+func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParams) (data string, apiResponse net.ApiResponse) {
+	params := generic.NewEmptyMap()
+	for _, allowedKey := range allowedAppKeys {
+		if input.Has(allowedKey) {
+			params.Set(allowedKey, input.Get(allowedKey))
+		}
+	}
 
 	if params.Has("command") && params.Get("command").(string) == "null" {
 		params.Set("command", "")
@@ -176,15 +192,15 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(params cf.AppPara
 	vals := []string{}
 
 	if !params.IsEmpty() {
-		vals = append(vals, mapToJsonValues(params.ToMap())...)
+		vals = append(vals, mapToJsonValues(params)...)
 	}
-
-	if params.Has("env_vars") {
-		envVars := params.Get("env_vars").(generic.Map)
+	if input.Has("env") {
+		envVars := input.Get("env").(generic.Map)
 		if !envVars.IsEmpty() {
 			envVal := fmt.Sprintf(`"environment_json":{%s}`, strings.Join(mapToJsonValues(envVars), ","))
 			vals = append(vals, envVal)
 		}
+
 	}
 	data = fmt.Sprintf("{%s}", strings.Join(vals, ","))
 	return

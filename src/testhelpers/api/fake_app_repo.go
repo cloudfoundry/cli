@@ -68,8 +68,8 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 		resultApp.Memory = params.Get("memory").(uint64)
 	}
 
-	if params.Has("env_vars") {
-		envVars := params.Get("env_vars").(generic.Map)
+	if params.Has("env") {
+		envVars := params.Get("env").(generic.Map)
 		generic.Each(envVars,func(key,val interface {}){
 			resultApp.EnvironmentVars[key.(string)] = val.(string)
 		})

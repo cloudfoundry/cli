@@ -7,24 +7,49 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"encoding/json"
+	"fmt"
 )
 
-type JSONRequest map[string]interface{}
+type JSONMapRequest map[string]interface{}
+func (json *JSONMapRequest) String() string {
+	return fmt.Sprintf("%#v",*json)
+}
 
-func RequestBodyMatcher(expectedBody string) RequestMatcher {
+type JSONArrayRequest []interface{}
+func (json *JSONArrayRequest) String() string {
+	return fmt.Sprintf("%#v",*json)
+}
+
+func bytesToInterface(jsonBytes []byte) (interface {}, error){
+	mapResult := &JSONMapRequest{}
+	err := json.Unmarshal(jsonBytes,mapResult)
+	if err == nil {
+		return mapResult, err
+	}
+
+	arrayResult := &JSONArrayRequest{}
+	err = json.Unmarshal(jsonBytes,arrayResult)
+	return arrayResult, err
+}
+
+func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 	return func(t *testing.T, request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			assert.Fail(t,"Error reading request body: %s",err)
 		}
 
-		actualBody := &JSONRequest{}
-		json.Unmarshal(bodyBytes,actualBody)
-		expectedBody := &JSONRequest{}
-		json.Unmarshal(bodyBytes,expectedBody)
+		actualBody, err := bytesToInterface(bodyBytes)
+		if err != nil {
+			assert.Fail(t,"Error unmarshalling request",err.Error())
+		}
 
-		assert.Equal(t,actualBody,expectedBody)
+		expectedBody, err :=  bytesToInterface([]byte(expectedBodyString))
+		if err != nil {
+			assert.Fail(t,"Error unmarshalling expected json",err.Error())
+		}
 
+		assert.Equal(t,expectedBody,actualBody,"\nEXPECTED: %s\nACTUAL:   %s",expectedBody,actualBody)
 		assert.Equal(t,request.Header.Get("content-type"), "application/json", "Content Type was not application/json.")
 	}
 }
