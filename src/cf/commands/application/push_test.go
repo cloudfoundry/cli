@@ -28,6 +28,9 @@ applications:
   instances: 1
   host: my-host
   domain: example.com
+  stack: custom-stack
+  buildpack: some-buildpack
+  command: JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run
 `
 
 func TestPushingRequirements(t *testing.T) {
@@ -215,7 +218,7 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 	assert.Equal(t, appRepo.UpdateParams.Get("command"), "null")
 }
 
-func TestPushingAppWithManifestAndName(t *testing.T) {
+func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 	domain := cf.Domain{}
 	domain.Name = "bar.cf-app.com"
@@ -240,6 +243,13 @@ func TestPushingAppWithManifestAndName(t *testing.T) {
 	})
 
 	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "manifest-app-name")
+	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(128))
+	assert.Equal(t, appRepo.CreateAppParams.Get("instances").(int), 1)
+	assert.Equal(t, appRepo.CreateAppParams.Get("host").(string), "my-host")
+	assert.Equal(t, appRepo.CreateAppParams.Get("domain").(string), "example.com")
+	assert.Equal(t, appRepo.CreateAppParams.Get("stack").(string), "custom-stack")
+	assert.Equal(t, appRepo.CreateAppParams.Get("buildpack").(string), "some-buildpack")
+	assert.Equal(t, appRepo.CreateAppParams.Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {
