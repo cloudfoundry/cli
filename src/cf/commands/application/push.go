@@ -12,6 +12,7 @@ import (
 	"generic"
 	"github.com/codegangsta/cli"
 	"os"
+	"path/filepath"
 )
 
 type Push struct {
@@ -45,8 +46,21 @@ func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo m
 	return
 }
 
+func appPathFromContext(c *cli.Context) (dir string, err error) {
+	dir = c.String("p")
+	if dir == "" {
+		return os.Getwd()
+	}
+	return
+}
+
 func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	path := cmd.path(c)
+	path, err := appPathFromContext(c)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
+		return
+	}
+
 	m, err := cmd.manifestRepo.ReadManifest(path)
 	if err != nil {
 		cmd.ui.Failed("Error reading manifest from path:%s/n%s", path, err)
@@ -64,7 +78,12 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 		return
 	}
 
+	if manifestParams.Has("path") {
+		path = filepath.Join(path, manifestParams.Get("path").(string))
+	}
+
 	appFields := cf.NewAppParams(generic.Merge(manifestParams, contextParams))
+	appFields.Set("path", path)
 
 	if !appFields.Has("name") {
 		cmd.ui.FailWithUsage(c, "push")
@@ -93,7 +112,7 @@ func (cmd *Push) Run(c *cli.Context) {
 
 	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
-	apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, cmd.path(c))
+	apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, cmd.appParams.Get("path").(string))
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -235,19 +254,6 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 		hostName = c.String("n")
 		if hostName == "" {
 			hostName = defaultName
-		}
-	}
-	return
-}
-
-func (cmd *Push) path(c *cli.Context) (dir string) {
-	dir = c.String("p")
-	if dir == "" {
-		var err error
-		dir, err = os.Getwd()
-		if err != nil {
-			cmd.ui.Failed(err.Error())
-			return
 		}
 	}
 	return

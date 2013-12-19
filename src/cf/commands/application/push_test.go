@@ -8,6 +8,7 @@ import (
 	"cf/manifest"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"path/filepath"
 	"strings"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -31,6 +32,7 @@ applications:
   stack: custom-stack
   buildpack: some-buildpack
   command: JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run
+  path: ../../fixtures/example-app
 `
 
 func TestPushingRequirements(t *testing.T) {
@@ -250,6 +252,30 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	assert.Equal(t, appRepo.CreateAppParams.Get("stack").(string), "custom-stack")
 	assert.Equal(t, appRepo.CreateAppParams.Get("buildpack").(string), "some-buildpack")
 	assert.Equal(t, appRepo.CreateAppParams.Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
+
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+	assert.Equal(t, appRepo.CreateAppParams.Get("path").(string), filepath.Join(dir, "../../fixtures/example-app"))
+}
+
+func TestPushingAppWithPath(t *testing.T) {
+	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+	domain := cf.Domain{}
+	domain.Name = "bar.cf-app.com"
+	domain.Guid = "bar-domain-guid"
+	domainRepo.FindByNameDomain = domain
+	appRepo.ReadNotFound = true
+
+	m, err := manifest.Parse(strings.NewReader(singleAppManifest))
+	assert.NoError(t, err)
+	manifestRepo.ReadManifestManifest = m
+
+	callPush(t, []string{
+		"-p", "/foo/bar/baz",
+		"my-new-app",
+	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	assert.Equal(t, appRepo.CreateAppParams.Get("path").(string), filepath.Join("/foo/bar/baz", "../../fixtures/example-app"))
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {
