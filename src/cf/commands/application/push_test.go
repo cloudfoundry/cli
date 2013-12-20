@@ -41,6 +41,18 @@ applications:
     FOO: baz
 `
 
+const appManifestWithNulls = `
+applications:
+- name: hacker-manifesto
+  command: null
+  space_guid: null
+  buildpack: null
+  disk_quota: null
+  instances: null
+  memory: null
+  env: null
+`
+
 func TestPushingRequirements(t *testing.T) {
 	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 	ui := new(testterm.FakeUI)
@@ -272,6 +284,38 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 
 	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/my-app/bin")
 	assert.Equal(t, envVars.Get("FOO").(string), "baz")
+}
+
+func TestPushingAppManifestWithNulls(t *testing.T) {
+	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+	domain := cf.Domain{}
+	domain.Name = "bar.cf-app.com"
+	domain.Guid = "bar-domain-guid"
+	stack := cf.Stack{}
+	stack.Name = "customLinux"
+	stack.Guid = "custom-linux-guid"
+
+	domainRepo.FindByNameDomain = domain
+	routeRepo.FindByHostAndDomainErr = true
+	stackRepo.FindByNameStack = stack
+	appRepo.ReadNotFound = true
+
+	m, err := manifest.Parse(strings.NewReader(appManifestWithNulls))
+	assert.NoError(t, err)
+	manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"hacker-manifesto"},
+	})
+
+	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "hacker-manifesto")
+
+	shouldNotHaveKeys := []string{"command", "memory", "instances", "domain", "host", "env", "stack_guid", "buildpack"}
+	for _, key := range shouldNotHaveKeys {
+		assert.False(t, appRepo.CreateAppParams.Has(key))
+	}
 }
 
 func TestPushingAppWithPath(t *testing.T) {
