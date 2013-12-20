@@ -23,5 +23,13 @@ func NewManifest(data generic.Map) (m *Manifest) {
 		m.Applications = cf.NewEmptyAppSet()
 	}
 
+	if data.Has("env") {
+		globalEnv := generic.NewMap(data.Get("env"))
+		for _, app := range m.Applications {
+			localEnv := generic.NewMap(app.Get("env"))
+			app.Set("env", generic.Merge(globalEnv, localEnv))
+		}
+	}
+
 	return
 }
