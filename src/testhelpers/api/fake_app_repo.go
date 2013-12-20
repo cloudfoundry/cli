@@ -50,26 +50,26 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 	resultApp.State = "stopped"
 	resultApp.EnvironmentVars = map[string]string{}
 
-	if params.Has("space_guid") {
+	if params.NotNil("space_guid") {
 		resultApp.SpaceGuid = params.Get("space_guid").(string)
 	}
-	if params.Has("buildpack") {
+	if params.NotNil("buildpack") {
 		resultApp.BuildpackUrl = params.Get("buildpack").(string)
 	}
-	if params.Has("command") {
+	if params.NotNil("command") {
 		resultApp.Command = params.Get("command").(string)
 	}
-	if params.Has("disk_quota") {
+	if params.NotNil("disk_quota") {
 		resultApp.DiskQuota = params.Get("disk_quota").(uint64)
 	}
-	if params.Has("instances") {
+	if params.NotNil("instances") {
 		resultApp.InstanceCount = params.Get("instances").(int)
 	}
-	if params.Has("memory") {
+	if params.NotNil("memory") {
 		resultApp.Memory = params.Get("memory").(uint64)
 	}
 
-	if params.Has("env") {
+	if params.NotNil("env") {
 		envVars := params.Get("env").(generic.Map)
 		generic.Each(envVars,func(key,val interface {}){
 			resultApp.EnvironmentVars[key.(string)] = val.(string)

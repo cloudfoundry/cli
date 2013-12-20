@@ -70,6 +70,11 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	manifestParams := cf.NewEmptyAppParams()
 	if len(m.Applications) > 0 {
 		manifestParams = m.Applications[0]
+		generic.Each(manifestParams, func(key, value interface{}) {
+			if value == nil {
+				manifestParams.Delete(key)
+			}
+		})
 	}
 
 	contextParams, err := cf.NewAppParamsFromContext(c)

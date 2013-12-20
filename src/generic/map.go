@@ -26,6 +26,8 @@ type Map interface {
 	Count() int
 	Keys() []interface{}
 	Has(key interface{}) bool
+	IsNil(key interface{}) bool
+	NotNil(key interface{}) bool
 	Get(key interface{}) interface{}
 	Set(key interface{}, value interface{})
 	Delete(key interface{})
@@ -44,6 +46,16 @@ func (data *ConcreteMap) Count() int {
 func (data *ConcreteMap) Has(key interface{}) bool {
 	_, ok := (*data)[key]
 	return ok
+}
+
+func (data *ConcreteMap) IsNil(key interface{}) bool {
+	maybe, ok := (*data)[key]
+	return ok && maybe == nil
+}
+
+func (data *ConcreteMap) NotNil(key interface{}) bool {
+	maybe, ok := (*data)[key]
+	return ok && maybe != nil
 }
 
 func (data *ConcreteMap) Keys() (keys []interface{}) {

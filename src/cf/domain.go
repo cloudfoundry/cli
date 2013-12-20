@@ -117,7 +117,7 @@ func NewAppParams(data interface{}) (params AppParams) {
 		panic(fmt.Sprintf("AppParams initialized with unexpected type: %T", data))
 	}
 
-	if params.Map.Has("memory") {
+	if params.Map.NotNil("memory") {
 		memory, err := formatters.ToMegabytes(params.Map.Get("memory"))
 		if err != nil {
 			panic(err)
