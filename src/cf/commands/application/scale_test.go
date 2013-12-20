@@ -44,6 +44,16 @@ func TestScaleFailsWithUsage(t *testing.T) {
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
+func TestScaleFailsWithoutFlags(t *testing.T) {
+	args := []string{"my-app"}
+	reqFactory, restarter, appRepo := getScaleDependencies()
+	reqFactory.LoginSuccess = true
+	reqFactory.TargetedSpaceSuccess = true
+
+	callScale(t, args, reqFactory, restarter, appRepo)
+	assert.False(t, testcmd.CommandDidPassRequirements)
+}
+
 func TestScaleAll(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
