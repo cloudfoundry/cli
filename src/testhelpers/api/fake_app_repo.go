@@ -15,7 +15,7 @@ type FakeApplicationRepository struct {
 	ReadAuthErr   bool
 	ReadNotFound  bool
 
-	CreateAppParams    cf.AppParams
+	CreateAppParams    []cf.AppParams
 
 	UpdateParams    cf.AppParams
 	UpdateAppGuid   string
@@ -42,8 +42,19 @@ func (repo *FakeApplicationRepository) Read(name string) (app cf.Application, ap
 	return
 }
 
+func (repo *FakeApplicationRepository) CreatedAppParams() (params cf.AppParams) {
+	if (len(repo.CreateAppParams) > 0) {
+		params = repo.CreateAppParams[0]
+	}
+	return
+}
+
 func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf.Application, apiResponse net.ApiResponse) {
-	repo.CreateAppParams = params
+	if repo.CreateAppParams == nil {
+		repo.CreateAppParams = []cf.AppParams{}
+	}
+
+	repo.CreateAppParams = append(repo.CreateAppParams, params)
 
 	resultApp.Guid = params.Get("name").(string) + "-guid"
 	resultApp.Name = params.Get("name").(string)
