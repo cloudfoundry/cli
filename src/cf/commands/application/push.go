@@ -115,7 +115,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	for _, appParams := range cmd.appParams {
 		cmd.fetchStackGuid(&appParams)
 
-		app, didCreate := cmd.app(c, appParams)
+		app, didCreate := cmd.app(appParams)
 		if !didCreate {
 			app = cmd.updateApp(app, appParams)
 		}
@@ -158,11 +158,12 @@ func (cmd *Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Co
 		return
 	}
 
-	if len(app.Routes) > 0 && !cmd.routeFlagsPresent(c) {
+	routeFlagsPresent := c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
+	if len(app.Routes) > 0 && !routeFlagsPresent {
 		return
 	}
 
-	if len(app.Routes) == 0 && didCreateApp == false && !cmd.routeFlagsPresent(c) {
+	if len(app.Routes) == 0 && didCreateApp == false && !routeFlagsPresent {
 		cmd.ui.Say("App %s currently exists as a worker, skipping route creation", terminal.EntityNameColor(app.Name))
 		return
 	}
@@ -200,10 +201,6 @@ func (cmd *Push) restart(app cf.Application, c *cli.Context) {
 	if !c.Bool("no-start") {
 		cmd.starter.ApplicationStart(app)
 	}
-}
-
-func (cmd *Push) routeFlagsPresent(c *cli.Context) bool {
-	return c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
 }
 
 func (cmd *Push) route(hostName string, domain cf.DomainFields) (route cf.Route) {
@@ -272,7 +269,7 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 	return
 }
 
-func (cmd *Push) app(c *cli.Context, appParams cf.AppParams) (app cf.Application, didCreate bool) {
+func (cmd *Push) app(appParams cf.AppParams) (app cf.Application, didCreate bool) {
 	appName := appParams.Get("name").(string)
 	app, apiResponse := cmd.appRepo.Read(appName)
 	if apiResponse.IsError() {
@@ -281,7 +278,7 @@ func (cmd *Push) app(c *cli.Context, appParams cf.AppParams) (app cf.Application
 	}
 
 	if apiResponse.IsNotFound() {
-		app, apiResponse = cmd.createApp(c, appParams)
+		app, apiResponse = cmd.createApp(appParams)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
@@ -292,7 +289,7 @@ func (cmd *Push) app(c *cli.Context, appParams cf.AppParams) (app cf.Application
 	return
 }
 
-func (cmd *Push) createApp(c *cli.Context, appParams cf.AppParams) (app cf.Application, apiResponse net.ApiResponse) {
+func (cmd *Push) createApp(appParams cf.AppParams) (app cf.Application, apiResponse net.ApiResponse) {
 	appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
