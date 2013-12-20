@@ -31,8 +31,8 @@ applications:
 - name: manifest-app-name
   memory: 128M
   instances: 1
-  host: my-host
-  domain: example.com
+  host: manifest-host
+  domain: manifest-example.com
   stack: custom-stack
   buildpack: some-buildpack
   command: JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run
@@ -247,15 +247,11 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 	domain := cf.Domain{}
-	domain.Name = "bar.cf-app.com"
+	domain.Name = "manifest-example.com"
 	domain.Guid = "bar-domain-guid"
-	stack := cf.Stack{}
-	stack.Name = "customLinux"
-	stack.Guid = "custom-linux-guid"
 
 	domainRepo.FindByNameDomain = domain
 	routeRepo.FindByHostAndDomainErr = true
-	stackRepo.FindByNameStack = stack
 	appRepo.ReadNotFound = true
 
 	m, err := manifest.Parse(strings.NewReader(singleAppManifest))
@@ -265,14 +261,15 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	ui := callPush(t, []string{}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating route", "manifest-host.manifest-example.com"},
+		{"OK"},
+		{"Binding", "manifest-host.manifest-example.com"},
 		{"manifest-app-name"},
 	})
 
 	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "manifest-app-name")
 	assert.Equal(t, appRepo.CreatedAppParams().Get("memory").(uint64), uint64(128))
 	assert.Equal(t, appRepo.CreatedAppParams().Get("instances").(int), 1)
-	assert.Equal(t, appRepo.CreatedAppParams().Get("host").(string), "my-host")
-	assert.Equal(t, appRepo.CreatedAppParams().Get("domain").(string), "example.com")
 	assert.Equal(t, appRepo.CreatedAppParams().Get("stack").(string), "custom-stack")
 	assert.Equal(t, appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
 	assert.Equal(t, appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")

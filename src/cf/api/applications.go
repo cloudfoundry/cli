@@ -153,8 +153,6 @@ var allowedAppKeys = []string{
 	"space_guid",
 	"stack_guid",
 	"state",
-	"host",
-	"domain",
 }
 
 func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParams) (data string, apiResponse net.ApiResponse) {

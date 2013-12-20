@@ -120,7 +120,7 @@ func (cmd *Push) Run(c *cli.Context) {
 			app = cmd.updateApp(app, appParams)
 		}
 
-		cmd.bindAppToRoute(app, didCreate, c)
+		cmd.bindAppToRoute(app, appParams, didCreate, c)
 
 		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
@@ -153,7 +153,7 @@ func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
 	(*appParams).Set("stack_guid", stack.Guid)
 }
 
-func (cmd *Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
+func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCreateApp bool, c *cli.Context) {
 	if c.Bool("no-route") {
 		return
 	}
@@ -168,8 +168,22 @@ func (cmd *Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Co
 		return
 	}
 
-	hostName := cmd.hostname(c, app.Name)
-	domain := cmd.domain(c)
+	var defaultHostname string
+	if params.Has("host") {
+		defaultHostname = params.Get("host").(string)
+	} else {
+		defaultHostname = app.Name
+	}
+
+	var domainName string
+	if params.Has("domain") {
+		domainName = params.Get("domain").(string)
+	} else {
+		domainName = c.String("d")
+	}
+
+	hostName := cmd.hostname(c, defaultHostname)
+	domain := cmd.domain(c, domainName)
 	route := cmd.route(hostName, domain.DomainFields)
 
 	for _, boundRoute := range app.Routes {
@@ -223,11 +237,8 @@ func (cmd *Push) route(hostName string, domain cf.DomainFields) (route cf.Route)
 	return
 }
 
-func (cmd *Push) domain(c *cli.Context) (domain cf.Domain) {
-	var (
-		apiResponse net.ApiResponse
-		domainName  = c.String("d")
-	)
+func (cmd *Push) domain(c *cli.Context, domainName string) (domain cf.Domain) {
+	var apiResponse net.ApiResponse
 
 	if domainName != "" {
 		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
@@ -260,12 +271,15 @@ func (cmd *Push) domain(c *cli.Context) (domain cf.Domain) {
 }
 
 func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) {
-	if !c.Bool("no-hostname") {
-		hostName = c.String("n")
-		if hostName == "" {
-			hostName = defaultName
-		}
+	if c.Bool("no-hostname") {
+		return
 	}
+
+	hostName = c.String("n")
+	if hostName == "" {
+		hostName = defaultName
+	}
+
 	return
 }
 
