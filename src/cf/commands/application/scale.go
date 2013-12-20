@@ -36,6 +36,12 @@ func (cmd *Scale) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 		return
 	}
 
+	if c.Int("i") == -1 && c.String("m") == "" {
+		err = errors.New("Incorrect Usage")
+		cmd.ui.FailWithUsage(c, "scale")
+		return
+	}
+
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
 	reqs = []requirements.Requirement{
