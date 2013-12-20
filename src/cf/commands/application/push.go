@@ -17,7 +17,7 @@ import (
 
 type Push struct {
 	ui           terminal.UI
-	appParams    cf.AppParams
+	appParams    []cf.AppParams
 	config       *configuration.Configuration
 	manifestRepo manifest.ManifestRepository
 	starter      ApplicationStarter
@@ -55,48 +55,54 @@ func appPathFromContext(c *cli.Context) (dir string, err error) {
 }
 
 func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	path, err := appPathFromContext(c)
+	contextPath, err := appPathFromContext(c)
+
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	m, err := cmd.manifestRepo.ReadManifest(path)
-	if err != nil {
-		cmd.ui.Failed("Error reading manifest from path:%s/n%s", path, err)
-		return
-	}
-
-	manifestParams := cf.NewEmptyAppParams()
-	if len(m.Applications) > 0 {
-		manifestParams = m.Applications[0]
-		generic.Each(manifestParams, func(key, value interface{}) {
-			if value == nil {
-				manifestParams.Delete(key)
-			}
-		})
-	}
-
 	contextParams, err := cf.NewAppParamsFromContext(c)
+	contextParams.Set("path", contextPath)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
 	}
 
-	if manifestParams.Has("path") {
-		path = filepath.Join(path, manifestParams.Get("path").(string))
-	}
-
-	appFields := cf.NewAppParams(generic.Merge(manifestParams, contextParams))
-	appFields.Set("path", path)
-
-	if !appFields.Has("name") {
-		cmd.ui.FailWithUsage(c, "push")
-		err = errors.New("Incorrect Usage")
+	m, err := cmd.manifestRepo.ReadManifest(contextPath)
+	if err != nil {
+		cmd.ui.Failed("Error reading manifest from path:%s/n%s", contextPath, err)
 		return
 	}
 
-	cmd.appParams = appFields
+	if len(m.Applications) == 0 {
+		cmd.appParams = []cf.AppParams{contextParams}
+	} else {
+		cmd.appParams = []cf.AppParams{}
+
+		for _, manifestAppParams := range m.Applications {
+			generic.Each(manifestAppParams, func(key, value interface{}) {
+				if value == nil {
+					manifestAppParams.Delete(key)
+				}
+			})
+
+			path := contextPath
+			if manifestAppParams.Has("path") {
+				path = filepath.Join(contextPath, manifestAppParams.Get("path").(string))
+			}
+
+			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
+			appFields.Set("path", path)
+
+			if !appFields.Has("name") {
+				cmd.ui.FailWithUsage(c, "push")
+				err = errors.New("Incorrect Usage")
+				return
+			}
+			cmd.appParams = append(cmd.appParams, appFields)
+		}
+	}
 
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
@@ -106,33 +112,35 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd *Push) Run(c *cli.Context) {
-	cmd.fetchStackGuid()
+	for _, appParams := range cmd.appParams {
+		cmd.fetchStackGuid(&appParams)
 
-	app, didCreate := cmd.app(c)
-	if !didCreate {
-		app = cmd.updateApp(app, c)
+		app, didCreate := cmd.app(c, appParams)
+		if !didCreate {
+			app = cmd.updateApp(app, appParams)
+		}
+
+		cmd.bindAppToRoute(app, didCreate, c)
+
+		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
+
+		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, appParams.Get("path").(string))
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed(apiResponse.Message)
+			return
+		}
+
+		cmd.ui.Ok()
+		cmd.restart(app, c)
 	}
-
-	cmd.bindAppToRoute(app, didCreate, c)
-
-	cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
-
-	apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, cmd.appParams.Get("path").(string))
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	cmd.ui.Ok()
-	cmd.restart(app, c)
 }
 
-func (cmd *Push) fetchStackGuid() {
-	if !cmd.appParams.Has("stack") {
+func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
+	if !(*appParams).Has("stack") {
 		return
 	}
-	stackName := cmd.appParams.Get("stack").(string)
 
+	stackName := appParams.Get("stack").(string)
 	cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stackName))
 
 	stack, apiResponse := cmd.stackRepo.FindByName(stackName)
@@ -140,9 +148,9 @@ func (cmd *Push) fetchStackGuid() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
-	cmd.ui.Ok()
 
-	cmd.appParams.Set("stack_guid", stack.Guid)
+	cmd.ui.Ok()
+	(*appParams).Set("stack_guid", stack.Guid)
 }
 
 func (cmd *Push) bindAppToRoute(app cf.Application, didCreateApp bool, c *cli.Context) {
@@ -264,15 +272,16 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 	return
 }
 
-func (cmd *Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
-	app, apiResponse := cmd.appRepo.Read(cmd.appParams.Get("name").(string))
+func (cmd *Push) app(c *cli.Context, appParams cf.AppParams) (app cf.Application, didCreate bool) {
+	appName := appParams.Get("name").(string)
+	app, apiResponse := cmd.appRepo.Read(appName)
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
 	if apiResponse.IsNotFound() {
-		app, apiResponse = cmd.createApp(c)
+		app, apiResponse = cmd.createApp(c, appParams)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
@@ -283,17 +292,17 @@ func (cmd *Push) app(c *cli.Context) (app cf.Application, didCreate bool) {
 	return
 }
 
-func (cmd *Push) createApp(c *cli.Context) (app cf.Application, apiResponse net.ApiResponse) {
-	cmd.appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
+func (cmd *Push) createApp(c *cli.Context, appParams cf.AppParams) (app cf.Application, apiResponse net.ApiResponse) {
+	appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.appParams.Get("name").(string)),
+		terminal.EntityNameColor(appParams.Get("name").(string)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiResponse = cmd.appRepo.Create(cmd.appParams)
+	app, apiResponse = cmd.appRepo.Create(appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -305,7 +314,7 @@ func (cmd *Push) createApp(c *cli.Context) (app cf.Application, apiResponse net.
 	return
 }
 
-func (cmd *Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.Application) {
+func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedApp cf.Application) {
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -313,7 +322,7 @@ func (cmd *Push) updateApp(app cf.Application, c *cli.Context) (updatedApp cf.Ap
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, cmd.appParams)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

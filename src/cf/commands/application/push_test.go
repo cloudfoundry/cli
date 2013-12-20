@@ -53,6 +53,12 @@ applications:
   env: null
 `
 
+const manifestWithManyApps = `
+applications:
+- name: app1
+- name: app2
+`
+
 func TestPushingRequirements(t *testing.T) {
 	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
 	ui := new(testterm.FakeUI)
@@ -95,8 +101,8 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	ui := callPush(t, []string{"my-new-app"}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
-	assert.Equal(t, appRepo.CreateAppParams.Get("space_guid").(string), "my-space-guid")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("space_guid").(string), "my-space-guid")
 
 	assert.Equal(t, routeRepo.FindByHostAndDomainHost, "my-new-app")
 	assert.Equal(t, routeRepo.CreatedHost, "my-new-app")
@@ -199,12 +205,12 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 
 	assert.Equal(t, stackRepo.FindByNameName, "customLinux")
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
-	assert.Equal(t, appRepo.CreateAppParams.Get("command").(string), "unicorn -c config/unicorn.rb -D")
-	assert.Equal(t, appRepo.CreateAppParams.Get("instances").(int), 3)
-	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(2048))
-	assert.Equal(t, appRepo.CreateAppParams.Get("stack_guid"), "custom-linux-guid")
-	assert.Equal(t, appRepo.CreateAppParams.Get("buildpack"), "https://github.com/heroku/heroku-buildpack-play.git")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("command").(string), "unicorn -c config/unicorn.rb -D")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("instances").(int), 3)
+	assert.Equal(t, appRepo.CreatedAppParams().Get("memory").(uint64), uint64(2048))
+	assert.Equal(t, appRepo.CreatedAppParams().Get("stack_guid"), "custom-linux-guid")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("buildpack"), "https://github.com/heroku/heroku-buildpack-play.git")
 
 	assert.Equal(t, domainRepo.FindByNameInCurrentSpaceName, "bar.cf-app.com")
 
@@ -262,21 +268,21 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 		{"manifest-app-name"},
 	})
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "manifest-app-name")
-	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(128))
-	assert.Equal(t, appRepo.CreateAppParams.Get("instances").(int), 1)
-	assert.Equal(t, appRepo.CreateAppParams.Get("host").(string), "my-host")
-	assert.Equal(t, appRepo.CreateAppParams.Get("domain").(string), "example.com")
-	assert.Equal(t, appRepo.CreateAppParams.Get("stack").(string), "custom-stack")
-	assert.Equal(t, appRepo.CreateAppParams.Get("buildpack").(string), "some-buildpack")
-	assert.Equal(t, appRepo.CreateAppParams.Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "manifest-app-name")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("memory").(uint64), uint64(128))
+	assert.Equal(t, appRepo.CreatedAppParams().Get("instances").(int), 1)
+	assert.Equal(t, appRepo.CreatedAppParams().Get("host").(string), "my-host")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("domain").(string), "example.com")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("stack").(string), "custom-stack")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
 
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
-	assert.Equal(t, appRepo.CreateAppParams.Get("path").(string), filepath.Join(dir, "../../fixtures/example-app"))
+	assert.Equal(t, appRepo.CreatedAppParams().Get("path").(string), filepath.Join(dir, "../../fixtures/example-app"))
 
-	assert.True(t, appRepo.CreateAppParams.Has("env"))
-	envVars := appRepo.CreateAppParams.Get("env").(generic.Map)
+	assert.True(t, appRepo.CreatedAppParams().Has("env"))
+	envVars := appRepo.CreatedAppParams().Get("env").(generic.Map)
 
 	assert.Equal(t, 2, envVars.Count())
 	assert.True(t, envVars.Has("PATH"))
@@ -310,12 +316,44 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 		{"hacker-manifesto"},
 	})
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "hacker-manifesto")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "hacker-manifesto")
 
 	shouldNotHaveKeys := []string{"command", "memory", "instances", "domain", "host", "env", "stack_guid", "buildpack"}
 	for _, key := range shouldNotHaveKeys {
-		assert.False(t, appRepo.CreateAppParams.Has(key))
+		assert.False(t, appRepo.CreatedAppParams().Has(key))
 	}
+}
+
+func TestPushingManyAppsFromManifest(t *testing.T) {
+	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+	domain := cf.Domain{}
+	domain.Name = "bar.cf-app.com"
+	domain.Guid = "bar-domain-guid"
+	stack := cf.Stack{}
+	stack.Name = "customLinux"
+	stack.Guid = "custom-linux-guid"
+
+	domainRepo.FindByNameDomain = domain
+	routeRepo.FindByHostAndDomainErr = true
+	stackRepo.FindByNameStack = stack
+	appRepo.ReadNotFound = true
+
+	m, err := manifest.Parse(strings.NewReader(manifestWithManyApps))
+	assert.NoError(t, err)
+	manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating", "app1"},
+		{"Creating", "app2"},
+	})
+	assert.Equal(t, len(appRepo.CreateAppParams), 2)
+
+	firstApp := appRepo.CreateAppParams[0]
+	secondApp := appRepo.CreateAppParams[1]
+	assert.Equal(t, firstApp.Get("name").(string), "app1")
+	assert.Equal(t, secondApp.Get("name").(string), "app2")
 }
 
 func TestPushingAppWithPath(t *testing.T) {
@@ -335,7 +373,7 @@ func TestPushingAppWithPath(t *testing.T) {
 		"my-new-app",
 	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("path").(string), filepath.Join("/foo/bar/baz", "../../fixtures/example-app"))
+	assert.Equal(t, appRepo.CreatedAppParams().Get("path").(string), filepath.Join("/foo/bar/baz", "../../fixtures/example-app"))
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {
@@ -357,7 +395,7 @@ func TestPushingAppWithNoRoute(t *testing.T) {
 		"my-new-app",
 	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
 	assert.Equal(t, routeRepo.CreatedHost, "")
 	assert.Equal(t, routeRepo.CreatedDomainGuid, "")
 }
@@ -383,7 +421,7 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 		"my-new-app",
 	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("name").(string), "my-new-app")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
 	assert.Equal(t, routeRepo.CreatedHost, "")
 	assert.Equal(t, routeRepo.CreatedDomainGuid, "bar-domain-guid")
 }
@@ -401,7 +439,7 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 		"my-new-app",
 	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(256))
+	assert.Equal(t, appRepo.CreatedAppParams().Get("memory").(uint64), uint64(256))
 }
 
 func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
@@ -417,7 +455,7 @@ func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
 		"my-new-app",
 	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
-	assert.Equal(t, appRepo.CreateAppParams.Get("memory").(uint64), uint64(512))
+	assert.Equal(t, appRepo.CreatedAppParams().Get("memory").(uint64), uint64(512))
 }
 
 func TestPushingAppWithInvalidMemory(t *testing.T) {
