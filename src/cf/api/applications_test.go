@@ -141,9 +141,7 @@ var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 	"memory":2048,
 	"space_guid":"some-space-guid",
 	"stack_guid":"some-stack-guid",
-	"command":"some-command",
-	"host": "zombo",
-	"domain": "dev.zombo.com"
+	"command":"some-command"
 	}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusCreated,
@@ -159,8 +157,6 @@ func defaultAppParams() (params cf.AppParams) {
 	params.Set("command", "some-command")
 	params.Set("memory", 2048)
 	params.Set("instances", 3)
-	params.Set("host", "zombo")
-	params.Set("domain", "dev.zombo.com")
 	return
 }
 
