@@ -6,6 +6,7 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/manifest"
+	"generic"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
@@ -23,6 +24,9 @@ import (
 
 const singleAppManifest = `
 ---
+env:
+  PATH: /u/apps/my-app/bin
+  FOO: bar
 applications:
 - name: manifest-app-name
   memory: 128M
@@ -33,6 +37,8 @@ applications:
   buildpack: some-buildpack
   command: JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run
   path: ../../fixtures/example-app
+  env:
+    FOO: baz
 `
 
 func TestPushingRequirements(t *testing.T) {
@@ -256,6 +262,16 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
 	assert.Equal(t, appRepo.CreateAppParams.Get("path").(string), filepath.Join(dir, "../../fixtures/example-app"))
+
+	assert.True(t, appRepo.CreateAppParams.Has("env"))
+	envVars := appRepo.CreateAppParams.Get("env").(generic.Map)
+
+	assert.Equal(t, 2, envVars.Count())
+	assert.True(t, envVars.Has("PATH"))
+	assert.True(t, envVars.Has("FOO"))
+
+	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/my-app/bin")
+	assert.Equal(t, envVars.Get("FOO").(string), "baz")
 }
 
 func TestPushingAppWithPath(t *testing.T) {

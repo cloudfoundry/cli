@@ -73,6 +73,8 @@ func NewEmptyMap() Map {
 
 func NewMap(data interface {}) Map {
 	switch data := data.(type){
+	case Map:
+		return data
 	case map[string]string:
 		stringMap := NewEmptyMap()
 		for key, val := range data {

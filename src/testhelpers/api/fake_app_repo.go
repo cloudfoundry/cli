@@ -48,6 +48,7 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 	resultApp.Guid = params.Get("name").(string) + "-guid"
 	resultApp.Name = params.Get("name").(string)
 	resultApp.State = "stopped"
+	resultApp.EnvironmentVars = map[string]string{}
 
 	if params.Has("space_guid") {
 		resultApp.SpaceGuid = params.Get("space_guid").(string)
