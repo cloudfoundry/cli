@@ -1,7 +1,5 @@
 package generic
 
-import "strings"
-
 type Iterator func (key, val interface{})
 
 func Merge(collection, otherCollection Map) interface{} {
@@ -34,10 +32,6 @@ type Map interface {
 }
 
 type ConcreteMap map[interface{}]interface{}
-
-func canonicalKey(key interface{}) string {
-	return strings.ToLower(key.(string))
-}
 
 func (data *ConcreteMap) IsEmpty() bool {
 	return data.Count() == 0
