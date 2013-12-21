@@ -5,7 +5,7 @@ type Iterator func (key, val interface{})
 func Merge(collection, otherCollection Map) interface{} {
 	mergedMap := NewEmptyMap()
 
-	iterator := func(key interface{}, value interface{}) () {
+	iterator := func(key, value interface{}) () {
 		mergedMap.Set(key, value)
 	}
 
@@ -71,7 +71,7 @@ func (data *ConcreteMap) Get(key interface{}) interface{} {
 	return (*data)[key]
 }
 
-func (data *ConcreteMap) Set(key interface{}, value interface{}) {
+func (data *ConcreteMap) Set(key, value interface{}) {
 	(*data)[key] = value
 }
 
