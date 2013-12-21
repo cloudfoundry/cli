@@ -54,8 +54,14 @@ applications:
 `
 
 const manifestWithManyApps = `
+---
+env:
+  PATH: /u/apps/something/bin
+  SOMETHING: nothing
 applications:
 - name: app1
+  env:
+    SOMETHING: definitely-something
 - name: app2
 `
 
@@ -351,6 +357,20 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 	secondApp := appRepo.CreateAppParams[1]
 	assert.Equal(t, firstApp.Get("name").(string), "app1")
 	assert.Equal(t, secondApp.Get("name").(string), "app2")
+
+	assert.True(t, firstApp.Has("env"))
+	assert.True(t, secondApp.Has("env"))
+
+	envVars := firstApp.Get("env").(generic.Map)
+	assert.Equal(t, 2, envVars.Count())
+	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")
+	assert.Equal(t, envVars.Get("SOMETHING").(string), "definitely-something")
+
+
+	envVars = secondApp.Get("env").(generic.Map)
+	assert.Equal(t, 2, envVars.Count())
+	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")
+	assert.Equal(t, envVars.Get("SOMETHING").(string), "nothing")
 }
 
 func TestPushingAppWithPath(t *testing.T) {
