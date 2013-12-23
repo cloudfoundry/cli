@@ -71,7 +71,7 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 
 	m, err := cmd.manifestRepo.ReadManifest(contextPath)
 	if err != nil {
-		cmd.ui.Failed("Error reading manifest from path:%s/n%s", contextPath, err)
+		cmd.ui.Failed("Error reading manifest from path:%s\n%s", contextPath, err)
 		return
 	}
 
