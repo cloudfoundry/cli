@@ -69,10 +69,15 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 		return
 	}
 
-	m, err := cmd.manifestRepo.ReadManifest(contextPath)
-	if err != nil {
-		cmd.ui.Failed("Error reading manifest from path:%s\n%s", contextPath, err)
-		return
+	var m *manifest.Manifest
+	if cmd.manifestRepo.ManifestExists(contextPath) {
+		m, err = cmd.manifestRepo.ReadManifest(contextPath)
+		if err != nil {
+			cmd.ui.Failed("Error reading manifest from path:%s\n%s", contextPath, err)
+			return
+		}
+	} else {
+		m = manifest.NewEmptyManifest()
 	}
 
 	if len(m.Applications) == 0 {
