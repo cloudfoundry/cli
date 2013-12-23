@@ -1,5 +1,7 @@
 package generic
 
+import "fmt"
+
 type Iterator func (key, val interface{})
 
 func Merge(collection, otherCollection Map) interface{} {
@@ -34,6 +36,10 @@ type Map interface {
 }
 
 type ConcreteMap map[interface{}]interface{}
+
+func (data *ConcreteMap) String() string {
+	return fmt.Sprintf("%#v",*data)
+}
 
 func (data *ConcreteMap) IsEmpty() bool {
 	return data.Count() == 0

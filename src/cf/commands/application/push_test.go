@@ -366,7 +366,6 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")
 	assert.Equal(t, envVars.Get("SOMETHING").(string), "definitely-something")
 
-
 	envVars = secondApp.Get("env").(generic.Map)
 	assert.Equal(t, 2, envVars.Count())
 	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")

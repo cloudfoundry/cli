@@ -171,12 +171,20 @@ func NewEmptyAppSet() AppSet {
 	return NewAppSet(make([]interface{}, 0))
 }
 
-func NewAppSet(apps interface{}) (set AppSet) {
+func NewAppSet(values interface{}) (set AppSet) {
 	set = AppSet{}
-	for _, val := range apps.([]interface{}) {
-		app := generic.NewMap(val)
+
+	switch values := values.(type) {
+	case []interface{}:
+		for _, val := range values {
+			app := generic.NewMap(val)
+			set = append(set, NewAppParams(app))
+		}
+	default:
+		app := generic.NewMap(values)
 		set = append(set, NewAppParams(app))
 	}
+
 	return
 }
 
