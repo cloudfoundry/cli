@@ -17,7 +17,7 @@ import (
 
 type Push struct {
 	ui           terminal.UI
-	appParams    []cf.AppParams
+	appSet       cf.AppSet
 	config       *configuration.Configuration
 	manifestRepo manifest.ManifestRepository
 	starter      ApplicationStarter
@@ -76,9 +76,9 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	}
 
 	if len(m.Applications) == 0 {
-		cmd.appParams = []cf.AppParams{contextParams}
+		cmd.appSet = cf.NewAppSet(contextParams)
 	} else {
-		cmd.appParams = []cf.AppParams{}
+		cmd.appSet = cf.NewEmptyAppSet()
 
 		for _, manifestAppParams := range m.Applications {
 			generic.Each(manifestAppParams, func(key, value interface{}) {
@@ -86,21 +86,23 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 					manifestAppParams.Delete(key)
 				}
 			})
+			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
 
 			path := contextPath
 			if manifestAppParams.Has("path") {
 				path = filepath.Join(contextPath, manifestAppParams.Get("path").(string))
 			}
-
-			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
 			appFields.Set("path", path)
 
-			if !appFields.Has("name") {
-				cmd.ui.FailWithUsage(c, "push")
-				err = errors.New("Incorrect Usage")
-				return
-			}
-			cmd.appParams = append(cmd.appParams, appFields)
+			cmd.appSet = append(cmd.appSet, appFields)
+		}
+	}
+
+	for _, appParams := range cmd.appSet {
+		if !appParams.Has("name") {
+			cmd.ui.FailWithUsage(c, "push")
+			err = errors.New("Incorrect Usage")
+			return
 		}
 	}
 
@@ -112,7 +114,7 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd *Push) Run(c *cli.Context) {
-	for _, appParams := range cmd.appParams {
+	for _, appParams := range cmd.appSet {
 		cmd.fetchStackGuid(&appParams)
 
 		app, didCreate := cmd.app(appParams)
