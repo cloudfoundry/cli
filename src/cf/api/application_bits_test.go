@@ -215,7 +215,6 @@ func TestUploadApp(t *testing.T) {
 	assert.NoError(t, err)
 
 	_, apiResponse := testUploadApp(t, dir, defaultRequests)
-	println(apiResponse.Message)
 	assert.True(t, apiResponse.IsSuccessful())
 }
 

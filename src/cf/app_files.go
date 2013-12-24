@@ -12,6 +12,7 @@ import (
 
 var DefaultIgnoreFiles = []string{
 	".cfignore",
+	".gitignore",
 	".git",
 	".svn",
 	"_darcs",
@@ -20,6 +21,11 @@ var DefaultIgnoreFiles = []string{
 type Globs []*glob.Glob
 
 func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
+	dir, err = filepath.Abs(dir)
+	if err != nil {
+		return
+	}
+
 	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
@@ -130,7 +136,7 @@ func exclusionsForPattern(dir string, pattern string) (exclusions Globs) {
 	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern, "*")))
 	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern, "**", "*")))
 
-	if strings.Index(pattern, "/") != 0 {
+	if !filepath.IsAbs(pattern) {
 		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern)))
 		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern, "*")))
 		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern, "**", "*")))
