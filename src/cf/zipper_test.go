@@ -46,7 +46,7 @@ func TestZipWithDirectory(t *testing.T) {
 			return file.Name, string(buf.Bytes())
 		}
 
-		assert.Equal(t, len(reader.File), 2)
+		assert.Equal(t, len(reader.File), 3)
 
 		name, contents := readFileInZip(0)
 		assert.Equal(t, name, "foo.txt")
@@ -56,6 +56,10 @@ func TestZipWithDirectory(t *testing.T) {
 		assert.Equal(t, name, filepath.Clean("subDir/bar.txt"))
 		assert.Equal(t, contents, "I am in a subdirectory.")
 		assert.Equal(t, reader.File[1].FileInfo().Mode(), uint32(0666))
+
+		name, contents = readFileInZip(2)
+		assert.Equal(t, name, filepath.Clean("subDir/otherDir/file.txt"))
+		assert.Equal(t, contents, "This file should be present.")
 	})
 }
 

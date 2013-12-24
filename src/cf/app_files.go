@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"fileutils"
 	"fmt"
+	"glob"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,6 +16,8 @@ var DefaultIgnoreFiles = []string{
 	".svn",
 	"_darcs",
 }
+
+type Globs []*glob.Glob
 
 func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
@@ -78,11 +81,11 @@ func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
-		fileName, _ := filepath.Rel(dir, fullPath)
-		if fileShouldBeIgnored(exclusions, fileName) {
+		if fileShouldBeIgnored(exclusions, fullPath) {
 			return
 		}
 
+		fileName, _ := filepath.Rel(dir, fullPath)
 		err = onEachFile(fileName, fullPath)
 
 		return
@@ -92,16 +95,16 @@ func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	return
 }
 
-func fileShouldBeIgnored(exclusions []string, relativePath string) bool {
+func fileShouldBeIgnored(exclusions Globs, fullPath string) bool {
 	for _, exclusion := range exclusions {
-		if exclusion == relativePath {
+		if exclusion.Match(fullPath) {
 			return true
 		}
 	}
 	return false
 }
 
-func readCfIgnore(dir string) (exclusions []string) {
+func readCfIgnore(dir string) (exclusions Globs) {
 	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
 	if err != nil {
 		return
@@ -119,38 +122,18 @@ func readCfIgnore(dir string) (exclusions []string) {
 		patternExclusions := exclusionsForPattern(dir, pattern)
 		exclusions = append(exclusions, patternExclusions...)
 	}
-
 	return
 }
 
-func exclusionsForPattern(dir string, pattern string) (exclusions []string) {
-	starting_dir := dir
+func exclusionsForPattern(dir string, pattern string) (exclusions Globs) {
+	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern)))
+	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern, "*")))
+	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern, "**", "*")))
 
-	findPatternMatches := func(dir string, f os.FileInfo, inErr error) (err error) {
-		err = inErr
-		if err != nil {
-			return
-		}
-
-		absolutePaths := []string{}
-		if f.IsDir() && f.Name() == pattern {
-			absolutePaths, _ = filepath.Glob(filepath.Join(dir, "*"))
-		} else {
-			absolutePaths, _ = filepath.Glob(filepath.Join(dir, pattern))
-		}
-
-		for _, p := range absolutePaths {
-			relpath, _ := filepath.Rel(starting_dir, p)
-
-			exclusions = append(exclusions, relpath)
-		}
-		return
+	if strings.Index(pattern, "/") != 0 {
+		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern)))
+		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern, "*")))
+		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern, "**", "*")))
 	}
-
-	err := filepath.Walk(dir, findPatternMatches)
-	if err != nil {
-		return
-	}
-
 	return
 }
