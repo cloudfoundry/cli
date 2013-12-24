@@ -19,10 +19,10 @@ type Glob struct {
 	r       *regexp.Regexp // compiled regexp
 }
 
-const charPat = `[a-zA-Z0-9.\-_]`
+const charPat = `[^/]`
 
 func mustBuildRe(p string) *regexp.Regexp {
-	return regexp.MustCompile(`^/$|^(/` + p + `+)+$`)
+	return regexp.MustCompile(`^/$|^(` + p + `+)?(/` + p + `+)*$`)
 }
 
 var globRe = mustBuildRe(`(` + charPat + `|[\*\?])`)
@@ -67,6 +67,7 @@ func translateGlob(pat string) (string, error) {
 // CompileGlob translates pat into a form more convenient for
 // matching against paths in the store.
 func CompileGlob(pat string) (*Glob, error) {
+	pat = toSlash(pat)
 	s, err := translateGlob(pat)
 	if err != nil {
 		return nil, err
@@ -90,11 +91,15 @@ func MustCompileGlob(pat string) *Glob {
 }
 
 func (g *Glob) Match(path string) bool {
-	return g.r.MatchString(path)
+	return g.r.MatchString(toSlash(path))
 }
 
 type GlobError string
 
 func (e GlobError) Error() string {
 	return "invalid glob pattern: " + string(e)
+}
+
+func toSlash(path string) string {
+	return strings.Replace(path, "\\", "/", -1)
 }
