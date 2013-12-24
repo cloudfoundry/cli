@@ -203,7 +203,7 @@ func TestUploadWithInvalidDirectory(t *testing.T) {
 
 	apiResponse := repo.UploadApp("app-guid", "/foo/bar")
 	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Contains(t, apiResponse.Message, "/foo/bar")
+	assert.Contains(t, apiResponse.Message, filepath.Join("foo", "bar"))
 }
 
 func TestUploadApp(t *testing.T) {
