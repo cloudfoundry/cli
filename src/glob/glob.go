@@ -66,23 +66,23 @@ func translateGlob(pat string) (string, error) {
 
 // CompileGlob translates pat into a form more convenient for
 // matching against paths in the store.
-func CompileGlob(pat string) (*Glob, error) {
+func CompileGlob(pat string) (glob Glob, err error) {
 	pat = toSlash(pat)
 	s, err := translateGlob(pat)
 	if err != nil {
-		return nil, err
+		return
 	}
 	r, err := regexp.Compile(s)
 	if err != nil {
-		return nil, err
+		return
 	}
-
-	return &Glob{pat, s, r}, nil
+	glob = Glob{pat, s, r}
+	return
 }
 
 // MustCompileGlob is like CompileGlob, but it panics if an error occurs,
 // simplifying safe initialization of global variables holding glob patterns.
-func MustCompileGlob(pat string) *Glob {
+func MustCompileGlob(pat string) Glob {
 	g, err := CompileGlob(pat)
 	if err != nil {
 		panic(err)
@@ -90,7 +90,7 @@ func MustCompileGlob(pat string) *Glob {
 	return g
 }
 
-func (g *Glob) Match(path string) bool {
+func (g Glob) Match(path string) bool {
 	return g.r.MatchString(toSlash(path))
 }
 

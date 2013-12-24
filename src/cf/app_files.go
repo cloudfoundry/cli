@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"glob"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -18,7 +19,7 @@ var DefaultIgnoreFiles = []string{
 	"_darcs",
 }
 
-type Globs []*glob.Glob
+type Globs []glob.Glob
 
 func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 	dir, err = filepath.Abs(dir)
@@ -87,12 +88,13 @@ func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
-		if fileShouldBeIgnored(exclusions, fullPath) {
+		fileRelativePath, _ := filepath.Rel(dir, fullPath)
+		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
+		if fileShouldBeIgnored(exclusions, fileRelativeUnixPath) {
 			return
 		}
 
-		fileName, _ := filepath.Rel(dir, fullPath)
-		err = onEachFile(fileName, fullPath)
+		err = onEachFile(fileRelativePath, fullPath)
 
 		return
 	}
@@ -101,9 +103,13 @@ func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	return
 }
 
-func fileShouldBeIgnored(exclusions Globs, fullPath string) bool {
+func fileShouldBeIgnored(exclusions Globs, relPath string) bool {
 	for _, exclusion := range exclusions {
-		if exclusion.Match(fullPath) {
+		if strings.HasPrefix(exclusion.Pattern, "/") && !strings.HasPrefix(relPath, "/") {
+			relPath = "/" + relPath
+		}
+
+		if exclusion.Match(relPath) {
 			return true
 		}
 	}
@@ -124,22 +130,22 @@ func readCfIgnore(dir string) (exclusions Globs) {
 		if pattern == "" {
 			continue
 		}
-		pattern = filepath.Clean(pattern)
-		patternExclusions := exclusionsForPattern(dir, pattern)
+		pattern = path.Clean(pattern)
+		patternExclusions := exclusionsForPattern(pattern)
 		exclusions = append(exclusions, patternExclusions...)
 	}
 	return
 }
 
-func exclusionsForPattern(dir string, pattern string) (exclusions Globs) {
-	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern)))
-	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern, "*")))
-	exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, pattern, "**", "*")))
+func exclusionsForPattern(cfignorePattern string) (exclusions Globs) {
+	exclusions = append(exclusions, glob.MustCompileGlob(cfignorePattern))
+	exclusions = append(exclusions, glob.MustCompileGlob(path.Join(cfignorePattern, "*")))
+	exclusions = append(exclusions, glob.MustCompileGlob(path.Join(cfignorePattern, "**", "*")))
 
-	if !filepath.IsAbs(pattern) {
-		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern)))
-		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern, "*")))
-		exclusions = append(exclusions, glob.MustCompileGlob(filepath.Join(dir, "**", pattern, "**", "*")))
+	if !strings.HasPrefix(cfignorePattern, "/") {
+		exclusions = append(exclusions, glob.MustCompileGlob(path.Join("**", cfignorePattern)))
+		exclusions = append(exclusions, glob.MustCompileGlob(path.Join("**", cfignorePattern, "*")))
+		exclusions = append(exclusions, glob.MustCompileGlob(path.Join("**", cfignorePattern, "**", "*")))
 	}
 	return
 }
