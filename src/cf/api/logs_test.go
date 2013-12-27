@@ -29,6 +29,7 @@ func TestRecentLogsFor(t *testing.T) {
 		for _, msg := range messagesSent {
 			conn.Write(msg)
 		}
+		time.Sleep(time.Duration(1) * time.Millisecond)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
@@ -85,6 +86,7 @@ func TestTailsLogsFor(t *testing.T) {
 		for _, msg := range messagesSent {
 			conn.Write(msg)
 		}
+		time.Sleep(time.Duration(1) * time.Millisecond)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
@@ -153,6 +155,7 @@ func TestMessageOutputOrder(t *testing.T) {
 		for _, msg := range messagesSent {
 			conn.Write(msg)
 		}
+		time.Sleep(time.Duration(1) * time.Millisecond)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
