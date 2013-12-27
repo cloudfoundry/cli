@@ -161,6 +161,16 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 	if c.String("s") != "" {
 		appParams.Set("stack", c.String("s"))
 	}
+	if c.String("t") != "" {
+		var timeout int
+		timeout, err = strconv.Atoi(c.String("t"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid timeout param: %s\n%s", c.String("t"), err))
+			return
+		}
+
+		appParams.Set("health_check_timeout", timeout)
+	}
 
 	return
 }

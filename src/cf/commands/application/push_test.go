@@ -193,6 +193,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"-b", "https://github.com/heroku/heroku-buildpack-play.git",
 		"-p", "/Users/pivotal/workspace/my-new-app",
 		"-s", "customLinux",
+		"-t", "1",
 		"--no-start",
 		"my-new-app",
 	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
@@ -216,6 +217,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, appRepo.CreatedAppParams().Get("instances").(int), 3)
 	assert.Equal(t, appRepo.CreatedAppParams().Get("memory").(uint64), uint64(2048))
 	assert.Equal(t, appRepo.CreatedAppParams().Get("stack_guid"), "custom-linux-guid")
+	assert.Equal(t, appRepo.CreatedAppParams().Get("health_check_timeout").(int), 1)
 	assert.Equal(t, appRepo.CreatedAppParams().Get("buildpack"), "https://github.com/heroku/heroku-buildpack-play.git")
 
 	assert.Equal(t, domainRepo.FindByNameInCurrentSpaceName, "bar.cf-app.com")
@@ -229,6 +231,25 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, appBitsRepo.UploadedDir, "/Users/pivotal/workspace/my-new-app")
 
 	assert.Equal(t, starter.AppToStart.Name, "")
+}
+
+func TestPushingAppWithInvalidTimeout(t *testing.T) {
+	manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo := getPushDependencies()
+	domain := cf.Domain{}
+	domain.Name = "bar.cf-app.com"
+	domain.Guid = "bar-domain-guid"
+	domainRepo.FindByNameDomain = domain
+	appRepo.ReadNotFound = true
+
+	ui := callPush(t, []string{
+		"-t", "FooeyTimeout",
+		"my-new-app",
+	}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"invalid", "timeout"},
+	})
 }
 
 func TestPushingAppToResetStartCommand(t *testing.T) {
