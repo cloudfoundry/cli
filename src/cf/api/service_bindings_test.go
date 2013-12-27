@@ -20,7 +20,7 @@ func TestCreateServiceBinding(t *testing.T) {
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
 
-	ts, handler, repo := createServiceBindingRepo(t, req)
+	ts, handler, repo := createServiceBindingRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
@@ -39,7 +39,7 @@ func TestCreateServiceBindingIfError(t *testing.T) {
 		},
 	})
 
-	ts, handler, repo := createServiceBindingRepo(t, req)
+	ts, handler, repo := createServiceBindingRepo(t, []testnet.TestRequest{req})
 	defer ts.Close()
 
 	apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
@@ -56,7 +56,7 @@ var deleteBindingReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest
 })
 
 func TestDeleteServiceBinding(t *testing.T) {
-	ts, handler, repo := createServiceBindingRepo(t, deleteBindingReq)
+	ts, handler, repo := createServiceBindingRepo(t, []testnet.TestRequest{deleteBindingReq})
 	defer ts.Close()
 
 	serviceInstance := cf.ServiceInstance{}
@@ -78,7 +78,7 @@ func TestDeleteServiceBinding(t *testing.T) {
 }
 
 func TestDeleteServiceBindingWhenBindingDoesNotExist(t *testing.T) {
-	ts, handler, repo := createServiceBindingRepo(t, deleteBindingReq)
+	ts, handler, repo := createServiceBindingRepo(t, []testnet.TestRequest{})
 	defer ts.Close()
 
 	serviceInstance := cf.ServiceInstance{}
@@ -86,13 +86,13 @@ func TestDeleteServiceBindingWhenBindingDoesNotExist(t *testing.T) {
 
 	found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
-	assert.False(t, handler.AllRequestsCalled())
+	assert.Equal(t, handler.CallCount, 0)
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.False(t, found)
 }
 
-func createServiceBindingRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBindingRepository) {
-	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
+func createServiceBindingRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBindingRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
 	space := cf.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
