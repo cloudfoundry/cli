@@ -8,6 +8,7 @@ import (
 	"generic"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -48,13 +49,20 @@ func TestRunWhenApplicationExists(t *testing.T) {
 	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 	ui := callSetEnv(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Setting env variable")
-	assert.Contains(t, ui.Outputs[0], "DATABASE_URL")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	assert.Equal(t, len(ui.Outputs), 3)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{
+			"Setting env variable",
+			"DATABASE_URL",
+			"mysql://example.com/my-db",
+			"my-app",
+			"my-org",
+			"my-space",
+			"my-user",
+		},
+		{"OK"},
+		{"TIP"},
+	})
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
@@ -72,16 +80,30 @@ func TestSetEnvWhenItAlreadyExists(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 	appRepo := &testapi.FakeApplicationRepository{}
 
-	args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
+	args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
 	ui := callSetEnv(t, args, reqFactory, appRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "DATABASE_URL")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "DATABASE_URL")
-	assert.Contains(t, ui.Outputs[2], "was already set.")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{
+			"Setting env variable",
+			"DATABASE_URL",
+			"mysql://example2.com/my-db",
+			"my-app",
+			"my-org",
+			"my-space",
+			"my-user",
+		},
+		{"OK"},
+		{"TIP"},
+	})
+	assert.NotContains(t, ui.DumpOutputs(), "was already set")
 
+	assert.Equal(t, reqFactory.ApplicationName, "my-app")
+	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
+
+	envParams := appRepo.UpdateParams.Get("env").(generic.Map)
+	assert.Equal(t, envParams.Get("DATABASE_URL").(string), "mysql://example2.com/my-db")
 }
 
 func TestRunWhenSettingTheEnvFails(t *testing.T) {
@@ -97,9 +119,11 @@ func TestRunWhenSettingTheEnvFails(t *testing.T) {
 	args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
 	ui := callSetEnv(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Setting env variable")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Error updating app.")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Setting env variable"},
+		{"FAILED"},
+		{"Error updating app."},
+	})
 }
 
 func TestSetEnvFailsWithUsage(t *testing.T) {
