@@ -15,7 +15,6 @@ import (
 )
 
 func TestRecentLogsFor(t *testing.T) {
-
 	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message", int64(3000)),
 	}
@@ -30,7 +29,6 @@ func TestRecentLogsFor(t *testing.T) {
 		for _, msg := range messagesSent {
 			conn.Write(msg)
 		}
-		time.Sleep(time.Duration(2) * time.Second)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
@@ -71,7 +69,6 @@ func TestRecentLogsFor(t *testing.T) {
 }
 
 func TestTailsLogsFor(t *testing.T) {
-
 	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message 3", int64(300000)),
 		marshalledLogMessageWithTime(t, "My message 1", int64(100000)),
@@ -88,7 +85,6 @@ func TestTailsLogsFor(t *testing.T) {
 		for _, msg := range messagesSent {
 			conn.Write(msg)
 		}
-		time.Sleep(time.Duration(200) * time.Millisecond)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
@@ -139,13 +135,12 @@ func TestTailsLogsFor(t *testing.T) {
 	assert.Equal(t, actualMessage, messagesSent[0])
 }
 
-func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
-
+func TestMessageOutputOrder(t *testing.T) {
 	startTime := time.Now()
 	messagesSent := [][]byte{
-		marshalledLogMessageWithTime(t, "My message 1", startTime.Add(-9*time.Second).UnixNano()),
-		marshalledLogMessageWithTime(t, "My message 2", startTime.Add(-2*time.Second).UnixNano()),
-		marshalledLogMessageWithTime(t, "My message 3", startTime.Add(-1*time.Second).UnixNano()),
+		marshalledLogMessageWithTime(t, "My message 1", startTime.UnixNano()),
+		marshalledLogMessageWithTime(t, "My message 2", startTime.UnixNano()),
+		marshalledLogMessageWithTime(t, "My message 3", startTime.UnixNano()),
 	}
 
 	websocketEndpoint := func(conn *websocket.Conn) {
@@ -157,9 +152,7 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 
 		for _, msg := range messagesSent {
 			conn.Write(msg)
-			time.Sleep(200 * time.Millisecond)
 		}
-		time.Sleep(1 * time.Second)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
@@ -180,32 +173,20 @@ func TestMessageOutputTimesDuringNormalFlow(t *testing.T) {
 		logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, controlChan, time.Duration(1*time.Second))
 	}()
 
+	var messages []string
 	for msg := range logChan {
-
-		timeWhenOutputtable := startTime.Add(1 * time.Second).UnixNano()
-		timeNow := time.Now().UnixNano()
-
-		switch string(msg.GetLogMessage().Message) {
-		case "My message 1":
-			assert.True(t, (timeNow-timeWhenOutputtable) < (50*time.Millisecond).Nanoseconds())
-			assert.True(t, (timeNow-timeWhenOutputtable) > (10*time.Millisecond).Nanoseconds())
-		case "My message 2":
-			assert.True(t, (timeNow-timeWhenOutputtable) < (250*time.Millisecond).Nanoseconds())
-			assert.True(t, (timeNow-timeWhenOutputtable) > (200*time.Millisecond).Nanoseconds())
-		case "My message 3":
-			assert.True(t, (timeNow-timeWhenOutputtable) < (450*time.Millisecond).Nanoseconds())
-			assert.True(t, (timeNow-timeWhenOutputtable) > (400*time.Millisecond).Nanoseconds())
-		}
+		messages = append(messages, string(msg.GetLogMessage().Message))
 	}
+
+	assert.Equal(t, messages, []string{"My message 1", "My message 2", "My message 3"})
 }
 
 func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
-
 	startTime := time.Now()
 	messagesSent := [][]byte{
-		marshalledLogMessageWithTime(t, "My message 1", startTime.Add(-9*time.Second).UnixNano()),
-		marshalledLogMessageWithTime(t, "My message 2", startTime.Add(-2*time.Second).UnixNano()),
-		marshalledLogMessageWithTime(t, "My message 3", startTime.Add(-1*time.Second).UnixNano()),
+		marshalledLogMessageWithTime(t, "My message 1", startTime.UnixNano()),
+		marshalledLogMessageWithTime(t, "My message 2", startTime.UnixNano()),
+		marshalledLogMessageWithTime(t, "My message 3", startTime.UnixNano()),
 	}
 
 	websocketEndpoint := func(conn *websocket.Conn) {
@@ -217,7 +198,6 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 
 		for _, msg := range messagesSent {
 			conn.Write(msg)
-			time.Sleep(200 * time.Millisecond)
 		}
 		conn.Close()
 	}
