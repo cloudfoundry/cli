@@ -47,8 +47,9 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	varValue := c.Args()[2]
 	app := cmd.appReq.GetApplication()
 
-	cmd.ui.Say("Setting env variable %s for app %s in org %s / space %s as %s...",
+	cmd.ui.Say("Setting env variable '%s' to '%s' for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(varName),
+		terminal.EntityNameColor(varValue),
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
@@ -57,13 +58,6 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 
 	appParams := app.ToParams()
 	envParams := appParams.Get("env").(generic.Map)
-
-	if envParams.Has(varName) {
-		cmd.ui.Ok()
-		cmd.ui.Warn("Env var %s was already set.", varName)
-		return
-	}
-
 	envParams.Set(varName, varValue)
 
 	updateParams := cf.NewEmptyAppParams()
