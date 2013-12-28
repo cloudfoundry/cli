@@ -39,6 +39,7 @@ type Start struct {
 }
 
 type ApplicationStarter interface {
+	SetStartTimeoutSeconds(timeout int)
 	ApplicationStart(app cf.Application) (updatedApp cf.Application, err error)
 }
 
@@ -137,6 +138,10 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.appDisplayer.ShowApp(app)
 	return
+}
+
+func (cmd *Start) SetStartTimeoutSeconds(timeout int) {
+	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
 func (cmd Start) tailStagingLogs(app cf.Application, startChan chan bool, stopChan chan bool) {

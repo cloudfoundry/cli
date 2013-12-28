@@ -138,7 +138,7 @@ func (cmd *Push) Run(c *cli.Context) {
 		}
 
 		cmd.ui.Ok()
-		cmd.restart(app, c)
+		cmd.restart(app, appParams, c)
 	}
 }
 
@@ -211,7 +211,7 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCrea
 	cmd.ui.Say("")
 }
 
-func (cmd *Push) restart(app cf.Application, c *cli.Context) {
+func (cmd *Push) restart(app cf.Application, params cf.AppParams, c *cli.Context) {
 	if app.State != "stopped" {
 		cmd.ui.Say("")
 		app, _ = cmd.stopper.ApplicationStop(app)
@@ -219,9 +219,16 @@ func (cmd *Push) restart(app cf.Application, c *cli.Context) {
 
 	cmd.ui.Say("")
 
-	if !c.Bool("no-start") {
-		cmd.starter.ApplicationStart(app)
+	if c.Bool("no-start") {
+		return
 	}
+
+	if params.Has("health_check_timeout") {
+		timeout := params.Get("health_check_timeout").(int)
+		cmd.starter.SetStartTimeoutSeconds(timeout)
+	}
+
+	cmd.starter.ApplicationStart(app)
 }
 
 func (cmd *Push) route(hostName string, domain cf.DomainFields) (route cf.Route) {
