@@ -105,7 +105,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	appRepo.ReadNotFound = true
 
-	ui := callPush(t, []string{"my-new-app"}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	ui := callPush(t, []string{"-t", "111", "my-new-app"}, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
 
 	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
 	assert.Equal(t, appRepo.CreatedAppParams().Get("space_guid").(string), "my-space-guid")
@@ -135,6 +135,8 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, stopper.AppToStop.Guid, "")
 	assert.Equal(t, starter.AppToStart.Guid, "my-new-app-guid")
+	assert.Equal(t, starter.AppToStart.Name, "my-new-app")
+	assert.Equal(t, starter.Timeout, 111)
 }
 
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
