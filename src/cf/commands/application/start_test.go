@@ -23,6 +23,7 @@ var (
 	defaultAppForStart        = cf.Application{}
 	defaultInstanceReponses   = [][]cf.AppInstanceFields{}
 	defaultInstanceErrorCodes = []string{"", ""}
+	defaultStartTimeout       = 2
 )
 
 func init() {
@@ -64,14 +65,14 @@ func callStart(args []string, config *configuration.Configuration, reqFactory *t
 
 	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
 	cmd.StagingTimeout = 50 * time.Millisecond
-	cmd.StartupTimeout = 50 * time.Millisecond
+	cmd.StartupTimeout = config.ApplicationStartTimeout
 	cmd.PingerThrottle = 5 * time.Millisecond
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
 
-func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplayer, app cf.Application, instances [][]cf.AppInstanceFields, errorCodes []string) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
+func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplayer, app cf.Application, instances [][]cf.AppInstanceFields, errorCodes []string, startTimeout int) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
 	})
@@ -80,11 +81,12 @@ func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplaye
 	space.Name = "my-space"
 	org := cf.OrganizationFields{}
 	org.Name = "my-org"
+
 	config := &configuration.Configuration{
 		SpaceFields:             space,
 		OrganizationFields:      org,
 		AccessToken:             token,
-		ApplicationStartTimeout: 2,
+		ApplicationStartTimeout: time.Duration(startTimeout) * time.Second,
 	}
 
 	appRepo = &testapi.FakeApplicationRepository{
@@ -157,7 +159,7 @@ func TestStartApplication(t *testing.T) {
 	t.Parallel()
 
 	displayApp := &testcmd.FakeAppDisplayer{}
-	ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes)
+	ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, defaultStartTimeout)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app", "my-org", "my-space", "my-user"},
@@ -223,7 +225,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	}
 
 	errorCodes := []string{""}
-	ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(t, displayApp, app, instances, errorCodes)
+	ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(t, displayApp, app, instances, errorCodes, defaultStartTimeout)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app"},
@@ -261,7 +263,7 @@ func TestStartApplicationWhenAppIsStillStaging(t *testing.T) {
 
 	errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, "", "", ""}
 
-	ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes)
+	ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
 	assert.Equal(t, appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
 
@@ -279,7 +281,7 @@ func TestStartApplicationWhenStagingFails(t *testing.T) {
 	instances := [][]cf.AppInstanceFields{[]cf.AppInstanceFields{}}
 	errorCodes := []string{"170001"}
 
-	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes)
+	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app"},
@@ -308,7 +310,7 @@ func TestStartApplicationWhenOneInstanceFlaps(t *testing.T) {
 
 	errorCodes := []string{"", ""}
 
-	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes)
+	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"my-app"},
@@ -341,17 +343,18 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 		[]cf.AppInstanceFields{appInstance5, appInstance6},
 	}
 
-	errorCodes := []string{"", "", ""}
+	errorCodes := []string{"500", "500", "500"}
 
-	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes)
+	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes, 0)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"my-app"},
+		{"Starting", "my-app"},
 		{"OK"},
-		{"0 of 2 instances running", "1 starting", "1 down"},
-		{"0 of 2 instances running", "2 down"},
 		{"FAILED"},
 		{"Start app timeout"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"instances running"},
 	})
 }
 

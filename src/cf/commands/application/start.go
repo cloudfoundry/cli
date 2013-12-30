@@ -194,9 +194,14 @@ func (cmd Start) waitForOneRunningInstance(appGuid string) {
 	startupStartTime := time.Now()
 
 	for runningCount == 0 {
-		cmd.ui.Wait(cmd.PingerThrottle)
+		if time.Since(startupStartTime) > cmd.StartupTimeout {
+			cmd.ui.Failed("Start app timeout")
+			return
+		}
+
 		instances, apiResponse := cmd.appInstancesRepo.GetInstances(appGuid)
 		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Wait(cmd.PingerThrottle)
 			continue
 		}
 
@@ -220,11 +225,6 @@ func (cmd Start) waitForOneRunningInstance(appGuid string) {
 
 		if flappingCount > 0 {
 			cmd.ui.Failed("Start unsuccessful")
-			return
-		}
-
-		if time.Since(startupStartTime) > cmd.StartupTimeout {
-			cmd.ui.Failed("Start app timeout")
 			return
 		}
 	}
