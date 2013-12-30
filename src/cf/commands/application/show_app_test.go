@@ -7,6 +7,7 @@ import (
 	"cf/formatters"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -97,34 +98,15 @@ func TestDisplayingAppSummary(t *testing.T) {
 
 	assert.Equal(t, appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
 
-	assert.Contains(t, ui.Outputs[0], "Showing health and status")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-
-	assert.Contains(t, ui.Outputs[2], "state")
-	assert.Contains(t, ui.Outputs[2], "started")
-
-	assert.Contains(t, ui.Outputs[3], "instances")
-	assert.Contains(t, ui.Outputs[3], "2/2")
-
-	assert.Contains(t, ui.Outputs[4], "usage")
-	assert.Contains(t, ui.Outputs[4], "256M x 2 instances")
-
-	assert.Contains(t, ui.Outputs[5], "urls")
-	assert.Contains(t, ui.Outputs[5], "my-app.example.com, foo.example.com")
-
-	assert.Contains(t, ui.Outputs[7], "#0")
-	assert.Contains(t, ui.Outputs[7], "running")
-	assert.Contains(t, ui.Outputs[7], "2012-01-02 03:04:05 PM")
-	assert.Contains(t, ui.Outputs[7], "100.0%")
-	assert.Contains(t, ui.Outputs[7], "13 of 64M")
-	assert.Contains(t, ui.Outputs[7], "32M of 1G")
-
-	assert.Contains(t, ui.Outputs[8], "#1")
-	assert.Contains(t, ui.Outputs[8], "down")
-	assert.Contains(t, ui.Outputs[8], "2012-04-01 03:04:05 PM")
-	assert.Contains(t, ui.Outputs[8], "0%")
-	assert.Contains(t, ui.Outputs[8], "0 of 0")
-	assert.Contains(t, ui.Outputs[8], "0 of 0")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Showing health and status", "my-app"},
+		{"state", "started"},
+		{"instances", "2/2"},
+		{"usage", "256M x 2 instances"},
+		{"urls", "my-app.example.com", "foo.example.com"},
+		{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+		{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
+	})
 }
 
 func TestDisplayingStoppedAppSummary(t *testing.T) {
@@ -175,25 +157,15 @@ func testDisplayingAppSummaryWithErrorCode(t *testing.T, errorCode string) {
 
 	assert.Equal(t, appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
 	assert.Equal(t, appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
-	assert.Equal(t, len(ui.Outputs), 6)
 
-	assert.Contains(t, ui.Outputs[0], "Showing health and status")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
-	assert.Contains(t, ui.Outputs[2], "state")
-	assert.Contains(t, ui.Outputs[2], "stopped")
-
-	assert.Contains(t, ui.Outputs[3], "instances")
-	assert.Contains(t, ui.Outputs[3], "0/2")
-
-	assert.Contains(t, ui.Outputs[4], "usage")
-	assert.Contains(t, ui.Outputs[4], "256M x 2 instances")
-
-	assert.Contains(t, ui.Outputs[5], "urls")
-	assert.Contains(t, ui.Outputs[5], "my-app.example.com, foo.example.com")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
+		{"state", "stopped"},
+		{"instances", "0/2"},
+		{"usage", "256M x 2 instances"},
+		{"urls", "my-app.example.com, foo.example.com"},
+		{"no running instances"},
+	})
 }
 
 func callApp(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo, appInstancesRepo *testapi.FakeAppInstancesRepo) (ui *testterm.FakeUI) {

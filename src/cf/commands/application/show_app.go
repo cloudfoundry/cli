@@ -66,13 +66,17 @@ func (cmd *ShowApp) ShowApp(app cf.Application) {
 	)
 
 	appSummary, apiResponse := cmd.appSummaryRepo.GetSummary(app.Guid)
-	appIsStopped := apiResponse.ErrorCode == cf.APP_STOPPED || apiResponse.ErrorCode == cf.APP_NOT_STAGED
+	appIsStopped := apiResponse.ErrorCode == cf.APP_STOPPED ||
+		apiResponse.ErrorCode == cf.APP_NOT_STAGED ||
+		appSummary.State == "stopped"
+
 	if apiResponse.IsNotSuccessful() && !appIsStopped {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	instances, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
+	var instances []cf.AppInstanceFields
+	instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
 	if apiResponse.IsNotSuccessful() && !appIsStopped {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -87,9 +91,11 @@ func (cmd *ShowApp) ShowApp(app cf.Application) {
 	for _, route := range appSummary.RouteSummaries {
 		urls = append(urls, route.URL())
 	}
+
 	cmd.ui.Say("%s %s\n", terminal.HeaderColor("urls:"), strings.Join(urls, ", "))
 
 	if appIsStopped {
+		cmd.ui.Say("There are no running instances of this app.")
 		return
 	}
 
