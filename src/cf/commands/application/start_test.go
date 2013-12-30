@@ -113,7 +113,7 @@ func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplaye
 
 func TestStartCommandDefaultTimeouts(t *testing.T) {
 	cmd := NewStart(new(testterm.FakeUI), &configuration.Configuration{}, &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
-	assert.Equal(t, cmd.StagingTimeout, 20*time.Minute)
+	assert.Equal(t, cmd.StagingTimeout, 15*time.Minute)
 	assert.Equal(t, cmd.StartupTimeout, 5*time.Minute)
 }
 
