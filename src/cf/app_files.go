@@ -88,6 +88,10 @@ func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
+		if !f.Mode().IsRegular() {
+			return
+		}
+
 		fileRelativePath, _ := filepath.Rel(dir, fullPath)
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
 		if fileShouldBeIgnored(exclusions, fileRelativeUnixPath) {
