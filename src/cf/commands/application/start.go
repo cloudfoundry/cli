@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	DefaultStagingTimeout = 20 * time.Minute
+	DefaultStagingTimeout = 15 * time.Minute
 	DefaultStartupTimeout = 5 * time.Minute
 	DefaultPingerThrottle = 5 * time.Second
 )
