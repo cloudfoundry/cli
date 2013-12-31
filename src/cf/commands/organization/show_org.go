@@ -5,6 +5,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -57,7 +58,9 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 		spaces = append(spaces, space.Name)
 	}
 
+	orgMemoryLimit := fmt.Sprintf("%s (%dM memory limit)", org.QuotaDefinition.Name, org.QuotaDefinition.MemoryLimit)
+
 	cmd.ui.Say("  domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
-	cmd.ui.Say("  quota:   %s", terminal.EntityNameColor(org.MemoryLimit))
-	cmd.ui.Say("  spaces: %s", terminal.EntityNameColor(strings.Join(spaces, ", ")))
+	cmd.ui.Say("  quota:   %s", terminal.EntityNameColor(orgMemoryLimit))
+	cmd.ui.Say("  spaces:  %s", terminal.EntityNameColor(strings.Join(spaces, ", ")))
 }

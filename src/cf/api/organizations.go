@@ -29,7 +29,7 @@ func (resource OrganizationResource) ToFields() (fields cf.OrganizationFields) {
 	fields.Name = resource.Entity.Name
 	fields.Guid = resource.Metadata.Guid
 
-	fields.MemoryLimit = fmt.Sprintf("%dM", resource.Entity.QuotaDefinition.Entity.MemoryLimit)
+	fields.QuotaDefinition = resource.Entity.QuotaDefinition.ToFields()
 	return
 }
 
