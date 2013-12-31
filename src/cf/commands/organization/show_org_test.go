@@ -5,6 +5,7 @@ import (
 	. "cf/commands/organization"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -51,6 +52,7 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "my-org"
 	org.Guid = "my-org-guid"
+	org.MemoryLimit = "256M"
 	org.Spaces = []cf.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 	org.Domains = []cf.DomainFields{domainFields, cfAppDomainFields}
 
@@ -61,16 +63,14 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 
 	assert.Equal(t, reqFactory.OrganizationName, "my-org")
 
-	assert.Equal(t, len(ui.Outputs), 5)
-	assert.Contains(t, ui.Outputs[0], "Getting info for org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "my-org")
-	assert.Contains(t, ui.Outputs[3], "  domains:")
-	assert.Contains(t, ui.Outputs[3], "cfapps.io, cf-app.com")
-	assert.Contains(t, ui.Outputs[4], "  spaces:")
-	assert.Contains(t, ui.Outputs[4], "development, staging")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting info for org", "my-org", "my-user"},
+		{"OK"},
+		{"my-org"},
+		{"  domains:", "cfapps.io", "cf-app.com"},
+		{"  quota: ", "256M"},
+		{"  spaces:", "development", "staging"},
+	})
 }
 
 func callShowOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

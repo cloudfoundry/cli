@@ -31,6 +31,7 @@ func (model BasicFields) String() string {
 
 type OrganizationFields struct {
 	BasicFields
+	MemoryLimit string
 }
 
 type Organization struct {

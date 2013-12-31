@@ -58,5 +58,6 @@ func (cmd *ShowOrg) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("  domains: %s", terminal.EntityNameColor(strings.Join(domains, ", ")))
+	cmd.ui.Say("  quota:   %s", terminal.EntityNameColor(org.MemoryLimit))
 	cmd.ui.Say("  spaces: %s", terminal.EntityNameColor(strings.Join(spaces, ", ")))
 }

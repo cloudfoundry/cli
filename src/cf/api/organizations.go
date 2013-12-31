@@ -8,9 +8,11 @@ import (
 	"strings"
 )
 
-type PaginatedOrganizationResources struct {
-	Resources []OrganizationResource
-	NextUrl   string `json:"next_url"`
+type OrganizationEntity struct {
+	Name            string
+	QuotaDefinition QuotaResource `json:"quota_definition"`
+	Spaces          []SpaceResource
+	Domains         []DomainResource
 }
 
 type OrganizationResource struct {
@@ -18,9 +20,16 @@ type OrganizationResource struct {
 	Entity OrganizationEntity
 }
 
+type PaginatedOrganizationResources struct {
+	Resources []OrganizationResource
+	NextUrl   string `json:"next_url"`
+}
+
 func (resource OrganizationResource) ToFields() (fields cf.OrganizationFields) {
 	fields.Name = resource.Entity.Name
 	fields.Guid = resource.Metadata.Guid
+
+	fields.MemoryLimit = fmt.Sprintf("%dM", resource.Entity.QuotaDefinition.Entity.MemoryLimit)
 	return
 }
 
@@ -40,12 +49,6 @@ func (resource OrganizationResource) ToModel() (org cf.Organization) {
 	org.Domains = domains
 
 	return
-}
-
-type OrganizationEntity struct {
-	Name    string
-	Spaces  []SpaceResource
-	Domains []DomainResource
 }
 
 type OrganizationRepository interface {
@@ -129,7 +132,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org c
 		return
 	}
 
-	if len(orgs) == 0 {
+	if len(orgs) != 1 {
 		apiResponse = net.NewNotFoundApiResponse("Org %s not found", name)
 		return
 	}
