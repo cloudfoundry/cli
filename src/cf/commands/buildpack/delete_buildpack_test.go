@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -47,12 +48,13 @@ func TestDeleteBuildpackSuccess(t *testing.T) {
 
 	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
-	assert.Contains(t, ui.Prompts[0], "delete")
-	assert.Contains(t, ui.Prompts[0], "my-buildpack")
-
-	assert.Contains(t, ui.Outputs[0], "Deleting buildpack")
-	assert.Contains(t, ui.Outputs[0], "my-buildpack")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"delete", "my-buildpack"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }
 
 func TestDeleteBuildpackNoConfirmation(t *testing.T) {
@@ -72,8 +74,9 @@ func TestDeleteBuildpackNoConfirmation(t *testing.T) {
 
 	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "")
 
-	assert.Contains(t, ui.Prompts[0], "delete")
-	assert.Contains(t, ui.Prompts[0], "my-buildpack")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"delete", "my-buildpack"},
+	})
 }
 
 func TestDeleteBuildpackThatDoesNotExist(t *testing.T) {
@@ -94,11 +97,12 @@ func TestDeleteBuildpackThatDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, buildpackRepo.FindByNameName, "my-buildpack")
 	assert.True(t, buildpackRepo.FindByNameNotFound)
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "my-buildpack")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "my-buildpack")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "my-buildpack"},
+		{"OK"},
+		{"my-buildpack", "does not exist"},
+	})
 }
 
 func TestDeleteBuildpackDeleteError(t *testing.T) {
@@ -120,11 +124,11 @@ func TestDeleteBuildpackDeleteError(t *testing.T) {
 
 	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
-	assert.Contains(t, ui.Outputs[0], "Deleting buildpack")
-	assert.Contains(t, ui.Outputs[0], "my-buildpack")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "my-buildpack")
-	assert.Contains(t, ui.Outputs[2], "failed badly")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting buildpack", "my-buildpack"},
+		{"FAILED"},
+		{"my-buildpack", "failed badly"},
+	})
 }
 
 func TestDeleteBuildpackForceFlagSkipsConfirmation(t *testing.T) {
@@ -146,7 +150,8 @@ func TestDeleteBuildpackForceFlagSkipsConfirmation(t *testing.T) {
 	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting buildpack")
-	assert.Contains(t, ui.Outputs[0], "my-buildpack")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }

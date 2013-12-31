@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -17,11 +18,11 @@ func TestRenameAppFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	appRepo := &testapi.FakeApplicationRepository{}
 
-	fakeUI := callRename(t, []string{}, reqFactory, appRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callRename(t, []string{}, reqFactory, appRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callRename(t, []string{"foo"}, reqFactory, appRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callRename(t, []string{"foo"}, reqFactory, appRepo)
+	assert.True(t, ui.FailedWithUsage)
 }
 
 func TestRenameRequirements(t *testing.T) {
@@ -41,15 +42,12 @@ func TestRenameRun(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	ui := callRename(t, []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Renaming app ")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-new-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
 	assert.Equal(t, appRepo.UpdateParams.Get("name"), "my-new-app")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 }
 
 func callRename(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {

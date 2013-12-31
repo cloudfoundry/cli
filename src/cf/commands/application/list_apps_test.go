@@ -69,25 +69,12 @@ func TestApps(t *testing.T) {
 
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	assert.Contains(t, ui.Outputs[0], "Getting apps in")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "development")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[4], "Application-1")
-	assert.Contains(t, ui.Outputs[4], "started")
-	assert.Contains(t, ui.Outputs[4], "1/1")
-	assert.Contains(t, ui.Outputs[4], "512M")
-	assert.Contains(t, ui.Outputs[4], "1G")
-	assert.Contains(t, ui.Outputs[4], "app1.cfapps.io, app1.example.com")
-
-	assert.Contains(t, ui.Outputs[5], "Application-2")
-	assert.Contains(t, ui.Outputs[5], "started")
-	assert.Contains(t, ui.Outputs[5], "1/2")
-	assert.Contains(t, ui.Outputs[5], "256M")
-	assert.Contains(t, ui.Outputs[5], "1G")
-	assert.Contains(t, ui.Outputs[5], "app2.cfapps.io")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting apps in", "my-org", "development", "my-user"},
+		{"OK"},
+		{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
+		{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
+	})
 }
 
 func TestAppsEmptyList(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -54,14 +55,14 @@ func TestDeleteServiceAuthToken(t *testing.T) {
 	args := []string{"a label", "a provider"}
 
 	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Deleting service auth token as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service auth token as", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, authTokenRepo.FindByLabelAndProviderLabel, "a label")
 	assert.Equal(t, authTokenRepo.FindByLabelAndProviderProvider, "a provider")
 	assert.Equal(t, authTokenRepo.DeletedServiceAuthTokenFields, expectedToken)
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteServiceAuthTokenWithN(t *testing.T) {
@@ -71,8 +72,9 @@ func TestDeleteServiceAuthTokenWithN(t *testing.T) {
 
 	ui := callDeleteServiceAuthToken(t, args, []string{"N"}, reqFactory, authTokenRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Are you sure you want to delete")
-	assert.Contains(t, ui.Prompts[0], "a label a provider")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Are you sure you want to delete", "a label", "a provider"},
+	})
 	assert.Equal(t, len(ui.Outputs), 0)
 	assert.Equal(t, authTokenRepo.DeletedServiceAuthTokenFields, cf.ServiceAuthTokenFields{})
 }
@@ -90,12 +92,15 @@ func TestDeleteServiceAuthTokenWithY(t *testing.T) {
 
 	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
 
-	assert.Contains(t, ui.Prompts[0], "delete")
-	assert.Contains(t, ui.Prompts[0], "a label")
-	assert.Contains(t, ui.Prompts[0], "a provider")
-	assert.Contains(t, ui.Outputs[0], "Deleting")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Are you sure you want to delete", "a label", "a provider"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting"},
+		{"OK"},
+	})
+
 	assert.Equal(t, authTokenRepo.DeletedServiceAuthTokenFields, expectedToken)
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteServiceAuthTokenWithForce(t *testing.T) {
@@ -111,8 +116,10 @@ func TestDeleteServiceAuthTokenWithForce(t *testing.T) {
 	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
 
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting"},
+		{"OK"},
+	})
 
 	assert.Equal(t, authTokenRepo.DeletedServiceAuthTokenFields, expectedToken)
 }
@@ -125,10 +132,11 @@ func TestDeleteServiceAuthTokenWhenTokenDoesNotExist(t *testing.T) {
 	args := []string{"a label", "a provider"}
 
 	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Deleting service auth token as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service auth token as", "my-user"},
+		{"OK"},
+		{"does not exist"},
+	})
 }
 
 func TestDeleteServiceAuthTokenFailsWithError(t *testing.T) {
@@ -139,10 +147,11 @@ func TestDeleteServiceAuthTokenFailsWithError(t *testing.T) {
 	args := []string{"a label", "a provider"}
 
 	ui := callDeleteServiceAuthToken(t, args, []string{"Y"}, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Deleting service auth token as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "OH NOES")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service auth token as", "my-user"},
+		{"FAILED"},
+		{"OH NOES"},
+	})
 }
 
 func callDeleteServiceAuthToken(t *testing.T, args []string, inputs []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {

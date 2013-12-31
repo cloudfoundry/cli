@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -38,18 +39,13 @@ func TestListServiceAuthTokens(t *testing.T) {
 	authTokenRepo.FindAllAuthTokens = []cf.ServiceAuthTokenFields{authToken, authToken2}
 
 	ui := callListServiceAuthTokens(t, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Getting service auth tokens as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[3], "label")
-	assert.Contains(t, ui.Outputs[3], "provider")
-
-	assert.Contains(t, ui.Outputs[4], "a label")
-	assert.Contains(t, ui.Outputs[4], "a provider")
-
-	assert.Contains(t, ui.Outputs[5], "a second label")
-	assert.Contains(t, ui.Outputs[5], "a second provider")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting service auth tokens as", "my-user"},
+		{"OK"},
+		{"label", "provider"},
+		{"a label", "a provider"},
+		{"a second label", "a second provider"},
+	})
 }
 
 func callListServiceAuthTokens(t *testing.T, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {

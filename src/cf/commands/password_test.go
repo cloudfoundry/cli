@@ -5,6 +5,7 @@ import (
 	. "cf/commands"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -29,19 +30,22 @@ func TestPasswordCanBeChanged(t *testing.T) {
 	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
-	assert.Contains(t, ui.PasswordPrompts[1], "New Password")
-	assert.Contains(t, ui.PasswordPrompts[2], "Verify Password")
+	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
+		{"Current Password"},
+		{"New Password"},
+		{"Verify Password"},
+	})
 
 	assert.Equal(t, pwdRepo.ScoredPassword, "new-password")
-	assert.Contains(t, ui.Outputs[0], "Your password strength is: meh")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Your password strength is: meh"},
+		{"Changing password..."},
+		{"OK"},
+		{"Please log in again"},
+	})
 
-	assert.Contains(t, ui.Outputs[1], "Changing password...")
 	assert.Equal(t, pwdRepo.UpdateNewPassword, "new-password")
 	assert.Equal(t, pwdRepo.UpdateOldPassword, "old-password")
-	assert.Contains(t, ui.Outputs[2], "OK")
-
-	assert.Contains(t, ui.Outputs[3], "Please log in again")
 
 	updatedConfig, err := configRepo.Get()
 	assert.NoError(t, err)
@@ -56,12 +60,15 @@ func TestPasswordVerification(t *testing.T) {
 	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
-	assert.Contains(t, ui.PasswordPrompts[1], "New Password")
-	assert.Contains(t, ui.PasswordPrompts[2], "Verify Password")
-
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "Password verification does not match")
+	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
+		{"Current Password"},
+		{"New Password"},
+		{"Verify Password"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"Password verification does not match"},
+	})
 
 	assert.Equal(t, pwdRepo.UpdateNewPassword, "")
 }
@@ -72,18 +79,22 @@ func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
 	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Contains(t, ui.PasswordPrompts[0], "Current Password")
-	assert.Contains(t, ui.PasswordPrompts[1], "New Password")
-	assert.Contains(t, ui.PasswordPrompts[2], "Verify Password")
-
 	assert.Equal(t, pwdRepo.ScoredPassword, "new-password")
-	assert.Contains(t, ui.Outputs[0], "Your password strength is: meh")
+	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
+		{"Current Password"},
+		{"New Password"},
+		{"Verify Password"},
+	})
 
-	assert.Contains(t, ui.Outputs[1], "Changing password...")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Your password strength is: meh"},
+		{"Changing password..."},
+		{"FAILED"},
+		{"Current password did not match"},
+	})
+
 	assert.Equal(t, pwdRepo.UpdateNewPassword, "new-password")
 	assert.Equal(t, pwdRepo.UpdateOldPassword, "old-password")
-	assert.Contains(t, ui.Outputs[2], "FAILED")
-	assert.Contains(t, ui.Outputs[3], "Current password did not match")
 }
 
 func callPassword(inputs []string, reqFactory *testreq.FakeReqFactory, pwdRepo *testapi.FakePasswordRepo, configRepo *testconfig.FakeConfigRepository) (ui *testterm.FakeUI) {

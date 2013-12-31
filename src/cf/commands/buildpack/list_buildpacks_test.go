@@ -5,6 +5,7 @@ import (
 	"cf/commands/buildpack"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -44,19 +45,13 @@ func TestListBuildpacks(t *testing.T) {
 
 	ui := callListBuildpacks(reqFactory, buildpackRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting buildpacks")
-
-	assert.Contains(t, ui.Outputs[1], "buildpack")
-	assert.Contains(t, ui.Outputs[1], "position")
-
-	assert.Contains(t, ui.Outputs[2], "Buildpack-1")
-	assert.Contains(t, ui.Outputs[2], "5")
-
-	assert.Contains(t, ui.Outputs[3], "Buildpack-2")
-	assert.Contains(t, ui.Outputs[3], "10")
-
-	assert.Contains(t, ui.Outputs[4], "Buildpack-3")
-	assert.Contains(t, ui.Outputs[4], "15")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting buildpacks"},
+		{"buildpack", "position"},
+		{"Buildpack-1", "5"},
+		{"Buildpack-2", "10"},
+		{"Buildpack-3", "15"},
+	})
 }
 
 func TestListingBuildpacksWhenNoneExist(t *testing.T) {
@@ -69,14 +64,16 @@ func TestListingBuildpacksWhenNoneExist(t *testing.T) {
 
 	ui := callListBuildpacks(reqFactory, buildpackRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting buildpacks")
-	assert.Contains(t, ui.Outputs[1], "No buildpacks found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting buildpacks"},
+		{"No buildpacks found"},
+	})
 }
 
-func callListBuildpacks(reqFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{}
+func callListBuildpacks(reqFactory *testreq.FakeReqFactory, buildpackRepo *testapi.FakeBuildpackRepository) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("buildpacks", []string{})
-	cmd := buildpack.NewListBuildpacks(fakeUI, buildpackRepo)
+	cmd := buildpack.NewListBuildpacks(ui, buildpackRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

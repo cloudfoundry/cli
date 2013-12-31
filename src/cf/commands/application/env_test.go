@@ -5,6 +5,7 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -42,18 +43,11 @@ func TestEnvListsEnvironmentVariables(t *testing.T) {
 
 	ui := callEnv(t, []string{"my-app"}, reqFactory)
 
-	assert.Contains(t, ui.Outputs[0], "Getting env variables for app")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[3], "my-key")
-	assert.Contains(t, ui.Outputs[3], "my-value")
-	assert.Contains(t, ui.Outputs[4], "my-key2")
-	assert.Contains(t, ui.Outputs[4], "my-value2")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"my-key", "my-value", "my-key2", "my-value2"},
+	})
 }
 
 func TestEnvShowsEmptyMessage(t *testing.T) {
@@ -62,12 +56,11 @@ func TestEnvShowsEmptyMessage(t *testing.T) {
 
 	ui := callEnv(t, []string{"my-app"}, reqFactory)
 
-	assert.Contains(t, ui.Outputs[0], "Getting env variables for")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[3], "No env variables exist")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting env variables for app", "my-app"},
+		{"OK"},
+		{"No env variables exist"},
+	})
 }
 
 func callEnv(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

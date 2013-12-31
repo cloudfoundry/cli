@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -55,15 +56,13 @@ func TestRenameServiceBroker(t *testing.T) {
 
 	assert.Equal(t, repo.FindByNameName, "my-broker")
 
-	assert.Contains(t, ui.Outputs[0], "Renaming service broker")
-	assert.Contains(t, ui.Outputs[0], "my-found-broker")
-	assert.Contains(t, ui.Outputs[0], "my-new-broker")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, repo.RenamedServiceBrokerGuid, "my-found-broker-guid")
 	assert.Equal(t, repo.RenamedServiceBrokerName, "my-new-broker")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callRenameServiceBroker(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {

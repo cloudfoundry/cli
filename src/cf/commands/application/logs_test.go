@@ -7,6 +7,7 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -18,11 +19,11 @@ import (
 func TestLogsFailWithUsage(t *testing.T) {
 	reqFactory, logsRepo := getLogsDependencies()
 
-	fakeUI := callLogs(t, []string{}, reqFactory, logsRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callLogs(t, []string{}, reqFactory, logsRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callLogs(t, []string{"foo"}, reqFactory, logsRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callLogs(t, []string{"foo"}, reqFactory, logsRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestLogsRequirements(t *testing.T) {
@@ -58,14 +59,13 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app.Guid, logsRepo.AppLoggedGuid)
+
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "Connected, dumping recent logs for app")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "Log Line 1")
-	assert.Contains(t, ui.Outputs[2], "Log Line 2")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
+		{"Log Line 1"},
+		{"Log Line 2"},
+	})
 }
 
 func TestLogsTailsTheAppLogs(t *testing.T) {
@@ -85,13 +85,12 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app.Guid, logsRepo.AppLoggedGuid)
+
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Outputs[0], "Connected, tailing logs for app")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "Log Line 1")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
+		{"Log Line 1"},
+	})
 }
 
 func getLogsDependencies() (reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) {

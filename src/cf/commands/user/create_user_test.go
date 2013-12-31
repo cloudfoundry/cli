@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -25,11 +26,11 @@ func TestCreateUserFailsWithUsage(t *testing.T) {
 
 	emptyArgs := []string{}
 
-	fakeUI := callCreateUser(t, emptyArgs, defaultReqs, defaultUserRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callCreateUser(t, emptyArgs, defaultReqs, defaultUserRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callCreateUser(t, defaultArgs, defaultReqs, defaultUserRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callCreateUser(t, defaultArgs, defaultReqs, defaultUserRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestCreateUserRequirements(t *testing.T) {
@@ -47,14 +48,14 @@ func TestCreateUserRequirements(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
 
-	fakeUI := callCreateUser(t, defaultArgs, defaultReqs, defaultUserRepo)
+	ui := callCreateUser(t, defaultArgs, defaultReqs, defaultUserRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating user")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
-	assert.Contains(t, fakeUI.Outputs[0], "current-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating user", "my-user", "current-user"},
+		{"OK"},
+		{"TIP"},
+	})
 	assert.Equal(t, defaultUserRepo.CreateUserUsername, "my-user")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "TIP")
 }
 
 func TestCreateUserWhenItAlreadyExists(t *testing.T) {
@@ -62,11 +63,14 @@ func TestCreateUserWhenItAlreadyExists(t *testing.T) {
 
 	userAlreadyExistsRepo.CreateUserExists = true
 
-	fakeUI := callCreateUser(t, defaultArgs, defaultReqs, userAlreadyExistsRepo)
+	ui := callCreateUser(t, defaultArgs, defaultReqs, userAlreadyExistsRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 3)
-	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
-	assert.Contains(t, fakeUI.Outputs[2], "my-user")
+	assert.Equal(t, len(ui.Outputs), 3)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating user"},
+		{"FAILED"},
+		{"my-user", "already exists"},
+	})
 }
 
 func callCreateUser(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {

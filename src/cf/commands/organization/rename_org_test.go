@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -17,11 +18,11 @@ func TestRenameOrgFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	orgRepo := &testapi.FakeOrgRepository{}
 
-	fakeUI := callRenameOrg(t, []string{}, reqFactory, orgRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callRenameOrg(t, []string{}, reqFactory, orgRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callRenameOrg(t, []string{"foo"}, reqFactory, orgRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callRenameOrg(t, []string{"foo"}, reqFactory, orgRepo)
+	assert.True(t, ui.FailedWithUsage)
 }
 
 func TestRenameOrgRequirements(t *testing.T) {
@@ -42,13 +43,13 @@ func TestRenameOrgRun(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
 	ui := callRenameOrg(t, []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Renaming org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-new-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Renaming org", "my-org", "my-new-org", "my-user"},
+		{"OK"},
+	})
+
 	assert.Equal(t, orgRepo.RenameOrganizationGuid, "my-org-guid")
 	assert.Equal(t, orgRepo.RenameNewName, "my-new-org")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callRenameOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {

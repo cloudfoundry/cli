@@ -68,19 +68,15 @@ func TestOrgUsers(t *testing.T) {
 	ui := callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
 
 	assert.Equal(t, userRepo.ListUsersOrganizationGuid, "found-org-guid")
-
-	assert.Contains(t, ui.Outputs[0], "Getting users in org")
-	assert.Contains(t, ui.Outputs[0], "Found Org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		testassert.Line{"ORG MANAGER"},
-		testassert.Line{"user1"},
-		testassert.Line{"user2"},
-		testassert.Line{"BILLING MANAGER"},
-		testassert.Line{"user4"},
-		testassert.Line{"ORG AUDITOR"},
-		testassert.Line{"user3"},
+		{"Getting users in org", "Found Org", "my-user"},
+		{"ORG MANAGER"},
+		{"user1"},
+		{"user2"},
+		{"BILLING MANAGER"},
+		{"user4"},
+		{"ORG AUDITOR"},
+		{"user3"},
 	})
 }
 

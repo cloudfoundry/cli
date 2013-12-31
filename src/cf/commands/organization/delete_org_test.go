@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -21,12 +22,16 @@ func TestDeleteOrgConfirmingWithY(t *testing.T) {
 
 	ui := deleteOrg(t, "y", []string{org.Name}, orgRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Really delete")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete"},
+	})
 
-	assert.Contains(t, ui.Outputs[0], "Deleting")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "org-to-delete"},
+		{"OK"},
+	})
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
 	assert.Equal(t, orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteOrgConfirmingWithYes(t *testing.T) {
@@ -37,14 +42,16 @@ func TestDeleteOrgConfirmingWithYes(t *testing.T) {
 
 	ui := deleteOrg(t, "Yes", []string{"org-to-delete"}, orgRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Really delete")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "org-to-delete"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting org", "org-to-delete", "my-user"},
+		{"OK"},
+	})
 
-	assert.Contains(t, ui.Outputs[0], "Deleting org")
-	assert.Contains(t, ui.Outputs[0], "org-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-user")
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
 	assert.Equal(t, orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteTargetedOrganizationClearsConfig(t *testing.T) {
@@ -109,11 +116,12 @@ func TestDeleteOrgWithForceOption(t *testing.T) {
 	ui := deleteOrg(t, "Yes", []string{"-f", "org-to-delete"}, orgRepo)
 
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "org-to-delete")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "org-to-delete"},
+		{"OK"},
+	})
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
 	assert.Equal(t, orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteOrgCommandFailsWithUsage(t *testing.T) {
@@ -130,12 +138,13 @@ func TestDeleteOrgWhenOrgDoesNotExist(t *testing.T) {
 	ui := deleteOrg(t, "y", []string{"org-to-delete"}, orgRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "org-to-delete")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "org-to-delete"},
+		{"OK"},
+		{"org-to-delete", "does not exist."},
+	})
+
 	assert.Equal(t, orgRepo.FindByNameName, "org-to-delete")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "org-to-delete")
-	assert.Contains(t, ui.Outputs[2], "does not exist.")
 }
 
 func deleteOrg(t *testing.T, confirmation string, args []string, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {

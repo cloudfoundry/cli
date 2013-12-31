@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -64,17 +65,14 @@ func TestUnsetOrgRole(t *testing.T) {
 
 	ui := callUnsetOrgRole(t, args, userRepo, reqFactory)
 
-	assert.Contains(t, ui.Outputs[0], "Removing role ")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-username")
-	assert.Contains(t, ui.Outputs[0], "OrgManager")
-	assert.Contains(t, ui.Outputs[0], "current-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Removing role", "OrgManager", "my-username", "my-org", "current-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, userRepo.UnsetOrgRoleRole, cf.ORG_MANAGER)
 	assert.Equal(t, userRepo.UnsetOrgRoleUserGuid, "some-user-guid")
 	assert.Equal(t, userRepo.UnsetOrgRoleOrganizationGuid, "some-org-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callUnsetOrgRole(t *testing.T, args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

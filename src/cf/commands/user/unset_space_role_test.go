@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -71,18 +72,13 @@ func TestUnsetSpaceRole(t *testing.T) {
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "my-space")
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
 
-	assert.Contains(t, ui.Outputs[0], "Removing role ")
-	assert.Contains(t, ui.Outputs[0], "SpaceManager")
-	assert.Contains(t, ui.Outputs[0], "some-user")
-	assert.Contains(t, ui.Outputs[0], "some-org")
-	assert.Contains(t, ui.Outputs[0], "some-space")
-	assert.Contains(t, ui.Outputs[0], "current-user")
-
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "current-user"},
+		{"OK"},
+	})
 	assert.Equal(t, userRepo.UnsetSpaceRoleRole, cf.SPACE_MANAGER)
 	assert.Equal(t, userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
 	assert.Equal(t, userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func getUnsetSpaceRoleDeps() (reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) {

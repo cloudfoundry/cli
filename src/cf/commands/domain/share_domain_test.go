@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -37,13 +38,13 @@ func TestShareDomainFailsWithUsage(t *testing.T) {
 func TestShareDomain(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	domainRepo := &testapi.FakeDomainRepository{}
-	fakeUI := callShareDomain(t, []string{"example.com"}, reqFactory, domainRepo)
+	ui := callShareDomain(t, []string{"example.com"}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.CreateSharedDomainName, "example.com")
-	assert.Contains(t, fakeUI.Outputs[0], "Sharing domain")
-	assert.Contains(t, fakeUI.Outputs[0], "example.com")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Sharing domain", "example.com", "my-user"},
+		{"OK"},
+	})
 }
 
 func callShareDomain(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {

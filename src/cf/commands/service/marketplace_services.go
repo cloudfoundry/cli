@@ -47,6 +47,11 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
+	if len(serviceOfferings) == 0 {
+		cmd.ui.Say("No service offerings found")
+		return
+	}
+
 	table := [][]string{
 		[]string{"service", "plans", "description"},
 	}

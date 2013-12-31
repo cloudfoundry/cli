@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/commands/service"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -59,17 +60,13 @@ func TestShowServiceOutput(t *testing.T) {
 	}
 	ui := callShowService([]string{"service1"}, reqFactory)
 
-	assert.Contains(t, ui.Outputs[0], "")
-	assert.Contains(t, ui.Outputs[1], "Service instance: ")
-	assert.Contains(t, ui.Outputs[1], "service1")
-	assert.Contains(t, ui.Outputs[2], "Service: ")
-	assert.Contains(t, ui.Outputs[2], "mysql")
-	assert.Contains(t, ui.Outputs[3], "Plan: ")
-	assert.Contains(t, ui.Outputs[3], "plan-name")
-	assert.Contains(t, ui.Outputs[4], "Description: ")
-	assert.Contains(t, ui.Outputs[4], "the-description")
-	assert.Contains(t, ui.Outputs[5], "Documentation url: ")
-	assert.Contains(t, ui.Outputs[5], "http://documentation.url")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Service instance:", "service1"},
+		{"Service: ", "mysql"},
+		{"Plan: ", "plan-name"},
+		{"Description: ", "the-description"},
+		{"Documentation url: ", "http://documentation.url"},
+	})
 }
 
 func TestShowUserProvidedServiceOutput(t *testing.T) {
@@ -84,11 +81,10 @@ func TestShowUserProvidedServiceOutput(t *testing.T) {
 	ui := callShowService([]string{"service1"}, reqFactory)
 
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "")
-	assert.Contains(t, ui.Outputs[1], "Service instance: ")
-	assert.Contains(t, ui.Outputs[1], "service1")
-	assert.Contains(t, ui.Outputs[2], "Service: ")
-	assert.Contains(t, ui.Outputs[2], "user-provided")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Service instance: ", "service1"},
+		{"Service: ", "user-provided"},
+	})
 }
 
 func callShowService(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

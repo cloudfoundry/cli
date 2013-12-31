@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -26,24 +27,19 @@ func TestBindCommand(t *testing.T) {
 		ServiceInstance: serviceInstance,
 	}
 	serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-	fakeUI := callBindService(t, []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
+	ui := callBindService(t, []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
 
-	assert.Contains(t, fakeUI.Outputs[0], "Binding service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-app")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-space")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
-
+	assert.Equal(t, len(ui.Outputs), 3)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"TIP"},
+	})
 	assert.Equal(t, serviceBindingRepo.CreateServiceInstanceGuid, "my-service-guid")
 	assert.Equal(t, serviceBindingRepo.CreateApplicationGuid, "my-app-guid")
-
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "TIP")
-	assert.Equal(t, len(fakeUI.Outputs), 3)
 }
 
 func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
@@ -58,28 +54,28 @@ func TestBindCommandIfServiceIsAlreadyBound(t *testing.T) {
 		ServiceInstance: serviceInstance,
 	}
 	serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
-	fakeUI := callBindService(t, []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
+	ui := callBindService(t, []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 3)
-	assert.Contains(t, fakeUI.Outputs[0], "Binding service")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "my-app")
-	assert.Contains(t, fakeUI.Outputs[2], "is already bound")
-	assert.Contains(t, fakeUI.Outputs[2], "my-service")
+	assert.Equal(t, len(ui.Outputs), 3)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Binding service"},
+		{"OK"},
+		{"my-app", "is already bound", "my-service"},
+	})
 }
 
 func TestBindCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
 
-	fakeUI := callBindService(t, []string{"my-service"}, reqFactory, serviceBindingRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callBindService(t, []string{"my-service"}, reqFactory, serviceBindingRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callBindService(t, []string{"my-app"}, reqFactory, serviceBindingRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callBindService(t, []string{"my-app"}, reqFactory, serviceBindingRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callBindService(t, []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callBindService(t, []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func callBindService(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, serviceBindingRepo api.ServiceBindingRepository) (fakeUI *testterm.FakeUI) {

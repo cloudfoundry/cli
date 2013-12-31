@@ -23,7 +23,7 @@ var (
 	defaultAppForStart        = cf.Application{}
 	defaultInstanceReponses   = [][]cf.AppInstanceFields{}
 	defaultInstanceErrorCodes = []string{"", ""}
-	defaultStartTimeout       = 2
+	defaultStartTimeout       = 50 * time.Millisecond
 )
 
 func init() {
@@ -64,7 +64,7 @@ func callStart(args []string, config *configuration.Configuration, reqFactory *t
 	ctxt := testcmd.NewContext("start", args)
 
 	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
-	cmd.StagingTimeout = 50 * time.Millisecond
+	cmd.StagingTimeout = 5 * time.Millisecond
 	cmd.StartupTimeout = config.ApplicationStartTimeout
 	cmd.PingerThrottle = 5 * time.Millisecond
 
@@ -72,7 +72,7 @@ func callStart(args []string, config *configuration.Configuration, reqFactory *t
 	return
 }
 
-func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplayer, app cf.Application, instances [][]cf.AppInstanceFields, errorCodes []string, startTimeout int) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
+func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplayer, app cf.Application, instances [][]cf.AppInstanceFields, errorCodes []string, startTimeout time.Duration) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
 	})
@@ -86,7 +86,7 @@ func startAppWithInstancesAndErrors(t *testing.T, displayApp ApplicationDisplaye
 		SpaceFields:             space,
 		OrganizationFields:      org,
 		AccessToken:             token,
-		ApplicationStartTimeout: time.Duration(startTimeout) * time.Second,
+		ApplicationStartTimeout: startTimeout,
 	}
 
 	appRepo = &testapi.FakeApplicationRepository{

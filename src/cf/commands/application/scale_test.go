@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -63,11 +64,10 @@ func TestScaleAll(t *testing.T) {
 
 	ui := callScale(t, []string{"-i", "5", "-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Scaling")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Scaling", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 	assert.Equal(t, appRepo.UpdateParams.Get("memory"), uint64(512))

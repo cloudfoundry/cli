@@ -3,6 +3,7 @@ package requirements
 import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -24,5 +25,6 @@ func TestLoginRequirement(t *testing.T) {
 	req = newLoginRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
-	assert.Contains(t, ui.Outputs[0], "Not logged in.")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{{"Not logged in."}})
 }

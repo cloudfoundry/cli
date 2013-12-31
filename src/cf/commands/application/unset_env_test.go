@@ -8,6 +8,7 @@ import (
 	"generic"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -46,13 +47,10 @@ func TestUnsetEnvWhenApplicationExists(t *testing.T) {
 	args := []string{"my-app", "DATABASE_URL"}
 	ui := callUnsetEnv(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Removing env variable")
-	assert.Contains(t, ui.Outputs[0], "DATABASE_URL")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
@@ -75,9 +73,11 @@ func TestUnsetEnvWhenUnsettingTheEnvFails(t *testing.T) {
 	args := []string{"does-not-exist", "DATABASE_URL"}
 	ui := callUnsetEnv(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Removing env variable")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Error updating app.")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Removing env variable"},
+		{"FAILED"},
+		{"Error updating app."},
+	})
 }
 
 func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
@@ -91,10 +91,11 @@ func TestUnsetEnvWhenEnvVarDoesNotExist(t *testing.T) {
 	ui := callUnsetEnv(t, args, reqFactory, appRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "Removing env variable")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "DATABASE_URL")
-	assert.Contains(t, ui.Outputs[2], "was not set.")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Removing env variable"},
+		{"OK"},
+		{"DATABASE_URL", "was not set."},
+	})
 }
 
 func TestUnsetEnvFailsWithUsage(t *testing.T) {

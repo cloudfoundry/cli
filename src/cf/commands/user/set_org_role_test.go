@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -62,17 +63,13 @@ func TestSetOrgRole(t *testing.T) {
 
 	ui := callSetOrgRole(t, []string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Assigning role ")
-	assert.Contains(t, ui.Outputs[0], "OrgManager")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "current-user")
-
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Assigning role", "OrgManager", "my-user", "my-org", "current-user"},
+		{"OK"},
+	})
 	assert.Equal(t, userRepo.SetOrgRoleUserGuid, "my-user-guid")
 	assert.Equal(t, userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
 	assert.Equal(t, userRepo.SetOrgRoleRole, cf.ORG_MANAGER)
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callSetOrgRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {

@@ -4,6 +4,7 @@ import (
 	"cf"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -32,5 +33,8 @@ func TestUserReqWhenUserDoesNotExist(t *testing.T) {
 	success := userReq.Execute()
 
 	assert.False(t, success)
-	assert.Contains(t, ui.Outputs[0], "FAILED")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"UserFields not found"},
+	})
 }

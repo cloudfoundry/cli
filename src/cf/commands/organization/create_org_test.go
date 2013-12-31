@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -17,11 +18,11 @@ func TestCreateOrgFailsWithUsage(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	fakeUI := callCreateOrg(t, []string{}, reqFactory, orgRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callCreateOrg(t, []string{}, reqFactory, orgRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestCreateOrgRequirements(t *testing.T) {
@@ -39,25 +40,25 @@ func TestCreateOrgRequirements(t *testing.T) {
 func TestCreateOrg(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	fakeUI := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
+	ui := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating org", "my-org", "my-user"},
+		{"OK"},
+	})
 	assert.Equal(t, orgRepo.CreateName, "my-org")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestCreateOrgWhenAlreadyExists(t *testing.T) {
 	orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	fakeUI := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
+	ui := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "my-org")
-	assert.Contains(t, fakeUI.Outputs[2], "already exists")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating org", "my-org"},
+		{"OK"},
+		{"my-org", "already exists"},
+	})
 }
 
 func callCreateOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {

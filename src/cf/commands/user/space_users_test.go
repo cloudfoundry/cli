@@ -76,22 +76,17 @@ func TestSpaceUsers(t *testing.T) {
 
 	assert.Equal(t, spaceRepo.FindByNameInOrgName, "my-space")
 	assert.Equal(t, spaceRepo.FindByNameInOrgOrgGuid, "org1-guid")
-
-	assert.Contains(t, ui.Outputs[0], "Getting users in org")
-	assert.Contains(t, ui.Outputs[0], "Org1")
-	assert.Contains(t, ui.Outputs[0], "Space1")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
 	assert.Equal(t, userRepo.ListUsersSpaceGuid, "space1-guid")
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		testassert.Line{"SPACE MANAGER"},
-		testassert.Line{"user1"},
-		testassert.Line{"user2"},
-		testassert.Line{"SPACE DEVELOPER"},
-		testassert.Line{"user4"},
-		testassert.Line{"SPACE AUDITOR"},
-		testassert.Line{"user3"},
+		{"Getting users in org", "Org1", "Space1", "my-user"},
+		{"SPACE MANAGER"},
+		{"user1"},
+		{"user2"},
+		{"SPACE DEVELOPER"},
+		{"user4"},
+		{"SPACE AUDITOR"},
+		{"user3"},
 	})
 }
 

@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -57,23 +58,12 @@ func TestEventsSuccess(t *testing.T) {
 
 	ui := callEvents(t, []string{"my-app"}, reqFactory, eventsRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting events for app")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "time")
-	assert.Contains(t, ui.Outputs[1], "instance")
-	assert.Contains(t, ui.Outputs[1], "description")
-	assert.Contains(t, ui.Outputs[1], "exit status")
-	assert.Contains(t, ui.Outputs[2], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[2], "98")
-	assert.Contains(t, ui.Outputs[2], "app instance exited")
-	assert.Contains(t, ui.Outputs[2], "78")
-	assert.Contains(t, ui.Outputs[3], timestamp.Local().Format(TIMESTAMP_FORMAT))
-	assert.Contains(t, ui.Outputs[3], "99")
-	assert.Contains(t, ui.Outputs[3], "app instance was stopped")
-	assert.Contains(t, ui.Outputs[3], "77")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
+		{"time", "instance", "description", "exit status"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "98", "app instance exited", "78"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "99", "app instance was stopped", "77"},
+	})
 }
 
 func TestEventsWhenNoEventsAvailable(t *testing.T) {
@@ -84,10 +74,10 @@ func TestEventsWhenNoEventsAvailable(t *testing.T) {
 
 	ui := callEvents(t, []string{"my-app"}, reqFactory, eventsRepo)
 
-	assert.Contains(t, ui.Outputs[0], "events")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[1], "No events")
-	assert.Contains(t, ui.Outputs[1], "my-app")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"events", "my-app"},
+		{"No events", "my-app"},
+	})
 }
 
 func getEventsDependencies() (reqFactory *testreq.FakeReqFactory, eventsRepo *testapi.FakeAppEventsRepo) {

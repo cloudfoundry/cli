@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -18,14 +19,13 @@ func TestDeleteConfirmingWithY(t *testing.T) {
 
 	assert.Equal(t, appRepo.ReadName, "app-to-delete")
 	assert.Equal(t, appRepo.DeletedAppGuid, "app-to-delete-guid")
-	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "app-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestDeleteConfirmingWithYes(t *testing.T) {
@@ -33,14 +33,15 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 
 	assert.Equal(t, appRepo.ReadName, "app-to-delete")
 	assert.Equal(t, appRepo.DeletedAppGuid, "app-to-delete-guid")
+
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "app-to-delete"},
+	})
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "app-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestDeleteWithForceOption(t *testing.T) {
@@ -61,9 +62,10 @@ func TestDeleteWithForceOption(t *testing.T) {
 	assert.Equal(t, appRepo.DeletedAppGuid, "app-to-delete-guid")
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "app-to-delete")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "app-to-delete"},
+		{"OK"},
+	})
 }
 
 func TestDeleteAppThatDoesNotExist(t *testing.T) {
@@ -78,11 +80,12 @@ func TestDeleteAppThatDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, appRepo.ReadName, "app-to-delete")
 	assert.Equal(t, appRepo.DeletedAppGuid, "")
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "app-to-delete")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "app-to-delete")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "app-to-delete"},
+		{"OK"},
+		{"app-to-delete", "does not exist"},
+	})
 }
 
 func TestDeleteCommandFailsWithUsage(t *testing.T) {

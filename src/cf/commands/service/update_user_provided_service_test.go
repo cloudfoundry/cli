@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -18,11 +19,11 @@ func TestUpdateUserProvidedServiceFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-	fakeUI := callUpdateUserProvidedService(t, []string{}, reqFactory, userProvidedServiceInstanceRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callUpdateUserProvidedService(t, []string{}, reqFactory, userProvidedServiceInstanceRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callUpdateUserProvidedService(t, []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callUpdateUserProvidedService(t, []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestUpdateUserProvidedServiceRequirements(t *testing.T) {
@@ -52,13 +53,11 @@ func TestUpdateUserProvidedServiceWhenNoFlagsArePresent(t *testing.T) {
 	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	ui := callUpdateUserProvidedService(t, args, reqFactory, repo)
 
-	assert.Contains(t, ui.Outputs[0], "Updating user provided service")
-	assert.Contains(t, ui.Outputs[0], "found-service-name")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "No changes")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"No changes"},
+	})
 }
 
 func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
@@ -72,17 +71,13 @@ func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	ui := callUpdateUserProvidedService(t, args, reqFactory, repo)
 
-	assert.Contains(t, ui.Outputs[0], "Updating user provided service")
-	assert.Contains(t, ui.Outputs[0], "found-service-name")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 	assert.Equal(t, repo.UpdateServiceInstance.Name, serviceInstance.Name)
 	assert.Equal(t, repo.UpdateServiceInstance.Params, map[string]string{"foo": "bar"})
 	assert.Equal(t, repo.UpdateServiceInstance.SysLogDrainUrl, "syslog://example.com")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestUpdateUserProvidedServiceWithoutJson(t *testing.T) {
@@ -96,7 +91,10 @@ func TestUpdateUserProvidedServiceWithoutJson(t *testing.T) {
 	repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 	ui := callUpdateUserProvidedService(t, args, reqFactory, repo)
 
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating user provided service"},
+		{"OK"},
+	})
 }
 
 func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
@@ -113,8 +111,10 @@ func TestUpdateUserProvidedServiceWithInvalidJson(t *testing.T) {
 
 	assert.NotEqual(t, userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "JSON is invalid")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"JSON is invalid"},
+	})
 }
 
 func TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided(t *testing.T) {
@@ -135,8 +135,10 @@ func TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided(t *t
 
 	assert.NotEqual(t, userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "Service Instance is not user provided")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"Service Instance is not user provided"},
+	})
 }
 
 func callUpdateUserProvidedService(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {

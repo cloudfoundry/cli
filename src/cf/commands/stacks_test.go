@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
@@ -28,15 +29,12 @@ func TestStacks(t *testing.T) {
 	ui := callStacks(t, stackRepo)
 
 	assert.Equal(t, len(ui.Outputs), 6)
-	assert.Contains(t, ui.Outputs[0], "Getting stacks in org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[4], "Stack-1")
-	assert.Contains(t, ui.Outputs[4], "Stack 1 Description")
-	assert.Contains(t, ui.Outputs[5], "Stack-2")
-	assert.Contains(t, ui.Outputs[5], "Stack 2 Description")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting stacks in org", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"Stack-1", "Stack 1 Description"},
+		{"Stack-2", "Stack 2 Description"},
+	})
 }
 
 func callStacks(t *testing.T, stackRepo *testapi.FakeStackRepository) (ui *testterm.FakeUI) {

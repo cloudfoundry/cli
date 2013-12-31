@@ -97,7 +97,6 @@ func TestSetEnvWhenItAlreadyExists(t *testing.T) {
 		{"OK"},
 		{"TIP"},
 	})
-	assert.NotContains(t, ui.DumpOutputs(), "was already set")
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
