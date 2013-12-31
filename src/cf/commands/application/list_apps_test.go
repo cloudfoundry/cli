@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -87,6 +88,23 @@ func TestApps(t *testing.T) {
 	assert.Contains(t, ui.Outputs[5], "256M")
 	assert.Contains(t, ui.Outputs[5], "1G")
 	assert.Contains(t, ui.Outputs[5], "app2.cfapps.io")
+}
+
+func TestAppsEmptyList(t *testing.T) {
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{
+		GetSummariesInCurrentSpaceApps: []cf.AppSummary{},
+	}
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+
+	ui := callApps(t, appSummaryRepo, reqFactory)
+
+	assert.True(t, testcmd.CommandDidPassRequirements)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting apps in", "my-org", "development", "my-user"},
+		{"OK"},
+		{"No apps found"},
+	})
 }
 
 func TestAppsRequiresLogin(t *testing.T) {

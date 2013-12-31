@@ -48,6 +48,11 @@ func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
+	if len(apps) == 0 {
+		cmd.ui.Say("No apps found")
+		return
+	}
+
 	table := [][]string{
 		[]string{"name", "requested state", "instances", "memory", "disk", "urls"},
 	}
