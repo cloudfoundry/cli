@@ -93,6 +93,11 @@ func TestOrganizationsFindByName(t *testing.T) {
 		  "metadata": { "guid": "org1-guid" },
 		  "entity": {
 			"name": "Org1",
+			"quota_definition": {
+			  "entity": {
+			    "memory_limit": 128
+			  }
+			},
 			"spaces": [{
 			  "metadata": { "guid": "space1-guid" },
 			  "entity": { "name": "Space1" }
@@ -117,6 +122,7 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
+	assert.Equal(t, org.MemoryLimit, "128M")
 	assert.Equal(t, len(org.Spaces), 1)
 	assert.Equal(t, org.Spaces[0].Name, "Space1")
 	assert.Equal(t, org.Spaces[0].Guid, "space1-guid")
