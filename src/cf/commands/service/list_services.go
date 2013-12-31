@@ -43,6 +43,11 @@ func (cmd ListServices) Run(c *cli.Context) {
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 
+	if len(serviceInstances) == 0 {
+		cmd.ui.Say("No services found")
+		return
+	}
+
 	table := [][]string{
 		[]string{"name", "service", "plan", "bound apps"},
 	}
