@@ -7,6 +7,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -18,14 +19,14 @@ func TestMapRouteFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	fakeUI := callMapRoute(t, []string{}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callMapRoute(t, []string{}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callMapRoute(t, []string{"foo"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callMapRoute(t, []string{"foo"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callMapRoute(t, []string{"foo", "bar"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callMapRoute(t, []string{"foo", "bar"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestMapRouteRequirements(t *testing.T) {
@@ -58,17 +59,13 @@ func TestMapRouteWhenBinding(t *testing.T) {
 
 	ui := callMapRoute(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator)
 
-	assert.Contains(t, ui.Outputs[0], "Adding route")
-	assert.Contains(t, ui.Outputs[0], "foo.example.com")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Adding route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, routeRepo.BoundRouteGuid, "my-route-guid")
 	assert.Equal(t, routeRepo.BoundAppGuid, "my-app-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestMapRouteWhenRouteNotReserved(t *testing.T) {

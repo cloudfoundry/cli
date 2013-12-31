@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -20,18 +21,18 @@ func TestDeleteServiceCommandWithY(t *testing.T) {
 	serviceInstance.Guid = "my-service-guid"
 	reqFactory := &testreq.FakeReqFactory{}
 	serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-	fakeUI := callDeleteService(t, "Y", []string{"my-service"}, reqFactory, serviceRepo)
+	ui := callDeleteService(t, "Y", []string{"my-service"}, reqFactory, serviceRepo)
 
-	assert.Contains(t, fakeUI.Prompts[0], "Are you sure")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Are you sure"},
+	})
 
-	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-space")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, serviceRepo.DeleteServiceServiceInstance, serviceInstance)
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestDeleteServiceCommandWithYes(t *testing.T) {
@@ -40,42 +41,39 @@ func TestDeleteServiceCommandWithYes(t *testing.T) {
 	serviceInstance.Guid = "my-service-guid"
 	reqFactory := &testreq.FakeReqFactory{}
 	serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-	fakeUI := callDeleteService(t, "Yes", []string{"my-service"}, reqFactory, serviceRepo)
+	ui := callDeleteService(t, "Yes", []string{"my-service"}, reqFactory, serviceRepo)
 
-	assert.Contains(t, fakeUI.Prompts[0], "Are you sure")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{{"Are you sure"}})
 
-	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-space")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service", "my-service"},
+		{"OK"},
+	})
 
 	assert.Equal(t, serviceRepo.DeleteServiceServiceInstance, serviceInstance)
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestDeleteServiceCommandOnNonExistentService(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
-	fakeUI := callDeleteService(t, "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
+	ui := callDeleteService(t, "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Deleting service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-service")
-
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "my-service")
-	assert.Contains(t, fakeUI.Outputs[2], "not exist")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service", "my-service"},
+		{"OK"},
+		{"my-service", "does not exist"},
+	})
 }
 
 func TestDeleteServiceCommandFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	serviceRepo := &testapi.FakeServiceRepo{}
 
-	fakeUI := callDeleteService(t, "", []string{"-f"}, reqFactory, serviceRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callDeleteService(t, "", []string{"-f"}, reqFactory, serviceRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callDeleteService(t, "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callDeleteService(t, "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestDeleteServiceForceFlagSkipsConfirmation(t *testing.T) {
@@ -85,9 +83,10 @@ func TestDeleteServiceForceFlagSkipsConfirmation(t *testing.T) {
 	ui := callDeleteService(t, "", []string{"-f", "foo.com"}, reqFactory, serviceRepo)
 
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting service")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service", "foo.com"},
+		{"OK"},
+	})
 }
 
 func callDeleteService(t *testing.T, confirmation string, args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {

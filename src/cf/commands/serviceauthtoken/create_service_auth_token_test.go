@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -50,15 +51,16 @@ func TestCreateServiceAuthToken(t *testing.T) {
 	args := []string{"a label", "a provider", "a value"}
 
 	ui := callCreateServiceAuthToken(t, args, reqFactory, authTokenRepo)
-	assert.Contains(t, ui.Outputs[0], "Creating service auth token as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating service auth token as", "my-user"},
+		{"OK"},
+	})
+
 	authToken := cf.ServiceAuthTokenFields{}
 	authToken.Label = "a label"
 	authToken.Provider = "a provider"
 	authToken.Token = "a value"
 	assert.Equal(t, authTokenRepo.CreatedServiceAuthTokenFields, authToken)
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callCreateServiceAuthToken(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {

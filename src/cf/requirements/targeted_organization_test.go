@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -26,6 +27,8 @@ func TestTargetedOrgRequirement(t *testing.T) {
 	req = newTargetedOrgRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "No org targeted")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"No org targeted"},
+	})
 }

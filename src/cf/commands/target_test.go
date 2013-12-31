@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -53,8 +54,10 @@ func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
 	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Outputs[0], "No org targeted")
-	assert.Contains(t, ui.Outputs[1], "No space targeted")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"No org targeted"},
+		{"No space targeted"},
+	})
 }
 
 func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
@@ -96,15 +99,12 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "No org targeted")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"No org targeted"},
+	})
 
 	ui = callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-
-	ui = callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Contains(t, ui.Outputs[0], "No org targeted")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{{"FAILED"}})
 }
 
 func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
@@ -126,9 +126,10 @@ func TestTargetOrganizationWhenOrgNotFound(t *testing.T) {
 
 	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "my-organization")
-	assert.Contains(t, ui.Outputs[1], "not found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"my-organization", "not found"},
+	})
 }
 
 func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
@@ -139,8 +140,10 @@ func TestTargetSpaceWhenNoOrganizationIsSelected(t *testing.T) {
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "An org must be targeted before targeting a space")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"An org must be targeted before targeting a space"},
+	})
 	savedConfig := testconfig.SavedConfiguration
 	assert.Equal(t, savedConfig.OrganizationFields.Guid, "")
 }
@@ -182,8 +185,10 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "my-space")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"Unable to access space", "my-space"},
+	})
 
 	savedConfig := testconfig.SavedConfiguration
 	assert.Equal(t, savedConfig.SpaceFields.Guid, "")
@@ -203,9 +208,10 @@ func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
 
 	ui := callTarget([]string{"-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "my-space")
-	assert.Contains(t, ui.Outputs[1], "not found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"my-space", "not found"},
+	})
 }
 
 func TestTargetOrganizationAndSpace(t *testing.T) {
@@ -256,7 +262,10 @@ func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
 	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-organization-guid")
 	assert.Equal(t, spaceRepo.FindByNameName, "my-space")
 	assert.Equal(t, savedConfig.SpaceFields.Guid, "")
-	assert.Contains(t, ui.Outputs[0], "FAILED")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"Unable to access space", "my-space"},
+	})
 }
 
 func callTarget(args []string,

@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -31,8 +32,10 @@ func TestSpaceRequirement(t *testing.T) {
 	req = newTargetedSpaceRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "No space targeted")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"No space targeted"},
+	})
 
 	ui.ClearOutputs()
 	config.OrganizationFields = cf.OrganizationFields{}
@@ -40,6 +43,8 @@ func TestSpaceRequirement(t *testing.T) {
 	req = newTargetedSpaceRequirement(ui, config)
 	success = req.Execute()
 	assert.False(t, success)
-	assert.Contains(t, ui.Outputs[0], "FAILED")
-	assert.Contains(t, ui.Outputs[1], "No org and space targeted")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"No org and space targeted"},
+	})
 }

@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -17,17 +18,17 @@ func TestSetQuotaFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	quotaRepo := &testapi.FakeQuotaRepository{}
 
-	fakeUI := callSetQuota(t, []string{}, reqFactory, quotaRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callSetQuota(t, []string{}, reqFactory, quotaRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callSetQuota(t, []string{"org"}, reqFactory, quotaRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callSetQuota(t, []string{"org"}, reqFactory, quotaRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callSetQuota(t, []string{"org", "quota"}, reqFactory, quotaRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callSetQuota(t, []string{"org", "quota"}, reqFactory, quotaRepo)
+	assert.False(t, ui.FailedWithUsage)
 
-	fakeUI = callSetQuota(t, []string{"org", "quota", "extra-stuff"}, reqFactory, quotaRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callSetQuota(t, []string{"org", "quota", "extra-stuff"}, reqFactory, quotaRepo)
+	assert.True(t, ui.FailedWithUsage)
 }
 
 func TestSetQuotaRequirements(t *testing.T) {
@@ -61,15 +62,13 @@ func TestSetQuota(t *testing.T) {
 
 	assert.Equal(t, quotaRepo.FindByNameName, "my-quota")
 
-	assert.Contains(t, ui.Outputs[0], "Setting quota")
-	assert.Contains(t, ui.Outputs[0], "my-found-quota")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Setting quota", "my-found-quota", "my-org", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, quotaRepo.UpdateOrgGuid, "my-org-guid")
 	assert.Equal(t, quotaRepo.UpdateQuotaGuid, "my-quota-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callSetQuota(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (ui *testterm.FakeUI) {

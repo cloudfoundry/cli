@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -42,12 +43,10 @@ func TestMapDomainSuccess(t *testing.T) {
 
 	assert.Equal(t, domainRepo.MapDomainGuid, "foo-guid")
 	assert.Equal(t, domainRepo.MapSpaceGuid, "my-space-guid")
-	assert.Contains(t, ui.Outputs[0], "Mapping domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Mapping domain", "foo.com", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestMapDomainDomainNotFound(t *testing.T) {
@@ -56,11 +55,11 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 	ui := callDomainMapper(t, true, []string{"my-space", "foo.com"}, reqFactory, domainRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "Mapping domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "foo.com")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Mapping domain", "foo.com", "my-space"},
+		{"FAILED"},
+		{"Error finding", "foo.com"},
+	})
 }
 
 func TestMapDomainMappingFails(t *testing.T) {
@@ -70,12 +69,11 @@ func TestMapDomainMappingFails(t *testing.T) {
 	ui := callDomainMapper(t, true, []string{"my-space", "foo.com"}, reqFactory, domainRepo)
 
 	assert.Equal(t, len(ui.Outputs), 3)
-	assert.Contains(t, ui.Outputs[0], "Mapping domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Did not work")
-	assert.Contains(t, ui.Outputs[2], "bummer")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Mapping domain", "foo.com", "my-space"},
+		{"FAILED"},
+		{"Did not work", "bummer"},
+	})
 }
 
 func TestUnmapDomainSuccess(t *testing.T) {
@@ -84,12 +82,10 @@ func TestUnmapDomainSuccess(t *testing.T) {
 
 	assert.Equal(t, domainRepo.UnmapDomainGuid, "foo-guid")
 	assert.Equal(t, domainRepo.UnmapSpaceGuid, "my-space-guid")
-	assert.Contains(t, ui.Outputs[0], "Unmapping domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Unmapping domain", "foo.com", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 }
 
 func getDomainMapperDeps() (reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) {

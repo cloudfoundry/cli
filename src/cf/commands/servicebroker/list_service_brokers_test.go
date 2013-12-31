@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -34,20 +35,13 @@ func TestListServiceBrokers(t *testing.T) {
 
 	ui := callListServiceBrokers(t, []string{}, repo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
-	assert.Contains(t, ui.Outputs[1], "name")
-	assert.Contains(t, ui.Outputs[1], "url")
-
-	assert.Contains(t, ui.Outputs[2], "service-broker-to-list-a")
-	assert.Contains(t, ui.Outputs[2], "http://service-a-url.com")
-
-	assert.Contains(t, ui.Outputs[3], "service-broker-to-list-b")
-	assert.Contains(t, ui.Outputs[3], "http://service-b-url.com")
-
-	assert.Contains(t, ui.Outputs[4], "service-broker-to-list-c")
-	assert.Contains(t, ui.Outputs[4], "http://service-c-url.com")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting service brokers as", "my-user"},
+		{"name", "url"},
+		{"service-broker-to-list-a", "http://service-a-url.com"},
+		{"service-broker-to-list-b", "http://service-b-url.com"},
+		{"service-broker-to-list-c", "http://service-c-url.com"},
+	})
 }
 
 func TestListingServiceBrokersWhenNoneExist(t *testing.T) {
@@ -57,9 +51,10 @@ func TestListingServiceBrokersWhenNoneExist(t *testing.T) {
 
 	ui := callListServiceBrokers(t, []string{}, repo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "No service brokers found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting service brokers as", "my-user"},
+		{"No service brokers found"},
+	})
 }
 
 func TestListingServiceBrokersWhenFindFails(t *testing.T) {
@@ -67,9 +62,10 @@ func TestListingServiceBrokersWhenFindFails(t *testing.T) {
 
 	ui := callListServiceBrokers(t, []string{}, repo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting service brokers as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting service brokers as ", "my-user"},
+		{"FAILED"},
+	})
 }
 
 func callListServiceBrokers(t *testing.T, args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {

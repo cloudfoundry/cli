@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -40,12 +41,13 @@ func TestDeleteConfirmingWithY(t *testing.T) {
 	assert.Equal(t, repo.FindByNameName, "service-broker-to-delete")
 	assert.Equal(t, repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-	assert.Contains(t, ui.Outputs[0], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[0], "Deleting service broker")
-	assert.Contains(t, ui.Outputs[0], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "service-broker-to-delete"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service broker", "service-broker-to-delete", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestDeleteConfirmingWithYes(t *testing.T) {
@@ -54,12 +56,14 @@ func TestDeleteConfirmingWithYes(t *testing.T) {
 	assert.Equal(t, repo.FindByNameName, "service-broker-to-delete")
 	assert.Equal(t, repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-	assert.Contains(t, ui.Outputs[0], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[0], "Deleting service broker")
-	assert.Contains(t, ui.Outputs[0], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "service-broker-to-delete"},
+	})
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service broker", "service-broker-to-delete", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestDeleteWithForceOption(t *testing.T) {
@@ -75,10 +79,10 @@ func TestDeleteWithForceOption(t *testing.T) {
 	assert.Equal(t, repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
 	assert.Equal(t, len(ui.Prompts), 0)
 	assert.Equal(t, len(ui.Outputs), 2)
-	assert.Contains(t, ui.Outputs[0], "Deleting service broker")
-	assert.Contains(t, ui.Outputs[0], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service broker", "service-broker-to-delete", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestDeleteAppThatDoesNotExist(t *testing.T) {
@@ -88,11 +92,11 @@ func TestDeleteAppThatDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, repo.FindByNameName, "service-broker-to-delete")
 	assert.Equal(t, repo.DeletedServiceBrokerGuid, "")
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "service-broker-to-delete")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting service broker", "service-broker-to-delete"},
+		{"OK"},
+		{"service-broker-to-delete", "does not exist"},
+	})
 }
 
 func callDeleteServiceBroker(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {

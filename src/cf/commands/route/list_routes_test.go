@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -52,24 +53,13 @@ func TestListingRoutes(t *testing.T) {
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting routes")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-
-	assert.Contains(t, ui.Outputs[1], "host")
-	assert.Contains(t, ui.Outputs[1], "domain")
-	assert.Contains(t, ui.Outputs[1], "apps")
-
-	assert.Contains(t, ui.Outputs[2], "hostname-1")
-	assert.Contains(t, ui.Outputs[2], "example.com")
-	assert.Contains(t, ui.Outputs[2], "dora, dora2")
-
-	assert.Contains(t, ui.Outputs[3], "hostname-2")
-	assert.Contains(t, ui.Outputs[3], "cfapps.com")
-	assert.Contains(t, ui.Outputs[3], "my-app, my-app2")
-
-	assert.Contains(t, ui.Outputs[4], "hostname-3")
-	assert.Contains(t, ui.Outputs[4], "another-example.com")
-	assert.Contains(t, ui.Outputs[4], "july")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting routes", "my-user"},
+		{"host", "domain", "apps"},
+		{"hostname-1", "example.com", "dora", "dora2"},
+		{"hostname-2", "cfapps.com", "my-app", "my-app2"},
+		{"hostname-3", "another-example.com", "july"},
+	})
 }
 
 func TestListingRoutesWhenNoneExist(t *testing.T) {
@@ -78,9 +68,10 @@ func TestListingRoutesWhenNoneExist(t *testing.T) {
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting routes")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "No routes found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting routes"},
+		{"No routes found"},
+	})
 }
 
 func TestListingRoutesWhenFindFails(t *testing.T) {
@@ -88,8 +79,10 @@ func TestListingRoutesWhenFindFails(t *testing.T) {
 
 	ui := callListRoutes(t, []string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting routes")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting routes"},
+		{"FAILED"},
+	})
 }
 
 func callListRoutes(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {

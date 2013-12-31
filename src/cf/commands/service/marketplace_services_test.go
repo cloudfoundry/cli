@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -54,19 +55,13 @@ func TestMarketplaceServices(t *testing.T) {
 
 	ui := callMarketplaceServices(t, config, serviceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting services from marketplace in org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[4], "my-service-offering-1")
-	assert.Contains(t, ui.Outputs[4], "service offering 1 description")
-	assert.Contains(t, ui.Outputs[4], "service-plan-a, service-plan-b")
-
-	assert.Contains(t, ui.Outputs[5], "my-service-offering-2")
-	assert.Contains(t, ui.Outputs[5], "service offering 2 description")
-	assert.Contains(t, ui.Outputs[5], "service-plan-c, service-plan-d")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting services from marketplace in org", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"service", "plans", "description"},
+		{"my-service-offering-1", "service offering 1 description", "service-plan-a", "service-plan-b"},
+		{"my-service-offering-2", "service offering 2 description", "service-plan-c", "service-plan-d"},
+	})
 }
 
 func TestMarketplaceServicesWhenNotLoggedIn(t *testing.T) {
@@ -77,8 +72,14 @@ func TestMarketplaceServicesWhenNotLoggedIn(t *testing.T) {
 
 	ui := callMarketplaceServices(t, config, serviceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting services from marketplace...")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting services from marketplace..."},
+		{"OK"},
+		{"No service offerings found"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"service", "plans", "description"},
+	})
 }
 
 func callMarketplaceServices(t *testing.T, config *configuration.Configuration, serviceRepo *testapi.FakeServiceRepo) (ui *testterm.FakeUI) {

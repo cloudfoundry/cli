@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -46,15 +47,16 @@ func TestDeleteUserWhenConfirmingWithY(t *testing.T) {
 
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Equal(t, len(ui.Prompts), 1)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-	assert.Contains(t, ui.Outputs[0], "Deleting user")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[0], "current-user")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "my-user"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting user", "my-user", "current-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
 	assert.Equal(t, userRepo.DeleteUserGuid, "my-found-user-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteUserWhenConfirmingWithYes(t *testing.T) {
@@ -62,22 +64,23 @@ func TestDeleteUserWhenConfirmingWithYes(t *testing.T) {
 
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Equal(t, len(ui.Prompts), 1)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-	assert.Contains(t, ui.Outputs[0], "Deleting user")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[0], "current-user")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "my-user"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting user", "my-user", "current-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
 	assert.Equal(t, userRepo.DeleteUserGuid, "my-found-user-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteUserWhenNotConfirming(t *testing.T) {
 	ui, userRepo := deleteWithConfirmation(t, "Nope")
 
 	assert.Equal(t, len(ui.Outputs), 0)
-	assert.Contains(t, ui.Prompts[0], "Really delete")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{{"Really delete"}})
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "")
 	assert.Equal(t, userRepo.DeleteUserGuid, "")
@@ -93,13 +96,13 @@ func TestDeleteUserWithForceOption(t *testing.T) {
 
 	assert.Equal(t, len(ui.Outputs), 2)
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting user")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting user", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
 	assert.Equal(t, userRepo.DeleteUserGuid, "my-found-user-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteUserWhenUserNotFound(t *testing.T) {
@@ -110,14 +113,14 @@ func TestDeleteUserWhenUserNotFound(t *testing.T) {
 
 	assert.Equal(t, len(ui.Outputs), 3)
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting user")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting user", "my-user"},
+		{"OK"},
+		{"my-user", "does not exist"},
+	})
 
 	assert.Equal(t, userRepo.FindByUsernameUsername, "my-user")
 	assert.Equal(t, userRepo.DeleteUserGuid, "")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
 }
 
 func callDeleteUser(t *testing.T, args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -61,9 +62,10 @@ func TestUpdateServiceAuthToken(t *testing.T) {
 	expectedAuthToken.Provider = "found provider"
 	expectedAuthToken.Token = "a value"
 
-	assert.Contains(t, ui.Outputs[0], "Updating service auth token as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating service auth token as", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, authTokenRepo.FindByLabelAndProviderLabel, "a label")
 	assert.Equal(t, authTokenRepo.FindByLabelAndProviderProvider, "a provider")

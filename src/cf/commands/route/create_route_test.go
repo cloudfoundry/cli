@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -66,12 +67,10 @@ func TestCreateRoute(t *testing.T) {
 
 	ui := callCreateRoute(t, []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Creating route")
-	assert.Contains(t, ui.Outputs[0], "host.example.com")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, routeRepo.CreateInSpaceHost, "host")
 	assert.Equal(t, routeRepo.CreateInSpaceDomainGuid, "domain-guid")
@@ -105,13 +104,15 @@ func TestCreateRouteIsIdempotent(t *testing.T) {
 
 	ui := callCreateRoute(t, []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "host.example.com")
-	assert.Contains(t, ui.Outputs[2], "already exists")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating route"},
+		{"OK"},
+		{"host.example.com", "already exists"},
+	})
+
 	assert.Equal(t, routeRepo.CreateInSpaceHost, "host")
 	assert.Equal(t, routeRepo.CreateInSpaceDomainGuid, "domain-guid")
 	assert.Equal(t, routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
-
 }
 
 func TestRouteCreator(t *testing.T) {
@@ -147,16 +148,15 @@ func TestRouteCreator(t *testing.T) {
 	assert.Equal(t, route.Guid, createdRoute.Guid)
 
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Contains(t, ui.Outputs[0], "Creating route")
-	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, routeRepo.CreateInSpaceHost, "my-host")
 	assert.Equal(t, routeRepo.CreateInSpaceDomainGuid, "domain-guid")
 	assert.Equal(t, routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callCreateRoute(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {

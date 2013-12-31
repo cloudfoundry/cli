@@ -4,6 +4,7 @@ import (
 	. "cf/commands/buildpack"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -34,37 +35,38 @@ func TestUpdateBuildpack(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
-
-	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	ui := callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }
 
 func TestUpdateBuildpackPosition(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	ui := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 	assert.Equal(t, *repo.UpdateBuildpack.Position, 999)
-
-	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }
 
 func TestUpdateBuildpackPath(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callUpdateBuildpack([]string{"-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	ui := callUpdateBuildpack([]string{"-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 	assert.Equal(t, bitsRepo.UploadBuildpackPath, "buildpack.zip")
 
-	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }
 
 func TestUpdateBuildpackWithInvalidPath(t *testing.T) {
@@ -72,11 +74,12 @@ func TestUpdateBuildpackWithInvalidPath(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 	bitsRepo.UploadBuildpackErr = true
 
-	fakeUI := callUpdateBuildpack([]string{"-p", "bogus/path", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	ui := callUpdateBuildpack([]string{"-p", "bogus/path", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating buildpack", "my-buildpack"},
+		{"FAILED"},
+	})
 }
 
 func callUpdateBuildpack(args []string, reqFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository,

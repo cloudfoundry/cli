@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -34,13 +35,12 @@ func TestListQuotas(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	ui := callListQuotas(t, reqFactory, quotaRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Getting quotas as")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[3], "name")
-	assert.Contains(t, ui.Outputs[3], "memory limit")
-	assert.Contains(t, ui.Outputs[4], "quota-name")
-	assert.Contains(t, ui.Outputs[4], "1G")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting quotas as", "my-user"},
+		{"OK"},
+		{"name", "memory limit"},
+		{"quota-name", "1g"},
+	})
 }
 
 func callListQuotas(t *testing.T, reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (fakeUI *testterm.FakeUI) {

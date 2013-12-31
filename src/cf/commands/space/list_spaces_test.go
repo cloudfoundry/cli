@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -55,12 +56,12 @@ func TestListingSpaces(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
-	assert.Contains(t, ui.Outputs[0], "Getting spaces in org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[2], "space1")
-	assert.Contains(t, ui.Outputs[3], "space2")
-	assert.Contains(t, ui.Outputs[4], "space3")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting spaces in org", "my-org", "my-user"},
+		{"space1"},
+		{"space2"},
+		{"space3"},
+	})
 }
 
 func TestListingSpacesWhenNoSpaces(t *testing.T) {
@@ -81,10 +82,10 @@ func TestListingSpacesWhenNoSpaces(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 	ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
-	assert.Contains(t, ui.Outputs[0], "Getting spaces in org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "No spaces found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting spaces in org", "my-org", "my-user"},
+		{"No spaces found"},
+	})
 }
 
 func callSpaces(args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {

@@ -6,10 +6,10 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
-	testassert "testhelpers/assert"
 	"testing"
 )
 

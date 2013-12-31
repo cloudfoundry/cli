@@ -7,6 +7,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -18,14 +19,14 @@ func TestUnmapRouteFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	routeRepo := &testapi.FakeRouteRepository{}
 
-	fakeUI := callUnmapRoute(t, []string{}, reqFactory, routeRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callUnmapRoute(t, []string{}, reqFactory, routeRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callUnmapRoute(t, []string{"foo"}, reqFactory, routeRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callUnmapRoute(t, []string{"foo"}, reqFactory, routeRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callUnmapRoute(t, []string{"foo", "bar"}, reqFactory, routeRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callUnmapRoute(t, []string{"foo", "bar"}, reqFactory, routeRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestUnmapRouteRequirements(t *testing.T) {
@@ -57,17 +58,13 @@ func TestUnmapRouteWhenUnbinding(t *testing.T) {
 
 	ui := callUnmapRoute(t, []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Removing route")
-	assert.Contains(t, ui.Outputs[0], "foo.example.com")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Removing route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, routeRepo.UnboundRouteGuid, "my-route-guid")
 	assert.Equal(t, routeRepo.UnboundAppGuid, "my-app-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callUnmapRoute(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {

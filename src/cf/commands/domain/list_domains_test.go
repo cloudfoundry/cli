@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -66,23 +67,16 @@ func TestListDomains(t *testing.T) {
 	domainRepo := &testapi.FakeDomainRepository{
 		ListDomainsForOrgDomains: []cf.Domain{domain1, domain2, domain3},
 	}
-	fakeUI := callListDomains(t, []string{}, reqFactory, domainRepo)
+	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
-
-	assert.Contains(t, fakeUI.Outputs[0], "Getting domains in org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
-
-	assert.Contains(t, fakeUI.Outputs[2], "Domain1")
-	assert.Contains(t, fakeUI.Outputs[2], "shared")
-
-	assert.Contains(t, fakeUI.Outputs[3], "Domain2")
-	assert.Contains(t, fakeUI.Outputs[3], "owned")
-	assert.Contains(t, fakeUI.Outputs[3], "my-space, my-space-2")
-
-	assert.Contains(t, fakeUI.Outputs[4], "Domain3")
-	assert.Contains(t, fakeUI.Outputs[4], "reserved")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting domains in org", "my-org", "my-user"},
+		{"name", "status", "spaces"},
+		{"Domain1", "shared"},
+		{"Domain2", "owned", "my-space", "my-space-2"},
+		{"Domain3", "reserved"},
+	})
 }
 
 func callListDomains(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {

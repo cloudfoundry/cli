@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -31,8 +32,10 @@ func testSuccessfulAuthenticate(t *testing.T, args []string) (ui *testterm.FakeU
 
 	savedConfig := testconfig.SavedConfiguration
 
-	assert.Contains(t, ui.Outputs[0], config.Target)
-	assert.Contains(t, ui.Outputs[2], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{config.Target},
+		{"OK"},
+	})
 
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
@@ -81,11 +84,13 @@ func TestUnsuccessfullyAuthenticatingWithoutInteractivity(t *testing.T) {
 		&testapi.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
 	)
 
-	assert.Contains(t, ui.Outputs[0], config.Target)
-	assert.Equal(t, ui.Outputs[1], "Authenticating...")
-	assert.Equal(t, ui.Outputs[2], "FAILED")
-	assert.Contains(t, ui.Outputs[3], "Error authenticating")
 	assert.Equal(t, len(ui.Outputs), 4)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{config.Target},
+		{"Authenticating..."},
+		{"FAILED"},
+		{"Error authenticating"},
+	})
 }
 
 func callAuthenticate(args []string, configRepo configuration.ConfigurationRepository, auth api.AuthenticationRepository) (ui *testterm.FakeUI) {

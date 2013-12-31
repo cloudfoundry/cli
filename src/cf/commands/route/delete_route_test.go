@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -53,13 +54,15 @@ func TestDeleteRouteWithConfirmation(t *testing.T) {
 
 	ui := callDeleteRoute(t, "y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Prompts[0], "Really delete")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "my-host"},
+	})
 
-	assert.Contains(t, ui.Outputs[0], "Deleting route")
-	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting route", "my-host.example.com"},
+		{"OK"},
+	})
 	assert.Equal(t, routeRepo.DeleteRouteGuid, "route-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteRouteWithForce(t *testing.T) {
@@ -79,11 +82,11 @@ func TestDeleteRouteWithForce(t *testing.T) {
 
 	assert.Equal(t, len(ui.Prompts), 0)
 
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "my-host.example.com"},
+		{"OK"},
+	})
 	assert.Equal(t, routeRepo.DeleteRouteGuid, "route-guid")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteRouteWhenRouteDoesNotExist(t *testing.T) {
@@ -94,12 +97,11 @@ func TestDeleteRouteWhenRouteDoesNotExist(t *testing.T) {
 
 	ui := callDeleteRoute(t, "y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "my-host.example.com")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "my-host")
-	assert.Contains(t, ui.Outputs[2], "does not exist")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "my-host.example.com"},
+		{"OK"},
+		{"my-host", "does not exist"},
+	})
 }
 
 func callDeleteRoute(t *testing.T, confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {

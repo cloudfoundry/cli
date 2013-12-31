@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -43,15 +44,12 @@ func TestRenameService(t *testing.T) {
 	serviceInstance.Name = "different-name"
 	serviceInstance.Guid = "different-name-guid"
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
-	fakeUI, fakeServiceRepo := callRenameService(t, []string{"my-service", "new-name"}, reqFactory)
+	ui, fakeServiceRepo := callRenameService(t, []string{"my-service", "new-name"}, reqFactory)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Renaming service")
-	assert.Contains(t, fakeUI.Outputs[0], "different-name")
-	assert.Contains(t, fakeUI.Outputs[0], "new-name")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-space")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
-	assert.Equal(t, fakeUI.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, fakeServiceRepo.RenameServiceServiceInstance, serviceInstance)
 	assert.Equal(t, fakeServiceRepo.RenameServiceNewName, "new-name")

@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -41,37 +42,38 @@ func TestDeleteSpaceRequirements(t *testing.T) {
 func TestDeleteSpaceConfirmingWithY(t *testing.T) {
 	ui, spaceRepo := deleteSpace(t, []string{"y"}, []string{"space-to-delete"}, defaultDeleteSpaceReqFactory())
 
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-
-	assert.Contains(t, ui.Outputs[0], "Deleting space ")
-	assert.Contains(t, ui.Outputs[0], "space-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "space-to-delete"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting space", "space-to-delete", "my-org", "my-user"},
+		{"OK"},
+	})
 	assert.Equal(t, spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteSpaceConfirmingWithYes(t *testing.T) {
 	ui, spaceRepo := deleteSpace(t, []string{"Yes"}, []string{"space-to-delete"}, defaultDeleteSpaceReqFactory())
 
-	assert.Contains(t, ui.Prompts[0], "Really delete")
-
-	assert.Contains(t, ui.Outputs[0], "Deleting space ")
-	assert.Contains(t, ui.Outputs[0], "space-to-delete")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"Really delete", "space-to-delete"},
+	})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting space", "space-to-delete", "my-org", "my-user"},
+		{"OK"},
+	})
 	assert.Equal(t, spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteSpaceWithForceOption(t *testing.T) {
 	ui, spaceRepo := deleteSpace(t, []string{}, []string{"-f", "space-to-delete"}, defaultDeleteSpaceReqFactory())
 
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting")
-	assert.Contains(t, ui.Outputs[0], "space-to-delete")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting", "space-to-delete"},
+		{"OK"},
+	})
 	assert.Equal(t, spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func TestDeleteSpaceWhenSpaceIsTargeted(t *testing.T) {

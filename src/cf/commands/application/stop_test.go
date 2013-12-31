@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -37,12 +38,10 @@ func TestStopApplication(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Stopping app")
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Stopping app", "my-app", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
@@ -57,9 +56,11 @@ func TestStopApplicationWhenStopFails(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "Error updating app.")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Stopping", "my-app"},
+		{"FAILED"},
+		{"Error updating app."},
+	})
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 }
 
@@ -73,8 +74,9 @@ func TestStopApplicationIsAlreadyStopped(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{Application: app}
 	ui := callStop(t, args, reqFactory, appRepo)
 
-	assert.Contains(t, ui.Outputs[0], "my-app")
-	assert.Contains(t, ui.Outputs[0], "is already stopped")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"my-app", "is already stopped"},
+	})
 	assert.Equal(t, appRepo.UpdateAppGuid, "")
 }
 

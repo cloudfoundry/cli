@@ -5,6 +5,7 @@ import (
 	. "cf/commands/buildpack"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -27,15 +28,15 @@ func TestCreateBuildpackRequirements(t *testing.T) {
 func TestCreateBuildpack(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 5)
-	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[3], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[4], "OK")
+	assert.Equal(t, len(ui.Outputs), 5)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating buildpack", "my-buildpack"},
+		{"OK"},
+		{"Uploading buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }
 
 func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
@@ -43,28 +44,28 @@ func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 
 	repo.CreateBuildpackExists = true
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 3)
-	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[2], "already exists")
+	assert.Equal(t, len(ui.Outputs), 3)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating buildpack", "my-buildpack"},
+		{"OK"},
+		{"my-buildpack", "already exists"},
+	})
 }
 
 func TestCreateBuildpackWithPosition(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(fakeUI.Outputs), 5)
-	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[3], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[4], "OK")
+	assert.Equal(t, len(ui.Outputs), 5)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating buildpack", "my-buildpack"},
+		{"OK"},
+		{"Uploading buildpack", "my-buildpack"},
+		{"OK"},
+	})
 }
 
 func TestCreateBuildpackWithInvalidPath(t *testing.T) {
@@ -72,24 +73,25 @@ func TestCreateBuildpackWithInvalidPath(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 
 	bitsRepo.UploadBuildpackErr = true
-	fakeUI := callCreateBuildpack([]string{"my-buildpack", "bogus/path", "5"}, reqFactory, repo, bitsRepo)
+	ui := callCreateBuildpack([]string{"my-buildpack", "bogus/path", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[4], "FAILED")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating buildpack", "my-buildpack"},
+		{"OK"},
+		{"Uploading buildpack"},
+		{"FAILED"},
+	})
 }
 
 func TestCreateBuildpackFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callCreateBuildpack([]string{}, reqFactory, repo, bitsRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callCreateBuildpack([]string{}, reqFactory, repo, bitsRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
-	assert.False(t, fakeUI.FailedWithUsage)
+	ui = callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func getRepositories() (*testapi.FakeBuildpackRepository, *testapi.FakeBuildpackBitsRepository) {

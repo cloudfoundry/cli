@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -43,13 +44,14 @@ func TestDeleteDomainSuccess(t *testing.T) {
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
-	assert.Contains(t, ui.Prompts[0], "delete")
-	assert.Contains(t, ui.Prompts[0], "foo.com")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"delete", "foo.com"},
+	})
 
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com", "my-user"},
+		{"OK"},
+	})
 }
 
 func TestDeleteDomainNoConfirmation(t *testing.T) {
@@ -65,13 +67,14 @@ func TestDeleteDomainNoConfirmation(t *testing.T) {
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "")
 
-	assert.Contains(t, ui.Prompts[0], "delete")
-	assert.Contains(t, ui.Prompts[0], "foo.com")
-
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"delete", "foo.com"},
+	})
 
 	assert.Equal(t, len(ui.Outputs), 1)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com"},
+	})
 }
 
 func TestDeleteDomainNotFound(t *testing.T) {
@@ -84,11 +87,11 @@ func TestDeleteDomainNotFound(t *testing.T) {
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "")
 
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "foo.com")
-	assert.Contains(t, ui.Outputs[2], "not found")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com"},
+		{"OK"},
+		{"foo.com", "not found"},
+	})
 }
 
 func TestDeleteDomainFindError(t *testing.T) {
@@ -101,11 +104,11 @@ func TestDeleteDomainFindError(t *testing.T) {
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "")
 
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "foo.com")
-	assert.Contains(t, ui.Outputs[2], "failed badly")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com"},
+		{"FAILED"},
+		{"foo.com", "failed badly"},
+	})
 }
 
 func TestDeleteDomainDeleteError(t *testing.T) {
@@ -122,11 +125,11 @@ func TestDeleteDomainDeleteError(t *testing.T) {
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[1], "FAILED")
-	assert.Contains(t, ui.Outputs[2], "foo.com")
-	assert.Contains(t, ui.Outputs[2], "failed badly")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com"},
+		{"FAILED"},
+		{"foo.com", "failed badly"},
+	})
 }
 
 func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
@@ -143,12 +146,14 @@ func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
-	assert.Contains(t, ui.Prompts[0], "shared")
-	assert.Contains(t, ui.Prompts[0], "foo.com")
+	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
+		{"shared", "foo.com"},
+	})
 
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com"},
+		{"OK"},
+	})
 }
 
 func TestDeleteDomainForceFlagSkipsConfirmation(t *testing.T) {
@@ -166,9 +171,10 @@ func TestDeleteDomainForceFlagSkipsConfirmation(t *testing.T) {
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
 
 	assert.Equal(t, len(ui.Prompts), 0)
-	assert.Contains(t, ui.Outputs[0], "Deleting domain")
-	assert.Contains(t, ui.Outputs[0], "foo.com")
-	assert.Contains(t, ui.Outputs[1], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Deleting domain", "foo.com"},
+		{"OK"},
+	})
 }
 
 func callDeleteDomain(t *testing.T, args []string, inputs []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (ui *testterm.FakeUI) {

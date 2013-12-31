@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -61,9 +62,11 @@ func TestUpdateServiceBroker(t *testing.T) {
 
 	assert.Equal(t, repo.FindByNameName, "my-broker")
 
-	assert.Contains(t, ui.Outputs[0], "Updating service broker")
-	assert.Contains(t, ui.Outputs[0], "my-found-broker")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Updating service broker", "my-found-broker", "my-user"},
+		{"OK"},
+	})
+
 	expectedServiceBroker := cf.ServiceBroker{}
 	expectedServiceBroker.Name = "my-found-broker"
 	expectedServiceBroker.Username = "new-username"
@@ -72,8 +75,6 @@ func TestUpdateServiceBroker(t *testing.T) {
 	expectedServiceBroker.Guid = "my-found-broker-guid"
 
 	assert.Equal(t, repo.UpdatedServiceBroker, expectedServiceBroker)
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callUpdateServiceBroker(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {

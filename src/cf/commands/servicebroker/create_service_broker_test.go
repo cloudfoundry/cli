@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -53,16 +54,15 @@ func TestCreateServiceBroker(t *testing.T) {
 	args := []string{"my-broker", "my username", "my password", "http://example.com"}
 	ui := callCreateServiceBroker(t, args, reqFactory, serviceBrokerRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Creating service broker ")
-	assert.Contains(t, ui.Outputs[0], "my-broker")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating service broker", "my-broker", "my-user"},
+		{"OK"},
+	})
 
 	assert.Equal(t, serviceBrokerRepo.CreateName, "my-broker")
 	assert.Equal(t, serviceBrokerRepo.CreateUrl, "http://example.com")
 	assert.Equal(t, serviceBrokerRepo.CreateUsername, "my username")
 	assert.Equal(t, serviceBrokerRepo.CreatePassword, "my password")
-
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callCreateServiceBroker(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {

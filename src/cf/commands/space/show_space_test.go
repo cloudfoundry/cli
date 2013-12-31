@@ -5,6 +5,7 @@ import (
 	. "cf/commands/space"
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -56,20 +57,15 @@ func TestShowSpaceInfoSuccess(t *testing.T) {
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
 	ui := callShowSpace(t, []string{"space1"}, reqFactory)
-	assert.Contains(t, ui.Outputs[0], "Getting info for space")
-	assert.Contains(t, ui.Outputs[0], "space1")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-	assert.Contains(t, ui.Outputs[2], "space1")
-	assert.Contains(t, ui.Outputs[3], "Org")
-	assert.Contains(t, ui.Outputs[3], "my-org")
-	assert.Contains(t, ui.Outputs[4], "Apps")
-	assert.Contains(t, ui.Outputs[4], "app1")
-	assert.Contains(t, ui.Outputs[5], "Domains")
-	assert.Contains(t, ui.Outputs[5], "domain1")
-	assert.Contains(t, ui.Outputs[6], "Services")
-	assert.Contains(t, ui.Outputs[6], "service1")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting info for space", "space1", "my-org", "my-user"},
+		{"OK"},
+		{"space1"},
+		{"Org", "my-org"},
+		{"Apps", "app1"},
+		{"Domains", "domain1"},
+		{"Services", "service1"},
+	})
 }
 
 func callShowSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {

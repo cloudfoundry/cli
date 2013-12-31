@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -17,11 +18,11 @@ func TestRenameSpaceFailsWithUsage(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	spaceRepo := &testapi.FakeSpaceRepository{}
 
-	fakeUI := callRenameSpace(t, []string{}, reqFactory, spaceRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui := callRenameSpace(t, []string{}, reqFactory, spaceRepo)
+	assert.True(t, ui.FailedWithUsage)
 
-	fakeUI = callRenameSpace(t, []string{"foo"}, reqFactory, spaceRepo)
-	assert.True(t, fakeUI.FailedWithUsage)
+	ui = callRenameSpace(t, []string{"foo"}, reqFactory, spaceRepo)
+	assert.True(t, ui.FailedWithUsage)
 }
 
 func TestRenameSpaceRequirements(t *testing.T) {
@@ -49,14 +50,13 @@ func TestRenameSpaceRun(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
 	ui := callRenameSpace(t, []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 
-	assert.Contains(t, ui.Outputs[0], "Renaming space")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-new-space")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Renaming space", "my-space", "my-new-space", "my-org", "my-user"},
+		{"OK"},
+	})
+
 	assert.Equal(t, spaceRepo.RenameSpaceGuid, "my-space-guid")
 	assert.Equal(t, spaceRepo.RenameNewName, "my-new-space")
-	assert.Contains(t, ui.Outputs[1], "OK")
 }
 
 func callRenameSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository) (ui *testterm.FakeUI) {

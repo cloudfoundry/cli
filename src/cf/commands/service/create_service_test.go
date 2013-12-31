@@ -7,6 +7,7 @@ import (
 	"cf/configuration"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
@@ -25,20 +26,18 @@ func TestCreateService(t *testing.T) {
 	offering2.Label = "postgres"
 	serviceOfferings := []cf.ServiceOffering{offering, offering2}
 	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
-	fakeUI := callCreateService(t,
+	ui := callCreateService(t,
 		[]string{"cleardb", "spark", "my-cleardb-service"},
 		[]string{},
 		serviceRepo,
 	)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-cleardb-service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-org")
-	assert.Contains(t, fakeUI.Outputs[0], "my-space")
-	assert.Contains(t, fakeUI.Outputs[0], "my-user")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
 	assert.Equal(t, serviceRepo.CreateServiceInstanceName, "my-cleardb-service")
 	assert.Equal(t, serviceRepo.CreateServiceInstancePlanGuid, "cleardb-spark-guid")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
 }
 
 func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
@@ -52,19 +51,19 @@ func TestCreateServiceWhenServiceAlreadyExists(t *testing.T) {
 	offering2.Label = "postgres"
 	serviceOfferings := []cf.ServiceOffering{offering, offering2}
 	serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
-	fakeUI := callCreateService(t,
+	ui := callCreateService(t,
 		[]string{"cleardb", "spark", "my-cleardb-service"},
 		[]string{},
 		serviceRepo,
 	)
 
-	assert.Contains(t, fakeUI.Outputs[0], "Creating service")
-	assert.Contains(t, fakeUI.Outputs[0], "my-cleardb-service")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating service", "my-cleardb-service"},
+		{"OK"},
+		{"my-cleardb-service", "already exists"},
+	})
 	assert.Equal(t, serviceRepo.CreateServiceInstanceName, "my-cleardb-service")
 	assert.Equal(t, serviceRepo.CreateServiceInstancePlanGuid, "cleardb-spark-guid")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[2], "my-cleardb-service")
-	assert.Contains(t, fakeUI.Outputs[2], "already exists")
 }
 
 func callCreateService(t *testing.T, args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
