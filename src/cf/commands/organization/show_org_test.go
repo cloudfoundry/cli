@@ -52,7 +52,7 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "my-org"
 	org.Guid = "my-org-guid"
-	org.MemoryLimit = "256M"
+	org.QuotaDefinition = cf.NewQuotaFields("cantina-quota", 512)
 	org.Spaces = []cf.SpaceFields{developmentSpaceFields, stagingSpaceFields}
 	org.Domains = []cf.DomainFields{domainFields, cfAppDomainFields}
 
@@ -68,7 +68,7 @@ func TestRunWhenOrganizationExists(t *testing.T) {
 		{"OK"},
 		{"my-org"},
 		{"  domains:", "cfapps.io", "cf-app.com"},
-		{"  quota: ", "256M"},
+		{"  quota: ", "cantina-quota", "512M"},
 		{"  spaces:", "development", "staging"},
 	})
 }

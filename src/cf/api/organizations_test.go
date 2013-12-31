@@ -95,6 +95,7 @@ func TestOrganizationsFindByName(t *testing.T) {
 			"name": "Org1",
 			"quota_definition": {
 			  "entity": {
+			  	"name": "not-your-average-quota",
 			    "memory_limit": 128
 			  }
 			},
@@ -122,7 +123,8 @@ func TestOrganizationsFindByName(t *testing.T) {
 
 	assert.Equal(t, org.Name, existingOrg.Name)
 	assert.Equal(t, org.Guid, existingOrg.Guid)
-	assert.Equal(t, org.MemoryLimit, "128M")
+	assert.Equal(t, org.QuotaDefinition.Name, "not-your-average-quota")
+	assert.Equal(t, org.QuotaDefinition.MemoryLimit, uint64(128))
 	assert.Equal(t, len(org.Spaces), 1)
 	assert.Equal(t, org.Spaces[0].Name, "Space1")
 	assert.Equal(t, org.Spaces[0].Guid, "space1-guid")

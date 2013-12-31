@@ -31,7 +31,7 @@ func (model BasicFields) String() string {
 
 type OrganizationFields struct {
 	BasicFields
-	MemoryLimit string
+	QuotaDefinition QuotaFields
 }
 
 type Organization struct {
@@ -313,6 +313,12 @@ type ServiceBindingFields struct {
 	Guid    string
 	Url     string
 	AppGuid string
+}
+
+func NewQuotaFields(name string, memory uint64) (q QuotaFields) {
+	q.Name = name
+	q.MemoryLimit = memory
+	return
 }
 
 type QuotaFields struct {
