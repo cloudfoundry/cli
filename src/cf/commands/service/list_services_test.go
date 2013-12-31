@@ -9,6 +9,7 @@ import (
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
+	testassert "testhelpers/assert"
 	"testing"
 )
 
@@ -62,22 +63,11 @@ func TestServices(t *testing.T) {
 	cmd := NewListServices(ui, config, serviceSummaryRepo)
 	cmd.Run(testcmd.NewContext("services", []string{}))
 
-	assert.Contains(t, ui.Outputs[0], "Getting services in org")
-	assert.Contains(t, ui.Outputs[0], "my-org")
-	assert.Contains(t, ui.Outputs[0], "my-space")
-	assert.Contains(t, ui.Outputs[0], "my-user")
-	assert.Contains(t, ui.Outputs[1], "OK")
-
-	assert.Contains(t, ui.Outputs[4], "my-service-1")
-	assert.Contains(t, ui.Outputs[4], "cleardb")
-	assert.Contains(t, ui.Outputs[4], "spark")
-	assert.Contains(t, ui.Outputs[4], "cli1, cli2")
-
-	assert.Contains(t, ui.Outputs[5], "my-service-2")
-	assert.Contains(t, ui.Outputs[5], "cleardb")
-	assert.Contains(t, ui.Outputs[5], "spark-2")
-	assert.Contains(t, ui.Outputs[5], "cli1")
-
-	assert.Contains(t, ui.Outputs[6], "my-service-provided-by-user")
-	assert.Contains(t, ui.Outputs[6], "user-provided")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting services in org", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"my-service-1", "cleardb", "spark", "cli1, cli2"},
+		{"my-service-2", "cleardb", "spark-2", "cli1"},
+		{"my-service-provided-by-user", "user-provided"},
+	})
 }
