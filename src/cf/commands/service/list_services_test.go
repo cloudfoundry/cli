@@ -71,3 +71,37 @@ func TestServices(t *testing.T) {
 		{"my-service-provided-by-user", "user-provided"},
 	})
 }
+
+func TestEmptyServicesList(t *testing.T) {
+	serviceInstances := []cf.ServiceInstance{}
+	serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
+		GetSummariesInCurrentSpaceInstances: serviceInstances,
+	}
+	ui := &testterm.FakeUI{}
+
+	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+		Username: "my-user",
+	})
+	assert.NoError(t, err)
+	org := cf.OrganizationFields{}
+	org.Name = "my-org"
+	space := cf.SpaceFields{}
+	space.Name = "my-space"
+	config := &configuration.Configuration{
+		SpaceFields:        space,
+		OrganizationFields: org,
+		AccessToken:        token,
+	}
+
+	cmd := NewListServices(ui, config, serviceSummaryRepo)
+	cmd.Run(testcmd.NewContext("services", []string{}))
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting services in org", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"No services found"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"name", "service", "plan", "bound apps"},
+	})
+}
