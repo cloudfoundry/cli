@@ -10,6 +10,8 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+const AppAlreadyBoundErrorCode = "90003"
+
 type BindService struct {
 	ui                 terminal.UI
 	config             *configuration.Configuration
@@ -47,15 +49,19 @@ func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	instance := cmd.serviceInstanceReq.GetServiceInstance()
 
+	cmd.BindApplication(app, instance)
+}
+
+func (cmd *BindService) BindApplication(app cf.Application, serviceInstance cf.ServiceInstance) {
 	cmd.ui.Say("Binding service %s to app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(instance.Name),
+		terminal.EntityNameColor(serviceInstance.Name),
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.serviceBindingRepo.Create(instance.Guid, app.Guid)
+	apiResponse := cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid)
 	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != "90003" {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -63,8 +69,8 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	if apiResponse.ErrorCode == "90003" {
-		cmd.ui.Warn("App %s is already bound to %s.", app.Name, instance.Name)
+	if apiResponse.ErrorCode == AppAlreadyBoundErrorCode {
+		cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
 		return
 	}
 
