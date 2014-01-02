@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -18,6 +19,10 @@ type BindService struct {
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
+}
+
+type ServiceBinder interface {
+	BindApplication(app cf.Application, serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
 func NewBindService(ui terminal.UI, config *configuration.Configuration, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
@@ -47,12 +52,8 @@ func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd *BindService) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	instance := cmd.serviceInstanceReq.GetServiceInstance()
+	serviceInstance := cmd.serviceInstanceReq.GetServiceInstance()
 
-	cmd.BindApplication(app, instance)
-}
-
-func (cmd *BindService) BindApplication(app cf.Application, serviceInstance cf.ServiceInstance) {
 	cmd.ui.Say("Binding service %s to app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(serviceInstance.Name),
 		terminal.EntityNameColor(app.Name),
@@ -61,10 +62,9 @@ func (cmd *BindService) BindApplication(app cf.Application, serviceInstance cf.S
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid)
-	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != "90003" {
+	apiResponse := cmd.BindApplication(app, serviceInstance)
+	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != AppAlreadyBoundErrorCode {
 		cmd.ui.Failed(apiResponse.Message)
-		return
 	}
 
 	cmd.ui.Ok()
@@ -75,4 +75,9 @@ func (cmd *BindService) BindApplication(app cf.Application, serviceInstance cf.S
 	}
 
 	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
+}
+
+func (cmd *BindService) BindApplication(app cf.Application, serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+	apiResponse = cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid)
+	return
 }

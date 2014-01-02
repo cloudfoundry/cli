@@ -3,6 +3,7 @@ package application
 import (
 	"cf"
 	"cf/api"
+	"cf/commands/service"
 	"cf/configuration"
 	"cf/manifest"
 	"cf/net"
@@ -16,32 +17,38 @@ import (
 )
 
 type Push struct {
-	ui           terminal.UI
-	appSet       cf.AppSet
-	config       *configuration.Configuration
-	manifestRepo manifest.ManifestRepository
-	starter      ApplicationStarter
-	stopper      ApplicationStopper
-	appRepo      api.ApplicationRepository
-	domainRepo   api.DomainRepository
-	routeRepo    api.RouteRepository
-	stackRepo    api.StackRepository
-	appBitsRepo  api.ApplicationBitsRepository
+	ui             terminal.UI
+	appSet         cf.AppSet
+	config         *configuration.Configuration
+	manifestRepo   manifest.ManifestRepository
+	starter        ApplicationStarter
+	stopper        ApplicationStopper
+	binder         service.ServiceBinder
+	appRepo        api.ApplicationRepository
+	domainRepo     api.DomainRepository
+	routeRepo      api.RouteRepository
+	serviceRepo    api.ServiceRepository
+	stackRepo      api.StackRepository
+	appBitsRepo    api.ApplicationBitsRepository
+	globalServices cf.ServiceInstanceSet
 }
 
-func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository, starter ApplicationStarter, stopper ApplicationStopper,
-	aR api.ApplicationRepository, dR api.DomainRepository, rR api.RouteRepository, sR api.StackRepository,
-	appBitsRepo api.ApplicationBitsRepository) (cmd *Push) {
+func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository,
+	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
+	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
+	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository) (cmd *Push) {
 	cmd = &Push{}
 	cmd.ui = ui
 	cmd.config = config
 	cmd.manifestRepo = manifestRepo
 	cmd.starter = starter
 	cmd.stopper = stopper
-	cmd.appRepo = aR
-	cmd.domainRepo = dR
-	cmd.routeRepo = rR
-	cmd.stackRepo = sR
+	cmd.binder = binder
+	cmd.appRepo = appRepo
+	cmd.domainRepo = domainRepo
+	cmd.routeRepo = routeRepo
+	cmd.serviceRepo = serviceRepo
+	cmd.stackRepo = stackRepo
 	cmd.appBitsRepo = appBitsRepo
 	return
 }
@@ -136,14 +143,35 @@ func (cmd *Push) Run(c *cli.Context) {
 			cmd.ui.Failed(apiResponse.Message)
 			return
 		}
-
 		cmd.ui.Ok()
+
+		if appParams.Has("services") {
+			services := generic.NewMap(appParams.Get("services"))
+			generic.Each(services, func(serviceName, fields interface{}) {
+				serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName.(string))
+
+				if response.IsNotSuccessful() {
+					cmd.ui.Failed("Could not find service %s to bind to %s", serviceName, appParams.Get("name").(string))
+					return
+				}
+
+				cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, appParams.Get("name").(string), cmd.config.OrganizationFields.Name, cmd.config.SpaceFields.Name, cmd.config.Username())
+				bindResponse := cmd.binder.BindApplication(app, serviceInstance)
+				cmd.ui.Ok()
+
+				if bindResponse.IsNotSuccessful() && bindResponse.ErrorCode != service.AppAlreadyBoundErrorCode {
+					cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, bindResponse.Message)
+					return
+				}
+			})
+		}
+
 		cmd.restart(app, appParams, c)
 	}
 }
 
 func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
-	if !(*appParams).Has("stack") {
+	if !appParams.Has("stack") {
 		return
 	}
 
@@ -157,7 +185,7 @@ func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
 	}
 
 	cmd.ui.Ok()
-	(*appParams).Set("stack_guid", stack.Guid)
+	appParams.Set("stack_guid", stack.Guid)
 }
 
 func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCreateApp bool, c *cli.Context) {
