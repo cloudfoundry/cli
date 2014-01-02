@@ -3,6 +3,7 @@ package formatters
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -42,8 +43,19 @@ func ByteSize(bytes uint64) string {
 }
 
 func BytesFromString(s string) (bytes uint64, err error) {
-	unit := string(s[len(s)-1])
-	stringValue := s[0 : len(s)-1]
+	var unit, stringValue string
+	unit = string(s[len(s)-1])
+
+	matches, err := regexp.MatchString("^[0-9]$", unit)
+	if err != nil {
+		return
+	}
+
+	if matches {
+		stringValue = s
+	} else {
+		stringValue = s[0 : len(s)-1]
+	}
 
 	value, err := strconv.ParseUint(stringValue, 10, 0)
 	if err != nil {
@@ -59,6 +71,8 @@ func BytesFromString(s string) (bytes uint64, err error) {
 		bytes = value * MEGABYTE
 	case "K":
 		bytes = value * KILOBYTE
+	default:
+		bytes = value * MEGABYTE
 	}
 
 	if bytes == 0 {
