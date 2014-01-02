@@ -32,7 +32,6 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())
 	factory.cmdsByName["apps"] = application.NewListApps(ui, config, repoLocator.GetAppSummaryRepository())
 	factory.cmdsByName["auth"] = NewAuthenticate(ui, configRepo, repoLocator.GetAuthenticationRepository())
-	factory.cmdsByName["bind-service"] = service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["buildpacks"] = buildpack.NewListBuildpacks(ui, repoLocator.GetBuildpackRepository())
 	factory.cmdsByName["create-buildpack"] = buildpack.NewCreateBuildpack(ui, repoLocator.GetBuildpackRepository(), repoLocator.GetBuildpackBitsRepository())
 	factory.cmdsByName["create-domain"] = domain.NewCreateDomain(ui, config, repoLocator.GetDomainRepository())
@@ -104,12 +103,14 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, configRepo 
 	start := application.NewStart(ui, config, displayApp, repoLocator.GetApplicationRepository(), repoLocator.GetAppInstancesRepository(), repoLocator.GetLogsRepository())
 	stop := application.NewStop(ui, config, repoLocator.GetApplicationRepository())
 	restart := application.NewRestart(ui, start, stop)
+	bind := service.NewBindService(ui, config, repoLocator.GetServiceBindingRepository())
 
 	factory.cmdsByName["app"] = displayApp
+	factory.cmdsByName["bind-service"] = bind
 	factory.cmdsByName["start"] = start
 	factory.cmdsByName["stop"] = stop
 	factory.cmdsByName["restart"] = restart
-	factory.cmdsByName["push"] = application.NewPush(ui, config, manifestRepo, start, stop, repoLocator.GetApplicationRepository(), repoLocator.GetDomainRepository(), repoLocator.GetRouteRepository(), repoLocator.GetStackRepository(), repoLocator.GetApplicationBitsRepository())
+	factory.cmdsByName["push"] = application.NewPush(ui, config, manifestRepo, start, stop, bind, repoLocator.GetApplicationRepository(), repoLocator.GetDomainRepository(), repoLocator.GetRouteRepository(), repoLocator.GetStackRepository(), repoLocator.GetServiceRepository(), repoLocator.GetApplicationBitsRepository())
 	factory.cmdsByName["scale"] = application.NewScale(ui, config, restart, repoLocator.GetApplicationRepository())
 
 	spaceRoleSetter := user.NewSetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())

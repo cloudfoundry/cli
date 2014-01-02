@@ -311,6 +311,7 @@ type ServiceInstanceFields struct {
 	Params           map[string]string
 }
 
+type ServiceInstanceSet []ServiceInstance
 type ServiceInstance struct {
 	ServiceInstanceFields
 	ServiceBindings []ServiceBindingFields

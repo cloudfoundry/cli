@@ -64,6 +64,17 @@ applications:
 - name: app2
 `
 
+const manifestWithGlobalServices = `
+---
+services:
+- work-queue:
+    type: rediscloud
+    provider: redis-provider
+    plan: 200mb
+applications:
+- name: app-with-redis-backend
+`
+
 func TestPushingRequirements(t *testing.T) {
 	ui := new(testterm.FakeUI)
 	config := &configuration.Configuration{}
@@ -71,13 +82,15 @@ func TestPushingRequirements(t *testing.T) {
 	manifestRepo := deps.manifestRepo
 	starter := deps.starter
 	stopper := deps.stopper
+	binder := deps.binder
 	appRepo := deps.appRepo
 	domainRepo := deps.domainRepo
 	routeRepo := deps.routeRepo
 	stackRepo := deps.stackRepo
 	appBitsRepo := deps.appBitsRepo
+	serviceRepo := deps.serviceRepo
 
-	cmd := NewPush(ui, config, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	cmd := NewPush(ui, config, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo)
 	ctxt := testcmd.NewContext("push", []string{})
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -380,6 +393,46 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 	assert.Equal(t, 2, envVars.Count())
 	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")
 	assert.Equal(t, envVars.Get("SOMETHING").(string), "nothing")
+}
+
+func TestPushingWithBindingGlobalServices(t *testing.T) {
+	deps := getPushDependencies()
+	deps.routeRepo.FindByHostAndDomainErr = true
+	deps.appRepo.ReadNotFound = true
+
+	expectedServiceInstance := cf.ServiceInstance{}
+	expectedServiceInstance.Name = "work-queue"
+	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
+
+	m, err := manifest.Parse(strings.NewReader(manifestWithGlobalServices))
+	assert.NoError(t, err)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{}, deps)
+
+	assert.Equal(t, deps.binder.AppToBind.Name, "app-with-redis-backend")
+	assert.Equal(t, deps.binder.InstanceToBindTo.Name, "work-queue")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating", "app-with-redis-backend"},
+		{"OK"},
+	})
+}
+
+func TestPushWithServicesThatAreNotFound(t *testing.T) {
+	deps := getPushDependencies()
+	deps.routeRepo.FindByHostAndDomainErr = true
+	deps.serviceRepo.FindInstanceByNameErr = true
+
+	m, err := manifest.Parse(strings.NewReader(manifestWithGlobalServices))
+	assert.NoError(t, err)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{}, deps)
+	println(ui.DumpOutputs())
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"Could not find service", "work-queue", "app-with-redis-backend"},
+	})
 }
 
 func TestPushingAppWithPath(t *testing.T) {
@@ -784,22 +837,26 @@ type pushDependencies struct {
 	manifestRepo *testmanifest.FakeManifestRepository
 	starter      *testcmd.FakeAppStarter
 	stopper      *testcmd.FakeAppStopper
+	binder       *testcmd.FakeAppBinder
 	appRepo      *testapi.FakeApplicationRepository
 	domainRepo   *testapi.FakeDomainRepository
 	routeRepo    *testapi.FakeRouteRepository
 	stackRepo    *testapi.FakeStackRepository
 	appBitsRepo  *testapi.FakeApplicationBitsRepository
+	serviceRepo  *testapi.FakeServiceRepo
 }
 
 func getPushDependencies() (deps pushDependencies) {
 	deps.manifestRepo = &testmanifest.FakeManifestRepository{}
 	deps.starter = &testcmd.FakeAppStarter{}
 	deps.stopper = &testcmd.FakeAppStopper{}
+	deps.binder = &testcmd.FakeAppBinder{}
 	deps.appRepo = &testapi.FakeApplicationRepository{}
 	deps.domainRepo = &testapi.FakeDomainRepository{}
 	deps.routeRepo = &testapi.FakeRouteRepository{}
 	deps.stackRepo = &testapi.FakeStackRepository{}
 	deps.appBitsRepo = &testapi.FakeApplicationBitsRepository{}
+	deps.serviceRepo = &testapi.FakeServiceRepo{}
 
 	return
 }
@@ -829,13 +886,15 @@ func callPush(t *testing.T, args []string, deps pushDependencies) (ui *testterm.
 	manifestRepo := deps.manifestRepo
 	starter := deps.starter
 	stopper := deps.stopper
+	binder := deps.binder
 	appRepo := deps.appRepo
 	domainRepo := deps.domainRepo
 	routeRepo := deps.routeRepo
 	stackRepo := deps.stackRepo
 	appBitsRepo := deps.appBitsRepo
+	serviceRepo := deps.serviceRepo
 
-	cmd := NewPush(ui, config, manifestRepo, starter, stopper, appRepo, domainRepo, routeRepo, stackRepo, appBitsRepo)
+	cmd := NewPush(ui, config, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo)
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 

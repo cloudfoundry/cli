@@ -31,5 +31,17 @@ func NewManifest(data generic.Map) (m *Manifest) {
 		}
 	}
 
+	if data.Has("services") {
+		services := data.Get("services")
+		if services != nil && len(services.([]interface{})) > 0 {
+			globalServices := generic.NewMap(services.([]interface{})[0])
+
+			for _, app := range m.Applications {
+				localServices := generic.NewMap(app.Get("services"))
+				app.Set("services", generic.Merge(globalServices, localServices))
+			}
+		}
+	}
+
 	return
 }
