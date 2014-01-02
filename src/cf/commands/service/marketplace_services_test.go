@@ -25,12 +25,12 @@ func TestMarketplaceServices(t *testing.T) {
 	plan4.Name = "service-plan-d"
 
 	offering := cf.ServiceOffering{}
-	offering.Label = "my-service-offering-1"
+	offering.Label = "zzz-my-service-offering"
 	offering.Description = "service offering 1 description"
 	offering.Plans = []cf.ServicePlanFields{plan, plan2}
 
 	offering2 := cf.ServiceOffering{}
-	offering2.Label = "my-service-offering-2"
+	offering2.Label = "aaa-my-service-offering"
 	offering2.Description = "service offering 2 description"
 	offering2.Plans = []cf.ServicePlanFields{plan3, plan4}
 
@@ -54,13 +54,12 @@ func TestMarketplaceServices(t *testing.T) {
 	}
 
 	ui := callMarketplaceServices(t, config, serviceRepo)
-
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting services from marketplace in org", "my-org", "my-space", "my-user"},
 		{"OK"},
 		{"service", "plans", "description"},
-		{"my-service-offering-1", "service offering 1 description", "service-plan-a", "service-plan-b"},
-		{"my-service-offering-2", "service offering 2 description", "service-plan-c", "service-plan-d"},
+		{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
+		{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
 	})
 }
 

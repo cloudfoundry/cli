@@ -113,7 +113,7 @@ type ServiceBindingEntity struct {
 }
 
 type ServiceRepository interface {
-	GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse)
+	GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse)
@@ -131,7 +131,7 @@ func NewCloudControllerServiceRepository(config *configuration.Configuration, ga
 	return
 }
 
-func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.Target)
 	spaceGuid := repo.config.SpaceFields.Guid
 

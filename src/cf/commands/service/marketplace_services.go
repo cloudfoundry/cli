@@ -6,6 +6,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
+	"sort"
 	"strings"
 )
 
@@ -56,6 +57,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 		[]string{"service", "plans", "description"},
 	}
 
+	sort.Sort(serviceOfferings)
 	for _, offering := range serviceOfferings {
 		planNames := ""
 

@@ -23,7 +23,7 @@ type FakeServiceRepo struct {
 	RenameServiceNewName string
 }
 
-func (repo *FakeServiceRepo) GetServiceOfferings() (offerings []cf.ServiceOffering, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse) {
 	offerings = repo.ServiceOfferings
 	return
 }
