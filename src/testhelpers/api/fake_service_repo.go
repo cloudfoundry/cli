@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/net"
+	"generic"
 )
 
 type FakeServiceRepo struct {
@@ -16,6 +17,8 @@ type FakeServiceRepo struct {
 	FindInstanceByNameServiceInstance cf.ServiceInstance
 	FindInstanceByNameErr bool
 	FindInstanceByNameNotFound bool
+
+	FindInstanceByNameMap generic.Map
 
 	DeleteServiceServiceInstance cf.ServiceInstance
 
@@ -38,7 +41,12 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (ident
 
 func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
 	repo.FindInstanceByNameName = name
-	instance = repo.FindInstanceByNameServiceInstance
+
+	if repo.FindInstanceByNameMap.Has(name) {
+		instance = repo.FindInstanceByNameMap.Get(name).(cf.ServiceInstance)
+	} else {
+		instance = repo.FindInstanceByNameServiceInstance
+	}
 
 	if repo.FindInstanceByNameErr {
 		apiResponse = net.NewApiResponseWithMessage("Error finding instance")

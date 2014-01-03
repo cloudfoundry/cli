@@ -6,13 +6,13 @@ import (
 )
 
 type FakeAppBinder struct {
-	AppToBind cf.Application
-	InstanceToBindTo cf.ServiceInstance
+	AppsToBind cf.ApplicationSet
+	InstancesToBindTo cf.ServiceInstanceSet
 }
 
 func (binder *FakeAppBinder) BindApplication(app cf.Application, service cf.ServiceInstance) (apiResponse net.ApiResponse) {
-	binder.AppToBind = app
-	binder.InstanceToBindTo = service
+	binder.AppsToBind = append(binder.AppsToBind, app)
+	binder.InstancesToBindTo = append(binder.InstancesToBindTo, service)
 
 	return
 }
