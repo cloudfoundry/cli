@@ -65,6 +65,7 @@ type ApplicationFields struct {
 	SpaceGuid        string
 }
 
+type ApplicationSet []Application
 type Application struct {
 	ApplicationFields
 	Stack  Stack
@@ -189,6 +190,13 @@ func NewAppSet(values interface{}) (set AppSet) {
 	case []interface{}:
 		for _, val := range values {
 			app := generic.NewMap(val)
+			if app.Has("services") {
+				services := app.Get("services").([]interface{})
+				if len(services) > 0 {
+					app.Set("services", generic.NewMap(services[0]))
+				}
+			}
+
 			set = append(set, NewAppParams(app))
 		}
 	default:

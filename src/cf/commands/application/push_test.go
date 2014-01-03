@@ -75,6 +75,20 @@ applications:
 - name: app-with-redis-backend
 `
 
+const manifestWithMergedServices = `
+---
+services:
+- global-service:
+plan: 200mb
+applications:
+- name: app-with-redis-backend
+  services:
+  - nested-service:
+- name: app2
+  services:
+  - app2-service:
+`
+
 func TestPushingRequirements(t *testing.T) {
 	ui := new(testterm.FakeUI)
 	config := &configuration.Configuration{}
@@ -397,7 +411,6 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 
 func TestPushingWithBindingGlobalServices(t *testing.T) {
 	deps := getPushDependencies()
-	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
 	expectedServiceInstance := cf.ServiceInstance{}
@@ -410,10 +423,66 @@ func TestPushingWithBindingGlobalServices(t *testing.T) {
 
 	ui := callPush(t, []string{}, deps)
 
-	assert.Equal(t, deps.binder.AppToBind.Name, "app-with-redis-backend")
-	assert.Equal(t, deps.binder.InstanceToBindTo.Name, "work-queue")
+	assert.Equal(t, len(deps.binder.AppsToBind), 1)
+	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app-with-redis-backend")
+	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "work-queue")
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating", "app-with-redis-backend"},
+		{"OK"},
+		{"Binding service", "work-queue", "app-with-redis-backend", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
+}
+
+func TestPushingWithBindingMergedServices(t *testing.T) {
+	deps := getPushDependencies()
+	deps.routeRepo.FindByHostAndDomainErr = true
+	deps.appRepo.ReadNotFound = true
+
+	service1 := cf.ServiceInstance{}
+	service1.Name = "work-queue"
+	service2 := cf.ServiceInstance{}
+	service2.Name = "nested-service"
+	service3 := cf.ServiceInstance{}
+	service3.Name = "app2-service"
+
+	mapOfServices := generic.NewEmptyMap()
+	mapOfServices.Set("global-service", service1)
+	mapOfServices.Set("nested-service", service2)
+	mapOfServices.Set("app2-service", service3)
+	deps.serviceRepo.FindInstanceByNameMap = mapOfServices
+
+	m, err := manifest.Parse(strings.NewReader(manifestWithMergedServices))
+	assert.NoError(t, err)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{}, deps)
+
+	assert.Equal(t, len(deps.binder.AppsToBind), 4)
+	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app-with-redis-backend")
+	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "work-queue")
+
+	assert.Equal(t, deps.binder.AppsToBind[1].Name, "app-with-redis-backend")
+	assert.Equal(t, deps.binder.InstancesToBindTo[1].Name, "nested-service")
+
+	assert.Equal(t, deps.binder.AppsToBind[2].Name, "app2")
+	assert.Equal(t, deps.binder.InstancesToBindTo[2].Name, "work-queue")
+
+	assert.Equal(t, deps.binder.AppsToBind[3].Name, "app2")
+	assert.Equal(t, deps.binder.InstancesToBindTo[3].Name, "app2-service")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating", "app-with-redis-backend"},
+		{"OK"},
+		{"Binding service", "global-service", "app-with-redis-backend", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"Binding service", "nested-service", "app-with-redis-backend", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"Creating", "app2"},
+		{"OK"},
+		{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
+		{"OK"},
+		{"Binding service", "app2-service", "app2", "my-org", "my-space", "my-user"},
 		{"OK"},
 	})
 }
@@ -428,7 +497,6 @@ func TestPushWithServicesThatAreNotFound(t *testing.T) {
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
-	println(ui.DumpOutputs())
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"Could not find service", "work-queue", "app-with-redis-backend"},
