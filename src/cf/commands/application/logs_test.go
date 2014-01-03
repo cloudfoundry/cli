@@ -68,6 +68,24 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 	})
 }
 
+func TestLogsEscapeFormattingVerbs(t *testing.T) {
+	app := cf.Application{}
+	app.Name = "my-app"
+	app.Guid = "my-app-guid"
+
+	recentLogs := []*logmessage.Message{
+		NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
+	}
+
+	reqFactory, logsRepo := getLogsDependencies()
+	reqFactory.Application = app
+	logsRepo.RecentLogs = recentLogs
+
+	ui := callLogs(t, []string{"--recent", "my-app"}, reqFactory, logsRepo)
+
+	assert.Contains(t, ui.Outputs[1], "hello%2Bworld%v")
+}
+
 func TestLogsTailsTheAppLogs(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
