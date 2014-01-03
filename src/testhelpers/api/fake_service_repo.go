@@ -42,7 +42,7 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (ident
 func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
 	repo.FindInstanceByNameName = name
 
-	if repo.FindInstanceByNameMap.Has(name) {
+	if repo.FindInstanceByNameMap != nil && repo.FindInstanceByNameMap.Has(name) {
 		instance = repo.FindInstanceByNameMap.Get(name).(cf.ServiceInstance)
 	} else {
 		instance = repo.FindInstanceByNameServiceInstance
