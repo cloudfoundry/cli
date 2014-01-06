@@ -114,7 +114,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Create a url route in a space for later use",
 			Usage:       fmt.Sprintf("%s create-route SPACE DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "n", Usage: "Hostname", OmitDefaultValue: true},
+				cli.StringFlag{Name: "n", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-route", c)
@@ -154,7 +154,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Create a space",
 			Usage:       fmt.Sprintf("%s create-space SPACE [-o ORG]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "o", Usage: "Organization name", OmitDefaultValue: true},
+				cli.StringFlag{Name: "o", Usage: "Organization name"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-space", c)
@@ -182,8 +182,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				fmt.Sprintf("   %s create-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
 				fmt.Sprintf("   %s create-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "p", Usage: "Parameters", OmitDefaultValue: true},
-				cli.StringFlag{Name: "l", Usage: "Syslog Drain Url", OmitDefaultValue: true},
+				cli.StringFlag{Name: "p", Usage: "Parameters"},
+				cli.StringFlag{Name: "l", Usage: "Syslog Drain Url"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-user-provided-service", c)
@@ -240,7 +240,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s delete-route DOMAIN -n HOSTNAME", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
-				cli.StringFlag{Name: "n", Usage: "Hostname", OmitDefaultValue: true},
+				cli.StringFlag{Name: "n", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete-route", c)
@@ -348,11 +348,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name()) +
 				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "a", Usage: "API endpoint (e.g. https://api.example.com)", OmitDefaultValue: true},
-				cli.StringFlag{Name: "u", Usage: "Username", OmitDefaultValue: true},
-				cli.StringFlag{Name: "p", Usage: "Password", OmitDefaultValue: true},
-				cli.StringFlag{Name: "o", Usage: "Org", OmitDefaultValue: true},
-				cli.StringFlag{Name: "s", Usage: "Space", OmitDefaultValue: true},
+				cli.StringFlag{Name: "a", Usage: "API endpoint (e.g. https://api.example.com)"},
+				cli.StringFlag{Name: "u", Usage: "Username"},
+				cli.StringFlag{Name: "p", Usage: "Password"},
+				cli.StringFlag{Name: "o", Usage: "Org"},
+				cli.StringFlag{Name: "s", Usage: "Space"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("login", c)
@@ -400,7 +400,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Add a url route to an app",
 			Usage:       fmt.Sprintf("%s map-route APP DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "n", Usage: "Hostname", OmitDefaultValue: true},
+				cli.StringFlag{Name: "n", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("map-route", c)
@@ -448,15 +448,15 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				"               [-m MEMORY] [-n HOST] [-p PATH] [-s STACK]\n" +
 				"               [--no-hostname] [--no-route] [--no-start]",
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "b", Usage: "Custom buildpack URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)", OmitDefaultValue: true},
-				cli.StringFlag{Name: "c", Usage: "Startup command, set to null to reset to default start command", OmitDefaultValue: true},
-				cli.StringFlag{Name: "d", Usage: "Domain (e.g. example.com)", OmitDefaultValue: true},
-				cli.StringFlag{Name: "i", Usage: "Number of instances", OmitDefaultValue: true},
-				cli.StringFlag{Name: "m", Usage: "Memory limit (e.g. 256M, 1024M, 1G)", OmitDefaultValue: true},
-				cli.StringFlag{Name: "n", Usage: "Hostname (e.g. my-subdomain)", OmitDefaultValue: true},
-				cli.StringFlag{Name: "p", Usage: "Path of app directory or zip file", OmitDefaultValue: true},
-				cli.StringFlag{Name: "s", Usage: "Stack to use", OmitDefaultValue: true},
-				cli.StringFlag{Name: "t", Usage: "Start timeout in seconds", OmitDefaultValue: true},
+				cli.StringFlag{Name: "b", Usage: "Custom buildpack URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"},
+				cli.StringFlag{Name: "c", Usage: "Startup command, set to null to reset to default start command"},
+				cli.StringFlag{Name: "d", Usage: "Domain (e.g. example.com)"},
+				cli.StringFlag{Name: "i", Usage: "Number of instances"},
+				cli.StringFlag{Name: "m", Usage: "Memory limit (e.g. 256M, 1024M, 1G)"},
+				cli.StringFlag{Name: "n", Usage: "Hostname (e.g. my-subdomain)"},
+				cli.StringFlag{Name: "p", Usage: "Path of app directory or zip file"},
+				cli.StringFlag{Name: "s", Usage: "Stack to use"},
+				cli.StringFlag{Name: "t", Usage: "Start timeout in seconds"},
 				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
 				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
 				cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
@@ -536,8 +536,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Change the instance count and memory limit for an app",
 			Usage:       fmt.Sprintf("%s scale APP -i INSTANCES -m MEMORY", cf.Name()),
 			Flags: []cli.Flag{
-				cli.IntFlag{Name: "i", Value: -1, Usage: "number of instances", OmitDefaultValue: true},
-				cli.StringFlag{Name: "m", Usage: "memory limit (e.g. 256M, 1024M, 1G)", OmitDefaultValue: true},
+				cli.IntFlag{Name: "i", Value: -1, Usage: "number of instances"},
+				cli.StringFlag{Name: "m", Usage: "memory limit (e.g. 256M, 1024M, 1G)"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("scale", c)
@@ -683,8 +683,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Set or view the targeted org or space",
 			Usage:       fmt.Sprintf("%s target [-o ORG] [-s SPACE]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "o", Usage: "organization", OmitDefaultValue: true},
-				cli.StringFlag{Name: "s", Usage: "space", OmitDefaultValue: true},
+				cli.StringFlag{Name: "o", Usage: "organization"},
+				cli.StringFlag{Name: "s", Usage: "space"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("target", c)
@@ -712,7 +712,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Remove a url route from an app",
 			Usage:       fmt.Sprintf("%s unmap-route APP DOMAIN [-n HOSTNAME]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "n", Usage: "Hostname", OmitDefaultValue: true},
+				cli.StringFlag{Name: "n", Usage: "Hostname"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unmap-route", c)
@@ -748,7 +748,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-i POSITION]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.IntFlag{Name: "i", Usage: "Buildpack position among other buildpacks"},
-				cli.StringFlag{Name: "p", Usage: "Path to directory or zip file", OmitDefaultValue: true},
+				cli.StringFlag{Name: "p", Usage: "Path to directory or zip file"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("update-buildpack", c)
@@ -779,8 +779,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				fmt.Sprintf("   %s update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
 				fmt.Sprintf("   %s update-user-provided-service my-drain-service -l syslog://example.com\n", cf.Name()),
 			Flags: []cli.Flag{
-				cli.StringFlag{Name: "p", Usage: "Parameters", OmitDefaultValue: true},
-				cli.StringFlag{Name: "l", Usage: "Syslog Drain Url", OmitDefaultValue: true},
+				cli.StringFlag{Name: "p", Usage: "Parameters"},
+				cli.StringFlag{Name: "l", Usage: "Syslog Drain Url"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("update-user-provided-service", c)
