@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/stretchr/testify/assert"
 	"strings"
+	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
 	testmanifest "testhelpers/manifest"
 	testreq "testhelpers/requirements"
@@ -70,7 +71,41 @@ func TestUsageIncludesCommandName(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{}
 	cmdRunner := commands.NewRunner(nil, reqFactory)
 	app, _ := NewApp(cmdRunner)
+
 	for _, cmd := range app.Commands {
 		assert.Contains(t, strings.Split(cmd.Usage, "\n")[0], cmd.Name)
 	}
+}
+
+func TestPushCommandHelpOutput(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{}
+	cmdRunner := commands.NewRunner(nil, reqFactory)
+	app, _ := NewApp(cmdRunner)
+
+	var updateCommand, pushCommand cli.Command
+	for _, cmd := range app.Commands {
+		if cmd.Name == "push" {
+			pushCommand = cmd
+		} else if cmd.Name == "update-buildpack" {
+			updateCommand = cmd
+		}
+	}
+
+	flags := []string{}
+	for _, flag := range pushCommand.Flags {
+		flags = append(flags, flag.String())
+	}
+
+	testassert.SliceContains(t, flags, testassert.Lines{
+		{"-b \tCustom buildpack URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"},
+	})
+
+	flags = []string{}
+	for _, flag := range updateCommand.Flags {
+		flags = append(flags, flag.String())
+	}
+
+	testassert.SliceContains(t, flags, testassert.Lines{
+		{"-i \tBuildpack position among other buildpacks"},
+	})
 }
