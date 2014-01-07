@@ -61,6 +61,51 @@ func appPathFromContext(c *cli.Context) (dir string, err error) {
 	return
 }
 
+func (cmd *Push) manifestFromContextPath(contextPath string) (m *manifest.Manifest, err error) {
+	if cmd.manifestRepo.ManifestExists(contextPath) {
+		m, err = cmd.manifestRepo.ReadManifest(contextPath)
+	} else {
+		m = manifest.NewEmptyManifest()
+	}
+	return
+}
+
+func createAppSetFromContextAndManifest(
+	contextParams cf.AppParams,
+	contextPath string,
+	m *manifest.Manifest) (appSet cf.AppSet, err error) {
+	if len(m.Applications) == 0 {
+		appSet = cf.NewAppSet(contextParams)
+	} else {
+		appSet = cf.NewEmptyAppSet()
+
+		for _, manifestAppParams := range m.Applications {
+			generic.Each(manifestAppParams, func(key, value interface{}) {
+					if value == nil {
+						manifestAppParams.Delete(key)
+					}
+				})
+			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
+
+			path := contextPath
+			if manifestAppParams.Has("path") {
+				path = filepath.Join(contextPath, manifestAppParams.Get("path").(string))
+			}
+			appFields.Set("path", path)
+
+			appSet = append(appSet, appFields)
+		}
+	}
+
+	for _, appParams := range appSet {
+		if !appParams.Has("name") {
+			err = errors.New("app name is a required field")
+		}
+	}
+
+	return
+}
+
 func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	contextPath, err := appPathFromContext(c)
 
@@ -70,52 +115,24 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	}
 
 	contextParams, err := cf.NewAppParamsFromContext(c)
-	contextParams.Set("path", contextPath)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
-	}
-
-	var m *manifest.Manifest
-	if cmd.manifestRepo.ManifestExists(contextPath) {
-		m, err = cmd.manifestRepo.ReadManifest(contextPath)
-		if err != nil {
-			cmd.ui.Failed("Error reading manifest from path:%s\n%s", contextPath, err)
-			return
-		}
 	} else {
-		m = manifest.NewEmptyManifest()
+		contextParams.Set("path", contextPath)
 	}
 
-	if len(m.Applications) == 0 {
-		cmd.appSet = cf.NewAppSet(contextParams)
-	} else {
-		cmd.appSet = cf.NewEmptyAppSet()
-
-		for _, manifestAppParams := range m.Applications {
-			generic.Each(manifestAppParams, func(key, value interface{}) {
-				if value == nil {
-					manifestAppParams.Delete(key)
-				}
-			})
-			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
-
-			path := contextPath
-			if manifestAppParams.Has("path") {
-				path = filepath.Join(contextPath, manifestAppParams.Get("path").(string))
-			}
-			appFields.Set("path", path)
-
-			cmd.appSet = append(cmd.appSet, appFields)
-		}
+	m, err := cmd.manifestFromContextPath(contextPath)
+	if err != nil {
+		cmd.ui.Failed("Error reading manifest from path:%s\n%s", contextPath, err)
+		return
 	}
 
-	for _, appParams := range cmd.appSet {
-		if !appParams.Has("name") {
-			cmd.ui.FailWithUsage(c, "push")
-			err = errors.New("Incorrect Usage")
-			return
-		}
+	cmd.appSet, err = createAppSetFromContextAndManifest(contextParams, contextPath, m)
+	if err != nil {
+		cmd.ui.FailWithUsage(c, "push")
+		err = errors.New("Incorrect Usage")
+		return
 	}
 
 	reqs = []requirements.Requirement{
