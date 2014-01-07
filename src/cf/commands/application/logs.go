@@ -100,6 +100,6 @@ func (cmd *Logs) tailLogsFor(app cf.Application, logChan chan *logmessage.Messag
 
 func (cmd *Logs) displayLogMessages(logChan chan *logmessage.Message) {
 	for msg := range logChan {
-		cmd.ui.Say(logMessageOutput(msg))
+		cmd.ui.Say("%s", logMessageOutput(msg))
 	}
 }
