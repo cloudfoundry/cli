@@ -9,7 +9,6 @@ import (
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
-	"strings"
 	"time"
 )
 
@@ -101,10 +100,6 @@ func (cmd *Logs) tailLogsFor(app cf.Application, logChan chan *logmessage.Messag
 
 func (cmd *Logs) displayLogMessages(logChan chan *logmessage.Message) {
 	for msg := range logChan {
-		cmd.ui.Say(escapeFormattingVerb(logMessageOutput(msg)))
+		cmd.ui.Say("%s", logMessageOutput(msg))
 	}
-}
-
-func escapeFormattingVerb(msg string) string {
-	return strings.Replace(msg, "%", "%%", -1)
 }
