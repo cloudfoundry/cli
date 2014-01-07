@@ -2,4 +2,4 @@
 
 set -e
 export CF_MANIFEST=true
-$(dirname $0)/go run src/main/cf.go $*
+$(dirname $0)/go run -race src/main/cf.go $*

@@ -73,32 +73,24 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 
 	onConnect()
 
-	inputChan := make(chan *logmessage.Message, LogBufferSize)
-	defer close(inputChan)
-	stopInputChan := make(chan bool, 1)
-
-	messageQueue := repo.createMessageSorter(inputChan, printTimeBuffer)
-
 	go repo.sendKeepAlive(ws)
+
+	inputChan := make(chan *logmessage.Message, LogBufferSize)
+	stopInputChan := make(chan bool, 1)
 	go func() {
 		defer close(stopInputChan)
+		defer close(inputChan)
 		repo.listenForMessages(ws, inputChan, stopInputChan)
 	}()
 
-	return repo.makeAndStartMessageSorter(messageQueue, outputChan, stopLoggingChan, stopInputChan)
-}
+	messageQueue := &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
 
-func (repo LoggregatorLogsRepository) createMessageSorter(inputChan <-chan *logmessage.Message, printTimeBuffer time.Duration) (messageQueue *SortedMessageQueue) {
-	messageQueue = &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
-	go func() {
-		for msg := range inputChan {
-			messageQueue.PushMessage(msg)
-		}
-	}()
+	repo.processMessages(messageQueue, inputChan, outputChan, stopLoggingChan, stopInputChan)
+
 	return
 }
 
-func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *SortedMessageQueue, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool, stopInputChan <-chan bool) (err error) {
+func (repo LoggregatorLogsRepository) processMessages(messageQueue *SortedMessageQueue, inputChan <-chan *logmessage.Message, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool, stopInputChan <-chan bool) {
 	flushLastMessages := func() {
 		for {
 			msg := messageQueue.PopMessage()
@@ -109,15 +101,18 @@ func (repo LoggregatorLogsRepository) makeAndStartMessageSorter(messageQueue *So
 		}
 	}
 
-OutputLoop:
 	for {
 		select {
+		case msg, ok := <-inputChan:
+			if ok {
+				messageQueue.PushMessage(msg)
+			}
 		case <-stopInputChan:
 			flushLastMessages()
-			break OutputLoop
+			return
 		case <-stopLoggingChan:
 			flushLastMessages()
-			break OutputLoop
+			return
 		case <-time.After(10 * time.Millisecond):
 			for messageQueue.NextTimestamp() < time.Now().UnixNano() {
 				msg := messageQueue.PopMessage()
@@ -125,7 +120,6 @@ OutputLoop:
 			}
 		}
 	}
-	return
 }
 
 func (repo LoggregatorLogsRepository) sendKeepAlive(ws *websocket.Conn) {
