@@ -31,17 +31,54 @@ func NewManifest(data generic.Map) (m *Manifest) {
 		}
 	}
 
+	var globalServices []string
 	if data.Has("services") {
-		services := data.Get("services")
-		if services != nil && len(services.([]interface{})) > 0 {
-			globalServices := generic.NewMap(services.([]interface{})[0])
+		global, hasGlobal := data.Get("services").([]interface{})
+		if !hasGlobal {
+			globalServices = []string{}
+		} else {
+			globalServices = interfaceSliceToString(global)
+		}
+	}
 
-			for _, app := range m.Applications {
-				localServices := generic.NewMap(app.Get("services"))
-				app.Set("services", generic.Merge(globalServices, localServices))
-			}
+	for _, app := range m.Applications {
+		locals, ok := app.Get("services").([]interface{})
+		if ok {
+			localServices := interfaceSliceToString(locals)
+			app.Set("services", mergeSets(globalServices, localServices))
+		} else {
+			app.Set("services", globalServices)
 		}
 	}
 
 	return
+}
+
+func interfaceSliceToString(set []interface{}) (result []string) {
+	for _, value := range set {
+		result = append(result, value.(string))
+	}
+	return
+}
+
+func mergeSets(set1, set2 []string) (result []string) {
+	for _, aString := range set1 {
+		result = append(result, aString)
+	}
+
+	for _, aString := range set2 {
+		if !stringInSlice(aString, result) {
+			result = append(result, aString)
+		}
+	}
+	return
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
