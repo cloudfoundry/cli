@@ -67,26 +67,30 @@ applications:
 const manifestWithGlobalServices = `
 ---
 services:
-- work-queue:
-    type: rediscloud
-    provider: redis-provider
-    plan: 200mb
+- work-queue
 applications:
 - name: app-with-redis-backend
+`
+
+const manifestWithLocalServices = `
+---
+applications:
+- name: app-with-redis-backend
+  services:
+  - work-queue
 `
 
 const manifestWithMergedServices = `
 ---
 services:
-- global-service:
-plan: 200mb
+- global-service
 applications:
 - name: app-with-redis-backend
   services:
-  - nested-service:
+  - nested-service
 - name: app2
   services:
-  - app2-service:
+  - app2-service
 `
 
 func TestPushingRequirements(t *testing.T) {
@@ -418,6 +422,31 @@ func TestPushingWithBindingGlobalServices(t *testing.T) {
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
 	m, err := manifest.Parse(strings.NewReader(manifestWithGlobalServices))
+	assert.NoError(t, err)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{}, deps)
+
+	assert.Equal(t, len(deps.binder.AppsToBind), 1)
+	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app-with-redis-backend")
+	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "work-queue")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating", "app-with-redis-backend"},
+		{"OK"},
+		{"Binding service", "work-queue", "app-with-redis-backend", "my-org", "my-space", "my-user"},
+		{"OK"},
+	})
+}
+
+func TestPushingWithBindingLocalServices(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	expectedServiceInstance := cf.ServiceInstance{}
+	expectedServiceInstance.Name = "work-queue"
+	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
+
+	m, err := manifest.Parse(strings.NewReader(manifestWithLocalServices))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 

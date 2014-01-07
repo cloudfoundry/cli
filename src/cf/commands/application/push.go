@@ -146,9 +146,10 @@ func (cmd *Push) Run(c *cli.Context) {
 		cmd.ui.Ok()
 
 		if appParams.Has("services") {
-			services := generic.NewMap(appParams.Get("services"))
-			generic.Each(services, func(serviceName, fields interface{}) {
-				serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName.(string))
+			services := appParams.Get("services").([]string)
+
+			for _, serviceName := range services {
+				serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName)
 
 				if response.IsNotSuccessful() {
 					cmd.ui.Failed("Could not find service %s to bind to %s", serviceName, appParams.Get("name").(string))
@@ -163,7 +164,7 @@ func (cmd *Push) Run(c *cli.Context) {
 					cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, bindResponse.Message)
 					return
 				}
-			})
+			}
 		}
 
 		cmd.restart(app, appParams, c)

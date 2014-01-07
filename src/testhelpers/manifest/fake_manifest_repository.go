@@ -23,6 +23,7 @@ func (repo *FakeManifestRepository) ReadManifest(dir string) (m *manifest.Manife
 	return
 }
 
-func (repo *FakeManifestRepository) ManifestExists(dir string) bool{
+func (repo *FakeManifestRepository) ManifestExists(dir string) bool {
 	return !repo.ManifestNotExists
 }
+
