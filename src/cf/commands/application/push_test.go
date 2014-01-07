@@ -5,6 +5,7 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/manifest"
+	"fixtures"
 	"generic"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -20,78 +21,6 @@ import (
 	testterm "testhelpers/terminal"
 	"testing"
 )
-
-const singleAppManifest = `
----
-env:
-  PATH: /u/apps/my-app/bin
-  FOO: bar
-applications:
-- name: manifest-app-name
-  memory: 128M
-  instances: 1
-  host: manifest-host
-  domain: manifest-example.com
-  stack: custom-stack
-  buildpack: some-buildpack
-  command: JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run
-  path: ../../fixtures/example-app
-  env:
-    FOO: baz
-`
-
-const appManifestWithNulls = `
-applications:
-- name: hacker-manifesto
-  command: null
-  space_guid: null
-  buildpack: null
-  disk_quota: null
-  instances: null
-  memory: null
-  env: null
-`
-
-const manifestWithManyApps = `
----
-env:
-  PATH: /u/apps/something/bin
-  SOMETHING: nothing
-applications:
-- name: app1
-  env:
-    SOMETHING: definitely-something
-- name: app2
-`
-
-const manifestWithGlobalServices = `
----
-services:
-- work-queue
-applications:
-- name: app-with-redis-backend
-`
-
-const manifestWithLocalServices = `
----
-applications:
-- name: app-with-redis-backend
-  services:
-  - work-queue
-`
-
-const manifestWithMergedServices = `
----
-services:
-- global-service
-applications:
-- name: app-with-redis-backend
-  services:
-  - nested-service
-- name: app2
-  services:
-  - app2-service
-`
 
 func TestPushingRequirements(t *testing.T) {
 	ui := new(testterm.FakeUI)
@@ -322,7 +251,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
-	m, err := manifest.Parse(strings.NewReader(singleAppManifest))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("single app")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -361,7 +290,7 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, err := manifest.Parse(strings.NewReader(appManifestWithNulls))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("nulls")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -382,7 +311,7 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 func TestPushingManyAppsFromManifest(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-	m, err := manifest.Parse(strings.NewReader(manifestWithManyApps))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("many apps")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -421,7 +350,7 @@ func TestPushingWithBindingGlobalServices(t *testing.T) {
 	expectedServiceInstance.Name = "work-queue"
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
-	m, err := manifest.Parse(strings.NewReader(manifestWithGlobalServices))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("global services")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -446,7 +375,7 @@ func TestPushingWithBindingLocalServices(t *testing.T) {
 	expectedServiceInstance.Name = "work-queue"
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
-	m, err := manifest.Parse(strings.NewReader(manifestWithLocalServices))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("local services")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -481,7 +410,7 @@ func TestPushingWithBindingMergedServices(t *testing.T) {
 	mapOfServices.Set("app2-service", service3)
 	deps.serviceRepo.FindInstanceByNameMap = mapOfServices
 
-	m, err := manifest.Parse(strings.NewReader(manifestWithMergedServices))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("merged services")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -521,7 +450,7 @@ func TestPushWithServicesThatAreNotFound(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.serviceRepo.FindInstanceByNameErr = true
 
-	m, err := manifest.Parse(strings.NewReader(manifestWithGlobalServices))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("global services")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -536,7 +465,7 @@ func TestPushingAppWithPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, err := manifest.Parse(strings.NewReader(singleAppManifest))
+	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("single app")))
 	assert.NoError(t, err)
 	deps.manifestRepo.ReadManifestManifest = m
 
