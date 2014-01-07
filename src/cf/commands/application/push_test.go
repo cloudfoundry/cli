@@ -394,7 +394,6 @@ func TestPushingWithBindingLocalServices(t *testing.T) {
 
 func TestPushingWithBindingMergedServices(t *testing.T) {
 	deps := getPushDependencies()
-	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
 	service1 := cf.ServiceInstance{}
