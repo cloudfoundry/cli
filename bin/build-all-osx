@@ -17,16 +17,18 @@ PLATFORMS="darwin/amd64 linux/386 linux/amd64 windows/amd64 windows/386"
 function build-architecture {
   GOOS=${1%/*}
   GOARCH=${1#*/}
+  BIN_NAME=gcf-$GOOS-$GOARCH
   printf "Creating $GOOS $GOARCH binary..."
 
   GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build" 
   cd out
 
   if [ $GOOS == windows ]; then
-    mv gcf gcf.exe
-    tar cvzf ../release/gcf-$GOOS-$GOARCH.tgz gcf.exe
+    mv gcf $BIN_NAME.exe
+    zip ../release/$BIN_NAME.zip $BIN_NAME.exe
   else
-    tar cvzf ../release/gcf-$GOOS-$GOARCH.tgz gcf
+    mv gcf $BIN_NAME
+    tar cvzf ../release/$BIN_NAME.zip $BIN_NAME
   fi
 
   cd ..
@@ -36,6 +38,8 @@ function build-architecture {
 for PLATFORM in $PLATFORMS; do
   build-architecture $PLATFORM
 done
+
+bin/build-installers
 
 git checkout $(dirname $0)/../src/cf/app_constants.go
 echo "Cleaned up version."
