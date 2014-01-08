@@ -2,39 +2,50 @@
 
 set -e
 
+ROOT_DIR=$(pwd)
+OUT_DIR=${ROOT_DIR}/out
+RELEASE_DIR=${ROOT_DIR}/release
+INSTALLERS_DIR=${ROOT_DIR}/installers
+
 echo "building windows-386 installer"
-cp out/gcf-windows-386.exe installers/windows/gcf.exe
-makensis installers/windows/install.nsi
-zip release/installer-windows-386.zip installers/windows/cf_installer.exe
-rm installers/windows/cf_installer.exe
-rm installers/windows/gcf.exe
+(
+    cd ${INSTALLERS_DIR}/windows
+    cp ${OUT_DIR}/gcf-windows-386.exe gcf.exe
+    makensis install.nsi
+    zip ${ROOT_DIR}/release/installer-windows-386.zip cf_installer.exe
+    rm cf_installer.exe gcf.exe
+)
 
 echo "building windows-amd64 installer"
-cp out/gcf-windows-amd64.exe installers/windows/gcf.exe
-makensis installers/windows/install.nsi
-zip release/installer-windows-amd64.zip installers/windows/cf_installer.exe
-rm installers/windows/cf_installer.exe
-rm installers/windows/gcf.exe
+(
+    cd ${INSTALLERS_DIR}/windows
+    cp ${OUT_DIR}/gcf-windows-amd64.exe gcf.exe
+    makensis install.nsi
+    zip ${RELEASE_DIR}/installer-windows-amd64.zip cf_installer.exe
+    rm cf_installer.exe gcf.exe
+)
 
 echo "building DEB package"
-mkdir -p installers/deb/cf/usr/bin
-cp out/gcf-linux-386 installers/deb/cf/usr/bin/gcf
-VERSION=$(out/gcf-linux-386 -v | cut -d' ' -f 3)
-cp installers/deb/control.template installers/deb/cf/DEBIAN/control
-echo "Version: ${VERSION}" >> installers/deb/cf/DEBIAN/control
-dpkg --build installers/deb/cf installers/deb/cf-cli_i386.deb
-mv installers/deb/cf-cli_i386.deb release/
-rm installers/deb/cf/usr/bin/gcf
-rm installers/deb/cf/DEBIAN/control
+(
+    cd ${INSTALLERS_DIR}/deb
+    mkdir -p cf/usr/bin
+    cp ${OUT_DIR}/gcf-linux-386 cf/usr/bin/gcf
+    VERSION=$(./gcf -v | cut -d' ' -f 3)
+    cp control.template cf/DEBIAN/control
+    echo "Version: ${VERSION}" >> cf/DEBIAN/control
+    dpkg --build cf cf-cli_i386.deb
+    mv cf-cli_i386.deb ${RELEASE_DIR}/
+    rm cf/usr/bin/gcf cf/DEBIAN/control
+)
 
 echo "building RPM package"
 (
-	cp out/gcf-linux-386 installers/rpm/gcf
-	cd installers/rpm
+	cd ${INSTALLERS_DIR}/rpm
+	cp ${OUT_DIR}/gcf-linux-386 gcf
 	VERSION=$(./gcf -v | cut -d' ' -f 3|sed 's/-/_/')
 	echo "Version: ${VERSION}" > cf-cli.spec
 	cat cf-cli.spec.template >> cf-cli.spec
 	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-	mv build/RPMS/i386/cf-cli*.rpm ../../release/
+	mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}
 	rm -rf build gcf cf-cli.spec
 )
