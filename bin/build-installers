@@ -25,3 +25,15 @@ dpkg --build installers/deb/cf installers/deb/cf-cli_i386.deb
 mv installers/deb/cf-cli_i386.deb release/
 rm installers/deb/cf/usr/bin/gcf
 rm installers/deb/cf/DEBIAN/control
+
+echo "building RPM package"
+(
+	cp out/gcf-linux-386 installers/rpm/gcf
+	cd installers/rpm
+	VERSION=$(./gcf -v | cut -d' ' -f 3|sed 's/-/_/')
+	echo "Version: ${VERSION}" > cf-cli.spec
+	cat cf-cli.spec.template >> cf-cli.spec
+	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+	mv build/RPMS/i386/cf-cli*.rpm ../../release/
+	rm -rf build gcf cf-cli.spec
+)
