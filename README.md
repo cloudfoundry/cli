@@ -19,13 +19,18 @@ Cloning the repository
 
 Downloading Edge
 ========
-The latest binary builds are published to Amazon S3 buckets
+The latest binary builds and installers are published to Amazon S3 buckets.
+
+Binaries:
 - http://go-cli.s3.amazonaws.com/gcf-darwin-amd64.tgz
 - http://go-cli.s3.amazonaws.com/gcf-linux-amd64.tgz
 - http://go-cli.s3.amazonaws.com/gcf-linux-386.tgz
 - http://go-cli.s3.amazonaws.com/gcf-windows-amd64.zip
 - http://go-cli.s3.amazonaws.com/gcf-windows-386.zip
 
+Installers:
+- http://go-cli.s3.amazonaws.com/installer-windows-amd64.zip
+- http://go-cli.s3.amazonaws.com/installer-windows-386.zip
 
 Building
 ========
@@ -50,11 +55,9 @@ If you want to run the benchmark tests
 Releasing
 =========
 
-On linux: run ```bin/build-all```
+run ```bin/build-all```
 
-On mac: run ```bin/build-all-osx```
-
-This will create tgz files in the release folder.
+This will create tgz files and installers in the release folder.
 
 Contributing
 ============
