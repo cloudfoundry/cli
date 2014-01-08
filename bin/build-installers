@@ -30,7 +30,7 @@ echo "building DEB package"
     cd ${INSTALLERS_DIR}/deb
     mkdir -p cf/usr/bin
     cp ${OUT_DIR}/gcf-linux-386 cf/usr/bin/gcf
-    VERSION=$(./gcf -v | cut -d' ' -f 3)
+    VERSION=$(cf/usr/bin/gcf -v | cut -d' ' -f 3)
     cp control.template cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
     dpkg --build cf cf-cli_i386.deb
