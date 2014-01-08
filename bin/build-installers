@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+echo "building windows-386 installer"
+cp out/gcf-windows-386.exe installers/windows/gcf.exe
+makensis installers/windows/install.nsi
+zip release/installer-windows-386.zip installers/windows/cf_installer.exe
+rm installers/windows/cf_installer.exe
+rm installers/windows/gcf.exe
+
+echo "building windows-amd64 installer"
+cp out/gcf-windows-amd64.exe installers/windows/gcf.exe
+makensis installers/windows/install.nsi
+zip release/installer-windows-amd64.zip installers/windows/cf_installer.exe
+rm installers/windows/cf_installer.exe
+rm installers/windows/gcf.exe
