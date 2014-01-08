@@ -17,6 +17,7 @@ rm installers/windows/cf_installer.exe
 rm installers/windows/gcf.exe
 
 echo "building DEB package"
+mkdir -p installers/deb/cf/usr/bin
 cp out/gcf-linux-386 installers/deb/cf/usr/bin/gcf
 VERSION=$(out/gcf-linux-386 -v | cut -d' ' -f 3)
 cp installers/deb/control.template installers/deb/cf/DEBIAN/control
