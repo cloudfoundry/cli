@@ -269,8 +269,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
 
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
+	dir, _ := os.Getwd()
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join(dir, "../../fixtures/example-app"))
 
 	assert.True(t, deps.appRepo.CreatedAppParams().Has("env"))
@@ -490,6 +489,65 @@ func TestPushingAppWithPath(t *testing.T) {
 	}, deps)
 
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("/foo/bar/baz", "../../fixtures/example-app"))
+}
+
+func TestPushingWithRelativeManifestPath(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{
+		"--manifest", "../relative/different-manifest.yml",
+		"-p", "some/relative/path",
+	}, deps)
+
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "../relative/different-manifest.yml")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"-p is ignored when using a manifest"},
+	})
+}
+
+func TestPushingWithManifestInAppDirectory(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	_ = callPush(t, []string{"-p", "some/relative/path"}, deps)
+
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "some/relative/path")
+}
+
+func TestPushingAppWithManifestIncludesRelativePathForApp(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	_ = callPush(t, []string{"--manifest", "some/relative/path"}, deps)
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), "some/fixtures/example-app")
+}
+
+func TestPushingWithAbsoluteManifestPath(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	callPush(t, []string{
+		"--manifest", "/absolute/path/to/different-manifest.yml",
+	}, deps)
+
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "/absolute/path/to/different-manifest.yml")
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {

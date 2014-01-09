@@ -53,17 +53,9 @@ func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo m
 	return
 }
 
-func appPathFromContext(c *cli.Context) (dir string, err error) {
-	dir = c.String("p")
-	if dir == "" {
-		return os.Getwd()
-	}
-	return
-}
-
 func createAppSetFromContextAndManifest(
 	contextParams cf.AppParams,
-	contextPath string,
+	rootAppPath string,
 	m *manifest.Manifest) (appSet cf.AppSet, err error) {
 	if len(m.Applications) == 0 {
 		appSet = cf.NewAppSet(contextParams)
@@ -73,9 +65,9 @@ func createAppSetFromContextAndManifest(
 		for _, manifestAppParams := range m.Applications {
 			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
 
-			path := contextPath
+			path := rootAppPath
 			if manifestAppParams.Has("path") {
-				path = filepath.Join(contextPath, manifestAppParams.Get("path").(string))
+				path = filepath.Join(rootAppPath, manifestAppParams.Get("path").(string))
 			}
 			appFields.Set("path", path)
 
@@ -92,34 +84,57 @@ func createAppSetFromContextAndManifest(
 	return
 }
 
-func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	contextPath, err := appPathFromContext(c)
+func (cmd *Push) appAndManifestPaths(userSpecifiedAppPath, userSpecifiedManifestPath string) (appPath, manifestPath string) {
+	cwd, _ := os.Getwd()
 
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+	if userSpecifiedAppPath != "" && userSpecifiedManifestPath != "" {
+		cmd.ui.Warn("-p is ignored when using a manifest. Please specify the path in the manifest.")
 	}
 
-	contextParams, err := cf.NewAppParamsFromContext(c)
-	if err != nil {
-		cmd.ui.Failed("Error: %s", err)
-		return
+	if userSpecifiedAppPath != "" {
+		appPath = userSpecifiedAppPath
+	} else if userSpecifiedManifestPath != "" {
+		appPath = userSpecifiedManifestPath
 	} else {
-		contextParams.Set("path", contextPath)
+		appPath = cwd
 	}
 
-	manifest, errs := cmd.manifestRepo.ReadManifest(contextPath)
+	if userSpecifiedManifestPath != "" {
+		manifestPath = userSpecifiedManifestPath
+	} else if userSpecifiedAppPath != "" {
+		manifestPath = userSpecifiedAppPath
+	} else {
+		manifestPath = cwd
+	}
+
+	return
+}
+
+func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
+	appPath, manifestPath := cmd.appAndManifestPaths(c.String("p"), c.String("manifest"))
+
+	manifest, errs := cmd.manifestRepo.ReadManifest(manifestPath)
 	if !errs.Empty() {
 		cmd.ui.Failed("Error reading manifest file: \n%s", errs)
 		return
 	}
 
-	cmd.appSet, err = createAppSetFromContextAndManifest(contextParams, contextPath, manifest)
+	appParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
 	}
 
+	appParams.Set("path", appPath)
+
+	cmd.appSet, err = createAppSetFromContextAndManifest(appParams, appPath, manifest)
+	if err != nil {
+		cmd.ui.Failed("Error: %s", err)
+		return
+	}
+}
+
+func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
 		reqFactory.NewTargetedSpaceRequirement(),
@@ -128,6 +143,8 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd *Push) Run(c *cli.Context) {
+	cmd.findAndValidateAppsToPush(c)
+
 	for _, appParams := range cmd.appSet {
 		cmd.fetchStackGuid(&appParams)
 
