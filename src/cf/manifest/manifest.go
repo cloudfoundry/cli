@@ -6,7 +6,6 @@ import (
 )
 
 type Manifest struct {
-	data         generic.Map
 	Applications cf.AppSet
 }
 
@@ -17,7 +16,6 @@ func NewEmptyManifest() (m *Manifest) {
 
 func NewManifest(data generic.Map) (m *Manifest, errs ManifestErrors) {
 	m = &Manifest{}
-	m.data = data
 
 	components, errs := newManifestComponents(data)
 	if len(errs) > 0 {
