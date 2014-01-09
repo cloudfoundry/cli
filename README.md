@@ -31,6 +31,8 @@ Binaries:
 Installers:
 - http://go-cli.s3.amazonaws.com/installer-windows-amd64.zip
 - http://go-cli.s3.amazonaws.com/installer-windows-386.zip
+- http://go-cli.s3.amazonaws.com/cf-cli_i386.deb
+- http://go-cli.s3.amazonaws.com/cf-cli_i386.rpm
 
 Building
 ========
