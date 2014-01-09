@@ -5,15 +5,13 @@ import (
 )
 
 type FakeManifestRepository struct {
-	ReadManifestDir string
+	ReadManifestPath string
 	ReadManifestErrors manifest.ManifestErrors
 	ReadManifestManifest *manifest.Manifest
-
-	ManifestNotExists bool
 }
 
 func (repo *FakeManifestRepository) ReadManifest(dir string) (m *manifest.Manifest, errs manifest.ManifestErrors) {
-	repo.ReadManifestDir = dir
+	repo.ReadManifestPath = dir
 	errs = repo.ReadManifestErrors
 
 	if repo.ReadManifestManifest != nil {
@@ -24,7 +22,4 @@ func (repo *FakeManifestRepository) ReadManifest(dir string) (m *manifest.Manife
 	return
 }
 
-func (repo *FakeManifestRepository) ManifestExists(dir string) bool {
-	return !repo.ManifestNotExists
-}
 

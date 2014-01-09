@@ -61,15 +61,6 @@ func appPathFromContext(c *cli.Context) (dir string, err error) {
 	return
 }
 
-func (cmd *Push) manifestFromContextPath(contextPath string) (m *manifest.Manifest, errs manifest.ManifestErrors) {
-	if cmd.manifestRepo.ManifestExists(contextPath) {
-		m, errs = cmd.manifestRepo.ReadManifest(contextPath)
-	} else {
-		m = manifest.NewEmptyManifest()
-	}
-	return
-}
-
 func createAppSetFromContextAndManifest(
 	contextParams cf.AppParams,
 	contextPath string,
@@ -117,7 +108,7 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 		contextParams.Set("path", contextPath)
 	}
 
-	manifest, errs := cmd.manifestFromContextPath(contextPath)
+	manifest, errs := cmd.manifestRepo.ReadManifest(contextPath)
 	if !errs.Empty() {
 		cmd.ui.Failed("Error reading manifest file: \n%s", errs)
 		return
