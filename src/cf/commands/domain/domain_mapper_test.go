@@ -54,7 +54,6 @@ func TestMapDomainDomainNotFound(t *testing.T) {
 	domainRepo.FindByNameInOrgApiResponse = net.NewNotFoundApiResponse("Domain foo.com not found")
 	ui := callDomainMapper(t, true, []string{"my-space", "foo.com"}, reqFactory, domainRepo)
 
-	assert.Equal(t, len(ui.Outputs), 3)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Mapping domain", "foo.com", "my-space"},
 		{"FAILED"},

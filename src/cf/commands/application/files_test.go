@@ -54,7 +54,8 @@ func TestListingDirectoryEntries(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
 		{"OK"},
-		{"file 1\nfile 2"},
+		{"file 1"},
+		{"file 2"},
 	})
 
 	assert.Equal(t, appFilesRepo.AppGuid, "my-app-guid")

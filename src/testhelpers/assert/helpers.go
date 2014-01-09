@@ -49,6 +49,19 @@ func CallerInfo() string {
 	return fmt.Sprintf("%s:%d", file, line)
 }
 
+// Takes a slice of errors and asserts that there were none provided
+// When failing, appends error messages together on newlines and
+// provides a count of how many errors were passed in
+func AssertNoErrors(t *testing.T, errs []error) {
+	if len(errs) > 0 {
+		var concatErrors string
+		for _, err := range errs {
+			concatErrors = concatErrors + err.Error() + "\n"
+		}
+		t.Errorf("Expected no errors, but there were %d.\n%s", len(errs), concatErrors)
+	}
+}
+
 // getWhitespaceString returns a string that is long enough to overwrite the default
 // output from the go testing framework.
 func getWhitespaceString() string {

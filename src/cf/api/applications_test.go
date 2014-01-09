@@ -109,7 +109,7 @@ func TestSetEnv(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	envParams := generic.NewEmptyMap()
+	envParams := generic.NewMap()
 	envParams.Set("DATABASE_URL", "mysql://example.com/my-db")
 
 	params := cf.NewEmptyAppParams()

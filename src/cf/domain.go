@@ -104,7 +104,7 @@ func (app AppParams) ToMap() generic.Map {
 }
 
 func NewEmptyAppParams() AppParams {
-	return NewAppParams(generic.NewEmptyMap())
+	return NewAppParams(generic.NewMap())
 }
 
 func NewAppParams(data interface{}) (params AppParams) {

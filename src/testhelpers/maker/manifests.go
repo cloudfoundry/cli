@@ -1,4 +1,4 @@
-package fixtures
+package maker
 
 var fixtureMap = map[string]string{
 	"merged services": `
@@ -43,6 +43,7 @@ applications:
 `,
 
 	"nulls": `
+---
 applications:
 - name: hacker-manifesto
   command: null
@@ -72,8 +73,30 @@ applications:
   env:
     FOO: baz
 `,
+	"invalid": `
+---
+env:
+- PATH
+- USER
+services:
+  old-service-format:
+    plan: free
+    provider: nobody
+    type: deprecated
+applications:
+- name: bad-services
+  services:
+    old-service-format:
+      plan: paid
+      provider: somebody
+      type: deprecated
+- name: bad-env
+  env:
+  - FOO
+  - BAR
+`,
 }
 
-func FixtureWithName(name string) (fixture string) {
+func ManifestWithName(name string) (fixture string) {
 	return fixtureMap[name]
 }

@@ -210,8 +210,9 @@ func TestLoggingInWithTooManyOrgsDoesNotShowOrgList(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	assert.True(t, len(c.ui.Outputs) < 50)
-
+	testassert.SliceDoesNotContain(t, c.ui.Outputs, testassert.Lines{
+		{"my-org-2"},
+	})
 	assert.Equal(t, c.orgRepo.FindByNameName, "my-org-1")
 	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid-1")
 }
@@ -414,9 +415,9 @@ func TestUnsuccessfullyLoggingInWithAuthError(t *testing.T) {
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
 
-	failIndex := len(c.ui.Outputs) - 2
-	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
-	assert.Equal(t, len(c.ui.PasswordPrompts), 3)
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Failed"},
+	})
 }
 
 func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
@@ -435,8 +436,9 @@ func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
 	assert.Empty(t, savedConfig.AccessToken)
 	assert.Empty(t, savedConfig.RefreshToken)
 
-	failIndex := len(c.ui.Outputs) - 2
-	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Failed"},
+	})
 }
 
 func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
@@ -457,8 +459,9 @@ func TestUnsuccessfullyLoggingInWithOrgFindByNameErr(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	failIndex := len(c.ui.Outputs) - 2
-	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Failed"},
+	})
 }
 
 func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
@@ -479,6 +482,7 @@ func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	failIndex := len(c.ui.Outputs) - 2
-	assert.Equal(t, c.ui.Outputs[failIndex], "FAILED")
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Failed"},
+	})
 }
