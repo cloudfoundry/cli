@@ -2,48 +2,5 @@
 
 set -e
 
-echo "TIP: Make sure bin/compile has already been run"
-
-mkdir -p release
-echo "Created release dir."
-
-CURRENT_SHA=`git rev-parse HEAD | cut -c1-10`
-if [ $(uname) == darwin ]; then
-    sed -i "" -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
-else
-    sed -i -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
-fi
-
-echo "Bumped SHA in version."
-
-PLATFORMS="darwin/amd64 linux/386 linux/amd64 windows/amd64 windows/386"
-
-function build-architecture {
-  GOOS=${1%/*}
-  GOARCH=${1#*/}
-  BIN_NAME=gcf-$GOOS-$GOARCH
-  printf "Creating $GOOS $GOARCH binary..."
-
-  GOOS=$GOOS GOARCH=$GOARCH "$(dirname $0)/build"
-  cd out
-
-  if [ $GOOS == windows ]; then
-    mv gcf $BIN_NAME.exe
-    zip ../release/$BIN_NAME.zip $BIN_NAME.exe
-  else
-    mv gcf $BIN_NAME
-    tar cvzf ../release/$BIN_NAME.zip $BIN_NAME
-  fi
-
-  cd ..
-  echo " done."
-}
-
-for PLATFORM in $PLATFORMS; do
-  build-architecture $PLATFORM
-done
-
+bin/build-binaries
 bin/build-installers
-
-git checkout $(dirname $0)/../src/cf/app_constants.go
-echo "Cleaned up version."
