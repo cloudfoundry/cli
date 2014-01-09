@@ -107,7 +107,8 @@ func TestDeleteDomainFindError(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Deleting domain", "foo.com"},
 		{"FAILED"},
-		{"foo.com", "failed badly"},
+		{"foo.com"},
+		{"failed badly"},
 	})
 }
 
@@ -128,7 +129,8 @@ func TestDeleteDomainDeleteError(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Deleting domain", "foo.com"},
 		{"FAILED"},
-		{"foo.com", "failed badly"},
+		{"foo.com"},
+		{"failed badly"},
 	})
 }
 

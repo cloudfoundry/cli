@@ -5,7 +5,6 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/manifest"
-	"fixtures"
 	"generic"
 	"github.com/stretchr/testify/assert"
 	"os"
@@ -79,7 +78,6 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	appRepo.ReadNotFound = true
 
 	ui := callPush(t, []string{"-t", "111", "my-new-app"}, deps)
-
 	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
 	assert.Equal(t, appRepo.CreatedAppParams().Get("space_guid").(string), "my-space-guid")
 
@@ -251,8 +249,8 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("single app")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
@@ -290,29 +288,28 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("nulls")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("nulls")))
 	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestErrors = errs
 
 	ui := callPush(t, []string{}, deps)
-
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"hacker-manifesto"},
+		{"FAILED"},
+		{"Error", "reading", "manifest"},
+		{"command"},
+		{"space_guid"},
+		{"buildpack"},
+		{"disk_quota"},
+		{"instances"},
+		{"memory"},
 	})
-
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("name").(string), "hacker-manifesto")
-
-	shouldNotHaveKeys := []string{"command", "memory", "instances", "domain", "host", "env", "stack_guid", "buildpack"}
-	for _, key := range shouldNotHaveKeys {
-		assert.False(t, deps.appRepo.CreatedAppParams().Has(key))
-	}
 }
 
 func TestPushingManyAppsFromManifest(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("many apps")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("many apps")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
@@ -350,8 +347,8 @@ func TestPushingWithBindingGlobalServices(t *testing.T) {
 	expectedServiceInstance.Name = "work-queue"
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("global services")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("global services")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
@@ -375,8 +372,8 @@ func TestPushingWithBindingLocalServices(t *testing.T) {
 	expectedServiceInstance.Name = "work-queue"
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("local services")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("local services")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
@@ -403,14 +400,14 @@ func TestPushingWithBindingMergedServices(t *testing.T) {
 	service3 := cf.ServiceInstance{}
 	service3.Name = "app2-service"
 
-	mapOfServices := generic.NewEmptyMap()
+	mapOfServices := generic.NewMap()
 	mapOfServices.Set("global-service", service1)
 	mapOfServices.Set("nested-service", service2)
 	mapOfServices.Set("app2-service", service3)
 	deps.serviceRepo.FindInstanceByNameMap = mapOfServices
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("merged services")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("merged services")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
@@ -444,13 +441,32 @@ func TestPushingWithBindingMergedServices(t *testing.T) {
 	})
 }
 
+func TestPushWithInvalidManifestProperties(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("invalid")))
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestErrors = errs
+
+	ui := callPush(t, []string{}, deps)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"Error", "reading", "manifest"},
+		{"Expected", "local services"},
+		{"Expected", "local env"},
+		{"Expected", "global env"},
+		{"Expected", "global services"},
+	})
+}
+
 func TestPushWithServicesThatAreNotFound(t *testing.T) {
 	deps := getPushDependencies()
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.serviceRepo.FindInstanceByNameErr = true
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("global services")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("global services")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	ui := callPush(t, []string{}, deps)
@@ -464,8 +480,8 @@ func TestPushingAppWithPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, err := manifest.Parse(strings.NewReader(fixtures.FixtureWithName("single app")))
-	assert.NoError(t, err)
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
 	callPush(t, []string{

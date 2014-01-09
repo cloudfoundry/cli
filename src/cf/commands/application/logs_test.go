@@ -59,8 +59,6 @@ func TestLogsOutputsRecentLogs(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app.Guid, logsRepo.AppLoggedGuid)
-
-	assert.Equal(t, len(ui.Outputs), 3)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 		{"Log Line 1"},
@@ -83,7 +81,9 @@ func TestLogsEscapeFormattingVerbs(t *testing.T) {
 
 	ui := callLogs(t, []string{"--recent", "my-app"}, reqFactory, logsRepo)
 
-	assert.Contains(t, ui.Outputs[1], "hello%2Bworld%v")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"hello%2Bworld%v"},
+	})
 }
 
 func TestLogsTailsTheAppLogs(t *testing.T) {
@@ -103,8 +103,6 @@ func TestLogsTailsTheAppLogs(t *testing.T) {
 
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 	assert.Equal(t, app.Guid, logsRepo.AppLoggedGuid)
-
-	assert.Equal(t, len(ui.Outputs), 2)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 		{"Log Line 1"},

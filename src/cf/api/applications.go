@@ -157,7 +157,7 @@ var allowedAppKeys = []string{
 }
 
 func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParams) (data string, apiResponse net.ApiResponse) {
-	params := generic.NewEmptyMap()
+	params := generic.NewMap()
 	for _, allowedKey := range allowedAppKeys {
 		if input.Has(allowedKey) {
 			params.Set(allowedKey, input.Get(allowedKey))

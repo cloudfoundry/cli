@@ -127,7 +127,8 @@ func TestDeleteBuildpackDeleteError(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Deleting buildpack", "my-buildpack"},
 		{"FAILED"},
-		{"my-buildpack", "failed badly"},
+		{"my-buildpack"},
+		{"failed badly"},
 	})
 }
 

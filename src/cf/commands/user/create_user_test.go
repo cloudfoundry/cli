@@ -65,11 +65,11 @@ func TestCreateUserWhenItAlreadyExists(t *testing.T) {
 
 	ui := callCreateUser(t, defaultArgs, defaultReqs, userAlreadyExistsRepo)
 
-	assert.Equal(t, len(ui.Outputs), 3)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating user"},
 		{"FAILED"},
-		{"my-user", "already exists"},
+		{"my-user"},
+		{"already exists"},
 	})
 }
 

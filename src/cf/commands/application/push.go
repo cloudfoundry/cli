@@ -61,9 +61,9 @@ func appPathFromContext(c *cli.Context) (dir string, err error) {
 	return
 }
 
-func (cmd *Push) manifestFromContextPath(contextPath string) (m *manifest.Manifest, err error) {
+func (cmd *Push) manifestFromContextPath(contextPath string) (m *manifest.Manifest, errs manifest.ManifestErrors) {
 	if cmd.manifestRepo.ManifestExists(contextPath) {
-		m, err = cmd.manifestRepo.ReadManifest(contextPath)
+		m, errs = cmd.manifestRepo.ReadManifest(contextPath)
 	} else {
 		m = manifest.NewEmptyManifest()
 	}
@@ -80,11 +80,6 @@ func createAppSetFromContextAndManifest(
 		appSet = cf.NewEmptyAppSet()
 
 		for _, manifestAppParams := range m.Applications {
-			generic.Each(manifestAppParams, func(key, value interface{}) {
-					if value == nil {
-						manifestAppParams.Delete(key)
-					}
-				})
 			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
 
 			path := contextPath
@@ -122,16 +117,15 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 		contextParams.Set("path", contextPath)
 	}
 
-	m, err := cmd.manifestFromContextPath(contextPath)
-	if err != nil {
-		cmd.ui.Failed("Error reading manifest from path:%s\n%s", contextPath, err)
+	manifest, errs := cmd.manifestFromContextPath(contextPath)
+	if !errs.Empty() {
+		cmd.ui.Failed("Error reading manifest file: \n%s", errs)
 		return
 	}
 
-	cmd.appSet, err = createAppSetFromContextAndManifest(contextParams, contextPath, m)
+	cmd.appSet, err = createAppSetFromContextAndManifest(contextParams, contextPath, manifest)
 	if err != nil {
-		cmd.ui.FailWithUsage(c, "push")
-		err = errors.New("Incorrect Usage")
+		cmd.ui.Failed("Error: %s", err)
 		return
 	}
 

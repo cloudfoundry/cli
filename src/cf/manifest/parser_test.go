@@ -8,7 +8,6 @@ import (
 
 var simpleManifest = `
 ---
-services:
 applications:
 - name: my-app
 `

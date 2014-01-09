@@ -31,7 +31,7 @@ func (ui *FakeUI) PrintPaginator(rows []string, err error) {
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
 	message =  fmt.Sprintf(message, args...)
-	ui.Outputs = append(ui.Outputs,message)
+	ui.Outputs = append(ui.Outputs, strings.Split(message, "\n")...)
 	return
 }
 
@@ -68,9 +68,8 @@ func (ui *FakeUI) Ok() {
 }
 
 func (ui *FakeUI) Failed(message string, args ...interface{}) {
-	message = fmt.Sprintf(message, args...)
 	ui.Say("FAILED")
-	ui.Say(message)
+	ui.Say(message, args...)
 	return
 }
 

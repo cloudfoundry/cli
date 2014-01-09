@@ -6,15 +6,16 @@ import (
 
 type FakeManifestRepository struct {
 	ReadManifestDir string
-	ReadManifestError error
+	ReadManifestErrors manifest.ManifestErrors
 	ReadManifestManifest *manifest.Manifest
 
 	ManifestNotExists bool
 }
 
-func (repo *FakeManifestRepository) ReadManifest(dir string) (m *manifest.Manifest, err error) {
+func (repo *FakeManifestRepository) ReadManifest(dir string) (m *manifest.Manifest, errs manifest.ManifestErrors) {
 	repo.ReadManifestDir = dir
-	err = repo.ReadManifestError
+	errs = repo.ReadManifestErrors
+
 	if repo.ReadManifestManifest != nil {
 		m = repo.ReadManifestManifest
 	} else {

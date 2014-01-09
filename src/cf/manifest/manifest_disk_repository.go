@@ -6,7 +6,7 @@ import (
 )
 
 type ManifestRepository interface {
-	ReadManifest(dir string) (manifest *Manifest, err error)
+	ReadManifest(dir string) (manifest *Manifest, errs ManifestErrors)
 	ManifestExists(dir string) bool
 }
 
@@ -17,13 +17,15 @@ func NewManifestDiskRepository() (repo ManifestRepository) {
 	return ManifestDiskRepository{}
 }
 
-func (repo ManifestDiskRepository) ReadManifest(dir string) (m *Manifest, err error) {
+func (repo ManifestDiskRepository) ReadManifest(dir string) (m *Manifest, errs ManifestErrors) {
 	file, err := os.Open(repo.filenameFromPath(dir))
 	if err != nil {
+		errs = append(errs, err)
 		return
 	}
 
-	return Parse(file)
+	m, errs = Parse(file)
+	return
 }
 
 func (repo ManifestDiskRepository) ManifestExists(dir string) bool {
