@@ -532,7 +532,7 @@ func TestPushingAppWithManifestIncludesRelativePathForApp(t *testing.T) {
 	deps.manifestRepo.ReadManifestManifest = m
 
 	_ = callPush(t, []string{"--manifest", "some/relative/path"}, deps)
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), "some/fixtures/example-app")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some", "fixtures", "example-app")
 }
 
 func TestPushingWithAbsoluteManifestPath(t *testing.T) {
