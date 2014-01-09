@@ -1,6 +1,7 @@
 package cf
 
 const (
+	ORG_USER        = "OrgUser"
 	ORG_MANAGER     = "OrgManager"
 	BILLING_MANAGER = "BillingManager"
 	ORG_AUDITOR     = "OrgAuditor"

@@ -22,6 +22,12 @@ func TestOrgUsersFailsWithUsage(t *testing.T) {
 
 	ui = callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
 	assert.False(t, ui.FailedWithUsage)
+
+	ui = callOrgUsers(t, []string{"-a"}, reqFactory, userRepo)
+	assert.True(t, ui.FailedWithUsage)
+
+	ui = callOrgUsers(t, []string{"-a", "Org1"}, reqFactory, userRepo)
+	assert.False(t, ui.FailedWithUsage)
 }
 
 func TestOrgUsersRequirements(t *testing.T) {
@@ -77,6 +83,36 @@ func TestOrgUsers(t *testing.T) {
 		{"user4"},
 		{"ORG AUDITOR"},
 		{"user3"},
+	})
+}
+
+func TestOrgUsersAll(t *testing.T) {
+	org := cf.Organization{}
+	org.Name = "Found Org"
+	org.Guid = "found-org-guid"
+
+	userRepo := &testapi.FakeUserRepository{}
+	user := cf.UserFields{}
+	user.Username = "user1"
+	user2 := cf.UserFields{}
+	user2.Username = "user2"
+	userRepo.ListUsersByRole = map[string][]cf.UserFields{
+		cf.ORG_USER: []cf.UserFields{user, user2},
+	}
+
+	reqFactory := &testreq.FakeReqFactory{
+		LoginSuccess: true,
+		Organization: org,
+	}
+
+	ui := callOrgUsers(t, []string{"-a", "Org1"}, reqFactory, userRepo)
+
+	assert.Equal(t, userRepo.ListUsersOrganizationGuid, "found-org-guid")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting users in org", "Found Org", "my-user"},
+		{"USERS"},
+		{"user1"},
+		{"user2"},
 	})
 }
 

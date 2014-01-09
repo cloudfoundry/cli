@@ -420,6 +420,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "org-users",
 			Description: "Show org users by role",
 			Usage:       fmt.Sprintf("%s org-users ORG", cf.Name()),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "a", Usage: "List all users in the org"},
+			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("org-users", c)
 			},

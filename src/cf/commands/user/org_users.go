@@ -13,6 +13,7 @@ import (
 var orgRoles = []string{cf.ORG_MANAGER, cf.BILLING_MANAGER, cf.ORG_AUDITOR}
 
 var orgRoleToDisplayName = map[string]string{
+	cf.ORG_USER:        "USERS",
 	cf.ORG_MANAGER:     "ORG MANAGER",
 	cf.BILLING_MANAGER: "BILLING MANAGER",
 	cf.ORG_AUDITOR:     "ORG AUDITOR",
@@ -49,13 +50,19 @@ func (cmd *OrgUsers) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 
 func (cmd *OrgUsers) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
+	all := c.Bool("a")
 
 	cmd.ui.Say("Getting users in org %s as %s...",
 		terminal.EntityNameColor(org.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	for _, role := range orgRoles {
+	roles := orgRoles
+	if all {
+		roles = []string{cf.ORG_USER}
+	}
+
+	for _, role := range roles {
 		stopChan := make(chan bool)
 		defer close(stopChan)
 
