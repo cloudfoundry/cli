@@ -46,6 +46,6 @@ echo "building RPM package"
 	echo "Version: ${VERSION}" > cf-cli.spec
 	cat cf-cli.spec.template >> cf-cli.spec
 	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-	mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}
+	mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_i386.rpm
 	rm -rf build gcf cf-cli.spec
 )
