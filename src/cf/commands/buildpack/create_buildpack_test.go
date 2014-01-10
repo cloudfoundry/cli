@@ -71,7 +71,7 @@ func TestCreateBuildpackWithPosition(t *testing.T) {
 func TestCreateBuildpackEnabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	fakeUI := callCreateBuildpack([]string{"-enabled", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	fakeUI := callCreateBuildpack([]string{"-enable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.CreateBuildpack.Enabled)
 	assert.Equal(t, *repo.CreateBuildpack.Enabled, true)
@@ -96,7 +96,7 @@ func TestCreateBuildpackNoEnableFlag(t *testing.T) {
 func TestCreateBuildpackDisabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	callCreateBuildpack([]string{"-disabled", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	callCreateBuildpack([]string{"-disable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.CreateBuildpack.Enabled)
 	assert.Equal(t, *repo.CreateBuildpack.Enabled, false)

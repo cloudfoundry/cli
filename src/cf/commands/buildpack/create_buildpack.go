@@ -73,8 +73,8 @@ func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context)
 		return
 	}
 
-	enabled := c.Bool("enabled")
-	disabled := c.Bool("disabled")
+	enabled := c.Bool("enable")
+	disabled := c.Bool("disable")
 	if enabled && disabled {
 		apiResponse = net.NewApiResponseWithMessage("Cannot specify both enabled and disabled.")
 		return

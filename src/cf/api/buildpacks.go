@@ -27,7 +27,7 @@ type BuildpackResource struct {
 type BuildpackEntity struct {
 	Name     string `json:"name"`
 	Position *int   `json:"position,omitempty"`
-	Enabled  *bool  `json:"enabled"`
+	Enabled  *bool  `json:"enabled,omitempty"`
 }
 
 type BuildpackRepository interface {
