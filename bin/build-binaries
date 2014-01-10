@@ -31,8 +31,7 @@ function build-architecture {
     mv gcf $BIN_NAME.exe
     zip ../release/$BIN_NAME.zip $BIN_NAME.exe
   else
-    mv gcf $BIN_NAME
-    tar cvzf ../release/$BIN_NAME.tgz $BIN_NAME
+    tar cvzf ../release/$BIN_NAME.tgz gcf
   fi
 
   cd ..
