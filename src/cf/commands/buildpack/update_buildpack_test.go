@@ -64,22 +64,11 @@ func TestUpdateBuildpackNoPosition(t *testing.T) {
 	assert.Nil(t, repo.UpdateBuildpack.Position)
 }
 
-func TestUpdateBuildpackInvalidPosition(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-	repo, bitsRepo := getRepositories()
-
-	fakeUI := callUpdateBuildpack([]string{"-i", "abc", "my-buildpack"}, reqFactory, repo, bitsRepo)
-
-	assert.Contains(t, fakeUI.Outputs[0], "Updating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "FAILED")
-}
-
 func TestUpdateBuildpackEnabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callUpdateBuildpack([]string{"-enabled", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	fakeUI := callUpdateBuildpack([]string{"-enable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.UpdateBuildpack.Enabled)
 	assert.Equal(t, *repo.UpdateBuildpack.Enabled, true)
@@ -93,7 +82,7 @@ func TestUpdateBuildpackDisabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	callUpdateBuildpack([]string{"-disabled", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	callUpdateBuildpack([]string{"-disable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.UpdateBuildpack.Enabled)
 	assert.Equal(t, *repo.UpdateBuildpack.Enabled, false)
