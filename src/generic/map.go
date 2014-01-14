@@ -38,7 +38,7 @@ type Map interface {
 type ConcreteMap map[interface{}]interface{}
 
 func (data *ConcreteMap) String() string {
-	return fmt.Sprintf("%#v",*data)
+	return fmt.Sprintf("% v",*data)
 }
 
 func (data *ConcreteMap) IsEmpty() bool {
