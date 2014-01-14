@@ -108,7 +108,6 @@ func NewMap(data ...interface {}) Map {
 	case map[interface {}]interface{}:
 		mapp := ConcreteMap(data)
 		return &mapp
-	default:
-		return &ConcreteMap{}
 	}
+	panic("NewMap called with unexpected argument")
 }
