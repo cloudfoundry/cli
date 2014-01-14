@@ -53,87 +53,6 @@ func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo m
 	return
 }
 
-func createAppSetFromContextAndManifest(
-	contextParams cf.AppParams,
-	rootAppPath string,
-	m *manifest.Manifest) (appSet cf.AppSet, err error) {
-	if len(m.Applications) == 0 {
-		appSet = cf.NewAppSet(contextParams)
-	} else {
-		appSet = cf.NewEmptyAppSet()
-
-		for _, manifestAppParams := range m.Applications {
-			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
-
-			path := rootAppPath
-			if manifestAppParams.Has("path") {
-				path = filepath.Join(rootAppPath, manifestAppParams.Get("path").(string))
-			}
-			appFields.Set("path", path)
-
-			appSet = append(appSet, appFields)
-		}
-	}
-
-	for _, appParams := range appSet {
-		if !appParams.Has("name") {
-			err = errors.New("app name is a required field")
-		}
-	}
-
-	return
-}
-
-func (cmd *Push) appAndManifestPaths(userSpecifiedAppPath, userSpecifiedManifestPath string) (appPath, manifestPath string) {
-	cwd, _ := os.Getwd()
-
-	if userSpecifiedAppPath != "" && userSpecifiedManifestPath != "" {
-		cmd.ui.Warn("-p is ignored when using a manifest. Please specify the path in the manifest.")
-	}
-
-	if userSpecifiedAppPath != "" {
-		appPath = userSpecifiedAppPath
-	} else if userSpecifiedManifestPath != "" {
-		appPath = userSpecifiedManifestPath
-	} else {
-		appPath = cwd
-	}
-
-	if userSpecifiedManifestPath != "" {
-		manifestPath = userSpecifiedManifestPath
-	} else if userSpecifiedAppPath != "" {
-		manifestPath = userSpecifiedAppPath
-	} else {
-		manifestPath = cwd
-	}
-
-	return
-}
-
-func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
-	appPath, manifestPath := cmd.appAndManifestPaths(c.String("p"), c.String("manifest"))
-
-	manifest, errs := cmd.manifestRepo.ReadManifest(manifestPath)
-	if !errs.Empty() {
-		cmd.ui.Failed("Error reading manifest file: \n%s", errs)
-		return
-	}
-
-	appParams, err := cf.NewAppParamsFromContext(c)
-	if err != nil {
-		cmd.ui.Failed("Error: %s", err)
-		return
-	}
-
-	appParams.Set("path", appPath)
-
-	cmd.appSet, err = createAppSetFromContextAndManifest(appParams, appPath, manifest)
-	if err != nil {
-		cmd.ui.Failed("Error: %s", err)
-		return
-	}
-}
-
 func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = []requirements.Requirement{
 		reqFactory.NewLoginRequirement(),
@@ -403,6 +322,84 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
+
+	return
+}
+
+func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
+	basePath, manifestFilename := cmd.findManifestPath(c)
+
+	m, errs := cmd.manifestRepo.ReadManifest(filepath.Join(basePath, manifestFilename))
+
+	if !errs.Empty() {
+		if os.IsNotExist(errs[0]) && c.String("manifest") == "" {
+			m = manifest.NewEmptyManifest()
+		} else {
+			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+			return
+		}
+	}
+
+	appParams, err := cf.NewAppParamsFromContext(c)
+	if err != nil {
+		cmd.ui.Failed("Error: %s", err)
+		return
+	}
+
+	appParams.Set("path", basePath)
+
+	cmd.appSet, err = createAppSetFromContextAndManifest(appParams, basePath, m)
+	if err != nil {
+		cmd.ui.Failed("Error: %s", err)
+		return
+	}
+}
+
+func (cmd *Push) findManifestPath(c *cli.Context) (basePath, manifestFilename string) {
+	var err error
+
+	if c.String("p") != "" && c.String("manifest") != "" {
+		cmd.ui.Warn("-p is ignored when using a manifest. Please specify the path in the manifest.")
+	}
+
+	if c.String("manifest") != "" {
+		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("manifest"))
+	} else {
+		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("p"))
+	}
+
+	if err != nil {
+		cmd.ui.Failed("%s", err)
+		return
+	}
+
+	return
+}
+
+func createAppSetFromContextAndManifest(contextParams cf.AppParams, rootAppPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
+	if len(m.Applications) == 0 {
+		appSet = cf.NewAppSet(contextParams)
+	} else {
+		appSet = cf.NewEmptyAppSet()
+
+		for _, manifestAppParams := range m.Applications {
+			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
+
+			path := rootAppPath
+			if manifestAppParams.Has("path") {
+				path = filepath.Join(rootAppPath, manifestAppParams.Get("path").(string))
+			}
+			appFields.Set("path", path)
+
+			appSet = append(appSet, appFields)
+		}
+	}
+
+	for _, appParams := range appSet {
+		if !appParams.Has("name") {
+			err = errors.New("app name is a required field")
+		}
+	}
 
 	return
 }

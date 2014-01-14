@@ -5,11 +5,12 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/manifest"
+	"errors"
 	"generic"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -89,10 +90,6 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 
 	assert.Equal(t, appBitsRepo.UploadedAppGuid, "my-new-app-guid")
 
-	expectedAppDir, err := os.Getwd()
-	assert.NoError(t, err)
-	assert.Equal(t, appBitsRepo.UploadedDir, expectedAppDir)
-
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating app", "my-new-app", "my-org", "my-space"},
 		{"OK"},
@@ -156,6 +153,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.stackRepo.FindByNameStack = stack
 	deps.appRepo.ReadNotFound = true
+	deps.manifestRepo.ManifestDir = "/path/to/my-new-app"
 
 	ui := callPush(t, []string{
 		"-c", "unicorn -c config/unicorn.rb -D",
@@ -164,7 +162,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 		"-i", "3",
 		"-m", "2G",
 		"-b", "https://github.com/heroku/heroku-buildpack-play.git",
-		"-p", "/Users/pivotal/workspace/my-new-app",
+		"-p", "/path/to/my-new-app",
 		"-s", "customLinux",
 		"-t", "1",
 		"--no-start",
@@ -201,7 +199,7 @@ func TestPushingAppWithCustomFlags(t *testing.T) {
 	assert.Equal(t, deps.routeRepo.BoundRouteGuid, "my-hostname-route-guid")
 
 	assert.Equal(t, deps.appBitsRepo.UploadedAppGuid, "my-new-app-guid")
-	assert.Equal(t, deps.appBitsRepo.UploadedDir, "/Users/pivotal/workspace/my-new-app")
+	assert.Equal(t, deps.appBitsRepo.UploadedDir, "/path/to/my-new-app")
 
 	assert.Equal(t, deps.starter.AppToStart.Name, "")
 }
@@ -268,9 +266,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("stack").(string), "custom-stack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
-
-	dir, _ := os.Getwd()
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join(dir, "../../fixtures/example-app"))
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), "../../fixtures/example-app")
 
 	assert.True(t, deps.appRepo.CreatedAppParams().Has("env"))
 	envVars := deps.appRepo.CreatedAppParams().Get("env").(generic.Map)
@@ -482,12 +478,14 @@ func TestPushingAppWithPath(t *testing.T) {
 	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestDir = "/foo/bar/baz"
 
 	callPush(t, []string{
 		"-p", "/foo/bar/baz",
 		"my-new-app",
 	}, deps)
 
+	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "/foo/bar/baz")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("/foo/bar/baz", "../../fixtures/example-app"))
 }
 
@@ -498,16 +496,91 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestDir = "returned/path/"
+	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
 	ui := callPush(t, []string{
-		"--manifest", "../relative/different-manifest.yml",
-		"-p", "some/relative/path",
+		"--manifest", "user/supplied/path/different-manifest.yml",
+		"-p", "foo/bar/baz",
 	}, deps)
 
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "../relative/different-manifest.yml")
+	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "user/supplied/path/different-manifest.yml")
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "returned/path/different-manifest.yml")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("returned/path", "../../fixtures/example-app"))
+
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"-p is ignored when using a manifest"},
 	})
+}
+
+func TestPushingWithBadManifestPath(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestPathErr = errors.New("read manifest error")
+
+	ui := callPush(t, []string{
+		"--manifest", "bad/manifest/path",
+	}, deps)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"read manifest error"},
+	})
+}
+
+func TestPushingWithDefaultManifestNotFound(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{syscall.ENOENT}
+
+	ui := callPush(t, []string{"--no-route", "app-name"}, deps)
+
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
+}
+
+func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestPathErr = syscall.ENOENT
+
+	ui := callPush(t, []string{
+		"--manifest", "bad/manifest/path",
+	}, deps)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
+}
+
+func TestPushingWithAppPathFromManifestFile(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestDir = "some/relative/path/"
+
+	callPush(t, []string{
+		"--manifest", "some/relative/path/different-manifest.yml",
+	}, deps)
+
+	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path/different-manifest.yml")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
 }
 
 func TestPushingWithManifestInAppDirectory(t *testing.T) {
@@ -520,34 +593,23 @@ func TestPushingWithManifestInAppDirectory(t *testing.T) {
 
 	_ = callPush(t, []string{"-p", "some/relative/path"}, deps)
 
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "some/relative/path")
+	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path")
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "some/relative/path/manifest.yml")
 }
 
-func TestPushingAppWithManifestIncludesRelativePathForApp(t *testing.T) {
+func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
 	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestDir = "some/relative/path"
 
 	_ = callPush(t, []string{"--manifest", "some/relative/path"}, deps)
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some", "fixtures", "example-app"))
-}
 
-func TestPushingWithAbsoluteManifestPath(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
-
-	callPush(t, []string{
-		"--manifest", "/absolute/path/to/different-manifest.yml",
-	}, deps)
-
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "/absolute/path/to/different-manifest.yml")
+	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
 }
 
 func TestPushingAppWithNoRoute(t *testing.T) {
