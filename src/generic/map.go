@@ -128,7 +128,13 @@ func NewMap(data ...interface{}) Map {
 		stringMap.Set(key, val)
 	}
 		return stringMap
-	case map[interface{}]interface{}:
+	case map[string]interface{}:
+		stringToInterfaceMap := newEmptyMap()
+		for key, val := range data {
+			stringToInterfaceMap.Set(key, val)
+		}
+		return stringToInterfaceMap
+	case map[interface {}]interface{}:
 		mapp := ConcreteMap(data)
 		return &mapp
 	}

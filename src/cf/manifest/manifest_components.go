@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"generic"
+	"strconv"
 )
 
 type manifestComponents struct {
@@ -27,8 +28,25 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 			}
 
 			if app.Has("timeout") {
-				app.Set("health_check_timeout", app.Get("timeout"))
-				app.Delete("timeout")
+				timeoutStr := app.Get("timeout").(string)
+				timeout, err := strconv.Atoi(timeoutStr)
+				if err != nil {
+					errs = append(errs, err)
+				} else {
+					app.Set("health_check_timeout", timeout)
+					app.Delete("timeout")
+				}
+			}
+
+			for _, fieldName := range []string{"instances"} {
+				if app.Has(fieldName) && app.Get(fieldName) != nil {
+					value, err := strconv.Atoi(app.Get(fieldName).(string))
+					if err != nil {
+						errs = append(errs, errors.New(fmt.Sprintf("Expected %s to be a number.", fieldName)))
+					} else {
+						app.Set(fieldName, value)
+					}
+				}
 			}
 
 			if app.Has("services") {
@@ -43,7 +61,7 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 			}
 
 			if app.Has("env") {
-				env, ok := app.Get("env").(map[interface{}]interface{})
+				env, ok := app.Get("env").(map[string]interface{})
 				if !ok {
 					errs = append(errs, errors.New("Expected local env vars to be a set of key => value."))
 				} else {
