@@ -390,6 +390,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 		}
 	}
 
+	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(manifestPath))
 	return
 }
 
