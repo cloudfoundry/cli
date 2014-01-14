@@ -27,7 +27,8 @@ func TestBuildpacksListBuildpacks(t *testing.T) {
 			      },
 			      "entity": {
 			        "name": "Buildpack1",
-					"position" : 1
+					"position" : 1,
+					"filename" : "firstbp.zip"
 			      }
 			    }
 			  ]
@@ -62,10 +63,12 @@ func TestBuildpacksListBuildpacks(t *testing.T) {
 	buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
 
 	one := 1
+	firstbp := "firstbp.zip"
 	buildpack := cf.Buildpack{}
 	buildpack.Guid = "buildpack1-guid"
 	buildpack.Name = "Buildpack1"
 	buildpack.Position = &one
+	buildpack.Filename = &firstbp
 
 	two := 2
 	buildpack2 := cf.Buildpack{}

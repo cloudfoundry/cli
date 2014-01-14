@@ -25,9 +25,11 @@ type BuildpackResource struct {
 }
 
 type BuildpackEntity struct {
-	Name     string `json:"name"`
-	Position *int   `json:"position,omitempty"`
-	Enabled  *bool  `json:"enabled,omitempty"`
+	Name     string  `json:"name"`
+	Position *int    `json:"position,omitempty"`
+	Enabled  *bool   `json:"enabled,omitempty"`
+	Key      *string `json:"key,omitempty"`
+	Filename *string `json:"filename,omitempty"`
 }
 
 type BuildpackRepository interface {
@@ -148,7 +150,7 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (api
 func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
 
-	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled}
+	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled, nil, nil}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize updates.", err)
@@ -170,5 +172,7 @@ func unmarshallBuildpack(resource BuildpackResource) (buildpack cf.Buildpack) {
 	buildpack.Name = resource.Entity.Name
 	buildpack.Position = resource.Entity.Position
 	buildpack.Enabled = resource.Entity.Enabled
+	buildpack.Key = resource.Entity.Key
+	buildpack.Filename = resource.Entity.Filename
 	return
 }
