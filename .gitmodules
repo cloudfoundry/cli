@@ -12,4 +12,4 @@
 	url = https://github.com/codegangsta/cli.git
 [submodule "src/github.com/cloudfoundry/gamble"]
 	path = src/github.com/cloudfoundry/gamble
-	url = git@github.com:cloudfoundry/gamble.git
+	url = https://github.com/cloudfoundry/gamble.git
