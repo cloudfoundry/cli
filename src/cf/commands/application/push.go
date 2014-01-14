@@ -265,6 +265,11 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 }
 
 func (cmd *Push) app(appParams cf.AppParams) (app cf.Application, didCreate bool) {
+	if !appParams.Has("name") {
+		cmd.ui.Failed("Error: No name found for app")
+		return
+	}
+
 	appName := appParams.Get("name").(string)
 	app, apiResponse := cmd.appRepo.Read(appName)
 	if apiResponse.IsError() {
@@ -327,18 +332,9 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 }
 
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
-	basePath, manifestFilename := cmd.findManifestPath(c)
+	basePath, manifestFilename := cmd.manifestPathFromContext(c)
 
-	m, errs := cmd.manifestRepo.ReadManifest(filepath.Join(basePath, manifestFilename))
-
-	if !errs.Empty() {
-		if os.IsNotExist(errs[0]) && c.String("manifest") == "" {
-			m = manifest.NewEmptyManifest()
-		} else {
-			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
-			return
-		}
-	}
+	m := cmd.instantiateManifest(c, filepath.Join(basePath, manifestFilename))
 
 	appParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
@@ -355,7 +351,7 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
 	}
 }
 
-func (cmd *Push) findManifestPath(c *cli.Context) (basePath, manifestFilename string) {
+func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFilename string) {
 	var err error
 
 	if c.String("p") != "" && c.String("manifest") != "" {
@@ -366,11 +362,32 @@ func (cmd *Push) findManifestPath(c *cli.Context) (basePath, manifestFilename st
 		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("manifest"))
 	} else {
 		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("p"))
-	}
 
+	}
 	if err != nil {
 		cmd.ui.Failed("%s", err)
 		return
+	}
+
+	return
+}
+
+func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *manifest.Manifest) {
+	if c.Bool("no-manifest") {
+		m = manifest.NewEmptyManifest()
+		return
+	}
+
+	m, errs := cmd.manifestRepo.ReadManifest(manifestPath)
+
+	if !errs.Empty() {
+		if os.IsNotExist(errs[0]) && c.String("manifest") == "" {
+			m = manifest.NewEmptyManifest()
+			return
+		} else {
+			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+			return
+		}
 	}
 
 	return

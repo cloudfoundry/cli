@@ -612,6 +612,42 @@ func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
 }
 
+func TestPushingWithNoManifestFlag(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("nulls")))
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestErrors = errs
+
+	ui := callPush(t, []string{"--no-route", "--no-manifest","app-name"}, deps)
+
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"hacker-manifesto"},
+	})
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("name").(string), "app-name")
+}
+
+func TestPushingWithNoManifestFlagAndMissingAppName(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("nulls")))
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestErrors = errs
+
+	ui := callPush(t, []string{"--no-route", "--no-manifest"}, deps)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
+
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"hacker-manifesto"},
+	})
+}
+
 func TestPushingAppWithNoRoute(t *testing.T) {
 	deps := getPushDependencies()
 	domain := cf.Domain{}
