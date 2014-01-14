@@ -266,7 +266,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("stack").(string), "custom-stack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), "../../fixtures/example-app")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Clean("../../fixtures/example-app"))
 
 	assert.True(t, deps.appRepo.CreatedAppParams().Has("env"))
 	envVars := deps.appRepo.CreatedAppParams().Get("env").(generic.Map)
@@ -505,7 +505,7 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	}, deps)
 
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "user/supplied/path/different-manifest.yml")
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "returned/path/different-manifest.yml")
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, filepath.Clean("returned/path/different-manifest.yml"))
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("returned/path", "../../fixtures/example-app"))
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
@@ -594,7 +594,7 @@ func TestPushingWithManifestInAppDirectory(t *testing.T) {
 	_ = callPush(t, []string{"-p", "some/relative/path"}, deps)
 
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path")
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "some/relative/path/manifest.yml")
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, filepath.Clean("some/relative/path/manifest.yml"))
 }
 
 func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
