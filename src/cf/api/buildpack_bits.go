@@ -9,6 +9,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path"
 )
 
 type BuildpackBitsRepository interface {
@@ -39,7 +40,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.
 			apiResponse = net.NewApiResponseWithError("Invalid buildpack", err)
 			return
 		}
-		apiResponse = repo.uploadBits(buildpack, zipFile)
+		apiResponse = repo.uploadBits(buildpack, zipFile, dir)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
@@ -47,7 +48,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack cf.Buildpack, zipFile *os.File) (apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack cf.Buildpack, zipFile *os.File, filename string) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, buildpack.Guid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
@@ -56,13 +57,14 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack cf.Build
 			return
 		}
 
-		boundary, err := repo.writeUploadBody(zipFile, requestFile)
+		boundary, err := repo.writeUploadBody(zipFile, requestFile, filename)
 		if err != nil {
 			apiResponse = net.NewApiResponseWithError("Error creating upload", err)
 			return
 		}
 
-		request, apiResponse := repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, requestFile)
+		var request *net.Request
+		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, requestFile)
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 		request.HttpReq.Header.Set("Content-Type", contentType)
 		if apiResponse.IsNotSuccessful() {
@@ -75,7 +77,7 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack cf.Build
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) writeUploadBody(zipFile *os.File, body *os.File) (boundary string, err error) {
+func (repo CloudControllerBuildpackBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, filename string) (boundary string, err error) {
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 
@@ -90,7 +92,7 @@ func (repo CloudControllerBuildpackBitsRepository) writeUploadBody(zipFile *os.F
 		return
 	}
 
-	part, err := writer.CreateFormFile("buildpack", "buildpack.zip")
+	part, err := writer.CreateFormFile("buildpack", path.Base(filename))
 	if err != nil {
 		return
 	}

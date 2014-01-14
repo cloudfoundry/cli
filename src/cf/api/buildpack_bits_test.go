@@ -13,69 +13,69 @@ import (
 	"testing"
 )
 
-var uploadBuildpackRequest = testnet.TestRequest{
-	Method:  "PUT",
-	Path:    "/v2/buildpacks/my-cool-buildpack-guid/bits",
-	Matcher: uploadBuildpackBodyMatcher,
-	Response: testnet.TestResponse{
-		Status: http.StatusCreated,
-		Body: `
+func uploadBuildpackRequest(filename string) testnet.TestRequest {
+	return testnet.TestRequest{
+		Method:  "PUT",
+		Path:    "/v2/buildpacks/my-cool-buildpack-guid/bits",
+		Matcher: uploadBuildpackBodyMatcher(filename),
+		Response: testnet.TestResponse{
+			Status: http.StatusCreated,
+			Body: `
 {
 	"metadata":{
 		"guid": "my-job-guid"
 	}
 }
 	`},
+	}
 }
 
 var expectedBuildpackContent = []string{"detect", "compile", "package"}
 
-var uploadBuildpackBodyMatcher = func(t *testing.T, request *http.Request) {
-	err := request.ParseMultipartForm(4096)
-	if err != nil {
-		assert.Fail(t, "Failed parsing multipart form: %s", err)
-		return
-	}
-	defer request.MultipartForm.RemoveAll()
-
-	assert.Equal(t, len(request.MultipartForm.Value), 0, "Should have 0 values")
-	assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
-
-	files, ok := request.MultipartForm.File["buildpack"]
-
-	assert.True(t, ok, "Buildpack file part not present")
-	assert.Equal(t, len(files), 1, "Wrong number of files")
-
-	buildpackFile := files[0]
-	assert.Equal(t, buildpackFile.Filename, "buildpack.zip", "Wrong file name")
-
-	file, err := buildpackFile.Open()
-	if err != nil {
-		assert.Fail(t, "Cannot get multipart file: %s", err.Error())
-		return
-	}
-
-	zipReader, err := zip.NewReader(file, 4096)
-	if err != nil {
-		assert.Fail(t, "Error reading zip content: %s", err.Error())
-	}
-
-	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
-	assert.Equal(t, zipReader.File[1].Mode(), uint32(0666))
-
-nextFile:
-	for _, f := range zipReader.File {
-		for _, expected := range expectedBuildpackContent {
-			if f.Name == expected {
-				continue nextFile
-			}
+func uploadBuildpackBodyMatcher(filename string) testnet.RequestMatcher {
+	return func(t *testing.T, request *http.Request) {
+		err := request.ParseMultipartForm(4096)
+		if err != nil {
+			assert.Fail(t, "Failed parsing multipart form: %s", err)
+			return
 		}
-		assert.Fail(t, "Missing file: "+f.Name)
-	}
-}
+		defer request.MultipartForm.RemoveAll()
 
-var defaultBuildpackRequests = []testnet.TestRequest{
-	uploadBuildpackRequest,
+		assert.Equal(t, len(request.MultipartForm.Value), 0, "Should have 0 values")
+		assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
+
+		files, ok := request.MultipartForm.File["buildpack"]
+
+		assert.True(t, ok, "Buildpack file part not present")
+		assert.Equal(t, len(files), 1, "Wrong number of files")
+
+		buildpackFile := files[0]
+		assert.Equal(t, buildpackFile.Filename, filepath.Base(filename), "Wrong file name")
+
+		file, err := buildpackFile.Open()
+		if err != nil {
+			assert.Fail(t, "Cannot get multipart file: %s", err.Error())
+			return
+		}
+
+		zipReader, err := zip.NewReader(file, 4096)
+		if err != nil {
+			assert.Fail(t, "Error reading zip content: %s", err.Error())
+		}
+
+		assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
+		assert.Equal(t, zipReader.File[1].Mode(), uint32(0666))
+
+	nextFile:
+		for _, f := range zipReader.File {
+			for _, expected := range expectedBuildpackContent {
+				if f.Name == expected {
+					continue nextFile
+				}
+			}
+			assert.Fail(t, "Missing file: "+f.Name)
+		}
+	}
 }
 
 func TestUploadBuildpackWithInvalidDirectory(t *testing.T) {
@@ -97,7 +97,9 @@ func TestUploadBuildpack(t *testing.T) {
 	err = os.Chmod(filepath.Join(dir, "detect"), 0666)
 	assert.NoError(t, err)
 
-	_, apiResponse := testUploadBuildpack(t, dir, defaultBuildpackRequests)
+	_, apiResponse := testUploadBuildpack(t, dir, []testnet.TestRequest{
+		uploadBuildpackRequest(dir),
+	})
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
@@ -106,7 +108,9 @@ func TestUploadBuildpackWithAZipFile(t *testing.T) {
 	assert.NoError(t, err)
 	dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
 
-	_, apiResponse := testUploadBuildpack(t, dir, defaultBuildpackRequests)
+	_, apiResponse := testUploadBuildpack(t, dir, []testnet.TestRequest{
+		uploadBuildpackRequest(dir),
+	})
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
