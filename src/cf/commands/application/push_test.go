@@ -574,13 +574,19 @@ func TestPushingWithAppPathFromManifestFile(t *testing.T) {
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "some/relative/path/"
-
-	callPush(t, []string{
+	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
+	ui := callPush(t, []string{
 		"--manifest", "some/relative/path/different-manifest.yml",
 	}, deps)
 
+	expectedManifestPath := filepath.Clean("some/relative/path/different-manifest.yml")
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path/different-manifest.yml")
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, expectedManifestPath)
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Using manifest file", expectedManifestPath},
+	})
 }
 
 func TestPushingWithManifestInAppDirectory(t *testing.T) {
@@ -591,10 +597,15 @@ func TestPushingWithManifestInAppDirectory(t *testing.T) {
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
-	_ = callPush(t, []string{"-p", "some/relative/path"}, deps)
+	ui := callPush(t, []string{"-p", "some/relative/path"}, deps)
 
+	expectedManifestPath := filepath.Clean("some/relative/path/manifest.yml")
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path")
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, filepath.Clean("some/relative/path/manifest.yml"))
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, expectedManifestPath)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Using manifest file", expectedManifestPath},
+	})
 }
 
 func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
@@ -620,7 +631,7 @@ func TestPushingWithNoManifestFlag(t *testing.T) {
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ReadManifestErrors = errs
 
-	ui := callPush(t, []string{"--no-route", "--no-manifest","app-name"}, deps)
+	ui := callPush(t, []string{"--no-route", "--no-manifest", "app-name"}, deps)
 
 	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
