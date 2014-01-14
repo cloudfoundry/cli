@@ -2,8 +2,9 @@
 
 1. Download the CLI from github: https://github.com/cloudfoundry/cli/releases
 2. Extract the zip file.
-3. Move `gcf` to C:\Program Files\Cloud Foundry\
-4. Set your %PATH% to include C:\Program Files\Cloud Foundry [(see instructions)](http://www.wikihow.com/Create-a-Custom-Windows-Command-Prompt)
+3. Create a folder in C:\Program Files\, named "Cloud Foundry"
+4. Move `gcf` to C:\Program Files\Cloud Foundry\
+5. Set your %PATH% to include C:\Program Files\Cloud Foundry [(see instructions)](http://www.wikihow.com/Create-a-Custom-Windows-Command-Prompt)
   1. Right-click My Computer > Properties
   2. Click on Advanced system settings
   3. Click on Environment Variables
@@ -12,8 +13,8 @@
   6. Append C:\Program Files\Cloud Foundry\ to the Variable value separated by a semicolon
   7. Click OK
   8. Click OK
-5. Open up the command prompt and type `gcf`
-6. You should see the CLI help if everything is successful
+6. Open up the command prompt and type `gcf`
+7. You should see the CLI help if everything is successful
 
 ## Mac OSX and Linux
 
