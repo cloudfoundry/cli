@@ -291,12 +291,13 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"Error", "reading", "manifest"},
-		{"command"},
-		{"space_guid"},
-		{"buildpack"},
-		{"disk_quota"},
-		{"instances"},
-		{"memory"},
+		{"command", "should not be null"},
+		{"space_guid", "should not be null"},
+		{"buildpack", "should not be null"},
+		{"disk_quota", "should not be null"},
+		{"instances", "should not be null"},
+		{"memory", "should not be null"},
+		{"env", "should not be null"},
 	})
 }
 

@@ -95,6 +95,14 @@ applications:
   - FOO
   - BAR
 `,
+	"invalid env": `
+---
+applications:
+- name: app-name
+env:
+  foo: bar
+  bar:
+`,
 }
 
 func ManifestWithName(name string) (fixture string) {

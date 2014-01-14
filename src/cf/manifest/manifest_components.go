@@ -3,6 +3,7 @@ package manifest
 import (
 	"cf"
 	"errors"
+	"fmt"
 	"generic"
 )
 
@@ -41,7 +42,12 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 				if !ok {
 					errs = append(errs, errors.New("Expected local env vars to be a set of key => value."))
 				} else {
-					app.Set("env", generic.NewMap(env))
+					merrs := validateEnvVars(env)
+					if merrs != nil {
+						errs = append(errs, merrs)
+					} else {
+						app.Set("env", generic.NewMap(env))
+					}
 				}
 			} else {
 				app.Set("env", generic.NewMap())
@@ -53,6 +59,10 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 		env, ok := data.Get("env").(map[interface{}]interface{})
 		if ok {
 			m.GlobalEnvVars = generic.NewMap(env)
+			merrs := validateEnvVars(m.GlobalEnvVars)
+			if merrs != nil {
+				errs = append(errs, merrs)
+			}
 		} else {
 			errs = append(errs, errors.New("Expected global env vars to be a set of key => value."))
 		}
@@ -71,13 +81,23 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 }
 
 func validateAppParams(appParams cf.AppParams) (errs ManifestErrors) {
-	keysToCheck := []string{"name", "command", "space_guid", "buildpack", "disk_quota", "instances", "memory"}
+	keysToCheck := []string{"name", "command", "space_guid", "buildpack", "disk_quota", "instances", "memory", "env"}
 	for _, key := range keysToCheck {
 		if appParams.Has(key) && appParams.Get(key) == nil {
-			errs = append(errs, errors.New(key+" should not be null"))
+			errs = append(errs, errors.New(fmt.Sprintf("%s should not be null", key)))
 		}
 	}
 
+	return
+}
+
+func validateEnvVars(input interface{}) (errs ManifestErrors) {
+	envVars := generic.NewMap(input)
+	generic.Each(envVars, func(key, value interface{}) {
+		if value == nil {
+			errs = append(errs, errors.New(fmt.Sprintf("env var '%s' should not be null", key)))
+		}
+	})
 	return
 }
 
