@@ -1,12 +1,14 @@
 package manifest
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 )
 
 type ManifestRepository interface {
-	ReadManifest(dir string) (manifest *Manifest, errs ManifestErrors)
+	ReadManifest(path string) (manifest *Manifest, errs ManifestErrors)
+	ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error)
 }
 
 type ManifestDiskRepository struct {
@@ -23,24 +25,39 @@ func (repo ManifestDiskRepository) ReadManifest(path string) (m *Manifest, errs 
 		return
 	}
 
-	fileInfo, err := os.Stat(path)
-
+	file, err := os.Open(filepath.Clean(path))
 	if err != nil {
-		return
-	}
-
-	var fullPath string
-	if fileInfo.IsDir() {
-		fullPath = filepath.Join(path, "manifest.yml")
-	} else {
-		fullPath = path
-	}
-
-	file, err := os.Open(fullPath)
-	if err != nil {
+		errs = append(errs, err)
 		return
 	}
 
 	m, errs = Parse(file)
+	return
+}
+
+func (repo ManifestDiskRepository) ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
+	if userSpecifiedPath == "" {
+		userSpecifiedPath, err = os.Getwd()
+		if err != nil {
+			err = errors.New("Error finding current directory: " + err.Error())
+			return
+		}
+	}
+
+	fileInfo, err := os.Stat(userSpecifiedPath)
+	if err != nil {
+		err = errors.New("Error finding manifest path: " + err.Error())
+		return
+	}
+
+	if fileInfo.IsDir() {
+		manifestDir = userSpecifiedPath
+		manifestFilename = "manifest.yml"
+	} else {
+		manifestDir = filepath.Dir(userSpecifiedPath)
+		manifestFilename = fileInfo.Name()
+	}
+
+	fileInfo, err = os.Stat(userSpecifiedPath)
 	return
 }

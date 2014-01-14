@@ -3,6 +3,7 @@ package manifest
 import (
 	"github.com/stretchr/testify/assert"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -12,22 +13,12 @@ func assertFeatureFlag(t *testing.T) {
 	}
 }
 
-func TestReadManifestWithDirectoryName(t *testing.T) {
+func TestReadManifestWithGoodPath(t *testing.T) {
 	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
-	manifest, err := repo.ReadManifest("../../fixtures/example-app")
+	manifest, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
 
-	assert.NoError(t, err)
-	assert.Equal(t, len(manifest.Applications), 1)
-	assert.Equal(t, manifest.Applications[0].Get("name").(string), "hello")
-}
-
-func TestReadDifferentManifestFilename(t *testing.T) {
-	assertFeatureFlag(t)
-	repo := NewManifestDiskRepository()
-	manifest, err := repo.ReadManifest("../../fixtures/different-manifest.yml")
-
-	assert.NoError(t, err)
+	assert.True(t, errs.Empty())
 	assert.Equal(t, len(manifest.Applications), 1)
 	assert.Equal(t, manifest.Applications[0].Get("name").(string), "goodbyte")
 }
@@ -35,17 +26,50 @@ func TestReadDifferentManifestFilename(t *testing.T) {
 func TestReadManifestWithBadPath(t *testing.T) {
 	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
-	m, err := repo.ReadManifest("some/path/that/doesnt/exist")
+	_, errs := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
 
-	assert.NoError(t, err)
-	assert.Equal(t, m, NewEmptyManifest())
+	assert.False(t, errs.Empty())
 }
 
-func TestReadManifestWithValidPathAndNoManifest(t *testing.T) {
+func TestManifestPathsDefaultsToCurrentDirectory(t *testing.T) {
 	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
-	m, err := repo.ReadManifest(".")
+
+	cwd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	path, filename, err := repo.ManifestPath("")
 
 	assert.NoError(t, err)
-	assert.Equal(t, m, NewEmptyManifest())
+	assert.Equal(t, path, cwd)
+	assert.Equal(t, filename, "manifest.yml")
+}
+
+func TestAppAndManifestPathsIgnoreAppPathWhenManifestPathIsSpecified(t *testing.T) {
+	assertFeatureFlag(t)
+	repo := NewManifestDiskRepository()
+
+	cwd, err := os.Getwd()
+	assert.NoError(t, err)
+	expectedDir := filepath.Join(cwd, "..")
+
+	path, filename, err := repo.ManifestPath(expectedDir)
+
+	assert.NoError(t, err)
+	assert.Equal(t, path, expectedDir)
+	assert.Equal(t, filename, "manifest.yml")
+}
+
+func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
+	assertFeatureFlag(t)
+	repo := NewManifestDiskRepository()
+
+	cwd, err := os.Getwd()
+	assert.NoError(t, err)
+
+	path, filename, err := repo.ManifestPath(filepath.Join(cwd, "example_manifest.yml"))
+
+	assert.NoError(t, err)
+	assert.Equal(t, path, cwd)
+	assert.Equal(t, filename, "example_manifest.yml")
 }
