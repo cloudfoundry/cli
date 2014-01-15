@@ -622,7 +622,7 @@ func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
 		"--manifest", "some/relative/path/different-manifest.yml",
 	}, deps)
 
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), "/absolute/path/to/example-app")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("/absolute/path/to/example-app"))
 }
 
 func TestPushingWithManifestInAppDirectory(t *testing.T) {
