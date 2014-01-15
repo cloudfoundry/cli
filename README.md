@@ -30,7 +30,9 @@ Binaries:
 
 Installers:
 - http://go-cli.s3.amazonaws.com/installer-osx-amd64.pkg
+- http://go-cli.s3.amazonaws.com/cf-cli_amd64.deb
 - http://go-cli.s3.amazonaws.com/cf-cli_i386.deb
+- http://go-cli.s3.amazonaws.com/cf-cli_amd64.rpm
 - http://go-cli.s3.amazonaws.com/cf-cli_i386.rpm
 - http://go-cli.s3.amazonaws.com/installer-windows-amd64.zip
 - http://go-cli.s3.amazonaws.com/installer-windows-386.zip
