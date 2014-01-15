@@ -90,8 +90,19 @@ func TestParsingManifestWithInheritance(t *testing.T) {
 	repo := NewManifestDiskRepository()
 	m, err := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
 	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("name"), "base-app")
+	assert.Equal(t, m.Applications[0].Get("services"), []string{"base-service"})
+	assert.Equal(t, m.Applications[0].Get("env"), generic.NewMap(map[string]string{
+		"foo": "bar",
+		"will-be-overridden": "my-value",
+	}))
 
-	env := generic.NewMap(m.Applications[0].Get("env"))
+	assert.Equal(t, m.Applications[1].Get("name"), "my-app")
+
+	env := generic.NewMap(m.Applications[1].Get("env"))
 	assert.Equal(t, env.Get("will-be-overridden"), "my-value")
 	assert.Equal(t, env.Get("foo"), "bar")
+
+	services := m.Applications[1].Get("services")
+	assert.Equal(t, services, []string{"base-service", "foo-service"})
 }
