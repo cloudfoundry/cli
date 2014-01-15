@@ -56,9 +56,8 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 	}
 
 	if data.Has("env") {
-		env, ok := data.Get("env").(map[interface{}]interface{})
-		if ok {
-			m.GlobalEnvVars = generic.NewMap(env)
+		if generic.IsMappable(data.Get("env")) {
+			m.GlobalEnvVars = generic.NewMap(data.Get("env"))
 			merrs := validateEnvVars(m.GlobalEnvVars)
 			if merrs != nil {
 				errs = append(errs, merrs)

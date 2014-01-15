@@ -1,0 +1,4 @@
+---
+env:
+  foo: bar
+  will-be-overridden: baz

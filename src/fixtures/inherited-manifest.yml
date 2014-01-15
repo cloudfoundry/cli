@@ -1,0 +1,6 @@
+---
+inherit: base-manifest.yml
+env:
+  will-be-overridden: my-value
+applications:
+ - name: my-app

@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"errors"
+	"generic"
 	"os"
 	"path/filepath"
 )
@@ -25,14 +26,74 @@ func (repo ManifestDiskRepository) ReadManifest(path string) (m *Manifest, errs 
 		return
 	}
 
-	file, err := os.Open(filepath.Clean(path))
+	mapp, err := repo.readAllYAMLFiles(path)
 	if err != nil {
 		errs = append(errs, err)
 		return
 	}
 
-	m, errs = Parse(file)
+	m, errs = NewManifest(mapp)
+	if !errs.Empty() {
+		return
+	}
 	return
+}
+
+func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap generic.Map, err error) {
+	mergedMap = generic.NewMap()
+
+	file, err := os.Open(filepath.Clean(path))
+	if err != nil {
+		dir, _ := os.Getwd()
+		println("expected file to exist, but it does not: ", path, dir)
+		return
+	}
+	defer file.Close()
+
+	mapp, err := Parse(file)
+	if err != nil {
+		return
+	}
+
+	if !mapp.Has("inherit") {
+		mergedMap = mapp
+		return
+	}
+
+	inheritedPath, ok := mapp.Get("inherit").(string)
+	if !ok {
+		err = errors.New("invalid inherit path in manifest")
+		return
+	}
+
+	if !filepath.IsAbs(inheritedPath) {
+		inheritedPath = filepath.Join(filepath.Dir(path), inheritedPath)
+	}
+
+	inheritedMap, err := repo.readAllYAMLFiles(inheritedPath)
+	if err != nil {
+		return
+	}
+
+	mergedMap = generic.Reduce([]generic.Map{inheritedMap, mapp}, mergedMap, reducer)
+	return
+}
+
+func reducer(key, val interface{}, reduced generic.Map) generic.Map {
+	if !reduced.Has(key) {
+		reduced.Set(key, val)
+		return reduced
+	}
+
+	if generic.IsMappable(val) {
+		maps := []generic.Map{generic.NewMap(reduced.Get(key)), generic.NewMap(val)}
+		mergedMap := generic.Reduce(maps, generic.NewMap(), reducer)
+		reduced.Set(key, mergedMap)
+		return reduced
+	}
+
+	reduced.Set(key, val)
+	return reduced
 }
 
 func (repo ManifestDiskRepository) ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
