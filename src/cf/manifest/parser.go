@@ -28,5 +28,6 @@ func ParseToManifest(reader io.Reader) (m *Manifest, errs ManifestErrors) {
 		errs = append(errs, err)
 		return
 	}
+
 	return NewManifest(mapp)
 }
