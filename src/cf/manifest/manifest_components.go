@@ -26,6 +26,11 @@ func newManifestComponents(data generic.Map) (m manifestComponents, errs Manifes
 				errs = append(errs, appErrs...)
 			}
 
+			if app.Has("timeout") {
+				app.Set("health_check_timeout", app.Get("timeout"))
+				app.Delete("timeout")
+			}
+
 			if app.Has("services") {
 				appServices, err := servicesComponent(app.Get("services"))
 				if err != nil {

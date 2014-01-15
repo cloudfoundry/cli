@@ -1,6 +1,7 @@
-package manifest
+package manifest_test
 
 import (
+	. "cf/manifest"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testhelpers/maker"
