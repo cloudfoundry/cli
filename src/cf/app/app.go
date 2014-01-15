@@ -606,7 +606,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Define the quota for an org",
 			Usage: fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name()) +
 				"TIP:\n" +
-				"   Allowable quotas can be seen by issuing the command 'gcf quotas'",
+				fmt.Sprintf("   View allowable quotas with '%s quotas'", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("set-quota", c)
 			},
