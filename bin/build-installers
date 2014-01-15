@@ -6,6 +6,7 @@ ROOT_DIR=$(pwd)
 OUT_DIR=${ROOT_DIR}/out
 RELEASE_DIR=${ROOT_DIR}/release
 INSTALLERS_DIR=${ROOT_DIR}/installers
+VERSION=$(${OUT_DIR}/gcf-linux-amd64 -v | cut -d' ' -f 3)
 
 echo "building windows-386 installer"
 (
@@ -30,7 +31,6 @@ echo "building DEB package"
     cd ${INSTALLERS_DIR}/deb
     mkdir -p cf/usr/bin
     cp ${OUT_DIR}/gcf-linux-386 cf/usr/bin/gcf
-    VERSION=$(cf/usr/bin/gcf -v | cut -d' ' -f 3)
     cp control.template cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
     dpkg --build cf cf-cli_i386.deb
@@ -42,7 +42,7 @@ echo "building RPM package"
 (
 	cd ${INSTALLERS_DIR}/rpm
 	cp ${OUT_DIR}/gcf-linux-386 gcf
-	VERSION=$(./gcf -v | cut -d' ' -f 3|sed 's/-/_/')
+	RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
 	echo "Version: ${VERSION}" > cf-cli.spec
 	cat cf-cli.spec.template >> cf-cli.spec
 	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
