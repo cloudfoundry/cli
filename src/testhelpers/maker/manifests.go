@@ -74,6 +74,15 @@ applications:
   env:
     FOO: baz
 `,
+	"app with absolute path": `
+---
+env:
+  PATH: /u/apps/my-app/bin
+  FOO: bar
+applications:
+- name: manifest-app-name
+  path: /absolute/path/to/example-app
+`,
 	"invalid": `
 ---
 env:
