@@ -1,6 +1,0 @@
-#!/bin/bash
-
-set -e
-
-bin/build-binaries
-bin/build-installers

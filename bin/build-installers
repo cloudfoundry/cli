@@ -26,19 +26,33 @@ echo "building windows-amd64 installer"
     rm cf_installer.exe gcf.exe
 )
 
-echo "building DEB package"
+echo "building i386 DEB package"
 (
     cd ${INSTALLERS_DIR}/deb
     mkdir -p cf/usr/bin
     cp ${OUT_DIR}/gcf-linux-386 cf/usr/bin/gcf
     cp control.template cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
+    echo "Architecture: i386" >> cf/DEBIAN/control
     dpkg --build cf cf-cli_i386.deb
     mv cf-cli_i386.deb ${RELEASE_DIR}/
-    rm cf/usr/bin/gcf cf/DEBIAN/control
+    rm -rf cf/usr/bin cf/DEBIAN/control
 )
 
-echo "building RPM package"
+echo "building amd64 DEB package"
+(
+    cd ${INSTALLERS_DIR}/deb
+    mkdir -p cf/usr/bin
+    cp ${OUT_DIR}/gcf-linux-amd64 cf/usr/bin/gcf
+    cp control.template cf/DEBIAN/control
+    echo "Version: ${VERSION}" >> cf/DEBIAN/control
+    echo "Architecture: amd64" >> cf/DEBIAN/control
+    dpkg --build cf cf-cli_amd64.deb
+    mv cf-cli_amd64.deb ${RELEASE_DIR}/
+    rm -rf cf/usr/bin cf/DEBIAN/control
+)
+
+echo "building i386 RPM package"
 (
 	cd ${INSTALLERS_DIR}/rpm
 	cp ${OUT_DIR}/gcf-linux-386 gcf
@@ -47,6 +61,18 @@ echo "building RPM package"
 	cat cf-cli.spec.template >> cf-cli.spec
 	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
 	mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_i386.rpm
+	rm -rf build gcf cf-cli.spec
+)
+
+echo "building amd64 RPM package"
+(
+	cd ${INSTALLERS_DIR}/rpm
+	cp ${OUT_DIR}/gcf-linux-amd64 gcf
+	RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
+	echo "Version: ${RPM_VERSION}" > cf-cli.spec
+	cat cf-cli.spec.template >> cf-cli.spec
+	rpmbuild --target amd64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+	mv build/RPMS/amd64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
 	rm -rf build gcf cf-cli.spec
 )
 

@@ -1,5 +1,4 @@
 Package: cf-cli
-Architecture: i386
 Maintainer: Ted Young <tyoung@pivotallabs.com>
 Source: cf-cli
 Homepage: https://github.com/cloudfoundry/cli
