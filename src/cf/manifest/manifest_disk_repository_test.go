@@ -93,7 +93,7 @@ func TestParsingManifestWithInheritance(t *testing.T) {
 	assert.Equal(t, m.Applications[0].Get("name"), "base-app")
 	assert.Equal(t, m.Applications[0].Get("services"), []string{"base-service"})
 	assert.Equal(t, m.Applications[0].Get("env"), generic.NewMap(map[string]string{
-		"foo": "bar",
+		"foo":                "bar",
 		"will-be-overridden": "my-value",
 	}))
 

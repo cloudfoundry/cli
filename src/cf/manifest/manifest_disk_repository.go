@@ -105,14 +105,14 @@ func (repo ManifestDiskRepository) ManifestPath(userSpecifiedPath string) (manif
 	if userSpecifiedPath == "" {
 		userSpecifiedPath, err = os.Getwd()
 		if err != nil {
-			err = errors.New("Error finding current directory: "+err.Error())
+			err = errors.New("Error finding current directory: " + err.Error())
 			return
 		}
 	}
 
 	fileInfo, err := os.Stat(userSpecifiedPath)
 	if err != nil {
-		err = errors.New("Error finding manifest path: "+err.Error())
+		err = errors.New("Error finding manifest path: " + err.Error())
 		return
 	}
 
