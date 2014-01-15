@@ -54,40 +54,40 @@ echo "building amd64 DEB package"
 
 echo "building i386 RPM package"
 (
-	cd ${INSTALLERS_DIR}/rpm
-	cp ${OUT_DIR}/gcf-linux-386 gcf
-	RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
-	echo "Version: ${RPM_VERSION}" > cf-cli.spec
-	cat cf-cli.spec.template >> cf-cli.spec
-	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-	mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_i386.rpm
-	rm -rf build gcf cf-cli.spec
+    cd ${INSTALLERS_DIR}/rpm
+    cp ${OUT_DIR}/gcf-linux-386 gcf
+    RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
+    echo "Version: ${RPM_VERSION}" > cf-cli.spec
+    cat cf-cli.spec.template >> cf-cli.spec
+    rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+    mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_i386.rpm
+    rm -rf build gcf cf-cli.spec
 )
 
 echo "building amd64 RPM package"
 (
-	cd ${INSTALLERS_DIR}/rpm
-	cp ${OUT_DIR}/gcf-linux-amd64 gcf
-	RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
-	echo "Version: ${RPM_VERSION}" > cf-cli.spec
-	cat cf-cli.spec.template >> cf-cli.spec
-	rpmbuild --target amd64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-	mv build/RPMS/amd64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
-	rm -rf build gcf cf-cli.spec
+    cd ${INSTALLERS_DIR}/rpm
+    cp ${OUT_DIR}/gcf-linux-amd64 gcf
+    RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
+    echo "Version: ${RPM_VERSION}" > cf-cli.spec
+    cat cf-cli.spec.template >> cf-cli.spec
+    rpmbuild --target amd64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+    mv build/RPMS/amd64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
+    rm -rf build gcf cf-cli.spec
 )
 
 echo "building OS X installer"
 (
-	cd ${INSTALLERS_DIR}/osx
-	mkdir -p cf-cli/usr/local/bin
-	mkdir -p cf-cli/usr/local/share/doc/cf-cli
-	cp ${OUT_DIR}/gcf-darwin-amd64 cf-cli/usr/local/bin/gcf
-	cp COPYING cf-cli/usr/local/share/doc/cf-cli
-	chmod -R go-w cf-cli
-	( cd cf-cli && find usr | cpio -o --format=odc | gzip -c > ../Payload )
-	ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
-	mkbom -i bom_list Bom
-	xar -c --compression none -f installer-osx-amd64.pkg Bom PackageInfo Payload
-	mv installer-osx-amd64.pkg ${RELEASE_DIR}/
-	rm -rf cf-cli Payload Bom bom_list
+    cd ${INSTALLERS_DIR}/osx
+    mkdir -p cf-cli/usr/local/bin
+    mkdir -p cf-cli/usr/local/share/doc/cf-cli
+    cp ${OUT_DIR}/gcf-darwin-amd64 cf-cli/usr/local/bin/gcf
+    cp COPYING cf-cli/usr/local/share/doc/cf-cli
+    chmod -R go-w cf-cli
+    ( cd cf-cli && find usr | cpio -o --format=odc | gzip -c > ../Payload )
+    ls4mkbom cf-cli | sed 's/1000\/1000/0\/80/' > bom_list
+    mkbom -i bom_list Bom
+    xar -c --compression none -f installer-osx-amd64.pkg Bom PackageInfo Payload
+    mv installer-osx-amd64.pkg ${RELEASE_DIR}/
+    rm -rf cf-cli Payload Bom bom_list
 )
