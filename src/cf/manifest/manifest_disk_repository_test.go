@@ -1,8 +1,10 @@
-package manifest
+package manifest_test
 
 import (
+	. "cf/manifest"
 	"generic"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -77,6 +79,13 @@ func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
 	assert.Equal(t, filename, "example_manifest.yml")
 }
 
+func TestParsingManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
+	mapp, err := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
+	assert.NoError(t, err)
+	assert.Equal(t, mapp.Applications[0].Get("health_check_timeout"), 360)
+	assert.False(t, mapp.Applications[0].Has("timeout"))
+}
+
 func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
 	mapp, err := Parse(strings.NewReader(maker.ManifestWithName("invalid env")))
 	assert.NoError(t, err)
@@ -105,4 +114,13 @@ func TestParsingManifestWithInheritance(t *testing.T) {
 
 	services := m.Applications[1].Get("services")
 	assert.Equal(t, services, []string{"base-service", "foo-service"})
+}
+
+func parseToManifest(reader io.Reader) (m *Manifest, errs ManifestErrors) {
+	mapp, err := Parse(reader)
+	if err != nil {
+		errs = append(errs, err)
+		return
+	}
+	return NewManifest(mapp)
 }

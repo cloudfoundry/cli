@@ -67,6 +67,7 @@ applications:
   host: manifest-host
   domain: manifest-example.com
   stack: custom-stack
+  timeout: 360
   buildpack: some-buildpack
   command: JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run
   path: ../../fixtures/example-app

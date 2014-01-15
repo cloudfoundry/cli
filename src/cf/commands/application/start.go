@@ -118,9 +118,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	params := cf.NewEmptyAppParams()
 	params.Set("state", "STARTED")
-
 	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
-
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
