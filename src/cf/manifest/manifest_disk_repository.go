@@ -80,34 +80,39 @@ func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap gene
 }
 
 func reducer(key, val interface{}, reduced generic.Map) generic.Map {
-	if !reduced.Has(key) {
+	switch {
+	case reduced.Has(key) == false:
 		reduced.Set(key, val)
 		return reduced
-	}
 
-	if generic.IsMappable(val) {
+	case generic.IsMappable(val):
 		maps := []generic.Map{generic.NewMap(reduced.Get(key)), generic.NewMap(val)}
 		mergedMap := generic.Reduce(maps, generic.NewMap(), reducer)
 		reduced.Set(key, mergedMap)
 		return reduced
-	}
 
-	reduced.Set(key, val)
-	return reduced
+	case generic.IsSliceable(val):
+		reduced.Set(key, append(reduced.Get(key).([]interface{}), val.([]interface{})...))
+		return reduced
+
+	default:
+		reduced.Set(key, val)
+		return reduced
+	}
 }
 
 func (repo ManifestDiskRepository) ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
 	if userSpecifiedPath == "" {
 		userSpecifiedPath, err = os.Getwd()
 		if err != nil {
-			err = errors.New("Error finding current directory: " + err.Error())
+			err = errors.New("Error finding current directory: "+err.Error())
 			return
 		}
 	}
 
 	fileInfo, err := os.Stat(userSpecifiedPath)
 	if err != nil {
-		err = errors.New("Error finding manifest path: " + err.Error())
+		err = errors.New("Error finding manifest path: "+err.Error())
 		return
 	}
 
