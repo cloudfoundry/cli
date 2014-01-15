@@ -410,7 +410,12 @@ func createAppSetFromContextAndManifest(contextParams cf.AppParams, rootAppPath 
 
 			path := rootAppPath
 			if manifestAppParams.Has("path") {
-				path = filepath.Join(rootAppPath, manifestAppParams.Get("path").(string))
+				pathFromManifest := manifestAppParams.Get("path").(string)
+				if filepath.IsAbs(pathFromManifest) {
+					path = pathFromManifest
+				} else {
+					path = filepath.Join(rootAppPath, pathFromManifest)
+				}
 			}
 			appFields.Set("path", path)
 

@@ -584,7 +584,7 @@ func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
 	})
 }
 
-func TestPushingWithAppPathFromManifestFile(t *testing.T) {
+func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
@@ -593,6 +593,7 @@ func TestPushingWithAppPathFromManifestFile(t *testing.T) {
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "some/relative/path/"
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
+
 	ui := callPush(t, []string{
 		"--manifest", "some/relative/path/different-manifest.yml",
 	}, deps)
@@ -600,11 +601,28 @@ func TestPushingWithAppPathFromManifestFile(t *testing.T) {
 	expectedManifestPath := filepath.Clean("some/relative/path/different-manifest.yml")
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path/different-manifest.yml")
 	assert.Equal(t, deps.manifestRepo.ReadManifestPath, expectedManifestPath)
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Using manifest file", expectedManifestPath},
 	})
+}
+
+func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("app with absolute path")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestDir = "some/relative/path/"
+	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
+
+	callPush(t, []string{
+		"--manifest", "some/relative/path/different-manifest.yml",
+	}, deps)
+
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), "/absolute/path/to/example-app")
 }
 
 func TestPushingWithManifestInAppDirectory(t *testing.T) {
