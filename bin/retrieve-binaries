@@ -15,10 +15,14 @@ chmod +x out/gcf-*
   cd out
 
   for BIN in gcf-[ld]*; do
-    tar cvzf ../release/${BIN}.tgz ${BIN}
+    cp ${BIN} gcf
+    tar cvzf ../release/${BIN}.tgz gcf
+    rm gcf
   done
 
   for BIN in gcf-windows*; do
-    zip ../release/${BIN%exe}zip ${BIN}
+    cp ${BIN} gcf.exe
+    zip ../release/${BIN%exe}zip gcf.exe
+    rm gcf.exe
   done
 )
