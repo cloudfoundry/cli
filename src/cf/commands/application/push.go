@@ -395,6 +395,11 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 }
 
 func createAppSetFromContextAndManifest(contextParams cf.AppParams, rootAppPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
+	if contextParams.Has("name") && len(m.Applications) > 1 {
+		err = errors.New("APP_NAME command line argument is not allowed when pushing multiple apps from a manifest file.")
+		return
+	}
+
 	if len(m.Applications) == 0 {
 		appSet = cf.NewAppSet(contextParams)
 	} else {
