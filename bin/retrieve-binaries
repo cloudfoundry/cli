@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p out release
+wget http://go-cli.s3.amazonaws.com/builds/gcf-darwin-amd64 -P out
+wget http://go-cli.s3.amazonaws.com/builds/gcf-linux-amd64 -P out
+wget http://go-cli.s3.amazonaws.com/builds/gcf-linux-386 -P out
+wget http://go-cli.s3.amazonaws.com/builds/gcf-windows-amd64.exe -P out
+wget http://go-cli.s3.amazonaws.com/builds/gcf-windows-386.exe -P out
+
+chmod +x out/gcf-*
+
+(
+  cd out
+
+  for BIN in gcf-[ld]*; do
+    tar cvzf ../release/${BIN}.tgz ${BIN}
+  done
+
+  for BIN in gcf-windows*; do
+    zip ../release/${BIN%exe}zip ${BIN}
+  done
+)
