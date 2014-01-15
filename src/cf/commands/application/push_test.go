@@ -336,6 +336,22 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 	assert.Equal(t, envVars.Get("SOMETHING").(string), "nothing")
 }
 
+func TestPushingManyAppsDoesNotAllowNameFlag(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("many apps")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+
+	ui := callPush(t, []string{"app-name"}, deps)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"APP_NAME", "not allowed", "multiple apps", "manifest"},
+	})
+	assert.Equal(t, len(deps.appRepo.CreateAppParams), 0)
+}
+
 func TestPushingWithBindingGlobalServices(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
