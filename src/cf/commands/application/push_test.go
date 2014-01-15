@@ -247,7 +247,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -283,7 +283,7 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("nulls")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("nulls")))
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ReadManifestErrors = errs
 
@@ -304,7 +304,7 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 func TestPushingManyAppsFromManifest(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("many apps")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("many apps")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -343,7 +343,7 @@ func TestPushingWithBindingGlobalServices(t *testing.T) {
 	expectedServiceInstance.Name = "work-queue"
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("global services")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("global services")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -368,7 +368,7 @@ func TestPushingWithBindingLocalServices(t *testing.T) {
 	expectedServiceInstance.Name = "work-queue"
 	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("local services")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("local services")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -402,7 +402,7 @@ func TestPushingWithBindingMergedServices(t *testing.T) {
 	mapOfServices.Set("app2-service", service3)
 	deps.serviceRepo.FindInstanceByNameMap = mapOfServices
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("merged services")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("merged services")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -441,7 +441,7 @@ func TestPushWithInvalidManifestProperties(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("invalid")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("invalid")))
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ReadManifestErrors = errs
 
@@ -461,7 +461,7 @@ func TestPushWithServicesThatAreNotFound(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.serviceRepo.FindInstanceByNameErr = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("global services")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("global services")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -476,7 +476,7 @@ func TestPushingAppWithPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "/foo/bar/baz"
@@ -494,7 +494,7 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "returned/path/"
@@ -518,7 +518,7 @@ func TestPushingWithBadManifestPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestPathErr = errors.New("read manifest error")
@@ -537,7 +537,7 @@ func TestPushingWithDefaultManifestNotFound(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{syscall.ENOENT}
@@ -553,7 +553,7 @@ func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestPathErr = syscall.ENOENT
@@ -571,7 +571,7 @@ func TestPushingWithAppPathFromManifestFile(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "some/relative/path/"
@@ -594,7 +594,7 @@ func TestPushingWithManifestInAppDirectory(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 
@@ -613,7 +613,7 @@ func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("single app")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "some/relative/path"
@@ -628,7 +628,7 @@ func TestPushingWithNoManifestFlag(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("nulls")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("nulls")))
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ReadManifestErrors = errs
 
@@ -645,7 +645,7 @@ func TestPushingWithNoManifestFlagAndMissingAppName(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := manifest.Parse(strings.NewReader(maker.ManifestWithName("nulls")))
+	m, errs := manifest.ParseToManifest(strings.NewReader(maker.ManifestWithName("nulls")))
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ReadManifestErrors = errs
 

@@ -2,9 +2,10 @@ package generic
 
 import "fmt"
 
-type Iterator func (key, val interface{})
+type Iterator func(key, val interface{})
+type Reducer func(key, val interface{}, reducedVal Map) Map
 
-func Merge(collection, otherCollection Map) interface{} {
+func Merge(collection, otherCollection Map) Map {
 	mergedMap := NewMap()
 
 	iterator := func(key, value interface{}) () {
@@ -15,6 +16,15 @@ func Merge(collection, otherCollection Map) interface{} {
 	Each(otherCollection, iterator)
 
 	return mergedMap
+}
+
+func Reduce(collections []Map, resultVal Map, cb Reducer) Map {
+	for _, collection := range collections {
+		for _, key := range collection.Keys() {
+			resultVal = cb(key, collection.Get(key), resultVal)
+		}
+	}
+	return resultVal
 }
 
 func Each(collection Map, cb Iterator) {
@@ -35,10 +45,23 @@ type Map interface {
 	Delete(key interface{})
 }
 
+func IsMappable(value interface{}) bool {
+	switch value.(type) {
+	case Map:
+		return true
+	case map[string]interface{}:
+		return true
+	case map[interface{}]interface{}:
+		return true
+	default:
+		return false
+	}
+}
+
 type ConcreteMap map[interface{}]interface{}
 
 func (data *ConcreteMap) String() string {
-	return fmt.Sprintf("% v",*data)
+	return fmt.Sprintf("% v", *data)
 }
 
 func (data *ConcreteMap) IsEmpty() bool {
@@ -89,7 +112,7 @@ func newEmptyMap() Map {
 	return &ConcreteMap{}
 }
 
-func NewMap(data ...interface {}) Map {
+func NewMap(data ...interface{}) Map {
 	if len(data) == 0 {
 		return newEmptyMap()
 	} else if len(data) > 1 {
@@ -101,11 +124,11 @@ func NewMap(data ...interface {}) Map {
 		return data
 	case map[string]string:
 		stringMap := newEmptyMap()
-		for key, val := range data {
-			stringMap.Set(key, val)
-		}
+	for key, val := range data {
+		stringMap.Set(key, val)
+	}
 		return stringMap
-	case map[interface {}]interface{}:
+	case map[interface{}]interface{}:
 		mapp := ConcreteMap(data)
 		return &mapp
 	}

@@ -1,9 +1,12 @@
 package manifest
 
 import (
+	"generic"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
+	"strings"
+	"testhelpers/maker"
 	"testing"
 )
 
@@ -72,4 +75,23 @@ func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, path, cwd)
 	assert.Equal(t, filename, "example_manifest.yml")
+}
+
+func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
+	mapp, err := Parse(strings.NewReader(maker.ManifestWithName("invalid env")))
+	assert.NoError(t, err)
+
+	_, err = NewManifest(mapp)
+	assert.Error(t, err)
+}
+
+func TestParsingManifestWithInheritance(t *testing.T) {
+	assertFeatureFlag(t)
+	repo := NewManifestDiskRepository()
+	m, err := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
+	assert.NoError(t, err)
+
+	env := generic.NewMap(m.Applications[0].Get("env"))
+	assert.Equal(t, env.Get("will-be-overridden"), "my-value")
+	assert.Equal(t, env.Get("foo"), "bar")
 }
