@@ -43,7 +43,7 @@ echo "building RPM package"
 	cd ${INSTALLERS_DIR}/rpm
 	cp ${OUT_DIR}/gcf-linux-386 gcf
 	RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
-	echo "Version: ${VERSION}" > cf-cli.spec
+	echo "Version: ${RPM_VERSION}" > cf-cli.spec
 	cat cf-cli.spec.template >> cf-cli.spec
 	rpmbuild --target i386 --define "_topdir $(pwd)/build" -bb cf-cli.spec
 	mv build/RPMS/i386/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_i386.rpm
