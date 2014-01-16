@@ -519,7 +519,7 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
 	ui := callPush(t, []string{
-		"--manifest", "user/supplied/path/different-manifest.yml",
+		"-f", "user/supplied/path/different-manifest.yml",
 		"-p", "foo/bar/baz",
 	}, deps)
 
@@ -542,7 +542,7 @@ func TestPushingWithBadManifestPath(t *testing.T) {
 	deps.manifestRepo.ManifestPathErr = errors.New("read manifest error")
 
 	ui := callPush(t, []string{
-		"--manifest", "bad/manifest/path",
+		"-f", "bad/manifest/path",
 	}, deps)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
@@ -577,7 +577,7 @@ func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
 	deps.manifestRepo.ManifestPathErr = syscall.ENOENT
 
 	ui := callPush(t, []string{
-		"--manifest", "bad/manifest/path",
+		"-f", "bad/manifest/path",
 	}, deps)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
@@ -596,7 +596,7 @@ func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
 	ui := callPush(t, []string{
-		"--manifest", "some/relative/path/different-manifest.yml",
+		"-f", "some/relative/path/different-manifest.yml",
 	}, deps)
 
 	expectedManifestPath := filepath.Clean("some/relative/path/different-manifest.yml")
@@ -628,7 +628,7 @@ func pushingWithAbsoluteUnixPath(t *testing.T) {
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
 	callPush(t, []string{
-		"--manifest", "some/relative/path/different-manifest.yml",
+		"-f", "some/relative/path/different-manifest.yml",
 	}, deps)
 
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("/absolute/path/to/example-app"))
@@ -645,7 +645,7 @@ func pushingWithAbsoluteWindowsPath(t *testing.T) {
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
 	callPush(t, []string{
-		"--manifest", "some/relative/path/different-manifest.yml",
+		"-f", "some/relative/path/different-manifest.yml",
 	}, deps)
 
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("C:\\absolute\\path\\to\\example-app"))
@@ -679,7 +679,7 @@ func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "some/relative/path"
 
-	_ = callPush(t, []string{"--manifest", "some/relative/path"}, deps)
+	_ = callPush(t, []string{"-f", "some/relative/path"}, deps)
 
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
