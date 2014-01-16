@@ -180,7 +180,7 @@ func TestBuildpackCreateRejectsImproperNames(t *testing.T) {
 	ts, _, repo := createBuildpackRepo(t, badRequest)
 	defer ts.Close()
 	one := 1
-	createdBuildpack, apiResponse := repo.Create("name with space", &one)
+	createdBuildpack, apiResponse := repo.Create("name with space", &one, nil)
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, createdBuildpack, cf.Buildpack{})
 	assert.Equal(t, apiResponse.ErrorCode, "290003")
@@ -209,7 +209,41 @@ func TestCreateBuildpackWithPosition(t *testing.T) {
 	defer ts.Close()
 
 	position := 999
-	created, apiResponse := repo.Create("my-cool-buildpack", &position)
+	created, apiResponse := repo.Create("my-cool-buildpack", &position, nil)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.NotNil(t, created.Guid)
+	assert.Equal(t, "my-cool-buildpack", created.Name)
+	assert.Equal(t, 999, *created.Position)
+}
+
+func TestCreateBuildpackEnabled(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "POST",
+		Path:    "/v2/buildpacks",
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":999, "enabled":true}`),
+		Response: testnet.TestResponse{
+			Status: http.StatusCreated,
+			Body: `{
+				"metadata": {
+					"guid": "my-cool-buildpack-guid"
+				},
+				"entity": {
+					"name": "my-cool-buildpack",
+					"position":999,
+					"enabled":true
+				}
+			}`},
+	})
+
+	ts, handler, repo := createBuildpackRepo(t, req)
+	defer ts.Close()
+
+	position := 999
+	enabled := true
+	created, apiResponse := repo.Create("my-cool-buildpack", &position, &enabled)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -240,17 +274,17 @@ func TestUpdateBuildpack(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "PUT",
 		Path:    "/v2/buildpacks/my-cool-buildpack-guid",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":555}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","position":555,"enabled":false}`),
 		Response: testnet.TestResponse{
 			Status: http.StatusCreated,
 			Body: `{
-				
 				    "metadata": {
 				        "guid": "my-cool-buildpack-guid"
 				    },
 				    "entity": {
 				        "name": "my-cool-buildpack",
-						"position":555
+						"position":555,
+						"enabled":false
 				    }
 				}`},
 	})
@@ -259,10 +293,12 @@ func TestUpdateBuildpack(t *testing.T) {
 	defer ts.Close()
 
 	position := 555
+	enabled := false
 	buildpack := cf.Buildpack{}
 	buildpack.Name = "my-cool-buildpack"
 	buildpack.Guid = "my-cool-buildpack-guid"
 	buildpack.Position = &position
+	buildpack.Enabled = &enabled
 	updated, apiResponse := repo.Update(buildpack)
 
 	assert.True(t, handler.AllRequestsCalled())
