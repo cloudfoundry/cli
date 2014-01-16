@@ -188,10 +188,7 @@ func NewAppSet(values interface{}) (set AppSet) {
 
 	switch values := values.(type) {
 	case []interface{}:
-		for _, val := range values {
-			app := generic.NewMap(val)
-			set = append(set, NewAppParams(app))
-		}
+
 	default:
 		app := generic.NewMap(values)
 		set = append(set, NewAppParams(app))
