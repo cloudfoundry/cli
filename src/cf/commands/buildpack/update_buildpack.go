@@ -48,9 +48,27 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 
 	updateBuildpack := false
 
-	if c.String("i") != "" {
-		val := c.Int("i")
-		buildpack.Position = &val
+	if c.IsSet("i") {
+		position := c.Int("i")
+
+		buildpack.Position = &position
+		updateBuildpack = true
+	}
+
+	enabled := c.Bool("enable")
+	disabled := c.Bool("disable")
+	if enabled && disabled {
+		cmd.ui.Failed("Cannot specify both enabled and disabled options.")
+		return
+	}
+
+	if enabled {
+		buildpack.Enabled = &enabled
+		updateBuildpack = true
+	}
+	if disabled {
+		disabled = false
+		buildpack.Enabled = &disabled
 		updateBuildpack = true
 	}
 
