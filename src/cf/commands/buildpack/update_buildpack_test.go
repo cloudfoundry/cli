@@ -68,7 +68,7 @@ func TestUpdateBuildpackEnabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	fakeUI := callUpdateBuildpack([]string{"-enable", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	fakeUI := callUpdateBuildpack([]string{"--enable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.UpdateBuildpack.Enabled)
 	assert.Equal(t, *repo.UpdateBuildpack.Enabled, true)
@@ -82,7 +82,7 @@ func TestUpdateBuildpackDisabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 	repo, bitsRepo := getRepositories()
 
-	callUpdateBuildpack([]string{"-disable", "my-buildpack"}, reqFactory, repo, bitsRepo)
+	callUpdateBuildpack([]string{"--disable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.UpdateBuildpack.Enabled)
 	assert.Equal(t, *repo.UpdateBuildpack.Enabled, false)
