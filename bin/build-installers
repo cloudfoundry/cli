@@ -34,7 +34,7 @@ echo "building i386 DEB package"
     cp control.template cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
     echo "Architecture: i386" >> cf/DEBIAN/control
-    dpkg --build cf cf-cli_i386.deb
+    fakeroot dpkg --build cf cf-cli_i386.deb
     mv cf-cli_i386.deb ${RELEASE_DIR}/
     rm -rf cf/usr/bin cf/DEBIAN/control
 )
@@ -47,7 +47,7 @@ echo "building amd64 DEB package"
     cp control.template cf/DEBIAN/control
     echo "Version: ${VERSION}" >> cf/DEBIAN/control
     echo "Architecture: amd64" >> cf/DEBIAN/control
-    dpkg --build cf cf-cli_amd64.deb
+    fakeroot dpkg --build cf cf-cli_amd64.deb
     mv cf-cli_amd64.deb ${RELEASE_DIR}/
     rm -rf cf/usr/bin cf/DEBIAN/control
 )
