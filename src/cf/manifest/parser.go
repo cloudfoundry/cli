@@ -21,13 +21,3 @@ func Parse(reader io.Reader) (yamlMap generic.Map, err error) {
 	yamlMap = generic.NewMap(document)
 	return
 }
-
-func ParseToManifest(reader io.Reader) (m *Manifest, errs ManifestErrors) {
-	mapp, err := Parse(reader)
-	if err != nil {
-		errs = append(errs, err)
-		return
-	}
-
-	return NewManifest(mapp)
-}
