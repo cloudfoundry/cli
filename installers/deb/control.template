@@ -5,3 +5,4 @@ Homepage: https://github.com/cloudfoundry/cli
 Section: misc
 Priority: optional
 Description: Cloud Foundry command line client
+Installed-Size: 10480
