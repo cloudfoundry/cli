@@ -354,12 +354,12 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
 func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFilename string) {
 	var err error
 
-	if c.String("p") != "" && c.String("manifest") != "" {
+	if c.String("p") != "" && c.String("f") != "" {
 		cmd.ui.Warn("-p is ignored when using a manifest. Please specify the path in the manifest.")
 	}
 
-	if c.String("manifest") != "" {
-		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("manifest"))
+	if c.String("f") != "" {
+		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("f"))
 	} else {
 		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("p"))
 
@@ -381,7 +381,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 	m, errs := cmd.manifestRepo.ReadManifest(manifestPath)
 
 	if !errs.Empty() {
-		if os.IsNotExist(errs[0]) && c.String("manifest") == "" {
+		if os.IsNotExist(errs[0]) && c.String("f") == "" {
 			m = manifest.NewEmptyManifest()
 			return
 		} else {

@@ -459,7 +459,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("p", "Path of app directory or zip file"),
 				NewStringFlag("s", "Stack to use"),
 				NewStringFlag("t", "Start timeout in seconds"),
-				NewStringFlag("manifest", "Path to manifest"),
+				NewStringFlag("f", "Path to manifest"),
 				cli.BoolFlag{Name: "no-manifest", Usage: "Ignore manifest file"},
 				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
 				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
