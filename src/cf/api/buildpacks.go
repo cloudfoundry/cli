@@ -27,12 +27,13 @@ type BuildpackResource struct {
 type BuildpackEntity struct {
 	Name     string `json:"name"`
 	Position *int   `json:"position,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
 }
 
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse)
 	ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse)
-	Create(name string, position *int) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse)
+	Create(name string, position *int, enabled *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse)
 	Delete(buildpackGuid string) (apiResponse net.ApiResponse)
 	Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse)
 }
@@ -119,9 +120,9 @@ func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (bu
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Create(name string, position *int) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := repo.config.Target + buildpacks_path
-	entity := BuildpackEntity{Name: name, Position: position}
+	entity := BuildpackEntity{Name: name, Position: position, Enabled: enabled}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize information", err)
@@ -147,7 +148,7 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (api
 func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
 
-	entity := BuildpackEntity{buildpack.Name, buildpack.Position}
+	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Could not serialize updates.", err)
@@ -168,5 +169,6 @@ func unmarshallBuildpack(resource BuildpackResource) (buildpack cf.Buildpack) {
 	buildpack.Guid = resource.Metadata.Guid
 	buildpack.Name = resource.Entity.Name
 	buildpack.Position = resource.Entity.Position
+	buildpack.Enabled = resource.Entity.Enabled
 	return
 }

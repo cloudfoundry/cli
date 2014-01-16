@@ -70,9 +70,26 @@ func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context)
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())
+		return
 	}
 
-	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position)
+	enabled := c.Bool("enable")
+	disabled := c.Bool("disable")
+	if enabled && disabled {
+		apiResponse = net.NewApiResponseWithMessage("Cannot specify both enabled and disabled.")
+		return
+	}
+
+	var enableOption *bool = nil
+	if enabled {
+		enableOption = &enabled
+	}
+	if disabled {
+		disabled = false
+		enableOption = &disabled
+	}
+
+	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position, enableOption)
 
 	return
 }
