@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	testapi "testhelpers/api"
@@ -609,10 +610,18 @@ func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
 }
 
 func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		pushingWithAbsoluteWindowsPath(t)
+	} else {
+		pushingWithAbsoluteUnixPath(t)
+	}
+}
+
+func pushingWithAbsoluteUnixPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("app with absolute path")))
+	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("app with absolute unix path")))
 	testassert.AssertNoErrors(t, errs)
 	deps.manifestRepo.ReadManifestManifest = m
 	deps.manifestRepo.ManifestDir = "some/relative/path/"
@@ -623,6 +632,23 @@ func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
 	}, deps)
 
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("/absolute/path/to/example-app"))
+}
+
+func pushingWithAbsoluteWindowsPath(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("app with absolute windows path")))
+	testassert.AssertNoErrors(t, errs)
+	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ManifestDir = "some/relative/path/"
+	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
+
+	callPush(t, []string{
+		"--manifest", "some/relative/path/different-manifest.yml",
+	}, deps)
+
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("C:\\absolute\\path\\to\\example-app"))
 }
 
 func TestPushingWithManifestInAppDirectory(t *testing.T) {
