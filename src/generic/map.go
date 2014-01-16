@@ -2,9 +2,6 @@ package generic
 
 import "fmt"
 
-type Iterator func(key, val interface{})
-type Reducer func(key, val interface{}, reducedVal Map) Map
-
 func Merge(collection, otherCollection Map) Map {
 	mergedMap := NewMap()
 
@@ -16,6 +13,33 @@ func Merge(collection, otherCollection Map) Map {
 	Each(otherCollection, iterator)
 
 	return mergedMap
+}
+
+func DeepMerge(maps ...Map) Map {
+	mergedMap := NewMap()
+	return Reduce(maps, mergedMap, mergeReducer)
+}
+
+func mergeReducer(key, val interface{}, reduced Map) Map {
+	switch {
+	case reduced.Has(key) == false:
+		reduced.Set(key, val)
+		return reduced
+
+	case IsMappable(val):
+		maps := []Map{NewMap(reduced.Get(key)), NewMap(val)}
+		mergedMap := Reduce(maps, NewMap(), mergeReducer)
+		reduced.Set(key, mergedMap)
+		return reduced
+
+	case IsSliceable(val):
+		reduced.Set(key, append(reduced.Get(key).([]interface{}), val.([]interface{})...))
+		return reduced
+
+	default:
+		reduced.Set(key, val)
+		return reduced
+	}
 }
 
 func Reduce(collections []Map, resultVal Map, cb Reducer) Map {
@@ -33,16 +57,20 @@ func Each(collection Map, cb Iterator) {
 	}
 }
 
-type Map interface {
-	IsEmpty() bool
-	Count() int
-	Keys() []interface{}
-	Has(key interface{}) bool
-	IsNil(key interface{}) bool
-	NotNil(key interface{}) bool
-	Get(key interface{}) interface{}
-	Set(key interface{}, value interface{})
-	Delete(key interface{})
+func Contains(collection, item interface{}) bool {
+	switch collection := collection.(type) {
+	case Map:
+		return collection.Has(item)
+	case []interface{}:
+		for _, val := range collection {
+			if val == item {
+				return true
+			}
+		}
+		return false
+	}
+
+	panic("unexpected type passed to Contains")
 }
 
 func IsMappable(value interface{}) bool {
@@ -56,6 +84,55 @@ func IsMappable(value interface{}) bool {
 	default:
 		return false
 	}
+}
+
+type Iterator func(key, val interface{})
+type Reducer func(key, val interface{}, reducedVal Map) Map
+
+type Map interface {
+	IsEmpty() bool
+	Count() int
+	Keys() []interface{}
+	Has(key interface{}) bool
+	Except(keys []interface{}) Map
+	IsNil(key interface{}) bool
+	NotNil(key interface{}) bool
+	Get(key interface{}) interface{}
+	Set(key interface{}, value interface{})
+	Delete(key interface{})
+}
+
+func newEmptyMap() Map {
+	return &ConcreteMap{}
+}
+
+func NewMap(data ...interface{}) Map {
+	if len(data) == 0 {
+		return newEmptyMap()
+	} else if len(data) > 1 {
+		panic("NewMap called with more than one argument")
+	}
+
+	switch data := data[0].(type){
+	case Map:
+		return data
+	case map[string]string:
+		stringMap := newEmptyMap()
+	for key, val := range data {
+		stringMap.Set(key, val)
+	}
+		return stringMap
+	case map[string]interface{}:
+		stringToInterfaceMap := newEmptyMap()
+	for key, val := range data {
+		stringToInterfaceMap.Set(key, val)
+	}
+		return stringToInterfaceMap
+	case map[interface {}]interface{}:
+		mapp := ConcreteMap(data)
+		return &mapp
+	}
+	panic("NewMap called with unexpected argument")
 }
 
 type ConcreteMap map[interface{}]interface{}
@@ -75,6 +152,16 @@ func (data *ConcreteMap) Count() int {
 func (data *ConcreteMap) Has(key interface{}) bool {
 	_, ok := (*data)[key]
 	return ok
+}
+
+func (data *ConcreteMap) Except(keys []interface{}) Map {
+	otherMap := NewMap()
+	Each(data, func(key, value interface{}) {
+		if !Contains(keys,key){
+			otherMap.Set(key, value)
+		}
+	})
+	return otherMap
 }
 
 func (data *ConcreteMap) IsNil(key interface{}) bool {
@@ -108,35 +195,4 @@ func (data *ConcreteMap) Delete(key interface{}) {
 	delete(*data, key)
 }
 
-func newEmptyMap() Map {
-	return &ConcreteMap{}
-}
 
-func NewMap(data ...interface{}) Map {
-	if len(data) == 0 {
-		return newEmptyMap()
-	} else if len(data) > 1 {
-		panic("NewMap called with more than one argument")
-	}
-
-	switch data := data[0].(type){
-	case Map:
-		return data
-	case map[string]string:
-		stringMap := newEmptyMap()
-	for key, val := range data {
-		stringMap.Set(key, val)
-	}
-		return stringMap
-	case map[string]interface{}:
-		stringToInterfaceMap := newEmptyMap()
-		for key, val := range data {
-			stringToInterfaceMap.Set(key, val)
-		}
-		return stringToInterfaceMap
-	case map[interface {}]interface{}:
-		mapp := ConcreteMap(data)
-		return &mapp
-	}
-	panic("NewMap called with unexpected argument")
-}

@@ -81,6 +81,7 @@ func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
 
 func TestParsingManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
 	mapp, err := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
+
 	assert.NoError(t, err)
 	assert.Equal(t, mapp.Applications[0].Get("health_check_timeout"), 360)
 	assert.False(t, mapp.Applications[0].Has("timeout"))

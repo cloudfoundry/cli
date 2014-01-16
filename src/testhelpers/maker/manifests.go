@@ -47,7 +47,6 @@ applications:
 applications:
 - name: hacker-manifesto
   command: null
-  space_guid: null
   buildpack: null
   disk_quota: null
   instances: null

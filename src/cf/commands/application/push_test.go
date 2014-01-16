@@ -290,16 +290,15 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 	deps.manifestRepo.ReadManifestErrors = errs
 
 	ui := callPush(t, []string{}, deps)
+
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"Error", "reading", "manifest"},
-		{"command", "should not be null"},
-		{"space_guid", "should not be null"},
 		{"buildpack", "should not be null"},
 		{"disk_quota", "should not be null"},
+		{"env", "should not be null"},
 		{"instances", "should not be null"},
 		{"memory", "should not be null"},
-		{"env", "should not be null"},
 	})
 }
 
@@ -467,10 +466,8 @@ func TestPushWithInvalidManifestProperties(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"Error", "reading", "manifest"},
-		{"Expected", "local services"},
-		{"Expected", "local env"},
-		{"Expected", "global env"},
-		{"Expected", "global services"},
+		{"Expected", "services"},
+		{"Expected", "env"},
 	})
 }
 
