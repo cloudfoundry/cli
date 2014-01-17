@@ -64,7 +64,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 	params := cf.NewEmptyAppParams()
 
 	if c.String("m") != "" {
-		memory, err := extractMegaBytes(c.String("m"))
+		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
 			cmd.ui.Say("Invalid value for memory")
 			cmd.ui.FailWithUsage(c, "scale")
@@ -85,17 +85,4 @@ func (cmd *Scale) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
-}
-
-func extractMegaBytes(arg string) (megaBytes uint64, err error) {
-	if arg != "" {
-		var byteSize uint64
-		byteSize, err = formatters.BytesFromString(arg)
-		if err != nil {
-			return
-		}
-		megaBytes = byteSize / formatters.MEGABYTE
-	}
-
-	return
 }
