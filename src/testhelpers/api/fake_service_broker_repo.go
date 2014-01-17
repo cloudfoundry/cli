@@ -46,7 +46,6 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBr
 		return
 	}
 
-
 	go func() {
 		serviceBrokersCount := len(repo.ServiceBrokers)
 		for i := 0; i < serviceBrokersCount; i += 2 {
@@ -54,8 +53,8 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBr
 			case <-stop:
 				break
 			default:
-				if serviceBrokersCount - i > 1 {
-					serviceBrokersChan <- repo.ServiceBrokers[i:i + 2]
+				if serviceBrokersCount-i > 1 {
+					serviceBrokersChan <- repo.ServiceBrokers[i : i+2]
 				} else {
 					serviceBrokersChan <- repo.ServiceBrokers[i:]
 				}

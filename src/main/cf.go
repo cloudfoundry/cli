@@ -1,19 +1,19 @@
 package main
 
 import (
-	"os"
-	"cf/app"
-	"cf/requirements"
-	"cf/commands"
-	"cf/api"
 	"cf"
-	"fmt"
-	"cf/terminal"
+	"cf/api"
+	"cf/app"
+	"cf/commands"
 	"cf/configuration"
-	"github.com/codegangsta/cli"
-	"cf/net"
-	"fileutils"
 	"cf/manifest"
+	"cf/net"
+	"cf/requirements"
+	"cf/terminal"
+	"fileutils"
+	"fmt"
+	"github.com/codegangsta/cli"
+	"os"
 )
 
 func main() {
@@ -28,12 +28,12 @@ func main() {
 	config := loadConfig(termUI, configRepo)
 	manifestRepo := manifest.NewManifestDiskRepository()
 	repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
-		"auth": net.NewUAAGateway(),
+		"auth":             net.NewUAAGateway(),
 		"cloud-controller": net.NewCloudControllerGateway(),
-		"uaa": net.NewUAAGateway(),
+		"uaa":              net.NewUAAGateway(),
 	})
 
-	cmdFactory := commands.NewFactory(termUI, config, configRepo, manifestRepo,repoLocator)
+	cmdFactory := commands.NewFactory(termUI, config, configRepo, manifestRepo, repoLocator)
 	reqFactory := requirements.NewFactory(termUI, config, repoLocator)
 	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
 

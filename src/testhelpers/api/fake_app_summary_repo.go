@@ -6,21 +6,21 @@ import (
 	"net/http"
 )
 
-type FakeAppSummaryRepo struct{
+type FakeAppSummaryRepo struct {
 	GetSummariesInCurrentSpaceApps []cf.AppSummary
 
 	GetSummaryErrorCode string
-	GetSummaryAppGuid string
-	GetSummarySummary cf.AppSummary
+	GetSummaryAppGuid   string
+	GetSummarySummary   cf.AppSummary
 }
 
-func (repo *FakeAppSummaryRepo)GetSummariesInCurrentSpace() (apps []cf.AppSummary, apiResponse net.ApiResponse) {
+func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []cf.AppSummary, apiResponse net.ApiResponse) {
 	apps = repo.GetSummariesInCurrentSpaceApps
 	return
 }
 
-func (repo *FakeAppSummaryRepo)GetSummary(appGuid string) (summary cf.AppSummary, apiResponse net.ApiResponse) {
-	repo.GetSummaryAppGuid= appGuid
+func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary cf.AppSummary, apiResponse net.ApiResponse) {
+	repo.GetSummaryAppGuid = appGuid
 	summary = repo.GetSummarySummary
 
 	if repo.GetSummaryErrorCode != "" {

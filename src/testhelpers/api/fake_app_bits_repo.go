@@ -6,10 +6,10 @@ import (
 
 type FakeApplicationBitsRepository struct {
 	UploadedAppGuid string
-	UploadedDir string
-	UploadAppErr bool
+	UploadedDir     string
+	UploadAppErr    bool
 
-	CallbackZipSize uint64
+	CallbackZipSize   uint64
 	CallbackFileCount uint64
 }
 

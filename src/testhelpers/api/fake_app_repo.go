@@ -9,13 +9,13 @@ import (
 type FakeApplicationRepository struct {
 	FindAllApps []cf.Application
 
-	ReadName      string
-	ReadApp       cf.Application
-	ReadErr       bool
-	ReadAuthErr   bool
-	ReadNotFound  bool
+	ReadName     string
+	ReadApp      cf.Application
+	ReadErr      bool
+	ReadAuthErr  bool
+	ReadNotFound bool
 
-	CreateAppParams    []cf.AppParams
+	CreateAppParams []cf.AppParams
 
 	UpdateParams    cf.AppParams
 	UpdateAppGuid   string
@@ -43,7 +43,7 @@ func (repo *FakeApplicationRepository) Read(name string) (app cf.Application, ap
 }
 
 func (repo *FakeApplicationRepository) CreatedAppParams() (params cf.AppParams) {
-	if (len(repo.CreateAppParams) > 0) {
+	if len(repo.CreateAppParams) > 0 {
 		params = repo.CreateAppParams[0]
 	}
 	return
@@ -82,7 +82,7 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 
 	if params.NotNil("env") {
 		envVars := params.Get("env").(generic.Map)
-		generic.Each(envVars,func(key,val interface {}){
+		generic.Each(envVars, func(key, val interface{}) {
 			resultApp.EnvironmentVars[key.(string)] = val.(string)
 		})
 	}

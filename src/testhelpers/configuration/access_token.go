@@ -1,10 +1,10 @@
 package configuration
 
 import (
-	"encoding/base64"
-	"fmt"
 	"cf/configuration"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 )
 
 func CreateAccessTokenWithTokenInfo(tokenInfo configuration.TokenInfo) (accessToken string, err error) {

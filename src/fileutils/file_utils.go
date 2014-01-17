@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 )
 
-func OpenFile(path string) (file *os.File, err error){
-	err = os.MkdirAll(filepath.Dir(path), os.ModeDir | os.ModeTemporary | os.ModePerm)
+func OpenFile(path string) (file *os.File, err error) {
+	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModeTemporary|os.ModePerm)
 	if err != nil {
 		return
 	}
@@ -16,8 +16,8 @@ func OpenFile(path string) (file *os.File, err error){
 	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 }
 
-func CreateFile(path string) (file *os.File, err error){
-	err = os.MkdirAll(filepath.Dir(path), os.ModeDir | os.ModeTemporary | os.ModePerm)
+func CreateFile(path string) (file *os.File, err error) {
+	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModeTemporary|os.ModePerm)
 	if err != nil {
 		return
 	}
@@ -35,7 +35,6 @@ func ReadFile(file *os.File) string {
 
 	return string(buf.Bytes())
 }
-
 
 func CopyFilePaths(fromPath, toPath string) (err error) {
 	dst, err := CreateFile(toPath)
@@ -94,7 +93,7 @@ func SetExecutableBits(dest string, fileInfoToCopy os.FileInfo) (err error) {
 		return
 	}
 
-	err = os.Chmod(dest, destFileInfo.Mode() | (fileInfoToCopy.Mode() & 0111))
+	err = os.Chmod(dest, destFileInfo.Mode()|(fileInfoToCopy.Mode()&0111))
 	return
 }
 

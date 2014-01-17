@@ -6,7 +6,7 @@ import (
 )
 
 type FakeAppBinder struct {
-	AppsToBind cf.ApplicationSet
+	AppsToBind        cf.ApplicationSet
 	InstancesToBindTo cf.ServiceInstanceSet
 }
 

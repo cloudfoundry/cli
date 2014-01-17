@@ -1,10 +1,10 @@
 package assert
 
 import (
-	"testing"
 	"fmt"
 	"runtime"
 	"strings"
+	"testing"
 )
 
 // Fail reports a failure through
@@ -76,7 +76,6 @@ func getWhitespaceString() string {
 	return strings.Repeat(" ", len(fmt.Sprintf("%s:%d:      ", file, line)))
 
 }
-
 
 func messageFromMsgAndArgs(msgAndArgs ...interface{}) string {
 	if len(msgAndArgs) == 0 || msgAndArgs == nil {

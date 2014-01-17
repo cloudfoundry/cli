@@ -5,13 +5,12 @@ import (
 	"cf/net"
 )
 
-type FakeAppEventsRepo struct{
+type FakeAppEventsRepo struct {
 	AppGuid string
-	Events []cf.EventFields
+	Events  []cf.EventFields
 }
 
-
-func (repo FakeAppEventsRepo)ListEvents(appGuid string) (events chan []cf.EventFields, statusChan chan net.ApiResponse) {
+func (repo FakeAppEventsRepo) ListEvents(appGuid string) (events chan []cf.EventFields, statusChan chan net.ApiResponse) {
 	repo.AppGuid = appGuid
 
 	events = make(chan []cf.EventFields, 4)

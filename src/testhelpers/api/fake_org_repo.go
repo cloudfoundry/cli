@@ -17,7 +17,7 @@ type FakeOrgRepository struct {
 	FindByNameOrganization cf.Organization
 
 	RenameOrganizationGuid string
-	RenameNewName      string
+	RenameNewName          string
 
 	DeletedOrganizationGuid string
 }
@@ -28,13 +28,13 @@ func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organ
 
 	go func() {
 		orgsCount := len(repo.Organizations)
-		for i:= 0; i < orgsCount; i += 2 {
+		for i := 0; i < orgsCount; i += 2 {
 			select {
 			case <-stop:
 				break
 			default:
-				if orgsCount - i > 1 {
-					orgsChan <- repo.Organizations[i:i+2]
+				if orgsCount-i > 1 {
+					orgsChan <- repo.Organizations[i : i+2]
 				} else {
 					orgsChan <- repo.Organizations[i:]
 				}

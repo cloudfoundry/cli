@@ -2,7 +2,7 @@ package maker
 
 import "cf"
 
-var routeGuid func () string
+var routeGuid func() string
 
 func init() {
 	routeGuid = guidGenerator("route")

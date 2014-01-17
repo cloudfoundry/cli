@@ -1,14 +1,15 @@
 package assert
 
 import (
-	"testing"
 	"fmt"
 	"strings"
+	"testing"
 )
 
 type Line []string
-func (line Line)String()string{
-	return strings.Join(line,", ")
+
+func (line Line) String() string {
+	return strings.Join(line, ", ")
 }
 
 type Lines []Line
@@ -38,7 +39,7 @@ func SliceDoesNotContain(t *testing.T, actual []string, expected Lines, msgAndAr
 			for _, expectedValue := range expectedLine {
 				allStringsFound = allStringsFound && strings.Contains(strings.ToLower(actualValue), strings.ToLower(expectedValue))
 			}
-			if allStringsFound  {
+			if allStringsFound {
 				return Fail(t, fmt.Sprintf("\"%s\" found on line %d", expectedLine, i), msgAndArgs...)
 			}
 		}

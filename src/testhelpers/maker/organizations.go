@@ -12,7 +12,7 @@ func NewOrgFields(overrides Overrides) (org cf.OrganizationFields) {
 	org.Name = "new-org"
 	org.Guid = orgGuid()
 
-	if overrides.Has("guid"){
+	if overrides.Has("guid") {
 		org.Guid = overrides.Get("guid").(string)
 	}
 

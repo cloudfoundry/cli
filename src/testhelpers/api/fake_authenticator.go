@@ -9,12 +9,12 @@ import (
 type FakeAuthenticationRepository struct {
 	ConfigRepo testconfig.FakeConfigRepository
 
-	Config *configuration.Configuration
-	Email string
+	Config   *configuration.Configuration
+	Email    string
 	Password string
 
-	AuthError bool
-	AccessToken string
+	AuthError    bool
+	AccessToken  string
 	RefreshToken string
 }
 
@@ -24,7 +24,7 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 	auth.Password = password
 
 	if auth.AuthError {
-		apiResponse =  net.NewApiResponseWithMessage("Error authenticating.")
+		apiResponse = net.NewApiResponseWithMessage("Error authenticating.")
 		return
 	}
 

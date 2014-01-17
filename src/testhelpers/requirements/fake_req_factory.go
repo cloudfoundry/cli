@@ -16,13 +16,13 @@ type FakeReqFactory struct {
 	ValidAccessTokenSuccess bool
 	TargetedSpaceSuccess    bool
 	TargetedOrgSuccess      bool
-	BuildpackSuccess		bool
+	BuildpackSuccess        bool
 
 	SpaceName string
 	Space     cf.Space
 
-	OrganizationName string
-	Organization cf.Organization
+	OrganizationName   string
+	Organization       cf.Organization
 	OrganizationFields cf.OrganizationFields
 
 	RouteHost   string
@@ -33,9 +33,9 @@ type FakeReqFactory struct {
 	Domain     cf.Domain
 
 	UserUsername string
-	UserFields         cf.UserFields
+	UserFields   cf.UserFields
 
-	Buildpack     cf.Buildpack
+	Buildpack cf.Buildpack
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {

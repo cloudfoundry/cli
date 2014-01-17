@@ -5,7 +5,7 @@ import "fmt"
 func Merge(collection, otherCollection Map) Map {
 	mergedMap := NewMap()
 
-	iterator := func(key, value interface{}) () {
+	iterator := func(key, value interface{}) {
 		mergedMap.Set(key, value)
 	}
 
@@ -113,22 +113,22 @@ func NewMap(data ...interface{}) Map {
 		panic("NewMap called with more than one argument")
 	}
 
-	switch data := data[0].(type){
+	switch data := data[0].(type) {
 	case Map:
 		return data
 	case map[string]string:
 		stringMap := newEmptyMap()
-	for key, val := range data {
-		stringMap.Set(key, val)
-	}
+		for key, val := range data {
+			stringMap.Set(key, val)
+		}
 		return stringMap
 	case map[string]interface{}:
 		stringToInterfaceMap := newEmptyMap()
-	for key, val := range data {
-		stringToInterfaceMap.Set(key, val)
-	}
+		for key, val := range data {
+			stringToInterfaceMap.Set(key, val)
+		}
 		return stringToInterfaceMap
-	case map[interface {}]interface{}:
+	case map[interface{}]interface{}:
 		mapp := ConcreteMap(data)
 		return &mapp
 	}
@@ -157,7 +157,7 @@ func (data *ConcreteMap) Has(key interface{}) bool {
 func (data *ConcreteMap) Except(keys []interface{}) Map {
 	otherMap := NewMap()
 	Each(data, func(key, value interface{}) {
-		if !Contains(keys,key){
+		if !Contains(keys, key) {
 			otherMap.Set(key, value)
 		}
 	})
@@ -194,5 +194,3 @@ func (data *ConcreteMap) Set(key, value interface{}) {
 func (data *ConcreteMap) Delete(key interface{}) {
 	delete(*data, key)
 }
-
-

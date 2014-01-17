@@ -7,13 +7,13 @@ import (
 
 type FakeAuthTokenRepo struct {
 	CreatedServiceAuthTokenFields cf.ServiceAuthTokenFields
-	
+
 	FindAllAuthTokens []cf.ServiceAuthTokenFields
 
-	FindByLabelAndProviderLabel string
-	FindByLabelAndProviderProvider string
+	FindByLabelAndProviderLabel                  string
+	FindByLabelAndProviderProvider               string
 	FindByLabelAndProviderServiceAuthTokenFields cf.ServiceAuthTokenFields
-	FindByLabelAndProviderApiResponse net.ApiResponse
+	FindByLabelAndProviderApiResponse            net.ApiResponse
 
 	UpdatedServiceAuthTokenFields cf.ServiceAuthTokenFields
 
@@ -38,7 +38,7 @@ func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (a
 	return
 }
 
-func (repo  *FakeAuthTokenRepo) Delete(authToken cf.ServiceAuthTokenFields) (apiResponse net.ApiResponse) {
+func (repo *FakeAuthTokenRepo) Delete(authToken cf.ServiceAuthTokenFields) (apiResponse net.ApiResponse) {
 	repo.DeletedServiceAuthTokenFields = authToken
 	return
 }

@@ -1,22 +1,22 @@
 package net
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"strings"
-	"fmt"
+	"testing"
 )
 
 type TestRequest struct {
-	Method     string
-	Path       string
-	Header 	http.Header
-	Matcher    RequestMatcher
-	Response   TestResponse
+	Method   string
+	Path     string
+	Header   http.Header
+	Matcher  RequestMatcher
+	Response TestResponse
 }
 
-type RequestMatcher func (*testing.T, *http.Request)
+type RequestMatcher func(*testing.T, *http.Request)
 
 type TestResponse struct {
 	Body   string
@@ -36,14 +36,14 @@ func (h *TestHandler) AllRequestsCalled() bool {
 	}
 	fmt.Print("Failed to call requests:\n")
 	for i := h.CallCount; i < len(h.Requests); i++ {
-		fmt.Printf("%#v\n",h.Requests[i])
+		fmt.Printf("%#v\n", h.Requests[i])
 	}
 	fmt.Print("\n\n")
 	return false
 }
 
 func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if (len(h.Requests) <= h.CallCount) {
+	if len(h.Requests) <= h.CallCount {
 		h.logError("Index out of range! Test server called too many times. Final Request:", r.Method, r.RequestURI)
 		return
 	}
@@ -70,26 +70,26 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for key, values := range tester.Header {
 		key = http.CanonicalHeaderKey(key)
-		actualValues := strings.Join(r.Header[key],";")
-		expectedValues := strings.Join(values,";")
+		actualValues := strings.Join(r.Header[key], ";")
+		expectedValues := strings.Join(values, ";")
 
 		if key == "Authorization" && !strings.Contains(actualValues, expectedValues) {
 			h.logError("%s header is not contained in actual value.\nExpected: %s\nActual:   %s", key, expectedValues, actualValues)
 		}
-		if  key != "Authorization" && actualValues != expectedValues {
+		if key != "Authorization" && actualValues != expectedValues {
 			h.logError("%s header did not match.\nExpected: %s\nActual:   %s", key, expectedValues, actualValues)
 		}
 	}
 
 	// match custom request matcher
 	if tester.Matcher != nil {
-		tester.Matcher(h.T,r)
+		tester.Matcher(h.T, r)
 	}
 
 	// set response headers
 	header := w.Header()
 	for name, values := range tester.Response.Header {
-		if (len(values) < 1) {
+		if len(values) < 1 {
 			continue
 		}
 		header.Set(name, values[0])
@@ -100,10 +100,10 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, tester.Response.Body)
 }
 
-func NewTLSServer(t *testing.T, requests []TestRequest) ( s *httptest.Server, h *TestHandler) {
+func NewTLSServer(t *testing.T, requests []TestRequest) (s *httptest.Server, h *TestHandler) {
 	h = &TestHandler{
-		Requests:requests,
-		T: t,
+		Requests: requests,
+		T:        t,
 	}
 	s = httptest.NewTLSServer(h)
 	return

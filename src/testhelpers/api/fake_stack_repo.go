@@ -7,7 +7,7 @@ import (
 
 type FakeStackRepository struct {
 	FindByNameStack cf.Stack
-	FindByNameName string
+	FindByNameName  string
 
 	FindAllStacks []cf.Stack
 }
@@ -23,4 +23,3 @@ func (repo *FakeStackRepository) FindAll() (stacks []cf.Stack, apiResponse net.A
 	stacks = repo.FindAllStacks
 	return
 }
-
