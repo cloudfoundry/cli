@@ -3,6 +3,9 @@ package manifest
 import (
 	"errors"
 	"generic"
+	"github.com/cloudfoundry/gamble"
+	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -46,7 +49,7 @@ func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap gene
 	}
 	defer file.Close()
 
-	mapp, err := Parse(file)
+	mapp, err := parseManifest(file)
 	if err != nil {
 		return
 	}
@@ -72,6 +75,21 @@ func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap gene
 	}
 
 	mergedMap = generic.DeepMerge(inheritedMap, mapp)
+	return
+}
+
+func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
+	yamlBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return
+	}
+
+	document, err := gamble.Parse(string(yamlBytes))
+	if err != nil {
+		return
+	}
+
+	yamlMap = generic.NewMap(document)
 	return
 }
 

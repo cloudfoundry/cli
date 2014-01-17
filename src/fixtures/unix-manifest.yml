@@ -1,0 +1,4 @@
+---
+applications:
+ - name: my-app
+   path: /absolute/path/to/example-app
