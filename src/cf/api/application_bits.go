@@ -25,7 +25,7 @@ type AppFileResource struct {
 }
 
 type ApplicationBitsRepository interface {
-	UploadApp(appGuid, dir string) (apiResponse net.ApiResponse)
+	UploadApp(appGuid, dir string, cb func(zipSize, fileCount uint64)) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -41,7 +41,7 @@ func NewCloudControllerApplicationBitsRepository(config *configuration.Configura
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, cb func(zipSize, fileCount uint64)) (apiResponse net.ApiResponse) {
 	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
@@ -73,6 +73,13 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 				apiResponse = net.NewApiResponseWithError("Error zipping application", err)
 				return
 			}
+
+			stat, err := zipFile.Stat()
+			if err != nil {
+				apiResponse = net.NewApiResponseWithError("Error zipping application", err)
+				return
+			}
+			cb(uint64(stat.Size()), cf.CountFiles(uploadDir))
 
 			apiResponse = repo.uploadBits(appGuid, zipFile, presentResourcesJson)
 			if apiResponse.IsNotSuccessful() {
