@@ -27,7 +27,7 @@ func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 		return
 	}
 
-	err = walkAppFiles(dir, func(fileName string, fullPath string) (err error) {
+	err = WalkAppFiles(dir, func(fileName string, fullPath string) (err error) {
 		fileInfo, err := os.Lstat(fullPath)
 		if err != nil {
 			return
@@ -73,11 +73,19 @@ func CopyFiles(appFiles []AppFileFields, fromDir, toDir string) (err error) {
 	return
 }
 
+func CountFiles(directory string) uint64 {
+	var count uint64
+	WalkAppFiles(directory, func(_, _ string) error {
+		count++
+		return nil
+	})
+	return count
+}
+
 type walkAppFileFunc func(fileName, fullPath string) (err error)
 
-func walkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
+func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	exclusions := readCfIgnore(dir)
-
 	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
 		err = inErr
 		if err != nil {

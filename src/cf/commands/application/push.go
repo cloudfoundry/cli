@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	"cf/commands/service"
 	"cf/configuration"
+	"cf/formatters"
 	"cf/manifest"
 	"cf/net"
 	"cf/requirements"
@@ -76,7 +77,7 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
-		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, appParams.Get("path").(string))
+		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, appParams.Get("path").(string), cmd.describeUploadOperation)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 			return
@@ -107,6 +108,11 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		cmd.restart(app, appParams, c)
 	}
+}
+
+func (cmd *Push) describeUploadOperation(zipFileBytes, fileCount uint64) {
+	humanReadableBytes := formatters.ByteSize(zipFileBytes)
+	cmd.ui.Say("Uploading app: %s, %d files", humanReadableBytes, fileCount)
 }
 
 func (cmd *Push) fetchStackGuid(appParams cf.AppParams) {

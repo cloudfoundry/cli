@@ -1088,6 +1088,19 @@ func TestPushingAppWithInvalidPath(t *testing.T) {
 	})
 }
 
+func TestPushingAppDescribesUpload(t *testing.T) {
+	deps := getPushDependencies()
+
+	deps.appRepo.ReadNotFound = true
+	deps.appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
+	deps.appBitsRepo.CallbackFileCount = 11
+
+	ui := callPush(t, []string{"app name"}, deps)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Uploading", "61M", "11 files"},
+	})
+}
+
 type pushDependencies struct {
 	manifestRepo *testmanifest.FakeManifestRepository
 	starter      *testcmd.FakeAppStarter

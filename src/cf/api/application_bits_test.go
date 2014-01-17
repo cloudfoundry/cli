@@ -201,7 +201,7 @@ func TestUploadWithInvalidDirectory(t *testing.T) {
 
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
-	apiResponse := repo.UploadApp("app-guid", "/foo/bar")
+	apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(uploadSize, fileCount uint64) {})
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Contains(t, apiResponse.Message, filepath.Join("foo", "bar"))
 }
@@ -255,7 +255,14 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 	zipper := cf.ApplicationZipper{}
 	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
-	apiResponse = repo.UploadApp("my-cool-app-guid", dir)
+	var reportedFileCount, reportedUploadSize uint64
+	apiResponse = repo.UploadApp("my-cool-app-guid", dir, func(uploadSize, fileCount uint64) {
+		reportedUploadSize = uploadSize
+		reportedFileCount = fileCount
+	})
+
+	assert.Equal(t, reportedFileCount, uint64(len(expectedApplicationContent)))
+	assert.Equal(t, reportedUploadSize, uint64(759))
 	assert.True(t, handler.AllRequestsCalled())
 
 	return
