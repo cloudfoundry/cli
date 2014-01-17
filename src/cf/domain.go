@@ -155,24 +155,6 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 
 type AppSet []AppParams
 
-func NewEmptyAppSet() AppSet {
-	return NewAppSet(make([]interface{}, 0))
-}
-
-func NewAppSet(values interface{}) (set AppSet) {
-	set = AppSet{}
-
-	switch values := values.(type) {
-	case []interface{}:
-
-	default:
-		app := generic.NewMap(values)
-		set = append(set, NewAppParams(app))
-	}
-
-	return
-}
-
 type AppFileFields struct {
 	Path string
 	Sha1 string

@@ -400,11 +400,10 @@ func createAppSetFromContextAndManifest(contextParams cf.AppParams, rootAppPath 
 		return
 	}
 
+	appSet = make([]cf.AppParams, 0, len(m.Applications))
 	if len(m.Applications) == 0 {
-		appSet = cf.NewAppSet(contextParams)
+		appSet = append(appSet, contextParams)
 	} else {
-		appSet = cf.NewEmptyAppSet()
-
 		for _, manifestAppParams := range m.Applications {
 			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
 
