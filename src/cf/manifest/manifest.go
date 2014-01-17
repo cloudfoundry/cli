@@ -40,7 +40,7 @@ func NewManifest(data generic.Map) (m *Manifest, errs ManifestErrors) {
 }
 
 func mapToAppSet(data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
-	appSet = cf.NewEmptyAppSet()
+	appSet = make([]cf.AppParams, 0)
 
 	if data.Has("applications") {
 		appMaps, ok := data.Get("applications").([]interface{})
