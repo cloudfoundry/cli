@@ -780,18 +780,6 @@ func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("memory").(uint64), uint64(256))
 }
 
-func TestPushingAppWithMemoryWithoutUnit(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	callPush(t, []string{
-		"-m", "512",
-		"my-new-app",
-	}, deps)
-
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("memory").(uint64), uint64(512))
-}
-
 func TestPushingAppWithInvalidMemory(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true

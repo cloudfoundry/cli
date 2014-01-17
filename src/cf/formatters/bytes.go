@@ -42,75 +42,34 @@ func ByteSize(bytes uint64) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
-func BytesFromString(s string) (bytes uint64, err error) {
-	var unit, stringValue string
-	unit = string(s[len(s)-1])
+var bytesPattern *regexp.Regexp = regexp.MustCompile("(?i)^(\\d+)([KMGT])[B]?$")
 
-	matches, err := regexp.MatchString("^[0-9]$", unit)
+func ToMegabytes(s string) (megabytes uint64, err error) {
+	parts := bytesPattern.FindStringSubmatch(s)
+	if len(parts) < 3 {
+		err = errors.New("Could not parse byte quantity '" + s + "'")
+		return
+	}
+
+	var quantity uint64
+	quantity, err = strconv.ParseUint(parts[1], 10, 0)
 	if err != nil {
 		return
-	}
-
-	if matches {
-		stringValue = s
-	} else {
-		stringValue = s[0 : len(s)-1]
-	}
-
-	value, err := strconv.ParseUint(stringValue, 10, 0)
-	if err != nil {
-		return
-	}
-
-	switch unit {
-	case "T":
-		bytes = value * TERABYTE
-	case "G":
-		bytes = value * GIGABYTE
-	case "M":
-		bytes = value * MEGABYTE
-	case "K":
-		bytes = value * KILOBYTE
-	default:
-		bytes = value * MEGABYTE
-	}
-
-	if bytes == 0 {
-		err = errors.New("Could not parse byte string")
-	}
-
-	return
-}
-
-func ToMegabytes(val interface{}) (megabytes uint64, err error) {
-	var s string
-	switch val := val.(type) {
-	case string:
-		s = val
-	case uint64:
-		megabytes = val
-		return
-	default:
-		err = errors.New(fmt.Sprintf("Cannot parse memory size from input:\n%#v", val))
-		return
-	}
-
-	if s == "" {
-		return 0, nil
-	}
-
-	if strings.ContainsAny(string(s[len(s)-1]), "0123456789") {
-		return strconv.ParseUint(s, 10, 0)
 	}
 
 	var bytes uint64
-
-	bytes, err = BytesFromString(s)
-	if err != nil {
-		return
+	unit := strings.ToUpper(parts[2])
+	switch unit {
+	case "T":
+		bytes = quantity * TERABYTE
+	case "G":
+		bytes = quantity * GIGABYTE
+	case "M":
+		bytes = quantity * MEGABYTE
+	case "K":
+		bytes = quantity * KILOBYTE
 	}
 
 	megabytes = bytes / MEGABYTE
-
 	return
 }

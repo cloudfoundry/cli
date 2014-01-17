@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"cf"
+	"cf/formatters"
 	"errors"
 	"fmt"
 	"generic"
@@ -80,10 +81,18 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		return
 	}
 
-	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "memory", "name", "path", "stack"} {
+	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack"} {
 		if yamlMap.Has(key) {
 			setStringVal(appMap, key, yamlMap.Get(key), &errs)
 		}
+	}
+
+	if yamlMap.Has("memory") {
+		memory, err := formatters.ToMegabytes(yamlMap.Get("memory").(string))
+		if err == nil {
+			panic(err)
+		}
+		appParams.Set("memory", memory)
 	}
 
 	if yamlMap.Has("timeout") {

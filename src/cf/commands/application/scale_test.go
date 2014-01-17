@@ -106,22 +106,6 @@ func TestScaleOnlyMemory(t *testing.T) {
 	assert.False(t, appRepo.UpdateParams.Has("instances"))
 }
 
-func TestScaleMemoryWithIntAssumesMegabytes(t *testing.T) {
-	app := cf.Application{}
-	app.Name = "my-app"
-	app.Guid = "my-app-guid"
-	reqFactory, restarter, appRepo := getScaleDependencies()
-	reqFactory.Application = app
-
-	callScale(t, []string{"-m", "1024", "my-app"}, reqFactory, restarter, appRepo)
-
-	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
-	assert.Equal(t, appRepo.UpdateParams.Get("memory").(uint64), uint64(1024))
-
-	assert.False(t, appRepo.UpdateParams.Has("disk_quota"))
-	assert.False(t, appRepo.UpdateParams.Has("instances"))
-}
-
 func getScaleDependencies() (reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo *testapi.FakeApplicationRepository) {
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	restarter = &testcmd.FakeAppRestarter{}
