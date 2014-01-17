@@ -75,6 +75,7 @@ type ServiceInstanceResource struct {
 func (resource ServiceInstanceResource) ToFields() (fields cf.ServiceInstanceFields) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
+	fields.DashboardURL = resource.Entity.DashboardURL
 	return
 }
 
@@ -92,6 +93,7 @@ func (resource ServiceInstanceResource) ToModel() (instance cf.ServiceInstance) 
 
 type ServiceInstanceEntity struct {
 	Name            string
+	DashboardURL    string                   `json:"dashboard_url"`
 	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
 	ServicePlan     ServicePlanResource      `json:"service_plan"`
 }

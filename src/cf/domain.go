@@ -262,6 +262,7 @@ func (s ServiceOfferings) Less(i, j int) bool {
 
 type ServiceInstanceFields struct {
 	BasicFields
+	DashboardURL     string
 	SysLogDrainUrl   string
 	ApplicationNames []string
 	Params           map[string]string

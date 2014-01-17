@@ -29,6 +29,8 @@ func (resource ServiceInstancesSummaries) ToModels() (instances []cf.ServiceInst
 
 		instance := cf.ServiceInstance{}
 		instance.Name = instanceSummary.Name
+		instance.Guid = instanceSummary.Guid
+		instance.DashboardURL = instanceSummary.DashboardURL
 		instance.ApplicationNames = applicationNames
 		instance.ServicePlan = servicePlan
 		instance.ServiceOffering = serviceOffering
@@ -57,8 +59,10 @@ type ServiceInstanceSummaryApp struct {
 }
 
 type ServiceInstanceSummary struct {
-	Name        string
-	ServicePlan ServicePlanSummary `json:"service_plan"`
+	Name         string
+	Guid         string
+	DashboardURL string             `json:"dashboard_url"`
+	ServicePlan  ServicePlanSummary `json:"service_plan"`
 }
 
 type ServicePlanSummary struct {
