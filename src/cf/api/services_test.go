@@ -113,17 +113,18 @@ func TestGetServiceOfferingsWhenTargetingASpace(t *testing.T) {
 }
 
 func TestCreateServiceInstance(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	createReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/service_instances",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
 
-	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{createReq, findServiceInstanceReq})
 	defer ts.Close()
 
-	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
+	serviceInstance, identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
+	assert.Equal(t, serviceInstance.Name, "my-service")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
@@ -143,8 +144,9 @@ func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{errorReq, findServiceInstanceReq})
 	defer ts.Close()
 
-	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
+	serviceInstance, identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
 
+	assert.Equal(t, serviceInstance.Name, "my-service")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, true)
@@ -164,8 +166,9 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{errorReq, findServiceInstanceReq})
 	defer ts.Close()
 
-	identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
+	serviceInstance, identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
+	assert.Equal(t, serviceInstance.Name, "my-service")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, identicalAlreadyExists, false)
