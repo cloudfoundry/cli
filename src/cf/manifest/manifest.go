@@ -74,7 +74,7 @@ func mapToAppSet(data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
 }
 
 func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestErrors) {
-	appMap := generic.NewMap()
+	appParams = cf.NewEmptyAppParams()
 
 	errs = checkForNulls(yamlMap)
 	if !errs.Empty() {
@@ -83,39 +83,39 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 
 	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack"} {
 		if yamlMap.Has(key) {
-			setStringVal(appMap, key, yamlMap.Get(key), &errs)
+			setStringVal(appParams, key, yamlMap.Get(key), &errs)
 		}
 	}
 
 	if yamlMap.Has("memory") {
 		memory, err := formatters.ToMegabytes(yamlMap.Get("memory").(string))
-		if err == nil {
-			panic(err)
+		if err != nil {
+			errs = append(errs, errors.New(fmt.Sprintf("Unexpected value for app memory:\n%s", err.Error())))
+			return
 		}
 		appParams.Set("memory", memory)
 	}
 
 	if yamlMap.Has("timeout") {
-		setIntVal(appMap, "health_check_timeout", yamlMap.Get("timeout"), &errs)
+		setIntVal(appParams, "health_check_timeout", yamlMap.Get("timeout"), &errs)
 	}
 
 	if yamlMap.Has("instances") {
-		setIntVal(appMap, "instances", yamlMap.Get("instances"), &errs)
+		setIntVal(appParams, "instances", yamlMap.Get("instances"), &errs)
 	}
 
 	if yamlMap.Has("services") {
-		setStringSlice(appMap, "services", yamlMap.Get("services"), &errs)
+		setStringSlice(appParams, "services", yamlMap.Get("services"), &errs)
 	} else {
-		appMap.Set("services", []string{})
+		appParams.Set("services", []string{})
 	}
 
 	if yamlMap.Has("env") {
-		setEnvVar(appMap, yamlMap.Get("env"), &errs)
+		setEnvVar(appParams, yamlMap.Get("env"), &errs)
 	} else {
-		appMap.Set("env", generic.NewMap())
+		appParams.Set("env", generic.NewMap())
 	}
 
-	appParams = cf.NewAppParams(appMap)
 	return
 }
 

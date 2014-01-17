@@ -42,7 +42,7 @@ func ByteSize(bytes uint64) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
-var bytesPattern *regexp.Regexp = regexp.MustCompile("(?i)^(\\d+)([KMGT])[B]?$")
+var bytesPattern *regexp.Regexp = regexp.MustCompile("(?i)^(\\d+)([KMGT])B?$")
 
 func ToMegabytes(s string) (megabytes uint64, err error) {
 	parts := bytesPattern.FindStringSubmatch(s)

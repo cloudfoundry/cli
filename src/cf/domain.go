@@ -73,7 +73,7 @@ type Application struct {
 }
 
 func (model Application) ToParams() (params AppParams) {
-	params = NewAppParams(map[interface{}]interface{}{
+	params = NewAppParams(generic.NewMap(map[interface{}]interface{}{
 		"guid":       model.Guid,
 		"name":       model.Name,
 		"buildpack":  model.BuildpackUrl,
@@ -85,7 +85,7 @@ func (model Application) ToParams() (params AppParams) {
 		"stack_guid": model.Stack.Guid,
 		"space_guid": model.SpaceGuid,
 		"env":        generic.NewMap(model.EnvironmentVars),
-	})
+	}))
 
 	return
 }
@@ -95,31 +95,14 @@ type AppSummary struct {
 	RouteSummaries []RouteSummary
 }
 
-type AppParams struct {
-	generic.Map
-}
-
-func (app AppParams) ToMap() generic.Map {
-	return app.Map
-}
+type AppParams generic.Map
 
 func NewEmptyAppParams() AppParams {
-	return NewAppParams(generic.NewMap())
+	return generic.NewMap()
 }
 
-func NewAppParams(data interface{}) (params AppParams) {
-	params = AppParams{}
-
-	switch data := data.(type) {
-	case map[interface{}]interface{}:
-		params.Map = generic.NewMap(data)
-	case generic.Map:
-		params.Map = data
-	default:
-		panic(fmt.Sprintf("AppParams initialized with unexpected type: %T", data))
-	}
-
-	return
+func NewAppParams(data generic.Map) AppParams {
+	return data
 }
 
 func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
