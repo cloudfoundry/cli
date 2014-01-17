@@ -65,7 +65,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	cmd.findAndValidateAppsToPush(c)
 
 	for _, appParams := range cmd.appSet {
-		cmd.fetchStackGuid(&appParams)
+		cmd.fetchStackGuid(appParams)
 
 		app, didCreate := cmd.app(appParams)
 		if !didCreate {
@@ -109,7 +109,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
+func (cmd *Push) fetchStackGuid(appParams cf.AppParams) {
 	if !appParams.Has("stack") {
 		return
 	}
