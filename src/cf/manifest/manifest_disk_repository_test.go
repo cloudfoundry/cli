@@ -4,11 +4,9 @@ import (
 	. "cf/manifest"
 	"generic"
 	"github.com/stretchr/testify/assert"
-	"io"
 	"os"
 	"path/filepath"
-	"strings"
-	"testhelpers/maker"
+	"runtime"
 	"testing"
 )
 
@@ -79,23 +77,7 @@ func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
 	assert.Equal(t, filename, "example_manifest.yml")
 }
 
-func TestParsingManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
-	mapp, err := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-
-	assert.NoError(t, err)
-	assert.Equal(t, mapp.Applications[0].Get("health_check_timeout"), 360)
-	assert.False(t, mapp.Applications[0].Has("timeout"))
-}
-
-func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
-	mapp, err := Parse(strings.NewReader(maker.ManifestWithName("invalid env")))
-	assert.NoError(t, err)
-
-	_, err = NewManifest(mapp)
-	assert.Error(t, err)
-}
-
-func TestParsingManifestWithInheritance(t *testing.T) {
+func TestManifestWithInheritance(t *testing.T) {
 	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 	m, err := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
@@ -117,11 +99,28 @@ func TestParsingManifestWithInheritance(t *testing.T) {
 	assert.Equal(t, services, []string{"base-service", "foo-service"})
 }
 
-func parseToManifest(reader io.Reader) (m *Manifest, errs ManifestErrors) {
-	mapp, err := Parse(reader)
-	if err != nil {
-		errs = append(errs, err)
-		return
+func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
+	assertFeatureFlag(t)
+
+	if runtime.GOOS == "windows" {
+		pushingWithAbsoluteWindowsPath(t)
+	} else {
+		pushingWithAbsoluteUnixPath(t)
 	}
-	return NewManifest(mapp)
+}
+
+func pushingWithAbsoluteUnixPath(t *testing.T) {
+	repo := NewManifestDiskRepository()
+	m, err := repo.ReadManifest("../../fixtures/unix-manifest.yml")
+
+	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("path"), "/absolute/path/to/example-app")
+}
+
+func pushingWithAbsoluteWindowsPath(t *testing.T) {
+	repo := NewManifestDiskRepository()
+	m, err := repo.ReadManifest("../../fixtures/windows-manifest.yml")
+
+	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("path"), "C:\\path\\to\\my\\app")
 }

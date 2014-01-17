@@ -8,10 +8,7 @@ import (
 	"errors"
 	"generic"
 	"github.com/stretchr/testify/assert"
-	"io"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"syscall"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -23,6 +20,50 @@ import (
 	testterm "testhelpers/terminal"
 	"testing"
 )
+
+func singleAppManifest() *manifest.Manifest {
+	return &manifest.Manifest{
+		Applications: []cf.AppParams{
+			cf.NewAppParams(generic.NewMap(map[interface{}]interface{}{
+				"name":      "manifest-app-name",
+				"memory":    uint64(128),
+				"instances": 1,
+				"host":      "manifest-host",
+				"domain":    "manifest-example.com",
+				"stack":     "custom-stack",
+				"timeout":   uint64(360),
+				"buildpack": "some-buildpack",
+				"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+				"path":      "../../fixtures/example-app",
+				"env": generic.NewMap(map[string]interface{}{
+					"FOO":  "baz",
+					"PATH": "/u/apps/my-app/bin",
+				}),
+			})),
+		},
+	}
+}
+
+func manifestWithServicesAndEnv() *manifest.Manifest {
+	return &manifest.Manifest{
+		Applications: []cf.AppParams{
+			cf.NewAppParams(generic.NewMap(map[interface{}]interface{}{
+				"name":     "app1",
+				"services": []string{"app1-service", "global-service"},
+				"env": generic.NewMap(map[string]interface{}{
+					"SOMETHING": "definitely-something",
+				}),
+			})),
+			cf.NewAppParams(generic.NewMap(map[interface{}]interface{}{
+				"name":     "app2",
+				"services": []string{"app2-service", "global-service"},
+				"env": generic.NewMap(map[string]interface{}{
+					"SOMETHING": "nothing",
+				}),
+			})),
+		},
+	}
+}
 
 func TestPushingRequirements(t *testing.T) {
 	ui := new(testterm.FakeUI)
@@ -249,12 +290,9 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 
 	ui := callPush(t, []string{}, deps)
-
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating route", "manifest-host.manifest-example.com"},
 		{"OK"},
@@ -284,30 +322,25 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 func TestPushingAppManifestWithNulls(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("nulls")))
-	deps.manifestRepo.ReadManifestManifest = m
-	deps.manifestRepo.ReadManifestErrors = errs
+	deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{
+		errors.New("buildpack should not be null"),
+		errors.New("disk_quota should not be null"),
+	}
 
 	ui := callPush(t, []string{}, deps)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"Error", "reading", "manifest"},
-		{"buildpack", "should not be null"},
-		{"disk_quota", "should not be null"},
-		{"env", "should not be null"},
-		{"instances", "should not be null"},
-		{"memory", "should not be null"},
+		{"buildpack should not be null"},
+		{"disk_quota should not be null"},
 	})
 }
 
 func TestPushingManyAppsFromManifest(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("many apps")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
 	ui := callPush(t, []string{}, deps)
 
@@ -319,29 +352,20 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 
 	firstApp := deps.appRepo.CreateAppParams[0]
 	secondApp := deps.appRepo.CreateAppParams[1]
-	assert.Equal(t, firstApp.Get("name").(string), "app1")
-	assert.Equal(t, secondApp.Get("name").(string), "app2")
-
-	assert.True(t, firstApp.Has("env"))
-	assert.True(t, secondApp.Has("env"))
+	assert.Equal(t, firstApp.Get("name"), "app1")
+	assert.Equal(t, secondApp.Get("name"), "app2")
 
 	envVars := firstApp.Get("env").(generic.Map)
-	assert.Equal(t, 2, envVars.Count())
-	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")
-	assert.Equal(t, envVars.Get("SOMETHING").(string), "definitely-something")
+	assert.Equal(t, envVars.Get("SOMETHING"), "definitely-something")
 
 	envVars = secondApp.Get("env").(generic.Map)
-	assert.Equal(t, 2, envVars.Count())
-	assert.Equal(t, envVars.Get("PATH").(string), "/u/apps/something/bin")
-	assert.Equal(t, envVars.Get("SOMETHING").(string), "nothing")
+	assert.Equal(t, envVars.Get("SOMETHING"), "nothing")
 }
 
 func TestPushingManyAppsDoesNotAllowNameFlag(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("many apps")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
 	ui := callPush(t, []string{"app-name"}, deps)
 
@@ -352,122 +376,44 @@ func TestPushingManyAppsDoesNotAllowNameFlag(t *testing.T) {
 	assert.Equal(t, len(deps.appRepo.CreateAppParams), 0)
 }
 
-func TestPushingWithBindingGlobalServices(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	expectedServiceInstance := cf.ServiceInstance{}
-	expectedServiceInstance.Name = "work-queue"
-	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("global services")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
-
-	ui := callPush(t, []string{}, deps)
-
-	assert.Equal(t, len(deps.binder.AppsToBind), 1)
-	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app-with-redis-backend")
-	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "work-queue")
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating", "app-with-redis-backend"},
-		{"OK"},
-		{"Binding service", "work-queue", "app-with-redis-backend", "my-org", "my-space", "my-user"},
-		{"OK"},
-	})
-}
-
-func TestPushingWithBindingLocalServices(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	expectedServiceInstance := cf.ServiceInstance{}
-	expectedServiceInstance.Name = "work-queue"
-	deps.serviceRepo.FindInstanceByNameServiceInstance = expectedServiceInstance
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("local services")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
-
-	ui := callPush(t, []string{}, deps)
-
-	assert.Equal(t, len(deps.binder.AppsToBind), 1)
-	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app-with-redis-backend")
-	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "work-queue")
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating", "app-with-redis-backend"},
-		{"OK"},
-		{"Binding service", "work-queue", "app-with-redis-backend", "my-org", "my-space", "my-user"},
-		{"OK"},
-	})
-}
-
 func TestPushingWithBindingMergedServices(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	service1 := cf.ServiceInstance{}
-	service1.Name = "work-queue"
-	service2 := cf.ServiceInstance{}
-	service2.Name = "nested-service"
-	service3 := cf.ServiceInstance{}
-	service3.Name = "app2-service"
+	deps.serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
+		"global-service": maker.NewServiceInstance("global-service"),
+		"app1-service":   maker.NewServiceInstance("app1-service"),
+		"app2-service":   maker.NewServiceInstance("app2-service"),
+	})
 
-	mapOfServices := generic.NewMap()
-	mapOfServices.Set("global-service", service1)
-	mapOfServices.Set("nested-service", service2)
-	mapOfServices.Set("app2-service", service3)
-	deps.serviceRepo.FindInstanceByNameMap = mapOfServices
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("merged services")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
 	ui := callPush(t, []string{}, deps)
 
 	assert.Equal(t, len(deps.binder.AppsToBind), 4)
-	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app-with-redis-backend")
-	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "work-queue")
-
-	assert.Equal(t, deps.binder.AppsToBind[1].Name, "app-with-redis-backend")
-	assert.Equal(t, deps.binder.InstancesToBindTo[1].Name, "nested-service")
+	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app1")
+	assert.Equal(t, deps.binder.AppsToBind[1].Name, "app1")
+	assert.Equal(t, deps.binder.InstancesToBindTo[0].Name, "app1-service")
+	assert.Equal(t, deps.binder.InstancesToBindTo[1].Name, "global-service")
 
 	assert.Equal(t, deps.binder.AppsToBind[2].Name, "app2")
-	assert.Equal(t, deps.binder.InstancesToBindTo[2].Name, "work-queue")
-
 	assert.Equal(t, deps.binder.AppsToBind[3].Name, "app2")
-	assert.Equal(t, deps.binder.InstancesToBindTo[3].Name, "app2-service")
+	assert.Equal(t, deps.binder.InstancesToBindTo[2].Name, "app2-service")
+	assert.Equal(t, deps.binder.InstancesToBindTo[3].Name, "global-service")
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating", "app-with-redis-backend"},
+		{"Creating", "app1"},
 		{"OK"},
-		{"Binding service", "global-service", "app-with-redis-backend", "my-org", "my-space", "my-user"},
+		{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
 		{"OK"},
-		{"Binding service", "nested-service", "app-with-redis-backend", "my-org", "my-space", "my-user"},
+		{"Binding service", "global-service", "app1", "my-org", "my-space", "my-user"},
 		{"OK"},
 		{"Creating", "app2"},
 		{"OK"},
-		{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
-		{"OK"},
 		{"Binding service", "app2-service", "app2", "my-org", "my-space", "my-user"},
 		{"OK"},
-	})
-}
-
-func TestPushWithInvalidManifestProperties(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("invalid")))
-	deps.manifestRepo.ReadManifestManifest = m
-	deps.manifestRepo.ReadManifestErrors = errs
-
-	ui := callPush(t, []string{}, deps)
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"Error", "reading", "manifest"},
-		{"Expected", "services"},
-		{"Expected", "env"},
+		{"Binding service", "global-service", "app2", "my-org", "my-space", "my-user"},
+		{"OK"},
 	})
 }
 
@@ -475,15 +421,12 @@ func TestPushWithServicesThatAreNotFound(t *testing.T) {
 	deps := getPushDependencies()
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.serviceRepo.FindInstanceByNameErr = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("global services")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
 	ui := callPush(t, []string{}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
-		{"Could not find service", "work-queue", "app-with-redis-backend"},
+		{"Could not find service", "app1-service", "app1"},
 	})
 }
 
@@ -491,9 +434,7 @@ func TestPushingAppWithPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ManifestDir = "/foo/bar/baz"
 
 	callPush(t, []string{
@@ -509,9 +450,7 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ManifestDir = "returned/path/"
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
@@ -533,9 +472,7 @@ func TestPushingWithBadManifestPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ManifestPathErr = errors.New("read manifest error")
 
 	ui := callPush(t, []string{
@@ -551,10 +488,7 @@ func TestPushingWithBadManifestPath(t *testing.T) {
 func TestPushingWithDefaultManifestNotFound(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{syscall.ENOENT}
 
 	ui := callPush(t, []string{"--no-route", "app-name"}, deps)
@@ -567,10 +501,7 @@ func TestPushingWithDefaultManifestNotFound(t *testing.T) {
 func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ManifestPathErr = syscall.ENOENT
 
 	ui := callPush(t, []string{
@@ -585,10 +516,7 @@ func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
 func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ManifestDir = "some/relative/path/"
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
@@ -606,55 +534,10 @@ func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
 	})
 }
 
-func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		pushingWithAbsoluteWindowsPath(t)
-	} else {
-		pushingWithAbsoluteUnixPath(t)
-	}
-}
-
-func pushingWithAbsoluteUnixPath(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("app with absolute unix path")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
-	deps.manifestRepo.ManifestDir = "some/relative/path/"
-	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
-
-	callPush(t, []string{
-		"-f", "some/relative/path/different-manifest.yml",
-	}, deps)
-
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("/absolute/path/to/example-app"))
-}
-
-func pushingWithAbsoluteWindowsPath(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("app with absolute windows path")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
-	deps.manifestRepo.ManifestDir = "some/relative/path/"
-	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
-
-	callPush(t, []string{
-		"-f", "some/relative/path/different-manifest.yml",
-	}, deps)
-
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("C:\\absolute\\path\\to\\example-app"))
-}
-
 func TestPushingWithManifestInAppDirectory(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 
 	ui := callPush(t, []string{"-p", "some/relative/path"}, deps)
 
@@ -670,10 +553,7 @@ func TestPushingWithManifestInAppDirectory(t *testing.T) {
 func TestPushingAppWhenManifestIncludesRelativePathForApp(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
-
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("single app")))
-	testassert.AssertNoErrors(t, errs)
-	deps.manifestRepo.ReadManifestManifest = m
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 	deps.manifestRepo.ManifestDir = "some/relative/path"
 
 	_ = callPush(t, []string{"-f", "some/relative/path"}, deps)
@@ -686,16 +566,14 @@ func TestPushingWithNoManifestFlag(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("nulls")))
-	deps.manifestRepo.ReadManifestManifest = m
-	deps.manifestRepo.ReadManifestErrors = errs
-
 	ui := callPush(t, []string{"--no-route", "--no-manifest", "app-name"}, deps)
 
 	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"hacker-manifesto"},
 	})
+
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("name").(string), "app-name")
 }
 
@@ -703,18 +581,9 @@ func TestPushingWithNoManifestFlagAndMissingAppName(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	m, errs := parseToManifest(strings.NewReader(maker.ManifestWithName("nulls")))
-	deps.manifestRepo.ReadManifestManifest = m
-	deps.manifestRepo.ReadManifestErrors = errs
-
 	ui := callPush(t, []string{"--no-route", "--no-manifest"}, deps)
-
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
-	})
-
-	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
-		{"hacker-manifesto"},
 	})
 }
 
@@ -1167,13 +1036,4 @@ func callPush(t *testing.T, args []string, deps pushDependencies) (ui *testterm.
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
-}
-
-func parseToManifest(reader io.Reader) (m *manifest.Manifest, errs manifest.ManifestErrors) {
-	mapp, err := manifest.Parse(reader)
-	if err != nil {
-		errs = append(errs, err)
-		return
-	}
-	return manifest.NewManifest(mapp)
 }

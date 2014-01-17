@@ -38,3 +38,34 @@ func TestManifestWithInvalidMemory(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "memory")
 }
+
+func TestParsingManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
+	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{
+				"name":    "bitcoin-miner",
+				"timeout": "360",
+			},
+		},
+	}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("health_check_timeout"), 360)
+	assert.False(t, m.Applications[0].Has("timeout"))
+}
+
+func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
+	_, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+		"env": map[string]interface{}{
+			"bar": nil,
+		},
+		"applications": []interface{}{
+			map[string]interface{}{
+				"name": "bad app",
+			},
+		},
+	}))
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "env var 'bar' should not be null")
+}
