@@ -115,7 +115,7 @@ type ServiceBindingEntity struct {
 type ServiceRepository interface {
 	GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
-	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
+	CreateServiceInstance(name, planGuid string) (serviceInstance cf.ServiceInstance, identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 	DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse)
 }
@@ -171,7 +171,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (serviceInstance cf.ServiceInstance, identicalAlreadyExists bool, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
@@ -180,9 +180,10 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 
 	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
 
-	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
+	var findInstanceApiResponse net.ApiResponse
+	serviceInstance, findInstanceApiResponse = repo.FindInstanceByName(name)
 
-		serviceInstance, findInstanceApiResponse := repo.FindInstanceByName(name)
+	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
 
 		if !findInstanceApiResponse.IsNotSuccessful() &&
 			serviceInstance.ServicePlan.Guid == planGuid {

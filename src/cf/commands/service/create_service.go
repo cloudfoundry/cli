@@ -65,7 +65,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 
 	var identicalAlreadyExists bool
-	identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
+	_, identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

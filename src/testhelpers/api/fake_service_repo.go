@@ -9,6 +9,8 @@ import (
 type FakeServiceRepo struct {
 	ServiceOfferings []cf.ServiceOffering
 
+	ServiceInstance cf.ServiceInstance
+
 	CreateServiceInstanceName string
 	CreateServiceInstancePlanGuid string
 	CreateServiceAlreadyExists bool
@@ -31,7 +33,8 @@ func (repo *FakeServiceRepo) GetServiceOfferings() (offerings cf.ServiceOffering
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (serviceInstance cf.ServiceInstance, identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+	serviceInstance = repo.ServiceInstance
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlanGuid = planGuid
 	identicalAlreadyExists = repo.CreateServiceAlreadyExists
