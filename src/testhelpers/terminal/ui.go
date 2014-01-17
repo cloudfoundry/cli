@@ -1,20 +1,20 @@
 package terminal
 
 import (
-	"fmt"
-	"strings"
-	"github.com/codegangsta/cli"
 	"cf/configuration"
-	"time"
 	term "cf/terminal"
+	"fmt"
+	"github.com/codegangsta/cli"
+	"strings"
+	"time"
 )
 
 type FakeUI struct {
-	Outputs []string
-	Prompts []string
-	PasswordPrompts []string
-	Inputs  []string
-	FailedWithUsage bool
+	Outputs                 []string
+	Prompts                 []string
+	PasswordPrompts         []string
+	Inputs                  []string
+	FailedWithUsage         bool
 	ShowConfigurationCalled bool
 }
 
@@ -30,13 +30,13 @@ func (ui *FakeUI) PrintPaginator(rows []string, err error) {
 }
 
 func (ui *FakeUI) Say(message string, args ...interface{}) {
-	message =  fmt.Sprintf(message, args...)
+	message = fmt.Sprintf(message, args...)
 	ui.Outputs = append(ui.Outputs, strings.Split(message, "\n")...)
 	return
 }
 
 func (ui *FakeUI) Warn(message string, args ...interface{}) {
-	ui.Say(message,args...)
+	ui.Say(message, args...)
 	return
 }
 
@@ -74,7 +74,7 @@ func (ui *FakeUI) Failed(message string, args ...interface{}) {
 }
 
 func (ui *FakeUI) ConfigFailure(err error) {
-	ui.Failed("Error loading config file.\n%s",err.Error())
+	ui.Failed("Error loading config file.\n%s", err.Error())
 }
 
 func (ui *FakeUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
@@ -112,11 +112,10 @@ func (ui *FakeUI) DisplayTable(table [][]string) {
 		for _, value := range line {
 			output = output + value + "  "
 		}
-		ui.Say("%s",output)
+		ui.Say("%s", output)
 	}
 }
 
 func (ui *FakeUI) Table(headers []string) term.Table {
-	return term.NewTable(ui,headers)
+	return term.NewTable(ui, headers)
 }
-

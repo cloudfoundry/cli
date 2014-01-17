@@ -20,9 +20,9 @@ func (params Overrides) Get(key interface{}) interface{} {
 	return params[params.canonicalKey(key)]
 }
 
-func guidGenerator(prefix string) func () string {
+func guidGenerator(prefix string) func() string {
 	count := 0
-	return func () string {
+	return func() string {
 		count++
 		return fmt.Sprintf("%s-guid-%d", prefix, count)
 	}

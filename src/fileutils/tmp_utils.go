@@ -14,21 +14,21 @@ const dirMask = os.ModeDir | os.ModeTemporary | os.ModePerm
 
 var tmpPathPrefix = ""
 
-func SetTmpPathPrefix(path string){
+func SetTmpPathPrefix(path string) {
 	tmpPathPrefix = path
 }
 
-func TmpPathPrefix() string{
+func TmpPathPrefix() string {
 	return tmpPathPrefix
 }
 
-func TempDir(namePrefix string, cb func (tmpDir string, err error)) {
+func TempDir(namePrefix string, cb func(tmpDir string, err error)) {
 	baseDir, err := baseTempDir()
 	if err != nil {
 		return
 	}
 
-	tmpDir := filepath.Join(baseDir,uniqueKey(namePrefix))
+	tmpDir := filepath.Join(baseDir, uniqueKey(namePrefix))
 	err = os.MkdirAll(tmpDir, dirMask)
 	defer func() {
 		os.RemoveAll(tmpDir)
@@ -37,7 +37,7 @@ func TempDir(namePrefix string, cb func (tmpDir string, err error)) {
 	cb(tmpDir, err)
 }
 
-func TempFile(namePrefix string, cb func (tmpFile *os.File, err error)) {
+func TempFile(namePrefix string, cb func(tmpFile *os.File, err error)) {
 	var (
 		tmpFile     *os.File
 		tmpFilepath string

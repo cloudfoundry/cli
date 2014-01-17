@@ -4,7 +4,7 @@ import (
 	"cf"
 )
 
-var appGuid func () string
+var appGuid func() string
 
 func init() {
 	appGuid = guidGenerator("app")
@@ -35,4 +35,3 @@ func NewApp(overrides Overrides) (app cf.Application) {
 
 	return
 }
-

@@ -1,18 +1,18 @@
 package api
 
 import (
-	"cf/net"
 	"cf"
-	testconfig "testhelpers/configuration"
 	"cf/configuration"
+	"cf/net"
+	testconfig "testhelpers/configuration"
 )
 
 type FakeEndpointRepo struct {
 	ConfigRepo testconfig.FakeConfigRepository
-	Config *configuration.Configuration
+	Config     *configuration.Configuration
 
 	UpdateEndpointEndpoint string
-	UpdateEndpointError bool
+	UpdateEndpointError    bool
 
 	GetEndpointEndpoints map[cf.EndpointType]string
 }
@@ -31,7 +31,7 @@ func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint str
 	return
 }
 
-func (repo *FakeEndpointRepo) GetEndpoint(name cf.EndpointType)  (endpoint string, apiResponse net.ApiResponse) {
+func (repo *FakeEndpointRepo) GetEndpoint(name cf.EndpointType) (endpoint string, apiResponse net.ApiResponse) {
 	endpoint = repo.GetEndpointEndpoints[name]
 	return
 }

@@ -8,8 +8,8 @@ import (
 
 type FakeServiceBindingRepo struct {
 	CreateServiceInstanceGuid string
-	CreateApplicationGuid string
-	CreateErrorCode string
+	CreateApplicationGuid     string
+	CreateErrorCode           string
 
 	DeleteServiceInstance cf.ServiceInstance
 	DeleteApplicationGuid string

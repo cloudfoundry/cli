@@ -55,7 +55,7 @@ func TestGlobMatches(t *testing.T) {
 
 		assert.NoError(t, err)
 		for _, path := range paths {
-			assert.True(t,glob.Match(path),"path %q should match %q", pat, path)
+			assert.True(t, glob.Match(path), "path %q should match %q", pat, path)
 		}
 	}
 }
@@ -67,7 +67,7 @@ func TestGlobNonMatches(t *testing.T) {
 
 		assert.NoError(t, err)
 		for _, path := range paths {
-			assert.False(t,glob.Match(path),"path %q should match %q", pat, path)
+			assert.False(t, glob.Match(path), "path %q should match %q", pat, path)
 		}
 	}
 }

@@ -6,9 +6,9 @@ import (
 )
 
 type FakeRouteRepository struct {
-	FindByHostHost       string
-	FindByHostErr        bool
-	FindByHostRoute      cf.Route
+	FindByHostHost  string
+	FindByHostErr   bool
+	FindByHostRoute cf.Route
 
 	FindByHostAndDomainHost     string
 	FindByHostAndDomainDomain   string
@@ -19,11 +19,11 @@ type FakeRouteRepository struct {
 	CreatedHost       string
 	CreatedDomainGuid string
 
-	CreateInSpaceHost string
-	CreateInSpaceDomainGuid string
-	CreateInSpaceSpaceGuid string
+	CreateInSpaceHost         string
+	CreateInSpaceDomainGuid   string
+	CreateInSpaceSpaceGuid    string
 	CreateInSpaceCreatedRoute cf.Route
-	CreateInSpaceErr bool
+	CreateInSpaceErr          bool
 
 	BoundRouteGuid string
 	BoundAppGuid   string
@@ -31,8 +31,8 @@ type FakeRouteRepository struct {
 	UnboundRouteGuid string
 	UnboundAppGuid   string
 
-	ListErr    bool
-	Routes []cf.Route
+	ListErr bool
+	Routes  []cf.Route
 
 	DeleteRouteGuid string
 }
@@ -48,16 +48,15 @@ func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []c
 		return
 	}
 
-
 	go func() {
 		routesCount := len(repo.Routes)
-		for i:= 0; i < routesCount; i += 2 {
+		for i := 0; i < routesCount; i += 2 {
 			select {
 			case <-stop:
 				break
 			default:
-				if routesCount - i > 1 {
-					routesChan <- repo.Routes[i:i+2]
+				if routesCount-i > 1 {
+					routesChan <- repo.Routes[i : i+2]
 				} else {
 					routesChan <- repo.Routes[i:]
 				}
@@ -93,7 +92,7 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	}
 
 	if repo.FindByHostAndDomainNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s.%s not found","Org",host, domain)
+		apiResponse = net.NewNotFoundApiResponse("%s %s.%s not found", "Org", host, domain)
 	}
 
 	route = repo.FindByHostAndDomainRoute

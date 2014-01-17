@@ -9,21 +9,21 @@ import (
 type FakeServiceRepo struct {
 	ServiceOfferings []cf.ServiceOffering
 
-	CreateServiceInstanceName string
+	CreateServiceInstanceName     string
 	CreateServiceInstancePlanGuid string
-	CreateServiceAlreadyExists bool
+	CreateServiceAlreadyExists    bool
 
-	FindInstanceByNameName string
+	FindInstanceByNameName            string
 	FindInstanceByNameServiceInstance cf.ServiceInstance
-	FindInstanceByNameErr bool
-	FindInstanceByNameNotFound bool
+	FindInstanceByNameErr             bool
+	FindInstanceByNameNotFound        bool
 
 	FindInstanceByNameMap generic.Map
 
 	DeleteServiceServiceInstance cf.ServiceInstance
 
 	RenameServiceServiceInstance cf.ServiceInstance
-	RenameServiceNewName string
+	RenameServiceNewName         string
 }
 
 func (repo *FakeServiceRepo) GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse) {
@@ -53,7 +53,7 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.Servic
 	}
 
 	if repo.FindInstanceByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Service instance", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service instance", name)
 	}
 
 	return
@@ -64,7 +64,7 @@ func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (apiResp
 	return
 }
 
-func (repo *FakeServiceRepo) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse){
+func (repo *FakeServiceRepo) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	repo.RenameServiceServiceInstance = instance
 	repo.RenameServiceNewName = newName
 	return

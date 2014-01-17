@@ -2,15 +2,15 @@ package commands
 
 import (
 	"cf/app"
+	"cf/commands"
 	"flag"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
-	"cf/commands"
 	testreq "testhelpers/requirements"
-	"fmt"
 )
 
-func NewContext(cmdName string, args []string) (*cli.Context) {
+func NewContext(cmdName string, args []string) *cli.Context {
 	targetCommand := findCommand(cmdName)
 
 	flagSet := new(flag.FlagSet)
@@ -50,7 +50,6 @@ func findCommand(cmdName string) (cmd cli.Command) {
 			return cmd
 		}
 	}
-	panic(fmt.Sprintf("command %s does not exist",cmdName))
+	panic(fmt.Sprintf("command %s does not exist", cmdName))
 	return
 }
-

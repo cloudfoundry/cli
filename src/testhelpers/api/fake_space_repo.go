@@ -10,24 +10,24 @@ type FakeSpaceRepository struct {
 
 	Spaces []cf.Space
 
-	FindByNameName string
-	FindByNameSpace cf.Space
-	FindByNameErr bool
+	FindByNameName     string
+	FindByNameSpace    cf.Space
+	FindByNameErr      bool
 	FindByNameNotFound bool
 
-	FindByNameInOrgName string
+	FindByNameInOrgName    string
 	FindByNameInOrgOrgGuid string
-	FindByNameInOrgSpace cf.Space
+	FindByNameInOrgSpace   cf.Space
 
 	SummarySpace cf.Space
 
-	CreateSpaceName string
+	CreateSpaceName    string
 	CreateSpaceOrgGuid string
-	CreateSpaceExists bool
-	CreateSpaceSpace cf.Space
+	CreateSpaceExists  bool
+	CreateSpaceSpace   cf.Space
 
 	RenameSpaceGuid string
-	RenameNewName string
+	RenameNewName   string
 
 	DeletedSpaceGuid string
 }
@@ -42,13 +42,13 @@ func (repo FakeSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []cf
 
 	go func() {
 		spacesCount := len(repo.Spaces)
-		for i:= 0; i < spacesCount; i += 2 {
+		for i := 0; i < spacesCount; i += 2 {
 			select {
 			case <-stop:
 				break
 			default:
-				if spacesCount - i > 1 {
-					spacesChan <- repo.Spaces[i:i+2]
+				if spacesCount-i > 1 {
+					spacesChan <- repo.Spaces[i : i+2]
 				} else {
 					spacesChan <- repo.Spaces[i:]
 				}
@@ -64,7 +64,6 @@ func (repo FakeSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []cf
 	return
 }
 
-
 func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	space = repo.FindByNameSpace
@@ -74,7 +73,7 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiRes
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found","Space", name)
+		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Space", name)
 	}
 
 	return

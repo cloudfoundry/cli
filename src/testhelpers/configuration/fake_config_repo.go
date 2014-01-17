@@ -1,8 +1,8 @@
 package configuration
 
 import (
-	"cf/configuration"
 	"cf"
+	"cf/configuration"
 )
 
 var TestConfigurationSingleton *configuration.Configuration
@@ -13,7 +13,7 @@ type FakeConfigRepository struct {
 
 func (repo FakeConfigRepository) SetOrganization(org cf.OrganizationFields) (err error) {
 	config, err := repo.Get()
-	if err != nil{
+	if err != nil {
 		return
 	}
 

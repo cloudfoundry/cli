@@ -1,41 +1,41 @@
 package api
 
 import (
-	"cf/net"
 	"cf"
+	"cf/net"
 )
 
 type FakeUserRepository struct {
-	FindByUsernameUsername string
+	FindByUsernameUsername   string
 	FindByUsernameUserFields cf.UserFields
-	FindByUsernameNotFound bool
+	FindByUsernameNotFound   bool
 
 	ListUsersOrganizationGuid string
-	ListUsersSpaceGuid string
-	ListUsersByRole map[string][]cf.UserFields
+	ListUsersSpaceGuid        string
+	ListUsersByRole           map[string][]cf.UserFields
 
 	CreateUserUsername string
 	CreateUserPassword string
-	CreateUserExists bool
+	CreateUserExists   bool
 
 	DeleteUserGuid string
 
-	SetOrgRoleUserGuid string
+	SetOrgRoleUserGuid         string
 	SetOrgRoleOrganizationGuid string
-	SetOrgRoleRole string
+	SetOrgRoleRole             string
 
-	UnsetOrgRoleUserGuid string
+	UnsetOrgRoleUserGuid         string
 	UnsetOrgRoleOrganizationGuid string
-	UnsetOrgRoleRole string
+	UnsetOrgRoleRole             string
 
-	SetSpaceRoleUserGuid string
-	SetSpaceRoleOrgGuid string
+	SetSpaceRoleUserGuid  string
+	SetSpaceRoleOrgGuid   string
 	SetSpaceRoleSpaceGuid string
-	SetSpaceRoleRole string
+	SetSpaceRoleRole      string
 
-	UnsetSpaceRoleUserGuid string
+	UnsetSpaceRoleUserGuid  string
 	UnsetSpaceRoleSpaceGuid string
-	UnsetSpaceRoleRole string
+	UnsetSpaceRoleRole      string
 }
 
 func (repo *FakeUserRepository) FindByUsername(username string) (user cf.UserFields, apiResponse net.ApiResponse) {
@@ -51,27 +51,27 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user cf.UserFie
 
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
 	repo.ListUsersOrganizationGuid = orgGuid
-	return repo.listUsersForRole(roleName,stop)
+	return repo.listUsersForRole(roleName, stop)
 }
 
-func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse){
+func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
 	repo.ListUsersSpaceGuid = spaceGuid
-	return repo.listUsersForRole(roleName,stop)
+	return repo.listUsersForRole(roleName, stop)
 }
 
-func (repo *FakeUserRepository) listUsersForRole(roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse){
+func (repo *FakeUserRepository) listUsersForRole(roleName string, stop chan bool) (usersChan chan []cf.UserFields, statusChan chan net.ApiResponse) {
 	usersChan = make(chan []cf.UserFields, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
 		usersCount := len(repo.ListUsersByRole[roleName])
-		for i:= 0; i < usersCount; i += 2 {
+		for i := 0; i < usersCount; i += 2 {
 			select {
 			case <-stop:
 				break
 			default:
-				if usersCount - i > 1 {
-					usersChan <- repo.ListUsersByRole[roleName][i:i+2]
+				if usersCount-i > 1 {
+					usersChan <- repo.ListUsersByRole[roleName][i : i+2]
 				} else {
 					usersChan <- repo.ListUsersByRole[roleName][i:]
 				}

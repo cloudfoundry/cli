@@ -3,17 +3,15 @@ package api
 import "cf/net"
 
 type FakePasswordRepo struct {
-	Score string
+	Score          string
 	ScoredPassword string
 
 	UpdateUnauthorized bool
-	UpdateNewPassword string
-	UpdateOldPassword string
+	UpdateNewPassword  string
+	UpdateOldPassword  string
 }
 
-
-
-func (repo *FakePasswordRepo) GetScore(password string) (score string, apiResponse net.ApiResponse){
+func (repo *FakePasswordRepo) GetScore(password string) (score string, apiResponse net.ApiResponse) {
 	repo.ScoredPassword = password
 	score = repo.Score
 	return
@@ -29,4 +27,3 @@ func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiRespons
 
 	return
 }
-
