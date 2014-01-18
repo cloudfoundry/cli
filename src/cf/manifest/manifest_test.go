@@ -69,3 +69,19 @@ func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "env var 'bar' should not be null")
 }
+
+func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
+	_, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{
+				"env": map[string]interface{}{
+					"bar": "many-$(foo)-are-cool",
+				},
+				"instances": nil,
+			},
+		},
+	}))
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Properties are no longer supported. Found property '$(foo)'")
+}
