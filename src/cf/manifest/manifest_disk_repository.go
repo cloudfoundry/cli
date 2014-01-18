@@ -25,10 +25,6 @@ func NewManifestDiskRepository() (repo ManifestRepository) {
 func (repo ManifestDiskRepository) ReadManifest(path string) (m *Manifest, errs ManifestErrors) {
 	m = NewEmptyManifest()
 
-	if os.Getenv("CF_MANIFEST") != "true" {
-		return
-	}
-
 	mapp, err := repo.readAllYAMLFiles(path)
 	if err != nil {
 		errs = append(errs, err)
