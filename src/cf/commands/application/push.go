@@ -19,7 +19,6 @@ import (
 
 type Push struct {
 	ui             terminal.UI
-	appSet         cf.AppSet
 	config         *configuration.Configuration
 	manifestRepo   manifest.ManifestRepository
 	starter        ApplicationStarter
@@ -63,9 +62,9 @@ func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd *Push) Run(c *cli.Context) {
-	cmd.findAndValidateAppsToPush(c)
+	appSet := cmd.findAndValidateAppsToPush(c)
 
-	for _, appParams := range cmd.appSet {
+	for _, appParams := range appSet {
 		cmd.fetchStackGuid(appParams)
 
 		app, didCreate := cmd.app(appParams)
@@ -337,7 +336,7 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 	return
 }
 
-func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
+func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 	basePath, manifestFilename := cmd.manifestPathFromContext(c)
 
 	m := cmd.instantiateManifest(c, filepath.Join(basePath, manifestFilename))
@@ -350,11 +349,11 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) {
 
 	appParams.Set("path", basePath)
 
-	cmd.appSet, err = createAppSetFromContextAndManifest(appParams, basePath, m)
+	appSet, err = createAppSetFromContextAndManifest(appParams, basePath, m)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
-		return
 	}
+	return
 }
 
 func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFilename string) {
