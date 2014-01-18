@@ -1,5 +1,4 @@
 #!/bin/bash
 
 set -e
-export CF_MANIFEST=true
 $(dirname $0)/go run -race $(dirname $0)/../src/main/cf.go $*

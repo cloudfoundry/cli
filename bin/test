@@ -1,7 +1,5 @@
 #!/bin/bash
 
-export CF_MANIFEST=true
-
 set -e
 
 function printStatus {

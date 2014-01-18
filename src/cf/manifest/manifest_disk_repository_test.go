@@ -10,14 +10,7 @@ import (
 	"testing"
 )
 
-func assertFeatureFlag(t *testing.T) {
-	if os.Getenv("CF_MANIFEST") != "true" {
-		t.Fatal("CF_MANIFEST must be set to 'true' to run manifest tests")
-	}
-}
-
 func TestReadManifestWithGoodPath(t *testing.T) {
-	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 	manifest, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
 
@@ -27,7 +20,6 @@ func TestReadManifestWithGoodPath(t *testing.T) {
 }
 
 func TestReadManifestWithBadPath(t *testing.T) {
-	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 	_, errs := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
 
@@ -35,7 +27,6 @@ func TestReadManifestWithBadPath(t *testing.T) {
 }
 
 func TestManifestPathsDefaultsToCurrentDirectory(t *testing.T) {
-	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 
 	cwd, err := os.Getwd()
@@ -49,7 +40,6 @@ func TestManifestPathsDefaultsToCurrentDirectory(t *testing.T) {
 }
 
 func TestAppAndManifestPathsIgnoreAppPathWhenManifestPathIsSpecified(t *testing.T) {
-	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 
 	cwd, err := os.Getwd()
@@ -64,7 +54,6 @@ func TestAppAndManifestPathsIgnoreAppPathWhenManifestPathIsSpecified(t *testing.
 }
 
 func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
-	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 
 	cwd, err := os.Getwd()
@@ -78,7 +67,6 @@ func TestAppAndManifestPathsManifestFileIsDroppedFromAppPath(t *testing.T) {
 }
 
 func TestManifestWithInheritance(t *testing.T) {
-	assertFeatureFlag(t)
 	repo := NewManifestDiskRepository()
 	m, err := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
 	assert.NoError(t, err)
@@ -100,8 +88,6 @@ func TestManifestWithInheritance(t *testing.T) {
 }
 
 func TestPushingWithAbsoluteAppPathFromManifestFile(t *testing.T) {
-	assertFeatureFlag(t)
-
 	if runtime.GOOS == "windows" {
 		pushingWithAbsoluteWindowsPath(t)
 	} else {
