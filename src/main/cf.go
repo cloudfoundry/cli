@@ -12,7 +12,6 @@ import (
 	"cf/terminal"
 	"fileutils"
 	"fmt"
-	"github.com/codegangsta/cli"
 	"os"
 )
 
@@ -42,43 +41,6 @@ func main() {
 		return
 	}
 	app.Run(os.Args)
-}
-
-func init() {
-	cli.AppHelpTemplate = `NAME:
-   {{.Name}} - {{.Usage}}
-
-USAGE:
-   [environment variables] {{.Name}} [global options] command [arguments...] [command options]
-
-VERSION:
-   {{.Version}}
-
-COMMANDS:
-   {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Description}}
-   {{end}}
-GLOBAL OPTIONS:
-   {{range .Flags}}{{.}}
-   {{end}}
-ENVIRONMENT VARIABLES:
-   CF_TRACE=true - will output HTTP requests and responses during command
-   HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
-`
-
-	cli.CommandHelpTemplate = `NAME:
-   {{.Name}} - {{.Description}}
-{{with .ShortName}}
-ALIAS:
-   {{.}}
-{{end}}
-USAGE:
-   {{.Usage}}{{with .Flags}}
-
-OPTIONS:
-   {{range .}}{{.}}
-   {{end}}{{else}}
-{{end}}`
-
 }
 
 func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationRepository) (config *configuration.Configuration) {
