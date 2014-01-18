@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"generic"
+	"regexp"
 	"strconv"
 )
 
@@ -34,8 +35,43 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 func NewManifest(data generic.Map) (m *Manifest, errs ManifestErrors) {
+	errs = walkManifestLookingForProperties(data)
+	if !errs.Empty() {
+		return
+	}
+
 	m = &Manifest{}
 	m.Applications, errs = mapToAppSet(data)
+	return
+}
+
+func walkManifestLookingForProperties(data generic.Map) (errs ManifestErrors) {
+	generic.Each(data, func(key, value interface{}) {
+		errs = append(errs, walkMapLookingForProperties(value)...)
+	})
+
+	return
+}
+
+func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
+	propertyRegex := regexp.MustCompile(`\$\(\w+\)`)
+	switch value := value.(type) {
+	case string:
+		match := propertyRegex.FindString(value)
+		if match != "" {
+			err := errors.New(fmt.Sprintf("Properties are no longer supported. Found property '%s' in manifest", match))
+			errs = append(errs, err)
+		}
+	case []interface{}:
+		for _, item := range value {
+			errs = append(errs, walkMapLookingForProperties(item)...)
+		}
+	case map[string]interface{}:
+		for _, item := range value {
+			errs = append(errs, walkMapLookingForProperties(item)...)
+		}
+	}
+
 	return
 }
 
