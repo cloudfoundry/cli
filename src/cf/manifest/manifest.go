@@ -255,25 +255,3 @@ func validateEnvVars(input interface{}) (errs ManifestErrors) {
 	})
 	return
 }
-
-func mergeSets(set1, set2 []string) (result []string) {
-	for _, aString := range set1 {
-		result = append(result, aString)
-	}
-
-	for _, aString := range set2 {
-		if !stringInSlice(aString, result) {
-			result = append(result, aString)
-		}
-	}
-	return
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
