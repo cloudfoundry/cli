@@ -60,9 +60,7 @@ If you want to run the benchmark tests
 Releasing
 =========
 
-run ```bin/build-all```
-
-This will create tgz files and installers in the release folder.
+Upon a successful test run, binaries built for each supported architecture and OS on CI are uploaded and bundled with the latest installers.
 
 Contributing
 ============
