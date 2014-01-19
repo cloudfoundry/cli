@@ -1,12 +1,12 @@
-Cloud Foundry CLI written in Go [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
+Butt Foundry CLI written in Go [![Build Status](https://travis-ci.org/buttfoundry/cli.png?branch=master)](https://travis-ci.org/buttfoundry/cli)
 ===========
 
 Background
 ===========
 
-Project to rewrite the Cloud Foundry CLI tool using Go. This project should currently be considered alpha quality
+Project to rewrite my Butt Foundry CLI tool using Go. This project should currently be considered alpha quality
 software and should not be used in production environments. If you need something more stable, please check
-out the [RubyGem](https://github.com/cloudfoundry/cf).
+out the [RubyGem](https://github.com/buttfoundry/cf).
 
 For a view on the current status of the project, check [cftracker](http://cftracker.cfapps.io/cfcli).
 
@@ -60,9 +60,7 @@ If you want to run the benchmark tests
 Releasing
 =========
 
-run ```bin/build-all```
-
-This will create tgz files and installers in the release folder.
+Upon a successful test run, binaries built for each supported architecture and OS on CI are uploaded and bundled with the latest installers.
 
 Contributing
 ============
@@ -84,7 +82,7 @@ Repositories communicate with the api endpoints through a Gateway (see ```src/cf
 
 Repositories return a Domain Object and an ApiResponse object.
 
-Domain objects are data structures related to Cloud Foundry (see ```src/cf/domain```).
+Domain objects are data structures related to Butt Foundry (see ```src/cf/domain```).
 
 ApiResponse objects convey a variety of important error conditions (see ```src/cf/net/api_status```).
 
@@ -117,7 +115,7 @@ In addition, command file and methods naming follows a CRUD like convention. For
 Creating Repositories
 ---------------------
 
-Although not ideal, we use the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid confusion with Service domain objects (i.e. creating Services and Service Instances within Cloud Foundry).
+Although not ideal, we use the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid confusion with Service domain objects (i.e. creating Services and Service Instances within Butt Foundry).
 
-By convention, Repository methods return a Domain object and an ApiResponse. Domain objects are used in both Commands and Repositories to model Cloud Foundry data.  ApiResponse objects are used to communicate application errors, runtime errors, whether the resource was found, etc.
+By convention, Repository methods return a Domain object and an ApiResponse. Domain objects are used in both Commands and Repositories to model Butt Foundry data.  ApiResponse objects are used to communicate application errors, runtime errors, whether the resource was found, etc.
 This convention provides a consistent method signature across repositories.
