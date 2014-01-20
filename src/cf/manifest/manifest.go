@@ -54,7 +54,7 @@ func walkManifestLookingForProperties(data generic.Map) (errs ManifestErrors) {
 }
 
 func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
-	propertyRegex := regexp.MustCompile(`\$\(\w+\)`)
+	propertyRegex := regexp.MustCompile(`\${\w+}`)
 	switch value := value.(type) {
 	case string:
 		match := propertyRegex.FindString(value)
