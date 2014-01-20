@@ -454,7 +454,7 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	deps.manifestRepo.ManifestDir = "returned/path/"
 	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
 
-	ui := callPush(t, []string{
+	_ = callPush(t, []string{
 		"-f", "user/supplied/path/different-manifest.yml",
 		"-p", "foo/bar/baz",
 	}, deps)
@@ -462,10 +462,6 @@ func TestPushingWithRelativeManifestPath(t *testing.T) {
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "user/supplied/path/different-manifest.yml")
 	assert.Equal(t, deps.manifestRepo.ReadManifestPath, filepath.Clean("returned/path/different-manifest.yml"))
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("returned/path", "../../fixtures/example-app"))
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"-p is ignored when using a manifest"},
-	})
 }
 
 func TestPushingWithBadManifestPath(t *testing.T) {
