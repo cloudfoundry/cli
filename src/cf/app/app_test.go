@@ -47,6 +47,10 @@ func (runner *FakeRunner) RunCmdByName(cmdName string, c *cli.Context) (err erro
 
 func TestCommands(t *testing.T) {
 	for _, cmdName := range availableCmdNames() {
+		if cmdName == "panic" {
+			continue
+		}
+
 		ui := &testterm.FakeUI{}
 		config := &configuration.Configuration{}
 		configRepo := testconfig.FakeConfigRepository{}

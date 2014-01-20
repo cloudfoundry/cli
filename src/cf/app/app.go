@@ -753,7 +753,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-buildpack",
 			Description: "Update a buildpack",
-			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-i POSITION] [--enable|--disable]", cf.Name()),
+			Usage:       fmt.Sprintf("%s update-buildpack BUILDPACK [-p PATH] [-i POSITION] [-enable|-disable]", cf.Name()),
 			Flags: []cli.Flag{
 				NewIntFlag("i", "Buildpack position among other buildpacks"),
 				NewStringFlag("p", "Path to directory or zip file"),
@@ -794,6 +794,15 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("update-user-provided-service", c)
+			},
+		},
+		{
+			Name:        "panic",
+			ShortName:   "panic",
+			Description: "Causes a panic",
+			Usage:       "panic",
+			Action: func(c *cli.Context) {
+				panic("Hello Scott. Have a nice day.")
 			},
 		},
 	}
