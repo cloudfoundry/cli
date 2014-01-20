@@ -75,7 +75,7 @@ func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
 		"applications": []interface{}{
 			map[string]interface{}{
 				"env": map[string]interface{}{
-					"bar": "many-$(foo)-are-cool",
+					"bar": "many-${foo}-are-cool",
 				},
 				"instances": nil,
 			},
@@ -83,5 +83,5 @@ func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
 	}))
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Properties are not supported. Found property '$(foo)'")
+	assert.Contains(t, err.Error(), "Properties are not supported. Found property '${foo}'")
 }
