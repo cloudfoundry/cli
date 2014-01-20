@@ -194,10 +194,24 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "curl",
+			Description: "Execute a raw request",
+			Usage:       fmt.Sprintf("%s curl PATH [-X METHOD] [-H HEADERS] [-d DATA] [-i]", cf.Name()),
+			Flags: []cli.Flag{
+				cli.StringFlag{Name: "X", Value: "GET", Usage: "HTTP method (GET,POST,PUT,DELETE,etc)"},
+				cli.StringSliceFlag{Name: "H", Value: &cli.StringSlice{}, Usage: "Custom headers to include in the request"},
+				NewStringFlag("d", "HTTP data to include in the request body"),
+				cli.BoolFlag{Name: "i", Usage: "Include response headers in the output"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("curl", c)
+			},
+		},
+		{
 			Name:        "delete",
 			ShortName:   "d",
 			Description: "Delete an app",
-			Usage:       fmt.Sprintf("%s delete -f APP", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete APP [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
