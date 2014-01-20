@@ -359,10 +359,6 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFilename string) {
 	var err error
 
-	if c.String("p") != "" && c.String("f") != "" {
-		cmd.ui.Warn("-p is ignored when using a manifest. Please specify the path in the manifest.")
-	}
-
 	if c.String("f") != "" {
 		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("f"))
 	} else {
