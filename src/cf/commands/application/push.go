@@ -337,13 +337,8 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 }
 
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
-	var m *manifest.Manifest
-	if c.String("f") != "" {
-		baseManifestPath, manifestFilename := cmd.manifestPathFromContext(c)
-		m = cmd.instantiateManifest(c, filepath.Join(baseManifestPath, manifestFilename))
-	} else {
-		m = manifest.NewEmptyManifest()
-	}
+	baseManifestPath, manifestFilename := cmd.manifestPathFromContext(c)
+	m := cmd.instantiateManifest(c, filepath.Join(baseManifestPath, manifestFilename))
 
 	appParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
@@ -384,10 +379,7 @@ func (cmd *Push) appPathFromContext(c *cli.Context) (appPath string) {
 
 func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFilename string) {
 	var err error
-
-	if c.String("f") != "" {
-		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("f"))
-	}
+	basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("f"))
 
 	if err != nil {
 		cmd.ui.Failed("%s", err)

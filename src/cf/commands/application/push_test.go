@@ -290,7 +290,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 
 	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 
-	ui := callPush(t, []string{"-f", "path/to/my/manifest.yml"}, deps)
+	ui := callPush(t, []string{}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating route", "manifest-host.manifest-example.com"},
 		{"OK"},
@@ -328,7 +328,7 @@ func TestPushingAppManifestWithNulls(t *testing.T) {
 		errors.New("disk_quota should not be null"),
 	}
 
-	ui := callPush(t, []string{"-f", "path/to/my/manifest.yml"}, deps)
+	ui := callPush(t, []string{}, deps)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
@@ -343,7 +343,7 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 	deps.appRepo.ReadNotFound = true
 	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
-	ui := callPush(t, []string{"-f", "path/to/my/manifest.yml"}, deps)
+	ui := callPush(t, []string{}, deps)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating", "app1"},
@@ -368,7 +368,7 @@ func TestPushingManyAppsDoesNotAllowNameFlag(t *testing.T) {
 	deps.appRepo.ReadNotFound = true
 	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
-	ui := callPush(t, []string{"-f", "/path/to/my/manifest.yml", "app-name"}, deps)
+	ui := callPush(t, []string{"app-name"}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"APP_NAME", "not allowed", "multiple apps", "manifest"},
@@ -388,7 +388,7 @@ func TestPushingWithBindingMergedServices(t *testing.T) {
 
 	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
-	ui := callPush(t, []string{"-f", "path/to/my/manifest.yml"}, deps)
+	ui := callPush(t, []string{}, deps)
 	assert.Equal(t, len(deps.binder.AppsToBind), 4)
 	assert.Equal(t, deps.binder.AppsToBind[0].Name, "app1")
 	assert.Equal(t, deps.binder.AppsToBind[1].Name, "app1")
@@ -422,7 +422,7 @@ func TestPushWithServicesThatAreNotFound(t *testing.T) {
 	deps.serviceRepo.FindInstanceByNameErr = true
 	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
-	ui := callPush(t, []string{"-f", "manifest.yml"}, deps)
+	ui := callPush(t, []string{}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"Could not find service", "app1-service", "app1"},
@@ -579,10 +579,12 @@ func TestPushingWithManifestInAppDirectory(t *testing.T) {
 	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
 
 	ui := callPush(t, []string{"-p", "some/relative/path"}, deps)
-	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{{"Using manifest file"}})
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Using manifest file", "manifest.yml"},
+	})
 
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "")
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "")
+	assert.Equal(t, deps.manifestRepo.ReadManifestPath, "manifest.yml")
 }
 
 func TestPushingWithNoManifestFlag(t *testing.T) {
