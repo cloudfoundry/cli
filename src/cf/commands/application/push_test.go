@@ -617,13 +617,9 @@ func TestPushingAppWithNoRoute(t *testing.T) {
 	domain := cf.Domain{}
 	domain.Name = "bar.cf-app.com"
 	domain.Guid = "bar-domain-guid"
-	stack := cf.Stack{}
-	stack.Name = "customLinux"
-	stack.Guid = "custom-linux-guid"
 
 	deps.domainRepo.FindByNameDomain = domain
 	deps.routeRepo.FindByHostErr = true
-	deps.stackRepo.FindByNameStack = stack
 	deps.appRepo.ReadNotFound = true
 
 	callPush(t, []string{
@@ -643,13 +639,8 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 	domain.Guid = "bar-domain-guid"
 	domain.Shared = true
 
-	stack := cf.Stack{}
-	stack.Name = "customLinux"
-	stack.Guid = "custom-linux-guid"
-
 	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain}
 	deps.routeRepo.FindByHostAndDomainErr = true
-	deps.stackRepo.FindByNameStack = stack
 	deps.appRepo.ReadNotFound = true
 
 	callPush(t, []string{
