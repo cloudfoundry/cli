@@ -444,6 +444,21 @@ func TestPushingAppWithPath(t *testing.T) {
 	assert.Equal(t, deps.appBitsRepo.UploadedDir, absPath)
 }
 
+func TestPushingAppWithPathToZipFile(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	absPath, err := filepath.Abs("../../../fixtures/example-app.jar")
+	assert.NoError(t, err)
+
+	callPush(t, []string{
+		"-p", absPath,
+		"app-with-path",
+	}, deps)
+
+	assert.Equal(t, deps.appBitsRepo.UploadedDir, absPath)
+}
+
 func TestPushingWithDefaultAppPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
