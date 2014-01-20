@@ -8,6 +8,7 @@ import (
 
 type RepositoryLocator struct {
 	authRepo                        AuthenticationRepository
+	curlRepo                        CurlRepository
 	endpointRepo                    RemoteEndpointRepository
 	organizationRepo                CloudControllerOrganizationRepository
 	quotaRepo                       CloudControllerQuotaRepository
@@ -52,6 +53,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
+	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, configRepo)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.endpointRepo)
@@ -75,6 +77,10 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 
 func (locator RepositoryLocator) GetAuthenticationRepository() AuthenticationRepository {
 	return locator.authRepo
+}
+
+func (locator RepositoryLocator) GetCurlRepository() CurlRepository {
+	return locator.curlRepo
 }
 
 func (locator RepositoryLocator) GetEndpointRepository() EndpointRepository {

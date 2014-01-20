@@ -158,6 +158,10 @@ func (gateway Gateway) PerformRequest(request *Request) (apiResponse ApiResponse
 	return
 }
 
+func (gateway Gateway) PerformRequestForResponse(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
+	return gateway.doRequestHandlingAuth(request)
+}
+
 func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, apiResponse ApiResponse) {
 	rawResponse, apiResponse := gateway.doRequestHandlingAuth(request)
 	if apiResponse.IsNotSuccessful() {
