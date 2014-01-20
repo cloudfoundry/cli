@@ -36,12 +36,12 @@ type AsyncResponse struct {
 	Metadata AsyncMetadata
 }
 
-type errorResponse struct {
+type ErrorResponse struct {
 	Code        string
 	Description string
 }
 
-type errorHandler func(*http.Response) errorResponse
+type ErrorHandler func(*http.Response) ErrorResponse
 
 type tokenRefresher interface {
 	RefreshAuthToken() (string, ApiResponse)
@@ -54,12 +54,12 @@ type Request struct {
 
 type Gateway struct {
 	authenticator   tokenRefresher
-	errHandler      errorHandler
+	errHandler      ErrorHandler
 	PollingEnabled  bool
 	PollingThrottle time.Duration
 }
 
-func newGateway(errHandler errorHandler) (gateway Gateway) {
+func newGateway(errHandler ErrorHandler) (gateway Gateway) {
 	gateway.errHandler = errHandler
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	return
