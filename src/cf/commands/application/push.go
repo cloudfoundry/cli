@@ -337,9 +337,13 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 }
 
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
-	basePath, manifestFilename := cmd.manifestPathFromContext(c)
-
-	m := cmd.instantiateManifest(c, filepath.Join(basePath, manifestFilename))
+	var m *manifest.Manifest
+	if c.String("f") != "" {
+		baseManifestPath, manifestFilename := cmd.manifestPathFromContext(c)
+		m = cmd.instantiateManifest(c, filepath.Join(baseManifestPath, manifestFilename))
+	} else {
+		m = manifest.NewEmptyManifest()
+	}
 
 	appParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
@@ -347,12 +351,45 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 		return
 	}
 
-	appParams.Set("path", basePath)
+	baseAppPath := cmd.appPathFromContext(c)
+	appParams.Set("path", baseAppPath)
 
-	appSet, err = createAppSetFromContextAndManifest(appParams, basePath, m)
+	appSet, err = createAppSetFromContextAndManifest(appParams, baseAppPath, m)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 	}
+	return
+}
+
+func (cmd *Push) appPathFromContext(c *cli.Context) (appPath string) {
+	if c.String("p") != "" {
+		path, err := filepath.Abs(c.String("p"))
+		if err != nil {
+			cmd.ui.Failed("Error finding app path: %s", err)
+			return
+		}
+
+		fileInfo, err := os.Stat(path)
+		if err != nil {
+			cmd.ui.Failed("Error finding app path: %s", err)
+			return
+		}
+
+		if fileInfo.IsDir() {
+			appPath = path
+		} else {
+			appPath = filepath.Dir(path)
+		}
+	} else {
+		cwd, err := os.Getwd()
+		if err != nil {
+			cmd.ui.Failed("Error reading current working directory: %s", err)
+			return
+		}
+
+		appPath = cwd
+	}
+
 	return
 }
 
@@ -361,10 +398,8 @@ func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFile
 
 	if c.String("f") != "" {
 		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("f"))
-	} else {
-		basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("p"))
-
 	}
+
 	if err != nil {
 		cmd.ui.Failed("%s", err)
 		return
