@@ -83,5 +83,5 @@ func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
 	}))
 
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "Properties are no longer supported. Found property '$(foo)'")
+	assert.Contains(t, err.Error(), "Properties are not supported. Found property '$(foo)'")
 }
