@@ -195,11 +195,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "curl",
-			Description: "Execute a raw request",
-			Usage:       fmt.Sprintf("%s curl PATH [-X METHOD] [-H HEADERS] [-d DATA] [-i]", cf.Name()),
+			Description: "Executes a raw request, content-type set to application/json by default",
+			Usage:       fmt.Sprintf("%s curl PATH [-X METHOD] [-H HEADER] [-d DATA] [-i]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.StringFlag{Name: "X", Value: "GET", Usage: "HTTP method (GET,POST,PUT,DELETE,etc)"},
-				cli.StringSliceFlag{Name: "H", Value: &cli.StringSlice{}, Usage: "Custom headers to include in the request"},
+				NewStringSliceFlag("H", "Custom headers to include in the request, flag can be specified multiple times"),
 				NewStringFlag("d", "HTTP data to include in the request body"),
 				cli.BoolFlag{Name: "i", Usage: "Include response headers in the output"},
 			},
