@@ -363,22 +363,11 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 
 func (cmd *Push) appPathFromContext(c *cli.Context) (appPath string) {
 	if c.String("p") != "" {
-		path, err := filepath.Abs(c.String("p"))
+		var err error
+		appPath, err = filepath.Abs(c.String("p"))
 		if err != nil {
 			cmd.ui.Failed("Error finding app path: %s", err)
 			return
-		}
-
-		fileInfo, err := os.Stat(path)
-		if err != nil {
-			cmd.ui.Failed("Error finding app path: %s", err)
-			return
-		}
-
-		if fileInfo.IsDir() {
-			appPath = path
-		} else {
-			appPath = filepath.Dir(path)
 		}
 	} else {
 		cwd, err := os.Getwd()
