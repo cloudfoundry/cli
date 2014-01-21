@@ -69,10 +69,10 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		app, didCreate := cmd.app(appParams)
 		if !didCreate {
-			app = cmd.updateApp(app, appParams)
+			cmd.updateApp(&app, appParams)
 		}
 
-		cmd.bindAppToRoute(app, appParams, didCreate, c)
+		cmd.bindAppToRoute(app, appParams, c)
 
 		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
@@ -132,7 +132,7 @@ func (cmd *Push) fetchStackGuid(appParams cf.AppParams) {
 	appParams.Set("stack_guid", stack.Guid)
 }
 
-func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCreateApp bool, c *cli.Context) {
+func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.Context) {
 	if c.Bool("no-route") {
 		return
 	}
@@ -144,11 +144,6 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCrea
 
 	routeFlagsPresent := c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
 	if len(app.Routes) > 0 && !routeFlagsPresent {
-		return
-	}
-
-	if len(app.Routes) == 0 && !didCreateApp && !routeFlagsPresent {
-		cmd.ui.Say("App %s currently exists as a worker, skipping route creation", terminal.EntityNameColor(app.Name))
 		return
 	}
 
@@ -321,7 +316,7 @@ func (cmd *Push) createApp(appParams cf.AppParams) (app cf.Application, apiRespo
 	return
 }
 
-func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedApp cf.Application) {
+func (cmd *Push) updateApp(app *cf.Application, appParams cf.AppParams) {
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -329,7 +324,8 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, appParams)
+	var apiResponse net.ApiResponse
+	*app, apiResponse = cmd.appRepo.Update(app.Guid, appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
