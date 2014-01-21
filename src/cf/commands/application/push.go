@@ -147,7 +147,7 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCrea
 		return
 	}
 
-	if len(app.Routes) == 0 && didCreateApp == false && !routeFlagsPresent {
+	if len(app.Routes) == 0 && !didCreateApp && !routeFlagsPresent {
 		cmd.ui.Say("App %s currently exists as a worker, skipping route creation", terminal.EntityNameColor(app.Name))
 		return
 	}
