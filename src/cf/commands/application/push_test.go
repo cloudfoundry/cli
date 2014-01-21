@@ -110,29 +110,23 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	sharedDomain.Name = "foo.cf-app.com"
 	sharedDomain.Shared = true
 	sharedDomain.Guid = "foo-domain-guid"
-	appRepo := deps.appRepo
-	domainRepo := deps.domainRepo
-	routeRepo := deps.routeRepo
-	appBitsRepo := deps.appBitsRepo
-	stopper := deps.stopper
-	starter := deps.starter
 
-	domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain, sharedDomain}
-	routeRepo.FindByHostAndDomainErr = true
+	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain, sharedDomain}
+	deps.routeRepo.FindByHostAndDomainErr = true
 
-	appRepo.ReadNotFound = true
+	deps.appRepo.ReadNotFound = true
 
 	ui := callPush(t, []string{"-t", "111", "my-new-app"}, deps)
-	assert.Equal(t, appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
-	assert.Equal(t, appRepo.CreatedAppParams().Get("space_guid").(string), "my-space-guid")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("name"), "my-new-app")
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("space_guid"), "my-space-guid")
 
-	assert.Equal(t, routeRepo.FindByHostAndDomainHost, "my-new-app")
-	assert.Equal(t, routeRepo.CreatedHost, "my-new-app")
-	assert.Equal(t, routeRepo.CreatedDomainGuid, "foo-domain-guid")
-	assert.Equal(t, routeRepo.BoundAppGuid, "my-new-app-guid")
-	assert.Equal(t, routeRepo.BoundRouteGuid, "my-new-app-route-guid")
+	assert.Equal(t, deps.routeRepo.FindByHostAndDomainHost, "my-new-app")
+	assert.Equal(t, deps.routeRepo.CreatedHost, "my-new-app")
+	assert.Equal(t, deps.routeRepo.CreatedDomainGuid, "foo-domain-guid")
+	assert.Equal(t, deps.routeRepo.BoundAppGuid, "my-new-app-guid")
+	assert.Equal(t, deps.routeRepo.BoundRouteGuid, "my-new-app-route-guid")
 
-	assert.Equal(t, appBitsRepo.UploadedAppGuid, "my-new-app-guid")
+	assert.Equal(t, deps.appBitsRepo.UploadedAppGuid, "my-new-app-guid")
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating app", "my-new-app", "my-org", "my-space"},
@@ -145,10 +139,10 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 		{"OK"},
 	})
 
-	assert.Equal(t, stopper.AppToStop.Guid, "")
-	assert.Equal(t, starter.AppToStart.Guid, "my-new-app-guid")
-	assert.Equal(t, starter.AppToStart.Name, "my-new-app")
-	assert.Equal(t, starter.Timeout, 111)
+	assert.Equal(t, deps.stopper.AppToStop.Guid, "")
+	assert.Equal(t, deps.starter.AppToStart.Guid, "my-new-app-guid")
+	assert.Equal(t, deps.starter.AppToStart.Name, "my-new-app")
+	assert.Equal(t, deps.starter.Timeout, 111)
 }
 
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
@@ -528,7 +522,12 @@ func TestPushingWithDefaultManifestNotFound(t *testing.T) {
 	deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{syscall.ENOENT}
 
 	ui := callPush(t, []string{"--no-route", "app-name"}, deps)
-
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating app", "app-name"},
+		{"OK"},
+		{"Uploading", "app-name"},
+		{"OK"},
+	})
 	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 	})
@@ -957,25 +956,37 @@ func TestPushingAppWhenItAlreadyExistsAndNoHostFlagIsPresent(t *testing.T) {
 	assert.Equal(t, deps.routeRepo.CreatedDomainGuid, "domain-guid")
 }
 
-func TestPushingAppWhenItAlreadyExistsWithoutARouteAndARouteIsNotProvided(t *testing.T) {
+func TestPushingAppWhenItAlreadyExistsWithoutARouteCreatesADefaultDomain(t *testing.T) {
 	deps := getPushDependencies()
-	existingApp := cf.Application{}
-	existingApp.Name = "existing-app"
-	existingApp.Guid = "existing-app-guid"
-	deps.appRepo.ReadApp = existingApp
 
-	ui := callPush(t, []string{"existing-app"}, deps)
+	sharedDomain := cf.Domain{}
+	sharedDomain.Name = "foo.cf-app.com"
+	sharedDomain.Shared = true
+	sharedDomain.Guid = "foo-domain-guid"
 
+	deps.routeRepo.FindByHostAndDomainErr = true
+	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{sharedDomain}
+	deps.appRepo.ReadApp = maker.NewApp(maker.Overrides{"name": "existing-app", "guid": "existing-app-guid"})
+	deps.appRepo.UpdateAppResult = deps.appRepo.ReadApp
+
+	ui := callPush(t, []string{"-t", "111", "existing-app"}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		testassert.Line{"skipping route creation"},
-		testassert.Line{"Uploading"},
-		testassert.Line{"OK"},
+		{"Creating route", "existing-app.foo.cf-app.com"},
+		{"OK"},
+		{"Binding", "existing-app.foo.cf-app.com"},
+		{"OK"},
+		{"Uploading"},
+		{"OK"},
 	})
 
-	assert.Equal(t, deps.routeRepo.FindByHostAndDomainDomain, "")
-	assert.Equal(t, deps.routeRepo.FindByHostAndDomainHost, "")
-	assert.Equal(t, deps.routeRepo.CreatedHost, "")
-	assert.Equal(t, deps.routeRepo.CreatedDomainGuid, "")
+	assert.Equal(t, deps.routeRepo.FindByHostAndDomainDomain, "foo.cf-app.com")
+	assert.Equal(t, deps.routeRepo.FindByHostAndDomainHost, "existing-app")
+
+	assert.Equal(t, deps.routeRepo.CreatedHost, "existing-app")
+	assert.Equal(t, deps.routeRepo.CreatedDomainGuid, "foo-domain-guid")
+
+	assert.Equal(t, deps.routeRepo.BoundAppGuid, "existing-app-guid")
+	assert.Equal(t, deps.routeRepo.BoundRouteGuid, "existing-app-route-guid")
 }
 
 func TestPushingAppWithInvalidPath(t *testing.T) {
