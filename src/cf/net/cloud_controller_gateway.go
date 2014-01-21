@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"strconv"
 )
 
@@ -16,6 +17,8 @@ func NewCloudControllerGateway() Gateway {
 	}
 
 	errorHandler := func(response *http.Response) errorResponse {
+		headerBytes, _ := httputil.DumpResponse(response, false)
+
 		jsonBytes, _ := ioutil.ReadAll(response.Body)
 		response.Body.Close()
 
@@ -27,7 +30,12 @@ func NewCloudControllerGateway() Gateway {
 			code = INVALID_TOKEN_CODE
 		}
 
-		return errorResponse{Code: code, Description: ccResp.Description}
+		return errorResponse{
+			Code:           code,
+			Description:    ccResp.Description,
+			ResponseBody:   string(jsonBytes),
+			ResponseHeader: string(headerBytes),
+		}
 	}
 
 	gateway := newGateway(errorHandler)

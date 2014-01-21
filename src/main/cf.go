@@ -40,7 +40,6 @@ func main() {
 	repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(),
 		"cloud-controller": net.NewCloudControllerGateway(),
-		"curl": 			net.NewCurlGateway(),
 		"uaa":              net.NewUAAGateway(),
 	})
 

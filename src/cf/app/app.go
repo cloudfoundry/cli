@@ -202,6 +202,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringSliceFlag("H", "Custom headers to include in the request, flag can be specified multiple times"),
 				NewStringFlag("d", "HTTP data to include in the request body"),
 				cli.BoolFlag{Name: "i", Usage: "Include response headers in the output"},
+				cli.BoolFlag{Name: "v", Usage: "Enable CF_TRACE output for all requests and responses"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("curl", c)

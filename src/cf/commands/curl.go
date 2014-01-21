@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"cf/trace"
 	"errors"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -42,10 +43,23 @@ func (cmd *Curl) Run(c *cli.Context) {
 	method := c.String("X")
 	headers := c.StringSlice("H")
 	body := c.String("d")
+	verbose := c.Bool("v")
 
 	reqHeader := strings.Join(headers, "\n")
 
-	respHeader, respBody, _ := cmd.curlRepo.Request(method, path, reqHeader, body)
+	if verbose {
+		trace.EnableTrace()
+	}
+
+	respHeader, respBody, apiResponse := cmd.curlRepo.Request(method, path, reqHeader, body)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Error creating request:\n%s", apiResponse.Message)
+		return
+	}
+
+	if verbose {
+		return
+	}
 
 	if c.Bool("i") {
 		cmd.ui.Say("%s", respHeader)

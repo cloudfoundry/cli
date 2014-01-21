@@ -39,7 +39,6 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	uaaGateway := gatewaysByName["uaa"]
-	curlGateway := gatewaysByName["curl"]
 	loc.authRepo = NewUAAAuthenticationRepository(authGateway, configRepo)
 
 	// ensure gateway refreshers are set before passing them by value to repositories
@@ -53,7 +52,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
-	loc.curlRepo = NewCloudControllerCurlRepository(config, curlGateway)
+	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, configRepo)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.endpointRepo)

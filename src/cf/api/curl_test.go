@@ -116,6 +116,14 @@ func TestCurlWithCustomHeaders(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestCurlWithInvalidHeaders(t *testing.T) {
+	deps := newCurlDependencies()
+	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+	_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
+	assert.True(t, apiResponse.IsError())
+	assert.Contains(t, apiResponse.Message, "headers")
+}
+
 type curlDependencies struct {
 	config  *configuration.Configuration
 	gateway net.Gateway
@@ -125,6 +133,6 @@ func newCurlDependencies() (deps curlDependencies) {
 	deps.config = &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
-	deps.gateway = net.NewCurlGateway()
+	deps.gateway = net.NewCloudControllerGateway()
 	return
 }
