@@ -137,6 +137,11 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, didCrea
 		return
 	}
 
+	if params.Has("no-route") && params.Get("no-route") == true {
+		cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
+		return
+	}
+
 	routeFlagsPresent := c.String("n") != "" || c.String("d") != "" || c.Bool("no-hostname")
 	if len(app.Routes) > 0 && !routeFlagsPresent {
 		return
