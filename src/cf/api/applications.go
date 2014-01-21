@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"fmt"
 	"generic"
+	"net/url"
 	"regexp"
 	"strings"
 )
@@ -110,7 +111,7 @@ func (repo CloudControllerApplicationRepository) Create(params cf.AppParams) (cr
 }
 
 func (repo CloudControllerApplicationRepository) Read(name string) (app cf.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=name%s&inline-relations-depth=1", repo.config.Target, repo.config.SpaceFields.Guid, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.Target, repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
 	appResources := new(PaginatedApplicationResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, appResources)
 	if apiResponse.IsNotSuccessful() {

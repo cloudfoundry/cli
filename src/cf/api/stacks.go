@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 )
 
 type PaginatedStackResources struct {
@@ -45,14 +46,14 @@ func NewCloudControllerStackRepository(config *configuration.Configuration, gate
 }
 
 func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/stacks?q=name%s", repo.config.Target, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.Target, url.QueryEscape("name:"+name))
 	stacks, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(stacks) == 0 {
-		apiResponse = net.NewApiResponseWithMessage("Stack %s not found", name)
+		apiResponse = net.NewApiResponseWithMessage("Stack '%s' not found", name)
 		return
 	}
 

@@ -158,7 +158,7 @@ func TestFindServiceBrokerByNameWheNotFound(t *testing.T) {
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsNotFound())
-	assert.Equal(t, apiResponse.Message, "Service Broker my-broker not found")
+	assert.Equal(t, apiResponse.Message, "Service Broker 'my-broker' not found")
 }
 
 func TestCreateServiceBroker(t *testing.T) {

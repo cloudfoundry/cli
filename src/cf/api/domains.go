@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -131,7 +132,7 @@ func (repo CloudControllerDomainRepository) findNextWithPath(path string) (domai
 }
 
 func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=name%%3A%s", name)
+	path := fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name))
 	domains, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -146,12 +147,12 @@ func (repo CloudControllerDomainRepository) FindByName(name string) (domain cf.D
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	spacePath := fmt.Sprintf("/v2/spaces/%s/domains?inline-relations-depth=1&q=name%%3A%s", repo.config.SpaceFields.Guid, name)
+	spacePath := fmt.Sprintf("/v2/spaces/%s/domains?inline-relations-depth=1&q=%s", repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
 	return repo.findOneWithPaths(spacePath, name)
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain cf.Domain, apiResponse net.ApiResponse) {
-	orgPath := fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=name%%3A%s", orgGuid, name)
+	orgPath := fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=%s", orgGuid, url.QueryEscape("name:"+name))
 	return repo.findOneWithPaths(orgPath, name)
 }
 
@@ -162,14 +163,14 @@ func (repo CloudControllerDomainRepository) findOneWithPaths(scopedPath, name st
 	}
 
 	if len(domains) == 0 {
-		sharedPath := fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=name%%3A%s", name)
+		sharedPath := fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name))
 		domains, _, apiResponse = repo.findNextWithPath(sharedPath)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
 
 		if len(domains) == 0 || !domains[0].Shared {
-			apiResponse = net.NewNotFoundApiResponse("Domain %s not found", name)
+			apiResponse = net.NewNotFoundApiResponse("Domain '%s' not found", name)
 			return
 		}
 	}

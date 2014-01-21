@@ -21,17 +21,27 @@ func TestStacksFindByName(t *testing.T) {
 			  "entity": { "name": "custom-linux" }
 			}
   		]}`}})
-
 	ts, handler, repo := createStackRepo(t, req)
 	defer ts.Close()
 
 	stack, apiResponse := repo.FindByName("linux")
 	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, stack.Name, "custom-linux")
 	assert.Equal(t, stack.Guid, "custom-linux-guid")
+}
 
-	stack, apiResponse = repo.FindByName("stack that does not exist")
+func TestStacksFindByNameNotFound(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "GET",
+		Path:     "/v2/stacks?q=name%3Alinux",
+		Response: testnet.TestResponse{Status: http.StatusOK, Body: ` { "resources": []}`},
+	})
+	ts, handler, repo := createStackRepo(t, req)
+	defer ts.Close()
+
+	_, apiResponse := repo.FindByName("linux")
+	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 

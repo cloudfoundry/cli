@@ -23,7 +23,7 @@ var singleAppResponse = testnet.TestResponse{
         "guid": "app1-guid"
       },
       "entity": {
-        "name": "App1",
+        "name": "My App",
         "environment_json": {
       		"foo": "bar",
       		"baz": "boom"
@@ -64,7 +64,7 @@ var singleAppResponse = testnet.TestResponse{
 
 var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "GET",
-	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AApp1&inline-relations-depth=1",
+	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
 	Response: singleAppResponse,
 })
 
@@ -72,10 +72,10 @@ func TestFindByName(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{findAppRequest})
 	defer ts.Close()
 
-	app, apiResponse := repo.Read("App1")
+	app, apiResponse := repo.Read("My App")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, app.Name, "App1")
+	assert.Equal(t, app.Name, "My App")
 	assert.Equal(t, app.Guid, "app1-guid")
 	assert.Equal(t, app.Memory, uint64(128))
 	assert.Equal(t, app.InstanceCount, 1)
@@ -92,7 +92,7 @@ func TestFindByNameWhenAppIsNotFound(t *testing.T) {
 	ts, handler, repo := createAppRepo(t, []testnet.TestRequest{request})
 	defer ts.Close()
 
-	_, apiResponse := repo.Read("App1")
+	_, apiResponse := repo.Read("My App")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsError())
 	assert.True(t, apiResponse.IsNotFound())

@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -67,14 +68,14 @@ func (repo CloudControllerQuotaRepository) FindAll() (quotas []cf.QuotaFields, a
 }
 
 func (repo CloudControllerQuotaRepository) FindByName(name string) (quota cf.QuotaFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/quota_definitions?q=name%%3A%s", repo.config.Target, name)
+	path := fmt.Sprintf("%s/v2/quota_definitions?q=%s", repo.config.Target, url.QueryEscape("name:"+name))
 	quotas, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(quotas) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Quota %s not found", name)
+		apiResponse = net.NewNotFoundApiResponse("Quota '%s' not found", name)
 		return
 	}
 

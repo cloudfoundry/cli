@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -125,7 +126,7 @@ func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) 
 }
 
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/organizations?q=name%s&inline-relations-depth=1", "%3A"+strings.ToLower(name))
+	path := fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name)))
 
 	orgs, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
