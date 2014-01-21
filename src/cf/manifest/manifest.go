@@ -190,7 +190,7 @@ func setStringOrNullVal(appMap generic.Map, key string, val interface{}, errs *M
 	case string:
 		appMap.Set(key, val)
 	case nil:
-		appMap.Set(key, "null")
+		appMap.Set(key, "")
 	default:
 		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string or null value", key)))
 	}

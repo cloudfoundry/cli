@@ -305,7 +305,7 @@ func TestUpdateApplicationSetCommandToNull(t *testing.T) {
 	defer ts.Close()
 
 	app := cf.NewEmptyAppParams()
-	app.Set("command", "null")
+	app.Set("command", "")
 
 	_, apiResponse := repo.Update("my-app-guid", app)
 	assert.True(t, handler.AllRequestsCalled())
