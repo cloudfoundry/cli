@@ -117,7 +117,7 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		return
 	}
 
-	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack", "no-route"} {
+	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack"} {
 		if yamlMap.Has(key) {
 			setStringVal(appParams, key, yamlMap.Get(key), &errs)
 		}
@@ -150,6 +150,10 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		setEnvVar(appParams, yamlMap.Get("env"), &errs)
 	} else {
 		appParams.Set("env", generic.NewMap())
+	}
+
+	if yamlMap.Has("no-route") {
+		setBoolVal(appParams, "no-route", yamlMap.Get("no-route"), &errs)
 	}
 
 	return
@@ -198,6 +202,20 @@ func setIntVal(appMap generic.Map, key string, val interface{}, errs *ManifestEr
 	}
 
 	appMap.Set(key, intVal)
+}
+
+func setBoolVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
+	switch val := val.(type) {
+	case bool:
+		appMap.Set(key, val)
+	case string:
+		boolVal := val == "true"
+		appMap.Set(key, boolVal)
+	default:
+		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a boolean.", key)))
+	}
+
+	return
 }
 
 func setStringSlice(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
