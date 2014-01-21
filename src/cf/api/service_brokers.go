@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -94,14 +95,14 @@ func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan 
 }
 
 func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/service_brokers?q=name%%3A%s", name)
+	path := fmt.Sprintf("/v2/service_brokers?q=%s", url.QueryEscape("name:"+name))
 	serviceBrokers, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
 	if len(serviceBrokers) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Service Broker %s not found", name)
+		apiResponse = net.NewNotFoundApiResponse("Service Broker '%s' not found", name)
 		return
 	}
 

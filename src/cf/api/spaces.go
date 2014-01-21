@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -113,7 +114,7 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Spa
 }
 
 func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3A%s&inline-relations-depth=1", orgGuid, strings.ToLower(name))
+	path := fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name)))
 
 	spaces, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
@@ -121,7 +122,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 	}
 
 	if len(spaces) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Space", name)
+		apiResponse = net.NewNotFoundApiResponse("Space '%s' not found", name)
 		return
 	}
 

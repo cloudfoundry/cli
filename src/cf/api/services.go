@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -153,7 +154,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings cf
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=name%s&inline-relations-depth=2", repo.config.Target, repo.config.SpaceFields.Guid, "%3A"+name)
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=%s&inline-relations-depth=2", repo.config.Target, repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
 
 	resources := new(PaginatedServiceInstanceResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
@@ -162,7 +163,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	if len(resources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Service instance %s not found", name)
+		apiResponse = net.NewNotFoundApiResponse("Service instance '%s' not found", name)
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"net/url"
 	"strings"
 )
 
@@ -103,7 +104,7 @@ func (repo CloudControllerRouteRepository) ListRoutes(stop chan bool) (routesCha
 }
 
 func (repo CloudControllerRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=host%s", "%3A"+host)
+	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host))
 	return repo.findOneWithPath(path)
 }
 
@@ -113,7 +114,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		return
 	}
 
-	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=host%%3A%s%%3Bdomain_guid%%3A%s", host, domain.Guid)
+	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid))
 	route, apiResponse = repo.findOneWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
