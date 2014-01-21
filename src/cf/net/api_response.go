@@ -5,26 +5,43 @@ import (
 )
 
 type ApiResponse struct {
-	Message    string
-	ErrorCode  string
-	StatusCode int
+	Message     string
+	ErrorCode   string
+	StatusCode  int
+	ErrorHeader string
+	ErrorBody   string
 
-	isError    bool
-	isNotFound bool
+	isError        bool
+	isHttpResponse bool
+	isNotFound     bool
 }
 
 func NewApiResponse(message string, errorCode string, statusCode int) (apiResponse ApiResponse) {
 	return ApiResponse{
-		Message:    message,
-		ErrorCode:  errorCode,
-		StatusCode: statusCode,
-		isError:    true,
+		Message:        message,
+		ErrorCode:      errorCode,
+		StatusCode:     statusCode,
+		isError:        true,
+		isHttpResponse: true,
+	}
+}
+
+func NewApiResponseWithHttpError(message string, errorCode string, statusCode int, errorHeader string, errorBody string) (apiResponse ApiResponse) {
+	return ApiResponse{
+		Message:        message,
+		ErrorCode:      errorCode,
+		StatusCode:     statusCode,
+		isError:        true,
+		isHttpResponse: true,
+		ErrorHeader:    errorHeader,
+		ErrorBody:      errorBody,
 	}
 }
 
 func NewApiResponseWithStatusCode(statusCode int) (apiResponse ApiResponse) {
 	return ApiResponse{
-		StatusCode: statusCode,
+		StatusCode:     statusCode,
+		isHttpResponse: true,
 	}
 }
 
@@ -55,6 +72,10 @@ func NewSuccessfulApiResponse() (apiResponse ApiResponse) {
 
 func (apiResponse ApiResponse) IsError() bool {
 	return apiResponse.isError
+}
+
+func (apiResponse ApiResponse) IsHttpError() bool {
+	return apiResponse.isError && apiResponse.isHttpResponse
 }
 
 func (apiResponse ApiResponse) IsNotFound() bool {

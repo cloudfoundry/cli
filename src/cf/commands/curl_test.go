@@ -1,8 +1,11 @@
 package commands_test
 
 import (
+	"bytes"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/net"
+	"cf/trace"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -108,6 +111,29 @@ func TestGetRequestWithDataFlag(t *testing.T) {
 	assert.Equal(t, deps.curlRepo.Body, "body content to upload")
 	testassert.SliceDoesNotContain(t, deps.ui.Outputs, testassert.Lines{
 		{"FAILED"},
+	})
+}
+
+func TestGetRequestWithVerboseFlagEnablesTrace(t *testing.T) {
+	deps := newCurlDependencies()
+	output := bytes.NewBuffer(make([]byte, 1024))
+	trace.SetStdout(output)
+
+	runCurlWithInputs(deps, []string{"-v", "/foo"})
+	trace.Logger.Print("logging enabled")
+
+	assert.Contains(t, output.String(), "logging enabled")
+}
+
+func TestGetRequestFailsWithError(t *testing.T) {
+	deps := newCurlDependencies()
+
+	deps.curlRepo.ApiResponse = net.NewApiResponseWithMessage("ooops")
+	runCurlWithInputs(deps, []string{"/foo"})
+
+	testassert.SliceContains(t, deps.ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"ooops"},
 	})
 }
 

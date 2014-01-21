@@ -28,6 +28,14 @@ func init() {
 	Logger = NewLogger()
 }
 
+func EnableTrace() {
+	Logger = newStdoutLogger()
+}
+
+func DisableTrace() {
+	Logger = new(nullLogger)
+}
+
 func SetStdout(s io.Writer) {
 	stdOut = s
 }

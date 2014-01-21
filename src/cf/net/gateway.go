@@ -37,8 +37,10 @@ type AsyncResponse struct {
 }
 
 type errorResponse struct {
-	Code        string
-	Description string
+	Code           string
+	Description    string
+	ResponseHeader string
+	ResponseBody   string
 }
 
 type errorHandler func(*http.Response) errorResponse
@@ -315,7 +317,7 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 			errorResponse.Code,
 			errorResponse.Description,
 		)
-		apiResponse = NewApiResponse(message, errorResponse.Code, rawResponse.StatusCode)
+		apiResponse = NewApiResponseWithHttpError(message, errorResponse.Code, rawResponse.StatusCode, errorResponse.ResponseHeader, errorResponse.ResponseBody)
 	} else {
 		apiResponse = NewApiResponseWithStatusCode(rawResponse.StatusCode)
 	}
