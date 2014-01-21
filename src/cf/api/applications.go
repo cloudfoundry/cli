@@ -164,12 +164,6 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParam
 		}
 	}
 
-	if params.Has("command") && params.Get("command").(string) == "null" {
-		params.Set("command", "")
-	} else if params.Has("command") {
-		params.Set("command", stringOrNull(params.Get("command")))
-	}
-
 	if params.Has("buildpack") {
 		params.Set("buildpack", stringOrNull(params.Get("buildpack")))
 	}

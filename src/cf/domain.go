@@ -115,6 +115,7 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 	if c.String("b") != "" {
 		appParams.Set("buildpack", c.String("b"))
 	}
+
 	if c.String("m") != "" {
 		var memory uint64
 		memory, err = formatters.ToMegabytes(c.String("m"))
@@ -124,9 +125,15 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 		}
 		appParams.Set("memory", memory)
 	}
+
 	if c.String("c") != "" {
 		appParams.Set("command", c.String("c"))
 	}
+
+	if c.String("c") == "null" {
+		appParams.Set("command", "")
+	}
+
 	if c.String("i") != "" {
 		var instances int
 		instances, err = strconv.Atoi(c.String("i"))
@@ -136,9 +143,11 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 		}
 		appParams.Set("instances", instances)
 	}
+
 	if c.String("s") != "" {
 		appParams.Set("stack", c.String("s"))
 	}
+
 	if c.String("t") != "" {
 		var timeout int
 		timeout, err = strconv.Atoi(c.String("t"))

@@ -270,7 +270,7 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 	}
 	_ = callPush(t, args, deps)
 
-	assert.Equal(t, deps.appRepo.UpdateParams.Get("command"), "null")
+	assert.Equal(t, deps.appRepo.UpdateParams.Get("command"), "")
 }
 
 func TestPushingAppWithSingleAppManifest(t *testing.T) {

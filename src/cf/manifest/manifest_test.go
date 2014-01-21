@@ -98,7 +98,16 @@ func TestParsingManifestWithNullCommand(t *testing.T) {
 	}))
 
 	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("command"), "")
+}
 
-	// because we accept 'null' as as string command line flag
-	assert.Equal(t, m.Applications[0].Get("command"), "null")
+func TestParsingEmptyManifestDoesNotSetCommand(t *testing.T) {
+	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{},
+		},
+	}))
+
+	assert.NoError(t, err)
+	assert.False(t, m.Applications[0].Has("command"))
 }
