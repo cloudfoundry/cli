@@ -68,6 +68,28 @@ func TestCurlPostRequest(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestCurlFailingRequest(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "POST",
+		Path:    "/v2/endpoint",
+		Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
+		Response: testnet.TestResponse{
+			Status: http.StatusBadRequest,
+			Body:   jsonResponse},
+	})
+
+	ts, _ := testnet.NewTLSServer(t, []testnet.TestRequest{req})
+	defer ts.Close()
+
+	deps := newCurlDependencies()
+	deps.config.Target = ts.URL
+
+	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+	_, body, _ := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+
+	testassert.JSONStringEquals(t, body, jsonResponse)
+}
+
 func TestCurlWithCustomHeaders(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "POST",
@@ -103,6 +125,6 @@ func newCurlDependencies() (deps curlDependencies) {
 	deps.config = &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
 	}
-	deps.gateway = net.NewCloudControllerGateway()
+	deps.gateway = net.NewCurlGateway()
 	return
 }
