@@ -962,9 +962,7 @@ func TestPushingAppWhenItAlreadyExistsWithoutARouteAndARouteIsNotProvided(t *tes
 	existingApp := cf.Application{}
 	existingApp.Name = "existing-app"
 	existingApp.Guid = "existing-app-guid"
-
 	deps.appRepo.ReadApp = existingApp
-	deps.appRepo.UpdateAppResult = existingApp
 
 	ui := callPush(t, []string{"existing-app"}, deps)
 
