@@ -73,6 +73,7 @@ GLOBAL OPTIONS:
    {{end}}
 ENVIRONMENT VARIABLES:
    CF_TRACE=true - will output HTTP requests and responses during command
+   CF_COLOR=false - will not colorize output
    HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
 `
 
@@ -110,15 +111,7 @@ func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationReposi
 func displayCrashDialog() {
 	formattedString := `
 
-       d8888 888       888 888       888        .d8888b.  888    888 888     888  .d8888b.  888    d8P   .d8888b.
-      d88888 888   o   888 888   o   888       d88P  Y88b 888    888 888     888 d88P  Y88b 888   d8P   d88P  Y88b
-     d88P888 888  d8b  888 888  d8b  888       Y88b.      888    888 888     888 888    888 888  d8P    Y88b.
-    d88P 888 888 d888b 888 888 d888b 888        "Y888b.   8888888888 888     888 888        888d88K      "Y888b.
-   d88P  888 888d88888b888 888d88888b888           "Y88b. 888    888 888     888 888        8888888b        "Y88b.
-  d88P   888 88888P Y88888 88888P Y88888             "888 888    888 888     888 888    888 888  Y88b         "888
- d8888888888 8888P   Y8888 8888P   Y8888       Y88b  d88P 888    888 Y88b. .d88P Y88b  d88P 888   Y88b  Y88b  d88P d8b
-d88P     888 888P     Y888 888P     Y888        "Y8888P"  888    888  "Y88888P"   "Y8888P"  888    Y88b  "Y8888P"  Y8P
-
+Aww shucks.
 
 Something completely unexpected happened. This is a bug in %s.
 Please file this bug : https://github.com/cloudfoundry/cli/issues
