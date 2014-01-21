@@ -42,11 +42,8 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 	}
 
 	res, apiResponse := repo.gateway.PerformRequestForResponse(req)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
 	bytes, err := ioutil.ReadAll(res.Body)
+
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Error reading response", err)
 	}
