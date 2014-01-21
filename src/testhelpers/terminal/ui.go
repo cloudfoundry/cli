@@ -103,10 +103,6 @@ func (c FakeUI) Wait(duration time.Duration) {
 	time.Sleep(duration)
 }
 
-func (ui *FakeUI) showBaseConfig(config *configuration.Configuration) {
-
-}
-
 func (ui *FakeUI) DisplayTable(table [][]string) {
 
 	for _, line := range table {
