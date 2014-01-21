@@ -117,10 +117,14 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		return
 	}
 
-	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack"} {
+	for _, key := range []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack"} {
 		if yamlMap.Has(key) {
 			setStringVal(appParams, key, yamlMap.Get(key), &errs)
 		}
+	}
+
+	if yamlMap.Has("command") {
+		setStringOrNullVal(appParams, "command", yamlMap.Get("command"), &errs)
 	}
 
 	if yamlMap.Has("memory") {
@@ -179,6 +183,17 @@ func setStringVal(appMap generic.Map, key string, val interface{}, errs *Manifes
 		return
 	}
 	appMap.Set(key, stringVal)
+}
+
+func setStringOrNullVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
+	switch val := val.(type) {
+	case string:
+		appMap.Set(key, val)
+	case nil:
+		appMap.Set(key, "null")
+	default:
+		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string or null value", key)))
+	}
 }
 
 func setIntVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {

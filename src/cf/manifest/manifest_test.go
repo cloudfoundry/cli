@@ -87,3 +87,18 @@ func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "Properties are not supported. Found property '${foo}'")
 }
+
+func TestParsingManifestWithNullCommand(t *testing.T) {
+	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{
+				"command": nil,
+			},
+		},
+	}))
+
+	assert.NoError(t, err)
+
+	// because we accept 'null' as as string command line flag
+	assert.Equal(t, m.Applications[0].Get("command"), "null")
+}
