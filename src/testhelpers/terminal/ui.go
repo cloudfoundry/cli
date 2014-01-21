@@ -10,12 +10,13 @@ import (
 )
 
 type FakeUI struct {
-	Outputs                 []string
-	Prompts                 []string
-	PasswordPrompts         []string
-	Inputs                  []string
-	FailedWithUsage         bool
-	ShowConfigurationCalled bool
+	Outputs                    []string
+	Prompts                    []string
+	PasswordPrompts            []string
+	Inputs                     []string
+	FailedWithUsage            bool
+	FailedWithUsageCommandName string
+	ShowConfigurationCalled    bool
 }
 
 func (ui *FakeUI) PrintPaginator(rows []string, err error) {
@@ -79,6 +80,7 @@ func (ui *FakeUI) ConfigFailure(err error) {
 
 func (ui *FakeUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 	ui.FailedWithUsage = true
+	ui.FailedWithUsageCommandName = cmdName
 	ui.Failed("Incorrect Usage.")
 }
 

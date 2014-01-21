@@ -1014,6 +1014,15 @@ func TestPushingAppDescribesUpload(t *testing.T) {
 	})
 }
 
+func TestPushingWithNoManifestAndNoName(t *testing.T) {
+	deps := getPushDependencies()
+
+	ui := callPush(t, []string{}, deps)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Incorrect Usage"},
+	})
+}
+
 type pushDependencies struct {
 	manifestRepo *testmanifest.FakeManifestRepository
 	starter      *testcmd.FakeAppStarter

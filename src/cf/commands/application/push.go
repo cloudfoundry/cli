@@ -350,10 +350,11 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 	baseAppPath := cmd.appPathFromContext(c)
 	appParams.Set("path", baseAppPath)
 
-	appSet, err = createAppSetFromContextAndManifest(appParams, baseAppPath, m)
+	appSet, err = cmd.createAppSetFromContextAndManifest(c, appParams, baseAppPath, m)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 	}
+
 	return
 }
 
@@ -412,7 +413,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 	return
 }
 
-func createAppSetFromContextAndManifest(contextParams cf.AppParams, rootAppPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
+func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, rootAppPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
 	if contextParams.Has("name") && len(m.Applications) > 1 {
 		err = errors.New("APP_NAME command line argument is not allowed when pushing multiple apps from a manifest file.")
 		return
@@ -420,6 +421,10 @@ func createAppSetFromContextAndManifest(contextParams cf.AppParams, rootAppPath 
 
 	appSet = make([]cf.AppParams, 0, len(m.Applications))
 	if len(m.Applications) == 0 {
+		if !contextParams.Has("name") || contextParams.Get("name") == "" {
+			cmd.ui.FailWithUsage(c, "push")
+			return
+		}
 		appSet = append(appSet, contextParams)
 	} else {
 		for _, manifestAppParams := range m.Applications {
