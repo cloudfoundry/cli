@@ -251,6 +251,13 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "rename-service-broker"),
 				},
 			},
+		}, {
+			Name: "ADVANCED",
+			CommandSubGroups: [][]cmdPresenter{
+				{
+					newCmdPresenter(app, maxNameLen, "curl"),
+				},
+			},
 		},
 	}
 	return
