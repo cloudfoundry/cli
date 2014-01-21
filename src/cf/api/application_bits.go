@@ -15,7 +15,6 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 type AppFileResource struct {
@@ -126,7 +125,8 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 
 func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb func(sourceDir string, err error)) {
 	// If appDir is a zip, first extract it to a temporary directory
-	if !repo.fileIsZip(appDir) {
+	zipReader, err := zip.OpenReader(appDir)
+	if err != nil {
 		cb(appDir, nil)
 		return
 	}
@@ -137,7 +137,8 @@ func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb
 			return
 		}
 
-		err = repo.extractZip(appDir, tmpDir)
+		err = repo.extractZip(zipReader, tmpDir)
+		zipReader.Close()
 		cb(tmpDir, err)
 	})
 }
@@ -164,21 +165,7 @@ func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) fileIsZip(file string) bool {
-	isZip := strings.HasSuffix(file, ".zip")
-	isWar := strings.HasSuffix(file, ".war")
-	isJar := strings.HasSuffix(file, ".jar")
-
-	return isZip || isWar || isJar
-}
-
-func (repo CloudControllerApplicationBitsRepository) extractZip(zipFile string, destDir string) (err error) {
-	r, err := zip.OpenReader(zipFile)
-	if err != nil {
-		return
-	}
-	defer r.Close()
-
+func (repo CloudControllerApplicationBitsRepository) extractZip(r *zip.ReadCloser, destDir string) (err error) {
 	for _, f := range r.File {
 		func() {
 			// Don't try to extract directories
