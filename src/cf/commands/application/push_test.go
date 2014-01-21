@@ -653,6 +653,25 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 	assert.Equal(t, deps.routeRepo.CreatedDomainGuid, "bar-domain-guid")
 }
 
+func TestPushingAppAsWorker(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+
+	workerManifest := singleAppManifest()
+	workerManifest.Applications[0].Set("no-route", true)
+	deps.manifestRepo.ReadManifestManifest = workerManifest
+
+	ui := callPush(t, []string{
+		"worker-app",
+	}, deps)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"worker-app", "is a worker", "skipping route creation"},
+	})
+	assert.Equal(t, deps.routeRepo.BoundAppGuid, "")
+	assert.Equal(t, deps.routeRepo.BoundRouteGuid, "")
+}
+
 func TestPushingAppWithMemoryInMegaBytes(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true

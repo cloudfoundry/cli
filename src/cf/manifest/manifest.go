@@ -117,7 +117,7 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		return
 	}
 
-	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack"} {
+	for _, key := range []string{"buildpack", "command", "disk_quota", "domain", "host", "name", "path", "stack", "no-route"} {
 		if yamlMap.Has(key) {
 			setStringVal(appParams, key, yamlMap.Get(key), &errs)
 		}
