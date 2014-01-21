@@ -13,7 +13,8 @@ func TestManifestWithGlobalAndAppSpecificProperties(t *testing.T) {
 		"memory":    "512M",
 		"applications": []interface{}{
 			map[string]interface{}{
-				"name": "bitcoin-miner",
+				"name":     "bitcoin-miner",
+				"no-route": true,
 			},
 		},
 	}))
@@ -22,6 +23,7 @@ func TestManifestWithGlobalAndAppSpecificProperties(t *testing.T) {
 	apps := m.Applications
 	assert.Equal(t, apps[0].Get("instances"), 3)
 	assert.Equal(t, apps[0].Get("memory").(uint64), uint64(512))
+	assert.True(t, apps[0].Get("no-route").(bool))
 }
 
 func TestManifestWithInvalidMemory(t *testing.T) {
