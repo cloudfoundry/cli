@@ -20,7 +20,7 @@ Section "CloudFoundry CLI (required)"
   SetOutPath $INSTDIR
   
   ; Put file there
-  File "gcf.exe"
+  File "cf.exe"
   
   ; Write the installation path into the registry
   WriteRegStr HKLM Software\CloudFoundryCLI "Install_Dir" "$INSTDIR"
