@@ -20,34 +20,6 @@ import (
 	"time"
 )
 
-var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
-    {
-        "fn": "Gemfile",
-        "sha1": "d9c3a51de5c89c11331d3b90b972789f1a14699a",
-        "size": 59
-    },
-    {
-        "fn": "Gemfile.lock",
-        "sha1": "345f999aef9070fb9a608e65cf221b7038156b6d",
-        "size": 229
-    },
-    {
-        "fn": "app.rb",
-        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51
-    },
-    {
-        "fn": "config.ru",
-        "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70
-    },
-    {
-        "fn": "manifest.yml",
-        "sha1": "19b5b4225dc64da3213b1ffaa1e1920ee5faf36c",
-        "size": 111
-    }
-]`)
-
 var permissionsToSet os.FileMode
 var expectedPermissionBits os.FileMode
 
@@ -70,19 +42,6 @@ func init() {
 	})
 }
 
-var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
-	{
-        "fn": "app.rb",
-        "sha1": "2474735f5163ba7612ef641f438f4b5bee00127b",
-        "size": 51
-    },
-    {
-        "fn": "config.ru",
-        "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
-        "size": 70
-    }
-]`)
-
 var uploadApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:  "PUT",
 	Path:    "/v2/apps/my-cool-app-guid/bits",
@@ -98,25 +57,13 @@ var uploadApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 }
 	`},
 })
-
-var matchResourceRequest = testnet.TestRequest{
-	Method:  "PUT",
-	Path:    "/v2/resource_match",
-	Matcher: testnet.RequestBodyMatcher(expectedResources),
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body:   matchedResources,
-	},
-}
-
 var defaultRequests = []testnet.TestRequest{
-	matchResourceRequest,
 	uploadApplicationRequest,
 	createProgressEndpoint("running"),
 	createProgressEndpoint("finished"),
 }
 
-var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.yml"}
+var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.yml", "app.rb", "config.ru"}
 
 var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
 	err := request.ParseMultipartForm(4096)
@@ -133,7 +80,7 @@ var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
 
 	resourceManifest := valuePart[0]
 	chompedResourceManifest := strings.Replace(resourceManifest, "\n", "", -1)
-	assert.Equal(t, chompedResourceManifest, matchedResources, "Resources do not match")
+	assert.Equal(t, chompedResourceManifest, "[]", "Resources do not match")
 
 	assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
 
@@ -162,7 +109,7 @@ var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
 		return
 	}
 
-	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
+	assert.Equal(t, len(zipReader.File), 5, "Wrong number of files in zip")
 	assert.Equal(t, zipReader.File[0].Mode(), uint32(expectedPermissionBits))
 
 nextFile:
@@ -233,7 +180,6 @@ func TestUploadAppFailsWhilePushingBits(t *testing.T) {
 	dir = filepath.Join(dir, "../../fixtures/example-app")
 
 	requests := []testnet.TestRequest{
-		matchResourceRequest,
 		uploadApplicationRequest,
 		createProgressEndpoint("running"),
 		createProgressEndpoint("failed"),
@@ -262,7 +208,7 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 	})
 
 	assert.Equal(t, reportedFileCount, uint64(len(expectedApplicationContent)))
-	assert.Equal(t, reportedUploadSize, uint64(759))
+	assert.Equal(t, reportedUploadSize, uint64(1094))
 	assert.True(t, handler.AllRequestsCalled())
 
 	return
