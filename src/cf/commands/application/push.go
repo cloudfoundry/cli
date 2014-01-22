@@ -15,6 +15,8 @@ import (
 	"github.com/codegangsta/cli"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 )
 
 type Push struct {
@@ -151,7 +153,7 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.
 	if params.Has("host") {
 		defaultHostname = params.Get("host").(string)
 	} else {
-		defaultHostname = app.Name
+		defaultHostname = hostNameForString(app.Name)
 	}
 
 	var domainName string
@@ -181,6 +183,16 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
+}
+
+var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
+var whitespaceRegex = regexp.MustCompile(`[\s_]+`)
+
+func hostNameForString(name string) string {
+	nameBytes := []byte(strings.ToLower(name))
+	nameBytes = whitespaceRegex.ReplaceAll(nameBytes, []byte("-"))
+	nameBytes = forbiddenHostCharRegex.ReplaceAll(nameBytes, []byte{})
+	return string(nameBytes)
 }
 
 func (cmd *Push) restart(app cf.Application, params cf.AppParams, c *cli.Context) {
