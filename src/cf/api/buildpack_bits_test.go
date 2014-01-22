@@ -32,7 +32,7 @@ func uploadBuildpackRequest(filename string) testnet.TestRequest {
 
 var expectedBuildpackContent = []string{"detect", "compile", "package"}
 
-func uploadBuildpackBodyMatcher(filename string) testnet.RequestMatcher {
+func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 	return func(t *testing.T, request *http.Request) {
 		err := request.ParseMultipartForm(4096)
 		if err != nil {
@@ -50,7 +50,7 @@ func uploadBuildpackBodyMatcher(filename string) testnet.RequestMatcher {
 		assert.Equal(t, len(files), 1, "Wrong number of files")
 
 		buildpackFile := files[0]
-		assert.Equal(t, buildpackFile.Filename, filepath.Base(filename), "Wrong file name")
+		assert.Equal(t, buildpackFile.Filename, filepath.Base(pathToFile), "Wrong file name")
 
 		file, err := buildpackFile.Open()
 		if err != nil {
