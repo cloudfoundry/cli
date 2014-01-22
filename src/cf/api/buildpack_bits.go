@@ -9,7 +9,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type BuildpackBitsRepository interface {
@@ -92,7 +92,7 @@ func (repo CloudControllerBuildpackBitsRepository) writeUploadBody(zipFile *os.F
 		return
 	}
 
-	part, err := writer.CreateFormFile("buildpack", path.Base(filename))
+	part, err := writer.CreateFormFile("buildpack", filepath.Base(filename))
 	if err != nil {
 		return
 	}
