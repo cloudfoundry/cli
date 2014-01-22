@@ -22,11 +22,11 @@ Downloading Edge
 The latest binary builds and installers are published to Amazon S3 buckets.
 
 Binaries:
-- http://go-cli.s3.amazonaws.com/gcf-darwin-amd64.tgz
-- http://go-cli.s3.amazonaws.com/gcf-linux-amd64.tgz
-- http://go-cli.s3.amazonaws.com/gcf-linux-386.tgz
-- http://go-cli.s3.amazonaws.com/gcf-windows-amd64.zip
-- http://go-cli.s3.amazonaws.com/gcf-windows-386.zip
+- http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz
+- http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz
+- http://go-cli.s3.amazonaws.com/cf-linux-386.tgz
+- http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip
+- http://go-cli.s3.amazonaws.com/cf-windows-386.zip
 
 Installers:
 - http://go-cli.s3.amazonaws.com/installer-osx-amd64.pkg
