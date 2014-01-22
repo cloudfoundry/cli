@@ -10,19 +10,21 @@ import (
 	"strconv"
 )
 
-var ManifestKeys = []string{
-	"buildpack",
-	"command",
-	"disk_quota",
-	"domain",
-	"env",
-	"host",
-	"instances",
-	"memory",
-	"name",
-	"path",
-	"stack",
-	"timeout",
+var manifestKeys = map[string]func(appParams, yamlMap generic.Map, key string, errs *ManifestErrors){
+	"buildpack":  setStringVal,
+	"disk_quota": setStringVal,
+	"domain":     setStringVal,
+	"host":       setStringVal,
+	"name":       setStringVal,
+	"path":       setStringVal,
+	"stack":      setStringVal,
+	"command":    setStringOrNullVal,
+	"memory":     setBytesVal,
+	"instances":  setIntVal,
+	"timeout":    setTimeoutVal,
+	"no-route":   setBoolVal,
+	"services":   setSliceOrEmptyVal,
+	"env":        setEnvVarOrEmptyMap,
 }
 
 type Manifest struct {
@@ -117,54 +119,17 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		return
 	}
 
-	for _, key := range []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack"} {
+	for key, handler := range manifestKeys {
 		if yamlMap.Has(key) {
-			setStringVal(appParams, key, yamlMap.Get(key), &errs)
+			handler(appParams, yamlMap, key, &errs)
 		}
-	}
-
-	if yamlMap.Has("command") {
-		setStringOrNullVal(appParams, "command", yamlMap.Get("command"), &errs)
-	}
-
-	if yamlMap.Has("memory") {
-		memory, err := formatters.ToMegabytes(yamlMap.Get("memory").(string))
-		if err != nil {
-			errs = append(errs, errors.New(fmt.Sprintf("Unexpected value for app memory:\n%s", err.Error())))
-			return
-		}
-		appParams.Set("memory", memory)
-	}
-
-	if yamlMap.Has("timeout") {
-		setIntVal(appParams, "health_check_timeout", yamlMap.Get("timeout"), &errs)
-	}
-
-	if yamlMap.Has("instances") {
-		setIntVal(appParams, "instances", yamlMap.Get("instances"), &errs)
-	}
-
-	if yamlMap.Has("services") {
-		setStringSlice(appParams, "services", yamlMap.Get("services"), &errs)
-	} else {
-		appParams.Set("services", []string{})
-	}
-
-	if yamlMap.Has("env") {
-		setEnvVar(appParams, yamlMap.Get("env"), &errs)
-	} else {
-		appParams.Set("env", generic.NewMap())
-	}
-
-	if yamlMap.Has("no-route") {
-		setBoolVal(appParams, "no-route", yamlMap.Get("no-route"), &errs)
 	}
 
 	return
 }
 
 func checkForNulls(appParams generic.Map) (errs ManifestErrors) {
-	for _, key := range ManifestKeys {
+	for key, _ := range manifestKeys {
 		if key == "command" {
 			continue
 		}
@@ -176,7 +141,8 @@ func checkForNulls(appParams generic.Map) (errs ManifestErrors) {
 	return
 }
 
-func setStringVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
+func setStringVal(appMap generic.Map, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	val := yamlMap.Get(key)
 	stringVal, ok := val.(string)
 	if !ok {
 		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string value", key)))
@@ -185,8 +151,8 @@ func setStringVal(appMap generic.Map, key string, val interface{}, errs *Manifes
 	appMap.Set(key, stringVal)
 }
 
-func setStringOrNullVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
-	switch val := val.(type) {
+func setStringOrNullVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	switch val := yamlMap.Get(key).(type) {
 	case string:
 		appMap.Set(key, val)
 	case nil:
@@ -196,13 +162,22 @@ func setStringOrNullVal(appMap generic.Map, key string, val interface{}, errs *M
 	}
 }
 
-func setIntVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
+func setBytesVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	value, err := formatters.ToMegabytes(yamlMap.Get(key).(string))
+	if err != nil {
+		*errs = append(*errs, errors.New(fmt.Sprintf("Unexpected value for %s :\n%s", key, err.Error())))
+		return
+	}
+	appMap.Set(key, value)
+}
+
+func setIntVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
 	var (
 		intVal int
 		err    error
 	)
 
-	switch val := val.(type) {
+	switch val := yamlMap.Get(key).(type) {
 	case string:
 		intVal, err = strconv.Atoi(val)
 	case int:
@@ -219,8 +194,31 @@ func setIntVal(appMap generic.Map, key string, val interface{}, errs *ManifestEr
 	appMap.Set(key, intVal)
 }
 
-func setBoolVal(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
-	switch val := val.(type) {
+func setTimeoutVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	var (
+		intVal int
+		err    error
+	)
+
+	switch val := yamlMap.Get(key).(type) {
+	case string:
+		intVal, err = strconv.Atoi(val)
+	case int:
+		intVal = val
+	default:
+		err = errors.New("Expected health_check_timeout to be a number.")
+	}
+
+	if err != nil {
+		*errs = append(*errs, err)
+		return
+	}
+
+	appMap.Set("health_check_timeout", intVal)
+}
+
+func setBoolVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	switch val := yamlMap.Get(key).(type) {
 	case bool:
 		appMap.Set(key, val)
 	case string:
@@ -233,7 +231,34 @@ func setBoolVal(appMap generic.Map, key string, val interface{}, errs *ManifestE
 	return
 }
 
-func setStringSlice(appMap generic.Map, key string, val interface{}, errs *ManifestErrors) {
+func setEnvVarOrEmptyMap(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	if !yamlMap.Has(key) {
+		appMap.Set(key, generic.NewMap())
+		return
+	}
+
+	envVars := yamlMap.Get(key)
+
+	if !generic.IsMappable(envVars) {
+		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value.", key)))
+		return
+	}
+
+	merrs := validateEnvVars(envVars)
+	if merrs != nil {
+		*errs = append(*errs, merrs)
+		return
+	}
+
+	appMap.Set(key, generic.NewMap(envVars))
+}
+
+func setSliceOrEmptyVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+	if !yamlMap.Has(key) {
+		appMap.Set(key, []string{})
+		return
+	}
+
 	var (
 		stringSlice []string
 		err         error
@@ -241,7 +266,7 @@ func setStringSlice(appMap generic.Map, key string, val interface{}, errs *Manif
 
 	errMsg := fmt.Sprintf("Expected %s to be a list of strings.", key)
 
-	switch input := val.(type) {
+	switch input := yamlMap.Get(key).(type) {
 	case []interface{}:
 		for _, value := range input {
 			stringValue, ok := value.(string)
@@ -262,21 +287,6 @@ func setStringSlice(appMap generic.Map, key string, val interface{}, errs *Manif
 
 	appMap.Set(key, stringSlice)
 	return
-}
-
-func setEnvVar(appMap generic.Map, env interface{}, errs *ManifestErrors) {
-	if !generic.IsMappable(env) {
-		*errs = append(*errs, errors.New("Expected env vars to be a set of key => value."))
-		return
-	}
-
-	merrs := validateEnvVars(env)
-	if merrs != nil {
-		*errs = append(*errs, merrs)
-		return
-	}
-
-	appMap.Set("env", generic.NewMap(env))
 }
 
 func validateEnvVars(input interface{}) (errs ManifestErrors) {
