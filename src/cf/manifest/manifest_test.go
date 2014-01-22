@@ -4,9 +4,9 @@ import (
 	"cf/manifest"
 	"generic"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	testassert "testhelpers/assert"
 	"strings"
+	testassert "testhelpers/assert"
+	"testing"
 )
 
 func TestManifestWithGlobalAndAppSpecificProperties(t *testing.T) {
@@ -78,27 +78,27 @@ func TestParsingManifestWithNulls(t *testing.T) {
 	_, errs := manifest.NewManifest(generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
-				"buildpack": nil,
+				"buildpack":  nil,
 				"disk_quota": nil,
-				"domain": nil,
-				"host": nil,
-				"name": nil,
-				"path": nil,
-				"stack": nil,
-				"memory": nil,
-				"instances": nil,
-				"timeout": nil,
-				"no-route": nil,
-				"services": nil,
-				"env": nil,
+				"domain":     nil,
+				"host":       nil,
+				"name":       nil,
+				"path":       nil,
+				"stack":      nil,
+				"memory":     nil,
+				"instances":  nil,
+				"timeout":    nil,
+				"no-route":   nil,
+				"services":   nil,
+				"env":        nil,
 			},
 		},
 	}))
 
 	assert.Error(t, errs)
-	errorSlice  := strings.Split(errs.Error(), "\n")
+	errorSlice := strings.Split(errs.Error(), "\n")
 	manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
-							 "memory", "instances", "timeout", "no-route", "services", "env"}
+		"memory", "instances", "timeout", "no-route", "services", "env"}
 
 	for _, key := range manifestKeys {
 		testassert.SliceContains(t, errorSlice, testassert.Lines{{key, "not be null"}})
