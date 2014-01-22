@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"generic"
 	"net/url"
-	"regexp"
 	"strings"
 )
 
@@ -175,14 +174,6 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParam
 
 	if params.Has("state") {
 		params.Set("state", strings.ToUpper(params.Get("state").(string)))
-	}
-
-	if params.Has("name") {
-		reg := regexp.MustCompile("^[0-9a-zA-Z\\-_]*$")
-		if !reg.MatchString(params.Get("name").(string)) {
-			apiResponse = net.NewApiResponseWithMessage("App name is invalid: name can only contain letters, numbers, underscores and hyphens")
-			return
-		}
 	}
 
 	vals := []string{}

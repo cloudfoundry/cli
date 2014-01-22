@@ -209,48 +209,6 @@ func TestCreateApplicationWithoutBuildpackStackOrCommand(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 }
 
-func TestCreateRejectsInproperNames(t *testing.T) {
-	baseRequest := testnet.TestRequest{
-		Method:   "POST",
-		Path:     "/v2/apps",
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: "{}"},
-	}
-
-	requests := []testnet.TestRequest{
-		baseRequest,
-		baseRequest,
-	}
-
-	ts, _, repo := createAppRepo(t, requests)
-	defer ts.Close()
-
-	params := cf.NewEmptyAppParams()
-	params.Set("name", "name with space")
-	params.Set("space_guid", "some-space-guid")
-
-	createdApp, apiResponse := repo.Create(params)
-	assert.Equal(t, createdApp, cf.Application{})
-	assert.Contains(t, apiResponse.Message, "App name is invalid")
-
-	params = cf.NewEmptyAppParams()
-	params.Set("name", "name-with-inv@lid-chars!")
-	params.Set("space_guid", "some-space-guid")
-	_, apiResponse = repo.Create(params)
-	assert.True(t, apiResponse.IsNotSuccessful())
-
-	params = cf.NewEmptyAppParams()
-	params.Set("name", "Valid-Name")
-	params.Set("space_guid", "some-space-guid")
-	_, apiResponse = repo.Create(params)
-	assert.True(t, apiResponse.IsSuccessful())
-
-	params = cf.NewEmptyAppParams()
-	params.Set("name", "name_with_numbers_2")
-	params.Set("space_guid", "some-space-guid")
-	_, apiResponse = repo.Create(params)
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
 var updateApplicationResponse = `
 {
     "metadata": {
@@ -310,42 +268,6 @@ func TestUpdateApplicationSetCommandToNull(t *testing.T) {
 	_, apiResponse := repo.Update("my-app-guid", app)
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func TestUpdateRejectsInproperNames(t *testing.T) {
-	baseRequest := testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/apps/my-app-guid",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: "{}"},
-	}
-
-	requests := []testnet.TestRequest{
-		baseRequest,
-		baseRequest,
-	}
-
-	ts, _, repo := createAppRepo(t, requests)
-	defer ts.Close()
-
-	app := cf.Application{}
-	app.Guid = "my-app-guid"
-	app.Name = "name with space"
-
-	createdApp, apiResponse := repo.Update(app.Guid, app.ToParams())
-	assert.Equal(t, createdApp, cf.Application{})
-	assert.Contains(t, apiResponse.Message, "App name is invalid")
-
-	app.Name = "name-with-inv@lid-chars!"
-	_, apiResponse = repo.Update(app.Guid, app.ToParams())
-	assert.True(t, apiResponse.IsNotSuccessful())
-
-	app.Name = "Valid-Name"
-	_, apiResponse = repo.Update(app.Guid, app.ToParams())
-	assert.True(t, apiResponse.IsSuccessful())
-
-	app.Name = "name_with_numbers_2"
-	_, apiResponse = repo.Update(app.Guid, app.ToParams())
-	assert.True(t, apiResponse.IsSuccessful())
 }
 
 func TestDeleteApplication(t *testing.T) {

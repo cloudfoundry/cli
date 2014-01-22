@@ -145,6 +145,31 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	assert.Equal(t, deps.starter.Timeout, 111)
 }
 
+func TestPushingAppWithACrazyName(t *testing.T) {
+	deps := getPushDependencies()
+
+	sharedDomain := cf.Domain{}
+	sharedDomain.Name = "foo.cf-app.com"
+	sharedDomain.Shared = true
+	sharedDomain.Guid = "foo-domain-guid"
+
+	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{sharedDomain}
+	deps.routeRepo.FindByHostAndDomainErr = true
+
+	deps.appRepo.ReadNotFound = true
+
+	ui := callPush(t, []string{"-t", "111", "Tim's 1st-Crazy__app!"}, deps)
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("name"), "Tim's 1st-Crazy__app!")
+
+	assert.Equal(t, deps.routeRepo.FindByHostAndDomainHost, "tims-1st-crazy-app")
+	assert.Equal(t, deps.routeRepo.CreatedHost, "tims-1st-crazy-app")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating", "tims-1st-crazy-app.foo.cf-app.com"},
+		{"Binding", "tims-1st-crazy-app.foo.cf-app.com"},
+	})
+}
+
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	deps := getPushDependencies()
 
