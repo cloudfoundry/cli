@@ -174,6 +174,15 @@ func TestCreateUploadDirWithAZipFile(t *testing.T) {
 	assert.True(t, apiResponse.IsSuccessful())
 }
 
+func TestCreateUploadDirWithAZipLikeFile(t *testing.T) {
+	dir, err := os.Getwd()
+	assert.NoError(t, err)
+	dir = filepath.Join(dir, "../../fixtures/example-app.azip")
+
+	_, apiResponse := testUploadApp(t, dir, defaultRequests)
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
 func TestUploadAppFailsWhilePushingBits(t *testing.T) {
 	dir, err := os.Getwd()
 	assert.NoError(t, err)
