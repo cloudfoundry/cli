@@ -55,7 +55,7 @@ func writeZipFile(dir string, targetFile *os.File) (err error) {
 		}
 
 		header, err := zip.FileInfoHeader(fileInfo)
-		header.Name = fileName
+		header.Name = filepath.ToSlash(fileName)
 		if err != nil {
 			return err
 		}
