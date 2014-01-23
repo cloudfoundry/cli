@@ -74,15 +74,7 @@ func (repo CloudControllerDomainRepository) ListSharedDomains(cb ListDomainsCall
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse {
-	return repo.listDomains("/v2/domains?inline-relations-depth=1", ListDomainsCallback(func(allDomains []cf.Domain) bool {
-		domainsToReturn := []cf.Domain{}
-		for _, domain := range allDomains {
-			if repo.isOrgDomain(orgGuid, domain.DomainFields) {
-				domainsToReturn = append(domainsToReturn, domain)
-			}
-		}
-		return cb(domainsToReturn)
-	}))
+	return repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
 }
 
 func (repo CloudControllerDomainRepository) listDomains(path string, cb ListDomainsCallback) (apiResponse net.ApiResponse) {

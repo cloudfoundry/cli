@@ -52,30 +52,43 @@ func TestListDomains(t *testing.T) {
 	domain2.Shared = false
 	domain2.Name = "Domain2"
 
-	space1 := cf.SpaceFields{}
-	space1.Name = "my-space"
-
-	space2 := cf.SpaceFields{}
-	space2.Name = "my-space-2"
-
-	domain2.Spaces = []cf.SpaceFields{space1, space2}
-
 	domain3 := cf.Domain{}
 	domain3.Shared = false
 	domain3.Name = "Domain3"
 
 	domainRepo := &testapi.FakeDomainRepository{
-		ListDomainsForOrgDomains: []cf.Domain{domain1, domain2, domain3},
+		ListSharedDomainsDomains: []cf.Domain{domain1},
+		ListDomainsForOrgDomains: []cf.Domain{domain2, domain3},
 	}
 	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
+
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting domains in org", "my-org", "my-user"},
-		{"name", "status", "spaces"},
+		{"name", "status"},
 		{"Domain1", "shared"},
-		{"Domain2", "owned", "my-space", "my-space-2"},
-		{"Domain3", "reserved"},
+		{"Domain2", "owned"},
+		{"Domain3", "owned"},
+	})
+}
+
+func TestListDomainsWhenThereAreNone(t *testing.T) {
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+	orgFields.Guid = "my-org-guid"
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+	domainRepo := &testapi.FakeDomainRepository{
+		ListSharedDomainsDomains: []cf.Domain{},
+		ListDomainsForOrgDomains: []cf.Domain{},
+	}
+	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting domains in org", "my-org", "my-user"},
+		{"No domains found"},
 	})
 }
 

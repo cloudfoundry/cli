@@ -15,7 +15,7 @@ import (
 
 var noDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/domains?inline-relations-depth=1",
+	Path:   "/v2/organizations/my-org-guid/private_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
 {
 	"next_url": "",
@@ -62,73 +62,56 @@ var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testn
 
 var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/domains?inline-relations-depth=1",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
-		"next_url": "/v2/domains?inline-relations-depth=1&page=2",
-		"resources": [
-	{
-      "metadata": {
-        "guid": "domain1-guid"
-      },
-      "entity": {
-        "name": "example.com",
-        "owning_organization_guid": "my-org-guid",
-        "spaces": [
-          {
-            "metadata": { "guid": "my-space-guid" },
-            "entity": { "name": "my-space" }
-          }
-        ]
-      }
-    },
-    {
-      "metadata": {
-        "guid": "domain2-guid"
-      },
-      "entity": {
-        "name": "some-shared.example.com",
-        "owning_organization_guid": null,
-        "spaces": [
-          {
-            "metadata": { "guid": "my-space-guid" },
-            "entity": { "name": "my-space" }
-          }
-        ]
-      }
-    }
-		]}`},
+	Path:   "/v2/organizations/my-org-guid/private_domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/organizations/my-org-guid/private_domains?page=2",
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain1-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		},
+		{
+		  "metadata": {
+			"guid": "domain2-guid"
+		  },
+		  "entity": {
+			"name": "some-example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`},
 })
 
 var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/domains?inline-relations-depth=1&page=2",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-    {
-      "metadata": {
-        "guid": "not-in-my-org-domain-guid"
-      },
-      "entity": {
-        "name": "example.com",
-        "owning_organization_guid": "not-my-org-guid",
-        "spaces": []
-      }
-    },
-	{
-      "metadata": {
-        "guid": "domain3-guid"
-      },
-      "entity": {
-        "name": "example.com",
-        "owning_organization_guid": "my-org-guid",
-        "spaces": [
-          {
-            "metadata": { "guid": "my-space-guid" },
-            "entity": { "name": "my-space" }
-          }
-        ]
-      }
-    }
-		]}`},
+	Path:   "/v2/organizations/my-org-guid/private_domains?page=2",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain3-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid",
+			"spaces": [
+			  {
+				"metadata": { "guid": "my-space-guid" },
+				"entity": { "name": "my-space" }
+			  }
+			]
+		  }
+		}
+	]
+}`},
 })
 
 func TestListSharedDomains(t *testing.T) {
@@ -183,7 +166,7 @@ func TestListDomainsForOrgWithNoDomains(t *testing.T) {
 func TestDomainListDomainsForOrgWithNoDomains(t *testing.T) {
 	emptyDomainsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "GET",
-		Path:     "/v2/domains?inline-relations-depth=1",
+		Path:     "/v2/organizations/my-org-guid/private_domains",
 		Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [] }`},
 	})
 
