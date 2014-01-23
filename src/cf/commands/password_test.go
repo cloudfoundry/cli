@@ -26,7 +26,7 @@ func TestPasswordRequiresValidAccessToken(t *testing.T) {
 
 func TestPasswordCanBeChanged(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testapi.FakePasswordRepo{Score: "meh"}
+	pwdRepo := &testapi.FakePasswordRepo{}
 	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
@@ -36,9 +36,7 @@ func TestPasswordCanBeChanged(t *testing.T) {
 		{"Verify Password"},
 	})
 
-	assert.Equal(t, pwdRepo.ScoredPassword, "new-password")
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Your password strength is: meh"},
 		{"Changing password..."},
 		{"OK"},
 		{"Please log in again"},
@@ -56,7 +54,7 @@ func TestPasswordCanBeChanged(t *testing.T) {
 
 func TestPasswordVerification(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testapi.FakePasswordRepo{Score: "meh"}
+	pwdRepo := &testapi.FakePasswordRepo{}
 	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, reqFactory, pwdRepo, configRepo)
 
@@ -75,11 +73,10 @@ func TestPasswordVerification(t *testing.T) {
 
 func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testapi.FakePasswordRepo{UpdateUnauthorized: true, Score: "meh"}
+	pwdRepo := &testapi.FakePasswordRepo{UpdateUnauthorized: true}
 	configRepo := &testconfig.FakeConfigRepository{}
 	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
 
-	assert.Equal(t, pwdRepo.ScoredPassword, "new-password")
 	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
 		{"Current Password"},
 		{"New Password"},
@@ -87,7 +84,6 @@ func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
 	})
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Your password strength is: meh"},
 		{"Changing password..."},
 		{"FAILED"},
 		{"Current password did not match"},
