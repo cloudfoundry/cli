@@ -8,10 +8,11 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"strings"
 )
 
 func TestLoadingWithNoConfigFile(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		repo := NewConfigurationDiskRepository()
 		config, err := repo.Get()
 		assert.NoError(t, err)
@@ -24,7 +25,7 @@ func TestLoadingWithNoConfigFile(t *testing.T) {
 }
 
 func TestSavingAndLoading(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		repo := NewConfigurationDiskRepository()
 		configToSave, err := repo.Get()
 		assert.NoError(t, err)
@@ -44,7 +45,7 @@ func TestSavingAndLoading(t *testing.T) {
 }
 
 func TestSetOrganization(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		repo := NewConfigurationDiskRepository()
 		config, err := repo.Get()
 		assert.NoError(t, err)
@@ -67,7 +68,7 @@ func TestSetOrganization(t *testing.T) {
 }
 
 func TestSetSpace(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		repo := NewConfigurationDiskRepository()
 		repo.Get()
 		space := cf.SpaceFields{}
@@ -86,7 +87,7 @@ func TestSetSpace(t *testing.T) {
 }
 
 func TestClearTokens(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		org := cf.OrganizationFields{}
 		org.Name = "my-org"
 		space := cf.SpaceFields{}
@@ -119,7 +120,7 @@ func TestClearTokens(t *testing.T) {
 }
 
 func TestClearSession(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		repo := NewConfigurationDiskRepository()
 		config, err := repo.Get()
 		assert.NoError(t, err)
@@ -149,7 +150,7 @@ func TestClearSession(t *testing.T) {
 }
 
 func TestNewConfigGivesYouCurrentVersionedConfig(t *testing.T) {
-	withFakeHome(func() {
+	withFakeHome(t, func() {
 		repo := NewConfigurationDiskRepository()
 		config, err := repo.Get()
 		assert.NoError(t, err)
@@ -177,10 +178,12 @@ func TestReadingVersionNumberFromExistingConfig(t *testing.T) {
 	})
 }
 
-func withFakeHome(callback func()) {
+func withFakeHome(t *testing.T, callback func()) {
 	oldHome := os.Getenv("HOME")
 	oldHomePath := os.Getenv("HOMEPATH")
+	oldHomeDrive := os.Getenv("HOMEDRIVE")
 	defer func() {
+		os.Setenv("HOMEDRIVE", oldHomeDrive)
 		os.Setenv("HOMEPATH", oldHomePath)
 		os.Setenv("HOME", oldHome)
 	}()
@@ -191,7 +194,15 @@ func withFakeHome(callback func()) {
 
 	fileutils.TempDir("test-config", func(dir string, err error) {
 		os.Setenv("HOME", dir)
-		os.Setenv("HOMEPATH", dir)
+
+		volumeName := filepath.VolumeName(dir)
+		if volumeName != "" {
+			relativePath := strings.Replace(dir, volumeName, "", 1)
+
+			os.Setenv("HOMEPATH", relativePath)
+			os.Setenv("HOMEDRIVE", volumeName)
+		}
+
 		callback()
 	})
 }
@@ -199,7 +210,9 @@ func withFakeHome(callback func()) {
 func withConfigFixture(t *testing.T, name string, callback func()) {
 	oldHome := os.Getenv("HOME")
 	oldHomePath := os.Getenv("HOMEPATH")
+	oldHomeDrive := os.Getenv("HOMEDRIVE")
 	defer func() {
+		os.Setenv("HOMEDRIVE", oldHomeDrive)
 		os.Setenv("HOMEPATH", oldHomePath)
 		os.Setenv("HOME", oldHome)
 	}()
@@ -213,6 +226,14 @@ func withConfigFixture(t *testing.T, name string, callback func()) {
 
 	fixturePath := filepath.Join(cwd, fmt.Sprintf("../../fixtures/config/%s", name))
 	os.Setenv("HOME", fixturePath)
-	os.Setenv("HOMEPATH", fixturePath)
+
+	volumeName := filepath.VolumeName(fixturePath)
+	if volumeName != "" {
+		relativePath := strings.Replace(fixturePath, volumeName, "", 1)
+
+		os.Setenv("HOMEPATH", relativePath)
+		os.Setenv("HOMEDRIVE", volumeName)
+	}
+
 	callback()
 }
