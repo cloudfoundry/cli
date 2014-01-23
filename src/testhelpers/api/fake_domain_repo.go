@@ -68,6 +68,10 @@ func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, stop chan bo
 	return
 }
 
+func (repo *FakeDomainRepository) ListSharedDomains(stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse) {
+	return
+}
+
 func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	domain = repo.FindByNameDomain
