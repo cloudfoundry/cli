@@ -82,7 +82,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 		repo.listenForMessages(ws, inputChan, stopInputChan)
 	}()
 
-	messageQueue := &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
+	messageQueue := NewSortedMessageQueue(printTimeBuffer)
 
 	repo.processMessages(messageQueue, inputChan, outputChan, stopLoggingChan, stopInputChan)
 

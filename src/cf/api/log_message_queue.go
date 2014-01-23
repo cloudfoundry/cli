@@ -14,8 +14,12 @@ type Item struct {
 }
 
 type SortedMessageQueue struct {
-	items           []*Item
 	printTimeBuffer time.Duration
+	items           []*Item
+}
+
+func NewSortedMessageQueue(printTimeBuffer time.Duration) *SortedMessageQueue {
+	return &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
 }
 
 func (pq *SortedMessageQueue) PushMessage(message *logmessage.Message) {
