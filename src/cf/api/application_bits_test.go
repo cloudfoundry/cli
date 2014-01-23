@@ -1,8 +1,9 @@
-package api
+package api_test
 
 import (
 	"archive/zip"
 	"cf"
+	. "cf/api"
 	"cf/configuration"
 	"cf/net"
 	"fileutils"

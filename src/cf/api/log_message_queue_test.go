@@ -1,6 +1,7 @@
-package api
+package api_test
 
 import (
+	. "cf/api"
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"

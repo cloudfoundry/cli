@@ -1,6 +1,7 @@
-package api
+package api_test
 
 import (
+	. "cf/api"
 	"cf/net"
 	"encoding/base64"
 	"github.com/stretchr/testify/assert"
