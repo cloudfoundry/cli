@@ -29,18 +29,12 @@ func (resource DomainResource) ToFields() (fields cf.DomainFields) {
 
 func (resource DomainResource) ToModel() (domain cf.Domain) {
 	domain.DomainFields = resource.ToFields()
-
-	for _, spaceResource := range resource.Entity.Spaces {
-		domain.Spaces = append(domain.Spaces, spaceResource.ToFields())
-	}
-
 	return
 }
 
 type DomainEntity struct {
 	Name                   string
 	OwningOrganizationGuid string `json:"owning_organization_guid"`
-	Spaces                 []SpaceResource
 }
 
 type ListDomainsCallback func(domains []cf.Domain) (fetchNext bool)
@@ -170,7 +164,7 @@ func (repo CloudControllerDomainRepository) findOneWithPaths(scopedPath, name st
 func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain cf.DomainFields, apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
 	data := fmt.Sprintf(
-		`{"name":"%s","wildcard":true,"owning_organization_guid":"%s"}`, domainName, owningOrgGuid,
+		`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid,
 	)
 
 	resource := new(DomainResource)
@@ -185,7 +179,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 
 func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiResponse net.ApiResponse) {
 	path := repo.config.Target + "/v2/domains"
-	data := fmt.Sprintf(`{"name":"%s","wildcard":true}`, domainName)
+	data := fmt.Sprintf(`{"name":"%s"}`, domainName)
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
 }
 
