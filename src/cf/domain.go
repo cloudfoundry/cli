@@ -185,7 +185,6 @@ func (model DomainFields) UrlForHost(host string) string {
 
 type Domain struct {
 	DomainFields
-	Spaces []SpaceFields
 }
 
 type EventFields struct {

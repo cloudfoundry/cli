@@ -101,13 +101,7 @@ var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		  },
 		  "entity": {
 			"name": "example.com",
-			"owning_organization_guid": "my-org-guid",
-			"spaces": [
-			  {
-				"metadata": { "guid": "my-space-guid" },
-				"entity": { "name": "my-space" }
-			  }
-			]
+			"owning_organization_guid": "my-org-guid"
 		  }
 		}
 	]
@@ -323,14 +317,7 @@ func TestDomainFindByNameInOrg(t *testing.T) {
 			  "metadata": { "guid": "my-domain-guid" },
 			  "entity": {
 				"name": "my-example.com",
-				"owning_organization_guid": "my-org-guid",
-				"wildcard": true,
-				"spaces": [
-				  {
-					"metadata": { "guid": "my-space-guid" },
-					"entity": { "name": "my-space" }
-				  }
-				]
+				"owning_organization_guid": "my-org-guid"
 			  }
 			}
 		]}`},
@@ -346,7 +333,6 @@ func TestDomainFindByNameInOrg(t *testing.T) {
 	assert.Equal(t, domain.Name, "my-example.com")
 	assert.Equal(t, domain.Guid, "my-domain-guid")
 	assert.False(t, domain.Shared)
-	assert.Equal(t, domain.Spaces[0].Name, "my-space")
 }
 
 func TestDomainFindByNameInOrgWhenNotFoundOnBothEndpoints(t *testing.T) {
@@ -386,9 +372,7 @@ func TestDomainFindByNameInOrgWhenFoundAsSharedDomain(t *testing.T) {
 			  "metadata": { "guid": "shared-domain-guid" },
 			  "entity": {
 				"name": "shared-example.com",
-				"owning_organization_guid": null,
-				"wildcard": true,
-				"spaces": []
+				"owning_organization_guid": null
 			  }
 			}
 		]}`},
@@ -421,9 +405,7 @@ func TestDomainFindByNameInOrgWhenFoundInDomainsButNotShared(t *testing.T) {
 			  "metadata": { "guid": "shared-domain-guid" },
 			  "entity": {
 				"name": "shared-example.com",
-				"owning_organization_guid": "some-other-org-guid",
-				"wildcard": true,
-				"spaces": []
+				"owning_organization_guid": "some-other-org-guid"
 			  }
 			}
 		]}`},
@@ -442,7 +424,7 @@ func TestCreateDomain(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
 		Path:    "/v2/domains",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","wildcard":true,"owning_organization_guid":"org-guid"}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
 			"metadata": { "guid": "abc-123" },
 			"entity": { "name": "example.com" }
@@ -463,7 +445,7 @@ func TestShareDomain(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
 		Path:    "/v2/domains",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","wildcard":true}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated, Body: ` {
 			"metadata": { "guid": "abc-123" },
 			"entity": { "name": "example.com" }
