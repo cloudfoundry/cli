@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	filePermissions = 0644
-	dirPermissions  = 0700
+	filePermissions      = 0644
+	dirPermissions       = 0700
+	currentConfigVersion = 1
 )
 
 var singleton *Configuration
@@ -26,8 +27,7 @@ type ConfigurationRepository interface {
 	SetSpace(space cf.SpaceFields) (err error)
 }
 
-type ConfigurationDiskRepository struct {
-}
+type ConfigurationDiskRepository struct{}
 
 func NewConfigurationDiskRepository() (repo ConfigurationDiskRepository) {
 	return ConfigurationDiskRepository{}
@@ -58,7 +58,7 @@ func (repo ConfigurationDiskRepository) SetSpace(space cf.SpaceFields) (err erro
 
 func (repo ConfigurationDiskRepository) Get() (c *Configuration, err error) {
 	if singleton == nil {
-		singleton, err = load()
+		singleton, err = repo.load()
 
 		if err != nil {
 			return
@@ -148,11 +148,12 @@ func defaultConfig() (c *Configuration) {
 	c.ApiVersion = ""
 	c.AuthorizationEndpoint = ""
 	c.ApplicationStartTimeout = 30 // seconds
+	c.ConfigVersion = currentConfigVersion
 
 	return
 }
 
-func load() (c *Configuration, parseError error) {
+func (repo ConfigurationDiskRepository) load() (c *Configuration, parseError error) {
 	file, readError := ConfigFile()
 	c = new(Configuration)
 
@@ -169,6 +170,14 @@ func load() (c *Configuration, parseError error) {
 	}
 
 	parseError = json.Unmarshal(data, c)
+	if parseError != nil {
+		return
+	}
+
+	if c.ConfigVersion < currentConfigVersion {
+		c = defaultConfig()
+		return c, nil
+	}
 
 	return
 }
