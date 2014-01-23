@@ -7,6 +7,7 @@ import (
 )
 
 type Configuration struct {
+	ConfigVersion           int
 	Target                  string
 	ApiVersion              string
 	AuthorizationEndpoint   string
