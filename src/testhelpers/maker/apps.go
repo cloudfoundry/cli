@@ -31,6 +31,7 @@ func NewAppFields(overrides Overrides) (app cf.ApplicationFields) {
 }
 
 func NewApp(overrides Overrides) (app cf.Application) {
+
 	app.ApplicationFields = NewAppFields(overrides)
 
 	return

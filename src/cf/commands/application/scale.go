@@ -62,6 +62,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 	)
 
 	params := cf.NewEmptyAppParams()
+	shouldRestart := false
 
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
@@ -71,13 +72,14 @@ func (cmd *Scale) Run(c *cli.Context) {
 			return
 		}
 		params.Set("memory", memory)
+		shouldRestart = true
 	}
 
 	if c.Int("i") != -1 {
 		params.Set("instances", c.Int("i"))
 	}
 
-	_, apiResponse := cmd.appRepo.Update(currentApp.Guid, params)
+	updatedApp, apiResponse := cmd.appRepo.Update(currentApp.Guid, params)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -85,4 +87,8 @@ func (cmd *Scale) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
+
+	if shouldRestart {
+		cmd.restarter.ApplicationRestart(updatedApp)
+	}
 }
