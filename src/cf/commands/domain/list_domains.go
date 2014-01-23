@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/formatters"
@@ -49,15 +50,10 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-
-	domainsChan, statusChan := cmd.domainRepo.ListDomainsForOrg(org.Guid, stopChan)
-
 	table := cmd.ui.Table([]string{"name", "status", "spaces"})
 	noDomains := true
 
-	for domains := range domainsChan {
+	apiResponse := cmd.domainRepo.ListDomainsForOrg(org.Guid, api.ListDomainsCallback(func(domains []cf.Domain) bool {
 		rows := [][]string{}
 		for _, domain := range domains {
 
@@ -78,11 +74,12 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		}
 		table.Print(rows)
 		noDomains = false
-	}
 
-	apiStatus := <-statusChan
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching domains.\n%s", apiStatus.Message)
+		return true
+	}))
+
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching domains.\n%s", apiResponse.Message)
 		return
 	}
 

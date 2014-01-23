@@ -13,6 +13,16 @@ import (
 	"testing"
 )
 
+var noDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/domains?inline-relations-depth=1",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "",
+	"resources": []
+}`},
+})
+
 var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/shared_domains?inline-relations-depth=1",
@@ -125,22 +135,16 @@ func TestListSharedDomains(t *testing.T) {
 	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
 	defer ts.Close()
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-	domainsChan, statusChan := repo.ListSharedDomains(stopChan)
+	receivedDomains := []cf.Domain{}
+	apiResponse := repo.ListSharedDomains(ListDomainsCallback(func(domains []cf.Domain) bool {
+		receivedDomains = append(receivedDomains, domains...)
+		return true
+	}))
 
-	domains := []cf.Domain{}
-	for chunk := range domainsChan {
-		domains = append(domains, chunk...)
-	}
-	apiResponse := <-statusChan
-	println(apiResponse.Message)
-
-	assert.Equal(t, len(domains), 2)
-
-	assert.Equal(t, domains[0].Guid, "shared-domain1-guid")
-	assert.Equal(t, domains[1].Guid, "shared-domain2-guid")
 	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, len(receivedDomains), 2)
+	assert.Equal(t, receivedDomains[0].Guid, "shared-domain1-guid")
+	assert.Equal(t, receivedDomains[1].Guid, "shared-domain2-guid")
 	assert.True(t, handler.AllRequestsCalled())
 }
 
@@ -148,20 +152,31 @@ func TestDomainListDomainsForOrg(t *testing.T) {
 	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
 	defer ts.Close()
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-	domainsChan, statusChan := repo.ListDomainsForOrg("my-org-guid", stopChan)
+	receivedDomains := []cf.Domain{}
+	apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+		receivedDomains = append(receivedDomains, domains...)
+		return true
+	}))
 
-	domains := []cf.Domain{}
-	for chunk := range domainsChan {
-		domains = append(domains, chunk...)
-	}
-	apiResponse := <-statusChan
-
-	assert.Equal(t, len(domains), 3)
-	assert.Equal(t, domains[0].Guid, "domain1-guid")
-	assert.Equal(t, domains[1].Guid, "domain2-guid")
 	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, len(receivedDomains), 3)
+	assert.Equal(t, receivedDomains[0].Guid, "domain1-guid")
+	assert.Equal(t, receivedDomains[1].Guid, "domain2-guid")
+	assert.True(t, handler.AllRequestsCalled())
+}
+
+func TestListDomainsForOrgWithNoDomains(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{noDomainsRequest})
+	defer ts.Close()
+
+	wasCalled := false
+	apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+		wasCalled = true
+		return true
+	}))
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.False(t, wasCalled)
 	assert.True(t, handler.AllRequestsCalled())
 }
 
@@ -175,19 +190,12 @@ func TestDomainListDomainsForOrgWithNoDomains(t *testing.T) {
 	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{emptyDomainsRequest})
 	defer ts.Close()
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-	domainsChan, statusChan := repo.ListDomainsForOrg("my-org-guid", stopChan)
+	receivedDomains := []cf.Domain{}
+	apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+		receivedDomains = append(receivedDomains, domains...)
+		return true
+	}))
 
-	domains := []cf.Domain{}
-	for chunk := range domainsChan {
-		domains = append(domains, chunk...)
-	}
-
-	_, ok := <-domainsChan
-	apiResponse := <-statusChan
-
-	assert.False(t, ok)
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.True(t, handler.AllRequestsCalled())
 }

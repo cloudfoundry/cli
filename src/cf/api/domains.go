@@ -9,8 +9,6 @@ import (
 	"strings"
 )
 
-const PAGE_BUFFER_SIZE = 4
-
 type PaginatedDomainResources struct {
 	NextUrl   string `json:"next_url"`
 	Resources []DomainResource
@@ -45,9 +43,11 @@ type DomainEntity struct {
 	Spaces                 []SpaceResource
 }
 
+type ListDomainsCallback func(domains []cf.Domain) (fetchNext bool)
+
 type DomainRepository interface {
-	ListDomainsForOrg(orgGuid string, stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse)
-	ListSharedDomains(stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse)
+	ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse
+	ListSharedDomains(cb ListDomainsCallback) net.ApiResponse
 	FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, owningOrgGuid string) (domain cf.Domain, apiResponse net.ApiResponse)
@@ -69,63 +69,41 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 	return
 }
 
-func (repo CloudControllerDomainRepository) ListSharedDomains(stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse) {
-	return repo.listDomains("/v2/shared_domains?inline-relations-depth=1", stop)
+func (repo CloudControllerDomainRepository) ListSharedDomains(cb ListDomainsCallback) net.ApiResponse {
+	return repo.listDomains("/v2/shared_domains?inline-relations-depth=1", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse) {
-	domainsChan = make(chan []cf.Domain, PAGE_BUFFER_SIZE)
-	defer close(domainsChan)
-
-	allDomainsChan, statusChan := repo.listDomains("/v2/domains?inline-relations-depth=1", stop)
-
-	for allDomains := range allDomainsChan {
+func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse {
+	return repo.listDomains("/v2/domains?inline-relations-depth=1", ListDomainsCallback(func(allDomains []cf.Domain) bool {
 		domainsToReturn := []cf.Domain{}
 		for _, domain := range allDomains {
 			if repo.isOrgDomain(orgGuid, domain.DomainFields) {
 				domainsToReturn = append(domainsToReturn, domain)
 			}
 		}
-		domainsChan <- domainsToReturn
-	}
-
-	return
+		return cb(domainsToReturn)
+	}))
 }
 
-func (repo CloudControllerDomainRepository) listDomains(path string, stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse) {
-	domainsChan = make(chan []cf.Domain, PAGE_BUFFER_SIZE)
-	statusChan = make(chan net.ApiResponse, 1)
+func (repo CloudControllerDomainRepository) listDomains(path string, cb ListDomainsCallback) (apiResponse net.ApiResponse) {
+	fetchNext := true
+	for fetchNext {
+		var (
+			domains     []cf.Domain
+			shouldFetch bool
+		)
 
-	go func() {
-	loop:
-		for path != "" {
-			select {
-			case <-stop:
-				break loop
-			default:
-				var (
-					domains     []cf.Domain
-					apiResponse net.ApiResponse
-				)
-
-				domains, path, apiResponse = repo.findNextWithPath(path)
-				if apiResponse.IsNotSuccessful() {
-					statusChan <- apiResponse
-					close(domainsChan)
-					close(statusChan)
-					return
-				}
-
-				if len(domains) > 0 {
-					domainsChan <- domains
-				}
-			}
+		domains, path, apiResponse = repo.findNextWithPath(path)
+		if apiResponse.IsNotSuccessful() {
+			return
 		}
-		close(domainsChan)
-		close(statusChan)
-		cf.WaitForClose(stop)
-	}()
 
+		if len(domains) > 0 {
+			shouldFetch = cb(domains)
+		}
+
+		fetchNext = shouldFetch && path != ""
+	}
 	return
 }
 

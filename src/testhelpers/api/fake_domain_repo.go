@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/net"
+	"cf/api"
 )
 
 type FakeDomainRepository struct {
@@ -10,6 +11,10 @@ type FakeDomainRepository struct {
 
 	ListDomainsForOrgDomainsGuid string
 	ListDomainsForOrgDomains     []cf.Domain
+	ListDomainsForOrgApiResponse net.ApiResponse
+
+	ListSharedDomainsDomains     []cf.Domain
+	ListSharedDomainsApiResponse net.ApiResponse
 
 	FindByNameInOrgDomain      cf.Domain
 	FindByNameInOrgApiResponse net.ApiResponse
@@ -38,38 +43,19 @@ type FakeDomainRepository struct {
 	DeleteApiResponse net.ApiResponse
 }
 
-func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse) {
+func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, cb api.ListDomainsCallback) net.ApiResponse {
 	repo.ListDomainsForOrgDomainsGuid = orgGuid
-
-	domainsChan = make(chan []cf.Domain, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		domainsCount := len(repo.ListDomainsForOrgDomains)
-		for i := 0; i < domainsCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if domainsCount-i > 1 {
-					domainsChan <- repo.ListDomainsForOrgDomains[i : i+2]
-				} else {
-					domainsChan <- repo.ListDomainsForOrgDomains[i:]
-				}
-			}
-		}
-
-		close(domainsChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
-	return
+	if len(repo.ListDomainsForOrgDomains) > 0 {
+		cb(repo.ListDomainsForOrgDomains)
+	}
+	return repo.ListDomainsForOrgApiResponse
 }
 
-func (repo *FakeDomainRepository) ListSharedDomains(stop chan bool) (domainsChan chan []cf.Domain, statusChan chan net.ApiResponse) {
-	return
+func (repo *FakeDomainRepository) ListSharedDomains(cb api.ListDomainsCallback) net.ApiResponse {
+	if len(repo.ListSharedDomainsDomains) > 0 {
+		cb(repo.ListSharedDomainsDomains)
+	}
+	return repo.ListSharedDomainsApiResponse
 }
 
 func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
