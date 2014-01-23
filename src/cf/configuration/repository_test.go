@@ -179,7 +179,9 @@ func TestReadingVersionNumberFromExistingConfig(t *testing.T) {
 
 func withFakeHome(callback func()) {
 	oldHome := os.Getenv("HOME")
+	oldHomePath := os.Getenv("HOMEPATH")
 	defer func() {
+		os.Setenv("HOMEPATH", oldHomePath)
 		os.Setenv("HOME", oldHome)
 	}()
 
@@ -189,19 +191,28 @@ func withFakeHome(callback func()) {
 
 	fileutils.TempDir("test-config", func(dir string, err error) {
 		os.Setenv("HOME", dir)
+		os.Setenv("HOMEPATH", dir)
 		callback()
 	})
 }
 
 func withConfigFixture(t *testing.T, name string, callback func()) {
 	oldHome := os.Getenv("HOME")
+	oldHomePath := os.Getenv("HOMEPATH")
+	defer func() {
+		os.Setenv("HOMEPATH", oldHomePath)
+		os.Setenv("HOME", oldHome)
+	}()
+
 	defer func() {
 		singleton = nil
-		os.Setenv("HOME", oldHome)
 	}()
 
 	cwd, err := os.Getwd()
 	assert.NoError(t, err)
-	os.Setenv("HOME", filepath.Join(cwd, fmt.Sprintf("../../fixtures/config/%s", name)))
+
+	fixturePath := filepath.Join(cwd, fmt.Sprintf("../../fixtures/config/%s", name))
+	os.Setenv("HOME", fixturePath)
+	os.Setenv("HOMEPATH", fixturePath)
 	callback()
 }
