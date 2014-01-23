@@ -1,6 +1,7 @@
-package api
+package api_test
 
 import (
+	. "cf/api"
 	"cf/configuration"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
