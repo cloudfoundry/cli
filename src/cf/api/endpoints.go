@@ -1,21 +1,16 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/net"
-	"regexp"
 	"strings"
-)
-
-const (
-	authEndpointPrefix = "login"
-	uaaEndpointPrefix  = "uaa"
 )
 
 type EndpointRepository interface {
 	UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse)
-	GetEndpoint(name cf.EndpointType) (endpoint string, apiResponse net.ApiResponse)
+	GetLoggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse)
+	GetUAAEndpoint() (endpoint string, apiResponse net.ApiResponse)
+	GetCloudControllerEndpoint() (endpoint string, apiResponse net.ApiResponse)
 }
 
 type RemoteEndpointRepository struct {
@@ -36,23 +31,23 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 
 	if endpointMissingScheme {
 		finalEndpoint = "https://" + endpoint
-		apiResponse = repo.doUpdateEndpoint(finalEndpoint)
+		apiResponse = repo.attemptUpdate(finalEndpoint)
 
 		if apiResponse.IsNotSuccessful() {
 			finalEndpoint = "http://" + endpoint
-			apiResponse = repo.doUpdateEndpoint(finalEndpoint)
+			apiResponse = repo.attemptUpdate(finalEndpoint)
 		}
 		return
 	}
 
 	finalEndpoint = endpoint
 
-	apiResponse = repo.doUpdateEndpoint(finalEndpoint)
+	apiResponse = repo.attemptUpdate(finalEndpoint)
 
 	return
 }
 
-func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse net.ApiResponse) {
 	request, apiResponse := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -61,6 +56,7 @@ func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiRespo
 	type infoResponse struct {
 		ApiVersion            string `json:"api_version"`
 		AuthorizationEndpoint string `json:"authorization_endpoint"`
+		LoggregatorEndpoint   string `json:"logging_endpoint"`
 	}
 
 	serverResponse := new(infoResponse)
@@ -76,6 +72,7 @@ func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiRespo
 	repo.config.Target = endpoint
 	repo.config.ApiVersion = serverResponse.ApiVersion
 	repo.config.AuthorizationEndpoint = serverResponse.AuthorizationEndpoint
+	repo.config.LoggregatorEndPoint = serverResponse.LoggregatorEndpoint
 
 	err := repo.configRepo.Save()
 	if err != nil {
@@ -84,24 +81,19 @@ func (repo RemoteEndpointRepository) doUpdateEndpoint(endpoint string) (apiRespo
 	return
 }
 
-func (repo RemoteEndpointRepository) GetEndpoint(name cf.EndpointType) (endpoint string, apiResponse net.ApiResponse) {
-	switch name {
-	case cf.CloudControllerEndpointKey:
-		return repo.cloudControllerEndpoint()
-	case cf.UaaEndpointKey:
-		return repo.uaaControllerEndpoint()
-	case cf.LoggregatorEndpointKey:
-		return repo.loggregatorEndpoint()
+func (repo RemoteEndpointRepository) GetLoggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+	if repo.config.LoggregatorEndPoint == "" {
+		apiResponse = net.NewApiResponseWithMessage("Loggregator endpoint missing from config file")
+		return
 	}
 
-	apiResponse = net.NewNotFoundApiResponse("Endpoint type %s is unkown", string(name))
-
+	endpoint = repo.config.LoggregatorEndPoint
 	return
 }
 
-func (repo RemoteEndpointRepository) cloudControllerEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) GetCloudControllerEndpoint() (endpoint string, apiResponse net.ApiResponse) {
 	if repo.config.Target == "" {
-		apiResponse = net.NewApiResponseWithMessage("Endpoint missing from config file")
+		apiResponse = net.NewApiResponseWithMessage("Target endpoint missing from config file")
 		return
 	}
 
@@ -109,31 +101,13 @@ func (repo RemoteEndpointRepository) cloudControllerEndpoint() (endpoint string,
 	return
 }
 
-func (repo RemoteEndpointRepository) uaaControllerEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) GetUAAEndpoint() (endpoint string, apiResponse net.ApiResponse) {
 	if repo.config.AuthorizationEndpoint == "" {
-		apiResponse = net.NewApiResponseWithMessage("Endpoint missing from config file")
+		apiResponse = net.NewApiResponseWithMessage("UAA endpoint missing from config file")
 		return
 	}
 
-	endpoint = strings.Replace(repo.config.AuthorizationEndpoint, authEndpointPrefix, uaaEndpointPrefix, 1)
+	endpoint = strings.Replace(repo.config.AuthorizationEndpoint, "login", "uaa", 1)
 
-	return
-}
-
-func (repo RemoteEndpointRepository) loggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse) {
-	if repo.config.Target == "" {
-		apiResponse = net.NewApiResponseWithMessage("Endpoint missing from config file")
-		return
-	}
-
-	re := regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
-
-	endpoint = re.ReplaceAllString(repo.config.Target, "ws${1}://loggregator.${2}")
-
-	if endpoint[0:3] == "wss" {
-		endpoint = endpoint + ":4443"
-	} else {
-		endpoint = endpoint + ":80"
-	}
 	return
 }

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/terminal"
 	"cf/trace"
@@ -32,7 +31,7 @@ func NewLoggregatorLogsRepository(config *configuration.Configuration, endpointR
 }
 
 func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
-	host, apiResponse := repo.endpointRepo.GetEndpoint(cf.LoggregatorEndpointKey)
+	host, apiResponse := repo.endpointRepo.GetLoggregatorEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		err = errors.New(apiResponse.Message)
 		return
@@ -46,7 +45,7 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect fu
 }
 
 func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) error {
-	host, apiResponse := repo.endpointRepo.GetEndpoint(cf.LoggregatorEndpointKey)
+	host, apiResponse := repo.endpointRepo.GetLoggregatorEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return errors.New(apiResponse.Message)
 	}

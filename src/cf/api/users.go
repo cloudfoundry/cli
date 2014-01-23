@@ -64,7 +64,7 @@ func NewCloudControllerUserRepository(config *configuration.Configuration, uaaGa
 }
 
 func (repo CloudControllerUserRepository) FindByUsername(username string) (user cf.UserFields, apiResponse net.ApiResponse) {
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -143,7 +143,7 @@ func (repo CloudControllerUserRepository) findNextWithPath(path string) (users [
 		return
 	}
 
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -195,7 +195,7 @@ func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers [
 }
 
 func (repo CloudControllerUserRepository) Create(username, password string) (apiResponse net.ApiResponse) {
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -241,7 +241,7 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiResponse n
 		return
 	}
 
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

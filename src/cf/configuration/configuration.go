@@ -11,6 +11,7 @@ type Configuration struct {
 	Target                  string
 	ApiVersion              string
 	AuthorizationEndpoint   string
+	LoggregatorEndPoint     string
 	AccessToken             string
 	RefreshToken            string
 	OrganizationFields      cf.OrganizationFields

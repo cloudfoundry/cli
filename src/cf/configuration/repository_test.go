@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestLoadingWithNoConfigFile(t *testing.T) {
@@ -154,7 +154,7 @@ func TestNewConfigGivesYouCurrentVersionedConfig(t *testing.T) {
 		repo := NewConfigurationDiskRepository()
 		config, err := repo.Get()
 		assert.NoError(t, err)
-		assert.Equal(t, config.ConfigVersion, 1)
+		assert.Equal(t, config.ConfigVersion, 2)
 	})
 }
 
@@ -164,7 +164,6 @@ func TestReadingOutdatedConfigReturnsNewConfig(t *testing.T) {
 		config, err := repo.Get()
 
 		assert.NoError(t, err)
-		assert.Equal(t, config.ConfigVersion, 1)
 		assert.Equal(t, config.Target, "")
 	})
 }

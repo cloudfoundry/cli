@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/net"
 	"github.com/stretchr/testify/assert"
@@ -59,9 +58,8 @@ func TestUpdatePassword(t *testing.T) {
 func createPasswordRepo(t *testing.T, req testnet.TestRequest, accessToken string) (passwordServer *httptest.Server, handler *testnet.TestHandler, repo PasswordRepository) {
 	passwordServer, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
 
-	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
-		cf.UaaEndpointKey: passwordServer.URL,
-	}}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.UAAEndpointReturns.Endpoint = passwordServer.URL
 
 	config := &configuration.Configuration{
 		AccessToken: accessToken,

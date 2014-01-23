@@ -27,6 +27,7 @@ var validApiInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
   "version": 2,
   "description": "Cloud Foundry sponsored by Pivotal",
   "authorization_endpoint": "https://login.example.com",
+  "logging_endpoint": "wss://loggregator.foo.example.org:4443",
   "api_version": "42.0.0"
 } `
 	fmt.Fprintln(w, infoResponse)
@@ -57,6 +58,7 @@ func TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint(t *testing.T) {
 
 	assert.Equal(t, savedConfig.AccessToken, "")
 	assert.Equal(t, savedConfig.AuthorizationEndpoint, "https://login.example.com")
+	assert.Equal(t, savedConfig.LoggregatorEndPoint, "wss://loggregator.foo.example.org:4443")
 	assert.Equal(t, savedConfig.Target, ts.URL)
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 	assert.False(t, savedConfig.HasOrganization())
@@ -139,15 +141,14 @@ func TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpEndpointExists(t *testing.T)
 	assert.Equal(t, savedConfig.ApiVersion, "42.0.0")
 }
 
-var notFoundApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
-}
-
 func TestUpdateEndpointWhenEndpointReturns404(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Login()
 
-	ts, repo := createEndpointRepoForUpdate(configRepo, notFoundApiEndpoint)
+	ts, repo := createEndpointRepoForUpdate(configRepo, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	})
+
 	defer ts.Close()
 
 	_, apiResponse := repo.UpdateEndpoint(ts.URL)
@@ -191,7 +192,7 @@ func makeRepo(configRepo testconfig.FakeConfigRepository) (repo EndpointReposito
 	return NewEndpointRepository(config, gateway, configRepo)
 }
 
-func TestGetEndpointForCloudController(t *testing.T) {
+func TestGetCloudControllerEndpoint(t *testing.T) {
 	configRepo := testconfig.FakeConfigRepository{}
 	config := &configuration.Configuration{
 		Target: "http://api.example.com",
@@ -199,37 +200,50 @@ func TestGetEndpointForCloudController(t *testing.T) {
 
 	repo := NewEndpointRepository(config, net.NewCloudControllerGateway(), configRepo)
 
-	endpoint, apiResponse := repo.GetEndpoint(cf.CloudControllerEndpointKey)
+	endpoint, apiResponse := repo.GetCloudControllerEndpoint()
 
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.Equal(t, endpoint, "http://api.example.com")
 }
 
-func TestGetEndpointForLoggregatorSecure(t *testing.T) {
+func TestGetLoggregatorEndpoint(t *testing.T) {
 	config := &configuration.Configuration{
-		Target: "https://foo.run.pivotal.io",
+		LoggregatorEndPoint: "wss://loggregator.example.com:4443",
 	}
 
 	repo := createEndpointRepoForGet(config)
 
-	endpoint, apiResponse := repo.GetEndpoint(cf.LoggregatorEndpointKey)
+	endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, endpoint, "wss://loggregator.run.pivotal.io:4443")
+	assert.Equal(t, endpoint, "wss://loggregator.example.com:4443")
 }
 
-func TestGetEndpointForLoggregatorInsecure(t *testing.T) {
-
+func TestGetUAAEndpoint(t *testing.T) {
 	config := &configuration.Configuration{
-		Target: "http://bar.run.pivotal.io",
+		AuthorizationEndpoint: "https://login.example.com",
 	}
 
 	repo := createEndpointRepoForGet(config)
 
-	endpoint, apiResponse := repo.GetEndpoint(cf.LoggregatorEndpointKey)
+	endpoint, apiResponse := repo.GetUAAEndpoint()
 
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, endpoint, "ws://loggregator.run.pivotal.io:80")
+	assert.Equal(t, endpoint, "https://uaa.example.com")
+}
+
+func TestEndpointsReturnAnErrorWhenMissing(t *testing.T) {
+	config := &configuration.Configuration{}
+	repo := createEndpointRepoForGet(config)
+
+	_, response := repo.GetLoggregatorEndpoint()
+	assert.True(t, response.IsNotSuccessful())
+
+	_, response = repo.GetCloudControllerEndpoint()
+	assert.True(t, response.IsNotSuccessful())
+
+	_, response = repo.GetUAAEndpoint()
+	assert.True(t, response.IsNotSuccessful())
 }
 
 func createEndpointRepoForGet(config *configuration.Configuration) (repo EndpointRepository) {
