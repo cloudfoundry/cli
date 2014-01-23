@@ -12,6 +12,43 @@ import (
 	"testing"
 )
 
+var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/shared_domains?inline-relations-depth=1",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/shared_domains?inline-relations-depth=1&page=2",
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "shared-domain1-guid"
+		  },
+		  "entity": {
+			"name": "shared-example1.com"
+ 		  }
+		}
+	]
+}`},
+})
+
+var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/shared_domains?inline-relations-depth=1",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "shared-domain2-guid"
+		  },
+		  "entity": {
+			"name": "shared-example2.com"
+ 		  }
+		}
+	]
+}`},
+})
+
 var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/domains?inline-relations-depth=1",
@@ -25,7 +62,6 @@ var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Test
       "entity": {
         "name": "example.com",
         "owning_organization_guid": "my-org-guid",
-        "wildcard": true,
         "spaces": [
           {
             "metadata": { "guid": "my-space-guid" },
@@ -41,7 +77,6 @@ var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Test
       "entity": {
         "name": "some-shared.example.com",
         "owning_organization_guid": null,
-        "wildcard": true,
         "spaces": [
           {
             "metadata": { "guid": "my-space-guid" },
@@ -64,7 +99,6 @@ var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
       "entity": {
         "name": "example.com",
         "owning_organization_guid": "not-my-org-guid",
-        "wildcard": true,
         "spaces": []
       }
     },
@@ -75,7 +109,6 @@ var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
       "entity": {
         "name": "example.com",
         "owning_organization_guid": "my-org-guid",
-        "wildcard": true,
         "spaces": [
           {
             "metadata": { "guid": "my-space-guid" },
@@ -86,6 +119,29 @@ var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
     }
 		]}`},
 })
+
+func TestListSharedDomains(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
+	defer ts.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	domainsChan, statusChan := repo.ListSharedDomains(stopChan)
+
+	domains := []cf.Domain{}
+	for chunk := range domainsChan {
+		domains = append(domains, chunk...)
+	}
+	apiResponse := <-statusChan
+	println(apiResponse.Message)
+
+	assert.Equal(t, len(domains), 2)
+
+	assert.Equal(t, domains[0].Guid, "shared-domain1-guid")
+	assert.Equal(t, domains[1].Guid, "shared-domain2-guid")
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.True(t, handler.AllRequestsCalled())
+}
 
 func TestDomainListDomainsForOrg(t *testing.T) {
 	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
@@ -104,10 +160,8 @@ func TestDomainListDomainsForOrg(t *testing.T) {
 	assert.Equal(t, len(domains), 3)
 	assert.Equal(t, domains[0].Guid, "domain1-guid")
 	assert.Equal(t, domains[1].Guid, "domain2-guid")
-	assert.Equal(t, domains[2].Guid, "domain3-guid")
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.True(t, handler.AllRequestsCalled())
-
 }
 
 func TestDomainListDomainsForOrgWithNoDomains(t *testing.T) {
