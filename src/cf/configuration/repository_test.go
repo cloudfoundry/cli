@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"path/filepath"
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestLoadingWithNoConfigFile(t *testing.T) {
