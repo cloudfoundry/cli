@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
@@ -40,9 +39,8 @@ func TestRecentLogsFor(t *testing.T) {
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
 
-	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
-		cf.LoggregatorEndpointKey: strings.Replace(websocketServer.URL, "https", "wss", 1),
-	}}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
 
 	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 
@@ -93,9 +91,8 @@ func TestTailsLogsFor(t *testing.T) {
 	defer websocketServer.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
-	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
-		cf.LoggregatorEndpointKey: strings.Replace(websocketServer.URL, "https", "wss", 1),
-	}}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
 
 	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 
@@ -162,9 +159,8 @@ func TestMessageOutputOrder(t *testing.T) {
 	defer websocketServer.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
-	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
-		cf.LoggregatorEndpointKey: strings.Replace(websocketServer.URL, "https", "wss", 1),
-	}}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
 
 	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 
@@ -208,9 +204,8 @@ func TestMessageOutputWhenFlushingAfterServerDeath(t *testing.T) {
 	defer websocketServer.Close()
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
-	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
-		cf.LoggregatorEndpointKey: strings.Replace(websocketServer.URL, "https", "wss", 1),
-	}}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
 
 	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
 

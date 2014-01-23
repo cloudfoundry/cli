@@ -408,9 +408,8 @@ func createUsersRepo(t *testing.T, ccReqs []testnet.TestRequest, uaaReqs []testn
 	}
 	ccGateway := net.NewCloudControllerGateway()
 	uaaGateway := net.NewUAAGateway()
-	endpointRepo := &testapi.FakeEndpointRepo{GetEndpointEndpoints: map[cf.EndpointType]string{
-		cf.UaaEndpointKey: uaaTarget,
-	}}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.UAAEndpointReturns.Endpoint = uaaTarget
 	repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway, endpointRepo)
 	return
 }

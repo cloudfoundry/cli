@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	testapi "testhelpers/api"
@@ -116,7 +117,7 @@ func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -171,7 +172,7 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -232,7 +233,7 @@ func TestSuccessfullyLoggingInWithFlags(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -260,7 +261,7 @@ func TestSuccessfullyLoggingInWithEndpointSetInConfig(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -292,7 +293,7 @@ func TestSuccessfullyLoggingInWithOrgSetInConfig(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -331,7 +332,7 @@ func TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -361,7 +362,7 @@ func TestSuccessfullyLoggingInWithOnlyOneOrg(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -390,7 +391,7 @@ func TestSuccessfullyLoggingInWithOnlyOneSpace(t *testing.T) {
 	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
 	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 
-	assert.Equal(t, c.endpointRepo.UpdateEndpointEndpoint, "http://api.example.com")
+	assert.Equal(t, c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 	assert.Equal(t, c.authRepo.Email, "user@example.com")
 	assert.Equal(t, c.authRepo.Password, "password")
 
@@ -425,7 +426,7 @@ func TestUnsuccessfullyLoggingInWithUpdateEndpointError(t *testing.T) {
 		Inputs: []string{"api.example.com"},
 	}
 	callLogin(t, &c, func(c *LoginTestContext) {
-		c.endpointRepo.UpdateEndpointError = true
+		c.endpointRepo.UpdateEndpointError = net.NewApiResponseWithMessage("Server error")
 	})
 
 	savedConfig := testconfig.SavedConfiguration

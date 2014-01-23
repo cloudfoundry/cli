@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/net"
 	"fmt"
@@ -33,7 +32,7 @@ type ScoreResponse struct {
 }
 
 func (repo CloudControllerPasswordRepository) GetScore(password string) (score string, apiResponse net.ApiResponse) {
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -60,7 +59,7 @@ func (repo CloudControllerPasswordRepository) GetScore(password string) (score s
 }
 
 func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiResponse net.ApiResponse) {
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetEndpoint(cf.UaaEndpointKey)
+	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
