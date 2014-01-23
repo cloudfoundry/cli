@@ -17,29 +17,29 @@ import (
 
 func TestScaleRequirements(t *testing.T) {
 	args := []string{"-m", "1G", "my-app"}
-	reqFactory, appRepo := getScaleDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 
 	reqFactory.LoginSuccess = false
 	reqFactory.TargetedSpaceSuccess = true
-	callScale(t, args, reqFactory, appRepo)
+	callScale(t, args, reqFactory, restarter, appRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = false
-	callScale(t, args, reqFactory, appRepo)
+	callScale(t, args, reqFactory, restarter, appRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = true
-	callScale(t, args, reqFactory, appRepo)
+	callScale(t, args, reqFactory, restarter, appRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 	assert.Equal(t, reqFactory.ApplicationName, "my-app")
 }
 
 func TestScaleFailsWithUsage(t *testing.T) {
-	reqFactory, appRepo := getScaleDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 
-	ui := callScale(t, []string{}, reqFactory, appRepo)
+	ui := callScale(t, []string{}, reqFactory, restarter, appRepo)
 
 	assert.True(t, ui.FailedWithUsage)
 	assert.False(t, testcmd.CommandDidPassRequirements)
@@ -47,11 +47,11 @@ func TestScaleFailsWithUsage(t *testing.T) {
 
 func TestScaleFailsWithoutFlags(t *testing.T) {
 	args := []string{"my-app"}
-	reqFactory, appRepo := getScaleDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.LoginSuccess = true
 	reqFactory.TargetedSpaceSuccess = true
 
-	callScale(t, args, reqFactory, appRepo)
+	callScale(t, args, reqFactory, restarter, appRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 
@@ -59,10 +59,10 @@ func TestScaleAll(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	reqFactory, appRepo := getScaleDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
-	ui := callScale(t, []string{"-i", "5", "-m", "512M", "my-app"}, reqFactory, appRepo)
+	ui := callScale(t, []string{"-i", "5", "-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Scaling", "my-app", "my-org", "my-space", "my-user"},
@@ -78,10 +78,10 @@ func TestScaleOnlyInstances(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	reqFactory, appRepo := getScaleDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
-	callScale(t, []string{"-i", "5", "my-app"}, reqFactory, appRepo)
+	callScale(t, []string{"-i", "5", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 	assert.Equal(t, appRepo.UpdateParams.Get("instances"), 5)
@@ -94,10 +94,10 @@ func TestScaleOnlyMemory(t *testing.T) {
 	app := cf.Application{}
 	app.Name = "my-app"
 	app.Guid = "my-app-guid"
-	reqFactory, appRepo := getScaleDependencies()
+	reqFactory, restarter, appRepo := getScaleDependencies()
 	reqFactory.Application = app
 
-	callScale(t, []string{"-m", "512M", "my-app"}, reqFactory, appRepo)
+	callScale(t, []string{"-m", "512M", "my-app"}, reqFactory, restarter, appRepo)
 
 	assert.Equal(t, appRepo.UpdateAppGuid, "my-app-guid")
 	assert.Equal(t, appRepo.UpdateParams.Get("memory").(uint64), uint64(512))
@@ -106,13 +106,14 @@ func TestScaleOnlyMemory(t *testing.T) {
 	assert.False(t, appRepo.UpdateParams.Has("instances"))
 }
 
-func getScaleDependencies() (reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) {
+func getScaleDependencies() (reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo *testapi.FakeApplicationRepository) {
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	restarter = &testcmd.FakeAppRestarter{}
 	appRepo = &testapi.FakeApplicationRepository{}
 	return
 }
 
-func callScale(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+func callScale(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, restarter *testcmd.FakeAppRestarter, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("scale", args)
 
@@ -130,7 +131,7 @@ func callScale(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, 
 		AccessToken:        token,
 	}
 
-	cmd := NewScale(ui, config, appRepo)
+	cmd := NewScale(ui, config, restarter, appRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

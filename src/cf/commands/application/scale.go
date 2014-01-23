@@ -12,16 +12,18 @@ import (
 )
 
 type Scale struct {
-	ui      terminal.UI
-	config  *configuration.Configuration
-	appReq  requirements.ApplicationRequirement
-	appRepo api.ApplicationRepository
+	ui        terminal.UI
+	config    *configuration.Configuration
+	restarter ApplicationRestarter
+	appReq    requirements.ApplicationRequirement
+	appRepo   api.ApplicationRepository
 }
 
-func NewScale(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Scale) {
+func NewScale(ui terminal.UI, config *configuration.Configuration, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
 	cmd = new(Scale)
 	cmd.ui = ui
 	cmd.config = config
+	cmd.restarter = restarter
 	cmd.appRepo = appRepo
 	return
 }
