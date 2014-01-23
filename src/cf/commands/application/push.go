@@ -243,26 +243,20 @@ func (cmd *Push) domain(c *cli.Context, domainName string) (domain cf.Domain) {
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 		}
-	} else {
-		stopChan := make(chan bool, 1)
-		domainsChan, statusChan := cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields.Guid, stopChan)
+		return
+	}
 
-		for domainsChunk := range domainsChan {
-			for _, d := range domainsChunk {
-				if d.Shared {
-					domain = d
-					stopChan <- true
-					break
-				}
-			}
-		}
+	apiResponse = cmd.domainRepo.ListSharedDomains(api.ListDomainsCallback(func(domains []cf.Domain) bool {
+		domain = domains[0]
+		return false
+	}))
 
-		apiResponse, ok := <-statusChan
-		if (domain.Guid == "") && ok && apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
-		} else if domain.Guid == "" {
-			cmd.ui.Failed("No default domain exists")
-		}
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+	}
+
+	if domain.Guid == "" {
+		cmd.ui.Failed("No default domain exists")
 	}
 
 	return

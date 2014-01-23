@@ -101,17 +101,12 @@ func TestPushingRequirements(t *testing.T) {
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	deps := getPushDependencies()
 
-	domain := cf.Domain{}
-	domain.Guid = "not-the-right-guid"
-	domain.Name = "not shared domain"
-	domain.OwningOrganizationGuid = "my-org-guid"
-
 	sharedDomain := cf.Domain{}
 	sharedDomain.Name = "foo.cf-app.com"
 	sharedDomain.Shared = true
 	sharedDomain.Guid = "foo-domain-guid"
 
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain, sharedDomain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
 	deps.routeRepo.FindByHostAndDomainErr = true
 
 	deps.appRepo.ReadNotFound = true
@@ -153,7 +148,7 @@ func TestPushingAppWithACrazyName(t *testing.T) {
 	sharedDomain.Shared = true
 	sharedDomain.Guid = "foo-domain-guid"
 
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{sharedDomain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
 	deps.routeRepo.FindByHostAndDomainErr = true
 
 	deps.appRepo.ReadNotFound = true
@@ -183,7 +178,7 @@ func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	route.Host = "my-new-app"
 	route.Domain = domain.DomainFields
 
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
 
 	deps.routeRepo.FindByHostAndDomainRoute = route
 	deps.appRepo.ReadNotFound = true
@@ -663,7 +658,7 @@ func TestPushingAppWithNoHostname(t *testing.T) {
 	domain.Guid = "bar-domain-guid"
 	domain.Shared = true
 
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
 	deps.routeRepo.FindByHostAndDomainErr = true
 	deps.appRepo.ReadNotFound = true
 
@@ -902,7 +897,7 @@ func TestPushingAppWhenItAlreadyExistsAndHostIsSpecified(t *testing.T) {
 	deps.appRepo.ReadApp = existingApp
 	deps.appRepo.UpdateAppResult = existingApp
 	deps.routeRepo.FindByHostAndDomainNotFound = true
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
 
 	ui := callPush(t, []string{"-n", "new-host", "existing-app"}, deps)
 
@@ -962,7 +957,7 @@ func TestPushingAppWhenItAlreadyExistsAndNoHostFlagIsPresent(t *testing.T) {
 	deps.appRepo.ReadApp = existingApp
 	deps.appRepo.UpdateAppResult = existingApp
 	deps.routeRepo.FindByHostAndDomainNotFound = true
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{domain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
 
 	ui := callPush(t, []string{"--no-hostname", "existing-app"}, deps)
 
@@ -990,7 +985,7 @@ func TestPushingAppWhenItAlreadyExistsWithoutARouteCreatesADefaultDomain(t *test
 	sharedDomain.Guid = "foo-domain-guid"
 
 	deps.routeRepo.FindByHostAndDomainErr = true
-	deps.domainRepo.ListDomainsForOrgDomains = []cf.Domain{sharedDomain}
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
 	deps.appRepo.ReadApp = maker.NewApp(maker.Overrides{"name": "existing-app", "guid": "existing-app-guid"})
 	deps.appRepo.UpdateAppResult = deps.appRepo.ReadApp
 
