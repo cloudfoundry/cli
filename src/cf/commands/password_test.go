@@ -14,21 +14,21 @@ import (
 )
 
 func TestPasswordRequiresValidAccessToken(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: false}
-	configRepo := &testconfig.FakeConfigRepository{}
-	callPassword([]string{}, reqFactory, &testapi.FakePasswordRepo{}, configRepo)
+	deps := getPasswordDeps()
+	deps.ReqFactory.ValidAccessTokenSuccess = false
+	callPassword([]string{}, deps)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	callPassword([]string{"", "", ""}, reqFactory, &testapi.FakePasswordRepo{}, configRepo)
+	deps.ReqFactory.ValidAccessTokenSuccess = true
+	callPassword([]string{"", "", ""}, deps)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
 func TestPasswordCanBeChanged(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testapi.FakePasswordRepo{}
-	configRepo := &testconfig.FakeConfigRepository{}
-	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
+	deps := getPasswordDeps()
+	deps.ReqFactory.ValidAccessTokenSuccess = true
+	deps.PwdRepo.UpdateUnauthorized = false
+	ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
 
 	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
 		{"Current Password"},
@@ -42,10 +42,10 @@ func TestPasswordCanBeChanged(t *testing.T) {
 		{"Please log in again"},
 	})
 
-	assert.Equal(t, pwdRepo.UpdateNewPassword, "new-password")
-	assert.Equal(t, pwdRepo.UpdateOldPassword, "old-password")
+	assert.Equal(t, deps.PwdRepo.UpdateNewPassword, "new-password")
+	assert.Equal(t, deps.PwdRepo.UpdateOldPassword, "old-password")
 
-	updatedConfig, err := configRepo.Get()
+	updatedConfig, err := deps.ConfigRepo.Get()
 	assert.NoError(t, err)
 	assert.Empty(t, updatedConfig.AccessToken)
 	assert.Equal(t, updatedConfig.OrganizationFields, cf.OrganizationFields{})
@@ -53,10 +53,9 @@ func TestPasswordCanBeChanged(t *testing.T) {
 }
 
 func TestPasswordVerification(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testapi.FakePasswordRepo{}
-	configRepo := &testconfig.FakeConfigRepository{}
-	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, reqFactory, pwdRepo, configRepo)
+	deps := getPasswordDeps()
+	deps.ReqFactory.ValidAccessTokenSuccess = true
+	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
 
 	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
 		{"Current Password"},
@@ -68,14 +67,14 @@ func TestPasswordVerification(t *testing.T) {
 		{"Password verification does not match"},
 	})
 
-	assert.Equal(t, pwdRepo.UpdateNewPassword, "")
+	assert.Equal(t, deps.PwdRepo.UpdateNewPassword, "")
 }
 
 func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{ValidAccessTokenSuccess: true}
-	pwdRepo := &testapi.FakePasswordRepo{UpdateUnauthorized: true}
-	configRepo := &testconfig.FakeConfigRepository{}
-	ui := callPassword([]string{"old-password", "new-password", "new-password"}, reqFactory, pwdRepo, configRepo)
+	deps := getPasswordDeps()
+	deps.ReqFactory.ValidAccessTokenSuccess = true
+	deps.PwdRepo.UpdateUnauthorized = true
+	ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
 
 	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
 		{"Current Password"},
@@ -89,16 +88,30 @@ func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
 		{"Current password did not match"},
 	})
 
-	assert.Equal(t, pwdRepo.UpdateNewPassword, "new-password")
-	assert.Equal(t, pwdRepo.UpdateOldPassword, "old-password")
+	assert.Equal(t, deps.PwdRepo.UpdateNewPassword, "new-password")
+	assert.Equal(t, deps.PwdRepo.UpdateOldPassword, "old-password")
 }
 
-func callPassword(inputs []string, reqFactory *testreq.FakeReqFactory, pwdRepo *testapi.FakePasswordRepo, configRepo *testconfig.FakeConfigRepository) (ui *testterm.FakeUI) {
+type passwordDeps struct {
+	ReqFactory *testreq.FakeReqFactory
+	PwdRepo    *testapi.FakePasswordRepo
+	ConfigRepo *testconfig.FakeConfigRepository
+}
+
+func getPasswordDeps() passwordDeps {
+	return passwordDeps{
+		ReqFactory: &testreq.FakeReqFactory{ValidAccessTokenSuccess: true},
+		PwdRepo:    &testapi.FakePasswordRepo{UpdateUnauthorized: true},
+		ConfigRepo: &testconfig.FakeConfigRepository{},
+	}
+}
+
+func callPassword(inputs []string, deps passwordDeps) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{Inputs: inputs}
 
 	ctxt := testcmd.NewContext("passwd", []string{})
-	cmd := NewPassword(ui, pwdRepo, configRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	cmd := NewPassword(ui, deps.PwdRepo, deps.ConfigRepo)
+	testcmd.RunCommand(cmd, ctxt, deps.ReqFactory)
 
 	return
 }
