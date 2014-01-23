@@ -11,12 +11,6 @@ type FakePasswordRepo struct {
 	UpdateOldPassword  string
 }
 
-func (repo *FakePasswordRepo) GetScore(password string) (score string, apiResponse net.ApiResponse) {
-	repo.ScoredPassword = password
-	score = repo.Score
-	return
-}
-
 func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiResponse net.ApiResponse) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
