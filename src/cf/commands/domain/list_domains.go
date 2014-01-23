@@ -4,12 +4,10 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
-	"cf/formatters"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"strings"
 )
 
 type ListDomains struct {
@@ -50,33 +48,10 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	table := cmd.ui.Table([]string{"name", "status", "spaces"})
 	noDomains := true
-
-	apiResponse := cmd.domainRepo.ListDomainsForOrg(org.Guid, api.ListDomainsCallback(func(domains []cf.Domain) bool {
-		rows := [][]string{}
-		for _, domain := range domains {
-
-			var status string
-			if domain.Shared {
-				status = "shared"
-			} else if len(domain.Spaces) == 0 {
-				status = "reserved"
-			} else {
-				status = "owned"
-			}
-
-			rows = append(rows, []string{
-				domain.Name,
-				status,
-				strings.Join(formatters.MapStr(domain.Spaces), ", "),
-			})
-		}
-		table.Print(rows)
-		noDomains = false
-
-		return true
-	}))
+	table := cmd.ui.Table([]string{"name", "status"})
+	apiResponse := cmd.domainRepo.ListSharedDomains(domainsCallback("shared", table, &noDomains))
+	apiResponse = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback("owned", table, &noDomains))
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Failed fetching domains.\n%s", apiResponse.Message)
@@ -86,4 +61,16 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	if noDomains {
 		cmd.ui.Say("No domains found")
 	}
+}
+
+func domainsCallback(status string, table terminal.Table, noDomains *bool) api.ListDomainsCallback {
+	return api.ListDomainsCallback(func(domains []cf.Domain) bool {
+		rows := [][]string{}
+		for _, domain := range domains {
+			rows = append(rows, []string{domain.Name, status})
+		}
+		table.Print(rows)
+		*noDomains = false
+		return true
+	})
 }
