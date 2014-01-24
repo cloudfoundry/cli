@@ -1,6 +1,7 @@
 package service
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -80,7 +81,7 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("TIP: To make these changes take affect, use 'gcf unbind-service' to unbind the service, 'gcf bind-service' to rebind, and then 'gcf push' to update the app with the new env variables")
+	cmd.ui.Say("TIP: To make these changes take effect, use '%s unbind-service' to unbind the service, '%s bind-service' to rebind, and then '%s push' to update the app with the new env variables", cf.Name(), cf.Name(), cf.Name())
 
 	if params == "" && drainUrl == "" {
 		cmd.ui.Warn("No flags specified. No changes were made.")

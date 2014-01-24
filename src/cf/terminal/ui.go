@@ -106,7 +106,7 @@ func (c terminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {
 }
 
 func (c terminalUI) ConfigFailure(err error) {
-	c.Failed("Please use '%s api' to set an API endpoint and then 'cf login' to login.", cf.Name())
+	c.Failed("Please use '%s api' to set an API endpoint and then '%s login' to login.", cf.Name(), cf.Name())
 }
 
 func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
