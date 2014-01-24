@@ -64,12 +64,11 @@ func TestBuildpacksListBuildpacks(t *testing.T) {
 	buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
 
 	one := 1
-	firstbp := "firstbp.zip"
 	buildpack := cf.Buildpack{}
 	buildpack.Guid = "buildpack1-guid"
 	buildpack.Name = "Buildpack1"
 	buildpack.Position = &one
-	buildpack.Filename = &firstbp
+	buildpack.Filename = "firstbp.zip"
 
 	two := 2
 	buildpack2 := cf.Buildpack{}

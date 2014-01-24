@@ -48,15 +48,12 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 			if buildpack.Enabled != nil {
 				enabled = strconv.FormatBool(*buildpack.Enabled)
 			}
-			filename := ""
-			if buildpack.Filename != nil {
-				filename = *buildpack.Filename
-			}
+
 			rows = append(rows, []string{
 				buildpack.Name,
 				position,
 				enabled,
-				filename,
+				buildpack.Filename,
 			})
 		}
 		table.Print(rows)
