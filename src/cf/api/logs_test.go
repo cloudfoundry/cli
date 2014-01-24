@@ -68,6 +68,33 @@ func TestRecentLogsFor(t *testing.T) {
 	assert.Equal(t, dumpedMessages[0].GetLogMessage().GetMessageType(), expectedMessage.GetLogMessage().GetMessageType())
 }
 
+func TestRecentLogsSendsAllMessages(t *testing.T) {
+	messagesSent := [][]byte{
+		marshalledLogMessageWithTime(t, "My message", int64(3000)),
+	}
+	websocketEndpoint := func(conn *websocket.Conn) {
+		for _, msg := range messagesSent {
+			conn.Write(msg)
+		}
+		conn.Close()
+	}
+	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
+	defer websocketServer.Close()
+
+	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
+
+	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
+
+	onConnect := func() {}
+
+	logChan := make(chan *logmessage.Message, 1000)
+
+	logsRepo.RecentLogsFor("my-app-guid", onConnect, logChan)
+	assert.Equal(t, len(logChan), 1)
+}
+
 func TestTailsLogsFor(t *testing.T) {
 	messagesSent := [][]byte{
 		marshalledLogMessageWithTime(t, "My message 3", int64(300000)),
