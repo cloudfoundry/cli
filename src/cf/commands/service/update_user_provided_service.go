@@ -80,6 +80,8 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
+	cmd.ui.Say("TIP: To make these changes take affect, use 'gcf unbind-service' to unbind the service, 'gcf bind-service' to rebind, and then 'gcf push' to update the app with the new env variables")
+
 	if params == "" && drainUrl == "" {
 		cmd.ui.Warn("No flags specified. No changes were made.")
 	}
