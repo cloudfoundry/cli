@@ -30,12 +30,14 @@ func TestCreateBuildpack(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 	ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(ui.Outputs), 5)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating buildpack", "my-buildpack"},
 		{"OK"},
 		{"Uploading buildpack", "my-buildpack"},
 		{"OK"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
 	})
 }
 
@@ -46,11 +48,14 @@ func TestCreateBuildpackWhenItAlreadyExists(t *testing.T) {
 	repo.CreateBuildpackExists = true
 	ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(ui.Outputs), 3)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating buildpack", "my-buildpack"},
 		{"OK"},
 		{"my-buildpack", "already exists"},
+		{"tip", "update-buildpack"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
 	})
 }
 
@@ -59,30 +64,34 @@ func TestCreateBuildpackWithPosition(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 	ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-	assert.Equal(t, len(ui.Outputs), 5)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Creating buildpack", "my-buildpack"},
 		{"OK"},
 		{"Uploading buildpack", "my-buildpack"},
 		{"OK"},
 	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
 }
 
 func TestCreateBuildpackEnabled(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 	repo, bitsRepo := getRepositories()
-	fakeUI := callCreateBuildpack([]string{"--enable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	ui := callCreateBuildpack([]string{"--enable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 	assert.NotNil(t, repo.CreateBuildpack.Enabled)
 	assert.Equal(t, *repo.CreateBuildpack.Enabled, true)
 
-	assert.Equal(t, len(fakeUI.Outputs), 5)
-	assert.Contains(t, fakeUI.Outputs[0], "Creating buildpack")
-	assert.Contains(t, fakeUI.Outputs[0], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[1], "OK")
-	assert.Contains(t, fakeUI.Outputs[3], "Uploading buildpack")
-	assert.Contains(t, fakeUI.Outputs[3], "my-buildpack")
-	assert.Contains(t, fakeUI.Outputs[4], "OK")
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"creating buildpack", "my-buildpack"},
+		{"OK"},
+		{"uploading buildpack", "my-buildpack"},
+		{"OK"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
 }
 
 func TestCreateBuildpackNoEnableFlag(t *testing.T) {
