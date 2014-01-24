@@ -493,58 +493,6 @@ func TestDeleteDomainFailure(t *testing.T) {
 	assert.True(t, apiResponse.IsNotSuccessful())
 }
 
-func mapDomainReq(statusCode int) testnet.TestRequest {
-	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/spaces/my-space-guid/domains/my-domain-guid",
-		Response: testnet.TestResponse{Status: statusCode},
-	})
-}
-
-func TestMapDomainSuccess(t *testing.T) {
-	req := mapDomainReq(http.StatusOK)
-
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	apiResponse := repo.Map("my-domain-guid", "my-space-guid")
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func TestMapDomainWhenServerError(t *testing.T) {
-	req := mapDomainReq(http.StatusBadRequest)
-
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	apiResponse := repo.Map("my-domain-guid", "my-space-guid")
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsNotSuccessful())
-}
-
-func unmapDomainReq(statusCode int) testnet.TestRequest {
-	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "DELETE",
-		Path:     "/v2/spaces/my-space-guid/domains/my-domain-guid",
-		Response: testnet.TestResponse{Status: statusCode},
-	})
-}
-
-func TestUnmapDomainSuccess(t *testing.T) {
-	req := unmapDomainReq(http.StatusOK)
-
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	apiResponse := repo.Unmap("my-domain-guid", "my-space-guid")
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
 func createDomainRepo(t *testing.T, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
 	ts, handler = testnet.NewTLSServer(t, reqs)
 	org := cf.OrganizationFields{}
