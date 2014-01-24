@@ -124,6 +124,49 @@ func TestUpdateBuildpackWithInvalidPath(t *testing.T) {
 	})
 }
 
+func TestUpdateBuildpackLock(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+	repo, bitsRepo := getRepositories()
+
+	ui := callUpdateBuildpack([]string{"--lock", "my-buildpack"}, reqFactory, repo, bitsRepo)
+
+	assert.NotNil(t, repo.UpdateBuildpack.Locked)
+	assert.Equal(t, *repo.UpdateBuildpack.Locked, true)
+
+	assert.Contains(t, ui.Outputs[0], "Updating buildpack")
+	assert.Contains(t, ui.Outputs[0], "my-buildpack")
+	assert.Contains(t, ui.Outputs[1], "OK")
+}
+
+func TestUpdateBuildpackUnlock(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+	repo, bitsRepo := getRepositories()
+
+	ui := callUpdateBuildpack([]string{"--unlock", "my-buildpack"}, reqFactory, repo, bitsRepo)
+
+	assert.Contains(t, ui.Outputs[0], "Updating buildpack")
+	assert.Contains(t, ui.Outputs[0], "my-buildpack")
+	assert.Contains(t, ui.Outputs[1], "OK")
+}
+
+func TestUpdateBuildpackInvalidLockWithBits(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+	repo, bitsRepo := getRepositories()
+
+	ui := callUpdateBuildpack([]string{"--lock", "-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
+
+	assert.Contains(t, ui.Outputs[1], "FAILED")
+}
+
+func TestUpdateBuildpackInvalidUnlockWithBits(t *testing.T) {
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+	repo, bitsRepo := getRepositories()
+
+	ui := callUpdateBuildpack([]string{"--unlock", "-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
+
+	assert.Contains(t, ui.Outputs[1], "FAILED")
+}
+
 func callUpdateBuildpack(args []string, reqFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository,
 	fakeBitsRepo *testapi.FakeBuildpackBitsRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)

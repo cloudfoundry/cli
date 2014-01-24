@@ -72,6 +72,28 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 		updateBuildpack = true
 	}
 
+	lock := c.Bool("lock")
+	unlock := c.Bool("unlock")
+	if lock && unlock {
+		cmd.ui.Failed("Cannot specify both lock and unlock options.")
+		return
+	}
+
+	dir := c.String("p")
+	if dir != "" && (lock || unlock) {
+		cmd.ui.Failed("Cannot specify buildpack bits and lock/unlock.")
+	}
+
+	if lock {
+		buildpack.Locked = &lock
+		updateBuildpack = true
+	}
+	if unlock {
+		unlock = false
+		buildpack.Locked = &unlock
+		updateBuildpack = true
+	}
+
 	if updateBuildpack {
 		buildpack, apiResponse := cmd.buildpackRepo.Update(buildpack)
 		if apiResponse.IsNotSuccessful() {
@@ -80,7 +102,6 @@ func (cmd *UpdateBuildpack) Run(c *cli.Context) {
 		}
 	}
 
-	dir := c.String("p")
 	if dir != "" {
 		apiResponse := cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
 		if apiResponse.IsNotSuccessful() {
