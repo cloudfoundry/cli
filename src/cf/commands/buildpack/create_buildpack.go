@@ -45,6 +45,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 		if apiResponse.ErrorCode == cf.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
+			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" update-buildpack"))
 		} else {
 			cmd.ui.Failed(apiResponse.Message)
 		}
