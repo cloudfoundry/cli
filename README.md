@@ -1,24 +1,11 @@
-Cloud Foundry CLI written in Go [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
-===========
+Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
+=================
 
-Background
-===========
-
-Project to rewrite the Cloud Foundry CLI tool using Go. This project should currently be considered alpha quality
-software and should not be used in production environments. If you need something more stable, please check
-out the [RubyGem](https://github.com/cloudfoundry/cf).
-
-For a view on the current status of the project, check [cftracker](http://cftracker.cfapps.io/cfcli).
-
-Cloning the repository
-======================
-
-1. Install Go ```brew install go --cross-compile-common```
-1. Clone (Fork before hand for development).
-1. Run ```git submodule update --init --recursive```
+This is the official command line client for Cloud Foundry.
+You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
 Downloading Edge
-========
+================
 The latest binary builds and installers are published to Amazon S3 buckets.
 
 Binaries:
@@ -37,30 +24,30 @@ Installers:
 - http://go-cli.s3.amazonaws.com/installer-windows-amd64.zip
 - http://go-cli.s3.amazonaws.com/installer-windows-386.zip
 
+Cloning the repository
+======================
+
+1. Install [Go](http://golang.org)
+1. Clone (Forking beforehand for development).
+1. Run ```git submodule update --init --recursive```
+
 Building
 ========
 
 1. Run ```./bin/build```
-1. The binary will be built into the out directory.
+1. The binary will be built into the `./out` directory.
 
 Development
 ===========
 
-NOTE: Currently only development on OSX 10.8 is supported
-
 1. Write a test.
-1. Run ``` bin/test ``` and watch test fail.
-1. Make test pass.
+1. Run ```bin/test``` and watch the test fail.
+1. Make the test pass.
 1. Submit a pull request.
 
 If you want to run the benchmark tests
 
     ./bin/go test -bench . -benchmem cf/...
-
-Releasing
-=========
-
-Upon a successful test run, binaries built for each supported architecture and OS on CI are uploaded and bundled with the latest installers.
 
 Contributing
 ============
