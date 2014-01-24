@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/net"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -60,6 +61,7 @@ func TestListDomains(t *testing.T) {
 		ListSharedDomainsDomains: []cf.Domain{domain1},
 		ListDomainsForOrgDomains: []cf.Domain{domain2, domain3},
 	}
+
 	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
@@ -79,16 +81,53 @@ func TestListDomainsWhenThereAreNone(t *testing.T) {
 	orgFields.Guid = "my-org-guid"
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+	domainRepo := &testapi.FakeDomainRepository{}
 
-	domainRepo := &testapi.FakeDomainRepository{
-		ListSharedDomainsDomains: []cf.Domain{},
-		ListDomainsForOrgDomains: []cf.Domain{},
-	}
 	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting domains in org", "my-org", "my-user"},
 		{"No domains found"},
+	})
+}
+
+func TestListDomainsSharedDomainsFails(t *testing.T) {
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+	orgFields.Guid = "my-org-guid"
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+	domainRepo := &testapi.FakeDomainRepository{
+		ListSharedDomainsApiResponse: net.NewApiResponseWithMessage("borked!"),
+	}
+	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting domains in org", "my-org", "my-user"},
+		{"failed"},
+		{"shared domains"},
+		{"borked!"},
+	})
+}
+
+func TestListDomainsOrgDomainsFails(t *testing.T) {
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+	orgFields.Guid = "my-org-guid"
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+	domainRepo := &testapi.FakeDomainRepository{
+		ListDomainsForOrgApiResponse: net.NewApiResponseWithMessage("borked!"),
+	}
+	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting domains in org", "my-org", "my-user"},
+		{"failed"},
+		{"private domains"},
+		{"borked!"},
 	})
 }
 
