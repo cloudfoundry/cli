@@ -62,12 +62,12 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack cf.Build
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, net.NewApiResponse("Buildpack already exists", cf.BUILDPACK_EXISTS, 400)
 	}
 
-	repo.CreateBuildpack = cf.Buildpack{BasicFields: cf.BasicFields{Name: name}, Position: position, Enabled: enabled}
+	repo.CreateBuildpack = cf.Buildpack{BasicFields: cf.BasicFields{Name: name}, Position: position, Enabled: enabled, Locked: locked}
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 

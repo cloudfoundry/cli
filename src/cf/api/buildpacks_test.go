@@ -183,7 +183,7 @@ func TestBuildpackCreateRejectsImproperNames(t *testing.T) {
 	ts, _, repo := createBuildpackRepo(t, badRequest)
 	defer ts.Close()
 	one := 1
-	createdBuildpack, apiResponse := repo.Create("name with space", &one, nil)
+	createdBuildpack, apiResponse := repo.Create("name with space", &one, nil, nil)
 	assert.True(t, apiResponse.IsNotSuccessful())
 	assert.Equal(t, createdBuildpack, cf.Buildpack{})
 	assert.Equal(t, apiResponse.ErrorCode, "290003")
@@ -212,7 +212,7 @@ func TestCreateBuildpackWithPosition(t *testing.T) {
 	defer ts.Close()
 
 	position := 999
-	created, apiResponse := repo.Create("my-cool-buildpack", &position, nil)
+	created, apiResponse := repo.Create("my-cool-buildpack", &position, nil, nil)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -246,7 +246,7 @@ func TestCreateBuildpackEnabled(t *testing.T) {
 
 	position := 999
 	enabled := true
-	created, apiResponse := repo.Create("my-cool-buildpack", &position, &enabled)
+	created, apiResponse := repo.Create("my-cool-buildpack", &position, &enabled, nil)
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.True(t, apiResponse.IsSuccessful())
@@ -308,6 +308,51 @@ func TestUpdateBuildpack(t *testing.T) {
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	assert.Equal(t, buildpack, updated)
+}
+
+func TestLockBuildpack(t *testing.T) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:  "PUT",
+		Path:    "/v2/buildpacks/my-cool-buildpack-guid",
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-buildpack","locked":true}`),
+		Response: testnet.TestResponse{
+			Status: http.StatusCreated,
+			Body: `{
+				
+				    "metadata": {
+				        "guid": "my-cool-buildpack-guid"
+				    },
+				    "entity": {
+				        "name": "my-cool-buildpack",
+						"position":123,
+						"locked": true
+				    }
+				}`},
+	})
+
+	ts, handler, repo := createBuildpackRepo(t, req)
+	defer ts.Close()
+
+	position := 123
+	locked := true
+
+	buildpack := cf.Buildpack{}
+	buildpack.Name = "my-cool-buildpack"
+	buildpack.Guid = "my-cool-buildpack-guid"
+	buildpack.Locked = &locked
+
+	expectedBuildpack := cf.Buildpack{}
+	expectedBuildpack.Name = "my-cool-buildpack"
+	expectedBuildpack.Guid = "my-cool-buildpack-guid"
+	expectedBuildpack.Position = &position
+	expectedBuildpack.Locked = &locked
+
+	updated, apiResponse := repo.Update(buildpack)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+
+	assert.Equal(t, expectedBuildpack, updated)
 }
 
 func createBuildpackRepo(t *testing.T, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
