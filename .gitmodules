@@ -13,6 +13,3 @@
 [submodule "src/github.com/cloudfoundry/gamble"]
 	path = src/github.com/cloudfoundry/gamble
 	url = https://github.com/cloudfoundry/gamble.git
-[submodule "src/github.com/olekukonko/ts"]
-	path = src/github.com/olekukonko/ts
-	url = https://github.com/olekukonko/ts.git
