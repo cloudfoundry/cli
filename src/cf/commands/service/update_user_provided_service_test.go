@@ -74,6 +74,7 @@ func TestUpdateUserProvidedServiceWithJson(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
 		{"OK"},
+		{"TIP"},
 	})
 	assert.Equal(t, repo.UpdateServiceInstance.Name, serviceInstance.Name)
 	assert.Equal(t, repo.UpdateServiceInstance.Params, map[string]string{"foo": "bar"})
