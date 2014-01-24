@@ -61,8 +61,6 @@ func (t *PrintableTable) printRow(row []string) {
 	for col, value := range row {
 		if col == 0 {
 			value = TableContentHeaderColor(value)
-		} else {
-			value = TableContentColor(value)
 		}
 
 		output = output + t.cellValue(col, value)

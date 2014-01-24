@@ -143,7 +143,7 @@ func coloredInstanceState(instance cf.AppInstanceFields) (colored string) {
 	state := string(instance.State)
 	switch state {
 	case "started", "running":
-		colored = terminal.StartedColor("running")
+		colored = "running"
 	case "stopped":
 		colored = terminal.StoppedColor("stopped")
 	case "flapping":
