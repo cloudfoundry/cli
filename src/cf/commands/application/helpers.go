@@ -50,6 +50,13 @@ func logMessageOutput(msg *logmessage.Message) string {
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }
 
+func max(a,b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader string) {
 	logMsg := msg.GetLogMessage()
 	sourceName := logMsg.GetSourceName()
@@ -69,7 +76,7 @@ func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader stri
 	// Calculate padding
 	longestHeader := fmt.Sprintf("%s  [App/0]  ", timeFormat)
 	expectedHeaderLength := len(longestHeader)
-	padding := strings.Repeat(" ", expectedHeaderLength-len(logHeader))
+	padding := strings.Repeat(" ", max(0, expectedHeaderLength-len(logHeader)))
 
 	logHeader = logHeader + padding
 	coloredLogHeader = coloredLogHeader + padding
