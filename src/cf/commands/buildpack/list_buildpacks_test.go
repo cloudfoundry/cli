@@ -25,17 +25,18 @@ func TestListBuildpacksRequirements(t *testing.T) {
 }
 
 func TestListBuildpacks(t *testing.T) {
-	buildpackBuilder := func(name string, position int, enabled bool) (buildpack cf.Buildpack) {
+	buildpackBuilder := func(name string, position int, enabled bool, locked bool) (buildpack cf.Buildpack) {
 		buildpack.Name = name
 		buildpack.Position = &position
 		buildpack.Enabled = &enabled
+		buildpack.Locked = &locked
 		return
 	}
 
 	buildpacks := []cf.Buildpack{
-		buildpackBuilder("Buildpack-1", 5, true),
-		buildpackBuilder("Buildpack-2", 10, false),
-		buildpackBuilder("Buildpack-3", 15, true),
+		buildpackBuilder("Buildpack-1", 5, true, false),
+		buildpackBuilder("Buildpack-2", 10, false, true),
+		buildpackBuilder("Buildpack-3", 15, true, false),
 	}
 
 	buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -49,9 +50,9 @@ func TestListBuildpacks(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting buildpacks"},
 		{"buildpack", "position", "enabled"},
-		{"Buildpack-1", "5", "true"},
-		{"Buildpack-2", "10", "false"},
-		{"Buildpack-3", "15", "true"},
+		{"Buildpack-1", "5", "true", "false"},
+		{"Buildpack-2", "10", "false", "true"},
+		{"Buildpack-3", "15", "true", "false"},
 	})
 }
 

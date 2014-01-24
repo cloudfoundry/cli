@@ -331,4 +331,5 @@ type Buildpack struct {
 	Enabled  *bool
 	Key      string
 	Filename string
+	Locked   *bool
 }

@@ -90,7 +90,7 @@ func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context)
 		enableOption = &disabled
 	}
 
-	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position, enableOption)
+	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position, enableOption, nil)
 
 	return
 }

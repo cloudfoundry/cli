@@ -34,7 +34,7 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 
 	buildpackChan, statusChan := cmd.buildpackRepo.ListBuildpacks(stopChan)
 
-	table := cmd.ui.Table([]string{"buildpack", "position", "enabled", "filename"})
+	table := cmd.ui.Table([]string{"buildpack", "position", "enabled", "locked", "filename"})
 	noBuildpacks := true
 
 	for buildpacks := range buildpackChan {
@@ -48,11 +48,15 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 			if buildpack.Enabled != nil {
 				enabled = strconv.FormatBool(*buildpack.Enabled)
 			}
-
+			locked := ""
+			if buildpack.Locked != nil {
+				locked = strconv.FormatBool(*buildpack.Locked)
+			}
 			rows = append(rows, []string{
 				buildpack.Name,
 				position,
 				enabled,
+				locked,
 				buildpack.Filename,
 			})
 		}
