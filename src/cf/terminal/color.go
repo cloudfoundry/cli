@@ -45,16 +45,8 @@ func HeaderColor(message string) string {
 	return colorize(message, white, true)
 }
 
-func TableContentColor(message string) string {
-	return colorize(message, grey, false)
-}
-
 func CommandColor(message string) string {
 	return colorize(message, yellow, true)
-}
-
-func StartedColor(message string) string {
-	return colorize(message, grey, true)
 }
 
 func StoppedColor(message string) string {

@@ -171,7 +171,7 @@ func tableColoringFunc(value string, row int, col int) string {
 		return HeaderColor(value)
 	case col == 0 && row > 0:
 		return TableContentHeaderColor(value)
+	default:
+		return value
 	}
-
-	return TableContentColor(value)
 }
