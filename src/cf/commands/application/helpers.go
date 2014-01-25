@@ -50,7 +50,7 @@ func logMessageOutput(msg *logmessage.Message) string {
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }
 
-func max(a,b int) int {
+func max(a, b int) int {
 	if a > b {
 		return a
 	}
