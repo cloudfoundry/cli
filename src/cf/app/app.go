@@ -87,7 +87,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-buildpack",
 			Description: "Create a buildpack",
-			Usage:       fmt.Sprintf("%s create-buildpack BUILDPACK PATH POSITION [--enable|--disable]", cf.Name()),
+			Usage: fmt.Sprintf("%s create-buildpack BUILDPACK PATH POSITION [--enable|--disable]", cf.Name()) +
+				"\n\nTIP:\n" +
+				"   Path should be a zip file. Position is an integer, sets priority, and is sorted from lowest to highest.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "enable", Usage: "Enable the buildpack"},
 				cli.BoolFlag{Name: "disable", Usage: "Disable the buildpack"},
