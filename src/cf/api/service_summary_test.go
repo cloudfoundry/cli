@@ -31,6 +31,7 @@ var serviceInstanceSummariesResponse = testnet.TestResponse{Status: http.StatusO
   "services": [
     {
       "guid": "my-service-instance-guid",
+      "dashboard_url": "http://myservice.com/instance/my-service-instance-guid?token=foobar",
       "name": "my-service-instance",
       "bound_app_count": 2,
       "service_plan": {
@@ -65,6 +66,8 @@ func TestServiceSummaryGetSummariesInCurrentSpace(t *testing.T) {
 
 	instance1 := serviceInstances[0]
 	assert.Equal(t, instance1.Name, "my-service-instance")
+	assert.Equal(t, instance1.Guid, "my-service-instance-guid")
+	assert.Equal(t, instance1.DashboardURL, "http://myservice.com/instance/my-service-instance-guid?token=foobar")
 	assert.Equal(t, instance1.ServicePlan.Name, "spark")
 	assert.Equal(t, instance1.ServiceOffering.Label, "cleardb")
 	assert.Equal(t, instance1.ServiceOffering.Label, "cleardb")
