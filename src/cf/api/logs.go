@@ -74,7 +74,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 
 	defer func() {
 		ws.Close()
-		repo.drainRemainingMessages(messageQueue, inputChan, outputChan, stopLoggingChan)
+		repo.drainRemainingMessages(messageQueue, inputChan, outputChan)
 	}()
 
 	onConnect()
@@ -111,7 +111,7 @@ func (repo LoggregatorLogsRepository) processMessages(messageQueue *SortedMessag
 	}
 }
 
-func (repo LoggregatorLogsRepository) drainRemainingMessages(messageQueue *SortedMessageQueue, inputChan <-chan *logmessage.Message, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool) {
+func (repo LoggregatorLogsRepository) drainRemainingMessages(messageQueue *SortedMessageQueue, inputChan <-chan *logmessage.Message, outputChan chan *logmessage.Message) {
 	for msg := range inputChan {
 		messageQueue.PushMessage(msg)
 	}
