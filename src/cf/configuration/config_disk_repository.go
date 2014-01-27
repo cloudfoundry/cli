@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	filePermissions      = 0644
+	filePermissions      = 0600
 	dirPermissions       = 0700
 	currentConfigVersion = 2
 )
