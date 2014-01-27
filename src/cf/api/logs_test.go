@@ -69,13 +69,9 @@ func TestRecentLogsFor(t *testing.T) {
 }
 
 func TestRecentLogsSendsAllMessages(t *testing.T) {
-	messagesSent := [][]byte{
-		marshalledLogMessageWithTime(t, "My message", int64(3000)),
-	}
 	websocketEndpoint := func(conn *websocket.Conn) {
-		for _, msg := range messagesSent {
-			conn.Write(msg)
-		}
+		conn.Write(marshalledLogMessageWithTime(t, "My message", int64(3000)))
+		time.Sleep(time.Duration(1) * time.Millisecond)
 		conn.Close()
 	}
 	websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
@@ -86,12 +82,9 @@ func TestRecentLogsSendsAllMessages(t *testing.T) {
 	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
 
 	logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
-
-	onConnect := func() {}
-
 	logChan := make(chan *logmessage.Message, 1000)
 
-	logsRepo.RecentLogsFor("my-app-guid", onConnect, logChan)
+	logsRepo.RecentLogsFor("my-app-guid", func() {}, logChan)
 	assert.Equal(t, len(logChan), 1)
 }
 
