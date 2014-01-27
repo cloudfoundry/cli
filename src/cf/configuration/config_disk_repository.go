@@ -115,8 +115,13 @@ func (repo ConfigurationDiskRepository) ClearSession() (err error) {
 
 // Keep this one public for configtest/configuration.go
 func ConfigFile() (file string, err error) {
+	var configDir string
 
-	configDir := filepath.Join(userHomeDir(), ".cf")
+	if os.Getenv("CF_HOME") != "" {
+		configDir = os.Getenv("CF_HOME")
+	} else {
+		configDir = filepath.Join(userHomeDir(), ".cf")
+	}
 
 	err = os.MkdirAll(configDir, dirPermissions)
 
