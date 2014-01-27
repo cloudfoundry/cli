@@ -20,9 +20,8 @@ import (
 
 func main() {
 	defer func() {
-		maybeSomething := recover()
-
-		if maybeSomething != nil {
+		err := recover()
+		if err != nil {
 			displayCrashDialog()
 		}
 	}()
@@ -71,9 +70,13 @@ GLOBAL OPTIONS:
    {{range .Flags}}{{.}}
    {{end}}
 ENVIRONMENT VARIABLES:
-   CF_TRACE=true - will output HTTP requests and responses during command
+   CF_HOME=path/to/config/ override default config directory
+   CF_STAGING_TIMEOUT=15 max wait time for buildpack staging, in minutes
+   CF_STARTUP_TIMEOUT=5 max wait time for app instance startup, in minutes
    CF_COLOR=false - will not colorize output
-   HTTP_PROXY=http://proxy.example.com:8080 - set to your proxy
+   CF_TRACE=true - print API request diagnostics to stdout
+   CF_TRACE=path/to/trace.log - append API request diagnostics to a log file
+   HTTP_PROXY=http://proxy.example.com:8080 - enable http proxying for API requests
 `
 
 	cli.CommandHelpTemplate = `NAME:
@@ -95,11 +98,7 @@ OPTIONS:
 func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationRepository) (config *configuration.Configuration) {
 	config, err := configRepo.Get()
 	if err != nil {
-		termUI.Failed(fmt.Sprintf(
-			"Error loading config. Please reset target (%s) and log in (%s).",
-			terminal.CommandColor(fmt.Sprintf("%s target", cf.Name())),
-			terminal.CommandColor(fmt.Sprintf("%s login", cf.Name())),
-		))
+		termUI.Failed(fmt.Sprintf("Error loading config file: %s",err))
 		configRepo.Delete()
 		os.Exit(1)
 		return
