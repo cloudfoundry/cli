@@ -160,18 +160,21 @@ func (repo CloudControllerDomainRepository) findOneWithPaths(scopedPath, name st
 }
 
 func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain cf.DomainFields, apiResponse net.ApiResponse) {
-	path := repo.config.Target + "/v2/domains"
-	data := fmt.Sprintf(
-		`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid,
-	)
-
+	data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid)
 	resource := new(DomainResource)
+
+	path := repo.config.Target + "/v2/private_domains"
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
-	if apiResponse.IsNotSuccessful() {
-		return
+
+	if apiResponse.IsNotFound() {
+		path := repo.config.Target + "/v2/domains"
+		apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	}
 
-	createdDomain = resource.ToFields()
+	if apiResponse.IsSuccessful() {
+		createdDomain = resource.ToFields()
+	}
+
 	return
 }
 

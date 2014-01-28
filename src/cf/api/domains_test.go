@@ -420,18 +420,45 @@ func TestDomainFindByNameInOrgWhenFoundInDomainsButNotShared(t *testing.T) {
 	assert.True(t, apiResponse.IsNotFound())
 }
 
-func TestCreateDomain(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:  "POST",
-		Path:    "/v2/domains",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
-			"metadata": { "guid": "abc-123" },
-			"entity": { "name": "example.com" }
-		}`},
+func TestCreateDomainUsingOldEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "POST",
+			Path:     "/v2/private_domains",
+			Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+			Response: testnet.TestResponse{Status: http.StatusNotFound},
+		}),
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/domains",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
+				"metadata": { "guid": "abc-123" },
+				"entity": { "name": "example.com" }
+			}`},
+		}),
 	})
+	defer ts.Close()
 
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
+	createdDomain, apiResponse := repo.Create("example.com", "org-guid")
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+	assert.Equal(t, createdDomain.Guid, "abc-123")
+}
+
+func TestCreateDomainUsingNewEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/private_domains",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
+				"metadata": { "guid": "abc-123" },
+				"entity": { "name": "example.com" }
+			}`},
+		}),
+	})
 	defer ts.Close()
 
 	createdDomain, apiResponse := repo.Create("example.com", "org-guid")
