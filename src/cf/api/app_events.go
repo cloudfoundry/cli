@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -18,6 +19,15 @@ type PaginatedEventResources struct {
 type EventResource struct {
 	Resource
 	Entity EventEntity
+}
+
+func (resource EventResource) ToFields() (event cf.EventFields) {
+	description := fmt.Sprintf("reason: %s, exit_status: %s", resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus))
+	event.Name = "app crashed"
+	event.Timestamp = resource.Entity.Timestamp
+	event.Description = description
+	event.InstanceIndex = resource.Entity.InstanceIndex
+	return
 }
 
 type EventEntity struct {
@@ -62,13 +72,9 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string) (event
 
 			events := []cf.EventFields{}
 			for _, resource := range eventResources.Resources {
-				events = append(events, cf.EventFields{
-					Timestamp:       resource.Entity.Timestamp,
-					ExitDescription: resource.Entity.ExitDescription,
-					ExitStatus:      resource.Entity.ExitStatus,
-					InstanceIndex:   resource.Entity.InstanceIndex,
-				})
+				events = append(events, resource.ToFields())
 			}
+
 			if len(events) > 0 {
 				eventChan <- events
 			}

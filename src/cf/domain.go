@@ -188,10 +188,10 @@ type Domain struct {
 }
 
 type EventFields struct {
-	InstanceIndex   int
-	Timestamp       time.Time
-	ExitDescription string
-	ExitStatus      int
+	BasicFields
+	InstanceIndex int
+	Timestamp     time.Time
+	Description   string
 }
 
 type RouteFields struct {

@@ -83,21 +83,24 @@ func TestListEvents(t *testing.T) {
 
 	eventChan, apiErr := repo.ListEvents("my-app-guid")
 
-	firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
-	secondExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00")
+	time1, _ := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
+	time2, _ := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00")
+
+	event1 := cf.EventFields{}
+	event1.Name = "app crashed"
+	event1.InstanceIndex = 1
+	event1.Description = "reason: app instance exited, exit_status: 1"
+	event1.Timestamp = time1
+
+	event2 := cf.EventFields{}
+	event2.Name = "app crashed"
+	event2.InstanceIndex = 2
+	event2.Description = "reason: app instance was stopped, exit_status: 2"
+	event2.Timestamp = time2
+
 	expectedEvents := []cf.EventFields{
-		{
-			InstanceIndex:   1,
-			ExitStatus:      1,
-			ExitDescription: "app instance exited",
-			Timestamp:       firstExpectedTime,
-		},
-		{
-			InstanceIndex:   2,
-			ExitStatus:      2,
-			ExitDescription: "app instance was stopped",
-			Timestamp:       secondExpectedTime,
-		},
+		event1,
+		event2,
 	}
 
 	list := []cf.EventFields{}
@@ -105,9 +108,9 @@ func TestListEvents(t *testing.T) {
 		list = append(list, events...)
 	}
 
-	_, open := <-apiErr
+	apiResponse, open := <-apiErr
 
-	assert.NoError(t, err)
+	assert.True(t, apiResponse.IsSuccessful())
 	assert.False(t, open)
 	assert.Equal(t, list, expectedEvents)
 	assert.True(t, handler.AllRequestsCalled())
@@ -156,13 +159,15 @@ func TestListEventsNotFound(t *testing.T) {
 	eventChan, apiErr := repo.ListEvents("my-app-guid")
 
 	firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
+
+	event1 := cf.EventFields{}
+	event1.Name = "app crashed"
+	event1.InstanceIndex = 1
+	event1.Description = "reason: app instance exited, exit_status: 1"
+	event1.Timestamp = firstExpectedTime
+
 	expectedEvents := []cf.EventFields{
-		{
-			InstanceIndex:   1,
-			ExitStatus:      1,
-			ExitDescription: "app instance exited",
-			Timestamp:       firstExpectedTime,
-		},
+		event1,
 	}
 
 	list := []cf.EventFields{}
