@@ -9,25 +9,25 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type ShareDomain struct {
+type CreateSharedDomain struct {
 	ui         terminal.UI
 	config     *configuration.Configuration
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewShareDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *ShareDomain) {
-	cmd = new(ShareDomain)
+func NewCreateSharedDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *CreateSharedDomain) {
+	cmd = new(CreateSharedDomain)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.domainRepo = domainRepo
 	return
 }
 
-func (cmd *ShareDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *CreateSharedDomain) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
-		cmd.ui.FailWithUsage(c, "share-domain")
+		cmd.ui.FailWithUsage(c, "create-shared-domain")
 		return
 	}
 
@@ -37,10 +37,10 @@ func (cmd *ShareDomain) GetRequirements(reqFactory requirements.Factory, c *cli.
 	return
 }
 
-func (cmd *ShareDomain) Run(c *cli.Context) {
+func (cmd *CreateSharedDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
 
-	cmd.ui.Say("Sharing domain %s as %s...",
+	cmd.ui.Say("Creating shared domain %s as %s...",
 		terminal.EntityNameColor(domainName),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
