@@ -468,18 +468,46 @@ func TestCreateDomainUsingNewEndpoint(t *testing.T) {
 	assert.Equal(t, createdDomain.Guid, "abc-123")
 }
 
-func TestShareDomain(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:  "POST",
-		Path:    "/v2/domains",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: ` {
-			"metadata": { "guid": "abc-123" },
-			"entity": { "name": "example.com" }
-		}`},
+func TestCreateSharedDomainsWithNewEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/shared_domains",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+			{
+				"metadata": { "guid": "abc-123" },
+				"entity": { "name": "example.com" }
+			}`},
+		}),
 	})
+	defer ts.Close()
 
-	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{req})
+	apiResponse := repo.CreateSharedDomain("example.com")
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func TestCreateSharedDomainsWithOldEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "POST",
+			Path:     "/v2/shared_domains",
+			Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+			Response: testnet.TestResponse{Status: http.StatusNotFound},
+		}),
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/domains",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+			{
+				"metadata": { "guid": "abc-123" },
+				"entity": { "name": "example.com" }
+			}`},
+		}),
+	})
 	defer ts.Close()
 
 	apiResponse := repo.CreateSharedDomain("example.com")

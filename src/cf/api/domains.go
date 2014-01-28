@@ -174,20 +174,25 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	if apiResponse.IsSuccessful() {
 		createdDomain = resource.ToFields()
 	}
-
 	return
 }
 
 func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiResponse net.ApiResponse) {
-	path := repo.config.Target + "/v2/domains"
-	data := fmt.Sprintf(`{"name":"%s"}`, domainName)
-	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
+	path := repo.config.Target + "/v2/shared_domains"
+	data := strings.NewReader(fmt.Sprintf(`{"name":"%s"}`, domainName))
+	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, data)
+
+	if apiResponse.IsNotFound() {
+		path := repo.config.Target + "/v2/domains"
+		apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, data)
+	}
+	return
 }
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.Target, domainGuid)
 	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
-	
+
 	if apiResponse.IsNotFound() {
 		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domainGuid)
 		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
