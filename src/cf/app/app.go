@@ -749,7 +749,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-org-role",
 			Description: "Remove an org role from a user",
-			Usage:       fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE", cf.Name()),
+			Usage:       fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE\n\n", cf.Name()) +
+				"ROLES:\n" +
+				"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
+				"   BillingManager - Create and manage the billing account and payment info\n" +
+				"   OrgAuditor - View logs, reports, and settings on this org and all spaces\n",
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-org-role", c)
 			},
