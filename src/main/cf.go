@@ -76,13 +76,13 @@ GLOBAL OPTIONS:
    {{range .Flags}}{{.}}
    {{end}}
 ENVIRONMENT VARIABLES:
+   CF_COLOR=false - will not colorize output
    CF_HOME=path/to/config/ override default config directory
    CF_STAGING_TIMEOUT=15 max wait time for buildpack staging, in minutes
    CF_STARTUP_TIMEOUT=5 max wait time for app instance startup, in minutes
-   CF_COLOR=false - will not colorize output
    CF_TRACE=true - print API request diagnostics to stdout
    CF_TRACE=path/to/trace.log - append API request diagnostics to a log file
-   HTTP_PROXY=http://proxy.example.com:8080 - enable http proxying for API requests
+   HTTP_PROXY=http://proxy.example.com:8080 - enable HTTP proxying for API requests
 `
 
 	cli.CommandHelpTemplate = `NAME:
