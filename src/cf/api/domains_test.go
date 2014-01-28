@@ -524,6 +524,14 @@ func deleteDomainReq(statusCode int) testnet.TestRequest {
 	})
 }
 
+func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
+	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/shared_domains/my-domain-guid?recursive=true",
+		Response: testnet.TestResponse{Status: statusCode},
+	})
+}
+
 func TestDeleteDomainWithNewEndpoint(t *testing.T) {
 	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
 		deleteDomainReq(http.StatusOK),
@@ -548,6 +556,35 @@ func TestDeleteDomainWithOldEndpoint(t *testing.T) {
 	defer ts.Close()
 
 	apiResponse := repo.Delete("my-domain-guid")
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestDeleteSharedDomainWithNewEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
+		deleteSharedDomainReq(http.StatusOK),
+	})
+	defer ts.Close()
+
+	apiResponse := repo.DeleteSharedDomain("my-domain-guid")
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.False(t, apiResponse.IsNotSuccessful())
+}
+
+func TestDeleteSharedDomainWithOldEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{
+		deleteSharedDomainReq(http.StatusNotFound),
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "DELETE",
+			Path:     "/v2/domains/my-domain-guid?recursive=true",
+			Response: testnet.TestResponse{Status: http.StatusOK},
+		}),
+	})
+	defer ts.Close()
+
+	apiResponse := repo.DeleteSharedDomain("my-domain-guid")
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())

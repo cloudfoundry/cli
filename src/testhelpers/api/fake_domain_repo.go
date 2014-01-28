@@ -33,6 +33,9 @@ type FakeDomainRepository struct {
 
 	DeleteDomainGuid string
 	DeleteApiResponse net.ApiResponse
+
+	DeleteSharedDomainGuid string
+	DeleteSharedApiResponse net.ApiResponse
 }
 
 func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, cb api.ListDomainsCallback) net.ApiResponse {
@@ -98,5 +101,11 @@ func (repo *FakeDomainRepository) CreateSharedDomain(domainName string) (apiResp
 func (repo *FakeDomainRepository) Delete(domainGuid string) (apiResponse net.ApiResponse) {
 	repo.DeleteDomainGuid = domainGuid
 	apiResponse = repo.DeleteApiResponse
+	return
+}
+
+func (repo *FakeDomainRepository) DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse) {
+	repo.DeleteSharedDomainGuid = domainGuid
+	apiResponse = repo.DeleteSharedApiResponse
 	return
 }

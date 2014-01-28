@@ -48,6 +48,7 @@ type DomainRepository interface {
 	Create(domainName string, owningOrgGuid string) (createdDomain cf.DomainFields, apiResponse net.ApiResponse)
 	CreateSharedDomain(domainName string) (apiResponse net.ApiResponse)
 	Delete(domainGuid string) (apiResponse net.ApiResponse)
+	DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerDomainRepository struct {
@@ -191,6 +192,17 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.Target, domainGuid)
+	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+
+	if apiResponse.IsNotFound() {
+		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domainGuid)
+		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+	}
+	return
+}
+
+func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/shared_domains/%s?recursive=true", repo.config.Target, domainGuid)
 	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
 
 	if apiResponse.IsNotFound() {
