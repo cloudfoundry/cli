@@ -50,7 +50,13 @@ func main() {
 	if err != nil {
 		return
 	}
-	app.Run(os.Args)
+
+	args := os.Args
+	if len(args) == 2 && args[1][0] == '-' {
+		args[1] = "help"
+	}
+
+	app.Run(args)
 }
 
 func init() {
