@@ -282,7 +282,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "delete-service",
 			ShortName:   "ds",
 			Description: "Delete a service instance",
-			Usage:       fmt.Sprintf("%s delete-service SERVICE", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-service SERVICE_INSTANCE", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
