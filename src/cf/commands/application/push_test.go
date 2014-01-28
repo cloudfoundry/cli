@@ -1028,9 +1028,21 @@ func TestPushingAppDescribesUpload(t *testing.T) {
 	deps.appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
 	deps.appBitsRepo.CallbackFileCount = 11
 
-	ui := callPush(t, []string{"app name"}, deps)
+	ui := callPush(t, []string{"appName"}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Uploading", "61M", "11 files"},
+	})
+}
+
+func TestPushingAppPrintsTipWhenStagingBitsFails(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+	deps.appBitsRepo.UploadAppErr = true
+
+	ui := callPush(t, []string{"appName"}, deps)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+		{"TIP", "logs appName --recent"},
 	})
 }
 
