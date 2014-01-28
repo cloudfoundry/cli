@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var firstPageEventsRequest = testnet.TestRequest{
+var firstPageOldV2EventsRequest = testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-app-guid/events",
 	Response: testnet.TestResponse{
@@ -35,7 +35,8 @@ var firstPageEventsRequest = testnet.TestRequest{
 }
 `},
 }
-var secondPageEventsRequest = testnet.TestRequest{
+
+var secondPageOldV2EventsRequest = testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-app-guid/events",
 	Response: testnet.TestResponse{
@@ -60,7 +61,7 @@ var secondPageEventsRequest = testnet.TestRequest{
 `},
 }
 
-var notFoundRequest = testnet.TestRequest{
+var oldV2NotFoundRequest = testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-app-guid/events",
 	Response: testnet.TestResponse{
@@ -70,8 +71,8 @@ var notFoundRequest = testnet.TestRequest{
 
 func TestListEvents(t *testing.T) {
 	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{
-		firstPageEventsRequest,
-		secondPageEventsRequest,
+		firstPageOldV2EventsRequest,
+		secondPageOldV2EventsRequest,
 	})
 	defer listEventsServer.Close()
 
@@ -80,8 +81,6 @@ func TestListEvents(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 	}
 	repo := NewCloudControllerAppEventsRepository(config, net.NewCloudControllerGateway())
-
-	eventChan, apiErr := repo.ListEvents("my-app-guid")
 
 	time1, _ := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 	time2, _ := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00")
@@ -104,50 +103,21 @@ func TestListEvents(t *testing.T) {
 	}
 
 	list := []cf.EventFields{}
-	for events := range eventChan {
+	apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
 		list = append(list, events...)
-	}
-
-	apiResponse, open := <-apiErr
+		return true
+	}))
 
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.False(t, open)
 	assert.Equal(t, list, expectedEvents)
-	assert.True(t, handler.AllRequestsCalled())
-}
-
-func TestListEventsWithNoEvents(t *testing.T) {
-	emptyEventsRequest := testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/apps/my-app-guid/events",
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body:   `{"resources": []}`},
-	}
-
-	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{emptyEventsRequest})
-	defer listEventsServer.Close()
-
-	config := &configuration.Configuration{
-		Target:      listEventsServer.URL,
-		AccessToken: "BEARER my_access_token",
-	}
-	repo := NewCloudControllerAppEventsRepository(config, net.NewCloudControllerGateway())
-	eventChan, apiErr := repo.ListEvents("my-app-guid")
-
-	_, ok := <-eventChan
-	_, open := <-apiErr
-
-	assert.False(t, ok)
-	assert.False(t, open)
 	assert.True(t, handler.AllRequestsCalled())
 }
 
 func TestListEventsNotFound(t *testing.T) {
 
 	listEventsServer, handler := testnet.NewTLSServer(t, []testnet.TestRequest{
-		firstPageEventsRequest,
-		notFoundRequest,
+		firstPageOldV2EventsRequest,
+		oldV2NotFoundRequest,
 	})
 	defer listEventsServer.Close()
 
@@ -156,7 +126,6 @@ func TestListEventsNotFound(t *testing.T) {
 		AccessToken: "BEARER my_access_token",
 	}
 	repo := NewCloudControllerAppEventsRepository(config, net.NewCloudControllerGateway())
-	eventChan, apiErr := repo.ListEvents("my-app-guid")
 
 	firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 
@@ -171,11 +140,10 @@ func TestListEventsNotFound(t *testing.T) {
 	}
 
 	list := []cf.EventFields{}
-	for events := range eventChan {
+	apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
 		list = append(list, events...)
-	}
-
-	apiResponse := <-apiErr
+		return true
+	}))
 
 	assert.NoError(t, err)
 	assert.Equal(t, list, expectedEvents)

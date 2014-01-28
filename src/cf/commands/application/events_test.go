@@ -65,8 +65,8 @@ func TestEventsSuccess(t *testing.T) {
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 		{"time", "instance", "event", "description"},
-		{timestamp.Local().Format(TIMESTAMP_FORMAT), "98", "app crashed","app instance exited", "78"},
-		{timestamp.Local().Format(TIMESTAMP_FORMAT), "99", "app crashed","app instance was stopped", "77"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "98", "app crashed", "app instance exited", "78"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "99", "app crashed", "app instance was stopped", "77"},
 	})
 }
 

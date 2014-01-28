@@ -3,26 +3,19 @@ package api
 import (
 	"cf"
 	"cf/net"
+	"cf/api"
 )
 
 type FakeAppEventsRepo struct {
 	AppGuid string
 	Events  []cf.EventFields
+	ApiResponse net.ApiResponse
 }
 
-func (repo FakeAppEventsRepo) ListEvents(appGuid string) (events chan []cf.EventFields, statusChan chan net.ApiResponse) {
+func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb api.ListEventsCallback) net.ApiResponse {
 	repo.AppGuid = appGuid
-
-	events = make(chan []cf.EventFields, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		for _, event := range repo.Events {
-			events <- []cf.EventFields{event}
-		}
-		close(events)
-		close(statusChan)
-	}()
-
-	return
+	if len(repo.Events) > 0 {
+		cb(repo.Events)
+	}
+	return repo.ApiResponse
 }
