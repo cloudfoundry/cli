@@ -245,6 +245,17 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "delete-shared-domain",
+			Description: "Delete a shared domain",
+			Usage:       fmt.Sprintf("%s delete-shared-domain DOMAIN", cf.Name()),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("delete-shared-domain", c)
+			},
+		},
+		{
 			Name:        "delete-org",
 			Description: "Delete an org",
 			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name()),
