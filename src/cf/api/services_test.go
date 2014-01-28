@@ -117,7 +117,7 @@ func TestCreateServiceInstance(t *testing.T) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "POST",
 		Path:     "/v2/service_instances",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
 
@@ -134,7 +134,7 @@ func TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists(t *testing.T) {
 	errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
 		Path:    "/v2/service_instances",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid"}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
 		Response: testnet.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
@@ -155,7 +155,7 @@ func TestCreateServiceInstanceWhenDifferentServiceAlreadyExists(t *testing.T) {
 	errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:  "POST",
 		Path:    "/v2/service_instances",
-		Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid"}`),
+		Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
 		Response: testnet.TestResponse{
 			Status: http.StatusBadRequest,
 			Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,

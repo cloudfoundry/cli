@@ -175,7 +175,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
 	data := fmt.Sprintf(
-		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s"}`,
+		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s", "async": true}`,
 		name, planGuid, repo.config.SpaceFields.Guid,
 	)
 
