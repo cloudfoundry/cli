@@ -431,7 +431,7 @@ func TestCreateDomainUsingOldEndpoint(t *testing.T) {
 		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/domains",
-			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid", "wildcard": true}`),
 			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
 				"metadata": { "guid": "abc-123" },
 				"entity": { "name": "example.com" }
@@ -500,7 +500,7 @@ func TestCreateSharedDomainsWithOldEndpoint(t *testing.T) {
 		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/domains",
-			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+			Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
 			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 			{
 				"metadata": { "guid": "abc-123" },
