@@ -27,7 +27,7 @@ func NewCloudControllerServiceBindingRepository(config *configuration.Configurat
 func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_bindings", repo.config.Target)
 	body := fmt.Sprintf(
-		`{"app_guid":"%s","service_instance_guid":"%s"}`,
+		`{"app_guid":"%s","service_instance_guid":"%s","async":true}`,
 		appGuid, instanceGuid,
 	)
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
