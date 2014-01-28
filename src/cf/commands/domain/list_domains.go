@@ -50,13 +50,14 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 
 	noDomains := true
 	table := cmd.ui.Table([]string{"name                              ", "status"})
-	apiResponse := cmd.domainRepo.ListSharedDomains(domainsCallback("shared", table, &noDomains))
-	if apiResponse.IsNotSuccessful() {
+	apiResponse := cmd.domainRepo.ListSharedDomains(domainsCallback(table, &noDomains))
+
+	if apiResponse.IsNotSuccessful() && !apiResponse.IsNotFound() {
 		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiResponse.Message)
 		return
 	}
 
-	apiResponse = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback("owned", table, &noDomains))
+	apiResponse = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Failed fetching private domains.\n%s", apiResponse.Message)
 		return
@@ -67,14 +68,22 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	}
 }
 
-func domainsCallback(status string, table terminal.Table, noDomains *bool) api.ListDomainsCallback {
+func domainsCallback(table terminal.Table, noDomains *bool) api.ListDomainsCallback {
 	return api.ListDomainsCallback(func(domains []cf.Domain) bool {
 		rows := [][]string{}
 		for _, domain := range domains {
-			rows = append(rows, []string{domain.Name, status})
+			rows = append(rows, []string{domain.Name, domainStatusString(domain)})
 		}
 		table.Print(rows)
 		*noDomains = false
 		return true
 	})
+}
+
+func domainStatusString(domain cf.Domain) string {
+	if domain.Shared {
+		return "shared"
+	} else {
+		return "owned"
+	}
 }
