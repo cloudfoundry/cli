@@ -160,7 +160,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Create a space",
 			Usage:       fmt.Sprintf("%s create-space SPACE [-o ORG]", cf.Name()),
 			Flags: []cli.Flag{
-				NewStringFlag("o", "Organization name"),
+				NewStringFlag("o", "Organization"),
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("create-space", c)
@@ -225,9 +225,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-buildpack",
 			Description: "Delete a buildpack",
-			Usage:       fmt.Sprintf("%s delete-buildpack BUILDPACK", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-buildpack BUILDPACK [-f]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete-buildpack", c)
@@ -236,9 +236,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-domain",
 			Description: "Delete a domain",
-			Usage:       fmt.Sprintf("%s delete-domain DOMAIN", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-domain DOMAIN [-f]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete-domain", c)
@@ -247,9 +247,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-shared-domain",
 			Description: "Delete a shared domain",
-			Usage:       fmt.Sprintf("%s delete-shared-domain DOMAIN", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-shared-domain DOMAIN [-f]", cf.Name()),
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "f", Usage: "force deletion without confirmation"},
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete-shared-domain", c)
@@ -258,7 +258,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-org",
 			Description: "Delete an org",
-			Usage:       fmt.Sprintf("%s delete-org ORG", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-org ORG [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -269,7 +269,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-route",
 			Description: "Delete a route",
-			Usage:       fmt.Sprintf("%s delete-route DOMAIN -n HOSTNAME", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-route DOMAIN [-n HOSTNAME] [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 				NewStringFlag("n", "Hostname"),
@@ -282,7 +282,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "delete-service",
 			ShortName:   "ds",
 			Description: "Delete a service instance",
-			Usage:       fmt.Sprintf("%s delete-service SERVICE_INSTANCE", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-service SERVICE_INSTANCE [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -293,7 +293,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-service-auth-token",
 			Description: "Delete a service auth token",
-			Usage:       fmt.Sprintf("%s delete-service-auth-token LABEL PROVIDER", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-service-auth-token LABEL PROVIDER [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -304,7 +304,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-service-broker",
 			Description: "Delete a service broker",
-			Usage:       fmt.Sprintf("%s delete-service-broker SERVICE_BROKER", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-service-broker SERVICE_BROKER [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -315,7 +315,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-space",
 			Description: "Delete a space",
-			Usage:       fmt.Sprintf("%s delete-space SPACE", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-space SPACE [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -326,7 +326,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "delete-user",
 			Description: "Delete a user",
-			Usage:       fmt.Sprintf("%s delete-user USERNAME", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete-user USERNAME [-f]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
 			},
@@ -406,7 +406,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Tail or show recent logs for an app",
 			Usage:       fmt.Sprintf("%s logs APP", cf.Name()),
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "recent", Usage: "dump recent logs instead of tailing"},
+				cli.BoolFlag{Name: "recent", Usage: "Dump recent logs instead of tailing"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("logs", c)
@@ -477,13 +477,13 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("b", "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"),
 				NewStringFlag("c", "Startup command, set to null to reset to default start command"),
 				NewStringFlag("d", "Domain (e.g. example.com)"),
+				NewStringFlag("f", "Path to manifest"),
 				NewStringFlag("i", "Number of instances"),
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("n", "Hostname (e.g. my-subdomain)"),
 				NewStringFlag("p", "Path of app directory or zip file"),
 				NewStringFlag("s", "Stack to use"),
 				NewStringFlag("t", "Start timeout in seconds"),
-				NewStringFlag("f", "Path to manifest"),
 				cli.BoolFlag{Name: "no-manifest", Usage: "Ignore manifest file"},
 				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
 				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
@@ -562,10 +562,10 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "scale",
 			Description: "Change the instance count and memory limit for an app",
-			Usage:       fmt.Sprintf("%s scale APP -i INSTANCES -m MEMORY", cf.Name()),
+			Usage:       fmt.Sprintf("%s scale APP [-i INSTANCES] [-m MEMORY]", cf.Name()),
 			Flags: []cli.Flag{
-				NewIntFlagWithValue("i", "number of instances", -1),
-				NewStringFlag("m", "memory limit (e.g. 256M, 1024M, 1G)"),
+				NewIntFlagWithValue("i", "Number of instances", -1),
+				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("scale", c)
@@ -620,7 +620,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				"ROLES:\n" +
 				"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
 				"   BillingManager - Create and manage the billing account and payment info\n" +
-				"   OrgAuditor - View logs, reports, and settings on this org and all spaces\n",
+				"   OrgAuditor - Read-only access to org info and reports\n",
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("set-org-role", c)
 			},
@@ -749,11 +749,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-org-role",
 			Description: "Remove an org role from a user",
-			Usage:       fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE\n\n", cf.Name()) +
+			Usage: fmt.Sprintf("%s unset-org-role USERNAME ORG ROLE\n\n", cf.Name()) +
 				"ROLES:\n" +
 				"   OrgManager - Invite and manage users, select and change plans, and set spending limits\n" +
 				"   BillingManager - Create and manage the billing account and payment info\n" +
-				"   OrgAuditor - View logs, reports, and settings on this org and all spaces\n",
+				"   OrgAuditor - Read-only access to org info and reports\n",
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-org-role", c)
 			},
@@ -761,7 +761,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-space-role",
 			Description: "Remove a space role from a user",
-			Usage:       fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE\n\n", cf.Name()) +
+			Usage: fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE\n\n", cf.Name()) +
 				"ROLES:\n" +
 				"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
 				"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
