@@ -111,6 +111,28 @@ func TestListDomainsSharedDomainsFails(t *testing.T) {
 	})
 }
 
+func TestListDomainsSharedDomainsTriesOldEndpointOn404(t *testing.T) {
+	orgFields := cf.OrganizationFields{}
+	orgFields.Name = "my-org"
+	orgFields.Guid = "my-org-guid"
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+	domain := cf.Domain{}
+	domain.Name = "ze-domain"
+
+	domainRepo := &testapi.FakeDomainRepository{
+		ListSharedDomainsApiResponse: net.NewNotFoundApiResponse("whoops! misplaced yr domainz"),
+		ListDomainsForOrgDomains:     []cf.Domain{domain},
+	}
+	ui := callListDomains(t, []string{}, reqFactory, domainRepo)
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Getting domains in org", "my-org", "my-user"},
+		{"ze-domain"},
+	})
+}
+
 func TestListDomainsOrgDomainsFails(t *testing.T) {
 	orgFields := cf.OrganizationFields{}
 	orgFields.Name = "my-org"

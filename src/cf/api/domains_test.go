@@ -25,10 +25,10 @@ var noDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest
 
 var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/shared_domains?inline-relations-depth=1",
+	Path:   "/v2/shared_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
 {
-	"next_url": "/v2/shared_domains?inline-relations-depth=1&page=2",
+	"next_url": "/v2/shared_domains?page=2",
 	"resources": [
 		{
 		  "metadata": {
@@ -44,7 +44,7 @@ var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testne
 
 var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/shared_domains?inline-relations-depth=1",
+	Path:   "/v2/shared_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
 {
 	"resources": [
@@ -59,6 +59,28 @@ var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testn
 	]
 }`},
 })
+
+var notFoundDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "GET",
+	Path:     "/v2/organizations/my-org-guid/private_domains",
+	Response: testnet.TestResponse{Status: http.StatusNotFound},
+})
+var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`}})
 
 var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
@@ -122,6 +144,22 @@ func TestListSharedDomains(t *testing.T) {
 	assert.Equal(t, len(receivedDomains), 2)
 	assert.Equal(t, receivedDomains[0].Guid, "shared-domain1-guid")
 	assert.Equal(t, receivedDomains[1].Guid, "shared-domain2-guid")
+	assert.True(t, handler.AllRequestsCalled())
+}
+
+func TestDomainListDomainsForOrgWithOldEndpoint(t *testing.T) {
+	ts, handler, repo := createDomainRepo(t, []testnet.TestRequest{notFoundDomainsRequest, oldEndpointDomainsRequest})
+	defer ts.Close()
+
+	receivedDomains := []cf.Domain{}
+	apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+		receivedDomains = append(receivedDomains, domains...)
+		return true
+	}))
+
+	assert.True(t, apiResponse.IsSuccessful())
+	assert.Equal(t, len(receivedDomains), 1)
+	assert.Equal(t, receivedDomains[0].Guid, "domain-guid")
 	assert.True(t, handler.AllRequestsCalled())
 }
 

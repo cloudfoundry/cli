@@ -63,11 +63,16 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 }
 
 func (repo CloudControllerDomainRepository) ListSharedDomains(cb ListDomainsCallback) net.ApiResponse {
-	return repo.listDomains("/v2/shared_domains?inline-relations-depth=1", cb)
+	return repo.listDomains("/v2/shared_domains", cb)
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse {
-	return repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
+	apiResponse := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
+	if apiResponse.IsNotFound() {
+		apiResponse = repo.listDomains("/v2/domains", cb)
+	}
+
+	return apiResponse
 }
 
 func (repo CloudControllerDomainRepository) listDomains(path string, cb ListDomainsCallback) (apiResponse net.ApiResponse) {
