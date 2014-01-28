@@ -761,7 +761,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "unset-space-role",
 			Description: "Remove a space role from a user",
-			Usage:       fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE", cf.Name()),
+			Usage:       fmt.Sprintf("%s unset-space-role USERNAME ORG SPACE ROLE\n\n", cf.Name()) +
+				"ROLES:\n" +
+				"   SpaceManager - Invite and manage users, and enable features for a given space\n" +
+				"   SpaceDeveloper - Create and manage apps and services, and see logs and reports\n" +
+				"   SpaceAuditor - View logs, reports, and settings on this space\n",
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("unset-space-role", c)
 			},
