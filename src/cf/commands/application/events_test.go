@@ -41,28 +41,32 @@ func TestEventsSuccess(t *testing.T) {
 	app.Name = "my-app"
 	reqFactory.Application = app
 
+	event1 := cf.EventFields{}
+	event1.Guid = "event-guid-1"
+	event1.Name = "app crashed"
+	event1.InstanceIndex = 98
+	event1.Timestamp = timestamp
+	event1.Description = "reason: app instance exited, exit_status: 78"
+
+	event2 := cf.EventFields{}
+	event2.Guid = "event-guid-2"
+	event2.Name = "app crashed"
+	event2.InstanceIndex = 99
+	event2.Timestamp = timestamp
+	event2.Description = "reason: app instance was stopped, exit_status: 77"
+
 	eventsRepo.Events = []cf.EventFields{
-		{
-			InstanceIndex:   98,
-			Timestamp:       timestamp,
-			ExitDescription: "app instance exited",
-			ExitStatus:      78,
-		},
-		{
-			InstanceIndex:   99,
-			Timestamp:       timestamp,
-			ExitDescription: "app instance was stopped",
-			ExitStatus:      77,
-		},
+		event1,
+		event2,
 	}
 
 	ui := callEvents(t, []string{"my-app"}, reqFactory, eventsRepo)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
-		{"time", "instance", "description", "exit status"},
-		{timestamp.Local().Format(TIMESTAMP_FORMAT), "98", "app instance exited", "78"},
-		{timestamp.Local().Format(TIMESTAMP_FORMAT), "99", "app instance was stopped", "77"},
+		{"time", "instance", "event", "description"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "98", "app crashed","app instance exited", "78"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "99", "app crashed","app instance was stopped", "77"},
 	})
 }
 

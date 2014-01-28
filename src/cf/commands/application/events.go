@@ -53,7 +53,7 @@ func (cmd *Events) Run(c *cli.Context) {
 	)
 
 	eventChan, statusChan := cmd.eventsRepo.ListEvents(app.Guid)
-	table := cmd.ui.Table([]string{"time", "instance", "description", "exit status"})
+	table := cmd.ui.Table([]string{"time", "instance", "event", "description"})
 	noEvents := true
 
 	for events := range eventChan {
@@ -63,8 +63,8 @@ func (cmd *Events) Run(c *cli.Context) {
 			rows = append(rows, []string{
 				event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
 				strconv.Itoa(event.InstanceIndex),
-				event.ExitDescription,
-				strconv.Itoa(event.ExitStatus),
+				event.Name,
+				event.Description,
 			})
 		}
 		table.Print(rows)
