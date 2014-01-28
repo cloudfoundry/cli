@@ -52,7 +52,7 @@ func main() {
 	}
 
 	args := os.Args
-	if len(args) == 2 && args[1][0] == '-' {
+	if len(args) == 2 && args[1][0] == '-' && args[1] != "-v" && args[1] != "--version" {
 		args[1] = "help"
 	}
 
