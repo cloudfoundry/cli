@@ -79,7 +79,7 @@ func (apiResponse ApiResponse) IsHttpError() bool {
 }
 
 func (apiResponse ApiResponse) IsNotFound() bool {
-	return apiResponse.isNotFound
+	return apiResponse.isNotFound || (apiResponse.isHttpResponse && apiResponse.StatusCode == 404)
 }
 
 func (apiResponse ApiResponse) IsSuccessful() bool {
