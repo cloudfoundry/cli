@@ -11,6 +11,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"generic"
 	"github.com/codegangsta/cli"
 	"os"
@@ -80,7 +81,8 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, appParams.Get("path").(string), cmd.describeUploadOperation)
 		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
+			messageToFailWith := fmt.Sprintf("%s\nTIP: use '%s logs %s --recent' for more information", apiResponse.Message, cf.Name(), app.Name)
+			cmd.ui.Failed(messageToFailWith)
 			return
 		}
 		cmd.ui.Ok()
