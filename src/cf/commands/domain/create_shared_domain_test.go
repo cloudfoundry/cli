@@ -42,14 +42,14 @@ func TestShareDomain(t *testing.T) {
 
 	assert.Equal(t, domainRepo.CreateSharedDomainName, "example.com")
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Sharing domain", "example.com", "my-user"},
+		{"Creating shared domain", "example.com", "my-user"},
 		{"OK"},
 	})
 }
 
 func callShareDomain(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("share-domain", args)
+	ctxt := testcmd.NewContext("create-shared-domain", args)
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
@@ -60,7 +60,7 @@ func callShareDomain(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 		AccessToken: token,
 	}
 
-	cmd := NewShareDomain(fakeUI, config, domainRepo)
+	cmd := NewCreateSharedDomain(fakeUI, config, domainRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

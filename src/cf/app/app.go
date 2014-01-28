@@ -637,11 +637,11 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
-			Name:        "share-domain",
-			Description: "Share a domain with all orgs",
-			Usage:       fmt.Sprintf("%s share-domain DOMAIN", cf.Name()),
+			Name:        "create-shared-domain",
+			Description: "Create a domain that can be used by all orgs (admin-only)",
+			Usage:       fmt.Sprintf("%s create-shared-domain DOMAIN", cf.Name()),
 			Action: func(c *cli.Context) {
-				cmdRunner.RunCmdByName("share-domain", c)
+				cmdRunner.RunCmdByName("create-shared-domain", c)
 			},
 		},
 		{
