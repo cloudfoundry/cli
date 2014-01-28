@@ -37,8 +37,10 @@ type EventEntity struct {
 	InstanceIndex   int    `json:"instance_index"`
 }
 
+type ListEventsCallback func(events []cf.EventFields) (fetchNext bool)
+
 type AppEventsRepository interface {
-	ListEvents(appGuid string) (events chan []cf.EventFields, statusChan chan net.ApiResponse)
+	ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -52,38 +54,34 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string) (eventChan chan []cf.EventFields, statusChan chan net.ApiResponse) {
+func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb ListEventsCallback) (apiResponse net.ApiResponse) {
+	fetchNext := true
+	path := fmt.Sprintf("/v2/apps/%s/events", appGuid)
 
-	eventChan = make(chan []cf.EventFields, 4)
-	statusChan = make(chan net.ApiResponse, 1)
+	for fetchNext {
+		var shouldFetch bool
 
-	go func() {
-		path := fmt.Sprintf("/v2/apps/%s/events", appGuid)
-		for path != "" {
-			url := fmt.Sprintf("%s%s", repo.config.Target, path)
-			eventResources := &PaginatedEventResources{}
-			apiResponse := repo.gateway.GetResource(url, repo.config.AccessToken, eventResources)
-			if apiResponse.IsNotSuccessful() {
-				statusChan <- apiResponse
-				close(eventChan)
-				close(statusChan)
-				return
-			}
+		url := fmt.Sprintf("%s%s", repo.config.Target, path)
+		eventResources := &PaginatedEventResources{}
 
-			events := []cf.EventFields{}
-			for _, resource := range eventResources.Resources {
-				events = append(events, resource.ToFields())
-			}
-
-			if len(events) > 0 {
-				eventChan <- events
-			}
-
-			path = eventResources.NextURL
+		apiResponse = repo.gateway.GetResource(url, repo.config.AccessToken, eventResources)
+		if apiResponse.IsNotSuccessful() {
+			return
 		}
-		close(eventChan)
-		close(statusChan)
-	}()
+
+		events := []cf.EventFields{}
+		for _, resource := range eventResources.Resources {
+			events = append(events, resource.ToFields())
+		}
+
+		if len(events) > 0 {
+			shouldFetch = cb(events)
+		}
+
+		path = eventResources.NextURL
+
+		fetchNext = shouldFetch && path != ""
+	}
 
 	return
 }

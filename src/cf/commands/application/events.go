@@ -1,6 +1,7 @@
 package application
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
@@ -52,14 +53,12 @@ func (cmd *Events) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	eventChan, statusChan := cmd.eventsRepo.ListEvents(app.Guid)
 	table := cmd.ui.Table([]string{"time", "instance", "event", "description"})
 	noEvents := true
 
-	for events := range eventChan {
+	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, api.ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
 		rows := [][]string{}
-		for i := len(events) - 1; i >= 0; i-- {
-			event := events[i]
+		for _, event := range events {
 			rows = append(rows, []string{
 				event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
 				strconv.Itoa(event.InstanceIndex),
@@ -69,11 +68,11 @@ func (cmd *Events) Run(c *cli.Context) {
 		}
 		table.Print(rows)
 		noEvents = false
-	}
+		return true
+	}))
 
-	apiStatus := <-statusChan
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching events.\n%s", apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching events.\n%s", apiResponse.Message)
 		return
 	}
 	if noEvents {
