@@ -169,6 +169,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 
 	if apiResponse.IsNotFound() {
 		path := repo.config.Target + "/v2/domains"
+		data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s", "wildcard": true}`, domainName, owningOrgGuid)
 		apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
 	}
 
@@ -185,6 +186,7 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 
 	if apiResponse.IsNotFound() {
 		path := repo.config.Target + "/v2/domains"
+		data := strings.NewReader(fmt.Sprintf(`{"name":"%s", "wildcard": true}`, domainName))
 		apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, data)
 	}
 	return
