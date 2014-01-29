@@ -377,15 +377,30 @@ func TestPushingManyAppsFromManifest(t *testing.T) {
 	assert.Equal(t, envVars.Get("SOMETHING"), "nothing")
 }
 
-func TestPushingManyAppsDoesNotAllowNameFlag(t *testing.T) {
+func TestPushingASingleAppFromAManifestWithManyApps(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
 
-	ui := callPush(t, []string{"app-name"}, deps)
+	ui := callPush(t, []string{"app2"}, deps)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"APP_NAME", "not allowed", "multiple apps", "manifest"},
+		{"Creating", "app2"},
+	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"Creating", "app1"},
+	})
+	assert.Equal(t, len(deps.appRepo.CreateAppParams), 1)
+	assert.Equal(t, deps.appRepo.CreateAppParams[0].Get("name"), "app2")
+}
+
+func TestNamedAppInAManifestIsNotFound(t *testing.T) {
+	deps := getPushDependencies()
+	deps.appRepo.ReadNotFound = true
+	deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
+
+	ui := callPush(t, []string{"non-existant-app"}, deps)
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Failed"},
 	})
 	assert.Equal(t, len(deps.appRepo.CreateAppParams), 0)
 }
