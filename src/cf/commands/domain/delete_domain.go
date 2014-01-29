@@ -63,12 +63,7 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 	}
 
 	if !force {
-		var answer bool
-		if domain.Shared {
-			answer = cmd.ui.Confirm("This domain is shared across all orgs.\nDeleting it will remove all associated routes, and will make any app with this domain unreachable.\nAre you sure you want to delete the domain %s? ", domainName)
-		} else {
-			answer = cmd.ui.Confirm("Are you sure you want to delete the domain %s and all of its associations?", domainName)
-		}
+		answer := cmd.ui.Confirm("Are you sure you want to delete the domain %s and all of its associations?", domainName)
 
 		if !answer {
 			return

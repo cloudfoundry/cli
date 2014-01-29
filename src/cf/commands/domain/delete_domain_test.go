@@ -134,44 +134,18 @@ func TestDeleteDomainDeleteError(t *testing.T) {
 	})
 }
 
-func TestDeleteDomainDeleteSharedHasSharedConfirmation(t *testing.T) {
-	domain := cf.Domain{}
-	domain.Name = "foo.com"
-	domain.Guid = "foo-guid"
-	domain.Shared = true
-	domainRepo := &testapi.FakeDomainRepository{
-		FindByNameInOrgDomain: domain,
-	}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-
-	ui := callDeleteDomain(t, []string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
-
-	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
-
-	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
-		{"shared", "foo.com"},
-	})
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Deleting domain", "foo.com"},
-		{"OK"},
-	})
-}
-
 func TestDeleteDomainForceFlagSkipsConfirmation(t *testing.T) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
 	domain := cf.Domain{}
 	domain.Name = "foo.com"
 	domain.Guid = "foo-guid"
-	domain.Shared = true
 	domainRepo := &testapi.FakeDomainRepository{
 		FindByNameInOrgDomain: domain,
 	}
 	ui := callDeleteDomain(t, []string{"-f", "foo.com"}, []string{}, reqFactory, domainRepo)
 
 	assert.Equal(t, domainRepo.DeleteDomainGuid, "foo-guid")
-
 	assert.Equal(t, len(ui.Prompts), 0)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Deleting domain", "foo.com"},
