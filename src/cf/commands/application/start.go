@@ -131,10 +131,10 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 
 	cmd.ui.Say("")
 
-	cmd.waitForOneRunningInstance(app.Guid)
+	cmd.waitForOneRunningInstance(updatedApp)
 	cmd.ui.Say(terminal.HeaderColor("\nApp started\n"))
 
-	cmd.appDisplayer.ShowApp(app)
+	cmd.appDisplayer.ShowApp(updatedApp)
 	return
 }
 
@@ -178,7 +178,9 @@ func (cmd Start) waitForInstancesToStage(app cf.Application) {
 	for apiResponse.IsNotSuccessful() && time.Since(stagingStartTime) < cmd.StagingTimeout {
 		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
-			cmd.ui.Failed(apiResponse.Message)
+			cmd.ui.Failed(fmt.Sprintf("%s\n\nTIP: use '%s' for more information",
+				apiResponse.Message,
+				terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
 			return
 		}
 		cmd.ui.Wait(cmd.PingerThrottle)
@@ -187,17 +189,17 @@ func (cmd Start) waitForInstancesToStage(app cf.Application) {
 	return
 }
 
-func (cmd Start) waitForOneRunningInstance(appGuid string) {
+func (cmd Start) waitForOneRunningInstance(app cf.Application) {
 	var runningCount, startingCount, flappingCount, downCount int
 	startupStartTime := time.Now()
 
 	for runningCount == 0 {
 		if time.Since(startupStartTime) > cmd.StartupTimeout {
-			cmd.ui.Failed("Start app timeout")
+			cmd.ui.Failed(fmt.Sprintf("Start app timeout\n\nTIP: use '%s' for more information", terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
 			return
 		}
 
-		instances, apiResponse := cmd.appInstancesRepo.GetInstances(appGuid)
+		instances, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Wait(cmd.PingerThrottle)
 			continue
@@ -222,7 +224,7 @@ func (cmd Start) waitForOneRunningInstance(appGuid string) {
 		cmd.ui.Say(instancesDetails(startingCount, downCount, runningCount, flappingCount, totalCount))
 
 		if flappingCount > 0 {
-			cmd.ui.Failed("Start unsuccessful")
+			cmd.ui.Failed(fmt.Sprintf("Start unsuccessful\n\nTIP: use '%s' for more information", terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
 			return
 		}
 	}

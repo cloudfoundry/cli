@@ -1049,18 +1049,6 @@ func TestPushingAppDescribesUpload(t *testing.T) {
 	})
 }
 
-func TestPushingAppPrintsTipWhenStagingBitsFails(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-	deps.appBitsRepo.UploadAppErr = true
-
-	ui := callPush(t, []string{"appName"}, deps)
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"TIP", "logs appName --recent"},
-	})
-}
-
 func TestPushingWithNoManifestAndNoName(t *testing.T) {
 	deps := getPushDependencies()
 
