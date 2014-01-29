@@ -17,8 +17,6 @@ var appHelpTemplate = `{{.Title "NAME:"}}
 
 {{.Title "VERSION:"}}
    {{.Version}}
-{{.Title "DOCS:"}}
-   http://docs.cloudfoundry.com [exact link to come]
    {{range .Commands}}
 {{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
