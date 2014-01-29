@@ -287,7 +287,7 @@ func TestUnmarshalUpdateAppEvent(t *testing.T) {
 	assert.Equal(t, eventFields.Guid, "event-1-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.update")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
-	assert.Equal(t, eventFields.Description, `instances: 1, memory: 256`)
+	assert.Equal(t, eventFields.Description, "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN")
 
 	resource = new(EventResourceNewV2)
 	err = json.Unmarshal([]byte(`
@@ -341,7 +341,7 @@ func TestUnmarshalDeleteAppEvent(t *testing.T) {
 	assert.Equal(t, eventFields.Guid, "event-2-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.delete-request")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00"))
-	assert.Equal(t, eventFields.Description, ``)
+	assert.Equal(t, eventFields.Description, "recursive: true")
 }
 
 func TestUnmarshalNewV2CreateEvent(t *testing.T) {
@@ -375,7 +375,7 @@ func TestUnmarshalNewV2CreateEvent(t *testing.T) {
 	assert.Equal(t, eventFields.Guid, "event-1-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.create")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-22T19:34:16+00:00"))
-	assert.Equal(t, eventFields.Description, `disk_quota: 1024, instances: 1, state: STOPPED`)
+	assert.Equal(t, eventFields.Description, "disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN")
 }
 
 type eventTestDependencies struct {

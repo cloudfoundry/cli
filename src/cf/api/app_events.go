@@ -77,25 +77,36 @@ type EventResourceNewV2 struct {
 	Entity EventEntityNewV2
 }
 
+var KNOWN_METADATA_KEYS = []string{
+	"index",
+	"reason",
+	"exit_description",
+	"exit_status",
+	"recursive",
+	"disk_quota",
+	"instances",
+	"memory",
+	"state",
+	"command",
+	"environment_json",
+}
+
 func (resource EventResourceNewV2) ToFields() (event cf.EventFields) {
 	event.Guid = resource.Metadata.Guid
 	event.Name = resource.Entity.Type
 	event.Timestamp = resource.Entity.Timestamp
-	metadata := generic.NewMap(resource.Entity.Metadata)
 
-	switch event.Name {
-	case "app.crash":
-		event.Description = formatDescription(metadata, "index", "reason", "exit_description", "exit_status")
-	case "audit.app.create":
-		fallthrough
-	case "audit.app.update":
-		event.Description = formatDescription(generic.NewMap(metadata.Get("request")), "disk_quota", "instances", "memory", "state")
+	metadata := generic.NewMap(resource.Entity.Metadata)
+	if metadata.Has("request") {
+		metadata = generic.NewMap(metadata.Get("request"))
 	}
+
+	event.Description = formatDescription(metadata, KNOWN_METADATA_KEYS)
 
 	return
 }
 
-func formatDescription(metadata generic.Map, keys ...string) string {
+func formatDescription(metadata generic.Map, keys []string) string {
 	parts := []string{}
 	for _, key := range keys {
 		value := metadata.Get(key)
@@ -112,6 +123,12 @@ func String(val interface{}) string {
 		return val
 	case float64:
 		return strconv.FormatFloat(val, byte('f'), -1, 64)
+	case bool:
+		if val {
+			return "true"
+		} else {
+			return "false"
+		}
 	default:
 		return fmt.Sprintf("%s", val)
 	}
