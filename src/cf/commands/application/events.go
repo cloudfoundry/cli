@@ -8,7 +8,6 @@ import (
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
-	"strconv"
 )
 
 type Events struct {
@@ -53,7 +52,7 @@ func (cmd *Events) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	table := cmd.ui.Table([]string{"time", "instance", "event", "description"})
+	table := cmd.ui.Table([]string{"time", "event", "description"})
 	noEvents := true
 
 	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, api.ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
@@ -61,7 +60,6 @@ func (cmd *Events) Run(c *cli.Context) {
 		for _, event := range events {
 			rows = append(rows, []string{
 				event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
-				strconv.Itoa(event.InstanceIndex),
 				event.Name,
 				event.Description,
 			})

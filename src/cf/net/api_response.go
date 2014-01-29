@@ -5,8 +5,9 @@ import (
 )
 
 type ApiResponse struct {
-	Message     string
-	ErrorCode   string
+	Message   string
+	ErrorCode string
+
 	StatusCode  int
 	ErrorHeader string
 	ErrorBody   string

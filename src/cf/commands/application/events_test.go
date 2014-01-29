@@ -44,14 +44,12 @@ func TestEventsSuccess(t *testing.T) {
 	event1 := cf.EventFields{}
 	event1.Guid = "event-guid-1"
 	event1.Name = "app crashed"
-	event1.InstanceIndex = 98
 	event1.Timestamp = timestamp
 	event1.Description = "reason: app instance exited, exit_status: 78"
 
 	event2 := cf.EventFields{}
 	event2.Guid = "event-guid-2"
 	event2.Name = "app crashed"
-	event2.InstanceIndex = 99
 	event2.Timestamp = timestamp
 	event2.Description = "reason: app instance was stopped, exit_status: 77"
 
@@ -64,9 +62,9 @@ func TestEventsSuccess(t *testing.T) {
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
-		{"time", "instance", "event", "description"},
-		{timestamp.Local().Format(TIMESTAMP_FORMAT), "98", "app crashed", "app instance exited", "78"},
-		{timestamp.Local().Format(TIMESTAMP_FORMAT), "99", "app crashed", "app instance was stopped", "77"},
+		{"time", "event", "description"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance exited", "78"},
+		{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance was stopped", "77"},
 	})
 }
 
