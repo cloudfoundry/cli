@@ -189,9 +189,8 @@ type Domain struct {
 
 type EventFields struct {
 	BasicFields
-	InstanceIndex int
-	Timestamp     time.Time
-	Description   string
+	Timestamp   time.Time
+	Description string
 }
 
 type RouteFields struct {
