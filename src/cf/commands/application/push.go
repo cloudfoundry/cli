@@ -81,8 +81,7 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, appParams.Get("path").(string), cmd.describeUploadOperation)
 		if apiResponse.IsNotSuccessful() {
-			messageToFailWith := fmt.Sprintf("%s\nTIP: use '%s logs %s --recent' for more information", apiResponse.Message, cf.Name(), app.Name)
-			cmd.ui.Failed(messageToFailWith)
+			cmd.ui.Failed(fmt.Sprintf("Error uploading application.\n%s", apiResponse.Message))
 			return
 		}
 		cmd.ui.Ok()
