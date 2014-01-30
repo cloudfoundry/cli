@@ -591,7 +591,7 @@ func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
 	expectedManifestPath := filepath.Clean("some/relative/path/different-manifest.yml")
 	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path/different-manifest.yml")
 	assert.Equal(t, deps.manifestRepo.ReadManifestPath, expectedManifestPath)
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Join("some/relative/path/", "../../fixtures/example-app"))
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("some/fixtures/example-app"))
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Using manifest file", expectedManifestPath},

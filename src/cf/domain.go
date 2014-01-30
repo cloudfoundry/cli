@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"path/filepath"
 )
 
 type InstanceState string
@@ -159,6 +160,15 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 		appParams.Set("health_check_timeout", timeout)
 	}
 
+	if c.String("p") != "" {
+		var path string
+		path, err = filepath.Abs(c.String("p"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Error finding app path: %s", err))
+			return
+		}
+		appParams.Set("path", path)
+	}
 	return
 }
 
