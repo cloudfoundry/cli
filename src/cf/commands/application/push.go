@@ -112,9 +112,9 @@ func (cmd *Push) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *Push) describeUploadOperation(zipFileBytes, fileCount uint64) {
+func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount uint64) {
 	humanReadableBytes := formatters.ByteSize(zipFileBytes)
-	cmd.ui.Say("Uploading app: %s, %d files", humanReadableBytes, fileCount)
+	cmd.ui.Say("Uploading from: %s\n%s, %d files", path, humanReadableBytes, fileCount)
 }
 
 func (cmd *Push) fetchStackGuid(appParams cf.AppParams) {
@@ -357,7 +357,7 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 	baseAppPath := cmd.appPathFromContext(c)
 	appParams.Set("path", baseAppPath)
 
-	appSet, err = cmd.createAppSetFromContextAndManifest(c, appParams, baseAppPath, m)
+	appSet, err = cmd.createAppSetFromContextAndManifest(c, appParams, baseManifestPath, m)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 	}
@@ -420,7 +420,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 	return
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, rootAppPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
+func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, baseManifestPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
 	if contextParams.Has("name") && len(m.Applications) > 1 {
 		var app cf.AppParams
 		app, err = findAppWithNameInManifest(contextParams.Get("name").(string), m)
@@ -444,16 +444,15 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 		for _, manifestAppParams := range m.Applications {
 			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
 
-			path := rootAppPath
 			if manifestAppParams.Has("path") {
 				pathFromManifest := manifestAppParams.Get("path").(string)
 				if filepath.IsAbs(pathFromManifest) {
-					path = filepath.Clean(pathFromManifest)
+					pathFromManifest = filepath.Clean(pathFromManifest)
 				} else {
-					path = filepath.Join(rootAppPath, pathFromManifest)
+					pathFromManifest = filepath.Join(baseManifestPath, pathFromManifest)
 				}
+				appFields.Set("path", pathFromManifest)
 			}
-			appFields.Set("path", path)
 
 			appSet = append(appSet, appFields)
 		}
