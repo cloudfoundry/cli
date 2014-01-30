@@ -346,7 +346,7 @@ func (cmd *Push) updateApp(app *cf.Application, appParams cf.AppParams) {
 
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 	baseManifestPath, manifestFilename := cmd.manifestPathFromContext(c)
-	m := cmd.instantiateManifest(c, filepath.Join(baseManifestPath, manifestFilename))
+	m := cmd.instantiateManifest(c, baseManifestPath, manifestFilename)
 
 	appParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
@@ -359,33 +359,9 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 		return
 	}
 
-	baseAppPath := cmd.appPathFromContext(c)
-	appParams.Set("path", baseAppPath)
-
-	appSet, err = cmd.createAppSetFromContextAndManifest(c, appParams, baseManifestPath, m)
+	appSet, err = cmd.createAppSetFromContextAndManifest(c, appParams, m)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
-	}
-
-	return
-}
-
-func (cmd *Push) appPathFromContext(c *cli.Context) (appPath string) {
-	if c.String("p") != "" {
-		var err error
-		appPath, err = filepath.Abs(c.String("p"))
-		if err != nil {
-			cmd.ui.Failed("Error finding app path: %s", err)
-			return
-		}
-	} else {
-		cwd, err := os.Getwd()
-		if err != nil {
-			cmd.ui.Failed("Error reading current working directory: %s", err)
-			return
-		}
-
-		appPath = cwd
 	}
 
 	return
@@ -403,13 +379,13 @@ func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFile
 	return
 }
 
-func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *manifest.Manifest) {
+func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath, manifestFilename string) (m *manifest.Manifest) {
 	if c.Bool("no-manifest") {
 		m = manifest.NewEmptyManifest()
 		return
 	}
 
-	m, errs := cmd.manifestRepo.ReadManifest(manifestPath)
+	m, errs := cmd.manifestRepo.ReadManifest(filepath.Join(manifestPath, manifestFilename))
 
 	if !errs.Empty() {
 		if os.IsNotExist(errs[0]) && c.String("f") == "" {
@@ -421,11 +397,24 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 		}
 	}
 
+	// update paths in manifests to be relative to its directory
+	for _, app := range m.Applications {
+		if app.Has("path") {
+			path := app.Get("path").(string)
+			if filepath.IsAbs(path) {
+				path = filepath.Clean(path)
+			} else {
+				path = filepath.Join(manifestPath, path)
+			}
+			app.Set("path", path)
+		}
+	}
+
 	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(manifestPath))
 	return
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, baseManifestPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
+func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, m *manifest.Manifest) (appSet cf.AppSet, err error) {
 	if len(m.Applications) > 1 {
 		if contextParams.Has("name") {
 			var app cf.AppParams
@@ -450,17 +439,6 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 	} else {
 		for _, manifestAppParams := range m.Applications {
 			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
-
-			if manifestAppParams.Has("path") {
-				pathFromManifest := manifestAppParams.Get("path").(string)
-				if filepath.IsAbs(pathFromManifest) {
-					pathFromManifest = filepath.Clean(pathFromManifest)
-				} else {
-					pathFromManifest = filepath.Join(baseManifestPath, pathFromManifest)
-				}
-				appFields.Set("path", pathFromManifest)
-			}
-
 			appSet = append(appSet, appFields)
 		}
 	}
@@ -468,6 +446,10 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 	for _, appParams := range appSet {
 		if !appParams.Has("name") {
 			err = errors.New("app name is a required field")
+		}
+		if !appParams.Has("path") {
+			cwd, _ := os.Getwd()
+			appParams.Set("path", cwd)
 		}
 	}
 
