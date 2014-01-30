@@ -23,7 +23,7 @@ var appHelpTemplate = `{{.Title "NAME:"}}
 {{end}}{{end}}{{end}}
 {{.Title "ENVIRONMENT VARIABLES"}}
    CF_COLOR=false                     Do not colorize output
-   CF_HOME=path/to/config/            Override default config directory
+   CF_HOME=path/to/dir/               Override path to default config directory
    CF_STAGING_TIMEOUT=15              Max wait time for buildpack staging, in minutes
    CF_STARTUP_TIMEOUT=5               Max wait time for app instance startup, in minutes
    CF_TRACE=true                      Print API request diagnostics to stdout

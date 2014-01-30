@@ -177,6 +177,34 @@ func TestReadingVersionNumberFromExistingConfig(t *testing.T) {
 	})
 }
 
+func TestWithCFHome(t *testing.T) {
+	fileutils.TempDir("cf-home-test", func(dir string, err error) {
+		assert.NoError(t, err)
+
+		withCFHome(dir, func() {
+			repo := NewConfigurationDiskRepository()
+			_, err := repo.Get()
+			assert.NoError(t, err)
+
+			fileInfo, err := os.Lstat(filepath.Join(dir, ".cf"))
+			assert.NoError(t, err)
+			assert.True(t, fileInfo.IsDir())
+
+			_, err = os.Lstat(filepath.Join(dir, ".cf", "config.json"))
+			assert.NoError(t, err)
+		})
+	})
+}
+
+func withCFHome(dirName string, callback func()) {
+	defer func() {
+		os.Setenv("CF_HOME", "")
+	}()
+
+	os.Setenv("CF_HOME", dirName)
+	callback()
+}
+
 func withFakeHome(t *testing.T, callback func()) {
 	oldHome := os.Getenv("HOME")
 	oldHomePath := os.Getenv("HOMEPATH")

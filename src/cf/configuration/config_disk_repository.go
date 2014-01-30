@@ -118,7 +118,8 @@ func ConfigFile() (file string, err error) {
 	var configDir string
 
 	if os.Getenv("CF_HOME") != "" {
-		configDir = os.Getenv("CF_HOME")
+		cfHome := os.Getenv("CF_HOME")
+		configDir = filepath.Join(cfHome, ".cf")
 	} else {
 		configDir = filepath.Join(userHomeDir(), ".cf")
 	}
