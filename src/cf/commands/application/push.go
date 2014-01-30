@@ -354,6 +354,11 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 		return
 	}
 
+	if !appParams.Has("name") && len(m.Applications) > 1 && appParams.Count() > 0 {
+		cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
+		return
+	}
+
 	baseAppPath := cmd.appPathFromContext(c)
 	appParams.Set("path", baseAppPath)
 
@@ -421,16 +426,18 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath string) (m *ma
 }
 
 func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, baseManifestPath string, m *manifest.Manifest) (appSet cf.AppSet, err error) {
-	if contextParams.Has("name") && len(m.Applications) > 1 {
-		var app cf.AppParams
-		app, err = findAppWithNameInManifest(contextParams.Get("name").(string), m)
+	if len(m.Applications) > 1 {
+		if contextParams.Has("name") {
+			var app cf.AppParams
+			app, err = findAppWithNameInManifest(contextParams.Get("name").(string), m)
 
-		if err != nil {
-			cmd.ui.Failed(fmt.Sprintf("Could not find app named '%s' in manifest", contextParams.Get("name").(string)))
-			return
+			if err != nil {
+				cmd.ui.Failed(fmt.Sprintf("Could not find app named '%s' in manifest", contextParams.Get("name").(string)))
+				return
+			}
+
+			m.Applications = cf.AppSet{app}
 		}
-
-		m.Applications = cf.AppSet{app}
 	}
 
 	appSet = make([]cf.AppParams, 0, len(m.Applications))
