@@ -380,12 +380,14 @@ func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFile
 }
 
 func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath, manifestFilename string) (m *manifest.Manifest) {
+	fullManifestPath := filepath.Join(manifestPath, manifestFilename)
+
 	if c.Bool("no-manifest") {
 		m = manifest.NewEmptyManifest()
 		return
 	}
 
-	m, errs := cmd.manifestRepo.ReadManifest(filepath.Join(manifestPath, manifestFilename))
+	m, errs := cmd.manifestRepo.ReadManifest(fullManifestPath)
 
 	if !errs.Empty() {
 		if os.IsNotExist(errs[0]) && c.String("f") == "" {
@@ -410,7 +412,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath, manifestFilen
 		}
 	}
 
-	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(manifestPath))
+	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(fullManifestPath))
 	return
 }
 
