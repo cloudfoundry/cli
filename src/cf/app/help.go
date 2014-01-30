@@ -21,17 +21,18 @@ var appHelpTemplate = `{{.Title "NAME:"}}
 {{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
 {{end}}{{end}}{{end}}
-{{.Title "GLOBAL OPTIONS:"}}
-   {{range .Flags}}{{.}}
-   {{end}}
-{{.Title "ENVIRONMENT VARIABLES:"}}
-   CF_COLOR=false - will not colorize output
-   CF_HOME=path/to/config/ override default config directory
-   CF_STAGING_TIMEOUT=15 max wait time for buildpack staging, in minutes
-   CF_STARTUP_TIMEOUT=5 max wait time for app instance startup, in minutes
-   CF_TRACE=true - print API request diagnostics to stdout
-   CF_TRACE=path/to/trace.log - append API request diagnostics to a log file
-   HTTP_PROXY=http://proxy.example.com:8080 - enable HTTP proxying for API requests
+{{.Title "ENVIRONMENT VARIABLES"}}
+   CF_COLOR=false                     Do not colorize output
+   CF_HOME=path/to/config/            Override default config directory
+   CF_STAGING_TIMEOUT=15              Max wait time for buildpack staging, in minutes
+   CF_STARTUP_TIMEOUT=5               Max wait time for app instance startup, in minutes
+   CF_TRACE=true                      Print API request diagnostics to stdout
+   CF_TRACE=path/to/trace.log         Append API request diagnostics to a log file
+   HTTP_PROXY=proxy.example.com:8080  Enable HTTP proxying for API requests
+
+{{.Title "GLOBAL OPTIONS"}}
+   --version, -v                      Print the version
+   --help, -h                         Show help
 `
 
 type groupedCommands struct {
@@ -186,8 +187,8 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 				{
 					newCmdPresenter(app, maxNameLen, "domains"),
 					newCmdPresenter(app, maxNameLen, "create-domain"),
-					newCmdPresenter(app, maxNameLen, "create-shared-domain"),
 					newCmdPresenter(app, maxNameLen, "delete-domain"),
+					newCmdPresenter(app, maxNameLen, "create-shared-domain"),
 					newCmdPresenter(app, maxNameLen, "delete-shared-domain"),
 				},
 			},
