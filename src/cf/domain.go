@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"generic"
 	"github.com/codegangsta/cli"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
-	"path/filepath"
 )
 
 type InstanceState string
