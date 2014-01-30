@@ -112,6 +112,5 @@ func (repo ManifestDiskRepository) ManifestPath(userSpecifiedPath string) (manif
 		manifestFilename = fileInfo.Name()
 	}
 
-	fileInfo, err = os.Stat(userSpecifiedPath)
 	return
 }
