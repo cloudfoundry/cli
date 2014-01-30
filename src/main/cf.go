@@ -22,7 +22,14 @@ func main() {
 	defer func() {
 		err := recover()
 		if err != nil {
-			displayCrashDialog()
+			switch err := err.(type) {
+			case error:
+				displayCrashDialog(err.Error())
+			case string:
+				displayCrashDialog(err)
+			default:
+				displayCrashDialog("An unexpected type of error")
+			}
 		}
 	}()
 
@@ -112,7 +119,7 @@ func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationReposi
 	return
 }
 
-func displayCrashDialog() {
+func displayCrashDialog(errorMessage string) {
 	formattedString := `
 
 Aww shucks.
@@ -123,12 +130,16 @@ Tell us that you ran this command:
 
 	%s
 
-and got this stack trace:
+this error occurred:
+
+	%s
+
+and this stack trace:
 
 %s
 	`
 
 	stackTrace := "\t" + strings.Replace(string(debug.Stack()), "\n", "\n\t", -1)
-	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), stackTrace))
+	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), errorMessage, stackTrace))
 	os.Exit(1)
 }
