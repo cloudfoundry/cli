@@ -49,6 +49,7 @@ type DomainRepository interface {
 	CreateSharedDomain(domainName string) (apiResponse net.ApiResponse)
 	Delete(domainGuid string) (apiResponse net.ApiResponse)
 	DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse)
+	ListDomains(cb ListDomainsCallback) net.ApiResponse
 }
 
 type CloudControllerDomainRepository struct {
@@ -64,6 +65,10 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 
 func (repo CloudControllerDomainRepository) ListSharedDomains(cb ListDomainsCallback) net.ApiResponse {
 	return repo.listDomains("/v2/shared_domains", cb)
+}
+
+func (repo CloudControllerDomainRepository) ListDomains(cb ListDomainsCallback) net.ApiResponse {
+	return repo.listDomains("/v2/domains", cb)
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse {

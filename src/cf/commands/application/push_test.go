@@ -5,6 +5,7 @@ import (
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/manifest"
+	"cf/net"
 	"errors"
 	"generic"
 	"github.com/stretchr/testify/assert"
@@ -96,6 +97,44 @@ func TestPushingRequirements(t *testing.T) {
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	assert.False(t, testcmd.CommandDidPassRequirements)
+}
+
+func TestPushingAppWithOldV2DomainsEndpoint(t *testing.T) {
+	deps := getPushDependencies()
+
+	privateDomain := cf.Domain{}
+	privateDomain.Shared = false
+	privateDomain.Name = "private.cf-app.com"
+	privateDomain.Guid = "private-domain-guid"
+
+	sharedDomain := cf.Domain{}
+	sharedDomain.Name = "shared.cf-app.com"
+	sharedDomain.Shared = true
+	sharedDomain.Guid = "shared-domain-guid"
+
+	deps.domainRepo.ListSharedDomainsApiResponse = net.NewNotFoundApiResponse("whoopsie")
+	deps.domainRepo.ListDomainsDomains = []cf.Domain{privateDomain, sharedDomain}
+	deps.routeRepo.FindByHostAndDomainErr = true
+	deps.appRepo.ReadNotFound = true
+
+	ui := callPush(t, []string{"-t", "111", "my-new-app"}, deps)
+
+	assert.Equal(t, deps.routeRepo.FindByHostAndDomainHost, "my-new-app")
+	assert.Equal(t, deps.routeRepo.CreatedHost, "my-new-app")
+	assert.Equal(t, deps.routeRepo.CreatedDomainGuid, "shared-domain-guid")
+	assert.Equal(t, deps.routeRepo.BoundAppGuid, "my-new-app-guid")
+	assert.Equal(t, deps.routeRepo.BoundRouteGuid, "my-new-app-route-guid")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Creating app", "my-new-app", "my-org", "my-space"},
+		{"OK"},
+		{"Creating", "my-new-app.shared.cf-app.com"},
+		{"OK"},
+		{"Binding", "my-new-app.shared.cf-app.com"},
+		{"OK"},
+		{"Uploading my-new-app"},
+		{"OK"},
+	})
 }
 
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
