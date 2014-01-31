@@ -10,16 +10,16 @@ import (
 
 func TestSpaceReqExecute(t *testing.T) {
 	space := cf.Space{}
-	space.Name = "my-space"
+	space.Name = "awesome-sauce-space"
 	space.Guid = "my-space-guid"
-	spaceRepo := &testapi.FakeSpaceRepository{FindByNameSpace: space}
+	spaceRepo := &testapi.FakeSpaceRepository{Spaces: []cf.Space{space}}
 	ui := new(testterm.FakeUI)
 
-	spaceReq := newSpaceRequirement("foo", ui, spaceRepo)
+	spaceReq := newSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
 	success := spaceReq.Execute()
 
 	assert.True(t, success)
-	assert.Equal(t, spaceRepo.FindByNameName, "foo")
+	assert.Equal(t, spaceRepo.FindByNameName, "awesome-sauce-space")
 	assert.Equal(t, spaceReq.GetSpace(), space)
 }
 

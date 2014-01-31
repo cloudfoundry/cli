@@ -7,6 +7,8 @@ import (
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
+	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strconv"
 	"strings"
@@ -43,6 +45,8 @@ func NewLogin(ui terminal.UI,
 	return
 }
 
+const userSkippedInput string = "user_skipped_input"
+
 func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
 }
@@ -64,16 +68,20 @@ func (cmd Login) Run(c *cli.Context) {
 
 	userChanged := (cmd.config.Username() != oldUserName && oldUserName != "")
 
-	apiResponse = cmd.setOrganization(c, userChanged)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	err := cmd.setOrganization(c, userChanged)
+	shouldSkipSpace := err != nil && err.Error() == userSkippedInput
+
+	if err != nil && !shouldSkipSpace {
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	apiResponse = cmd.setSpace(c, userChanged)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
+	if !shouldSkipSpace {
+		err = cmd.setSpace(c, userChanged)
+		if err != nil && err.Error() != userSkippedInput {
+			cmd.ui.Failed(err.Error())
+			return
+		}
 	}
 
 	cmd.ui.ShowConfiguration(cmd.config)
@@ -128,15 +136,14 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 	return
 }
 
-func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse net.ApiResponse) {
+func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 	orgName := c.String("o")
 
 	if orgName == "" {
 		// If the user is changing, clear out the org
 		if userChanged {
-			err := cmd.configRepo.SetOrganization(cf.OrganizationFields{})
+			err = cmd.configRepo.SetOrganization(cf.OrganizationFields{})
 			if err != nil {
-				apiResponse = net.NewApiResponseWithError("%s", err)
 				return
 			}
 		}
@@ -161,13 +168,12 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse 
 			}
 		}
 
-		apiResponse = <-statusChan
+		apiResponse := <-statusChan
 		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Error finding avilable orgs\n%s", apiResponse.Message)
+			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiResponse.Message))
 			return
 		}
 
-		// Target only org if possible
 		if len(availableOrgs) == 1 {
 			return cmd.targetOrganization(availableOrgs[0])
 		}
@@ -175,10 +181,18 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (apiResponse 
 		orgName = cmd.promptForOrgName(availableOrgs)
 	}
 
-	// Find org
-	org, apiResponse := cmd.orgRepo.FindByName(orgName)
+	if orgName == "" {
+		cmd.ui.Say("")
+		err = errors.New(userSkippedInput)
+		return
+	}
+
+	var org cf.Organization
+	var apiResponse net.ApiResponse
+	org, apiResponse = cmd.orgRepo.FindByName(orgName)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), apiResponse.Message)
+		err = errors.New(apiResponse.Message)
+		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err)
 		return
 	}
 
@@ -191,16 +205,13 @@ func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
 		orgNames = append(orgNames, org.Name)
 	}
 
-	return cmd.promptForName(orgNames, "Select an org:", "Org")
+	return cmd.promptForName(orgNames, "Select an org (or press enter to skip):", "Org")
 }
 
-func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiResponse) {
-	err := cmd.configRepo.SetOrganization(org.OrganizationFields)
+func (cmd Login) targetOrganization(org cf.Organization) (err error) {
+	err = cmd.configRepo.SetOrganization(org.OrganizationFields)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithMessage("Error setting org %s in config file\n%s",
-			terminal.EntityNameColor(org.Name),
-			err.Error(),
-		)
+		err = errors.New(fmt.Sprintf("Error setting org %s in config file\n%s", org.Name, err.Error()))
 		return
 	}
 
@@ -208,15 +219,14 @@ func (cmd Login) targetOrganization(org cf.Organization) (apiResponse net.ApiRes
 	return
 }
 
-func (cmd Login) setSpace(c *cli.Context, userChanged bool) (apiResponse net.ApiResponse) {
+func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 	spaceName := c.String("s")
 
 	if spaceName == "" {
 		// If user is changing, clear the space
 		if userChanged {
-			err := cmd.configRepo.SetSpace(cf.SpaceFields{})
+			err = cmd.configRepo.SetSpace(cf.SpaceFields{})
 			if err != nil {
-				apiResponse = net.NewApiResponseWithError("%s", err)
 				return
 			}
 		}
@@ -240,9 +250,10 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (apiResponse net.Api
 			}
 		}
 
-		apiResponse = <-statusChan
+		apiResponse := <-statusChan
 		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Error finding avilable spaces\n%s", apiResponse.Message)
+			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiResponse.Message))
+			cmd.ui.Failed(err.Error())
 			return
 		}
 
@@ -254,14 +265,23 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (apiResponse net.Api
 		spaceName = cmd.promptForSpaceName(availableSpaces)
 	}
 
-	// Find space
-	space, apiResponse := cmd.spaceRepo.FindByName(spaceName)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiResponse.Message)
+	if spaceName == "" {
+		cmd.ui.Say("")
+		err = errors.New(userSkippedInput)
 		return
 	}
 
-	return cmd.targetSpace(space)
+	var space cf.Space
+	var apiResponse net.ApiResponse
+	space, apiResponse = cmd.spaceRepo.FindByName(spaceName)
+	if apiResponse.IsNotSuccessful() {
+		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiResponse.Message))
+		cmd.ui.Failed(err.Error())
+		return
+	}
+
+	err = cmd.targetSpace(space)
+	return
 }
 
 func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
@@ -270,16 +290,16 @@ func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
 		spaceNames = append(spaceNames, space.Name)
 	}
 
-	return cmd.promptForName(spaceNames, "Select a space:", "Space")
+	return cmd.promptForName(spaceNames, "Select a space (or press enter to skip):", "Space")
 }
 
-func (cmd Login) targetSpace(space cf.Space) (apiResponse net.ApiResponse) {
-	err := cmd.configRepo.SetSpace(space.SpaceFields)
+func (cmd Login) targetSpace(space cf.Space) (err error) {
+	err = cmd.configRepo.SetSpace(space.SpaceFields)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithMessage("Error setting space %s in config file\n%s",
+		err = errors.New(fmt.Sprintf("Error setting space %s in config file\n%s",
 			terminal.EntityNameColor(space.Name),
 			err.Error(),
-		)
+		))
 		return
 	}
 
@@ -306,6 +326,10 @@ func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) st
 		}
 
 		nameString = cmd.ui.Ask("%s%s", itemPrompt, terminal.PromptColor(">"))
+		if nameString == "" {
+			return ""
+		}
+
 		nameIndex, err = strconv.Atoi(nameString)
 
 		if err != nil {

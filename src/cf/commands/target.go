@@ -7,6 +7,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -52,13 +53,6 @@ func (cmd Target) Run(c *cli.Context) {
 
 	if shouldShowTarget {
 		cmd.ui.ShowConfiguration(cmd.config)
-
-		if !cmd.config.HasOrganization() {
-			cmd.ui.Say("No org targeted, use '%s' to target an org", terminal.CommandColor(cf.Name()+" target -o"))
-		}
-		if !cmd.config.HasSpace() {
-			cmd.ui.Say("No space targeted, use '%s' to target a space", terminal.CommandColor(cf.Name()+" target -s"))
-		}
 		return
 	}
 
@@ -66,8 +60,7 @@ func (cmd Target) Run(c *cli.Context) {
 		err := cmd.setOrganization(orgName)
 
 		if spaceName == "" && cmd.config.IsLoggedIn() {
-			cmd.showConfig()
-			cmd.ui.Say("No space targeted, use '%s' to target a space", terminal.CommandColor(cf.Name()+" target -s"))
+			cmd.ui.ShowConfiguration(cmd.config)
 			return
 		}
 
@@ -83,7 +76,7 @@ func (cmd Target) Run(c *cli.Context) {
 			return
 		}
 	}
-	cmd.showConfig()
+	cmd.ui.ShowConfiguration(cmd.config)
 	return
 }
 
@@ -109,7 +102,7 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 
 func (cmd Target) setSpace(spaceName string) (err error) {
 	if !cmd.config.IsLoggedIn() {
-		cmd.ui.Failed("You must be logged in to set a space. Use '%s login'.", cf.Name())
+		cmd.ui.Failed("You must be logged in to set a space. Use '%s'.", terminal.CommandColor(fmt.Sprintf("%s login", cf.Name())))
 		return
 	}
 
@@ -139,8 +132,4 @@ func (cmd Target) saveConfig() {
 		cmd.ui.Failed(err.Error())
 		return
 	}
-}
-
-func (cmd Target) showConfig() {
-	cmd.ui.ShowConfiguration(cmd.config)
 }

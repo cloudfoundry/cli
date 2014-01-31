@@ -18,7 +18,7 @@ func TestDeleteOrgConfirmingWithY(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "org-to-delete"
 	org.Guid = "org-to-delete-guid"
-	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
 
 	ui := deleteOrg(t, "y", []string{org.Name}, orgRepo)
 
@@ -38,7 +38,7 @@ func TestDeleteOrgConfirmingWithYes(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "org-to-delete"
 	org.Guid = "org-to-delete-guid"
-	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
 
 	ui := deleteOrg(t, "Yes", []string{"org-to-delete"}, orgRepo)
 
@@ -70,7 +70,7 @@ func TestDeleteTargetedOrganizationClearsConfig(t *testing.T) {
 
 	org := cf.Organization{}
 	org.OrganizationFields = organizationFields
-	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
 	deleteOrg(t, "Yes", []string{"org-to-delete"}, orgRepo)
 
 	updatedConfig, err := configRepo.Get()
@@ -84,7 +84,7 @@ func TestDeleteUntargetedOrganizationDoesNotClearConfig(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "org-to-delete"
 	org.Guid = "org-to-delete-guid"
-	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
 
 	configRepo := &testconfig.FakeConfigRepository{}
 	config, _ := configRepo.Get()
@@ -111,7 +111,7 @@ func TestDeleteOrgWithForceOption(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "org-to-delete"
 	org.Guid = "org-to-delete-guid"
-	orgRepo := &testapi.FakeOrgRepository{FindByNameOrganization: org}
+	orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
 
 	ui := deleteOrg(t, "Yes", []string{"-f", "org-to-delete"}, orgRepo)
 

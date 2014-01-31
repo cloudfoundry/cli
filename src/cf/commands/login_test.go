@@ -11,6 +11,7 @@ import (
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	"testhelpers/maker"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -48,7 +49,7 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 	org.Guid = "my-org-guid"
 
 	c.orgRepo = &testapi.FakeOrgRepository{
-		FindByNameOrganization: org,
+		Organizations: []cf.Organization{org},
 	}
 
 	space := cf.Space{}
@@ -56,7 +57,7 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 	space.Guid = "my-space-guid"
 
 	c.spaceRepo = &testapi.FakeSpaceRepository{
-		FindByNameSpace: space,
+		Spaces: []cf.Space{space},
 	}
 
 	c.configRepo.Delete()
@@ -100,16 +101,14 @@ func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 
-	expectedOutputs := testassert.Lines{
-		testassert.Line{"Select an org:"},
-		testassert.Line{"1. some-org"},
-		testassert.Line{"2. my-org"},
-		testassert.Line{"Select a space:"},
-		testassert.Line{"1. my-space"},
-		testassert.Line{"2. some-space"},
-	}
-
-	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Select an org"},
+		{"1. some-org"},
+		{"2. my-org"},
+		{"Select a space"},
+		{"1. my-space"},
+		{"2. some-space"},
+	})
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
@@ -154,17 +153,14 @@ func TestSuccessfullyLoggingInWithStringPrompts(t *testing.T) {
 	})
 
 	savedConfig := testconfig.SavedConfiguration
-
-	expectedOutputs := testassert.Lines{
-		testassert.Line{"Select an org:"},
-		testassert.Line{"1. some-org"},
-		testassert.Line{"2. my-org"},
-		testassert.Line{"Select a space:"},
-		testassert.Line{"1. my-space"},
-		testassert.Line{"2. some-space"},
-	}
-
-	testassert.SliceContains(t, c.ui.Outputs, expectedOutputs)
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Select an org"},
+		{"1. some-org"},
+		{"2. my-org"},
+		{"Select a space"},
+		{"1. my-space"},
+		{"2. some-space"},
+	})
 
 	assert.Equal(t, savedConfig.Target, "api.example.com")
 	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-org-guid")
@@ -486,4 +482,63 @@ func TestUnsuccessfullyLoggingInWithSpaceFindByNameErr(t *testing.T) {
 	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
 		{"Failed"},
 	})
+}
+
+func TestSuccessfullyLoggingInWithoutTargetOrg(t *testing.T) {
+	c := LoginTestContext{
+		Inputs: []string{"api.example.com", "user@example.com", "password", ""},
+	}
+
+	org1 := maker.NewOrg(maker.Overrides{"name": "org1"})
+	org2 := maker.NewOrg(maker.Overrides{"name": "org2"})
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.Organizations = []cf.Organization{org1, org2}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Select an org (or press enter to skip):"},
+	})
+	testassert.SliceDoesNotContain(t, c.ui.Outputs, testassert.Lines{
+		{"Select a space", "or press enter to skip"},
+	})
+
+	assert.Equal(t, savedConfig.Target, "api.example.com")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+}
+
+func TestSuccessfullyLoggingInWithoutTargetSpace(t *testing.T) {
+	c := LoginTestContext{
+		Inputs: []string{"api.example.com", "user@example.com", "password", ""},
+	}
+
+	org := cf.Organization{}
+	org.Guid = "some-org-guid"
+	org.Name = "some-org"
+
+	space1 := maker.NewSpace(maker.Overrides{"name": "some-space", "guid": "some-space-guid"})
+	space2 := maker.NewSpace(maker.Overrides{"name": "other-space", "guid": "other-space-guid"})
+
+	callLogin(t, &c, func(c *LoginTestContext) {
+		c.orgRepo.Organizations = []cf.Organization{org}
+		c.spaceRepo.Spaces = []cf.Space{space1, space2}
+	})
+
+	savedConfig := testconfig.SavedConfiguration
+	testassert.SliceContains(t, c.ui.Outputs, testassert.Lines{
+		{"Select a space (or press enter to skip):"},
+	})
+	testassert.SliceDoesNotContain(t, c.ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
+
+	assert.Equal(t, savedConfig.Target, "api.example.com")
+	assert.Equal(t, savedConfig.OrganizationFields.Guid, "some-org-guid")
+	assert.Equal(t, savedConfig.SpaceFields.Guid, "")
+	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
+	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
 }

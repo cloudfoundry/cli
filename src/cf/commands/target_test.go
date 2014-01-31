@@ -45,21 +45,6 @@ func TestTargetRequirements(t *testing.T) {
 	assert.True(t, testcmd.CommandDidPassRequirements)
 }
 
-func TestTargetWithoutArgumentAndLoggedIn(t *testing.T) {
-	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
-
-	config := configRepo.Login()
-	config.Target = "https://api.run.pivotal.io"
-
-	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	assert.Equal(t, len(ui.Outputs), 2)
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"No org targeted"},
-		{"No space targeted"},
-	})
-}
-
 func TestTargetOrganizationWhenUserHasAccess(t *testing.T) {
 	orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 
@@ -97,13 +82,7 @@ func TestTargetOrganizationWhenUserDoesNotHaveAccess(t *testing.T) {
 	orgRepo.Organizations = orgs
 	orgRepo.FindByNameErr = true
 
-	ui := callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"No org targeted"},
-	})
-
-	ui = callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
+	ui := callTarget([]string{"-o", "my-organization"}, reqFactory, configRepo, orgRepo, spaceRepo)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{{"FAILED"}})
 }
 
@@ -222,12 +201,12 @@ func TestTargetOrganizationAndSpace(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "my-organization"
 	org.Guid = "my-organization-guid"
-	orgRepo.FindByNameOrganization = org
+	orgRepo.Organizations = []cf.Organization{org}
 
 	space := cf.Space{}
 	space.Name = "my-space"
 	space.Guid = "my-space-guid"
-	spaceRepo.FindByNameSpace = space
+	spaceRepo.Spaces = []cf.Space{space}
 
 	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
@@ -249,7 +228,7 @@ func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
 	org := cf.Organization{}
 	org.Name = "my-organization"
 	org.Guid = "my-organization-guid"
-	orgRepo.FindByNameOrganization = org
+	orgRepo.Organizations = []cf.Organization{org}
 
 	spaceRepo.FindByNameErr = true
 
