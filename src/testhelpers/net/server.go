@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
 type TestRequest struct {
@@ -16,7 +16,7 @@ type TestRequest struct {
 	Response TestResponse
 }
 
-type RequestMatcher func(*testing.T, *http.Request)
+type RequestMatcher func(mr.TestingT, *http.Request)
 
 type TestResponse struct {
 	Body   string
@@ -27,7 +27,7 @@ type TestResponse struct {
 type TestHandler struct {
 	Requests  []TestRequest
 	CallCount int
-	T         *testing.T
+	T         mr.TestingT
 }
 
 func (h *TestHandler) AllRequestsCalled() bool {
@@ -100,7 +100,7 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, tester.Response.Body)
 }
 
-func NewTLSServer(t *testing.T, requests []TestRequest) (s *httptest.Server, h *TestHandler) {
+func NewTLSServer(t mr.TestingT, requests []TestRequest) (s *httptest.Server, h *TestHandler) {
 	h = &TestHandler{
 		Requests: requests,
 		T:        t,

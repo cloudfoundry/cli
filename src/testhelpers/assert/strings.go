@@ -3,10 +3,10 @@ package assert
 import (
 	"fmt"
 	"strings"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
-func JSONStringEquals(t *testing.T, actual string, expected string, msgAndArgs ...interface{}) bool {
+func JSONStringEquals(t mr.TestingT, actual string, expected string, msgAndArgs ...interface{}) bool {
 	if RemoveWhitespace(actual) == RemoveWhitespace(expected) {
 		return true
 	}

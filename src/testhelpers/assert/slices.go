@@ -3,7 +3,7 @@ package assert
 import (
 	"fmt"
 	"strings"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
 type Line []string
@@ -14,7 +14,7 @@ func (line Line) String() string {
 
 type Lines []Line
 
-func SliceContains(t *testing.T, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+func SliceContains(t mr.TestingT, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
 	expectedIndex := 0
 	for _, actualValue := range actual {
 		allStringsFound := true
@@ -32,7 +32,7 @@ func SliceContains(t *testing.T, actual []string, expected Lines, msgAndArgs ...
 	return Fail(t, fmt.Sprintf("\"%s\" not found", expected[expectedIndex]), msgAndArgs...)
 }
 
-func SliceDoesNotContain(t *testing.T, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+func SliceDoesNotContain(t mr.TestingT, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
 	for i, actualValue := range actual {
 		for _, expectedLine := range expected {
 			allStringsFound := true
