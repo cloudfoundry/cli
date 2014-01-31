@@ -87,28 +87,30 @@ func (cmd *Push) Run(c *cli.Context) {
 		cmd.ui.Ok()
 
 		if appParams.Has("services") {
-			services := appParams.Get("services").([]string)
-
-			for _, serviceName := range services {
-				serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName)
-
-				if response.IsNotSuccessful() {
-					cmd.ui.Failed("Could not find service %s to bind to %s", serviceName, appParams.Get("name").(string))
-					return
-				}
-
-				cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, appParams.Get("name").(string), cmd.config.OrganizationFields.Name, cmd.config.SpaceFields.Name, cmd.config.Username())
-				bindResponse := cmd.binder.BindApplication(app, serviceInstance)
-				cmd.ui.Ok()
-
-				if bindResponse.IsNotSuccessful() && bindResponse.ErrorCode != service.AppAlreadyBoundErrorCode {
-					cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, bindResponse.Message)
-					return
-				}
-			}
+			cmd.bindAppToServices(appParams.Get("services").([]string), app)
 		}
 
 		cmd.restart(app, appParams, c)
+	}
+}
+
+func (cmd *Push) bindAppToServices(services []string, app cf.Application) {
+	for _, serviceName := range services {
+		serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName)
+
+		if response.IsNotSuccessful() {
+			cmd.ui.Failed("Could not find service %s to bind to %s", serviceName, app.Name)
+			return
+		}
+
+		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields.Name, cmd.config.SpaceFields.Name, cmd.config.Username())
+		bindResponse := cmd.binder.BindApplication(app, serviceInstance)
+		cmd.ui.Ok()
+
+		if bindResponse.IsNotSuccessful() && bindResponse.ErrorCode != service.AppAlreadyBoundErrorCode {
+			cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, bindResponse.Message)
+			return
+		}
 	}
 }
 
@@ -463,7 +465,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 		}
 	}
 
-	appSet = make([]cf.AppParams, 0, len(m.Applications))
+	appSet = make(cf.AppSet, 0, len(m.Applications))
 	if len(m.Applications) == 0 {
 		if !contextParams.Has("name") || contextParams.Get("name") == "" {
 			cmd.ui.FailWithUsage(c, "push")
