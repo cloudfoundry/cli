@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
 type JSONMapRequest map[string]interface{}
@@ -35,7 +35,7 @@ func bytesToInterface(jsonBytes []byte) (interface{}, error) {
 }
 
 func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
-	return func(t *testing.T, request *http.Request) {
+	return func(t mr.TestingT, request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			assert.Fail(t, "Error reading request body: %s", err)
@@ -57,7 +57,7 @@ func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 }
 
 func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {
-	return func(t *testing.T, request *http.Request) {
+	return func(t mr.TestingT, request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			assert.Fail(t, "Error reading request body: %s", err)

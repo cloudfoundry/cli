@@ -2,57 +2,12 @@ package terminal
 
 import (
 	"bytes"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"io"
 	"os"
-	"testing"
 )
-
-func TestSayWithStringOnly(t *testing.T) {
-	ui := new(terminalUI)
-	out := captureOutput(func() {
-		ui.Say("Hello")
-	})
-
-	assert.Equal(t, "Hello\n", out)
-}
-
-func TestSayWithStringWithFormat(t *testing.T) {
-	ui := new(terminalUI)
-	out := captureOutput(func() {
-		ui.Say("Hello %s", "World!")
-	})
-
-	assert.Equal(t, "Hello World!\n", out)
-}
-
-func TestConfirmYes(t *testing.T) {
-	simulateStdin("y\n", func() {
-		ui := new(terminalUI)
-
-		var result bool
-		out := captureOutput(func() {
-			result = ui.Confirm("Hello %s", "World?")
-		})
-
-		assert.True(t, result)
-		assert.Contains(t, out, "Hello World?")
-	})
-}
-
-func TestConfirmNo(t *testing.T) {
-	simulateStdin("wat\n", func() {
-		ui := new(terminalUI)
-
-		var result bool
-		out := captureOutput(func() {
-			result = ui.Confirm("Hello %s", "World?")
-		})
-
-		assert.False(t, result)
-		assert.Contains(t, out, "Hello World?")
-	})
-}
 
 func simulateStdin(input string, block func()) {
 	defer func() {
@@ -88,4 +43,53 @@ func captureOutput(f func()) string {
 	w.Close()
 	os.Stdout = old
 	return <-outC
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSayWithStringOnly", func() {
+			ui := new(terminalUI)
+			out := captureOutput(func() {
+				ui.Say("Hello")
+			})
+
+			assert.Equal(mr.T(), "Hello\n", out)
+		})
+		It("TestSayWithStringWithFormat", func() {
+
+			ui := new(terminalUI)
+			out := captureOutput(func() {
+				ui.Say("Hello %s", "World!")
+			})
+
+			assert.Equal(mr.T(), "Hello World!\n", out)
+		})
+		It("TestConfirmYes", func() {
+
+			simulateStdin("y\n", func() {
+				ui := new(terminalUI)
+
+				var result bool
+				out := captureOutput(func() {
+					result = ui.Confirm("Hello %s", "World?")
+				})
+
+				assert.True(mr.T(), result)
+				assert.Contains(mr.T(), out, "Hello World?")
+			})
+		})
+		It("TestConfirmNo", func() {
+
+			simulateStdin("wat\n", func() {
+				ui := new(terminalUI)
+
+				var result bool
+				out := captureOutput(func() {
+					result = ui.Confirm("Hello %s", "World?")
+				})
+
+				assert.False(mr.T(), result)
+				assert.Contains(mr.T(), out, "Hello World?")
+			})
+		})
+	})
 }

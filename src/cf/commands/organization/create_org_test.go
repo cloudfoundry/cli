@@ -4,64 +4,18 @@ import (
 	"cf"
 	. "cf/commands/organization"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestCreateOrgFailsWithUsage(t *testing.T) {
-	orgRepo := &testapi.FakeOrgRepository{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-
-	ui := callCreateOrg(t, []string{}, reqFactory, orgRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
-	assert.False(t, ui.FailedWithUsage)
-}
-
-func TestCreateOrgRequirements(t *testing.T) {
-	orgRepo := &testapi.FakeOrgRepository{}
-
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestCreateOrg(t *testing.T) {
-	orgRepo := &testapi.FakeOrgRepository{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	ui := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating org", "my-org", "my-user"},
-		{"OK"},
-	})
-	assert.Equal(t, orgRepo.CreateName, "my-org")
-}
-
-func TestCreateOrgWhenAlreadyExists(t *testing.T) {
-	orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	ui := callCreateOrg(t, []string{"my-org"}, reqFactory, orgRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating org", "my-org"},
-		{"OK"},
-		{"my-org", "already exists"},
-	})
-}
-
-func callCreateOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+func callCreateOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-org", args)
 
@@ -86,4 +40,54 @@ func callCreateOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFacto
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestCreateOrgFailsWithUsage", func() {
+			orgRepo := &testapi.FakeOrgRepository{}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+
+			ui := callCreateOrg(mr.T(), []string{}, reqFactory, orgRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestCreateOrgRequirements", func() {
+
+			orgRepo := &testapi.FakeOrgRepository{}
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+			callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestCreateOrg", func() {
+
+			orgRepo := &testapi.FakeOrgRepository{}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			ui := callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating org", "my-org", "my-user"},
+				{"OK"},
+			})
+			assert.Equal(mr.T(), orgRepo.CreateName, "my-org")
+		})
+		It("TestCreateOrgWhenAlreadyExists", func() {
+
+			orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			ui := callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating org", "my-org"},
+				{"OK"},
+				{"my-org", "already exists"},
+			})
+		})
+	})
 }

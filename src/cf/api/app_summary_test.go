@@ -5,12 +5,13 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
-	"testing"
 )
 
 var getAppSummariesResponseBody = `
@@ -68,47 +69,7 @@ var getAppSummariesResponseBody = `
   ]
 }`
 
-func TestGetAppSummariesInCurrentSpace(t *testing.T) {
-	getAppSummariesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "GET",
-		Path:     "/v2/spaces/my-space-guid/summary",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: getAppSummariesResponseBody},
-	})
-
-	ts, handler, repo := createAppSummaryRepo(t, []testnet.TestRequest{getAppSummariesRequest})
-	defer ts.Close()
-
-	apps, apiResponse := repo.GetSummariesInCurrentSpace()
-	assert.True(t, handler.AllRequestsCalled())
-
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, 2, len(apps))
-
-	app1 := apps[0]
-	assert.Equal(t, app1.Name, "app1")
-	assert.Equal(t, app1.Guid, "app-1-guid")
-	assert.Equal(t, len(app1.RouteSummaries), 1)
-	assert.Equal(t, app1.RouteSummaries[0].URL(), "app1.cfapps.io")
-
-	assert.Equal(t, app1.State, "started")
-	assert.Equal(t, app1.InstanceCount, 1)
-	assert.Equal(t, app1.RunningInstances, 1)
-	assert.Equal(t, app1.Memory, uint64(128))
-
-	app2 := apps[1]
-	assert.Equal(t, app2.Name, "app2")
-	assert.Equal(t, app2.Guid, "app-2-guid")
-	assert.Equal(t, len(app2.RouteSummaries), 2)
-	assert.Equal(t, app2.RouteSummaries[0].URL(), "app2.cfapps.io")
-	assert.Equal(t, app2.RouteSummaries[1].URL(), "foo.cfapps.io")
-
-	assert.Equal(t, app2.State, "started")
-	assert.Equal(t, app2.InstanceCount, 3)
-	assert.Equal(t, app2.RunningInstances, 1)
-	assert.Equal(t, app2.Memory, uint64(512))
-}
-
-func createAppSummaryRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppSummaryRepository) {
+func createAppSummaryRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppSummaryRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
 	space := cf.SpaceFields{}
 	space.Guid = "my-space-guid"
@@ -121,4 +82,47 @@ func createAppSummaryRepo(t *testing.T, requests []testnet.TestRequest) (ts *htt
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerAppSummaryRepository(config, gateway)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestGetAppSummariesInCurrentSpace", func() {
+			getAppSummariesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/spaces/my-space-guid/summary",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: getAppSummariesResponseBody},
+			})
+
+			ts, handler, repo := createAppSummaryRepo(mr.T(), []testnet.TestRequest{getAppSummariesRequest})
+			defer ts.Close()
+
+			apps, apiResponse := repo.GetSummariesInCurrentSpace()
+			assert.True(mr.T(), handler.AllRequestsCalled())
+
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+			assert.Equal(mr.T(), 2, len(apps))
+
+			app1 := apps[0]
+			assert.Equal(mr.T(), app1.Name, "app1")
+			assert.Equal(mr.T(), app1.Guid, "app-1-guid")
+			assert.Equal(mr.T(), len(app1.RouteSummaries), 1)
+			assert.Equal(mr.T(), app1.RouteSummaries[0].URL(), "app1.cfapps.io")
+
+			assert.Equal(mr.T(), app1.State, "started")
+			assert.Equal(mr.T(), app1.InstanceCount, 1)
+			assert.Equal(mr.T(), app1.RunningInstances, 1)
+			assert.Equal(mr.T(), app1.Memory, uint64(128))
+
+			app2 := apps[1]
+			assert.Equal(mr.T(), app2.Name, "app2")
+			assert.Equal(mr.T(), app2.Guid, "app-2-guid")
+			assert.Equal(mr.T(), len(app2.RouteSummaries), 2)
+			assert.Equal(mr.T(), app2.RouteSummaries[0].URL(), "app2.cfapps.io")
+			assert.Equal(mr.T(), app2.RouteSummaries[1].URL(), "foo.cfapps.io")
+
+			assert.Equal(mr.T(), app2.State, "started")
+			assert.Equal(mr.T(), app2.InstanceCount, 3)
+			assert.Equal(mr.T(), app2.RunningInstances, 1)
+			assert.Equal(mr.T(), app2.Memory, uint64(512))
+		})
+	})
 }

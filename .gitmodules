@@ -13,3 +13,12 @@
 [submodule "src/github.com/cloudfoundry/gamble"]
 	path = src/github.com/cloudfoundry/gamble
 	url = https://github.com/cloudfoundry/gamble.git
+[submodule "src/github.com/onsi/ginkgo"]
+	path = src/github.com/onsi/ginkgo
+	url = https://github.com/onsi/ginkgo
+[submodule "src/github.com/onsi/gomega"]
+	path = src/github.com/onsi/gomega
+	url = https://github.com/onsi/gomega
+[submodule "src/github.com/tjarratt/mr_t"]
+	path = src/github.com/tjarratt/mr_t
+	url = https://github.com/tjarratt/mr_t

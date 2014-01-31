@@ -3,94 +3,16 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
-
-func TestPasswordRequiresValidAccessToken(t *testing.T) {
-	deps := getPasswordDeps()
-	deps.ReqFactory.ValidAccessTokenSuccess = false
-	callPassword([]string{}, deps)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	deps.ReqFactory.ValidAccessTokenSuccess = true
-	callPassword([]string{"", "", ""}, deps)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestPasswordCanBeChanged(t *testing.T) {
-	deps := getPasswordDeps()
-	deps.ReqFactory.ValidAccessTokenSuccess = true
-	deps.PwdRepo.UpdateUnauthorized = false
-	ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
-
-	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
-		{"Current Password"},
-		{"New Password"},
-		{"Verify Password"},
-	})
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Changing password..."},
-		{"OK"},
-		{"Please log in again"},
-	})
-
-	assert.Equal(t, deps.PwdRepo.UpdateNewPassword, "new-password")
-	assert.Equal(t, deps.PwdRepo.UpdateOldPassword, "old-password")
-
-	updatedConfig, err := deps.ConfigRepo.Get()
-	assert.NoError(t, err)
-	assert.Empty(t, updatedConfig.AccessToken)
-	assert.Equal(t, updatedConfig.OrganizationFields, cf.OrganizationFields{})
-	assert.Equal(t, updatedConfig.SpaceFields, cf.SpaceFields{})
-}
-
-func TestPasswordVerification(t *testing.T) {
-	deps := getPasswordDeps()
-	deps.ReqFactory.ValidAccessTokenSuccess = true
-	ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
-
-	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
-		{"Current Password"},
-		{"New Password"},
-		{"Verify Password"},
-	})
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"Password verification does not match"},
-	})
-
-	assert.Equal(t, deps.PwdRepo.UpdateNewPassword, "")
-}
-
-func TestWhenCurrentPasswordDoesNotMatch(t *testing.T) {
-	deps := getPasswordDeps()
-	deps.ReqFactory.ValidAccessTokenSuccess = true
-	deps.PwdRepo.UpdateUnauthorized = true
-	ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
-
-	testassert.SliceContains(t, ui.PasswordPrompts, testassert.Lines{
-		{"Current Password"},
-		{"New Password"},
-		{"Verify Password"},
-	})
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Changing password..."},
-		{"FAILED"},
-		{"Current password did not match"},
-	})
-
-	assert.Equal(t, deps.PwdRepo.UpdateNewPassword, "new-password")
-	assert.Equal(t, deps.PwdRepo.UpdateOldPassword, "old-password")
-}
 
 type passwordDeps struct {
 	ReqFactory *testreq.FakeReqFactory
@@ -114,4 +36,86 @@ func callPassword(inputs []string, deps passwordDeps) (ui *testterm.FakeUI) {
 	testcmd.RunCommand(cmd, ctxt, deps.ReqFactory)
 
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestPasswordRequiresValidAccessToken", func() {
+			deps := getPasswordDeps()
+			deps.ReqFactory.ValidAccessTokenSuccess = false
+			callPassword([]string{}, deps)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			deps.ReqFactory.ValidAccessTokenSuccess = true
+			callPassword([]string{"", "", ""}, deps)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestPasswordCanBeChanged", func() {
+
+			deps := getPasswordDeps()
+			deps.ReqFactory.ValidAccessTokenSuccess = true
+			deps.PwdRepo.UpdateUnauthorized = false
+			ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
+
+			testassert.SliceContains(mr.T(), ui.PasswordPrompts, testassert.Lines{
+				{"Current Password"},
+				{"New Password"},
+				{"Verify Password"},
+			})
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Changing password..."},
+				{"OK"},
+				{"Please log in again"},
+			})
+
+			assert.Equal(mr.T(), deps.PwdRepo.UpdateNewPassword, "new-password")
+			assert.Equal(mr.T(), deps.PwdRepo.UpdateOldPassword, "old-password")
+
+			updatedConfig, err := deps.ConfigRepo.Get()
+			assert.NoError(mr.T(), err)
+			assert.Empty(mr.T(), updatedConfig.AccessToken)
+			assert.Equal(mr.T(), updatedConfig.OrganizationFields, cf.OrganizationFields{})
+			assert.Equal(mr.T(), updatedConfig.SpaceFields, cf.SpaceFields{})
+		})
+		It("TestPasswordVerification", func() {
+
+			deps := getPasswordDeps()
+			deps.ReqFactory.ValidAccessTokenSuccess = true
+			ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
+
+			testassert.SliceContains(mr.T(), ui.PasswordPrompts, testassert.Lines{
+				{"Current Password"},
+				{"New Password"},
+				{"Verify Password"},
+			})
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"Password verification does not match"},
+			})
+
+			assert.Equal(mr.T(), deps.PwdRepo.UpdateNewPassword, "")
+		})
+		It("TestWhenCurrentPasswordDoesNotMatch", func() {
+
+			deps := getPasswordDeps()
+			deps.ReqFactory.ValidAccessTokenSuccess = true
+			deps.PwdRepo.UpdateUnauthorized = true
+			ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
+
+			testassert.SliceContains(mr.T(), ui.PasswordPrompts, testassert.Lines{
+				{"Current Password"},
+				{"New Password"},
+				{"Verify Password"},
+			})
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Changing password..."},
+				{"FAILED"},
+				{"Current password did not match"},
+			})
+
+			assert.Equal(mr.T(), deps.PwdRepo.UpdateNewPassword, "new-password")
+			assert.Equal(mr.T(), deps.PwdRepo.UpdateOldPassword, "old-password")
+		})
+	})
 }
