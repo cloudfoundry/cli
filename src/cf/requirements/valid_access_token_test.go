@@ -1,27 +1,33 @@
 package requirements
 
 import (
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestValidAccessRequirement(t *testing.T) {
-	ui := new(testterm.FakeUI)
-	appRepo := &testapi.FakeApplicationRepository{
-		ReadAuthErr: true,
-	}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestValidAccessRequirement", func() {
 
-	req := newValidAccessTokenRequirement(ui, appRepo)
-	success := req.Execute()
-	assert.False(t, success)
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{{"Not logged in."}})
+			ui := new(testterm.FakeUI)
+			appRepo := &testapi.FakeApplicationRepository{
+				ReadAuthErr: true,
+			}
 
-	appRepo.ReadAuthErr = false
+			req := newValidAccessTokenRequirement(ui, appRepo)
+			success := req.Execute()
+			assert.False(mr.T(), success)
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
 
-	req = newValidAccessTokenRequirement(ui, appRepo)
-	success = req.Execute()
-	assert.True(t, success)
+			appRepo.ReadAuthErr = false
+
+			req = newValidAccessTokenRequirement(ui, appRepo)
+			success = req.Execute()
+			assert.True(mr.T(), success)
+		})
+	})
 }

@@ -4,68 +4,18 @@ import (
 	"cf"
 	. "cf/commands/servicebroker"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestRenameServiceBrokerFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	repo := &testapi.FakeServiceBrokerRepo{}
-
-	ui := callRenameServiceBroker(t, []string{}, reqFactory, repo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callRenameServiceBroker(t, []string{"arg1"}, reqFactory, repo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callRenameServiceBroker(t, []string{"arg1", "arg2"}, reqFactory, repo)
-	assert.False(t, ui.FailedWithUsage)
-}
-
-func TestRenameServiceBrokerRequirements(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	repo := &testapi.FakeServiceBrokerRepo{}
-	args := []string{"arg1", "arg2"}
-
-	reqFactory.LoginSuccess = false
-	callRenameServiceBroker(t, args, reqFactory, repo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory.LoginSuccess = true
-	callRenameServiceBroker(t, args, reqFactory, repo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestRenameServiceBroker(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	broker := cf.ServiceBroker{}
-	broker.Name = "my-found-broker"
-	broker.Guid = "my-found-broker-guid"
-	repo := &testapi.FakeServiceBrokerRepo{
-		FindByNameServiceBroker: broker,
-	}
-	args := []string{"my-broker", "my-new-broker"}
-
-	ui := callRenameServiceBroker(t, args, reqFactory, repo)
-
-	assert.Equal(t, repo.FindByNameName, "my-broker")
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
-		{"OK"},
-	})
-
-	assert.Equal(t, repo.RenamedServiceBrokerGuid, "my-found-broker-guid")
-	assert.Equal(t, repo.RenamedServiceBrokerName, "my-new-broker")
-}
-
-func callRenameServiceBroker(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+func callRenameServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
@@ -87,4 +37,58 @@ func callRenameServiceBroker(t *testing.T, args []string, reqFactory *testreq.Fa
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestRenameServiceBrokerFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+			repo := &testapi.FakeServiceBrokerRepo{}
+
+			ui := callRenameServiceBroker(mr.T(), []string{}, reqFactory, repo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callRenameServiceBroker(mr.T(), []string{"arg1"}, reqFactory, repo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callRenameServiceBroker(mr.T(), []string{"arg1", "arg2"}, reqFactory, repo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestRenameServiceBrokerRequirements", func() {
+
+			reqFactory := &testreq.FakeReqFactory{}
+			repo := &testapi.FakeServiceBrokerRepo{}
+			args := []string{"arg1", "arg2"}
+
+			reqFactory.LoginSuccess = false
+			callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory.LoginSuccess = true
+			callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestRenameServiceBroker", func() {
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			broker := cf.ServiceBroker{}
+			broker.Name = "my-found-broker"
+			broker.Guid = "my-found-broker-guid"
+			repo := &testapi.FakeServiceBrokerRepo{
+				FindByNameServiceBroker: broker,
+			}
+			args := []string{"my-broker", "my-new-broker"}
+
+			ui := callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+
+			assert.Equal(mr.T(), repo.FindByNameName, "my-broker")
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
+				{"OK"},
+			})
+
+			assert.Equal(mr.T(), repo.RenamedServiceBrokerGuid, "my-found-broker-guid")
+			assert.Equal(mr.T(), repo.RenamedServiceBrokerName, "my-new-broker")
+		})
+	})
 }

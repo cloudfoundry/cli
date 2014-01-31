@@ -17,7 +17,9 @@ import (
 	"strings"
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
-	"testing"
+
+	. "github.com/onsi/ginkgo"
+	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
@@ -66,7 +68,7 @@ var defaultRequests = []testnet.TestRequest{
 
 var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.yml", "app.rb", "config.ru"}
 
-var uploadBodyMatcher = func(t *testing.T, request *http.Request) {
+var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 	err := request.ParseMultipartForm(4096)
 	if err != nil {
 		assert.Fail(t, "Failed parsing multipart form", err)
@@ -142,63 +144,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	return
 }
 
-func TestUploadWithInvalidDirectory(t *testing.T) {
-	config := &configuration.Configuration{}
-	gateway := net.NewCloudControllerGateway()
-	zipper := &cf.ApplicationZipper{}
-
-	repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
-
-	apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Contains(t, apiResponse.Message, filepath.Join("foo", "bar"))
-}
-
-func TestUploadApp(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-	dir = filepath.Join(dir, "../../fixtures/example-app")
-	err = os.Chmod(filepath.Join(dir, "Gemfile"), permissionsToSet)
-
-	assert.NoError(t, err)
-
-	_, apiResponse := testUploadApp(t, dir, defaultRequests)
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestCreateUploadDirWithAZipFile(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-	dir = filepath.Join(dir, "../../fixtures/example-app.zip")
-
-	_, apiResponse := testUploadApp(t, dir, defaultRequests)
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestCreateUploadDirWithAZipLikeFile(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-	dir = filepath.Join(dir, "../../fixtures/example-app.azip")
-
-	_, apiResponse := testUploadApp(t, dir, defaultRequests)
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestUploadAppFailsWhilePushingBits(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-	dir = filepath.Join(dir, "../../fixtures/example-app")
-
-	requests := []testnet.TestRequest{
-		uploadApplicationRequest,
-		createProgressEndpoint("running"),
-		createProgressEndpoint("failed"),
-	}
-	_, apiResponse := testUploadApp(t, dir, requests)
-	assert.False(t, apiResponse.IsSuccessful())
-}
-
-func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse) {
+func testUploadApp(t mr.TestingT, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse) {
 	ts, handler := testnet.NewTLSServer(t, requests)
 	defer ts.Close()
 
@@ -227,4 +173,63 @@ func testUploadApp(t *testing.T, dir string, requests []testnet.TestRequest) (ap
 	assert.True(t, handler.AllRequestsCalled())
 
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestUploadWithInvalidDirectory", func() {
+			config := &configuration.Configuration{}
+			gateway := net.NewCloudControllerGateway()
+			zipper := &cf.ApplicationZipper{}
+
+			repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
+
+			apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
+			assert.True(mr.T(), apiResponse.IsNotSuccessful())
+			assert.Contains(mr.T(), apiResponse.Message, filepath.Join("foo", "bar"))
+		})
+		It("TestUploadApp", func() {
+
+			dir, err := os.Getwd()
+			assert.NoError(mr.T(), err)
+			dir = filepath.Join(dir, "../../fixtures/example-app")
+			err = os.Chmod(filepath.Join(dir, "Gemfile"), permissionsToSet)
+
+			assert.NoError(mr.T(), err)
+
+			_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestCreateUploadDirWithAZipFile", func() {
+
+			dir, err := os.Getwd()
+			assert.NoError(mr.T(), err)
+			dir = filepath.Join(dir, "../../fixtures/example-app.zip")
+
+			_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestCreateUploadDirWithAZipLikeFile", func() {
+
+			dir, err := os.Getwd()
+			assert.NoError(mr.T(), err)
+			dir = filepath.Join(dir, "../../fixtures/example-app.azip")
+
+			_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestUploadAppFailsWhilePushingBits", func() {
+
+			dir, err := os.Getwd()
+			assert.NoError(mr.T(), err)
+			dir = filepath.Join(dir, "../../fixtures/example-app")
+
+			requests := []testnet.TestRequest{
+				uploadApplicationRequest,
+				createProgressEndpoint("running"),
+				createProgressEndpoint("failed"),
+			}
+			_, apiResponse := testUploadApp(mr.T(), dir, requests)
+			assert.False(mr.T(), apiResponse.IsSuccessful())
+		})
+	})
 }

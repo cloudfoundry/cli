@@ -4,58 +4,18 @@ import (
 	"cf"
 	. "cf/commands/service"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestRenameServiceFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-
-	fakeUI, _ := callRenameService(t, []string{}, reqFactory)
-	assert.True(t, fakeUI.FailedWithUsage)
-
-	fakeUI, _ = callRenameService(t, []string{"my-service"}, reqFactory)
-	assert.True(t, fakeUI.FailedWithUsage)
-
-	fakeUI, _ = callRenameService(t, []string{"my-service", "new-name", "extra"}, reqFactory)
-	assert.True(t, fakeUI.FailedWithUsage)
-}
-
-func TestRenameServiceRequirements(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-	callRenameService(t, []string{"my-service", "new-name"}, reqFactory)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-	callRenameService(t, []string{"my-service", "new-name"}, reqFactory)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	assert.Equal(t, reqFactory.ServiceInstanceName, "my-service")
-}
-
-func TestRenameService(t *testing.T) {
-	serviceInstance := cf.ServiceInstance{}
-	serviceInstance.Name = "different-name"
-	serviceInstance.Guid = "different-name-guid"
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
-	ui, fakeServiceRepo := callRenameService(t, []string{"my-service", "new-name"}, reqFactory)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
-		{"OK"},
-	})
-
-	assert.Equal(t, fakeServiceRepo.RenameServiceServiceInstance, serviceInstance)
-	assert.Equal(t, fakeServiceRepo.RenameServiceNewName, "new-name")
-}
-
-func callRenameService(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
+func callRenameService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
 	ui = &testterm.FakeUI{}
 	serviceRepo = &testapi.FakeServiceRepo{}
 
@@ -79,4 +39,48 @@ func callRenameService(t *testing.T, args []string, reqFactory *testreq.FakeReqF
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestRenameServiceFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+
+			fakeUI, _ := callRenameService(mr.T(), []string{}, reqFactory)
+			assert.True(mr.T(), fakeUI.FailedWithUsage)
+
+			fakeUI, _ = callRenameService(mr.T(), []string{"my-service"}, reqFactory)
+			assert.True(mr.T(), fakeUI.FailedWithUsage)
+
+			fakeUI, _ = callRenameService(mr.T(), []string{"my-service", "new-name", "extra"}, reqFactory)
+			assert.True(mr.T(), fakeUI.FailedWithUsage)
+		})
+		It("TestRenameServiceRequirements", func() {
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+			callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+			callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+		})
+		It("TestRenameService", func() {
+
+			serviceInstance := cf.ServiceInstance{}
+			serviceInstance.Name = "different-name"
+			serviceInstance.Guid = "different-name-guid"
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
+			ui, fakeServiceRepo := callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
+				{"OK"},
+			})
+
+			assert.Equal(mr.T(), fakeServiceRepo.RenameServiceServiceInstance, serviceInstance)
+			assert.Equal(mr.T(), fakeServiceRepo.RenameServiceNewName, "new-name")
+		})
+	})
 }

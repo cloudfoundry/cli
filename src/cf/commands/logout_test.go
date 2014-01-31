@@ -3,34 +3,40 @@ package commands_test
 import (
 	"cf"
 	"cf/commands"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestLogoutClearsAccessTokenOrgAndSpace(t *testing.T) {
-	org := cf.OrganizationFields{}
-	org.Name = "MyOrg"
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestLogoutClearsAccessTokenOrgAndSpace", func() {
 
-	space := cf.SpaceFields{}
-	space.Name = "MySpace"
+			org := cf.OrganizationFields{}
+			org.Name = "MyOrg"
 
-	configRepo := &testconfig.FakeConfigRepository{}
-	config, _ := configRepo.Get()
-	config.AccessToken = "MyAccessToken"
-	config.OrganizationFields = org
-	config.SpaceFields = space
+			space := cf.SpaceFields{}
+			space.Name = "MySpace"
 
-	ui := new(testterm.FakeUI)
+			configRepo := &testconfig.FakeConfigRepository{}
+			config, _ := configRepo.Get()
+			config.AccessToken = "MyAccessToken"
+			config.OrganizationFields = org
+			config.SpaceFields = space
 
-	l := commands.NewLogout(ui, configRepo)
-	l.Run(nil)
+			ui := new(testterm.FakeUI)
 
-	updatedConfig, err := configRepo.Get()
-	assert.NoError(t, err)
+			l := commands.NewLogout(ui, configRepo)
+			l.Run(nil)
 
-	assert.Empty(t, updatedConfig.AccessToken)
-	assert.Equal(t, updatedConfig.OrganizationFields, cf.OrganizationFields{})
-	assert.Equal(t, updatedConfig.SpaceFields, cf.SpaceFields{})
+			updatedConfig, err := configRepo.Get()
+			assert.NoError(mr.T(), err)
+
+			assert.Empty(mr.T(), updatedConfig.AccessToken)
+			assert.Equal(mr.T(), updatedConfig.OrganizationFields, cf.OrganizationFields{})
+			assert.Equal(mr.T(), updatedConfig.SpaceFields, cf.SpaceFields{})
+		})
+	})
 }

@@ -2,33 +2,39 @@ package requirements
 
 import (
 	"cf"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestApplicationReqExecute(t *testing.T) {
-	app := cf.Application{}
-	app.Name = "my-app"
-	app.Guid = "my-app-guid"
-	appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
-	ui := new(testterm.FakeUI)
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestApplicationReqExecute", func() {
 
-	appReq := newApplicationRequirement("foo", ui, appRepo)
-	success := appReq.Execute()
+			app := cf.Application{}
+			app.Name = "my-app"
+			app.Guid = "my-app-guid"
+			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
+			ui := new(testterm.FakeUI)
 
-	assert.True(t, success)
-	assert.Equal(t, appRepo.ReadName, "foo")
-	assert.Equal(t, appReq.GetApplication(), app)
-}
+			appReq := newApplicationRequirement("foo", ui, appRepo)
+			success := appReq.Execute()
 
-func TestApplicationReqExecuteWhenApplicationNotFound(t *testing.T) {
-	appRepo := &testapi.FakeApplicationRepository{ReadNotFound: true}
-	ui := new(testterm.FakeUI)
+			assert.True(mr.T(), success)
+			assert.Equal(mr.T(), appRepo.ReadName, "foo")
+			assert.Equal(mr.T(), appReq.GetApplication(), app)
+		})
+		It("TestApplicationReqExecuteWhenApplicationNotFound", func() {
 
-	appReq := newApplicationRequirement("foo", ui, appRepo)
-	success := appReq.Execute()
+			appRepo := &testapi.FakeApplicationRepository{ReadNotFound: true}
+			ui := new(testterm.FakeUI)
 
-	assert.False(t, success)
+			appReq := newApplicationRequirement("foo", ui, appRepo)
+			success := appReq.Execute()
+
+			assert.False(mr.T(), success)
+		})
+	})
 }

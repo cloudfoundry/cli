@@ -4,9 +4,10 @@ import (
 	. "cf/commands"
 	"cf/requirements"
 	"github.com/codegangsta/cli"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testcmd "testhelpers/commands"
-	"testing"
 )
 
 type TestCommandFactory struct {
@@ -48,30 +49,34 @@ func (r *TestRequirement) Execute() (success bool) {
 
 	return true
 }
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestRun", func() {
 
-func TestRun(t *testing.T) {
-	passingReq := TestRequirement{Passes: true}
-	failingReq := TestRequirement{Passes: false}
-	lastReq := TestRequirement{Passes: true}
+			passingReq := TestRequirement{Passes: true}
+			failingReq := TestRequirement{Passes: false}
+			lastReq := TestRequirement{Passes: true}
 
-	cmd := TestCommand{
-		Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
-	}
+			cmd := TestCommand{
+				Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
+			}
 
-	cmdFactory := &TestCommandFactory{Cmd: &cmd}
-	runner := NewRunner(cmdFactory, nil)
+			cmdFactory := &TestCommandFactory{Cmd: &cmd}
+			runner := NewRunner(cmdFactory, nil)
 
-	ctxt := testcmd.NewContext("login", []string{})
+			ctxt := testcmd.NewContext("login", []string{})
 
-	err := runner.RunCmdByName("some-cmd", ctxt)
+			err := runner.RunCmdByName("some-cmd", ctxt)
 
-	assert.Equal(t, cmdFactory.CmdName, "some-cmd")
+			assert.Equal(mr.T(), cmdFactory.CmdName, "some-cmd")
 
-	assert.True(t, passingReq.WasExecuted, ctxt)
-	assert.True(t, failingReq.WasExecuted, ctxt)
+			assert.True(mr.T(), passingReq.WasExecuted, ctxt)
+			assert.True(mr.T(), failingReq.WasExecuted, ctxt)
 
-	assert.False(t, lastReq.WasExecuted)
-	assert.Nil(t, cmd.WasRunWith)
+			assert.False(mr.T(), lastReq.WasExecuted)
+			assert.Nil(mr.T(), cmd.WasRunWith)
 
-	assert.Error(t, err)
+			assert.Error(mr.T(), err)
+		})
+	})
 }

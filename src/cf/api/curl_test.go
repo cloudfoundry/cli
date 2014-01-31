@@ -4,12 +4,13 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testnet "testhelpers/net"
-	"testing"
 )
 
 var jsonResponse = `
@@ -20,110 +21,6 @@ var jsonResponse = `
 		}
 	]}
 `
-
-func TestCurlGetRequest(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/endpoint",
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body:   jsonResponse},
-	})
-	ts, handler := testnet.NewTLSServer(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	deps := newCurlDependencies()
-	deps.config.Target = ts.URL
-
-	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-	headers, body, apiResponse := repo.Request("GET", "/v2/endpoint", "", "")
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.Contains(t, headers, "200")
-	assert.Contains(t, headers, "Content-Type")
-	assert.Contains(t, headers, "text/plain")
-	testassert.JSONStringEquals(t, body, jsonResponse)
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestCurlPostRequest(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:  "POST",
-		Path:    "/v2/endpoint",
-		Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body:   jsonResponse},
-	})
-
-	ts, handler := testnet.NewTLSServer(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	deps := newCurlDependencies()
-	deps.config.Target = ts.URL
-
-	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-	_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestCurlFailingRequest(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:  "POST",
-		Path:    "/v2/endpoint",
-		Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
-		Response: testnet.TestResponse{
-			Status: http.StatusBadRequest,
-			Body:   jsonResponse},
-	})
-
-	ts, _ := testnet.NewTLSServer(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	deps := newCurlDependencies()
-	deps.config.Target = ts.URL
-
-	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-	_, body, _ := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
-
-	testassert.JSONStringEquals(t, body, jsonResponse)
-}
-
-func TestCurlWithCustomHeaders(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "POST",
-		Path:   "/v2/endpoint",
-		Matcher: func(t *testing.T, req *http.Request) {
-			assert.Equal(t, req.Header.Get("content-type"), "ascii/cats")
-			assert.Equal(t, req.Header.Get("x-something-else"), "5")
-		},
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body:   jsonResponse},
-	})
-	ts, handler := testnet.NewTLSServer(t, []testnet.TestRequest{req})
-	defer ts.Close()
-
-	deps := newCurlDependencies()
-	deps.config.Target = ts.URL
-
-	headers := "content-type: ascii/cats\nx-something-else:5"
-	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-	_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
-	println(apiResponse.Message)
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestCurlWithInvalidHeaders(t *testing.T) {
-	deps := newCurlDependencies()
-	repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-	_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
-	assert.True(t, apiResponse.IsError())
-	assert.Contains(t, apiResponse.Message, "headers")
-}
 
 type curlDependencies struct {
 	config  *configuration.Configuration
@@ -136,4 +33,111 @@ func newCurlDependencies() (deps curlDependencies) {
 	}
 	deps.gateway = net.NewCloudControllerGateway()
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestCurlGetRequest", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/endpoint",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   jsonResponse},
+			})
+			ts, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+			defer ts.Close()
+
+			deps := newCurlDependencies()
+			deps.config.Target = ts.URL
+
+			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+			headers, body, apiResponse := repo.Request("GET", "/v2/endpoint", "", "")
+
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.Contains(mr.T(), headers, "200")
+			assert.Contains(mr.T(), headers, "Content-Type")
+			assert.Contains(mr.T(), headers, "text/plain")
+			testassert.JSONStringEquals(mr.T(), body, jsonResponse)
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestCurlPostRequest", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/endpoint",
+				Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   jsonResponse},
+			})
+
+			ts, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+			defer ts.Close()
+
+			deps := newCurlDependencies()
+			deps.config.Target = ts.URL
+
+			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+			_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestCurlFailingRequest", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/endpoint",
+				Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
+				Response: testnet.TestResponse{
+					Status: http.StatusBadRequest,
+					Body:   jsonResponse},
+			})
+
+			ts, _ := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+			defer ts.Close()
+
+			deps := newCurlDependencies()
+			deps.config.Target = ts.URL
+
+			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+			_, body, _ := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+
+			testassert.JSONStringEquals(mr.T(), body, jsonResponse)
+		})
+		It("TestCurlWithCustomHeaders", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "POST",
+				Path:   "/v2/endpoint",
+				Matcher: func(t mr.TestingT, req *http.Request) {
+					assert.Equal(mr.T(), req.Header.Get("content-type"), "ascii/cats")
+					assert.Equal(mr.T(), req.Header.Get("x-something-else"), "5")
+				},
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   jsonResponse},
+			})
+			ts, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+			defer ts.Close()
+
+			deps := newCurlDependencies()
+			deps.config.Target = ts.URL
+
+			headers := "content-type: ascii/cats\nx-something-else:5"
+			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+			_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
+			println(apiResponse.Message)
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestCurlWithInvalidHeaders", func() {
+
+			deps := newCurlDependencies()
+			repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
+			_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
+			assert.True(mr.T(), apiResponse.IsError())
+			assert.Contains(mr.T(), apiResponse.Message, "headers")
+		})
+	})
 }
