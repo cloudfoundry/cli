@@ -70,10 +70,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	for _, appParams := range appSet {
 		cmd.fetchStackGuid(appParams)
 
-		app, didCreate := cmd.app(appParams)
-		if !didCreate {
-			cmd.updateApp(&app, appParams)
-		}
+		app := cmd.createOrUpdateApp(appParams)
 
 		cmd.bindAppToRoute(app, appParams, c)
 
@@ -310,7 +307,7 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 	return
 }
 
-func (cmd *Push) app(appParams cf.AppParams) (app cf.Application, didCreate bool) {
+func (cmd *Push) createOrUpdateApp(appParams cf.AppParams) (app cf.Application) {
 	if !appParams.Has("name") {
 		cmd.ui.Failed("Error: No name found for app")
 		return
@@ -323,6 +320,7 @@ func (cmd *Push) app(appParams cf.AppParams) (app cf.Application, didCreate bool
 		return
 	}
 
+	var didCreate bool = false
 	if apiResponse.IsNotFound() {
 		app, apiResponse = cmd.createApp(appParams)
 		if apiResponse.IsNotSuccessful() {
@@ -330,6 +328,10 @@ func (cmd *Push) app(appParams cf.AppParams) (app cf.Application, didCreate bool
 			return
 		}
 		didCreate = true
+	}
+
+	if !didCreate {
+		app = cmd.updateApp(app, appParams)
 	}
 
 	return
@@ -357,7 +359,7 @@ func (cmd *Push) createApp(appParams cf.AppParams) (app cf.Application, apiRespo
 	return
 }
 
-func (cmd *Push) updateApp(app *cf.Application, appParams cf.AppParams) {
+func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedApp cf.Application) {
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -366,7 +368,7 @@ func (cmd *Push) updateApp(app *cf.Application, appParams cf.AppParams) {
 	)
 
 	var apiResponse net.ApiResponse
-	*app, apiResponse = cmd.appRepo.Update(app.Guid, appParams)
+	updatedApp, apiResponse = cmd.appRepo.Update(app.Guid, appParams)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
