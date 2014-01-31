@@ -367,6 +367,11 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
+	if appParams.Has("env") {
+		mergedEnvVars := generic.Merge(generic.NewMap(app.EnvironmentVars), generic.NewMap(appParams.Get("env")))
+		appParams.Set("env", mergedEnvVars)
+	}
+
 	var apiResponse net.ApiResponse
 	updatedApp, apiResponse = cmd.appRepo.Update(app.Guid, appParams)
 	if apiResponse.IsNotSuccessful() {
