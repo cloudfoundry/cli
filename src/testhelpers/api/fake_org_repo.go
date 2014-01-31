@@ -52,9 +52,17 @@ func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organ
 
 func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
-	org = repo.FindByNameOrganization
 
-	if repo.FindByNameErr {
+	var foundOrg bool = false
+	for _, anOrg := range repo.Organizations {
+		if name == anOrg.Name {
+			foundOrg = true
+			org = anOrg
+			break
+		}
+	}
+
+	if repo.FindByNameErr || !foundOrg {
 		apiResponse = net.NewApiResponseWithMessage("Error finding organization by name.")
 	}
 

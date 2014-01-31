@@ -37,12 +37,11 @@ type UI interface {
 }
 
 type terminalUI struct {
+	stdin io.Reader
 }
 
-var stdin io.Reader = os.Stdin
-
-func NewUI() UI {
-	return terminalUI{}
+func NewUI(r io.Reader) UI {
+	return terminalUI{stdin: r}
 }
 
 func (c terminalUI) PrintPaginator(rows []string, err error) {
@@ -79,7 +78,7 @@ func (c terminalUI) Confirm(message string, args ...interface{}) bool {
 func (c terminalUI) Ask(prompt string, args ...interface{}) (answer string) {
 	fmt.Println("")
 	fmt.Printf(prompt+" ", args...)
-	fmt.Fscanln(stdin, &answer)
+	fmt.Fscanln(c.stdin, &answer)
 	return
 }
 
@@ -120,12 +119,24 @@ func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
 	}
 
+	if !config.HasOrganization() && !config.HasSpace() {
+		command := fmt.Sprintf("%s target -o ORG -s SPACE", cf.Name())
+		ui.Say("No org or space targeted, use '%s'", CommandColor(command))
+		return
+	}
+
 	if config.HasOrganization() {
 		ui.Say("Org:          %s", EntityNameColor(config.OrganizationFields.Name))
+	} else {
+		command := fmt.Sprintf("%s target -o Org", cf.Name())
+		ui.Say("Org:          No org targeted, use '%s'", CommandColor(command))
 	}
 
 	if config.HasSpace() {
 		ui.Say("Space:        %s", EntityNameColor(config.SpaceFields.Name))
+	} else {
+		command := fmt.Sprintf("%s target -s SPACE", cf.Name())
+		ui.Say("Space:        No space targeted, use '%s'", CommandColor(command))
 	}
 }
 

@@ -102,9 +102,8 @@ func TestCreateSpace(t *testing.T) {
 func TestCreateSpaceInOrg(t *testing.T) {
 	resetSpaceDefaults()
 
-	defaultOrgRepo.FindByNameOrganization = maker.NewOrg(maker.Overrides{
-		"name": "other-org",
-	})
+	org := maker.NewOrg(maker.Overrides{"name": "other-org"})
+	defaultOrgRepo.Organizations = []cf.Organization{org}
 
 	ui := callCreateSpace(t, []string{"-o", "other-org", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
@@ -117,7 +116,7 @@ func TestCreateSpaceInOrg(t *testing.T) {
 	})
 
 	assert.Equal(t, defaultSpaceRepo.CreateSpaceName, "my-space")
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceOrgGuid, defaultOrgRepo.FindByNameOrganization.Guid)
+	assert.Equal(t, defaultSpaceRepo.CreateSpaceOrgGuid, org.Guid)
 	assert.Equal(t, defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
 	assert.Equal(t, defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
 	assert.Equal(t, defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)

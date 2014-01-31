@@ -39,7 +39,7 @@ func main() {
 		os.Setenv("CF_COLOR", "true")
 	}
 
-	termUI := terminal.NewUI()
+	termUI := terminal.NewUI(os.Stdin)
 	configRepo := configuration.NewConfigurationDiskRepository()
 	config := loadConfig(termUI, configRepo)
 	manifestRepo := manifest.NewManifestDiskRepository()

@@ -66,9 +66,17 @@ func (repo FakeSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []cf
 
 func (repo *FakeSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
-	space = repo.FindByNameSpace
 
-	if repo.FindByNameErr {
+	var foundSpace bool = false
+	for _, someSpace := range repo.Spaces {
+		if name == someSpace.Name {
+			foundSpace = true
+			space = someSpace
+			break
+		}
+	}
+
+	if repo.FindByNameErr || !foundSpace {
 		apiResponse = net.NewApiResponseWithMessage("Error finding space by name.")
 	}
 
