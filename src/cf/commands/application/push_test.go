@@ -332,6 +332,28 @@ func TestPushingAppToResetStartCommand(t *testing.T) {
 	assert.Equal(t, deps.appRepo.UpdateParams.Get("command"), "")
 }
 
+func TestPushingAppMergesManifestEnvVarsWithExistingEnvVars(t *testing.T) {
+	deps := getPushDependencies()
+
+	existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
+	existingApp.EnvironmentVars = map[string]string{
+		"crazy": "pants",
+		"FOO":   "NotYoBaz",
+		"foo":   "manchu",
+	}
+	deps.appRepo.ReadApp = existingApp
+
+	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
+
+	_ = callPush(t, []string{"existing-app"}, deps)
+
+	updatedAppEnvVars := generic.NewMap(deps.appRepo.UpdateParams.Get("env"))
+	assert.Equal(t, updatedAppEnvVars.Get("crazy"), "pants")
+	assert.Equal(t, updatedAppEnvVars.Get("FOO"), "baz")
+	assert.Equal(t, updatedAppEnvVars.Get("foo"), "manchu")
+	assert.Equal(t, updatedAppEnvVars.Get("PATH"), "/u/apps/my-app/bin")
+}
+
 func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	deps := getPushDependencies()
 	domain := cf.Domain{}
