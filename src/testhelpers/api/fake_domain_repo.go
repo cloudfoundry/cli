@@ -16,6 +16,9 @@ type FakeDomainRepository struct {
 	ListSharedDomainsDomains     []cf.Domain
 	ListSharedDomainsApiResponse net.ApiResponse
 
+	ListDomainsDomains     []cf.Domain
+	ListDomainsApiResponse net.ApiResponse
+
 	FindByNameInOrgDomain      cf.Domain
 	FindByNameInOrgApiResponse net.ApiResponse
 
@@ -51,6 +54,13 @@ func (repo *FakeDomainRepository) ListSharedDomains(cb api.ListDomainsCallback) 
 		cb(repo.ListSharedDomainsDomains)
 	}
 	return repo.ListSharedDomainsApiResponse
+}
+
+func (repo *FakeDomainRepository) ListDomains(cb api.ListDomainsCallback) net.ApiResponse {
+	if len(repo.ListDomainsDomains) > 0 {
+		cb(repo.ListDomainsDomains)
+	}
+	return repo.ListDomainsApiResponse
 }
 
 func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse) {

@@ -247,17 +247,49 @@ func (cmd *Push) domain(c *cli.Context, domainName string) (domain cf.Domain) {
 		return
 	}
 
-	apiResponse = cmd.domainRepo.ListSharedDomains(api.ListDomainsCallback(func(domains []cf.Domain) bool {
-		domain = domains[0]
-		return false
-	}))
+	domain, err := cmd.findDefaultDomain()
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 
 	if domain.Guid == "" {
 		cmd.ui.Failed("No default domain exists")
+	}
+
+	return
+}
+
+func (cmd *Push) findDefaultDomain() (domain cf.Domain, err error) {
+	var foundSharedDomain bool = false
+	listDomainsCallback := api.ListDomainsCallback(func(domains []cf.Domain) bool {
+		for _, aDomain := range domains {
+			if aDomain.Shared {
+				foundSharedDomain = true
+				domain = aDomain
+				break
+			}
+		}
+
+		if foundSharedDomain {
+			return false
+		} else {
+			return true
+		}
+	})
+
+	apiResponse := cmd.domainRepo.ListSharedDomains(listDomainsCallback)
+	if apiResponse.IsNotFound() {
+		apiResponse = cmd.domainRepo.ListDomains(listDomainsCallback)
+	}
+
+	if apiResponse.IsNotSuccessful() {
+		err = errors.New(apiResponse.Message)
+	}
+
+	if foundSharedDomain != true {
+		err = errors.New("Could not find a default domain")
+		return
 	}
 
 	return
