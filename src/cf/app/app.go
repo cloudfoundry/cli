@@ -472,10 +472,10 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Push a new app or sync changes to an existing app",
 			Usage: "Push a single app (with or without a manifest):\n" +
 				fmt.Sprintf("   %s push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n", cf.Name()) +
-				"   [-i NUM_INSTANCES] [-m MEMORY] [-n HOST] [-p PATH] [-f MANIFEST_PATH] [-s STACK] [-t TIMEOUT]\n" +
+				"   [-i NUM_INSTANCES] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n" +
 				"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]" +
 				"\n\n   Push multiple apps with a manifest:\n" +
-				fmt.Sprintf("   %s push -f MANIFEST_PATH\n", cf.Name()),
+				fmt.Sprintf("   %s push [-f MANIFEST_PATH]\n", cf.Name()),
 			Flags: []cli.Flag{
 				NewStringFlag("b", "Custom buildpack by name (e.g. my-buildpack) or GIT URL (e.g. https://github.com/heroku/heroku-buildpack-play.git)"),
 				NewStringFlag("c", "Startup command, set to null to reset to default start command"),
