@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
 // Fail reports a failure through
-func Fail(t *testing.T, failureMessage string, msgAndArgs ...interface{}) bool {
+func Fail(t mr.TestingT, failureMessage string, msgAndArgs ...interface{}) bool {
 
 	message := messageFromMsgAndArgs(msgAndArgs...)
 
@@ -52,7 +52,7 @@ func CallerInfo() string {
 // Takes a slice of errors and asserts that there were none provided
 // When failing, appends error messages together on newlines and
 // provides a count of how many errors were passed in
-func AssertNoErrors(t *testing.T, errs []error) {
+func AssertNoErrors(t mr.TestingT, errs []error) {
 	if len(errs) > 0 {
 		var concatErrors string
 		for _, err := range errs {
