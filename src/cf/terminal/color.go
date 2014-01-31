@@ -13,11 +13,11 @@ const (
 	red    Color = 31
 	green        = 32
 	yellow       = 33
-	//	blue          = 34
-	magenta = 35
-	cyan    = 36
-	grey    = 37
-	white   = 38
+	blue         = 34
+	magenta      = 35
+	cyan         = 36
+	grey         = 37
+	white        = 38
 )
 
 func colorize(message string, color Color, bold bool) string {
@@ -46,7 +46,7 @@ func HeaderColor(message string) string {
 }
 
 func CommandColor(message string) string {
-	return colorize(message, yellow, true)
+	return colorize(message, cyan, true)
 }
 
 func StoppedColor(message string) string {
@@ -54,7 +54,7 @@ func StoppedColor(message string) string {
 }
 
 func AdvisoryColor(message string) string {
-	return colorize(message, yellow, true)
+	return colorize(message, cyan, true)
 }
 
 func CrashedColor(message string) string {
