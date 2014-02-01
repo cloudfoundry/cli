@@ -16,7 +16,8 @@ func TestReadManifestWithGoodPath(t *testing.T) {
 
 	assert.True(t, errs.Empty())
 	assert.Equal(t, len(manifest.Applications), 1)
-	assert.Equal(t, manifest.Applications[0].Get("name").(string), "goodbyte")
+	assert.Equal(t, manifest.Applications[0].Get("name"), "goodbyte")
+	assert.Equal(t, manifest.Applications[0].Get("path"), "../../fixtures")
 }
 
 func TestReadManifestWithBadPath(t *testing.T) {
