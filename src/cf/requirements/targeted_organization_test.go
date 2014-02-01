@@ -24,9 +24,10 @@ func TestTargetedOrgRequirement(t *testing.T) {
 
 	config.OrganizationFields = cf.OrganizationFields{}
 
-	req = newTargetedOrgRequirement(ui, config)
-	success = req.Execute()
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		newTargetedOrgRequirement(ui, config).Execute()
+	})
+
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"No org targeted"},

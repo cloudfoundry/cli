@@ -140,14 +140,7 @@ func TestPushingAppWithOldV2DomainsEndpoint(t *testing.T) {
 func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 	deps := getPushDependencies()
 
-	sharedDomain := cf.Domain{}
-	sharedDomain.Name = "foo.cf-app.com"
-	sharedDomain.Shared = true
-	sharedDomain.Guid = "foo-domain-guid"
-
-	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
 	deps.routeRepo.FindByHostAndDomainErr = true
-
 	deps.appRepo.ReadNotFound = true
 
 	ui := callPush(t, []string{"-t", "111", "my-new-app"}, deps)
@@ -182,14 +175,7 @@ func TestPushingAppWhenItDoesNotExist(t *testing.T) {
 func TestPushingAppWithACrazyName(t *testing.T) {
 	deps := getPushDependencies()
 
-	sharedDomain := cf.Domain{}
-	sharedDomain.Name = "foo.cf-app.com"
-	sharedDomain.Shared = true
-	sharedDomain.Guid = "foo-domain-guid"
-
-	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
 	deps.routeRepo.FindByHostAndDomainErr = true
-
 	deps.appRepo.ReadNotFound = true
 
 	ui := callPush(t, []string{"-t", "111", "Tim's 1st-Crazy__app!"}, deps)
@@ -202,22 +188,18 @@ func TestPushingAppWithACrazyName(t *testing.T) {
 		{"Creating", "tims-1st-crazy-app.foo.cf-app.com"},
 		{"Binding", "tims-1st-crazy-app.foo.cf-app.com"},
 	})
+	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
+		{"FAILED"},
+	})
 }
 
 func TestPushingAppWhenItDoesNotExistButRouteExists(t *testing.T) {
 	deps := getPushDependencies()
 
-	domain := cf.Domain{}
-	domain.Name = "foo.cf-app.com"
-	domain.Guid = "foo-domain-guid"
-	domain.Shared = true
-
 	route := cf.Route{}
 	route.Guid = "my-route-guid"
 	route.Host = "my-new-app"
-	route.Domain = domain.DomainFields
-
-	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
+	route.Domain = deps.domainRepo.ListSharedDomainsDomains[0].DomainFields
 
 	deps.routeRepo.FindByHostAndDomainRoute = route
 	deps.appRepo.ReadNotFound = true
@@ -392,7 +374,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	assert.Equal(t, envVars.Get("FOO").(string), "baz")
 }
 
-func TestPushingAppManifestWithNulls(t *testing.T) {
+func TestPushingAppManifestWithErrors(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 	deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{
@@ -1131,7 +1113,11 @@ func getPushDependencies() (deps pushDependencies) {
 	deps.stopper = &testcmd.FakeAppStopper{}
 	deps.binder = &testcmd.FakeAppBinder{}
 	deps.appRepo = &testapi.FakeApplicationRepository{}
+
 	deps.domainRepo = &testapi.FakeDomainRepository{}
+	sharedDomain := maker.NewSharedDomain(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
+	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
+
 	deps.routeRepo = &testapi.FakeRouteRepository{}
 	deps.stackRepo = &testapi.FakeStackRepository{}
 	deps.appBitsRepo = &testapi.FakeApplicationBitsRepository{}
@@ -1149,12 +1135,8 @@ func callPush(t *testing.T, args []string, deps pushDependencies) (ui *testterm.
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
-	space := cf.SpaceFields{}
-	space.Name = "my-space"
-	space.Guid = "my-space-guid"
+	org := maker.NewOrgFields(maker.Overrides{"name": "my-org"})
+	space := maker.NewSpaceFields(maker.Overrides{"name": "my-space", "guid": "my-space-guid"})
 
 	config := &configuration.Configuration{
 		SpaceFields:        space,

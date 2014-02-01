@@ -4,6 +4,7 @@ import (
 	"cf"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -27,8 +28,7 @@ func TestSpaceReqExecuteWhenSpaceNotFound(t *testing.T) {
 	spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	spaceReq := newSpaceRequirement("foo", ui, spaceRepo)
-	success := spaceReq.Execute()
-
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		newSpaceRequirement("foo", ui, spaceRepo).Execute()
+	})
 }

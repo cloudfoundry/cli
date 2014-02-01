@@ -4,6 +4,7 @@ import (
 	"cf"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -28,9 +29,10 @@ func TestDomainReqWhenDomainDoesNotExist(t *testing.T) {
 	ui := new(testterm.FakeUI)
 
 	domainReq := newDomainRequirement("example.com", ui, domainRepo)
-	success := domainReq.Execute()
 
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		domainReq.Execute()
+	})
 }
 
 func TestDomainReqOnError(t *testing.T) {
@@ -38,7 +40,8 @@ func TestDomainReqOnError(t *testing.T) {
 	ui := new(testterm.FakeUI)
 
 	domainReq := newDomainRequirement("example.com", ui, domainRepo)
-	success := domainReq.Execute()
 
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		domainReq.Execute()
+	})
 }

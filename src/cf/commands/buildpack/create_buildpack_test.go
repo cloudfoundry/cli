@@ -17,11 +17,11 @@ func TestCreateBuildpackRequirements(t *testing.T) {
 	repo, bitsRepo := getRepositories()
 
 	repo.FindByNameBuildpack = cf.Buildpack{}
-	callCreateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
+	callCreateBuildpack([]string{"my-buildpack", "my-dir", "0"}, reqFactory, repo, bitsRepo)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	callCreateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
+	reqFactory.LoginSuccess = false
+	callCreateBuildpack([]string{"my-buildpack", "my-dir", "0"}, reqFactory, repo, bitsRepo)
 	assert.False(t, testcmd.CommandDidPassRequirements)
 }
 

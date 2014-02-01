@@ -4,6 +4,7 @@ import (
 	"cf"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -27,8 +28,7 @@ func TestServiceInstanceReqExecuteWhenServiceInstanceNotFound(t *testing.T) {
 	repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	req := newServiceInstanceRequirement("foo", ui, repo)
-	success := req.Execute()
-
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		newServiceInstanceRequirement("foo", ui, repo).Execute()
+	})
 }

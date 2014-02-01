@@ -4,6 +4,7 @@ import (
 	"cf"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
+	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
 	"testing"
 )
@@ -28,7 +29,8 @@ func TestApplicationReqExecuteWhenApplicationNotFound(t *testing.T) {
 	ui := new(testterm.FakeUI)
 
 	appReq := newApplicationRequirement("foo", ui, appRepo)
-	success := appReq.Execute()
 
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		appReq.Execute()
+	})
 }
