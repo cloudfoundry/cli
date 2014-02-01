@@ -189,6 +189,7 @@ func TestListEventsUsingNewEndpoint(t *testing.T) {
 
 	assert.True(t, apiResponse.IsSuccessful())
 	assert.True(t, deps.handler.AllRequestsCalled())
+
 	assert.Equal(t, len(events), 2)
 	assert.Equal(t, events[0].Guid, "event-1-guid")
 	assert.Equal(t, events[0].Name, "audit.app.update")
@@ -252,7 +253,7 @@ func TestUnmarshalNewCrashEvent(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	eventFields := resource.ToFields()
+	eventFields := resource.ToFields().(cf.EventFields)
 	assert.Equal(t, eventFields.Guid, "event-1-guid")
 	assert.Equal(t, eventFields.Name, "app.crash")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"))
@@ -283,7 +284,7 @@ func TestUnmarshalUpdateAppEvent(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	eventFields := resource.ToFields()
+	eventFields := resource.ToFields().(cf.EventFields)
 	assert.Equal(t, eventFields.Guid, "event-1-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.update")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
@@ -309,7 +310,7 @@ func TestUnmarshalUpdateAppEvent(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	eventFields = resource.ToFields()
+	eventFields = resource.ToFields().(cf.EventFields)
 	assert.Equal(t, eventFields.Guid, "event-1-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.update")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
@@ -337,7 +338,7 @@ func TestUnmarshalDeleteAppEvent(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	eventFields := resource.ToFields()
+	eventFields := resource.ToFields().(cf.EventFields)
 	assert.Equal(t, eventFields.Guid, "event-2-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.delete-request")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00"))
@@ -371,7 +372,7 @@ func TestUnmarshalNewV2CreateEvent(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	eventFields := resource.ToFields()
+	eventFields := resource.ToFields().(cf.EventFields)
 	assert.Equal(t, eventFields.Guid, "event-1-guid")
 	assert.Equal(t, eventFields.Name, "audit.app.create")
 	assert.Equal(t, eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-22T19:34:16+00:00"))

@@ -14,67 +14,33 @@ import (
 
 const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"
 
-type PaginatedEventsResources interface {
-	ToEventFields() []cf.EventFields
-	NextUrl() string
-}
-
-type PaginatedEventResourcesOldV2 struct {
-	Resources []EventResource
-	NextURL   string `json:"next_url"`
-}
-
-func (res PaginatedEventResourcesOldV2) ToEventFields() (events []cf.EventFields) {
-	for _, resource := range res.Resources {
-		events = append(events, resource.ToFields())
-	}
-	return
-}
-
-func (res PaginatedEventResourcesOldV2) NextUrl() string {
-	return res.NextURL
-}
-
-type EventResource struct {
+type EventResourceOldV2 struct {
 	Resource
-	Entity EventEntity
+	Entity struct {
+		Timestamp       time.Time
+		ExitDescription string `json:"exit_description"`
+		ExitStatus      int    `json:"exit_status"`
+		InstanceIndex   int    `json:"instance_index"`
+	}
 }
 
-func (resource EventResource) ToFields() (event cf.EventFields) {
+func (resource EventResourceOldV2) ToFields() interface{} {
+	event := cf.EventFields{}
 	description := fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus))
 	event.Guid = resource.Metadata.Guid
 	event.Name = "app crashed"
 	event.Timestamp = resource.Entity.Timestamp
 	event.Description = description
-	return
-}
-
-type EventEntity struct {
-	Timestamp       time.Time
-	ExitDescription string `json:"exit_description"`
-	ExitStatus      int    `json:"exit_status"`
-	InstanceIndex   int    `json:"instance_index"`
-}
-
-type PaginatedEventResourcesNewV2 struct {
-	Resources []EventResourceNewV2
-	NextURL   string `json:"next_url"`
-}
-
-func (res PaginatedEventResourcesNewV2) ToEventFields() (events []cf.EventFields) {
-	for _, resource := range res.Resources {
-		events = append(events, resource.ToFields())
-	}
-	return
-}
-
-func (res PaginatedEventResourcesNewV2) NextUrl() string {
-	return res.NextURL
+	return event
 }
 
 type EventResourceNewV2 struct {
 	Resource
-	Entity EventEntityNewV2
+	Entity struct {
+		Timestamp time.Time
+		Type      string
+		Metadata  map[string]interface{}
+	}
 }
 
 var KNOWN_METADATA_KEYS = []string{
@@ -91,7 +57,8 @@ var KNOWN_METADATA_KEYS = []string{
 	"environment_json",
 }
 
-func (resource EventResourceNewV2) ToFields() (event cf.EventFields) {
+func (resource EventResourceNewV2) ToFields() interface{} {
+	event := cf.EventFields{}
 	event.Guid = resource.Metadata.Guid
 	event.Name = resource.Entity.Type
 	event.Timestamp = resource.Entity.Timestamp
@@ -100,10 +67,9 @@ func (resource EventResourceNewV2) ToFields() (event cf.EventFields) {
 	if metadata.Has("request") {
 		metadata = generic.NewMap(metadata.Get("request"))
 	}
-
 	event.Description = formatDescription(metadata, KNOWN_METADATA_KEYS)
 
-	return
+	return event
 }
 
 func formatDescription(metadata generic.Map, keys []string) string {
@@ -134,12 +100,6 @@ func String(val interface{}) string {
 	}
 }
 
-type EventEntityNewV2 struct {
-	Timestamp time.Time
-	Type      string
-	Metadata  map[string]interface{}
-}
-
 type ListEventsCallback func(events []cf.EventFields) (fetchNext bool)
 
 type AppEventsRepository interface {
@@ -167,15 +127,15 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb Lis
 
 func (repo CloudControllerAppEventsRepository) newV2ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse {
 	path := fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid)))
-	return repo.listEvents(path, &PaginatedEventResourcesNewV2{}, cb)
+	return repo.listEvents(path, NewPaginatedResources(EventResourceNewV2{}), cb)
 }
 
 func (repo CloudControllerAppEventsRepository) oldV2ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse {
 	path := fmt.Sprintf("/v2/apps/%s/events", appGuid)
-	return repo.listEvents(path, &PaginatedEventResourcesOldV2{}, cb)
+	return repo.listEvents(path, NewPaginatedResources(EventResourceOldV2{}), cb)
 }
 
-func (repo CloudControllerAppEventsRepository) listEvents(path string, eventResources PaginatedEventsResources, cb ListEventsCallback) (apiResponse net.ApiResponse) {
+func (repo CloudControllerAppEventsRepository) listEvents(path string, eventResources PaginatedResources, cb ListEventsCallback) (apiResponse net.ApiResponse) {
 	fetchNext := true
 
 	for fetchNext {
@@ -183,18 +143,21 @@ func (repo CloudControllerAppEventsRepository) listEvents(path string, eventReso
 
 		url := fmt.Sprintf("%s%s", repo.config.Target, path)
 
-		apiResponse = repo.gateway.GetResource(url, repo.config.AccessToken, eventResources)
+		apiResponse = repo.gateway.GetResource(url, repo.config.AccessToken, &eventResources)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
 
-		events := eventResources.ToEventFields()
+		events := make([]cf.EventFields, 0, len(eventResources.Resources()))
+		for _, resource := range eventResources.Resources() {
+			events = append(events, resource.ToFields().(cf.EventFields))
+		}
 
 		if len(events) > 0 {
 			shouldFetch = cb(events)
 		}
 
-		path = eventResources.NextUrl()
+		path = eventResources.NextURL
 
 		fetchNext = shouldFetch && path != ""
 	}
