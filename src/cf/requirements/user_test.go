@@ -29,10 +29,10 @@ func TestUserReqWhenUserDoesNotExist(t *testing.T) {
 	userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
 	ui := new(testterm.FakeUI)
 
-	userReq := newUserRequirement("foo", ui, userRepo)
-	success := userReq.Execute()
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		newUserRequirement("foo", ui, userRepo).Execute()
+	})
 
-	assert.False(t, success)
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"UserFields not found"},

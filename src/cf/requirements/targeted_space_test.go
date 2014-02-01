@@ -29,9 +29,10 @@ func TestSpaceRequirement(t *testing.T) {
 
 	config.SpaceFields = cf.SpaceFields{}
 
-	req = newTargetedSpaceRequirement(ui, config)
-	success = req.Execute()
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		newTargetedSpaceRequirement(ui, config).Execute()
+	})
+
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"No space targeted"},
@@ -40,9 +41,10 @@ func TestSpaceRequirement(t *testing.T) {
 	ui.ClearOutputs()
 	config.OrganizationFields = cf.OrganizationFields{}
 
-	req = newTargetedSpaceRequirement(ui, config)
-	success = req.Execute()
-	assert.False(t, success)
+	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
+		newTargetedSpaceRequirement(ui, config).Execute()
+	})
+
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
 		{"No org and space targeted"},

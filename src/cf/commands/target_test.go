@@ -171,7 +171,7 @@ func TestTargetSpaceWhenUserDoesNotHaveAccess(t *testing.T) {
 
 	savedConfig := testconfig.SavedConfiguration
 	assert.Equal(t, savedConfig.SpaceFields.Guid, "")
-	assert.True(t, ui.ShowConfigurationCalled)
+	assert.False(t, ui.ShowConfigurationCalled)
 }
 
 func TestTargetSpaceWhenSpaceNotFound(t *testing.T) {
@@ -235,7 +235,7 @@ func TestTargetOrganizationAndSpaceWhenSpaceFails(t *testing.T) {
 	ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, configRepo, orgRepo, spaceRepo)
 
 	savedConfig := testconfig.SavedConfiguration
-	assert.True(t, ui.ShowConfigurationCalled)
+	assert.False(t, ui.ShowConfigurationCalled)
 
 	assert.Equal(t, orgRepo.FindByNameName, "my-organization")
 	assert.Equal(t, savedConfig.OrganizationFields.Guid, "my-organization-guid")

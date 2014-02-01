@@ -222,6 +222,7 @@ func TestStartApplicationWhenAppHasNoURL(t *testing.T) {
 	appInstance.State = cf.InstanceRunning
 	instances := [][]cf.AppInstanceFields{
 		[]cf.AppInstanceFields{appInstance},
+		[]cf.AppInstanceFields{appInstance},
 	}
 
 	errorCodes := []string{""}
@@ -344,7 +345,7 @@ func TestStartApplicationWhenStartTimesOut(t *testing.T) {
 		[]cf.AppInstanceFields{appInstance5, appInstance6},
 	}
 
-	errorCodes := []string{"500", "500", "500"}
+	errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, cf.APP_NOT_STAGED}
 
 	ui, _, _, _ := startAppWithInstancesAndErrors(t, displayApp, defaultAppForStart, instances, errorCodes, 0)
 

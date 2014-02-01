@@ -20,6 +20,8 @@ func TestPasswordRequiresValidAccessToken(t *testing.T) {
 	assert.False(t, testcmd.CommandDidPassRequirements)
 
 	deps.ReqFactory.ValidAccessTokenSuccess = true
+	deps.PwdRepo.UpdateUnauthorized = false
+
 	callPassword([]string{"", "", ""}, deps)
 	assert.True(t, testcmd.CommandDidPassRequirements)
 }

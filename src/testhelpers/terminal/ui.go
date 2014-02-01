@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const FailedWasCalled = "FailedWasCalled"
+
 type FakeUI struct {
 	Outputs                    []string
 	Prompts                    []string
@@ -71,6 +73,7 @@ func (ui *FakeUI) Ok() {
 func (ui *FakeUI) Failed(message string, args ...interface{}) {
 	ui.Say("FAILED")
 	ui.Say(message, args...)
+	panic(FailedWasCalled)
 	return
 }
 

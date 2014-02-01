@@ -69,7 +69,7 @@ func callLogin(t *testing.T, c *LoginTestContext, beforeBlock func(*LoginTestCon
 	beforeBlock(c)
 
 	l := NewLogin(c.ui, c.configRepo, c.authRepo, c.endpointRepo, c.orgRepo, c.spaceRepo)
-	l.Run(testcmd.NewContext("login", c.Flags))
+	testcmd.RunCommand(l, testcmd.NewContext("login", c.Flags), nil)
 }
 
 func TestSuccessfullyLoggingInWithNumericalPrompts(t *testing.T) {

@@ -62,6 +62,18 @@ func AssertNoErrors(t *testing.T, errs []error) {
 	}
 }
 
+func AssertPanic(t *testing.T, panicValue interface{}, callback func()) {
+	defer func() {
+		value := recover()
+		if value != panicValue {
+			panic(value)
+		}
+	}()
+
+	callback()
+	t.Error("Expected a panic, but got none!")
+}
+
 // getWhitespaceString returns a string that is long enough to overwrite the default
 // output from the go testing framework.
 func getWhitespaceString() string {
