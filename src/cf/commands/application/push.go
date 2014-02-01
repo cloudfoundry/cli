@@ -386,8 +386,7 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 }
 
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
-	baseManifestPath, manifestFilename := cmd.manifestPathFromContext(c)
-	m := cmd.instantiateManifest(c, baseManifestPath, manifestFilename)
+	m := cmd.instantiateManifest(c)
 
 	appParams, err := cf.NewAppParamsFromContext(c)
 	if err != nil {
@@ -408,27 +407,20 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 	return
 }
 
-func (cmd *Push) manifestPathFromContext(c *cli.Context) (basePath, manifestFilename string) {
-	var err error
-	basePath, manifestFilename, err = cmd.manifestRepo.ManifestPath(c.String("f"))
+func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
+	basePath, manifestFilename, err := cmd.manifestRepo.ManifestPath(c.String("f"))
 
 	if err != nil {
 		cmd.ui.Failed("%s", err)
 		return
 	}
 
-	return
-}
-
-func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath, manifestFilename string) (m *manifest.Manifest) {
-	fullManifestPath := filepath.Join(manifestPath, manifestFilename)
-
 	if c.Bool("no-manifest") {
 		m = manifest.NewEmptyManifest()
 		return
 	}
 
-	m, errs := cmd.manifestRepo.ReadManifest(fullManifestPath)
+	m, errs := cmd.manifestRepo.ReadManifest(filepath.Join(basePath, manifestFilename))
 
 	if !errs.Empty() {
 		if os.IsNotExist(errs[0]) && c.String("f") == "" {
@@ -440,20 +432,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context, manifestPath, manifestFilen
 		}
 	}
 
-	// update paths in manifests to be relative to its directory
-	for _, app := range m.Applications {
-		if app.Has("path") {
-			path := app.Get("path").(string)
-			if filepath.IsAbs(path) {
-				path = filepath.Clean(path)
-			} else {
-				path = filepath.Join(manifestPath, path)
-			}
-			app.Set("path", path)
-		}
-	}
-
-	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(fullManifestPath))
+	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(filepath.Join(basePath, manifestFilename)))
 	return
 }
 

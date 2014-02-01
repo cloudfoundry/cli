@@ -10,7 +10,7 @@ import (
 )
 
 func TestManifestWithGlobalAndAppSpecificProperties(t *testing.T) {
-	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"instances": "3",
 		"memory":    "512M",
 		"applications": []interface{}{
@@ -29,7 +29,7 @@ func TestManifestWithGlobalAndAppSpecificProperties(t *testing.T) {
 }
 
 func TestManifestWithInvalidMemory(t *testing.T) {
-	_, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+	_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"instances": "3",
 		"memory":    "512",
 		"applications": []interface{}{
@@ -43,8 +43,8 @@ func TestManifestWithInvalidMemory(t *testing.T) {
 	assert.Contains(t, err.Error(), "memory")
 }
 
-func TestParsingManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
-	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+func TestManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
+	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
 				"name":    "bitcoin-miner",
@@ -58,8 +58,8 @@ func TestParsingManifestWithTimeoutSetsHealthCheckTimeout(t *testing.T) {
 	assert.False(t, m.Applications[0].Has("timeout"))
 }
 
-func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
-	_, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+func TestManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
+	_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"env": map[string]interface{}{
 			"bar": nil,
 		},
@@ -74,8 +74,34 @@ func TestParsingManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
 	assert.Contains(t, err.Error(), "env var 'bar' should not be null")
 }
 
+func TestManifestWithAbsolutePath(t *testing.T) {
+	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{
+				"path": "/another/path-segment",
+			},
+		},
+	}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("path"), "/another/path-segment")
+}
+
+func TestManifestWithRelativePath(t *testing.T) {
+	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{
+				"path": "../another/path-segment",
+			},
+		},
+	}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("path"), "/some/another/path-segment")
+}
+
 func TestParsingManifestWithNulls(t *testing.T) {
-	_, errs := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+	_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
 				"buildpack":  nil,
@@ -106,7 +132,7 @@ func TestParsingManifestWithNulls(t *testing.T) {
 }
 
 func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
-	_, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+	_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
 				"env": map[string]interface{}{
@@ -121,7 +147,7 @@ func TestParsingManifestWithPropertiesReturnsErrors(t *testing.T) {
 }
 
 func TestParsingManifestWithNullCommand(t *testing.T) {
-	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
 				"command": nil,
@@ -134,7 +160,7 @@ func TestParsingManifestWithNullCommand(t *testing.T) {
 }
 
 func TestParsingEmptyManifestDoesNotSetCommand(t *testing.T) {
-	m, err := manifest.NewManifest(generic.NewMap(map[string]interface{}{
+	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{},
 		},

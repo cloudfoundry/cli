@@ -25,13 +25,19 @@ func NewManifestDiskRepository() (repo ManifestRepository) {
 func (repo ManifestDiskRepository) ReadManifest(path string) (m *Manifest, errs ManifestErrors) {
 	m = NewEmptyManifest()
 
+	basePath, _, err := repo.ManifestPath(path)
+	if err != nil {
+		errs = append(errs, err)
+		return
+	}
+
 	mapp, err := repo.readAllYAMLFiles(path)
 	if err != nil {
 		errs = append(errs, err)
 		return
 	}
 
-	m, errs = NewManifest(mapp)
+	m, errs = NewManifest(basePath, mapp)
 	if !errs.Empty() {
 		return
 	}

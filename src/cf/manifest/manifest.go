@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"generic"
+	"path/filepath"
 	"regexp"
 	"strconv"
 )
@@ -32,18 +33,18 @@ type Manifest struct {
 }
 
 func NewEmptyManifest() (m *Manifest) {
-	m, _ = NewManifest(generic.NewMap())
+	m, _ = NewManifest("", generic.NewMap())
 	return m
 }
 
-func NewManifest(data generic.Map) (m *Manifest, errs ManifestErrors) {
+func NewManifest(basePath string, data generic.Map) (m *Manifest, errs ManifestErrors) {
 	errs = walkManifestLookingForProperties(data)
 	if !errs.Empty() {
 		return
 	}
 
 	m = &Manifest{}
-	m.Applications, errs = mapToAppSet(data)
+	m.Applications, errs = mapToAppSet(basePath, data)
 	return
 }
 
@@ -77,7 +78,7 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 	return
 }
 
-func mapToAppSet(data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
+func mapToAppSet(basePath string, data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
 	appSet = make([]cf.AppParams, 0)
 
 	if data.Has("applications") {
@@ -98,7 +99,7 @@ func mapToAppSet(data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
 
 			appMap := generic.DeepMerge(data, generic.NewMap(appData))
 
-			appParams, appErrs := mapToAppParams(appMap)
+			appParams, appErrs := mapToAppParams(basePath, appMap)
 			if !appErrs.Empty() {
 				errs = append(errs, appErrs)
 				continue
@@ -111,7 +112,7 @@ func mapToAppSet(data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
 	return
 }
 
-func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestErrors) {
+func mapToAppParams(basePath string, yamlMap generic.Map) (appParams cf.AppParams, errs ManifestErrors) {
 	appParams = cf.NewEmptyAppParams()
 
 	errs = checkForNulls(yamlMap)
@@ -123,6 +124,16 @@ func mapToAppParams(yamlMap generic.Map) (appParams cf.AppParams, errs ManifestE
 		if yamlMap.Has(key) {
 			handler(appParams, yamlMap, key, &errs)
 		}
+	}
+
+	if appParams.Has("path") {
+		path := appParams.Get("path").(string)
+		if filepath.IsAbs(path) {
+			path = filepath.Clean(path)
+		} else {
+			path = filepath.Join(basePath, path)
+		}
+		appParams.Set("path", path)
 	}
 
 	return

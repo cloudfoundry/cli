@@ -36,7 +36,7 @@ func singleAppManifest() *manifest.Manifest {
 				"timeout":   uint64(360),
 				"buildpack": "some-buildpack",
 				"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-				"path":      "../../fixtures/example-app",
+				"path":      "/some/path/from/manifest",
 				"env": generic.NewMap(map[string]interface{}{
 					"FOO":  "baz",
 					"PATH": "/u/apps/my-app/bin",
@@ -361,7 +361,7 @@ func TestPushingAppWithSingleAppManifest(t *testing.T) {
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("stack").(string), "custom-stack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
 	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Clean("../../fixtures/example-app"))
+	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Clean("/some/path/from/manifest"))
 
 	assert.True(t, deps.appRepo.CreatedAppParams().Has("env"))
 	envVars := deps.appRepo.CreatedAppParams().Get("env").(generic.Map)
@@ -553,28 +553,11 @@ func TestPushingWithRelativeAppPath(t *testing.T) {
 	assert.Equal(t, deps.appBitsRepo.UploadedDir, filepath.Join(dir, "../../../fixtures/example-app"))
 }
 
-func TestPushingWithRelativeManifestPath(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-
-	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
-	deps.manifestRepo.ManifestDir = "returned/path/"
-	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
-
-	_ = callPush(t, []string{
-		"-f", "user/supplied/path/different-manifest.yml",
-	}, deps)
-
-	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "user/supplied/path/different-manifest.yml")
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, filepath.Clean("returned/path/different-manifest.yml"))
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path").(string), filepath.Join("returned/path/", "../../fixtures/example-app"))
-}
-
 func TestPushingWithBadManifestPath(t *testing.T) {
 	deps := getPushDependencies()
 	deps.appRepo.ReadNotFound = true
 
-	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
+	deps.manifestRepo.ReadManifestManifest = manifest.NewEmptyManifest()
 	deps.manifestRepo.ManifestPathErr = errors.New("read manifest error")
 
 	ui := callPush(t, []string{
@@ -602,42 +585,6 @@ func TestPushingWithDefaultManifestNotFound(t *testing.T) {
 	})
 	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
 		{"FAILED"},
-	})
-}
-
-func TestPushingWithSpecifiedManifestNotFound(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
-	deps.manifestRepo.ManifestPathErr = syscall.ENOENT
-
-	ui := callPush(t, []string{
-		"-f", "bad/manifest/path",
-	}, deps)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-	})
-}
-
-func TestPushingWithRelativeAppPathFromManifestFile(t *testing.T) {
-	deps := getPushDependencies()
-	deps.appRepo.ReadNotFound = true
-	deps.manifestRepo.ReadManifestManifest = singleAppManifest()
-	deps.manifestRepo.ManifestDir = "some/relative/path/"
-	deps.manifestRepo.ManifestFilename = "different-manifest.yml"
-
-	ui := callPush(t, []string{
-		"-f", "some/relative/path/different-manifest.yml",
-	}, deps)
-
-	expectedManifestPath := filepath.Clean("some/relative/path/different-manifest.yml")
-	assert.Equal(t, deps.manifestRepo.UserSpecifiedPath, "some/relative/path/different-manifest.yml")
-	assert.Equal(t, deps.manifestRepo.ReadManifestPath, expectedManifestPath)
-	assert.Equal(t, deps.appRepo.CreatedAppParams().Get("path"), filepath.Clean("some/fixtures/example-app"))
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Using manifest file", expectedManifestPath},
 	})
 }
 
