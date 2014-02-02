@@ -1,12 +1,11 @@
 Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 =================
 
-This is the official command line client for Cloud Foundry.
-You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
+This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release. 
 
 Downloading Edge
 ================
-The latest binary builds and installers are published to Amazon S3 buckets.
+Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are not intended for wider use, but for developers to test new features and fixes as they are completed. 
 
 Binaries:
 - http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz
@@ -15,14 +14,7 @@ Binaries:
 - http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip
 - http://go-cli.s3.amazonaws.com/cf-windows-386.zip
 
-Installers:
-- http://go-cli.s3.amazonaws.com/installer-osx-amd64.pkg
-- http://go-cli.s3.amazonaws.com/cf-cli_amd64.deb
-- http://go-cli.s3.amazonaws.com/cf-cli_i386.deb
-- http://go-cli.s3.amazonaws.com/cf-cli_amd64.rpm
-- http://go-cli.s3.amazonaws.com/cf-cli_i386.rpm
-- http://go-cli.s3.amazonaws.com/installer-windows-amd64.zip
-- http://go-cli.s3.amazonaws.com/installer-windows-386.zip
+You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
 Cloning the repository
 ======================
