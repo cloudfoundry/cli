@@ -5,9 +5,7 @@ This is the official command line client for Cloud Foundry. [cf v6.0.0](https://
 
 Downloading Edge
 ================
-Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are not intended for wider use, but for developers to test new features and fixes as they are completed. 
-
-Binaries:
+Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are not intended for wider use, but for developers to test new features and fixes as they are completed. Download edge:
 - http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz
 - http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz
 - http://go-cli.s3.amazonaws.com/cf-linux-386.tgz
