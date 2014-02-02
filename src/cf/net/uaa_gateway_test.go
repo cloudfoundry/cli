@@ -3,10 +3,11 @@ package net_test
 import (
 	. "cf/net"
 	"fmt"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 )
 
 var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) {
@@ -15,18 +16,23 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-func TestUAAGatewayErrorHandling(t *testing.T) {
-	gateway := NewUAAGateway()
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestUAAGatewayErrorHandling", func() {
 
-	ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
-	defer ts.Close()
+			gateway := NewUAAGateway()
 
-	request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-	assert.False(t, apiResponse.IsNotSuccessful())
+			ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
+			defer ts.Close()
 
-	apiResponse = gateway.PerformRequest(request)
+			request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Contains(t, apiResponse.Message, "The foo is wrong")
-	assert.Contains(t, apiResponse.ErrorCode, "foo")
+			apiResponse = gateway.PerformRequest(request)
+
+			assert.True(mr.T(), apiResponse.IsNotSuccessful())
+			assert.Contains(mr.T(), apiResponse.Message, "The foo is wrong")
+			assert.Contains(mr.T(), apiResponse.ErrorCode, "foo")
+		})
+	})
 }

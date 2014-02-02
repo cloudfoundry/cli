@@ -4,74 +4,18 @@ import (
 	"cf"
 	"cf/commands/organization"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestSetQuotaFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	quotaRepo := &testapi.FakeQuotaRepository{}
-
-	ui := callSetQuota(t, []string{}, reqFactory, quotaRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callSetQuota(t, []string{"org"}, reqFactory, quotaRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callSetQuota(t, []string{"org", "quota"}, reqFactory, quotaRepo)
-	assert.False(t, ui.FailedWithUsage)
-
-	ui = callSetQuota(t, []string{"org", "quota", "extra-stuff"}, reqFactory, quotaRepo)
-	assert.True(t, ui.FailedWithUsage)
-}
-
-func TestSetQuotaRequirements(t *testing.T) {
-	quotaRepo := &testapi.FakeQuotaRepository{}
-
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callSetQuota(t, []string{"my-org", "my-quota"}, reqFactory, quotaRepo)
-
-	assert.True(t, testcmd.CommandDidPassRequirements)
-	assert.Equal(t, reqFactory.OrganizationName, "my-org")
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	callSetQuota(t, []string{"my-org", "my-quota"}, reqFactory, quotaRepo)
-
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestSetQuota(t *testing.T) {
-	org := cf.Organization{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
-
-	quota := cf.QuotaFields{}
-	quota.Name = "my-found-quota"
-	quota.Guid = "my-quota-guid"
-
-	quotaRepo := &testapi.FakeQuotaRepository{FindByNameQuota: quota}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
-
-	ui := callSetQuota(t, []string{"my-org", "my-quota"}, reqFactory, quotaRepo)
-
-	assert.Equal(t, quotaRepo.FindByNameName, "my-quota")
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Setting quota", "my-found-quota", "my-org", "my-user"},
-		{"OK"},
-	})
-
-	assert.Equal(t, quotaRepo.UpdateOrgGuid, "my-org-guid")
-	assert.Equal(t, quotaRepo.UpdateQuotaGuid, "my-quota-guid")
-}
-
-func callSetQuota(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (ui *testterm.FakeUI) {
+func callSetQuota(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-quota", args)
 
@@ -95,4 +39,64 @@ func callSetQuota(t *testing.T, args []string, reqFactory *testreq.FakeReqFactor
 	cmd := organization.NewSetQuota(ui, config, quotaRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSetQuotaFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+			quotaRepo := &testapi.FakeQuotaRepository{}
+
+			ui := callSetQuota(mr.T(), []string{}, reqFactory, quotaRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callSetQuota(mr.T(), []string{"org"}, reqFactory, quotaRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callSetQuota(mr.T(), []string{"org", "quota"}, reqFactory, quotaRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+
+			ui = callSetQuota(mr.T(), []string{"org", "quota", "extra-stuff"}, reqFactory, quotaRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestSetQuotaRequirements", func() {
+
+			quotaRepo := &testapi.FakeQuotaRepository{}
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			callSetQuota(mr.T(), []string{"my-org", "my-quota"}, reqFactory, quotaRepo)
+
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+			assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+			callSetQuota(mr.T(), []string{"my-org", "my-quota"}, reqFactory, quotaRepo)
+
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestSetQuota", func() {
+
+			org := cf.Organization{}
+			org.Name = "my-org"
+			org.Guid = "my-org-guid"
+
+			quota := cf.QuotaFields{}
+			quota.Name = "my-found-quota"
+			quota.Guid = "my-quota-guid"
+
+			quotaRepo := &testapi.FakeQuotaRepository{FindByNameQuota: quota}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
+
+			ui := callSetQuota(mr.T(), []string{"my-org", "my-quota"}, reqFactory, quotaRepo)
+
+			assert.Equal(mr.T(), quotaRepo.FindByNameName, "my-quota")
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Setting quota", "my-found-quota", "my-org", "my-user"},
+				{"OK"},
+			})
+
+			assert.Equal(mr.T(), quotaRepo.UpdateOrgGuid, "my-org-guid")
+			assert.Equal(mr.T(), quotaRepo.UpdateQuotaGuid, "my-quota-guid")
+		})
+	})
 }

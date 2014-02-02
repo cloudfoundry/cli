@@ -1,28 +1,34 @@
 package cf
 
 import (
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
-func TestRouteURL(t *testing.T) {
-	route := Route{}
-	route.Host = "foo"
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestRouteURL", func() {
 
-	domain := DomainFields{}
-	domain.Name = "example.com"
-	route.Domain = domain
+			route := Route{}
+			route.Host = "foo"
 
-	assert.Equal(t, route.URL(), "foo.example.com")
-}
+			domain := DomainFields{}
+			domain.Name = "example.com"
+			route.Domain = domain
 
-func TestRouteURLWithoutHost(t *testing.T) {
-	route := Route{}
-	route.Host = ""
+			assert.Equal(mr.T(), route.URL(), "foo.example.com")
+		})
+		It("TestRouteURLWithoutHost", func() {
 
-	domain := DomainFields{}
-	domain.Name = "example.com"
-	route.Domain = domain
+			route := Route{}
+			route.Host = ""
 
-	assert.Equal(t, route.URL(), "example.com")
+			domain := DomainFields{}
+			domain.Name = "example.com"
+			route.Domain = domain
+
+			assert.Equal(mr.T(), route.URL(), "example.com")
+		})
+	})
 }

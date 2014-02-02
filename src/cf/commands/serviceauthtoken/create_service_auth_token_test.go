@@ -4,66 +4,18 @@ import (
 	"cf"
 	. "cf/commands/serviceauthtoken"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestCreateServiceAuthTokenFailsWithUsage(t *testing.T) {
-	authTokenRepo := &testapi.FakeAuthTokenRepo{}
-	reqFactory := &testreq.FakeReqFactory{}
-
-	ui := callCreateServiceAuthToken(t, []string{}, reqFactory, authTokenRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateServiceAuthToken(t, []string{"arg1"}, reqFactory, authTokenRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateServiceAuthToken(t, []string{"arg1", "arg2"}, reqFactory, authTokenRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateServiceAuthToken(t, []string{"arg1", "arg2", "arg3"}, reqFactory, authTokenRepo)
-	assert.False(t, ui.FailedWithUsage)
-}
-
-func TestCreateServiceAuthTokenRequirements(t *testing.T) {
-	authTokenRepo := &testapi.FakeAuthTokenRepo{}
-	reqFactory := &testreq.FakeReqFactory{}
-	args := []string{"arg1", "arg2", "arg3"}
-
-	reqFactory.LoginSuccess = true
-	callCreateServiceAuthToken(t, args, reqFactory, authTokenRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory.LoginSuccess = false
-	callCreateServiceAuthToken(t, args, reqFactory, authTokenRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestCreateServiceAuthToken(t *testing.T) {
-	authTokenRepo := &testapi.FakeAuthTokenRepo{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	args := []string{"a label", "a provider", "a value"}
-
-	ui := callCreateServiceAuthToken(t, args, reqFactory, authTokenRepo)
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating service auth token as", "my-user"},
-		{"OK"},
-	})
-
-	authToken := cf.ServiceAuthTokenFields{}
-	authToken.Label = "a label"
-	authToken.Provider = "a provider"
-	authToken.Token = "a value"
-	assert.Equal(t, authTokenRepo.CreatedServiceAuthTokenFields, authToken)
-}
-
-func callCreateServiceAuthToken(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callCreateServiceAuthToken(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
@@ -85,4 +37,56 @@ func callCreateServiceAuthToken(t *testing.T, args []string, reqFactory *testreq
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestCreateServiceAuthTokenFailsWithUsage", func() {
+			authTokenRepo := &testapi.FakeAuthTokenRepo{}
+			reqFactory := &testreq.FakeReqFactory{}
+
+			ui := callCreateServiceAuthToken(mr.T(), []string{}, reqFactory, authTokenRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateServiceAuthToken(mr.T(), []string{"arg1"}, reqFactory, authTokenRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateServiceAuthToken(mr.T(), []string{"arg1", "arg2"}, reqFactory, authTokenRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateServiceAuthToken(mr.T(), []string{"arg1", "arg2", "arg3"}, reqFactory, authTokenRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestCreateServiceAuthTokenRequirements", func() {
+
+			authTokenRepo := &testapi.FakeAuthTokenRepo{}
+			reqFactory := &testreq.FakeReqFactory{}
+			args := []string{"arg1", "arg2", "arg3"}
+
+			reqFactory.LoginSuccess = true
+			callCreateServiceAuthToken(mr.T(), args, reqFactory, authTokenRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory.LoginSuccess = false
+			callCreateServiceAuthToken(mr.T(), args, reqFactory, authTokenRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestCreateServiceAuthToken", func() {
+
+			authTokenRepo := &testapi.FakeAuthTokenRepo{}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			args := []string{"a label", "a provider", "a value"}
+
+			ui := callCreateServiceAuthToken(mr.T(), args, reqFactory, authTokenRepo)
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating service auth token as", "my-user"},
+				{"OK"},
+			})
+
+			authToken := cf.ServiceAuthTokenFields{}
+			authToken.Label = "a label"
+			authToken.Provider = "a provider"
+			authToken.Token = "a value"
+			assert.Equal(mr.T(), authTokenRepo.CreatedServiceAuthTokenFields, authToken)
+		})
+	})
 }

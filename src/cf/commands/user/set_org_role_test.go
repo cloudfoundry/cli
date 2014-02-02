@@ -4,75 +4,18 @@ import (
 	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestSetOrgRoleFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	userRepo := &testapi.FakeUserRepository{}
-
-	ui := callSetOrgRole(t, []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
-	assert.False(t, ui.FailedWithUsage)
-
-	ui = callSetOrgRole(t, []string{"my-user", "my-org"}, reqFactory, userRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callSetOrgRole(t, []string{"my-user"}, reqFactory, userRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callSetOrgRole(t, []string{}, reqFactory, userRepo)
-	assert.True(t, ui.FailedWithUsage)
-}
-
-func TestSetOrgRoleRequirements(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	userRepo := &testapi.FakeUserRepository{}
-
-	reqFactory.LoginSuccess = false
-	callSetOrgRole(t, []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory.LoginSuccess = true
-	callSetOrgRole(t, []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	assert.Equal(t, reqFactory.UserUsername, "my-user")
-	assert.Equal(t, reqFactory.OrganizationName, "my-org")
-}
-
-func TestSetOrgRole(t *testing.T) {
-	org := cf.Organization{}
-	org.Guid = "my-org-guid"
-	org.Name = "my-org"
-	user := cf.UserFields{}
-	user.Guid = "my-user-guid"
-	user.Username = "my-user"
-	reqFactory := &testreq.FakeReqFactory{
-		LoginSuccess: true,
-		UserFields:   user,
-		Organization: org,
-	}
-	userRepo := &testapi.FakeUserRepository{}
-
-	ui := callSetOrgRole(t, []string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Assigning role", "OrgManager", "my-user", "my-org", "current-user"},
-		{"OK"},
-	})
-	assert.Equal(t, userRepo.SetOrgRoleUserGuid, "my-user-guid")
-	assert.Equal(t, userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
-	assert.Equal(t, userRepo.SetOrgRoleRole, cf.ORG_MANAGER)
-}
-
-func callSetOrgRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSetOrgRole(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-org-role", args)
 
@@ -93,4 +36,65 @@ func callSetOrgRole(t *testing.T, args []string, reqFactory *testreq.FakeReqFact
 	cmd := NewSetOrgRole(ui, config, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSetOrgRoleFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+			userRepo := &testapi.FakeUserRepository{}
+
+			ui := callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+
+			ui = callSetOrgRole(mr.T(), []string{"my-user", "my-org"}, reqFactory, userRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callSetOrgRole(mr.T(), []string{"my-user"}, reqFactory, userRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callSetOrgRole(mr.T(), []string{}, reqFactory, userRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestSetOrgRoleRequirements", func() {
+
+			reqFactory := &testreq.FakeReqFactory{}
+			userRepo := &testapi.FakeUserRepository{}
+
+			reqFactory.LoginSuccess = false
+			callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory.LoginSuccess = true
+			callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+			assert.Equal(mr.T(), reqFactory.UserUsername, "my-user")
+			assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+		})
+		It("TestSetOrgRole", func() {
+
+			org := cf.Organization{}
+			org.Guid = "my-org-guid"
+			org.Name = "my-org"
+			user := cf.UserFields{}
+			user.Guid = "my-user-guid"
+			user.Username = "my-user"
+			reqFactory := &testreq.FakeReqFactory{
+				LoginSuccess: true,
+				UserFields:   user,
+				Organization: org,
+			}
+			userRepo := &testapi.FakeUserRepository{}
+
+			ui := callSetOrgRole(mr.T(), []string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Assigning role", "OrgManager", "my-user", "my-org", "current-user"},
+				{"OK"},
+			})
+			assert.Equal(mr.T(), userRepo.SetOrgRoleUserGuid, "my-user-guid")
+			assert.Equal(mr.T(), userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
+			assert.Equal(mr.T(), userRepo.SetOrgRoleRole, cf.ORG_MANAGER)
+		})
+	})
 }

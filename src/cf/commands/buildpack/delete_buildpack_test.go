@@ -4,155 +4,161 @@ import (
 	"cf"
 	. "cf/commands/buildpack"
 	"cf/net"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestDeleteBuildpackGetRequirements(t *testing.T) {
-	ui := &testterm.FakeUI{Inputs: []string{"y"}}
-	buildpackRepo := &testapi.FakeBuildpackRepository{}
-	cmd := NewDeleteBuildpack(ui, buildpackRepo)
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestDeleteBuildpackGetRequirements", func() {
 
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
+			ui := &testterm.FakeUI{Inputs: []string{"y"}}
+			buildpackRepo := &testapi.FakeBuildpackRepository{}
+			cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
 
-	assert.True(t, testcmd.CommandDidPassRequirements)
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-func TestDeleteBuildpackSuccess(t *testing.T) {
-	ui := &testterm.FakeUI{Inputs: []string{"y"}}
-	buildpack := cf.Buildpack{}
-	buildpack.Name = "my-buildpack"
-	buildpack.Guid = "my-buildpack-guid"
-	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: buildpack,
-	}
-	cmd := NewDeleteBuildpack(ui, buildpackRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestDeleteBuildpackSuccess", func() {
 
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			ui := &testterm.FakeUI{Inputs: []string{"y"}}
+			buildpack := cf.Buildpack{}
+			buildpack.Name = "my-buildpack"
+			buildpack.Guid = "my-buildpack-guid"
+			buildpackRepo := &testapi.FakeBuildpackRepository{
+				FindByNameBuildpack: buildpack,
+			}
+			cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
-		{"delete", "my-buildpack"},
-	})
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Deleting buildpack", "my-buildpack"},
-		{"OK"},
-	})
-}
+			assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
-func TestDeleteBuildpackNoConfirmation(t *testing.T) {
-	ui := &testterm.FakeUI{Inputs: []string{"no"}}
-	buildpack := cf.Buildpack{}
-	buildpack.Name = "my-buildpack"
-	buildpack.Guid = "my-buildpack-guid"
-	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: buildpack,
-	}
-	cmd := NewDeleteBuildpack(ui, buildpackRepo)
+			testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+				{"delete", "my-buildpack"},
+			})
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Deleting buildpack", "my-buildpack"},
+				{"OK"},
+			})
+		})
+		It("TestDeleteBuildpackNoConfirmation", func() {
 
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			ui := &testterm.FakeUI{Inputs: []string{"no"}}
+			buildpack := cf.Buildpack{}
+			buildpack.Name = "my-buildpack"
+			buildpack.Guid = "my-buildpack-guid"
+			buildpackRepo := &testapi.FakeBuildpackRepository{
+				FindByNameBuildpack: buildpack,
+			}
+			cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "")
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	testassert.SliceContains(t, ui.Prompts, testassert.Lines{
-		{"delete", "my-buildpack"},
-	})
-}
+			assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "")
 
-func TestDeleteBuildpackThatDoesNotExist(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	buildpack := cf.Buildpack{}
-	buildpack.Name = "my-buildpack"
-	buildpack.Guid = "my-buildpack-guid"
-	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameNotFound:  true,
-		FindByNameBuildpack: buildpack,
-	}
+			testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+				{"delete", "my-buildpack"},
+			})
+		})
+		It("TestDeleteBuildpackThatDoesNotExist", func() {
 
-	ui := &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"-f", "my-buildpack"})
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			buildpack := cf.Buildpack{}
+			buildpack.Name = "my-buildpack"
+			buildpack.Guid = "my-buildpack-guid"
+			buildpackRepo := &testapi.FakeBuildpackRepository{
+				FindByNameNotFound:  true,
+				FindByNameBuildpack: buildpack,
+			}
 
-	cmd := NewDeleteBuildpack(ui, buildpackRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			ui := &testterm.FakeUI{}
+			ctxt := testcmd.NewContext("delete-buildpack", []string{"-f", "my-buildpack"})
 
-	assert.Equal(t, buildpackRepo.FindByNameName, "my-buildpack")
-	assert.True(t, buildpackRepo.FindByNameNotFound)
+			cmd := NewDeleteBuildpack(ui, buildpackRepo)
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Deleting", "my-buildpack"},
-		{"OK"},
-		{"my-buildpack", "does not exist"},
-	})
-}
+			assert.Equal(mr.T(), buildpackRepo.FindByNameName, "my-buildpack")
+			assert.True(mr.T(), buildpackRepo.FindByNameNotFound)
 
-func TestDeleteBuildpackDeleteError(t *testing.T) {
-	ui := &testterm.FakeUI{Inputs: []string{"y"}}
-	buildpack := cf.Buildpack{}
-	buildpack.Name = "my-buildpack"
-	buildpack.Guid = "my-buildpack-guid"
-	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: buildpack,
-		DeleteApiResponse:   net.NewApiResponseWithMessage("failed badly"),
-	}
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Deleting", "my-buildpack"},
+				{"OK"},
+				{"my-buildpack", "does not exist"},
+			})
+		})
+		It("TestDeleteBuildpackDeleteError", func() {
 
-	cmd := NewDeleteBuildpack(ui, buildpackRepo)
+			ui := &testterm.FakeUI{Inputs: []string{"y"}}
+			buildpack := cf.Buildpack{}
+			buildpack.Name = "my-buildpack"
+			buildpack.Guid = "my-buildpack-guid"
+			buildpackRepo := &testapi.FakeBuildpackRepository{
+				FindByNameBuildpack: buildpack,
+				DeleteApiResponse:   net.NewApiResponseWithMessage("failed badly"),
+			}
 
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			ctxt := testcmd.NewContext("delete-buildpack", []string{"my-buildpack"})
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Deleting buildpack", "my-buildpack"},
-		{"FAILED"},
-		{"my-buildpack"},
-		{"failed badly"},
-	})
-}
+			assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
 
-func TestDeleteBuildpackForceFlagSkipsConfirmation(t *testing.T) {
-	ui := &testterm.FakeUI{}
-	buildpack := cf.Buildpack{}
-	buildpack.Name = "my-buildpack"
-	buildpack.Guid = "my-buildpack-guid"
-	buildpackRepo := &testapi.FakeBuildpackRepository{
-		FindByNameBuildpack: buildpack,
-	}
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Deleting buildpack", "my-buildpack"},
+				{"FAILED"},
+				{"my-buildpack"},
+				{"failed badly"},
+			})
+		})
+		It("TestDeleteBuildpackForceFlagSkipsConfirmation", func() {
 
-	cmd := NewDeleteBuildpack(ui, buildpackRepo)
+			ui := &testterm.FakeUI{}
+			buildpack := cf.Buildpack{}
+			buildpack.Name = "my-buildpack"
+			buildpack.Guid = "my-buildpack-guid"
+			buildpackRepo := &testapi.FakeBuildpackRepository{
+				FindByNameBuildpack: buildpack,
+			}
 
-	ctxt := testcmd.NewContext("delete-buildpack", []string{"-f", "my-buildpack"})
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			cmd := NewDeleteBuildpack(ui, buildpackRepo)
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+			ctxt := testcmd.NewContext("delete-buildpack", []string{"-f", "my-buildpack"})
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-	assert.Equal(t, buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-	assert.Equal(t, len(ui.Prompts), 0)
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Deleting buildpack", "my-buildpack"},
-		{"OK"},
+			assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+
+			assert.Equal(mr.T(), len(ui.Prompts), 0)
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Deleting buildpack", "my-buildpack"},
+				{"OK"},
+			})
+		})
 	})
 }

@@ -1,72 +1,78 @@
 package formatters
 
 import (
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
-	"testing"
+	mr "github.com/tjarratt/mr_t"
 )
 
-func TestByteSize(t *testing.T) {
-	assert.Equal(t, ByteSize(100*MEGABYTE), "100M")
-	assert.Equal(t, ByteSize(uint64(100.5*MEGABYTE)), "100.5M")
-}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestByteSize", func() {
 
-func TestParsesByteAmounts(t *testing.T) {
-	var (
-		megabytes uint64
-		err       error
-	)
+			assert.Equal(mr.T(), ByteSize(100*MEGABYTE), "100M")
+			assert.Equal(mr.T(), ByteSize(uint64(100.5*MEGABYTE)), "100.5M")
+		})
+		It("TestParsesByteAmounts", func() {
 
-	megabytes, err = ToMegabytes("5M")
-	assert.Equal(t, megabytes, uint64(5))
-	assert.NoError(t, err)
+			var (
+				megabytes uint64
+				err       error
+			)
 
-	megabytes, err = ToMegabytes("5m")
-	assert.Equal(t, megabytes, uint64(5))
-	assert.NoError(t, err)
+			megabytes, err = ToMegabytes("5M")
+			assert.Equal(mr.T(), megabytes, uint64(5))
+			assert.NoError(mr.T(), err)
 
-	megabytes, err = ToMegabytes("2G")
-	assert.Equal(t, megabytes, uint64(2*1024))
-	assert.NoError(t, err)
+			megabytes, err = ToMegabytes("5m")
+			assert.Equal(mr.T(), megabytes, uint64(5))
+			assert.NoError(mr.T(), err)
 
-	megabytes, err = ToMegabytes("3T")
-	assert.Equal(t, megabytes, uint64(3*1024*1024))
-	assert.NoError(t, err)
-}
+			megabytes, err = ToMegabytes("2G")
+			assert.Equal(mr.T(), megabytes, uint64(2*1024))
+			assert.NoError(mr.T(), err)
 
-func TestParsesByteAmountsWithLongUnits(t *testing.T) {
-	var (
-		megabytes uint64
-		err       error
-	)
+			megabytes, err = ToMegabytes("3T")
+			assert.Equal(mr.T(), megabytes, uint64(3*1024*1024))
+			assert.NoError(mr.T(), err)
+		})
+		It("TestParsesByteAmountsWithLongUnits", func() {
 
-	megabytes, err = ToMegabytes("5MB")
-	assert.Equal(t, megabytes, uint64(5))
-	assert.NoError(t, err)
+			var (
+				megabytes uint64
+				err       error
+			)
 
-	megabytes, err = ToMegabytes("5mb")
-	assert.Equal(t, megabytes, uint64(5))
-	assert.NoError(t, err)
+			megabytes, err = ToMegabytes("5MB")
+			assert.Equal(mr.T(), megabytes, uint64(5))
+			assert.NoError(mr.T(), err)
 
-	megabytes, err = ToMegabytes("2GB")
-	assert.Equal(t, megabytes, uint64(2*1024))
-	assert.NoError(t, err)
+			megabytes, err = ToMegabytes("5mb")
+			assert.Equal(mr.T(), megabytes, uint64(5))
+			assert.NoError(mr.T(), err)
 
-	megabytes, err = ToMegabytes("3TB")
-	assert.Equal(t, megabytes, uint64(3*1024*1024))
-	assert.NoError(t, err)
-}
+			megabytes, err = ToMegabytes("2GB")
+			assert.Equal(mr.T(), megabytes, uint64(2*1024))
+			assert.NoError(mr.T(), err)
 
-func TestDoesNotParseAmountsWithoutUnits(t *testing.T) {
-	_, err := ToMegabytes("5")
-	assert.Error(t, err)
-}
+			megabytes, err = ToMegabytes("3TB")
+			assert.Equal(mr.T(), megabytes, uint64(3*1024*1024))
+			assert.NoError(mr.T(), err)
+		})
+		It("TestDoesNotParseAmountsWithoutUnits", func() {
 
-func TestDoesNotParseAmountsWithUnknownSuffixes(t *testing.T) {
-	_, err := ToMegabytes("5MBB")
-	assert.Error(t, err)
-}
+			_, err := ToMegabytes("5")
+			assert.Error(mr.T(), err)
+		})
+		It("TestDoesNotParseAmountsWithUnknownSuffixes", func() {
 
-func TestDoesNotParseAmountsWithUnknownPrefixes(t *testing.T) {
-	_, err := ToMegabytes(" 5MB")
-	assert.Error(t, err)
+			_, err := ToMegabytes("5MBB")
+			assert.Error(mr.T(), err)
+		})
+		It("TestDoesNotParseAmountsWithUnknownPrefixes", func() {
+
+			_, err := ToMegabytes(" 5MB")
+			assert.Error(mr.T(), err)
+		})
+	})
 }

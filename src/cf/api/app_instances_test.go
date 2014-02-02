@@ -10,7 +10,9 @@ import (
 	"net/http/httptest"
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
-	"testing"
+
+	. "github.com/onsi/ginkgo"
+	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
@@ -58,33 +60,7 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
   }
 }`}})
 
-func TestAppInstancesGetInstances(t *testing.T) {
-	ts, handler, repo := createAppInstancesRepo(t, []testnet.TestRequest{
-		appInstancesRequest,
-		appStatsRequest,
-	})
-	defer ts.Close()
-	appGuid := "my-cool-app-guid"
-
-	instances, err := repo.GetInstances(appGuid)
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, err.IsNotSuccessful())
-
-	assert.Equal(t, len(instances), 2)
-
-	assert.Equal(t, instances[0].State, cf.InstanceRunning)
-	assert.Equal(t, instances[1].State, cf.InstanceStarting)
-
-	instance0 := instances[0]
-	assert.Equal(t, instance0.Since, time.Unix(1379522342, 0))
-	assert.Exactly(t, instance0.DiskQuota, uint64(1073741824))
-	assert.Exactly(t, instance0.DiskUsage, uint64(56037376))
-	assert.Exactly(t, instance0.MemQuota, uint64(67108864))
-	assert.Exactly(t, instance0.MemUsage, uint64(19218432))
-	assert.Equal(t, instance0.CpuUsage, 3.659571249238058e-05)
-}
-
-func createAppInstancesRepo(t *testing.T, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
+func createAppInstancesRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
 	space := cf.SpaceFields{}
 	space.Guid = "my-space-guid"
@@ -97,4 +73,33 @@ func createAppInstancesRepo(t *testing.T, requests []testnet.TestRequest) (ts *h
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerAppInstancesRepository(config, gateway)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestAppInstancesGetInstances", func() {
+			ts, handler, repo := createAppInstancesRepo(mr.T(), []testnet.TestRequest{
+				appInstancesRequest,
+				appStatsRequest,
+			})
+			defer ts.Close()
+			appGuid := "my-cool-app-guid"
+
+			instances, err := repo.GetInstances(appGuid)
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.False(mr.T(), err.IsNotSuccessful())
+
+			assert.Equal(mr.T(), len(instances), 2)
+
+			assert.Equal(mr.T(), instances[0].State, cf.InstanceRunning)
+			assert.Equal(mr.T(), instances[1].State, cf.InstanceStarting)
+
+			instance0 := instances[0]
+			assert.Equal(mr.T(), instance0.Since, time.Unix(1379522342, 0))
+			assert.Exactly(mr.T(), instance0.DiskQuota, uint64(1073741824))
+			assert.Exactly(mr.T(), instance0.DiskUsage, uint64(56037376))
+			assert.Exactly(mr.T(), instance0.MemQuota, uint64(67108864))
+			assert.Exactly(mr.T(), instance0.MemUsage, uint64(19218432))
+			assert.Equal(mr.T(), instance0.CpuUsage, 3.659571249238058e-05)
+		})
+	})
 }

@@ -2,33 +2,39 @@ package requirements
 
 import (
 	"cf"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestBuildpackReqExecute(t *testing.T) {
-	buildpack := cf.Buildpack{}
-	buildpack.Name = "my-buildpack"
-	buildpack.Guid = "my-buildpack-guid"
-	buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameBuildpack: buildpack}
-	ui := new(testterm.FakeUI)
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestBuildpackReqExecute", func() {
 
-	buildpackReq := newBuildpackRequirement("foo", ui, buildpackRepo)
-	success := buildpackReq.Execute()
+			buildpack := cf.Buildpack{}
+			buildpack.Name = "my-buildpack"
+			buildpack.Guid = "my-buildpack-guid"
+			buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameBuildpack: buildpack}
+			ui := new(testterm.FakeUI)
 
-	assert.True(t, success)
-	assert.Equal(t, buildpackRepo.FindByNameName, "foo")
-	assert.Equal(t, buildpackReq.GetBuildpack(), buildpack)
-}
+			buildpackReq := newBuildpackRequirement("foo", ui, buildpackRepo)
+			success := buildpackReq.Execute()
 
-func TestBuildpackReqExecuteWhenBuildpackNotFound(t *testing.T) {
-	buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameNotFound: true}
-	ui := new(testterm.FakeUI)
+			assert.True(mr.T(), success)
+			assert.Equal(mr.T(), buildpackRepo.FindByNameName, "foo")
+			assert.Equal(mr.T(), buildpackReq.GetBuildpack(), buildpack)
+		})
+		It("TestBuildpackReqExecuteWhenBuildpackNotFound", func() {
 
-	buildpackReq := newBuildpackRequirement("foo", ui, buildpackRepo)
-	success := buildpackReq.Execute()
+			buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameNotFound: true}
+			ui := new(testterm.FakeUI)
 
-	assert.False(t, success)
+			buildpackReq := newBuildpackRequirement("foo", ui, buildpackRepo)
+			success := buildpackReq.Execute()
+
+			assert.False(mr.T(), success)
+		})
+	})
 }

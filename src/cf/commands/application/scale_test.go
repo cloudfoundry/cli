@@ -4,7 +4,9 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -12,97 +14,7 @@ import (
 	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
-
-func TestScaleRequirements(t *testing.T) {
-	args := []string{"-m", "1G", "my-app"}
-	deps := getScaleDependencies()
-
-	deps.reqFactory.LoginSuccess = false
-	deps.reqFactory.TargetedSpaceSuccess = true
-	callScale(t, args, deps)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	deps.reqFactory.LoginSuccess = true
-	deps.reqFactory.TargetedSpaceSuccess = false
-	callScale(t, args, deps)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	deps.reqFactory.LoginSuccess = true
-	deps.reqFactory.TargetedSpaceSuccess = true
-	callScale(t, args, deps)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-	assert.Equal(t, deps.reqFactory.ApplicationName, "my-app")
-}
-
-func TestScaleFailsWithUsage(t *testing.T) {
-	deps := getScaleDependencies()
-
-	ui := callScale(t, []string{}, deps)
-
-	assert.True(t, ui.FailedWithUsage)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestScaleFailsWithoutFlags(t *testing.T) {
-	args := []string{"my-app"}
-	deps := getScaleDependencies()
-	deps.reqFactory.LoginSuccess = true
-	deps.reqFactory.TargetedSpaceSuccess = true
-
-	callScale(t, args, deps)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestScaleAll(t *testing.T) {
-	app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-	deps := getScaleDependencies()
-	deps.reqFactory.Application = app
-	deps.appRepo.UpdateAppResult = app
-
-	ui := callScale(t, []string{"-i", "5", "-m", "512M", "my-app"}, deps)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Scaling", "my-app", "my-org", "my-space", "my-user"},
-		{"OK"},
-	})
-
-	assert.Equal(t, deps.restarter.AppToRestart.Guid, "my-app-guid")
-	assert.Equal(t, deps.appRepo.UpdateAppGuid, "my-app-guid")
-	assert.Equal(t, deps.appRepo.UpdateParams.Get("memory"), uint64(512))
-	assert.Equal(t, deps.appRepo.UpdateParams.Get("instances"), 5)
-}
-
-func TestScaleOnlyInstances(t *testing.T) {
-	app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-	deps := getScaleDependencies()
-	deps.reqFactory.Application = app
-	deps.appRepo.UpdateAppResult = app
-
-	callScale(t, []string{"-i", "5", "my-app"}, deps)
-
-	assert.Equal(t, deps.restarter.AppToRestart.Guid, "")
-	assert.Equal(t, deps.appRepo.UpdateAppGuid, "my-app-guid")
-	assert.Equal(t, deps.appRepo.UpdateParams.Get("instances"), 5)
-	assert.False(t, deps.appRepo.UpdateParams.Has("disk_quota"))
-	assert.False(t, deps.appRepo.UpdateParams.Has("memory"))
-}
-
-func TestScaleOnlyMemory(t *testing.T) {
-	app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-	deps := getScaleDependencies()
-	deps.reqFactory.Application = app
-	deps.appRepo.UpdateAppResult = app
-
-	callScale(t, []string{"-m", "512M", "my-app"}, deps)
-
-	assert.Equal(t, deps.restarter.AppToRestart.Guid, "my-app-guid")
-	assert.Equal(t, deps.appRepo.UpdateAppGuid, "my-app-guid")
-	assert.Equal(t, deps.appRepo.UpdateParams.Get("memory").(uint64), uint64(512))
-	assert.False(t, deps.appRepo.UpdateParams.Has("disk_quota"))
-	assert.False(t, deps.appRepo.UpdateParams.Has("instances"))
-}
 
 type scaleDependencies struct {
 	reqFactory *testreq.FakeReqFactory
@@ -119,7 +31,7 @@ func getScaleDependencies() (deps scaleDependencies) {
 	return
 }
 
-func callScale(t *testing.T, args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
+func callScale(t mr.TestingT, args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("scale", args)
 
@@ -140,4 +52,96 @@ func callScale(t *testing.T, args []string, deps scaleDependencies) (ui *testter
 	cmd := NewScale(ui, config, deps.restarter, deps.appRepo)
 	testcmd.RunCommand(cmd, ctxt, deps.reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestScaleRequirements", func() {
+			args := []string{"-m", "1G", "my-app"}
+			deps := getScaleDependencies()
+
+			deps.reqFactory.LoginSuccess = false
+			deps.reqFactory.TargetedSpaceSuccess = true
+			callScale(mr.T(), args, deps)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			deps.reqFactory.LoginSuccess = true
+			deps.reqFactory.TargetedSpaceSuccess = false
+			callScale(mr.T(), args, deps)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			deps.reqFactory.LoginSuccess = true
+			deps.reqFactory.TargetedSpaceSuccess = true
+			callScale(mr.T(), args, deps)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+			assert.Equal(mr.T(), deps.reqFactory.ApplicationName, "my-app")
+		})
+		It("TestScaleFailsWithUsage", func() {
+
+			deps := getScaleDependencies()
+
+			ui := callScale(mr.T(), []string{}, deps)
+
+			assert.True(mr.T(), ui.FailedWithUsage)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestScaleFailsWithoutFlags", func() {
+
+			args := []string{"my-app"}
+			deps := getScaleDependencies()
+			deps.reqFactory.LoginSuccess = true
+			deps.reqFactory.TargetedSpaceSuccess = true
+
+			callScale(mr.T(), args, deps)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestScaleAll", func() {
+
+			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
+			deps := getScaleDependencies()
+			deps.reqFactory.Application = app
+			deps.appRepo.UpdateAppResult = app
+
+			ui := callScale(mr.T(), []string{"-i", "5", "-m", "512M", "my-app"}, deps)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Scaling", "my-app", "my-org", "my-space", "my-user"},
+				{"OK"},
+			})
+
+			assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "my-app-guid")
+			assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
+			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("memory"), uint64(512))
+			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("instances"), 5)
+		})
+		It("TestScaleOnlyInstances", func() {
+
+			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
+			deps := getScaleDependencies()
+			deps.reqFactory.Application = app
+			deps.appRepo.UpdateAppResult = app
+
+			callScale(mr.T(), []string{"-i", "5", "my-app"}, deps)
+
+			assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "")
+			assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
+			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("instances"), 5)
+			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("disk_quota"))
+			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("memory"))
+		})
+		It("TestScaleOnlyMemory", func() {
+
+			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
+			deps := getScaleDependencies()
+			deps.reqFactory.Application = app
+			deps.appRepo.UpdateAppResult = app
+
+			callScale(mr.T(), []string{"-m", "512M", "my-app"}, deps)
+
+			assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "my-app-guid")
+			assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
+			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("memory").(uint64), uint64(512))
+			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("disk_quota"))
+			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("instances"))
+		})
+	})
 }
