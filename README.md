@@ -3,9 +3,9 @@ Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?br
 
 This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release. 
 
-Download edge
-=============
-Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are not intended for wider use, but for developers to test new features and fixes as they are completed. Download edge:
+Downloading edge
+================
+Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
 - http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz
 - http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz
 - http://go-cli.s3.amazonaws.com/cf-linux-386.tgz
@@ -22,13 +22,13 @@ Cloning the repository
 1. Run ```git submodule update --init --recursive```
 
 Building
-========
+=======
 
 1. Run ```./bin/build```
 1. The binary will be built into the `./out` directory.
 
-Development
-===========
+Developing
+==========
 
 1. Write a test.
 1. Run ```bin/test``` and watch the test fail.
@@ -42,8 +42,8 @@ If you want to run the benchmark tests
 Contributing
 ============
 
-Rough overview of the architecture
-----------------------------------
+Architecture overview
+---------------------
 
 The app (in ```src/cf/app/app.go```) declares the list of available commands. Help and flags are defined there.
 It will instantiate a command, and run it using the runner (in ```src/cf/commands/runner.go```).
