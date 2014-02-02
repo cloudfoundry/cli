@@ -3,8 +3,8 @@ Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?br
 
 This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release. 
 
-Downloading Edge
-================
+Download edge binaries
+======================
 Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are not intended for wider use, but for developers to test new features and fixes as they are completed. Download edge:
 - http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz
 - http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz
@@ -78,10 +78,10 @@ Example command
 Create Space is a good example of command. Its tests include checking arguments, having requirements, and the actual command itself.
 You will find it in ```src/cf/commands/space/create_space.go```.
 
-Current Conventions
+Current conventions
 ===================
 
-Creating Commands
+Creating commands
 -----------------
 
 Resources that include several commands have been broken out into their own sub-package using the Resource name. An example of this convention is the
@@ -89,7 +89,7 @@ Space resource and package.
 
 In addition, command file and methods naming follows a CRUD like convention. For example, the Space resource includes commands such a CreateSpace, ListSpaces, etc.
 
-Creating Repositories
+Creating repositories
 ---------------------
 
 Although not ideal, we use the name "Repository" for API related operations as opposed to "Service". Repository was chosen to avoid confusion with Service domain objects (i.e. creating Services and Service Instances within Cloud Foundry).
