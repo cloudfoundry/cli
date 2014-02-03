@@ -86,6 +86,7 @@ func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc)
 func createAuthenticationRepository(t mr.TestingT, apiServer *httptest.Server, authServer *httptest.Server) (*configuration.Configuration, api.AuthenticationRepository) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
+	configRepo.EnsureInitialized()
 	config, err := configRepo.Get()
 	assert.NoError(t, err)
 

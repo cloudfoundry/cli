@@ -18,6 +18,7 @@ import (
 func deleteOrg(t mr.TestingT, confirmation string, args []string, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
 	reqFactory := &testreq.FakeReqFactory{}
 	configRepo := &testconfig.FakeConfigRepository{}
+	configRepo.EnsureInitialized()
 
 	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
