@@ -24,12 +24,38 @@ type FakeServiceRepo struct {
 
 	RenameServiceServiceInstance cf.ServiceInstance
 	RenameServiceNewName         string
+
+	PurgedServiceOffering cf.ServiceOffering
+	PurgeServiceOfferingCalled bool
+	PurgeServiceOfferingApiResponse net.ApiResponse
+
+	FindServiceOfferingByLabelAndProviderName            string
+	FindServiceOfferingByLabelAndProviderProvider        string
+	FindServiceOfferingByLabelAndProviderServiceOffering cf.ServiceOffering
+	FindServiceOfferingByLabelAndProviderApiResponse  	net.ApiResponse
+	FindServiceOfferingByLabelAndProviderCalled 			bool
 }
 
 func (repo *FakeServiceRepo) GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse) {
 	offerings = repo.ServiceOfferings
 	return
 }
+
+func (repo *FakeServiceRepo) PurgeServiceOffering(offering cf.ServiceOffering) (apiResponse net.ApiResponse) {
+	repo.PurgedServiceOffering = offering
+	repo.PurgeServiceOfferingCalled = true
+	return
+}
+
+func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provider string) (offering cf.ServiceOffering, apiResponse net.ApiResponse) {
+	repo.FindServiceOfferingByLabelAndProviderCalled = true
+	repo.FindServiceOfferingByLabelAndProviderName = name
+	repo.FindServiceOfferingByLabelAndProviderProvider = provider
+	apiResponse = repo.FindServiceOfferingByLabelAndProviderApiResponse
+	offering = repo.FindServiceOfferingByLabelAndProviderServiceOffering
+	return
+}
+
 
 func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
 	repo.CreateServiceInstanceName = name

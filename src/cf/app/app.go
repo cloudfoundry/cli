@@ -470,6 +470,20 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "purge-service-offering",
+			Description: "Recursively remove a service and child objects from Cloud Foundry database without making requests to a service broker",
+			Usage: fmt.Sprintf("%s purge-service-offering SERVICE [-p PROVIDER]", cf.Name()) +
+				"\n\nWARNING:\n" +
+				"This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.",
+			Flags: []cli.Flag{
+				NewStringFlag("p", "Provider"),
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("purge-service-offering", c)
+			},
+		},
+		{
 			Name:        "push",
 			ShortName:   "p",
 			Description: "Push a new app or sync changes to an existing app",
