@@ -1,16 +1,26 @@
 Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 =================
 
-This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release. 
+This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release.
+
+Latest Installers (v6.0.0)
+==========================
+- [Mac OS X 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-osx-amd64.pkg)
+- [Windows 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-386.zip)
+- [Windows 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-amd64.zip)
+- [Debian 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_i386.deb)
+- [Debian 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_amd64.deb)
+- [Redhat 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_i386.rpm)
+- [Redhat 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_amd64.rpm)
 
 Downloading edge
 ================
-Edge binaries are published to our Amazon S3 bucket with each new commit. These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
-- http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz
-- http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz
-- http://go-cli.s3.amazonaws.com/cf-linux-386.tgz
-- http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip
-- http://go-cli.s3.amazonaws.com/cf-windows-386.zip
+Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI. These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
+- [Mac OS X 64 bit binary](http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz)
+- [Linux 64 bit binary](http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz)
+- [Linux 32 bit binary](http://go-cli.s3.amazonaws.com/cf-linux-386.tgz)
+- [Windows 64 bit executable](http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip)
+- [Windows 32 bit executable](http://go-cli.s3.amazonaws.com/cf-windows-386.zip)
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
@@ -24,14 +34,16 @@ Cloning the repository
 Building
 =======
 
-1. Run ```./bin/build```
+1. Run `./bin/build`
 1. The binary will be built into the `./out` directory.
+
+Optionally, you can use `bin/run` to compile and run the executable in one step.
 
 Developing
 ==========
 
 1. Write a test.
-1. Run ```bin/test``` and watch the test fail.
+1. Run `bin/test` and watch the test fail.
 1. Make the test pass.
 1. Submit a pull request.
 
