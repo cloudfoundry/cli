@@ -62,7 +62,7 @@ func AssertNoErrors(t mr.TestingT, errs []error) {
 	}
 }
 
-func AssertPanic(t *testing.T, panicValue interface{}, callback func()) {
+func AssertPanic(t mr.TestingT, panicValue interface{}, callback func()) {
 	defer func() {
 		value := recover()
 		if value != panicValue {
