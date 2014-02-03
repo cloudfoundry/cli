@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
-	"math/rand"
 	"testing"
 	"time"
 )
@@ -86,27 +85,12 @@ func TestStableSort(t *testing.T) {
 	assert.Equal(t, getMsgString(pq.PopMessage()), "message last")
 }
 
-func BenchmarkPushMessages(b *testing.B) {
-	r := rand.New(rand.NewSource(99))
-	pq := NewSortedMessageQueue(10 * time.Millisecond)
-	for i := 0; i < b.N; i++ {
-		msg := logMessageForBenchmark(b, fmt.Sprintf("message %d", i), r.Int63())
-		pq.PushMessage(msg)
-	}
-}
-
 func logMessageWithTime(t *testing.T, messageString string, timestamp int64) *logmessage.Message {
 	data, err := proto.Marshal(generateMessage(messageString, timestamp))
 	assert.NoError(t, err)
 	message, err := logmessage.ParseMessage(data)
 	assert.NoError(t, err)
 
-	return message
-}
-
-func logMessageForBenchmark(b *testing.B, messageString string, timestamp int64) *logmessage.Message {
-	data, _ := proto.Marshal(generateMessage(messageString, timestamp))
-	message, _ := logmessage.ParseMessage(data)
 	return message
 }
 
