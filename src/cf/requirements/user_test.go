@@ -2,39 +2,45 @@ package requirements
 
 import (
 	"cf"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestUserReqExecute(t *testing.T) {
-	user := cf.UserFields{}
-	user.Username = "my-user"
-	user.Guid = "my-user-guid"
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestUserReqExecute", func() {
 
-	userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: user}
-	ui := new(testterm.FakeUI)
+			user := cf.UserFields{}
+			user.Username = "my-user"
+			user.Guid = "my-user-guid"
 
-	userReq := newUserRequirement("foo", ui, userRepo)
-	success := userReq.Execute()
+			userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: user}
+			ui := new(testterm.FakeUI)
 
-	assert.True(t, success)
-	assert.Equal(t, userRepo.FindByUsernameUsername, "foo")
-	assert.Equal(t, userReq.GetUser(), user)
-}
+			userReq := newUserRequirement("foo", ui, userRepo)
+			success := userReq.Execute()
 
-func TestUserReqWhenUserDoesNotExist(t *testing.T) {
-	userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
-	ui := new(testterm.FakeUI)
+			assert.True(mr.T(), success)
+			assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "foo")
+			assert.Equal(mr.T(), userReq.GetUser(), user)
+		})
+		It("TestUserReqWhenUserDoesNotExist", func() {
 
-	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
-		newUserRequirement("foo", ui, userRepo).Execute()
-	})
+			userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
+			ui := new(testterm.FakeUI)
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"UserFields not found"},
+			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+				newUserRequirement("foo", ui, userRepo).Execute()
+			})
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"UserFields not found"},
+			})
+		})
 	})
 }

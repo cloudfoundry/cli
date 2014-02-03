@@ -6,12 +6,13 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"os"
 	"path/filepath"
 	testnet "testhelpers/net"
-	"testing"
 )
 
 func uploadBuildpackRequest(filename string) testnet.TestRequest {
@@ -34,7 +35,7 @@ func uploadBuildpackRequest(filename string) testnet.TestRequest {
 var expectedBuildpackContent = []string{"detect", "compile", "package"}
 
 func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
-	return func(t *testing.T, request *http.Request) {
+	return func(t mr.TestingT, request *http.Request) {
 		err := request.ParseMultipartForm(4096)
 		if err != nil {
 			assert.Fail(t, "Failed parsing multipart form: %s", err)
@@ -79,43 +80,7 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 	}
 }
 
-func TestUploadBuildpackWithInvalidDirectory(t *testing.T) {
-	config := &configuration.Configuration{}
-	gateway := net.NewCloudControllerGateway()
-
-	repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
-	buildpack := cf.Buildpack{}
-
-	apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Contains(t, apiResponse.Message, "Invalid buildpack")
-}
-
-func TestUploadBuildpack(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-	dir = filepath.Join(dir, "../../fixtures/example-buildpack")
-	err = os.Chmod(filepath.Join(dir, "detect"), 0666)
-	assert.NoError(t, err)
-
-	_, apiResponse := testUploadBuildpack(t, dir, []testnet.TestRequest{
-		uploadBuildpackRequest(dir),
-	})
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestUploadBuildpackWithAZipFile(t *testing.T) {
-	dir, err := os.Getwd()
-	assert.NoError(t, err)
-	dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
-
-	_, apiResponse := testUploadBuildpack(t, dir, []testnet.TestRequest{
-		uploadBuildpackRequest(dir),
-	})
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func testUploadBuildpack(t *testing.T, dir string, requests []testnet.TestRequest) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestRequest) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
 	ts, handler := testnet.NewTLSServer(t, requests)
 	defer ts.Close()
 
@@ -132,4 +97,43 @@ func testUploadBuildpack(t *testing.T, dir string, requests []testnet.TestReques
 	apiResponse = repo.UploadBuildpack(buildpack, dir)
 	assert.True(t, handler.AllRequestsCalled())
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestUploadBuildpackWithInvalidDirectory", func() {
+			config := &configuration.Configuration{}
+			gateway := net.NewCloudControllerGateway()
+
+			repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
+			buildpack := cf.Buildpack{}
+
+			apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
+			assert.True(mr.T(), apiResponse.IsNotSuccessful())
+			assert.Contains(mr.T(), apiResponse.Message, "Invalid buildpack")
+		})
+		It("TestUploadBuildpack", func() {
+
+			dir, err := os.Getwd()
+			assert.NoError(mr.T(), err)
+			dir = filepath.Join(dir, "../../fixtures/example-buildpack")
+			err = os.Chmod(filepath.Join(dir, "detect"), 0666)
+			assert.NoError(mr.T(), err)
+
+			_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
+				uploadBuildpackRequest(dir),
+			})
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestUploadBuildpackWithAZipFile", func() {
+
+			dir, err := os.Getwd()
+			assert.NoError(mr.T(), err)
+			dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
+
+			_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
+				uploadBuildpackRequest(dir),
+			})
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+	})
 }

@@ -3,50 +3,56 @@ package requirements
 import (
 	"cf"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestSpaceRequirement(t *testing.T) {
-	ui := new(testterm.FakeUI)
-	org := cf.OrganizationFields{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
-	space := cf.SpaceFields{}
-	space.Name = "my-space"
-	space.Guid = "my-space-guid"
-	config := &configuration.Configuration{
-		OrganizationFields: org,
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSpaceRequirement", func() {
 
-		SpaceFields: space,
-	}
+			ui := new(testterm.FakeUI)
+			org := cf.OrganizationFields{}
+			org.Name = "my-org"
+			org.Guid = "my-org-guid"
+			space := cf.SpaceFields{}
+			space.Name = "my-space"
+			space.Guid = "my-space-guid"
+			config := &configuration.Configuration{
+				OrganizationFields: org,
 
-	req := newTargetedSpaceRequirement(ui, config)
-	success := req.Execute()
-	assert.True(t, success)
+				SpaceFields: space,
+			}
 
-	config.SpaceFields = cf.SpaceFields{}
+			req := newTargetedSpaceRequirement(ui, config)
+			success := req.Execute()
+			assert.True(mr.T(), success)
 
-	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
-		newTargetedSpaceRequirement(ui, config).Execute()
-	})
+			config.SpaceFields = cf.SpaceFields{}
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"No space targeted"},
-	})
+			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+				newTargetedSpaceRequirement(ui, config).Execute()
+			})
 
-	ui.ClearOutputs()
-	config.OrganizationFields = cf.OrganizationFields{}
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"No space targeted"},
+			})
 
-	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
-		newTargetedSpaceRequirement(ui, config).Execute()
-	})
+			ui.ClearOutputs()
+			config.OrganizationFields = cf.OrganizationFields{}
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"No org and space targeted"},
+			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+				newTargetedSpaceRequirement(ui, config).Execute()
+			})
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"No org and space targeted"},
+			})
+		})
 	})
 }

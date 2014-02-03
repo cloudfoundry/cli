@@ -4,55 +4,18 @@ import (
 	"cf"
 	"cf/commands/organization"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestRenameOrgFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	orgRepo := &testapi.FakeOrgRepository{}
-
-	ui := callRenameOrg(t, []string{}, reqFactory, orgRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callRenameOrg(t, []string{"foo"}, reqFactory, orgRepo)
-	assert.True(t, ui.FailedWithUsage)
-}
-
-func TestRenameOrgRequirements(t *testing.T) {
-	orgRepo := &testapi.FakeOrgRepository{}
-
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callRenameOrg(t, []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-	assert.Equal(t, reqFactory.OrganizationName, "my-org")
-}
-
-func TestRenameOrgRun(t *testing.T) {
-	orgRepo := &testapi.FakeOrgRepository{}
-
-	org := cf.Organization{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
-	ui := callRenameOrg(t, []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Renaming org", "my-org", "my-new-org", "my-user"},
-		{"OK"},
-	})
-
-	assert.Equal(t, orgRepo.RenameOrganizationGuid, "my-org-guid")
-	assert.Equal(t, orgRepo.RenameNewName, "my-new-org")
-}
-
-func callRenameOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
+func callRenameOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("rename-org", args)
 
@@ -76,4 +39,45 @@ func callRenameOrg(t *testing.T, args []string, reqFactory *testreq.FakeReqFacto
 	cmd := organization.NewRenameOrg(ui, config, orgRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestRenameOrgFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+			orgRepo := &testapi.FakeOrgRepository{}
+
+			ui := callRenameOrg(mr.T(), []string{}, reqFactory, orgRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callRenameOrg(mr.T(), []string{"foo"}, reqFactory, orgRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestRenameOrgRequirements", func() {
+
+			orgRepo := &testapi.FakeOrgRepository{}
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			callRenameOrg(mr.T(), []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+			assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+		})
+		It("TestRenameOrgRun", func() {
+
+			orgRepo := &testapi.FakeOrgRepository{}
+
+			org := cf.Organization{}
+			org.Name = "my-org"
+			org.Guid = "my-org-guid"
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
+			ui := callRenameOrg(mr.T(), []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Renaming org", "my-org", "my-new-org", "my-user"},
+				{"OK"},
+			})
+
+			assert.Equal(mr.T(), orgRepo.RenameOrganizationGuid, "my-org-guid")
+			assert.Equal(mr.T(), orgRepo.RenameNewName, "my-new-org")
+		})
+	})
 }

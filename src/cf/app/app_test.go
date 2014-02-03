@@ -6,12 +6,13 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"github.com/codegangsta/cli"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testconfig "testhelpers/configuration"
 	testmanifest "testhelpers/manifest"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
 func availableCmdNames() (names []string) {
@@ -29,7 +30,7 @@ func availableCmdNames() (names []string) {
 
 type FakeRunner struct {
 	cmdFactory commands.Factory
-	t          *testing.T
+	t          mr.TestingT
 	cmdName    string
 }
 
@@ -42,25 +43,29 @@ func (runner *FakeRunner) RunCmdByName(cmdName string, c *cli.Context) (err erro
 	runner.cmdName = cmdName
 	return
 }
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestCommands", func() {
 
-func TestCommands(t *testing.T) {
-	for _, cmdName := range availableCmdNames() {
-		ui := &testterm.FakeUI{}
-		config := &configuration.Configuration{}
-		configRepo := testconfig.FakeConfigRepository{}
-		manifestRepo := &testmanifest.FakeManifestRepository{}
+			for _, cmdName := range availableCmdNames() {
+				ui := &testterm.FakeUI{}
+				config := &configuration.Configuration{}
+				configRepo := testconfig.FakeConfigRepository{}
+				manifestRepo := &testmanifest.FakeManifestRepository{}
 
-		repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
-			"auth":             net.NewUAAGateway(),
-			"cloud-controller": net.NewCloudControllerGateway(),
-			"uaa":              net.NewUAAGateway(),
+				repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
+					"auth":             net.NewUAAGateway(),
+					"cloud-controller": net.NewCloudControllerGateway(),
+					"uaa":              net.NewUAAGateway(),
+				})
+
+				cmdFactory := commands.NewFactory(ui, config, configRepo, manifestRepo, repoLocator)
+				cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: mr.T()}
+				app, _ := NewApp(cmdRunner)
+				app.Run([]string{"", cmdName})
+
+				assert.Equal(mr.T(), cmdRunner.cmdName, cmdName)
+			}
 		})
-
-		cmdFactory := commands.NewFactory(ui, config, configRepo, manifestRepo, repoLocator)
-		cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: t}
-		app, _ := NewApp(cmdRunner)
-		app.Run([]string{"", cmdName})
-
-		assert.Equal(t, cmdRunner.cmdName, cmdName)
-	}
+	})
 }

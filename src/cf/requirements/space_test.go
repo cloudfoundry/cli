@@ -2,33 +2,39 @@ package requirements
 
 import (
 	"cf"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestSpaceReqExecute(t *testing.T) {
-	space := cf.Space{}
-	space.Name = "awesome-sauce-space"
-	space.Guid = "my-space-guid"
-	spaceRepo := &testapi.FakeSpaceRepository{Spaces: []cf.Space{space}}
-	ui := new(testterm.FakeUI)
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSpaceReqExecute", func() {
 
-	spaceReq := newSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
-	success := spaceReq.Execute()
+			space := cf.Space{}
+			space.Name = "awesome-sauce-space"
+			space.Guid = "my-space-guid"
+			spaceRepo := &testapi.FakeSpaceRepository{Spaces: []cf.Space{space}}
+			ui := new(testterm.FakeUI)
 
-	assert.True(t, success)
-	assert.Equal(t, spaceRepo.FindByNameName, "awesome-sauce-space")
-	assert.Equal(t, spaceReq.GetSpace(), space)
-}
+			spaceReq := newSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
+			success := spaceReq.Execute()
 
-func TestSpaceReqExecuteWhenSpaceNotFound(t *testing.T) {
-	spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
-	ui := new(testterm.FakeUI)
+			assert.True(mr.T(), success)
+			assert.Equal(mr.T(), spaceRepo.FindByNameName, "awesome-sauce-space")
+			assert.Equal(mr.T(), spaceReq.GetSpace(), space)
+		})
+		It("TestSpaceReqExecuteWhenSpaceNotFound", func() {
 
-	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
-		newSpaceRequirement("foo", ui, spaceRepo).Execute()
+			spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
+			ui := new(testterm.FakeUI)
+
+			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+				newSpaceRequirement("foo", ui, spaceRepo).Execute()
+			})
+		})
 	})
 }

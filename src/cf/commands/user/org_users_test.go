@@ -4,83 +4,18 @@ import (
 	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestOrgUsersFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	userRepo := &testapi.FakeUserRepository{}
-	ui := callOrgUsers(t, []string{}, reqFactory, userRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
-	assert.False(t, ui.FailedWithUsage)
-}
-
-func TestOrgUsersRequirements(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	userRepo := &testapi.FakeUserRepository{}
-	args := []string{"Org1"}
-
-	reqFactory.LoginSuccess = false
-	callOrgUsers(t, args, reqFactory, userRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory.LoginSuccess = true
-	callOrgUsers(t, args, reqFactory, userRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	assert.Equal(t, "Org1", reqFactory.OrganizationName)
-}
-
-func TestOrgUsers(t *testing.T) {
-	org := cf.Organization{}
-	org.Name = "Found Org"
-	org.Guid = "found-org-guid"
-
-	userRepo := &testapi.FakeUserRepository{}
-	user := cf.UserFields{}
-	user.Username = "user1"
-	user2 := cf.UserFields{}
-	user2.Username = "user2"
-	user3 := cf.UserFields{}
-	user3.Username = "user3"
-	user4 := cf.UserFields{}
-	user4.Username = "user4"
-	userRepo.ListUsersByRole = map[string][]cf.UserFields{
-		cf.ORG_MANAGER:     []cf.UserFields{user, user2},
-		cf.BILLING_MANAGER: []cf.UserFields{user4},
-		cf.ORG_AUDITOR:     []cf.UserFields{user3},
-	}
-
-	reqFactory := &testreq.FakeReqFactory{
-		LoginSuccess: true,
-		Organization: org,
-	}
-
-	ui := callOrgUsers(t, []string{"Org1"}, reqFactory, userRepo)
-
-	assert.Equal(t, userRepo.ListUsersOrganizationGuid, "found-org-guid")
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Getting users in org", "Found Org", "my-user"},
-		{"ORG MANAGER"},
-		{"user1"},
-		{"user2"},
-		{"BILLING MANAGER"},
-		{"user4"},
-		{"ORG AUDITOR"},
-		{"user3"},
-	})
-}
-
-func callOrgUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callOrgUsers(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
@@ -102,4 +37,73 @@ func callOrgUsers(t *testing.T, args []string, reqFactory *testreq.FakeReqFactor
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestOrgUsersFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+			userRepo := &testapi.FakeUserRepository{}
+			ui := callOrgUsers(mr.T(), []string{}, reqFactory, userRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callOrgUsers(mr.T(), []string{"Org1"}, reqFactory, userRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestOrgUsersRequirements", func() {
+
+			reqFactory := &testreq.FakeReqFactory{}
+			userRepo := &testapi.FakeUserRepository{}
+			args := []string{"Org1"}
+
+			reqFactory.LoginSuccess = false
+			callOrgUsers(mr.T(), args, reqFactory, userRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory.LoginSuccess = true
+			callOrgUsers(mr.T(), args, reqFactory, userRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+			assert.Equal(mr.T(), "Org1", reqFactory.OrganizationName)
+		})
+		It("TestOrgUsers", func() {
+
+			org := cf.Organization{}
+			org.Name = "Found Org"
+			org.Guid = "found-org-guid"
+
+			userRepo := &testapi.FakeUserRepository{}
+			user := cf.UserFields{}
+			user.Username = "user1"
+			user2 := cf.UserFields{}
+			user2.Username = "user2"
+			user3 := cf.UserFields{}
+			user3.Username = "user3"
+			user4 := cf.UserFields{}
+			user4.Username = "user4"
+			userRepo.ListUsersByRole = map[string][]cf.UserFields{
+				cf.ORG_MANAGER:     []cf.UserFields{user, user2},
+				cf.BILLING_MANAGER: []cf.UserFields{user4},
+				cf.ORG_AUDITOR:     []cf.UserFields{user3},
+			}
+
+			reqFactory := &testreq.FakeReqFactory{
+				LoginSuccess: true,
+				Organization: org,
+			}
+
+			ui := callOrgUsers(mr.T(), []string{"Org1"}, reqFactory, userRepo)
+
+			assert.Equal(mr.T(), userRepo.ListUsersOrganizationGuid, "found-org-guid")
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Getting users in org", "Found Org", "my-user"},
+				{"ORG MANAGER"},
+				{"user1"},
+				{"user2"},
+				{"BILLING MANAGER"},
+				{"user4"},
+				{"ORG AUDITOR"},
+				{"user3"},
+			})
+		})
+	})
 }
