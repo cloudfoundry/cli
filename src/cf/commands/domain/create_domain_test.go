@@ -4,60 +4,18 @@ import (
 	"cf"
 	"cf/commands/domain"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestCreateDomainRequirements(t *testing.T) {
-	domainRepo := &testapi.FakeDomainRepository{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-
-	callCreateDomain(t, []string{"my-org", "example.com"}, reqFactory, domainRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-	assert.Equal(t, reqFactory.OrganizationName, "my-org")
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-
-	callCreateDomain(t, []string{"my-org", "example.com"}, reqFactory, domainRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-}
-
-func TestCreateDomainFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	domainRepo := &testapi.FakeDomainRepository{}
-	ui := callCreateDomain(t, []string{""}, reqFactory, domainRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateDomain(t, []string{"org1"}, reqFactory, domainRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateDomain(t, []string{"org1", "example.com"}, reqFactory, domainRepo)
-	assert.False(t, ui.FailedWithUsage)
-}
-
-func TestCreateDomain(t *testing.T) {
-	org := cf.Organization{}
-	org.Name = "myOrg"
-	org.Guid = "myOrg-guid"
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
-	domainRepo := &testapi.FakeDomainRepository{}
-	ui := callCreateDomain(t, []string{"myOrg", "example.com"}, reqFactory, domainRepo)
-
-	assert.Equal(t, domainRepo.CreateDomainName, "example.com")
-	assert.Equal(t, domainRepo.CreateDomainOwningOrgGuid, "myOrg-guid")
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating domain", "example.com", "myOrg", "my-user"},
-		{"OK"},
-	})
-}
-
-func callCreateDomain(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
+func callCreateDomain(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-domain", args)
 
@@ -74,4 +32,50 @@ func callCreateDomain(t *testing.T, args []string, reqFactory *testreq.FakeReqFa
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestCreateDomainRequirements", func() {
+			domainRepo := &testapi.FakeDomainRepository{}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+
+			callCreateDomain(mr.T(), []string{"my-org", "example.com"}, reqFactory, domainRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+			assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+
+			callCreateDomain(mr.T(), []string{"my-org", "example.com"}, reqFactory, domainRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestCreateDomainFailsWithUsage", func() {
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			domainRepo := &testapi.FakeDomainRepository{}
+			ui := callCreateDomain(mr.T(), []string{""}, reqFactory, domainRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateDomain(mr.T(), []string{"org1"}, reqFactory, domainRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateDomain(mr.T(), []string{"org1", "example.com"}, reqFactory, domainRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestCreateDomain", func() {
+
+			org := cf.Organization{}
+			org.Name = "myOrg"
+			org.Guid = "myOrg-guid"
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
+			domainRepo := &testapi.FakeDomainRepository{}
+			ui := callCreateDomain(mr.T(), []string{"myOrg", "example.com"}, reqFactory, domainRepo)
+
+			assert.Equal(mr.T(), domainRepo.CreateDomainName, "example.com")
+			assert.Equal(mr.T(), domainRepo.CreateDomainOwningOrgGuid, "myOrg-guid")
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating domain", "example.com", "myOrg", "my-user"},
+				{"OK"},
+			})
+		})
+	})
 }

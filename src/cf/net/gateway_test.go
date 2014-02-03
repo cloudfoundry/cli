@@ -6,7 +6,9 @@ import (
 	"cf/configuration"
 	. "cf/net"
 	"fmt"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -15,78 +17,9 @@ import (
 	"strings"
 	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
-	"testing"
 )
 
-func TestNewRequest(t *testing.T) {
-
-	gateway := NewCloudControllerGateway()
-
-	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
-
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, request.HttpReq.Header.Get("Authorization"), "BEARER my-access-token")
-	assert.Equal(t, request.HttpReq.Header.Get("accept"), "application/json")
-	assert.Equal(t, request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
-}
-
-func TestNewRequestWithAFileBody(t *testing.T) {
-
-	gateway := NewCloudControllerGateway()
-
-	body, err := os.Open("../../fixtures/hello_world.txt")
-	assert.NoError(t, err)
-	request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
-
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, request.HttpReq.ContentLength, 12)
-}
-
-func TestRefreshingTheTokenWithUAARequest(t *testing.T) {
-	gateway := NewUAAGateway()
-	endpoint := refreshTokenApiEndPoint(
-		`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-		testnet.TestResponse{Status: http.StatusOK},
-	)
-
-	testRefreshTokenWithSuccess(t, gateway, endpoint)
-}
-
-func TestRefreshingTheTokenWithUAARequestAndReturningError(t *testing.T) {
-	gateway := NewUAAGateway()
-	endpoint := refreshTokenApiEndPoint(
-		`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-		testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
-			"error": "333", "error_description": "bad request"
-		}`},
-	)
-
-	testRefreshTokenWithError(t, gateway, endpoint)
-}
-
-func TestRefreshingTheTokenWithCloudControllerRequest(t *testing.T) {
-	gateway := NewCloudControllerGateway()
-	endpoint := refreshTokenApiEndPoint(
-		`{ "code": 1000, "description": "Auth token is invalid" }`,
-		testnet.TestResponse{Status: http.StatusOK},
-	)
-
-	testRefreshTokenWithSuccess(t, gateway, endpoint)
-}
-
-func TestRefreshingTheTokenWithCloudControllerRequestAndReturningError(t *testing.T) {
-	gateway := NewCloudControllerGateway()
-	endpoint := refreshTokenApiEndPoint(
-		`{ "code": 1000, "description": "Auth token is invalid" }`,
-		testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
-			"code": 333, "description": "bad request"
-		}`},
-	)
-
-	testRefreshTokenWithError(t, gateway, endpoint)
-}
-
-func testRefreshTokenWithSuccess(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) {
+func testRefreshTokenWithSuccess(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.True(t, apiResponse.IsSuccessful())
 
@@ -95,7 +28,7 @@ func testRefreshTokenWithSuccess(t *testing.T, gateway Gateway, endpoint http.Ha
 	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
 }
 
-func testRefreshTokenWithError(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) {
+func testRefreshTokenWithError(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.False(t, apiResponse.IsSuccessful())
 	assert.Equal(t, apiResponse.ErrorCode, "333")
@@ -126,7 +59,7 @@ var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testne
 	}
 }
 
-func testRefreshToken(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) (apiResponse ApiResponse) {
+func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) (apiResponse ApiResponse) {
 	authEndpoint := func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintln(
 			writer,
@@ -150,7 +83,7 @@ func testRefreshToken(t *testing.T, gateway Gateway, endpoint http.HandlerFunc) 
 	return
 }
 
-func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, authServer *httptest.Server) (*configuration.Configuration, api.AuthenticationRepository) {
+func createAuthenticationRepository(t mr.TestingT, apiServer *httptest.Server, authServer *httptest.Server) (*configuration.Configuration, api.AuthenticationRepository) {
 	configRepo := testconfig.FakeConfigRepository{}
 	configRepo.Delete()
 	config, err := configRepo.Get()
@@ -165,4 +98,73 @@ func createAuthenticationRepository(t *testing.T, apiServer *httptest.Server, au
 	authenticator := api.NewUAAAuthenticationRepository(authGateway, configRepo)
 
 	return config, authenticator
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestNewRequest", func() {
+			gateway := NewCloudControllerGateway()
+
+			request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+			assert.Equal(mr.T(), request.HttpReq.Header.Get("Authorization"), "BEARER my-access-token")
+			assert.Equal(mr.T(), request.HttpReq.Header.Get("accept"), "application/json")
+			assert.Equal(mr.T(), request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
+		})
+		It("TestNewRequestWithAFileBody", func() {
+
+			gateway := NewCloudControllerGateway()
+
+			body, err := os.Open("../../fixtures/hello_world.txt")
+			assert.NoError(mr.T(), err)
+			request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
+
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+			assert.Equal(mr.T(), request.HttpReq.ContentLength, 12)
+		})
+		It("TestRefreshingTheTokenWithUAARequest", func() {
+
+			gateway := NewUAAGateway()
+			endpoint := refreshTokenApiEndPoint(
+				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusOK},
+			)
+
+			testRefreshTokenWithSuccess(mr.T(), gateway, endpoint)
+		})
+		It("TestRefreshingTheTokenWithUAARequestAndReturningError", func() {
+
+			gateway := NewUAAGateway()
+			endpoint := refreshTokenApiEndPoint(
+				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
+			"error": "333", "error_description": "bad request"
+		}`},
+			)
+
+			testRefreshTokenWithError(mr.T(), gateway, endpoint)
+		})
+		It("TestRefreshingTheTokenWithCloudControllerRequest", func() {
+
+			gateway := NewCloudControllerGateway()
+			endpoint := refreshTokenApiEndPoint(
+				`{ "code": 1000, "description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusOK},
+			)
+
+			testRefreshTokenWithSuccess(mr.T(), gateway, endpoint)
+		})
+		It("TestRefreshingTheTokenWithCloudControllerRequestAndReturningError", func() {
+
+			gateway := NewCloudControllerGateway()
+			endpoint := refreshTokenApiEndPoint(
+				`{ "code": 1000, "description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
+			"code": 333, "description": "bad request"
+		}`},
+			)
+
+			testRefreshTokenWithError(mr.T(), gateway, endpoint)
+		})
+	})
 }

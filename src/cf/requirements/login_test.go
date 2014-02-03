@@ -2,29 +2,35 @@ package requirements
 
 import (
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestLoginRequirement(t *testing.T) {
-	ui := new(testterm.FakeUI)
-	config := &configuration.Configuration{
-		AccessToken: "foo bar token",
-	}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestLoginRequirement", func() {
 
-	req := newLoginRequirement(ui, config)
-	success := req.Execute()
-	assert.True(t, success)
+			ui := new(testterm.FakeUI)
+			config := &configuration.Configuration{
+				AccessToken: "foo bar token",
+			}
 
-	config = &configuration.Configuration{
-		AccessToken: "",
-	}
+			req := newLoginRequirement(ui, config)
+			success := req.Execute()
+			assert.True(mr.T(), success)
 
-	req = newLoginRequirement(ui, config)
-	success = req.Execute()
-	assert.False(t, success)
+			config = &configuration.Configuration{
+				AccessToken: "",
+			}
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{{"Not logged in."}})
+			req = newLoginRequirement(ui, config)
+			success = req.Execute()
+			assert.False(mr.T(), success)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
+		})
+	})
 }

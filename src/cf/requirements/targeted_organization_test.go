@@ -3,33 +3,39 @@ package requirements
 import (
 	"cf"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestTargetedOrgRequirement(t *testing.T) {
-	ui := new(testterm.FakeUI)
-	org := cf.OrganizationFields{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
-	config := &configuration.Configuration{
-		OrganizationFields: org,
-	}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestTargetedOrgRequirement", func() {
 
-	req := newTargetedOrgRequirement(ui, config)
-	success := req.Execute()
-	assert.True(t, success)
+			ui := new(testterm.FakeUI)
+			org := cf.OrganizationFields{}
+			org.Name = "my-org"
+			org.Guid = "my-org-guid"
+			config := &configuration.Configuration{
+				OrganizationFields: org,
+			}
 
-	config.OrganizationFields = cf.OrganizationFields{}
+			req := newTargetedOrgRequirement(ui, config)
+			success := req.Execute()
+			assert.True(mr.T(), success)
 
-	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
-		newTargetedOrgRequirement(ui, config).Execute()
-	})
+			config.OrganizationFields = cf.OrganizationFields{}
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"No org targeted"},
+			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+				newTargetedOrgRequirement(ui, config).Execute()
+			})
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"No org targeted"},
+			})
+		})
 	})
 }

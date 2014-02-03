@@ -4,12 +4,13 @@ import (
 	. "cf/api"
 	"cf/net"
 	"encoding/base64"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
-	"testing"
 )
 
 var authHeaders = http.Header{
@@ -35,7 +36,7 @@ var successfulLoginRequest = testnet.TestRequest{
 } `},
 }
 
-var successfulLoginMatcher = func(t *testing.T, request *http.Request) {
+var successfulLoginMatcher = func(t mr.TestingT, request *http.Request) {
 	err := request.ParseForm()
 	if err != nil {
 		assert.Fail(t, "Failed to parse form: %s", err)
@@ -48,20 +49,6 @@ var successfulLoginMatcher = func(t *testing.T, request *http.Request) {
 	assert.Equal(t, request.Form.Get("scope"), "", "Scope did not mathc.")
 }
 
-func TestSuccessfullyLoggingIn(t *testing.T) {
-	ts, handler, auth := setupAuthWithEndpoint(t, successfulLoginRequest)
-	defer ts.Close()
-
-	apiResponse := auth.Authenticate("foo@example.com", "bar")
-	savedConfig := testconfig.SavedConfiguration
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsError())
-	assert.Equal(t, savedConfig.AuthorizationEndpoint, ts.URL)
-	assert.Equal(t, savedConfig.AccessToken, "BEARER my_access_token")
-	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
-}
-
 var unsuccessfulLoginRequest = testnet.TestRequest{
 	Method: "POST",
 	Path:   "/oauth/token",
@@ -70,38 +57,12 @@ var unsuccessfulLoginRequest = testnet.TestRequest{
 	},
 }
 
-func TestUnsuccessfullyLoggingIn(t *testing.T) {
-	ts, handler, auth := setupAuthWithEndpoint(t, unsuccessfulLoginRequest)
-	defer ts.Close()
-
-	apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
-	savedConfig := testconfig.SavedConfiguration
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, apiResponse.Message, "Password is incorrect, please try again.")
-	assert.Empty(t, savedConfig.AccessToken)
-}
-
 var errorLoginRequest = testnet.TestRequest{
 	Method: "POST",
 	Path:   "/oauth/token",
 	Response: testnet.TestResponse{
 		Status: http.StatusInternalServerError,
 	},
-}
-
-func TestServerErrorLoggingIn(t *testing.T) {
-	ts, handler, auth := setupAuthWithEndpoint(t, errorLoginRequest)
-	defer ts.Close()
-
-	apiResponse := auth.Authenticate("foo@example.com", "bar")
-	savedConfig := testconfig.SavedConfiguration
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsError())
-	assert.Equal(t, apiResponse.Message, "Server error, status code: 500, error code: , message: ")
-	assert.Empty(t, savedConfig.AccessToken)
 }
 
 var errorMaskedAsSuccessLoginRequest = testnet.TestRequest{
@@ -114,20 +75,7 @@ var errorMaskedAsSuccessLoginRequest = testnet.TestRequest{
 `},
 }
 
-func TestLoggingInWithErrorMaskedAsSuccess(t *testing.T) {
-	ts, handler, auth := setupAuthWithEndpoint(t, errorMaskedAsSuccessLoginRequest)
-	defer ts.Close()
-
-	apiResponse := auth.Authenticate("foo@example.com", "bar")
-	savedConfig := testconfig.SavedConfiguration
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsError())
-	assert.Equal(t, apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
-	assert.Empty(t, savedConfig.AccessToken)
-}
-
-func setupAuthWithEndpoint(t *testing.T, request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, auth UAAAuthenticationRepository) {
+func setupAuthWithEndpoint(t mr.TestingT, request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, auth UAAAuthenticationRepository) {
 	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{request})
 
 	configRepo := testconfig.FakeConfigRepository{}
@@ -141,4 +89,60 @@ func setupAuthWithEndpoint(t *testing.T, request testnet.TestRequest) (ts *httpt
 
 	auth = NewUAAAuthenticationRepository(gateway, configRepo)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSuccessfullyLoggingIn", func() {
+			ts, handler, auth := setupAuthWithEndpoint(mr.T(), successfulLoginRequest)
+			defer ts.Close()
+
+			apiResponse := auth.Authenticate("foo@example.com", "bar")
+			savedConfig := testconfig.SavedConfiguration
+
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.False(mr.T(), apiResponse.IsError())
+			assert.Equal(mr.T(), savedConfig.AuthorizationEndpoint, ts.URL)
+			assert.Equal(mr.T(), savedConfig.AccessToken, "BEARER my_access_token")
+			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+		})
+		It("TestUnsuccessfullyLoggingIn", func() {
+
+			ts, handler, auth := setupAuthWithEndpoint(mr.T(), unsuccessfulLoginRequest)
+			defer ts.Close()
+
+			apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
+			savedConfig := testconfig.SavedConfiguration
+
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsNotSuccessful())
+			assert.Equal(mr.T(), apiResponse.Message, "Password is incorrect, please try again.")
+			assert.Empty(mr.T(), savedConfig.AccessToken)
+		})
+		It("TestServerErrorLoggingIn", func() {
+
+			ts, handler, auth := setupAuthWithEndpoint(mr.T(), errorLoginRequest)
+			defer ts.Close()
+
+			apiResponse := auth.Authenticate("foo@example.com", "bar")
+			savedConfig := testconfig.SavedConfiguration
+
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsError())
+			assert.Equal(mr.T(), apiResponse.Message, "Server error, status code: 500, error code: , message: ")
+			assert.Empty(mr.T(), savedConfig.AccessToken)
+		})
+		It("TestLoggingInWithErrorMaskedAsSuccess", func() {
+
+			ts, handler, auth := setupAuthWithEndpoint(mr.T(), errorMaskedAsSuccessLoginRequest)
+			defer ts.Close()
+
+			apiResponse := auth.Authenticate("foo@example.com", "bar")
+			savedConfig := testconfig.SavedConfiguration
+
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsError())
+			assert.Equal(mr.T(), apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
+			assert.Empty(mr.T(), savedConfig.AccessToken)
+		})
+	})
 }

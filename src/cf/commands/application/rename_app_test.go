@@ -4,53 +4,18 @@ import (
 	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestRenameAppFailsWithUsage(t *testing.T) {
-	reqFactory := &testreq.FakeReqFactory{}
-	appRepo := &testapi.FakeApplicationRepository{}
-
-	ui := callRename(t, []string{}, reqFactory, appRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callRename(t, []string{"foo"}, reqFactory, appRepo)
-	assert.True(t, ui.FailedWithUsage)
-}
-
-func TestRenameRequirements(t *testing.T) {
-	appRepo := &testapi.FakeApplicationRepository{}
-
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-	callRename(t, []string{"my-app", "my-new-app"}, reqFactory, appRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-	assert.Equal(t, reqFactory.ApplicationName, "my-app")
-}
-
-func TestRenameRun(t *testing.T) {
-	appRepo := &testapi.FakeApplicationRepository{}
-	app := cf.Application{}
-	app.Name = "my-app"
-	app.Guid = "my-app-guid"
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
-	ui := callRename(t, []string{"my-app", "my-new-app"}, reqFactory, appRepo)
-
-	assert.Equal(t, appRepo.UpdateAppGuid, app.Guid)
-	assert.Equal(t, appRepo.UpdateParams.Get("name"), "my-new-app")
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
-		{"OK"},
-	})
-}
-
-func callRename(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
+func callRename(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("rename", args)
 
@@ -71,4 +36,43 @@ func callRename(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory,
 	cmd := NewRenameApp(ui, config, appRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestRenameAppFailsWithUsage", func() {
+			reqFactory := &testreq.FakeReqFactory{}
+			appRepo := &testapi.FakeApplicationRepository{}
+
+			ui := callRename(mr.T(), []string{}, reqFactory, appRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callRename(mr.T(), []string{"foo"}, reqFactory, appRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestRenameRequirements", func() {
+
+			appRepo := &testapi.FakeApplicationRepository{}
+
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+			callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		})
+		It("TestRenameRun", func() {
+
+			appRepo := &testapi.FakeApplicationRepository{}
+			app := cf.Application{}
+			app.Name = "my-app"
+			app.Guid = "my-app-guid"
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
+			ui := callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
+
+			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
+			assert.Equal(mr.T(), appRepo.UpdateParams.Get("name"), "my-new-app")
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
+				{"OK"},
+			})
+		})
+	})
 }

@@ -2,33 +2,39 @@ package requirements
 
 import (
 	"cf"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
-func TestServiceInstanceReqExecute(t *testing.T) {
-	instance := cf.ServiceInstance{}
-	instance.Name = "my-service"
-	instance.Guid = "my-service-guid"
-	repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
-	ui := new(testterm.FakeUI)
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestServiceInstanceReqExecute", func() {
 
-	req := newServiceInstanceRequirement("foo", ui, repo)
-	success := req.Execute()
+			instance := cf.ServiceInstance{}
+			instance.Name = "my-service"
+			instance.Guid = "my-service-guid"
+			repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
+			ui := new(testterm.FakeUI)
 
-	assert.True(t, success)
-	assert.Equal(t, repo.FindInstanceByNameName, "foo")
-	assert.Equal(t, req.GetServiceInstance(), instance)
-}
+			req := newServiceInstanceRequirement("foo", ui, repo)
+			success := req.Execute()
 
-func TestServiceInstanceReqExecuteWhenServiceInstanceNotFound(t *testing.T) {
-	repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
-	ui := new(testterm.FakeUI)
+			assert.True(mr.T(), success)
+			assert.Equal(mr.T(), repo.FindInstanceByNameName, "foo")
+			assert.Equal(mr.T(), req.GetServiceInstance(), instance)
+		})
+		It("TestServiceInstanceReqExecuteWhenServiceInstanceNotFound", func() {
 
-	testassert.AssertPanic(t, testterm.FailedWasCalled, func() {
-		newServiceInstanceRequirement("foo", ui, repo).Execute()
+			repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
+			ui := new(testterm.FakeUI)
+
+			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+				newServiceInstanceRequirement("foo", ui, repo).Execute()
+			})
+		})
 	})
 }

@@ -6,115 +6,16 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"fmt"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
-	"testing"
 )
 
-func TestSpacesListSpaces(t *testing.T) {
-	firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/organizations/some-org-guid/spaces",
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body: `{
-			"next_url": "/v2/organizations/some-org-guid/spaces?page=2",
-			"resources": [
-				{
-			  		"metadata": {
-				  		"guid": "acceptance-space-guid"
-			  		},
-			  		"entity": {
-				  		"name": "acceptance"
-			  		}
-			  	}
-			]
-		}`}})
-
-	secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/organizations/some-org-guid/spaces?page=2",
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body: `{
-			"resources": [
-			  	{
-			  		"metadata": {
-				      	"guid": "staging-space-guid"
-				  	},
-			    	"entity": {
-						"name": "staging"
-				    }
-				}
-			]
-		}`}})
-
-	ts, handler, repo := createSpacesRepo(t, firstPageSpacesRequest, secondPageSpacesRequest)
-	defer ts.Close()
-
-	stopChan := make(chan bool)
-	defer close(stopChan)
-	spacesChan, statusChan := repo.ListSpaces(stopChan)
-
-	spaces := []cf.Space{}
-	for chunk := range spacesChan {
-		spaces = append(spaces, chunk...)
-	}
-	apiResponse := <-statusChan
-
-	assert.Equal(t, spaces[0].Guid, "acceptance-space-guid")
-	assert.Equal(t, spaces[1].Guid, "staging-space-guid")
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.True(t, handler.AllRequestsCalled())
-}
-
-func TestSpacesListSpacesWithNoSpaces(t *testing.T) {
-	emptySpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/organizations/some-org-guid/spaces",
-		Response: testnet.TestResponse{
-			Status: http.StatusOK,
-			Body:   `{"resources": []}`,
-		},
-	})
-
-	ts, handler, repo := createSpacesRepo(t, emptySpacesRequest)
-	defer ts.Close()
-
-	stopChan := make(chan bool)
-	defer close(stopChan)
-	spacesChan, statusChan := repo.ListSpaces(stopChan)
-
-	_, ok := <-spacesChan
-	apiResponse := <-statusChan
-
-	assert.False(t, ok)
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.True(t, handler.AllRequestsCalled())
-}
-
-func TestSpacesFindByName(t *testing.T) {
-	testSpacesFindByNameWithOrg(t,
-		"some-org-guid",
-		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
-			return repo.FindByName(spaceName)
-		},
-	)
-}
-
-func TestSpacesFindByNameInOrg(t *testing.T) {
-	testSpacesFindByNameWithOrg(t,
-		"another-org-guid",
-		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
-			return repo.FindByNameInOrg(spaceName, "another-org-guid")
-		},
-	)
-}
-
-func testSpacesFindByNameWithOrg(t *testing.T, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
+func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -208,25 +109,7 @@ func testSpacesFindByNameWithOrg(t *testing.T, orgGuid string, findByName func(S
 	return
 }
 
-func TestSpacesDidNotFindByName(t *testing.T) {
-	testSpacesDidNotFindByNameWithOrg(t,
-		"some-org-guid",
-		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
-			return repo.FindByName(spaceName)
-		},
-	)
-}
-
-func TestSpacesDidNotFindByNameInOrg(t *testing.T) {
-	testSpacesDidNotFindByNameWithOrg(t,
-		"another-org-guid",
-		func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
-			return repo.FindByNameInOrg(spaceName, "another-org-guid")
-		},
-	)
-}
-
-func testSpacesDidNotFindByNameWithOrg(t *testing.T, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
+func testSpacesDidNotFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
@@ -254,55 +137,7 @@ var defaultCreateSpaceResponse = `{
   }
 }`
 
-func TestCreateSpace(t *testing.T) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "POST",
-		Path:     "/v2/spaces",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated, Body: defaultCreateSpaceResponse},
-	})
-
-	ts, handler, repo := createSpacesRepo(t, request)
-	defer ts.Close()
-
-	space, apiResponse := repo.Create("space-name", "some-org-guid")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, space.Guid, "space-guid")
-}
-
-func TestRenameSpace(t *testing.T) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/spaces/my-space-guid",
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"new-space-name"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated},
-	})
-
-	ts, handler, repo := createSpacesRepo(t, request)
-	defer ts.Close()
-
-	apiResponse := repo.Rename("my-space-guid", "new-space-name")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func TestDeleteSpace(t *testing.T) {
-	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "DELETE",
-		Path:     "/v2/spaces/my-space-guid?recursive=true",
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-
-	ts, handler, repo := createSpacesRepo(t, request)
-	defer ts.Close()
-
-	apiResponse := repo.Delete("my-space-guid")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-}
-
-func createSpacesRepo(t *testing.T, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
+func createSpacesRepo(t mr.TestingT, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
 	ts, handler = testnet.NewTLSServer(t, reqs)
 	org4 := cf.OrganizationFields{}
 	org4.Guid = "some-org-guid"
@@ -318,4 +153,169 @@ func createSpacesRepo(t *testing.T, reqs ...testnet.TestRequest) (ts *httptest.S
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerSpaceRepository(config, gateway)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestSpacesListSpaces", func() {
+			firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations/some-org-guid/spaces",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `{
+			"next_url": "/v2/organizations/some-org-guid/spaces?page=2",
+			"resources": [
+				{
+			  		"metadata": {
+				  		"guid": "acceptance-space-guid"
+			  		},
+			  		"entity": {
+				  		"name": "acceptance"
+			  		}
+			  	}
+			]
+		}`}})
+
+			secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations/some-org-guid/spaces?page=2",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body: `{
+			"resources": [
+			  	{
+			  		"metadata": {
+				      	"guid": "staging-space-guid"
+				  	},
+			    	"entity": {
+						"name": "staging"
+				    }
+				}
+			]
+		}`}})
+
+			ts, handler, repo := createSpacesRepo(mr.T(), firstPageSpacesRequest, secondPageSpacesRequest)
+			defer ts.Close()
+
+			stopChan := make(chan bool)
+			defer close(stopChan)
+			spacesChan, statusChan := repo.ListSpaces(stopChan)
+
+			spaces := []cf.Space{}
+			for chunk := range spacesChan {
+				spaces = append(spaces, chunk...)
+			}
+			apiResponse := <-statusChan
+
+			assert.Equal(mr.T(), spaces[0].Guid, "acceptance-space-guid")
+			assert.Equal(mr.T(), spaces[1].Guid, "staging-space-guid")
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+			assert.True(mr.T(), handler.AllRequestsCalled())
+		})
+		It("TestSpacesListSpacesWithNoSpaces", func() {
+
+			emptySpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/organizations/some-org-guid/spaces",
+				Response: testnet.TestResponse{
+					Status: http.StatusOK,
+					Body:   `{"resources": []}`,
+				},
+			})
+
+			ts, handler, repo := createSpacesRepo(mr.T(), emptySpacesRequest)
+			defer ts.Close()
+
+			stopChan := make(chan bool)
+			defer close(stopChan)
+			spacesChan, statusChan := repo.ListSpaces(stopChan)
+
+			_, ok := <-spacesChan
+			apiResponse := <-statusChan
+
+			assert.False(mr.T(), ok)
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+			assert.True(mr.T(), handler.AllRequestsCalled())
+		})
+		It("TestSpacesFindByName", func() {
+
+			testSpacesFindByNameWithOrg(mr.T(), "some-org-guid",
+				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+					return repo.FindByName(spaceName)
+				},
+			)
+		})
+		It("TestSpacesFindByNameInOrg", func() {
+
+			testSpacesFindByNameWithOrg(mr.T(), "another-org-guid",
+				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+					return repo.FindByNameInOrg(spaceName, "another-org-guid")
+				},
+			)
+		})
+		It("TestSpacesDidNotFindByName", func() {
+
+			testSpacesDidNotFindByNameWithOrg(mr.T(), "some-org-guid",
+				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+					return repo.FindByName(spaceName)
+				},
+			)
+		})
+		It("TestSpacesDidNotFindByNameInOrg", func() {
+
+			testSpacesDidNotFindByNameWithOrg(mr.T(), "another-org-guid",
+				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+					return repo.FindByNameInOrg(spaceName, "another-org-guid")
+				},
+			)
+		})
+		It("TestCreateSpace", func() {
+
+			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/spaces",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated, Body: defaultCreateSpaceResponse},
+			})
+
+			ts, handler, repo := createSpacesRepo(mr.T(), request)
+			defer ts.Close()
+
+			space, apiResponse := repo.Create("space-name", "some-org-guid")
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+			assert.Equal(mr.T(), space.Guid, "space-guid")
+		})
+		It("TestRenameSpace", func() {
+
+			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/spaces/my-space-guid",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"new-space-name"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+
+			ts, handler, repo := createSpacesRepo(mr.T(), request)
+			defer ts.Close()
+
+			apiResponse := repo.Rename("my-space-guid", "new-space-name")
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+		})
+		It("TestDeleteSpace", func() {
+
+			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/spaces/my-space-guid?recursive=true",
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			})
+
+			ts, handler, repo := createSpacesRepo(mr.T(), request)
+			defer ts.Close()
+
+			apiResponse := repo.Delete("my-space-guid")
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		})
+	})
 }

@@ -5,7 +5,9 @@ import (
 	. "cf/commands/space"
 	"cf/commands/user"
 	"cf/configuration"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -13,7 +15,6 @@ import (
 	"testhelpers/maker"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"testing"
 )
 
 var (
@@ -49,130 +50,7 @@ func resetSpaceDefaults() {
 	defaultOrgRepo = &testapi.FakeOrgRepository{}
 }
 
-func TestCreateSpaceFailsWithUsage(t *testing.T) {
-	resetSpaceDefaults()
-	reqFactory := &testreq.FakeReqFactory{}
-
-	ui := callCreateSpace(t, []string{}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-	assert.True(t, ui.FailedWithUsage)
-
-	ui = callCreateSpace(t, []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-	assert.False(t, ui.FailedWithUsage)
-}
-
-func TestCreateSpaceRequirements(t *testing.T) {
-	resetSpaceDefaults()
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-	callCreateSpace(t, []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-	callCreateSpace(t, []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-	callCreateSpace(t, []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-	assert.False(t, testcmd.CommandDidPassRequirements)
-
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-	callCreateSpace(t, []string{"-o", "some-org", "my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-	assert.True(t, testcmd.CommandDidPassRequirements)
-
-}
-
-func TestCreateSpace(t *testing.T) {
-	resetSpaceDefaults()
-	ui := callCreateSpace(t, []string{"my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating space", "my-space", "my-org", "my-user"},
-		{"OK"},
-		{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
-		{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]},
-		{"TIP"},
-	})
-
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceName, "my-space")
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceOrgGuid, "my-org-guid")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)
-}
-
-func TestCreateSpaceInOrg(t *testing.T) {
-	resetSpaceDefaults()
-
-	org := maker.NewOrg(maker.Overrides{"name": "other-org"})
-	defaultOrgRepo.Organizations = []cf.Organization{org}
-
-	ui := callCreateSpace(t, []string{"-o", "other-org", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating space", "my-space", "other-org", "my-user"},
-		{"OK"},
-		{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
-		{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]},
-		{"TIP"},
-	})
-
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceName, "my-space")
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceOrgGuid, org.Guid)
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)
-}
-
-func TestCreateSpaceInOrgWhenTheOrgDoesNotExist(t *testing.T) {
-	resetSpaceDefaults()
-
-	defaultOrgRepo.FindByNameNotFound = true
-
-	ui := callCreateSpace(t, []string{"-o", "cool-organization", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"cool-organization", "does not exist"},
-	})
-
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceName, "")
-}
-
-func TestCreateSpaceInOrgWhenErrorFindingOrg(t *testing.T) {
-	resetSpaceDefaults()
-
-	defaultOrgRepo.FindByNameErr = true
-
-	ui := callCreateSpace(t, []string{"-o", "cool-organization", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"FAILED"},
-		{"error"},
-	})
-
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceName, "")
-}
-
-func TestCreateSpaceWhenItAlreadyExists(t *testing.T) {
-	resetSpaceDefaults()
-	defaultSpaceRepo.CreateSpaceExists = true
-	ui := callCreateSpace(t, []string{"my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Creating space", "my-space"},
-		{"OK"},
-		{"my-space", "already exists"},
-	})
-	testassert.SliceDoesNotContain(t, ui.Outputs, testassert.Lines{
-		{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
-	})
-
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceName, "")
-	assert.Equal(t, defaultSpaceRepo.CreateSpaceOrgGuid, "")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleUserGuid, "")
-	assert.Equal(t, defaultUserRepo.SetSpaceRoleSpaceGuid, "")
-}
-
-func callCreateSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, orgRepo *testapi.FakeOrgRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callCreateSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, orgRepo *testapi.FakeOrgRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-space", args)
 
@@ -192,4 +70,129 @@ func callCreateSpace(t *testing.T, args []string, reqFactory *testreq.FakeReqFac
 	cmd := NewCreateSpace(ui, config, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestCreateSpaceFailsWithUsage", func() {
+			resetSpaceDefaults()
+			reqFactory := &testreq.FakeReqFactory{}
+
+			ui := callCreateSpace(mr.T(), []string{}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+			assert.True(mr.T(), ui.FailedWithUsage)
+
+			ui = callCreateSpace(mr.T(), []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+			assert.False(mr.T(), ui.FailedWithUsage)
+		})
+		It("TestCreateSpaceRequirements", func() {
+
+			resetSpaceDefaults()
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+			callCreateSpace(mr.T(), []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+			callCreateSpace(mr.T(), []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+			callCreateSpace(mr.T(), []string{"my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+			callCreateSpace(mr.T(), []string{"-o", "some-org", "my-space"}, reqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		})
+		It("TestCreateSpace", func() {
+
+			resetSpaceDefaults()
+			ui := callCreateSpace(mr.T(), []string{"my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating space", "my-space", "my-org", "my-user"},
+				{"OK"},
+				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
+				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]},
+				{"TIP"},
+			})
+
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "my-space")
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, "my-org-guid")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)
+		})
+		It("TestCreateSpaceInOrg", func() {
+
+			resetSpaceDefaults()
+
+			org := maker.NewOrg(maker.Overrides{"name": "other-org"})
+			defaultOrgRepo.Organizations = []cf.Organization{org}
+
+			ui := callCreateSpace(mr.T(), []string{"-o", "other-org", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating space", "my-space", "other-org", "my-user"},
+				{"OK"},
+				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
+				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]},
+				{"TIP"},
+			})
+
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "my-space")
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, org.Guid)
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)
+		})
+		It("TestCreateSpaceInOrgWhenTheOrgDoesNotExist", func() {
+
+			resetSpaceDefaults()
+
+			defaultOrgRepo.FindByNameNotFound = true
+
+			ui := callCreateSpace(mr.T(), []string{"-o", "cool-organization", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"cool-organization", "does not exist"},
+			})
+
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")
+		})
+		It("TestCreateSpaceInOrgWhenErrorFindingOrg", func() {
+
+			resetSpaceDefaults()
+
+			defaultOrgRepo.FindByNameErr = true
+
+			ui := callCreateSpace(mr.T(), []string{"-o", "cool-organization", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"error"},
+			})
+
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")
+		})
+		It("TestCreateSpaceWhenItAlreadyExists", func() {
+
+			resetSpaceDefaults()
+			defaultSpaceRepo.CreateSpaceExists = true
+			ui := callCreateSpace(mr.T(), []string{"my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
+
+			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+				{"Creating space", "my-space"},
+				{"OK"},
+				{"my-space", "already exists"},
+			})
+			testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
+			})
+
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")
+			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, "")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "")
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "")
+		})
+	})
 }

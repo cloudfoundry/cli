@@ -4,47 +4,14 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
 	testnet "testhelpers/net"
-	"testing"
 )
-
-func TestStacksFindByName(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method: "GET",
-		Path:   "/v2/stacks?q=name%3Alinux",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: ` { "resources": [
-			{
-			  "metadata": { "guid": "custom-linux-guid" },
-			  "entity": { "name": "custom-linux" }
-			}
-  		]}`}})
-	ts, handler, repo := createStackRepo(t, req)
-	defer ts.Close()
-
-	stack, apiResponse := repo.FindByName("linux")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, stack.Name, "custom-linux")
-	assert.Equal(t, stack.Guid, "custom-linux-guid")
-}
-
-func TestStacksFindByNameNotFound(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "GET",
-		Path:     "/v2/stacks?q=name%3Alinux",
-		Response: testnet.TestResponse{Status: http.StatusOK, Body: ` { "resources": []}`},
-	})
-	ts, handler, repo := createStackRepo(t, req)
-	defer ts.Close()
-
-	_, apiResponse := repo.FindByName("linux")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsNotSuccessful())
-}
 
 var allStacksResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
@@ -76,25 +43,7 @@ var allStacksResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
   ]
 }`}
 
-func TestStacksFindAll(t *testing.T) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "GET",
-		Path:     "/v2/stacks",
-		Response: allStacksResponse,
-	})
-
-	ts, handler, repo := createStackRepo(t, req)
-	defer ts.Close()
-
-	stacks, apiResponse := repo.FindAll()
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, len(stacks), 2)
-	assert.Equal(t, stacks[0].Name, "lucid64")
-	assert.Equal(t, stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")
-}
-
-func createStackRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo StackRepository) {
+func createStackRepo(t mr.TestingT, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo StackRepository) {
 	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
 
 	config := &configuration.Configuration{
@@ -104,4 +53,59 @@ func createStackRepo(t *testing.T, req testnet.TestRequest) (ts *httptest.Server
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerStackRepository(config, gateway)
 	return
+}
+func init() {
+	Describe("Testing with ginkgo", func() {
+		It("TestStacksFindByName", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/stacks?q=name%3Alinux",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: ` { "resources": [
+			{
+			  "metadata": { "guid": "custom-linux-guid" },
+			  "entity": { "name": "custom-linux" }
+			}
+  		]}`}})
+			ts, handler, repo := createStackRepo(mr.T(), req)
+			defer ts.Close()
+
+			stack, apiResponse := repo.FindByName("linux")
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsSuccessful())
+			assert.Equal(mr.T(), stack.Name, "custom-linux")
+			assert.Equal(mr.T(), stack.Guid, "custom-linux-guid")
+		})
+		It("TestStacksFindByNameNotFound", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/stacks?q=name%3Alinux",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: ` { "resources": []}`},
+			})
+			ts, handler, repo := createStackRepo(mr.T(), req)
+			defer ts.Close()
+
+			_, apiResponse := repo.FindByName("linux")
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		})
+		It("TestStacksFindAll", func() {
+
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/stacks",
+				Response: allStacksResponse,
+			})
+
+			ts, handler, repo := createStackRepo(mr.T(), req)
+			defer ts.Close()
+
+			stacks, apiResponse := repo.FindAll()
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+			assert.Equal(mr.T(), len(stacks), 2)
+			assert.Equal(mr.T(), stacks[0].Name, "lucid64")
+			assert.Equal(mr.T(), stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")
+		})
+	})
 }
