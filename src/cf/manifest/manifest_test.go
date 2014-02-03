@@ -4,6 +4,7 @@ import (
 	"cf/manifest"
 	"generic"
 	"github.com/stretchr/testify/assert"
+	"runtime"
 	"strings"
 	testassert "testhelpers/assert"
 	"testing"
@@ -75,6 +76,14 @@ func TestManifestWithEmptyEnvVarIsInvalid(t *testing.T) {
 }
 
 func TestManifestWithAbsolutePath(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		testManifestWithAbsolutePathOnWindows(t)
+	} else {
+		testManifestWithAbsolutePathOnPosix(t)
+	}
+}
+
+func testManifestWithAbsolutePathOnPosix(t *testing.T) {
 	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
@@ -85,6 +94,19 @@ func TestManifestWithAbsolutePath(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, m.Applications[0].Get("path"), "/another/path-segment")
+}
+
+func testManifestWithAbsolutePathOnWindows(t *testing.T) {
+	m, err := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[string]interface{}{
+		"applications": []interface{}{
+			map[string]interface{}{
+				"path": `C:\another\path`,
+			},
+		},
+	}))
+
+	assert.NoError(t, err)
+	assert.Equal(t, m.Applications[0].Get("path"), `C:\another\path`)
 }
 
 func TestManifestWithRelativePath(t *testing.T) {
