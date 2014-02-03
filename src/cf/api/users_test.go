@@ -70,6 +70,36 @@ func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, 
 	return
 }
 
+func TestListAllUsersInOrg(t *testing.T) {
+	ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/users")
+
+	cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
+	defer cc.Close()
+	defer uaa.Close()
+
+	stopChan := make(chan bool)
+	defer close(stopChan)
+	usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", cf.ORG_USER, stopChan)
+
+	users := []cf.UserFields{}
+	for chunk := range usersChan {
+		users = append(users, chunk...)
+	}
+	apiResponse := <-statusChan
+
+	assert.True(t, ccHandler.AllRequestsCalled())
+	assert.True(t, uaaHandler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+
+	assert.Equal(t, len(users), 3)
+	assert.Equal(t, users[0].Guid, "user-1-guid")
+	assert.Equal(t, users[0].Username, "Super user 1")
+	assert.Equal(t, users[1].Guid, "user-2-guid")
+	assert.Equal(t, users[1].Username, "Super user 2")
+	assert.Equal(t, users[2].Guid, "user-3-guid")
+	assert.Equal(t, users[2].Username, "Super user 3")
+}
+
 func TestListUsersInOrgForRole(t *testing.T) {
 	ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
