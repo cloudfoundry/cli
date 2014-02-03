@@ -33,7 +33,9 @@ func callRenameSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 		AccessToken:        token,
 	}
 
-	cmd := NewRenameSpace(ui, config, spaceRepo, testconfig.FakeConfigRepository{})
+	configRepo := testconfig.FakeConfigRepository{}
+	configRepo.EnsureInitialized()
+	cmd := NewRenameSpace(ui, config, spaceRepo, configRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
@@ -67,7 +69,6 @@ func init() {
 			assert.Equal(mr.T(), reqFactory.SpaceName, "my-space")
 		})
 		It("TestRenameSpaceRun", func() {
-
 			spaceRepo := &testapi.FakeSpaceRepository{}
 			space := cf.Space{}
 			space.Name = "my-space"

@@ -273,10 +273,8 @@ func init() {
 				{"0 of 2 instances running", "2 starting"},
 			})
 		})
-		It("TestStartApplicationWhenStagingFails", func() {
-			mr.T().Skip()
-			mr.T().Parallel()
-
+		XIt("TestStartApplicationWhenStagingFails", func() {
+			// TODO: fix this flakey test
 			displayApp := &testcmd.FakeAppDisplayer{}
 			instances := [][]cf.AppInstanceFields{[]cf.AppInstanceFields{}}
 			errorCodes := []string{"170001"}
@@ -291,8 +289,6 @@ func init() {
 			})
 		})
 		It("TestStartApplicationWhenOneInstanceFlaps", func() {
-			mr.T().Parallel()
-
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appInstance := cf.AppInstanceFields{}
 			appInstance.State = cf.InstanceStarting

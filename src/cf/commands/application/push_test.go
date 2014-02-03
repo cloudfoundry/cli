@@ -156,6 +156,7 @@ func init() {
 			ctxt := testcmd.NewContext("push", []string{})
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}

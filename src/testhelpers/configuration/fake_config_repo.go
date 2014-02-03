@@ -8,7 +8,16 @@ import (
 var TestConfigurationSingleton *configuration.Configuration
 var SavedConfiguration configuration.Configuration
 
-type FakeConfigRepository struct {
+type FakeConfigRepository struct { }
+
+func (repo FakeConfigRepository) EnsureInitialized() {
+	if TestConfigurationSingleton == nil {
+		TestConfigurationSingleton = new(configuration.Configuration)
+		TestConfigurationSingleton.Target = "https://api.run.pivotal.io"
+		TestConfigurationSingleton.ApiVersion = "2"
+		TestConfigurationSingleton.AuthorizationEndpoint = "https://login.run.pivotal.io"
+		TestConfigurationSingleton.ApplicationStartTimeout = 30 // seconds
+	}
 }
 
 func (repo FakeConfigRepository) SetOrganization(org cf.OrganizationFields) (err error) {
@@ -33,14 +42,7 @@ func (repo FakeConfigRepository) SetSpace(space cf.SpaceFields) (err error) {
 }
 
 func (repo FakeConfigRepository) Get() (c *configuration.Configuration, err error) {
-	if TestConfigurationSingleton == nil {
-		TestConfigurationSingleton = new(configuration.Configuration)
-		TestConfigurationSingleton.Target = "https://api.run.pivotal.io"
-		TestConfigurationSingleton.ApiVersion = "2"
-		TestConfigurationSingleton.AuthorizationEndpoint = "https://login.run.pivotal.io"
-		TestConfigurationSingleton.ApplicationStartTimeout = 30 // seconds
-	}
-
+	repo.EnsureInitialized()
 	return TestConfigurationSingleton, nil
 }
 

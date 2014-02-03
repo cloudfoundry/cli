@@ -28,6 +28,7 @@ func defaultDeleteSpaceReqFactory() *testreq.FakeReqFactory {
 func deleteSpace(t mr.TestingT, inputs []string, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, spaceRepo *testapi.FakeSpaceRepository) {
 	spaceRepo = &testapi.FakeSpaceRepository{}
 	configRepo := &testconfig.FakeConfigRepository{}
+	configRepo.EnsureInitialized()
 
 	ui = &testterm.FakeUI{
 		Inputs: inputs,

@@ -24,6 +24,8 @@ func getTargetDependencies() (orgRepo *testapi.FakeOrgRepository,
 	orgRepo = &testapi.FakeOrgRepository{}
 	spaceRepo = &testapi.FakeSpaceRepository{}
 	configRepo = &testconfig.FakeConfigRepository{}
+	configRepo.EnsureInitialized()
+
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	return
 }
@@ -60,6 +62,7 @@ func init() {
 			callTarget([]string{}, reqFactory, configRepo, orgRepo, spaceRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 		})
+
 		It("TestTargetOrganizationWhenUserHasAccess", func() {
 
 			orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
@@ -239,6 +242,7 @@ func init() {
 
 			orgRepo, spaceRepo, configRepo, reqFactory := getTargetDependencies()
 			configRepo.Delete()
+			configRepo.EnsureInitialized()
 			configRepo.Login()
 
 			org := cf.Organization{}
