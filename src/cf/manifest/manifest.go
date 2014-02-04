@@ -79,8 +79,6 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 }
 
 func mapToAppSet(basePath string, data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
-	appSet = make([]cf.AppParams, 0)
-
 	if data.Has("applications") {
 		appMaps, ok := data.Get("applications").([]interface{})
 		if !ok {

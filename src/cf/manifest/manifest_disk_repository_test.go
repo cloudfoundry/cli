@@ -27,25 +27,30 @@ func pushingWithAbsoluteWindowsPath(t mr.TestingT) {
 	assert.Equal(t, m.Applications[0].Get("path"), "C:\\path\\to\\my\\app")
 }
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestReadManifestWithGoodPath", func() {
+	Describe("ManifestDiskRepository", func() {
+		It("can parse a manifest when provided a valid path", func() {
 			repo := NewManifestDiskRepository()
 			manifest, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
 
 			assert.True(mr.T(), errs.Empty())
 			assert.Equal(mr.T(), len(manifest.Applications), 1)
 			assert.Equal(mr.T(), manifest.Applications[0].Get("name"), "goodbyte")
-			assert.Equal(mr.T(), manifest.Applications[0].Get("path"), "../../fixtures")
-		})
-		It("TestReadManifestWithBadPath", func() {
 
+			if runtime.GOOS == "windows" {
+				assert.Equal(mr.T(), manifest.Applications[0].Get("path"), "..\\..\\fixtures")
+			} else {
+				assert.Equal(mr.T(), manifest.Applications[0].Get("path"), "../../fixtures")
+			}
+		})
+
+		It("TestReadManifestWithBadPath", func() {
 			repo := NewManifestDiskRepository()
 			_, errs := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
 
 			assert.False(mr.T(), errs.Empty())
 		})
-		It("TestManifestPathsDefaultsToCurrentDirectory", func() {
 
+		It("TestManifestPathsDefaultsToCurrentDirectory", func() {
 			repo := NewManifestDiskRepository()
 
 			cwd, err := os.Getwd()
@@ -57,8 +62,8 @@ func init() {
 			assert.Equal(mr.T(), path, cwd)
 			assert.Equal(mr.T(), filename, "manifest.yml")
 		})
-		It("TestAppAndManifestPathsIgnoreAppPathWhenManifestPathIsSpecified", func() {
 
+		It("TestAppAndManifestPathsIgnoreAppPathWhenManifestPathIsSpecified", func() {
 			repo := NewManifestDiskRepository()
 
 			cwd, err := os.Getwd()
@@ -71,8 +76,8 @@ func init() {
 			assert.Equal(mr.T(), path, expectedDir)
 			assert.Equal(mr.T(), filename, "manifest.yml")
 		})
-		It("TestAppAndManifestPathsManifestFileIsDroppedFromAppPath", func() {
 
+		It("TestAppAndManifestPathsManifestFileIsDroppedFromAppPath", func() {
 			repo := NewManifestDiskRepository()
 
 			cwd, err := os.Getwd()
@@ -84,8 +89,8 @@ func init() {
 			assert.Equal(mr.T(), path, cwd)
 			assert.Equal(mr.T(), filename, "example_manifest.yml")
 		})
-		It("TestManifestWithInheritance", func() {
 
+		It("TestManifestWithInheritance", func() {
 			repo := NewManifestDiskRepository()
 			m, err := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
 			assert.NoError(mr.T(), err)
@@ -105,8 +110,8 @@ func init() {
 			services := m.Applications[1].Get("services")
 			assert.Equal(mr.T(), services, []string{"base-service", "foo-service"})
 		})
-		It("TestPushingWithAbsoluteAppPathFromManifestFile", func() {
 
+		It("TestPushingWithAbsoluteAppPathFromManifestFile", func() {
 			if runtime.GOOS == "windows" {
 				pushingWithAbsoluteWindowsPath(mr.T())
 			} else {
