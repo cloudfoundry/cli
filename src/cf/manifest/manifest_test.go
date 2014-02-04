@@ -56,8 +56,8 @@ func init() {
 			assert.Equal(mr.T(), apps[0].Get("memory").(uint64), uint64(512))
 			assert.True(mr.T(), apps[0].Get("no-route").(bool))
 		})
-		It("TestManifestWithInvalidMemory", func() {
 
+		It("TestManifestWithInvalidMemory", func() {
 			_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"instances": "3",
 				"memory":    "512",
@@ -71,8 +71,8 @@ func init() {
 			assert.Error(mr.T(), err)
 			assert.Contains(mr.T(), err.Error(), "memory")
 		})
-		It("TestManifestWithTimeoutSetsHealthCheckTimeout", func() {
 
+		It("TestManifestWithTimeoutSetsHealthCheckTimeout", func() {
 			m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"applications": []interface{}{
 					map[string]interface{}{
@@ -86,8 +86,8 @@ func init() {
 			assert.Equal(mr.T(), m.Applications[0].Get("health_check_timeout"), 360)
 			assert.False(mr.T(), m.Applications[0].Has("timeout"))
 		})
-		It("TestManifestWithEmptyEnvVarIsInvalid", func() {
 
+		It("TestManifestWithEmptyEnvVarIsInvalid", func() {
 			_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"env": map[string]interface{}{
 					"bar": nil,
@@ -102,16 +102,16 @@ func init() {
 			assert.Error(mr.T(), err)
 			assert.Contains(mr.T(), err.Error(), "env var 'bar' should not be null")
 		})
-		It("TestManifestWithAbsolutePath", func() {
 
+		It("TestManifestWithAbsolutePath", func() {
 			if runtime.GOOS == "windows" {
 				testManifestWithAbsolutePathOnWindows(mr.T())
 			} else {
 				testManifestWithAbsolutePathOnPosix(mr.T())
 			}
 		})
-		It("TestManifestWithRelativePath", func() {
 
+		It("TestManifestWithRelativePath", func() {
 			m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"applications": []interface{}{
 					map[string]interface{}{
@@ -121,10 +121,14 @@ func init() {
 			}))
 
 			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), m.Applications[0].Get("path"), "/some/another/path-segment")
+			if runtime.GOOS == "windows" {
+				assert.Equal(mr.T(), m.Applications[0].Get("path"), "\\some\\another\\path-segment")
+			} else {
+				assert.Equal(mr.T(), m.Applications[0].Get("path"), "/some/another/path-segment")
+			}
 		})
-		It("TestParsingManifestWithNulls", func() {
 
+		It("TestParsingManifestWithNulls", func() {
 			_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"applications": []interface{}{
 					map[string]interface{}{
@@ -154,8 +158,8 @@ func init() {
 				testassert.SliceContains(mr.T(), errorSlice, testassert.Lines{{key, "not be null"}})
 			}
 		})
-		It("TestParsingManifestWithPropertiesReturnsErrors", func() {
 
+		It("TestParsingManifestWithPropertiesReturnsErrors", func() {
 			_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"applications": []interface{}{
 					map[string]interface{}{
@@ -169,8 +173,8 @@ func init() {
 			assert.Error(mr.T(), err)
 			assert.Contains(mr.T(), err.Error(), "Properties are not supported. Found property '${foo}'")
 		})
-		It("TestParsingManifestWithNullCommand", func() {
 
+		It("TestParsingManifestWithNullCommand", func() {
 			m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"applications": []interface{}{
 					map[string]interface{}{
@@ -182,8 +186,8 @@ func init() {
 			assert.NoError(mr.T(), err)
 			assert.Equal(mr.T(), m.Applications[0].Get("command"), "")
 		})
-		It("TestParsingEmptyManifestDoesNotSetCommand", func() {
 
+		It("TestParsingEmptyManifestDoesNotSetCommand", func() {
 			m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 				"applications": []interface{}{
 					map[string]interface{}{},

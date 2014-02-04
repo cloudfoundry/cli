@@ -15,8 +15,7 @@ type ManifestRepository interface {
 	ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error)
 }
 
-type ManifestDiskRepository struct {
-}
+type ManifestDiskRepository struct{}
 
 func NewManifestDiskRepository() (repo ManifestRepository) {
 	return ManifestDiskRepository{}
