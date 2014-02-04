@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
 set -e
-exec $(dirname $0)/env ginkgo -r -watch
+exec $(dirname $0)/env ginkgo -r -watch -notify
