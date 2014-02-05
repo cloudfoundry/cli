@@ -1,6 +1,7 @@
-package cf
+package cf_test
 
 import (
+	. "cf"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -8,26 +9,22 @@ import (
 
 func init() {
 	Describe("Testing with ginkgo", func() {
-		It("TestRouteURL", func() {
-
-			route := Route{}
-			route.Host = "foo"
+		var route Route
+		BeforeEach(func() {
+			route = Route{}
 
 			domain := DomainFields{}
 			domain.Name = "example.com"
 			route.Domain = domain
+		})
 
+		It("TestRouteURL", func() {
+			route.Host = "foo"
 			assert.Equal(mr.T(), route.URL(), "foo.example.com")
 		})
+
 		It("TestRouteURLWithoutHost", func() {
-
-			route := Route{}
 			route.Host = ""
-
-			domain := DomainFields{}
-			domain.Name = "example.com"
-			route.Domain = domain
-
 			assert.Equal(mr.T(), route.URL(), "example.com")
 		})
 	})

@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -20,7 +21,7 @@ func init() {
 			spaceRepo := &testapi.FakeSpaceRepository{Spaces: []cf.Space{space}}
 			ui := new(testterm.FakeUI)
 
-			spaceReq := newSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
+			spaceReq := NewSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
 			success := spaceReq.Execute()
 
 			assert.True(mr.T(), success)
@@ -33,7 +34,7 @@ func init() {
 			ui := new(testterm.FakeUI)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				newSpaceRequirement("foo", ui, spaceRepo).Execute()
+				NewSpaceRequirement("foo", ui, spaceRepo).Execute()
 			})
 		})
 	})

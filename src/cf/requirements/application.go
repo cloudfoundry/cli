@@ -19,7 +19,7 @@ type applicationApiRequirement struct {
 	application cf.Application
 }
 
-func newApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRepository) (req *applicationApiRequirement) {
+func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRepository) (req *applicationApiRequirement) {
 	req = new(applicationApiRequirement)
 	req.name = name
 	req.ui = ui

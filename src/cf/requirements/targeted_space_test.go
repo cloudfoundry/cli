@@ -1,8 +1,9 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
 	"cf/configuration"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -13,7 +14,6 @@ import (
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestSpaceRequirement", func() {
-
 			ui := new(testterm.FakeUI)
 			org := cf.OrganizationFields{}
 			org.Name = "my-org"
@@ -27,14 +27,14 @@ func init() {
 				SpaceFields: space,
 			}
 
-			req := newTargetedSpaceRequirement(ui, config)
+			req := NewTargetedSpaceRequirement(ui, config)
 			success := req.Execute()
 			assert.True(mr.T(), success)
 
 			config.SpaceFields = cf.SpaceFields{}
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				newTargetedSpaceRequirement(ui, config).Execute()
+				NewTargetedSpaceRequirement(ui, config).Execute()
 			})
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -46,7 +46,7 @@ func init() {
 			config.OrganizationFields = cf.OrganizationFields{}
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				newTargetedSpaceRequirement(ui, config).Execute()
+				NewTargetedSpaceRequirement(ui, config).Execute()
 			})
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{

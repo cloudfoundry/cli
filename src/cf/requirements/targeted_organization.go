@@ -17,7 +17,7 @@ type targetedOrgApiRequirement struct {
 	config *configuration.Configuration
 }
 
-func newTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
+func NewTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
 	return targetedOrgApiRequirement{ui, config}
 }
 

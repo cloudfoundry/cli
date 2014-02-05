@@ -35,7 +35,7 @@ func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator
 }
 
 func (f apiRequirementFactory) NewApplicationRequirement(name string) ApplicationRequirement {
-	return newApplicationRequirement(
+	return NewApplicationRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
@@ -43,7 +43,7 @@ func (f apiRequirementFactory) NewApplicationRequirement(name string) Applicatio
 }
 
 func (f apiRequirementFactory) NewServiceInstanceRequirement(name string) ServiceInstanceRequirement {
-	return newServiceInstanceRequirement(
+	return NewServiceInstanceRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetServiceRepository(),
@@ -51,20 +51,20 @@ func (f apiRequirementFactory) NewServiceInstanceRequirement(name string) Servic
 }
 
 func (f apiRequirementFactory) NewLoginRequirement() Requirement {
-	return newLoginRequirement(
+	return NewLoginRequirement(
 		f.ui,
 		f.config,
 	)
 }
 func (f apiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
-	return newValidAccessTokenRequirement(
+	return NewValidAccessTokenRequirement(
 		f.ui,
 		f.repoLocator.GetApplicationRepository(),
 	)
 }
 
 func (f apiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement {
-	return newSpaceRequirement(
+	return NewSpaceRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetSpaceRepository(),
@@ -72,21 +72,21 @@ func (f apiRequirementFactory) NewSpaceRequirement(name string) SpaceRequirement
 }
 
 func (f apiRequirementFactory) NewTargetedSpaceRequirement() Requirement {
-	return newTargetedSpaceRequirement(
+	return NewTargetedSpaceRequirement(
 		f.ui,
 		f.config,
 	)
 }
 
 func (f apiRequirementFactory) NewTargetedOrgRequirement() TargetedOrgRequirement {
-	return newTargetedOrgRequirement(
+	return NewTargetedOrgRequirement(
 		f.ui,
 		f.config,
 	)
 }
 
 func (f apiRequirementFactory) NewOrganizationRequirement(name string) OrganizationRequirement {
-	return newOrganizationRequirement(
+	return NewOrganizationRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetOrganizationRepository(),
@@ -94,7 +94,7 @@ func (f apiRequirementFactory) NewOrganizationRequirement(name string) Organizat
 }
 
 func (f apiRequirementFactory) NewDomainRequirement(name string) DomainRequirement {
-	return newDomainRequirement(
+	return NewDomainRequirement(
 		name,
 		f.ui,
 		f.repoLocator.GetDomainRepository(),
@@ -102,7 +102,7 @@ func (f apiRequirementFactory) NewDomainRequirement(name string) DomainRequireme
 }
 
 func (f apiRequirementFactory) NewUserRequirement(username string) UserRequirement {
-	return newUserRequirement(
+	return NewUserRequirement(
 		username,
 		f.ui,
 		f.repoLocator.GetUserRepository(),
@@ -110,7 +110,7 @@ func (f apiRequirementFactory) NewUserRequirement(username string) UserRequireme
 }
 
 func (f apiRequirementFactory) NewBuildpackRequirement(buildpack string) BuildpackRequirement {
-	return newBuildpackRequirement(
+	return NewBuildpackRequirement(
 		buildpack,
 		f.ui,
 		f.repoLocator.GetBuildpackRepository(),

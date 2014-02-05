@@ -1,6 +1,7 @@
-package application
+package application_test
 
 import (
+	. "cf/commands/application"
 	"cf/terminal"
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
@@ -54,44 +55,44 @@ func init() {
 			}
 
 			msg := createMessage(mr.T(), protoMessage, &cloud_controller, &stdout)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 
 			msg = createMessage(mr.T(), protoMessage, &cloud_controller, &stderr)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 			sourceId = "1"
 			msg = createMessage(mr.T(), protoMessage, &router, &stdout)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 			msg = createMessage(mr.T(), protoMessage, &router, &stderr)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 			sourceId = "2"
 			msg = createMessage(mr.T(), protoMessage, &uaa, &stdout)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 			msg = createMessage(mr.T(), protoMessage, &uaa, &stderr)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 			sourceId = "3"
 			msg = createMessage(mr.T(), protoMessage, &dea, &stdout)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 			msg = createMessage(mr.T(), protoMessage, &dea, &stderr)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 
 			sourceId = "4"
 			msg = createMessage(mr.T(), protoMessage, &wardenContainer, &stdout)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStdoutColor("OUT Hello World!"))
 			msg = createMessage(mr.T(), protoMessage, &wardenContainer, &stderr)
-			assert.Contains(mr.T(), logMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
-			assert.Contains(mr.T(), logMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
+			assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
+			assert.Contains(mr.T(), LogMessageOutput(msg), terminal.LogStderrColor("ERR Hello World!"))
 		})
 	})
 }

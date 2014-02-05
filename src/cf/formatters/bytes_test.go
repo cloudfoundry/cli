@@ -1,6 +1,7 @@
-package formatters
+package formatters_test
 
 import (
+	. "cf/formatters"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -9,12 +10,11 @@ import (
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestByteSize", func() {
-
 			assert.Equal(mr.T(), ByteSize(100*MEGABYTE), "100M")
 			assert.Equal(mr.T(), ByteSize(uint64(100.5*MEGABYTE)), "100.5M")
 		})
-		It("TestParsesByteAmounts", func() {
 
+		It("TestParsesByteAmounts", func() {
 			var (
 				megabytes uint64
 				err       error
@@ -36,8 +36,8 @@ func init() {
 			assert.Equal(mr.T(), megabytes, uint64(3*1024*1024))
 			assert.NoError(mr.T(), err)
 		})
-		It("TestParsesByteAmountsWithLongUnits", func() {
 
+		It("TestParsesByteAmountsWithLongUnits", func() {
 			var (
 				megabytes uint64
 				err       error
@@ -59,18 +59,18 @@ func init() {
 			assert.Equal(mr.T(), megabytes, uint64(3*1024*1024))
 			assert.NoError(mr.T(), err)
 		})
-		It("TestDoesNotParseAmountsWithoutUnits", func() {
 
+		It("TestDoesNotParseAmountsWithoutUnits", func() {
 			_, err := ToMegabytes("5")
 			assert.Error(mr.T(), err)
 		})
-		It("TestDoesNotParseAmountsWithUnknownSuffixes", func() {
 
+		It("TestDoesNotParseAmountsWithUnknownSuffixes", func() {
 			_, err := ToMegabytes("5MBB")
 			assert.Error(mr.T(), err)
 		})
-		It("TestDoesNotParseAmountsWithUnknownPrefixes", func() {
 
+		It("TestDoesNotParseAmountsWithUnknownPrefixes", func() {
 			_, err := ToMegabytes(" 5MB")
 			assert.Error(mr.T(), err)
 		})

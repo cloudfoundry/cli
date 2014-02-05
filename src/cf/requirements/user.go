@@ -19,7 +19,7 @@ type userApiRequirement struct {
 	user     cf.UserFields
 }
 
-func newUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *userApiRequirement) {
+func NewUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *userApiRequirement) {
 	req = new(userApiRequirement)
 	req.username = username
 	req.ui = ui

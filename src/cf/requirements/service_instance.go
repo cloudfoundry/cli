@@ -19,7 +19,7 @@ type serviceInstanceApiRequirement struct {
 	serviceInstance cf.ServiceInstance
 }
 
-func newServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRepository) (req *serviceInstanceApiRequirement) {
+func NewServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRepository) (req *serviceInstanceApiRequirement) {
 	req = new(serviceInstanceApiRequirement)
 	req.name = name
 	req.ui = ui

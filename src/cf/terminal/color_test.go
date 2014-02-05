@@ -1,6 +1,7 @@
-package terminal
+package terminal_test
 
 import (
+	. "cf/terminal"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -11,10 +12,9 @@ import (
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestColorize", func() {
-
 			os.Setenv("CF_COLOR", "true")
 			text := "Hello World"
-			colorizedText := colorize(text, red, true)
+			colorizedText := Colorize(text, 31, true)
 
 			if runtime.GOOS == "windows" {
 				assert.Equal(mr.T(), colorizedText, "Hello World")

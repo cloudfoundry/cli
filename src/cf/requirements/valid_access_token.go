@@ -10,7 +10,7 @@ type ValidAccessTokenRequirement struct {
 	appRepo api.ApplicationRepository
 }
 
-func newValidAccessTokenRequirement(ui terminal.UI, appRepo api.ApplicationRepository) ValidAccessTokenRequirement {
+func NewValidAccessTokenRequirement(ui terminal.UI, appRepo api.ApplicationRepository) ValidAccessTokenRequirement {
 	return ValidAccessTokenRequirement{ui, appRepo}
 }
 

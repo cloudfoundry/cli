@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf/configuration"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -18,7 +19,7 @@ func init() {
 				AccessToken: "foo bar token",
 			}
 
-			req := newLoginRequirement(ui, config)
+			req := NewLoginRequirement(ui, config)
 			success := req.Execute()
 			assert.True(mr.T(), success)
 
@@ -26,7 +27,7 @@ func init() {
 				AccessToken: "",
 			}
 
-			req = newLoginRequirement(ui, config)
+			req = NewLoginRequirement(ui, config)
 			success = req.Execute()
 			assert.False(mr.T(), success)
 

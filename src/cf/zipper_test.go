@@ -1,8 +1,9 @@
-package cf
+package cf_test
 
 import (
 	"archive/zip"
 	"bytes"
+	. "cf"
 	"fileutils"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -23,7 +24,6 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestZipWithDirectory", func() {
 			fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
-
 				workingDir, err := os.Getwd()
 				assert.NoError(mr.T(), err)
 
@@ -72,8 +72,8 @@ func init() {
 				assert.Equal(mr.T(), contents, "This file should be present.")
 			})
 		})
-		It("TestZipWithZipFile", func() {
 
+		It("TestZipWithZipFile", func() {
 			fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 				dir, err := os.Getwd()
 				assert.NoError(mr.T(), err)
@@ -85,8 +85,8 @@ func init() {
 				assert.Equal(mr.T(), fileToString(mr.T(), zipFile), "This is an application zip file\n")
 			})
 		})
-		It("TestZipWithWarFile", func() {
 
+		It("TestZipWithWarFile", func() {
 			fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 				dir, err := os.Getwd()
 				assert.NoError(mr.T(), err)
@@ -98,8 +98,8 @@ func init() {
 				assert.Equal(mr.T(), fileToString(mr.T(), zipFile), "This is an application war file\n")
 			})
 		})
-		It("TestZipWithJarFile", func() {
 
+		It("TestZipWithJarFile", func() {
 			fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 				dir, err := os.Getwd()
 				assert.NoError(mr.T(), err)
@@ -111,8 +111,8 @@ func init() {
 				assert.Equal(mr.T(), fileToString(mr.T(), zipFile), "This is an application jar file\n")
 			})
 		})
-		It("TestZipWithInvalidFile", func() {
 
+		It("TestZipWithInvalidFile", func() {
 			fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 				zipper := ApplicationZipper{}
 				err = zipper.Zip("/a/bogus/directory", zipFile)
@@ -120,8 +120,8 @@ func init() {
 				assert.Contains(mr.T(), err.Error(), "open /a/bogus/directory")
 			})
 		})
-		It("TestZipWithEmptyDir", func() {
 
+		It("TestZipWithEmptyDir", func() {
 			fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 				fileutils.TempDir("zip_test", func(emptyDir string, err error) {
 					zipper := ApplicationZipper{}

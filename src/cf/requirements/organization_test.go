@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -20,7 +21,7 @@ func init() {
 			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
 			ui := new(testterm.FakeUI)
 
-			orgReq := newOrganizationRequirement("my-org-name", ui, orgRepo)
+			orgReq := NewOrganizationRequirement("my-org-name", ui, orgRepo)
 			success := orgReq.Execute()
 
 			assert.True(mr.T(), success)
@@ -32,7 +33,7 @@ func init() {
 			orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
 			ui := new(testterm.FakeUI)
 
-			orgReq := newOrganizationRequirement("foo", ui, orgRepo)
+			orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
 				orgReq.Execute()

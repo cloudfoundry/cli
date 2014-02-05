@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -12,27 +13,27 @@ import (
 
 func init() {
 	Describe("Testing with ginkgo", func() {
-		It("TestApplicationReqExecute", func() {
 
+		It("TestApplicationReqExecute", func() {
 			app := cf.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 			ui := new(testterm.FakeUI)
 
-			appReq := newApplicationRequirement("foo", ui, appRepo)
+			appReq := NewApplicationRequirement("foo", ui, appRepo)
 			success := appReq.Execute()
 
 			assert.True(mr.T(), success)
 			assert.Equal(mr.T(), appRepo.ReadName, "foo")
 			assert.Equal(mr.T(), appReq.GetApplication(), app)
 		})
-		It("TestApplicationReqExecuteWhenApplicationNotFound", func() {
 
+		It("TestApplicationReqExecuteWhenApplicationNotFound", func() {
 			appRepo := &testapi.FakeApplicationRepository{ReadNotFound: true}
 			ui := new(testterm.FakeUI)
 
-			appReq := newApplicationRequirement("foo", ui, appRepo)
+			appReq := NewApplicationRequirement("foo", ui, appRepo)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
 				appReq.Execute()

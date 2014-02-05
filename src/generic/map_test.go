@@ -1,16 +1,15 @@
-package generic
+package generic_test
 
 import (
-	"fmt"
+	. "generic"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 )
 
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestDeepMerge", func() {
-
+	Describe("generic maps", func() {
+		It("deep merges, with the last map taking precedence in conflicts", func() {
 			map1 := NewMap(map[interface{}]interface{}{
 				"key1": "val1",
 				"key2": "val2",
@@ -47,8 +46,6 @@ func init() {
 			})
 
 			mergedMap := DeepMerge(map1, map2)
-			fmt.Printf("Merged Map:\n%s\n", mergedMap)
-			fmt.Printf("Expected Map:\n%s\n", expectedMap)
 			assert.Equal(mr.T(), mergedMap, expectedMap)
 		})
 	})

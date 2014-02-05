@@ -20,7 +20,7 @@ const (
 	white   = 38
 )
 
-func colorize(message string, color Color, bold bool) string {
+func Colorize(message string, color Color, bold bool) string {
 	if runtime.GOOS == "windows" || os.Getenv("CF_COLOR") != "true" {
 		return message
 	}
@@ -42,61 +42,61 @@ func decolorize(message string) string {
 }
 
 func HeaderColor(message string) string {
-	return colorize(message, white, true)
+	return Colorize(message, white, true)
 }
 
 func CommandColor(message string) string {
-	return colorize(message, yellow, true)
+	return Colorize(message, yellow, true)
 }
 
 func StoppedColor(message string) string {
-	return colorize(message, grey, true)
+	return Colorize(message, grey, true)
 }
 
 func AdvisoryColor(message string) string {
-	return colorize(message, yellow, true)
+	return Colorize(message, yellow, true)
 }
 
 func CrashedColor(message string) string {
-	return colorize(message, red, true)
+	return Colorize(message, red, true)
 }
 
 func FailureColor(message string) string {
-	return colorize(message, red, true)
+	return Colorize(message, red, true)
 }
 
 func SuccessColor(message string) string {
-	return colorize(message, green, true)
+	return Colorize(message, green, true)
 }
 
 func EntityNameColor(message string) string {
-	return colorize(message, cyan, true)
+	return Colorize(message, cyan, true)
 }
 
 func PromptColor(message string) string {
-	return colorize(message, cyan, true)
+	return Colorize(message, cyan, true)
 }
 
 func TableContentHeaderColor(message string) string {
-	return colorize(message, cyan, true)
+	return Colorize(message, cyan, true)
 }
 
 func WarningColor(message string) string {
-	return colorize(message, magenta, true)
+	return Colorize(message, magenta, true)
 }
 
 func LogStdoutColor(message string) string {
-	return colorize(message, white, false)
+	return Colorize(message, white, false)
 }
 
 func LogStderrColor(message string) string {
-	return colorize(message, red, false)
+	return Colorize(message, red, false)
 }
 
 func LogAppHeaderColor(message string) string {
-	return colorize(message, yellow, true)
+	return Colorize(message, yellow, true)
 }
 
 func LogSysHeaderColor(message string) string {
-	return colorize(message, cyan, true)
+	return Colorize(message, cyan, true)
 }
