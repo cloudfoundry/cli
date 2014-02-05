@@ -42,7 +42,7 @@ func simpleLogMessageOutput(msg *logmessage.Message) (msgText string) {
 	return
 }
 
-func logMessageOutput(msg *logmessage.Message) string {
+func LogMessageOutput(msg *logmessage.Message) string {
 	logHeader, coloredLogHeader := extractLogHeader(msg)
 	logMsg := msg.GetLogMessage()
 	logContent := extractLogContent(logMsg, logHeader)

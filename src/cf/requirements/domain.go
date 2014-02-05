@@ -19,7 +19,7 @@ type domainApiRequirement struct {
 	domain     cf.Domain
 }
 
-func newDomainRequirement(name string, ui terminal.UI, domainRepo api.DomainRepository) (req *domainApiRequirement) {
+func NewDomainRequirement(name string, ui terminal.UI, domainRepo api.DomainRepository) (req *domainApiRequirement) {
 	req = new(domainApiRequirement)
 	req.name = name
 	req.ui = ui

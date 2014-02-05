@@ -1,7 +1,8 @@
-package app
+package app_test
 
 import (
 	"cf/api"
+	. "cf/app"
 	"cf/commands"
 	"cf/configuration"
 	"cf/net"

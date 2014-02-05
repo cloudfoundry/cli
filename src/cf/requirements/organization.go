@@ -19,7 +19,7 @@ type organizationApiRequirement struct {
 	org     cf.Organization
 }
 
-func newOrganizationRequirement(name string, ui terminal.UI, sR api.OrganizationRepository) (req *organizationApiRequirement) {
+func NewOrganizationRequirement(name string, ui terminal.UI, sR api.OrganizationRepository) (req *organizationApiRequirement) {
 	req = new(organizationApiRequirement)
 	req.name = name
 	req.ui = ui

@@ -10,7 +10,7 @@ type LoginRequirement struct {
 	config *configuration.Configuration
 }
 
-func newLoginRequirement(ui terminal.UI, config *configuration.Configuration) LoginRequirement {
+func NewLoginRequirement(ui terminal.UI, config *configuration.Configuration) LoginRequirement {
 	return LoginRequirement{ui, config}
 }
 

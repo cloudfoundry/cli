@@ -19,7 +19,7 @@ type buildpackApiRequirement struct {
 	buildpack     cf.Buildpack
 }
 
-func newBuildpackRequirement(name string, ui terminal.UI, bR api.BuildpackRepository) (req *buildpackApiRequirement) {
+func NewBuildpackRequirement(name string, ui terminal.UI, bR api.BuildpackRepository) (req *buildpackApiRequirement) {
 	req = new(buildpackApiRequirement)
 	req.name = name
 	req.ui = ui

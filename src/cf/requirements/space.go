@@ -19,7 +19,7 @@ type spaceApiRequirement struct {
 	space     cf.Space
 }
 
-func newSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (req *spaceApiRequirement) {
+func NewSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (req *spaceApiRequirement) {
 	req = new(spaceApiRequirement)
 	req.name = name
 	req.ui = ui

@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -20,7 +21,7 @@ func init() {
 			domainRepo := &testapi.FakeDomainRepository{FindByNameDomain: domain}
 			ui := new(testterm.FakeUI)
 
-			domainReq := newDomainRequirement("example.com", ui, domainRepo)
+			domainReq := NewDomainRequirement("example.com", ui, domainRepo)
 			success := domainReq.Execute()
 
 			assert.True(mr.T(), success)
@@ -32,7 +33,7 @@ func init() {
 			domainRepo := &testapi.FakeDomainRepository{FindByNameNotFound: true}
 			ui := new(testterm.FakeUI)
 
-			domainReq := newDomainRequirement("example.com", ui, domainRepo)
+			domainReq := NewDomainRequirement("example.com", ui, domainRepo)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
 				domainReq.Execute()
@@ -43,7 +44,7 @@ func init() {
 			domainRepo := &testapi.FakeDomainRepository{FindByNameErr: true}
 			ui := new(testterm.FakeUI)
 
-			domainReq := newDomainRequirement("example.com", ui, domainRepo)
+			domainReq := NewDomainRequirement("example.com", ui, domainRepo)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
 				domainReq.Execute()

@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -20,7 +21,7 @@ func init() {
 			buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameBuildpack: buildpack}
 			ui := new(testterm.FakeUI)
 
-			buildpackReq := newBuildpackRequirement("foo", ui, buildpackRepo)
+			buildpackReq := NewBuildpackRequirement("foo", ui, buildpackRepo)
 			success := buildpackReq.Execute()
 
 			assert.True(mr.T(), success)
@@ -32,7 +33,7 @@ func init() {
 			buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameNotFound: true}
 			ui := new(testterm.FakeUI)
 
-			buildpackReq := newBuildpackRequirement("foo", ui, buildpackRepo)
+			buildpackReq := NewBuildpackRequirement("foo", ui, buildpackRepo)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
 				buildpackReq.Execute()

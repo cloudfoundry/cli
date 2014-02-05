@@ -1,7 +1,8 @@
-package requirements
+package requirements_test
 
 import (
 	"cf"
+	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -20,7 +21,7 @@ func init() {
 			repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
 			ui := new(testterm.FakeUI)
 
-			req := newServiceInstanceRequirement("foo", ui, repo)
+			req := NewServiceInstanceRequirement("foo", ui, repo)
 			success := req.Execute()
 
 			assert.True(mr.T(), success)
@@ -33,7 +34,7 @@ func init() {
 			ui := new(testterm.FakeUI)
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				newServiceInstanceRequirement("foo", ui, repo).Execute()
+				NewServiceInstanceRequirement("foo", ui, repo).Execute()
 			})
 		})
 	})
