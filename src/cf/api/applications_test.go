@@ -104,7 +104,7 @@ func defaultAppParams() (params cf.AppParams) {
 	params.Set("space_guid", "some-space-guid")
 	params.Set("stack_guid", "some-stack-guid")
 	params.Set("command", "some-command")
-	params.Set("memory", 2048)
+	params.Set("memory", uint64(2048))
 	params.Set("instances", 3)
 	return
 }
@@ -196,8 +196,8 @@ func init() {
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		})
-		It("TestCreateApplication", func() {
 
+		It("TestCreateApplication", func() {
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{createApplicationRequest})
 			defer ts.Close()
 
@@ -212,6 +212,7 @@ func init() {
 			app.Guid = "my-cool-app-guid"
 			assert.Equal(mr.T(), createdApp, app)
 		})
+
 		It("TestCreateApplicationWhitelistsKeys", func() {
 
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{createApplicationRequest})
@@ -238,15 +239,15 @@ func init() {
 			params := cf.NewEmptyAppParams()
 			params.Set("name", "my-cool-app")
 			params.Set("space_guid", "some-space-guid")
-			params.Set("memory", 128)
+			params.Set("memory", uint64(128))
 			params.Set("instances", 1)
 
 			_, apiResponse := repo.Create(params)
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		})
-		It("TestUpdateApplication", func() {
 
+		It("TestUpdateApplication", func() {
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{updateApplicationRequest})
 			defer ts.Close()
 
@@ -268,6 +269,7 @@ func init() {
 			assert.Equal(mr.T(), updatedApp.Name, "my-cool-app")
 			assert.Equal(mr.T(), updatedApp.Guid, "my-cool-app-guid")
 		})
+
 		It("TestUpdateApplicationSetCommandToNull", func() {
 
 			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
