@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/configuration"
 	"cf/net"
+	"encoding/json"
 	"fmt"
 	"generic"
 	"net/url"
@@ -34,14 +35,18 @@ func (resource AppRouteResource) ToModel() (route cf.RouteSummary) {
 }
 
 type ApplicationEntity struct {
-	Name            string
-	State           string
-	SpaceGuid       string `json:"space_guid"`
-	Instances       int
-	Memory          int
-	Stack           StackResource
-	Routes          []AppRouteResource
-	EnvironmentJson map[string]string `json:"environment_json"`
+	Name               *string             `json:"name,omitempty"`
+	Command            *string             `json:"command,omitempty"`
+	State              *string             `json:"state,omitempty"`
+	SpaceGuid          *string             `json:"space_guid,omitempty"`
+	Instances          *int                `json:"instances,omitempty"`
+	Memory             *uint64             `json:"memory,omitempty"`
+	StackGuid          *string             `json:"stack_guid,omitempty"`
+	Stack              *StackResource      `json:"stack,omitempty"`
+	Routes             *[]AppRouteResource `json:"routes,omitempty"`
+	Buildpack          *string             `json:"buildpack,omitempty"`
+	EnvironmentJson    *map[string]string  `json:"environment_json,omitempty"`
+	HealthCheckTimeout *int                `json:"health_check_timeout,omitempty"`
 }
 
 type ApplicationResource struct {
@@ -49,24 +54,104 @@ type ApplicationResource struct {
 	Entity ApplicationEntity
 }
 
+func NewApplicationEntityFromAppParams(app cf.AppParams) (entity ApplicationEntity) {
+	if app.Has("buildpack") {
+		buildpack := app.Get("buildpack").(string)
+		entity.Buildpack = &buildpack
+	}
+	if app.Has("name") {
+		name := app.Get("name").(string)
+		entity.Name = &name
+	}
+
+	if app.Has("state") {
+		state := strings.ToUpper(app.Get("state").(string))
+		entity.State = &state
+	}
+
+	if app.Has("space_guid") {
+		spaceGuid := app.Get("space_guid").(string)
+		entity.SpaceGuid = &spaceGuid
+	}
+
+	if app.Has("instances") {
+		instances := app.Get("instances").(int)
+		entity.Instances = &instances
+	}
+
+	if app.Has("memory") {
+		memory := app.Get("memory").(uint64)
+		entity.Memory = &memory
+	}
+
+	if app.Has("stack_guid") {
+		stackGuid := app.Get("stack_guid").(string)
+		entity.StackGuid = &stackGuid
+	}
+
+	if app.Has("command") {
+		command := app.Get("command").(string)
+		entity.Command = &command
+	}
+
+	if app.Has("health_check_timeout") {
+		healthCheckTimeout := app.Get("health_check_timeout").(int)
+		entity.HealthCheckTimeout = &healthCheckTimeout
+	}
+
+	if app.Has("env") {
+		envMap := app.Get("env").(generic.Map)
+		if !envMap.IsEmpty() {
+			environmentJson := map[string]string{}
+			generic.Each(envMap, generic.Iterator(func(key, val interface{}) {
+				environmentJson[key.(string)] = val.(string)
+			}))
+			entity.EnvironmentJson = &environmentJson
+		}
+	}
+
+	return
+}
+
 func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
+	entity := resource.Entity
 	app.Guid = resource.Metadata.Guid
-	app.Name = resource.Entity.Name
-	app.EnvironmentVars = resource.Entity.EnvironmentJson
-	app.State = strings.ToLower(resource.Entity.State)
-	app.InstanceCount = resource.Entity.Instances
-	app.Memory = uint64(resource.Entity.Memory)
-	app.SpaceGuid = resource.Entity.SpaceGuid
+
+	if entity.Name != nil {
+		app.Name = *entity.Name
+	}
+	if entity.Memory != nil {
+		app.Memory = uint64(*entity.Memory)
+	}
+	if entity.Instances != nil {
+		app.InstanceCount = *entity.Instances
+	}
+	if entity.State != nil {
+		app.State = strings.ToLower(*entity.State)
+	}
+	if entity.EnvironmentJson != nil {
+		app.EnvironmentVars = *entity.EnvironmentJson
+	}
+	if entity.SpaceGuid != nil {
+		app.SpaceGuid = *entity.SpaceGuid
+	}
 	return
 }
 
 func (resource ApplicationResource) ToModel() (app cf.Application) {
 	app.ApplicationFields = resource.ToFields()
-	app.Stack = resource.Entity.Stack.ToFields()
 
-	for _, routeResource := range resource.Entity.Routes {
-		app.Routes = append(app.Routes, routeResource.ToModel())
+	entity := resource.Entity
+	if entity.Stack != nil {
+		app.Stack = entity.Stack.ToFields()
 	}
+
+	if entity.Routes != nil {
+		for _, routeResource := range *entity.Routes {
+			app.Routes = append(app.Routes, routeResource.ToModel())
+		}
+	}
+
 	return
 }
 
@@ -93,8 +178,9 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 }
 
 func (repo CloudControllerApplicationRepository) Create(params cf.AppParams) (createdApp cf.Application, apiResponse net.ApiResponse) {
-	data, apiResponse := repo.formatAppJSON(params)
-	if apiResponse.IsNotSuccessful() {
+	data, err := repo.formatAppJSON(params)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Failed to marshal JSON", err)
 		return
 	}
 
@@ -128,8 +214,9 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app cf.Appli
 }
 
 func (repo CloudControllerApplicationRepository) Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse) {
-	data, apiResponse := repo.formatAppJSON(params)
-	if apiResponse.IsNotSuccessful() {
+	data, err := repo.formatAppJSON(params)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Failed to marshal JSON", err)
 		return
 	}
 
@@ -144,52 +231,10 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params c
 	return
 }
 
-var allowedAppKeys = []string{
-	"buildpack",
-	"command",
-	"instances",
-	"memory",
-	"name",
-	"space_guid",
-	"stack_guid",
-	"state",
-	"health_check_timeout",
-}
-
-func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParams) (data string, apiResponse net.ApiResponse) {
-	params := generic.NewMap()
-	for _, allowedKey := range allowedAppKeys {
-		if input.Has(allowedKey) {
-			params.Set(allowedKey, input.Get(allowedKey))
-		}
-	}
-
-	if params.Has("buildpack") {
-		params.Set("buildpack", stringOrNull(params.Get("buildpack")))
-	}
-
-	if params.Has("stack_guid") {
-		params.Set("stack_guid", stringOrNull(params.Get("stack_guid")))
-	}
-
-	if params.Has("state") {
-		params.Set("state", strings.ToUpper(params.Get("state").(string)))
-	}
-
-	vals := []string{}
-
-	if !params.IsEmpty() {
-		vals = append(vals, mapToJsonValues(params)...)
-	}
-	if input.Has("env") {
-		envVars := input.Get("env").(generic.Map)
-		if !envVars.IsEmpty() {
-			envVal := fmt.Sprintf(`"environment_json":{%s}`, strings.Join(mapToJsonValues(envVars), ","))
-			vals = append(vals, envVal)
-		}
-
-	}
-	data = fmt.Sprintf("{%s}", strings.Join(vals, ","))
+func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParams) (data string, err error) {
+	appResource := NewApplicationEntityFromAppParams(input)
+	bytes, err := json.Marshal(appResource)
+	data = string(bytes)
 	return
 }
 
