@@ -39,7 +39,7 @@ func init() {
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"FAILED"},
-				{"UserFields not found"},
+				{"User not found"},
 			})
 		})
 	})

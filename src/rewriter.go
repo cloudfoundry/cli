@@ -40,7 +40,7 @@ func main() {
 		"Quota":                  "quota",
 		"ServiceAuthTokenFields": "authToken",
 		"ServiceBroker":          "broker",
-		"UserFields":             "user",
+		"User":             "user",
 		"Buildpack":              "buildpack",
 		"Organization":           "org",
 		"Space":                  "space",
