@@ -10,110 +10,6 @@ import (
 	"strings"
 )
 
-type PaginatedServiceOfferingResources struct {
-	Resources []ServiceOfferingResource
-}
-
-type ServiceOfferingResource struct {
-	Metadata Metadata
-	Entity   ServiceOfferingEntity
-}
-
-func (resource ServiceOfferingResource) ToFields() (fields models.ServiceOfferingFields) {
-	fields.Label = resource.Entity.Label
-	fields.Version = resource.Entity.Version
-	fields.Provider = resource.Entity.Provider
-	fields.Description = resource.Entity.Description
-	fields.Guid = resource.Metadata.Guid
-	fields.DocumentationUrl = resource.Entity.DocumentationUrl
-	return
-}
-
-func (resource ServiceOfferingResource) ToModel() (offering models.ServiceOffering) {
-	offering.ServiceOfferingFields = resource.ToFields()
-	for _, p := range resource.Entity.ServicePlans {
-		servicePlan := models.ServicePlanFields{}
-		servicePlan.Name = p.Entity.Name
-		servicePlan.Guid = p.Metadata.Guid
-		offering.Plans = append(offering.Plans, servicePlan)
-	}
-	return offering
-}
-
-type ServiceOfferingEntity struct {
-	Label            string
-	Version          string
-	Description      string
-	DocumentationUrl string `json:"documentation_url"`
-	Provider         string
-	ServicePlans     []ServicePlanResource `json:"service_plans"`
-}
-
-type ServicePlanResource struct {
-	Metadata Metadata
-	Entity   ServicePlanEntity
-}
-
-func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.Name = resource.Entity.Name
-	return
-}
-
-type ServicePlanEntity struct {
-	Name            string
-	ServiceOffering ServiceOfferingResource `json:"service"`
-}
-
-type PaginatedServiceInstanceResources struct {
-	Resources []ServiceInstanceResource
-}
-
-type ServiceInstanceResource struct {
-	Metadata Metadata
-	Entity   ServiceInstanceEntity
-}
-
-func (resource ServiceInstanceResource) ToFields() (fields models.ServiceInstanceFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.Name = resource.Entity.Name
-	return
-}
-
-func (resource ServiceInstanceResource) ToModel() (instance models.ServiceInstance) {
-	instance.ServiceInstanceFields = resource.ToFields()
-	instance.ServicePlan = resource.Entity.ServicePlan.ToFields()
-	instance.ServiceOffering = resource.Entity.ServicePlan.Entity.ServiceOffering.ToFields()
-
-	instance.ServiceBindings = []models.ServiceBindingFields{}
-	for _, bindingResource := range resource.Entity.ServiceBindings {
-		instance.ServiceBindings = append(instance.ServiceBindings, bindingResource.ToFields())
-	}
-	return
-}
-
-type ServiceInstanceEntity struct {
-	Name            string
-	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
-	ServicePlan     ServicePlanResource      `json:"service_plan"`
-}
-
-type ServiceBindingResource struct {
-	Metadata Metadata
-	Entity   ServiceBindingEntity
-}
-
-func (resource ServiceBindingResource) ToFields() (fields models.ServiceBindingFields) {
-	fields.Url = resource.Metadata.Url
-	fields.Guid = resource.Metadata.Guid
-	fields.AppGuid = resource.Entity.AppGuid
-	return
-}
-
-type ServiceBindingEntity struct {
-	AppGuid string `json:"app_guid"`
-}
-
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) net.ApiResponse
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse)
@@ -122,6 +18,8 @@ type ServiceRepository interface {
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 	DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse)
+	FindServicePlanToMigrateByDescription(v1Description V1ServicePlanDescription, v2Description V2ServicePlanDescription) (v1PlanGuid, v2PlanGuid string, apiResponse net.ApiResponse)
+	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) net.ApiResponse
 }
 
 type CloudControllerServiceRepository struct {
@@ -235,5 +133,63 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 		offering = resources.Resources[0].ToModel()
 	}
 
+	return
+}
+
+func (repo CloudControllerServiceRepository) FindServicePlanToMigrateByDescription(v1Description V1ServicePlanDescription, v2Description V2ServicePlanDescription) (v1PlanGuid, v2PlanGuid string, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_plans", repo.config.ApiEndpoint())
+
+	response := new(PaginatedServicePlanResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, resource := range response.Resources {
+		if v1PlanGuid == "" {
+			serviceOffering := resource.Entity.ServiceOffering.Entity
+
+			matchingPlan := resource.Entity.Name == v1Description.ServicePlanName
+			matchingService := serviceOffering.Label == v1Description.ServiceName
+			matchingProvider := serviceOffering.Provider == v1Description.ServiceProvider
+			if matchingPlan && matchingService && matchingProvider {
+				v1PlanGuid = resource.Metadata.Guid
+			}
+		}
+
+		if v2PlanGuid == "" {
+			serviceOffering := resource.Entity.ServiceOffering.Entity
+
+			matchingPlan := resource.Entity.Name == v2Description.ServicePlanName
+			matchingService := serviceOffering.Label == v2Description.ServiceName
+			matchingProvider := serviceOffering.Provider == ""
+			if matchingPlan && matchingService && matchingProvider {
+				v2PlanGuid = resource.Metadata.Guid
+			}
+		}
+	}
+
+	if v1PlanGuid == "" {
+		apiResponse = net.NewNotFoundApiResponse("Service plan '%s' not found", v1Description.ServicePlanName)
+		return
+	}
+
+	if v2PlanGuid == "" {
+		apiResponse = net.NewNotFoundApiResponse("Service plan '%s' not found", v2Description.ServicePlanName)
+		return
+	}
+
+	return
+}
+
+func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_plans/%s/service_instances", repo.config.ApiEndpoint(), v1PlanGuid)
+	body := strings.NewReader(fmt.Sprintf(`{"service_plan_guid":"%s"}`, v2PlanGuid))
+	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken(), body)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	apiResponse = repo.gateway.PerformRequest(request)
 	return
 }
