@@ -25,6 +25,7 @@ type UserEntity struct {
 }
 
 var orgRoleToPathMap = map[string]string{
+	cf.ORG_USER:        "users",
 	cf.ORG_MANAGER:     "managers",
 	cf.BILLING_MANAGER: "billing_managers",
 	cf.ORG_AUDITOR:     "auditors",
