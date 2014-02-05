@@ -11,19 +11,17 @@ import (
 )
 
 type DeleteSpace struct {
-	ui         terminal.UI
-	config     *configuration.Configuration
-	spaceRepo  api.SpaceRepository
-	configRepo configuration.ConfigurationRepository
-	spaceReq   requirements.SpaceRequirement
+	ui        terminal.UI
+	config    *configuration.Configuration
+	spaceRepo api.SpaceRepository
+	spaceReq  requirements.SpaceRequirement
 }
 
-func NewDeleteSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, configRepo configuration.ConfigurationRepository) (cmd *DeleteSpace) {
+func NewDeleteSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd *DeleteSpace) {
 	cmd = new(DeleteSpace)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
-	cmd.configRepo = configRepo
 	return
 }
 
@@ -74,15 +72,8 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	config, err := cmd.configRepo.Get()
-	if err != nil {
-		cmd.ui.ConfigFailure(err)
-		return
-	}
-
-	if config.SpaceFields.Name == spaceName {
-		config.SpaceFields = cf.SpaceFields{}
-		cmd.configRepo.Save()
+	if cmd.config.SpaceFields.Name == spaceName {
+		cmd.config.SetSpaceFields(cf.SpaceFields{})
 		cmd.ui.Say("TIP: No space targeted, use '%s target -s' to target a space", cf.Name())
 	}
 

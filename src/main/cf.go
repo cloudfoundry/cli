@@ -40,17 +40,21 @@ func main() {
 	}
 
 	termUI := terminal.NewUI(os.Stdin)
-	configRepo := configuration.NewConfigurationDiskRepository()
-	config := loadConfig(termUI, configRepo)
+
+	config, configRepo := loadConfig(termUI)
+	defer saveConfig(termUI, config, configRepo)
+
+	oldConfig := config.GetOldConfig()
+
 	manifestRepo := manifest.NewManifestDiskRepository()
-	repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
+	repoLocator := api.NewRepositoryLocator(oldConfig, map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(),
 		"cloud-controller": net.NewCloudControllerGateway(),
 		"uaa":              net.NewUAAGateway(),
 	})
 
-	cmdFactory := commands.NewFactory(termUI, config, configRepo, manifestRepo, repoLocator)
-	reqFactory := requirements.NewFactory(termUI, config, repoLocator)
+	cmdFactory := commands.NewFactory(termUI, oldConfig, manifestRepo, repoLocator)
+	reqFactory := requirements.NewFactory(termUI, oldConfig, repoLocator)
 	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
 
 	app, err := app.NewApp(cmdRunner)
@@ -108,8 +112,9 @@ OPTIONS:
 
 }
 
-func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationRepository) (config *configuration.Configuration) {
-	config, err := configRepo.Get()
+func loadConfig(termUI terminal.UI) (config configuration.ConfigReadWriteCloser, configRepo configuration.ConfigurationRepository) {
+	configRepo = configuration.NewConfigurationDiskRepository(configuration.ConfigFilePath())
+	config, err := configRepo.Load()
 	if err != nil {
 		termUI.Failed(fmt.Sprintf("Error loading config file: %s",err))
 		configRepo.Delete()
@@ -117,6 +122,13 @@ func loadConfig(termUI terminal.UI, configRepo configuration.ConfigurationReposi
 		return
 	}
 	return
+}
+
+func saveConfig(termUI terminal.UI,  config configuration.ConfigReadWriteCloser, configRepo configuration.ConfigurationRepository) {
+	err := configRepo.Save(config)
+	if err != nil {
+		termUI.Failed("Failed to save config file")
+	}
 }
 
 func displayCrashDialog(errorMessage string) {

@@ -9,15 +9,15 @@ import (
 )
 
 type Password struct {
-	ui         terminal.UI
-	pwdRepo    api.PasswordRepository
-	configRepo configuration.ConfigurationRepository
+	ui      terminal.UI
+	pwdRepo api.PasswordRepository
+	config  *configuration.Configuration
 }
 
-func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, configRepo configuration.ConfigurationRepository) (cmd Password) {
+func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config *configuration.Configuration) (cmd Password) {
 	cmd.ui = ui
 	cmd.pwdRepo = pwdRepo
-	cmd.configRepo = configRepo
+	cmd.config = config
 	return
 }
 
@@ -52,6 +52,6 @@ func (cmd Password) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	cmd.configRepo.ClearSession()
+	cmd.config.ClearSession()
 	cmd.ui.Say("Please log in again")
 }

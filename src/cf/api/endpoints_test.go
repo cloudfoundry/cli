@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	testconfig "testhelpers/configuration"
 )
 
 var validApiInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -39,40 +38,35 @@ var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request
 	fmt.Fprintln(w, `Foo`)
 }
 
-func createEndpointRepoForUpdate(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+func createEndpointRepoForUpdate(config *configuration.Configuration, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
 	if endpoint != nil {
 		ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	}
-	return ts, makeRepo(configRepo)
+	gateway := net.NewCloudControllerGateway()
+	return ts, NewEndpointRepository(config, gateway)
 }
 
-func createInsecureEndpointRepoForUpdate(configRepo testconfig.FakeConfigRepository, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+func createInsecureEndpointRepoForUpdate(config *configuration.Configuration, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
 	if endpoint != nil {
 		ts = httptest.NewServer(http.HandlerFunc(endpoint))
 	}
-	return ts, makeRepo(configRepo)
-}
-
-func makeRepo(configRepo testconfig.FakeConfigRepository) (repo EndpointRepository) {
-	config, _ := configRepo.Get()
 	gateway := net.NewCloudControllerGateway()
-	return NewEndpointRepository(config, gateway, configRepo)
+	return ts, NewEndpointRepository(config, gateway)
 }
 
-func createEndpointRepoForGet(config *configuration.Configuration) (repo EndpointRepository) {
-	configRepo := testconfig.FakeConfigRepository{}
-	repo = NewEndpointRepository(config, net.NewCloudControllerGateway(), configRepo)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
-		It("TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint", func() {
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Delete()
-			configRepo.Login()
+		var config *configuration.Configuration
 
-			ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
+		BeforeEach(func() {
+			config = &configuration.Configuration{}
+			config.AccessToken = `BEARER eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiJjNDE4OTllNS1kZTE1LTQ5NGQtYWFiNC04ZmNlYzUxN2UwMDUiLCJzdWIiOiI3NzJkZGEzZi02NjlmLTQyNzYtYjJiZC05MDQ4NmFiZTFmNmYiLCJzY29wZSI6WyJjbG91ZF9jb250cm9sbGVyLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwib3BlbmlkIiwicGFzc3dvcmQud3JpdGUiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImdyYW50X3R5cGUiOiJwYXNzd29yZCIsInVzZXJfaWQiOiI3NzJkZGEzZi02NjlmLTQyNzYtYjJiZC05MDQ4NmFiZTFmNmYiLCJ1c2VyX25hbWUiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJpYXQiOjEzNzcwMjgzNTYsImV4cCI6MTM3NzAzNTU1NiwiaXNzIjoiaHR0cHM6Ly91YWEuYXJib3JnbGVuLmNmLWFwcC5jb20vb2F1dGgvdG9rZW4iLCJhdWQiOlsib3BlbmlkIiwiY2xvdWRfY29udHJvbGxlciIsInBhc3N3b3JkIl19.kjFJHi0Qir9kfqi2eyhHy6kdewhicAFu8hrPR1a5AxFvxGB45slKEjuP0_72cM_vEYICgZn3PcUUkHU9wghJO9wjZ6kiIKK1h5f2K9g-Iprv9BbTOWUODu1HoLIvg2TtGsINxcRYy_8LW1RtvQc1b4dBPoopaEH4no-BIzp0E5E`
+		})
+
+		It("TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint", func() {
+			ts, repo := createEndpointRepoForUpdate(config, validApiInfoEndpoint)
 			defer ts.Close()
+
 			org := cf.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
@@ -81,29 +75,22 @@ func init() {
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 
-			config, _ := configRepo.Get()
 			config.OrganizationFields = org
 			config.SpaceFields = space
 
 			repo.UpdateEndpoint(ts.URL)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.AccessToken, "")
-			assert.Equal(mr.T(), savedConfig.AuthorizationEndpoint, "https://login.example.com")
-			assert.Equal(mr.T(), savedConfig.LoggregatorEndPoint, "wss://loggregator.foo.example.org:4443")
-			assert.Equal(mr.T(), savedConfig.Target, ts.URL)
-			assert.Equal(mr.T(), savedConfig.ApiVersion, "42.0.0")
-			assert.False(mr.T(), savedConfig.HasOrganization())
-			assert.False(mr.T(), savedConfig.HasSpace())
+			assert.Equal(mr.T(), config.AccessToken, "")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint, "https://login.example.com")
+			assert.Equal(mr.T(), config.LoggregatorEndPoint, "wss://loggregator.foo.example.org:4443")
+			assert.Equal(mr.T(), config.Target, ts.URL)
+			assert.Equal(mr.T(), config.ApiVersion, "42.0.0")
+			assert.False(mr.T(), config.HasOrganization())
+			assert.False(mr.T(), config.HasSpace())
 		})
+
 		It("TestUpdateEndpointWhenUrlIsAlreadyTargeted", func() {
-
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Delete()
-			configRepo.Login()
-
-			ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
+			ts, repo := createEndpointRepoForUpdate(config, validApiInfoEndpoint)
 			defer ts.Close()
 
 			org := cf.OrganizationFields{}
@@ -114,7 +101,6 @@ func init() {
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 
-			config, _ := configRepo.Get()
 			config.Target = ts.URL
 			config.AccessToken = "some access token"
 			config.RefreshToken = "some refresh token"
@@ -128,13 +114,9 @@ func init() {
 			assert.Equal(mr.T(), config.AccessToken, "some access token")
 			assert.Equal(mr.T(), config.RefreshToken, "some refresh token")
 		})
+
 		It("TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpsEndpointExists", func() {
-
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Delete()
-			configRepo.Login()
-
-			ts, repo := createEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
+			ts, repo := createEndpointRepoForUpdate(config, validApiInfoEndpoint)
 			defer ts.Close()
 
 			schemelessURL := strings.Replace(ts.URL, "https://", "", 1)
@@ -143,20 +125,14 @@ func init() {
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.AccessToken, "")
-			assert.Equal(mr.T(), savedConfig.AuthorizationEndpoint, "https://login.example.com")
-			assert.Equal(mr.T(), savedConfig.Target, ts.URL)
-			assert.Equal(mr.T(), savedConfig.ApiVersion, "42.0.0")
+			assert.Equal(mr.T(), config.AccessToken, "")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint, "https://login.example.com")
+			assert.Equal(mr.T(), config.Target, ts.URL)
+			assert.Equal(mr.T(), config.ApiVersion, "42.0.0")
 		})
+
 		It("TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpEndpointExists", func() {
-
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Delete()
-			configRepo.Login()
-
-			ts, repo := createInsecureEndpointRepoForUpdate(configRepo, validApiInfoEndpoint)
+			ts, repo := createInsecureEndpointRepoForUpdate(config, validApiInfoEndpoint)
 			defer ts.Close()
 
 			schemelessURL := strings.Replace(ts.URL, "http://", "", 1)
@@ -166,19 +142,14 @@ func init() {
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.AccessToken, "")
-			assert.Equal(mr.T(), savedConfig.AuthorizationEndpoint, "https://login.example.com")
-			assert.Equal(mr.T(), savedConfig.Target, ts.URL)
-			assert.Equal(mr.T(), savedConfig.ApiVersion, "42.0.0")
+			assert.Equal(mr.T(), config.AccessToken, "")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint, "https://login.example.com")
+			assert.Equal(mr.T(), config.Target, ts.URL)
+			assert.Equal(mr.T(), config.ApiVersion, "42.0.0")
 		})
+
 		It("TestUpdateEndpointWhenEndpointReturns404", func() {
-
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Login()
-
-			ts, repo := createEndpointRepoForUpdate(configRepo, func(w http.ResponseWriter, r *http.Request) {
+			ts, repo := createEndpointRepoForUpdate(config, func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNotFound)
 			})
 
@@ -188,26 +159,20 @@ func init() {
 
 			assert.True(mr.T(), apiResponse.IsNotSuccessful())
 		})
+
 		It("TestUpdateEndpointWhenEndpointReturnsInvalidJson", func() {
-
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Login()
-
-			ts, repo := createEndpointRepoForUpdate(configRepo, invalidJsonResponseApiEndpoint)
+			ts, repo := createEndpointRepoForUpdate(config, invalidJsonResponseApiEndpoint)
 			defer ts.Close()
 
 			_, apiResponse := repo.UpdateEndpoint(ts.URL)
 
 			assert.True(mr.T(), apiResponse.IsNotSuccessful())
 		})
+
 		It("TestGetCloudControllerEndpoint", func() {
+			config.Target = "http://api.example.com"
 
-			configRepo := testconfig.FakeConfigRepository{}
-			config := &configuration.Configuration{
-				Target: "http://api.example.com",
-			}
-
-			repo := NewEndpointRepository(config, net.NewCloudControllerGateway(), configRepo)
+			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			endpoint, apiResponse := repo.GetCloudControllerEndpoint()
 
@@ -215,35 +180,30 @@ func init() {
 			assert.Equal(mr.T(), endpoint, "http://api.example.com")
 		})
 		It("TestGetLoggregatorEndpoint", func() {
+			config.LoggregatorEndPoint = "wss://loggregator.example.com:4443"
 
-			config := &configuration.Configuration{
-				LoggregatorEndPoint: "wss://loggregator.example.com:4443",
-			}
-
-			repo := createEndpointRepoForGet(config)
+			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.Equal(mr.T(), endpoint, "wss://loggregator.example.com:4443")
 		})
+
 		It("TestGetUAAEndpoint", func() {
+			config.AuthorizationEndpoint = "https://login.example.com"
 
-			config := &configuration.Configuration{
-				AuthorizationEndpoint: "https://login.example.com",
-			}
-
-			repo := createEndpointRepoForGet(config)
+			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			endpoint, apiResponse := repo.GetUAAEndpoint()
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.Equal(mr.T(), endpoint, "https://uaa.example.com")
 		})
-		It("TestEndpointsReturnAnErrorWhenMissing", func() {
 
-			config := &configuration.Configuration{}
-			repo := createEndpointRepoForGet(config)
+		It("TestEndpointsReturnAnErrorWhenMissing", func() {
+			config = &configuration.Configuration{}
+			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			_, response := repo.GetLoggregatorEndpoint()
 			assert.True(mr.T(), response.IsNotSuccessful())

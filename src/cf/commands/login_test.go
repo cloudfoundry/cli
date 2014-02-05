@@ -12,17 +12,14 @@ import (
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
-	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	testterm "testhelpers/terminal"
 )
 
 type LoginTestContext struct {
 	Flags  []string
-	Inputs []string
-	Config configuration.Configuration
+	Config *configuration.Configuration
 
-	configRepo   testconfig.FakeConfigRepository
 	ui           *testterm.FakeUI
 	authRepo     *testapi.FakeAuthenticationRepository
 	endpointRepo *testapi.FakeEndpointRepo
@@ -30,20 +27,18 @@ type LoginTestContext struct {
 	spaceRepo    *testapi.FakeSpaceRepository
 }
 
-func defaultBeforeBlock(*LoginTestContext) {}
+func setUpLoginTestContext() (c *LoginTestContext) {
+	c = new(LoginTestContext)
+	c.Config = &configuration.Configuration{}
 
-func callLogin(t mr.TestingT, c *LoginTestContext, beforeBlock func(*LoginTestContext)) {
+	c.ui = &testterm.FakeUI{}
 
-	c.configRepo = testconfig.FakeConfigRepository{}
-	c.ui = &testterm.FakeUI{
-		Inputs: c.Inputs,
-	}
 	c.authRepo = &testapi.FakeAuthenticationRepository{
 		AccessToken:  "my_access_token",
 		RefreshToken: "my_refresh_token",
-		ConfigRepo:   c.configRepo,
+		Config:       c.Config,
 	}
-	c.endpointRepo = &testapi.FakeEndpointRepo{}
+	c.endpointRepo = &testapi.FakeEndpointRepo{Config: c.Config}
 
 	org := cf.Organization{}
 	org.Name = "my-org"
@@ -61,25 +56,22 @@ func callLogin(t mr.TestingT, c *LoginTestContext, beforeBlock func(*LoginTestCo
 		Spaces: []cf.Space{space},
 	}
 
-	c.configRepo.Delete()
-	config, _ := c.configRepo.Get()
-	config.Target = c.Config.Target
-	config.OrganizationFields = c.Config.OrganizationFields
-	config.SpaceFields = c.Config.SpaceFields
+	return
+}
 
-	beforeBlock(c)
-
-	l := NewLogin(c.ui, c.configRepo, c.authRepo, c.endpointRepo, c.orgRepo, c.spaceRepo)
+func callLogin(c *LoginTestContext) {
+	l := NewLogin(c.ui, c.Config, c.authRepo, c.endpointRepo, c.orgRepo, c.spaceRepo)
 	testcmd.RunCommand(l, testcmd.NewContext("login", c.Flags), nil)
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestSuccessfullyLoggingInWithNumericalPrompts", func() {
+			c := setUpLoginTestContext()
 
 			OUT_OF_RANGE_CHOICE := "3"
-			c := LoginTestContext{
-				Inputs: []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"},
-			}
+
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
 
 			org1 := cf.Organization{}
 			org1.Guid = "some-org-guid"
@@ -97,12 +89,10 @@ func init() {
 			space2.Guid = "some-space-guid"
 			space2.Name = "some-space"
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.Organizations = []cf.Organization{org1, org2}
-				c.spaceRepo.Spaces = []cf.Space{space1, space2}
-			})
+			c.orgRepo.Organizations = []cf.Organization{org1, org2}
+			c.spaceRepo.Spaces = []cf.Space{space1, space2}
 
-			savedConfig := testconfig.SavedConfiguration
+			callLogin(c)
 
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Select an org"},
@@ -113,11 +103,11 @@ func init() {
 				{"2. some-space"},
 			})
 
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -128,11 +118,11 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestSuccessfullyLoggingInWithStringPrompts", func() {
+			c := setUpLoginTestContext()
 
-			c := LoginTestContext{
-				Inputs: []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"},
-			}
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"}
 
 			org1 := cf.Organization{}
 			org1.Guid = "some-org-guid"
@@ -150,12 +140,11 @@ func init() {
 			space2.Guid = "some-space-guid"
 			space2.Name = "some-space"
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.Organizations = []cf.Organization{org1, org2}
-				c.spaceRepo.Spaces = []cf.Space{space1, space2}
-			})
+			c.orgRepo.Organizations = []cf.Organization{org1, org2}
+			c.spaceRepo.Spaces = []cf.Space{space1, space2}
 
-			savedConfig := testconfig.SavedConfiguration
+			callLogin(c)
+
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Select an org"},
 				{"1. some-org"},
@@ -165,11 +154,11 @@ func init() {
 				{"2. some-space"},
 			})
 
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -180,57 +169,53 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
-		It("TestLoggingInWithTooManyOrgsDoesNotShowOrgList", func() {
 
-			c := LoginTestContext{
-				Inputs: []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"},
+		It("TestLoggingInWithTooManyOrgsDoesNotShowOrgList", func() {
+			c := setUpLoginTestContext()
+
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
+
+			for i := 0; i < 60; i++ {
+				id := strconv.Itoa(i)
+				org := cf.Organization{}
+				org.Guid = "my-org-guid-" + id
+				org.Name = "my-org-" + id
+				c.orgRepo.Organizations = append(c.orgRepo.Organizations, org)
 			}
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				for i := 0; i < 60; i++ {
-					id := strconv.Itoa(i)
-					org := cf.Organization{}
-					org.Guid = "my-org-guid-" + id
-					org.Name = "my-org-" + id
-					c.orgRepo.Organizations = append(c.orgRepo.Organizations, org)
-				}
+			c.orgRepo.FindByNameOrganization = c.orgRepo.Organizations[1]
 
-				c.orgRepo.FindByNameOrganization = c.orgRepo.Organizations[1]
+			space1 := cf.Space{}
+			space1.Guid = "my-space-guid"
+			space1.Name = "my-space"
 
-				space1 := cf.Space{}
-				space1.Guid = "my-space-guid"
-				space1.Name = "my-space"
+			space2 := cf.Space{}
+			space2.Guid = "some-space-guid"
+			space2.Name = "some-space"
 
-				space2 := cf.Space{}
-				space2.Guid = "some-space-guid"
-				space2.Name = "some-space"
+			c.spaceRepo.Spaces = []cf.Space{space1, space2}
 
-				c.spaceRepo.Spaces = []cf.Space{space1, space2}
-			})
-
-			savedConfig := testconfig.SavedConfiguration
+			callLogin(c)
 
 			testassert.SliceDoesNotContain(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"my-org-2"},
 			})
 			assert.Equal(mr.T(), c.orgRepo.FindByNameName, "my-org-1")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid-1")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid-1")
 		})
+
 		It("TestSuccessfullyLoggingInWithFlags", func() {
+			c := setUpLoginTestContext()
 
-			c := LoginTestContext{
-				Flags: []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"},
-			}
+			c.Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"}
 
-			callLogin(mr.T(), &c, defaultBeforeBlock)
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -238,27 +223,21 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestSuccessfullyLoggingInWithEndpointSetInConfig", func() {
+			c := setUpLoginTestContext()
 
-			existingConfig := configuration.Configuration{
-				Target: "http://api.example.com",
-			}
+			c.Flags = []string{"-o", "my-org", "-s", "my-space"}
+			c.ui.Inputs = []string{"user@example.com", "password"}
+			c.Config.Target = "http://api.example.com"
 
-			c := LoginTestContext{
-				Flags:  []string{"-o", "my-org", "-s", "my-space"},
-				Inputs: []string{"user@example.com", "password"},
-				Config: existingConfig,
-			}
+			callLogin(c)
 
-			callLogin(mr.T(), &c, defaultBeforeBlock)
-
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "http://api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "http://api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -266,31 +245,27 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestSuccessfullyLoggingInWithOrgSetInConfig", func() {
+			c := setUpLoginTestContext()
 
 			org := cf.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
+			c.Config.OrganizationFields = org
 
-			existingConfig := configuration.Configuration{OrganizationFields: org}
+			c.Flags = []string{"-s", "my-space"}
+			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-			c := LoginTestContext{
-				Flags:  []string{"-s", "my-space"},
-				Inputs: []string{"http://api.example.com", "user@example.com", "password"},
-				Config: existingConfig,
-			}
+			c.orgRepo.FindByNameOrganization = cf.Organization{}
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.FindByNameOrganization = cf.Organization{}
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "http://api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "http://api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -298,38 +273,32 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig", func() {
+			c := setUpLoginTestContext()
 
 			org := cf.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
+			c.Config.OrganizationFields = org
 
 			space := cf.SpaceFields{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
+			c.Config.SpaceFields = space
 
-			existingConfig := configuration.Configuration{
-				OrganizationFields: org,
-				SpaceFields:        space,
-			}
+			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-			c := LoginTestContext{
-				Inputs: []string{"http://api.example.com", "user@example.com", "password"},
-				Config: existingConfig,
-			}
+			c.orgRepo.FindByNameOrganization = cf.Organization{}
+			c.spaceRepo.FindByNameInOrgSpace = cf.Space{}
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.FindByNameOrganization = cf.Organization{}
-				c.spaceRepo.FindByNameInOrgSpace = cf.Space{}
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "http://api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "http://api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -337,29 +306,26 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestSuccessfullyLoggingInWithOnlyOneOrg", func() {
+			c := setUpLoginTestContext()
 
 			org := cf.Organization{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 
-			c := LoginTestContext{
-				Flags:  []string{"-s", "my-space"},
-				Inputs: []string{"http://api.example.com", "user@example.com", "password"},
-			}
+			c.Flags = []string{"-s", "my-space"}
+			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+			c.orgRepo.FindByNameOrganization = cf.Organization{}
+			c.orgRepo.Organizations = []cf.Organization{org}
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.FindByNameOrganization = cf.Organization{}
-				c.orgRepo.Organizations = []cf.Organization{org}
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "http://api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "http://api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -367,28 +333,25 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestSuccessfullyLoggingInWithOnlyOneSpace", func() {
+			c := setUpLoginTestContext()
 
 			space := cf.Space{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
 
-			c := LoginTestContext{
-				Flags:  []string{"-o", "my-org"},
-				Inputs: []string{"http://api.example.com", "user@example.com", "password"},
-			}
+			c.Flags = []string{"-o", "my-org"}
+			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+			c.spaceRepo.Spaces = []cf.Space{space}
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.spaceRepo.Spaces = []cf.Space{space}
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "http://api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "my-space-guid")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "http://api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "my-space-guid")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			assert.Equal(mr.T(), c.endpointRepo.UpdateEndpointReceived, "http://api.example.com")
 			assert.Equal(mr.T(), c.authRepo.Email, "user@example.com")
@@ -396,128 +359,114 @@ func init() {
 
 			assert.True(mr.T(), c.ui.ShowConfigurationCalled)
 		})
+
 		It("TestUnsuccessfullyLoggingInWithAuthError", func() {
+			c := setUpLoginTestContext()
 
-			c := LoginTestContext{
-				Flags:  []string{"-u", "user@example.com"},
-				Inputs: []string{"api.example.com", "password", "password2", "password3"},
-			}
+			c.Flags = []string{"-u", "user@example.com"}
+			c.ui.Inputs = []string{"api.example.com", "password", "password2", "password3"}
+			c.authRepo.AuthError = true
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.authRepo.AuthError = true
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Empty(mr.T(), savedConfig.OrganizationFields.Guid)
-			assert.Empty(mr.T(), savedConfig.SpaceFields.Guid)
-			assert.Empty(mr.T(), savedConfig.AccessToken)
-			assert.Empty(mr.T(), savedConfig.RefreshToken)
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Empty(mr.T(), c.Config.OrganizationFields.Guid)
+			assert.Empty(mr.T(), c.Config.SpaceFields.Guid)
+			assert.Empty(mr.T(), c.Config.AccessToken)
+			assert.Empty(mr.T(), c.Config.RefreshToken)
 
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Failed"},
 			})
 		})
+
 		It("TestUnsuccessfullyLoggingInWithUpdateEndpointError", func() {
+			c := setUpLoginTestContext()
 
-			c := LoginTestContext{
-				Inputs: []string{"api.example.com"},
-			}
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.endpointRepo.UpdateEndpointError = net.NewApiResponseWithMessage("Server error")
-			})
+			c.ui.Inputs = []string{"api.example.com"}
+			c.endpointRepo.UpdateEndpointError = net.NewApiResponseWithMessage("Server error")
 
-			savedConfig := testconfig.SavedConfiguration
+			callLogin(c)
 
-			assert.Empty(mr.T(), savedConfig.Target)
-			assert.Empty(mr.T(), savedConfig.OrganizationFields.Guid)
-			assert.Empty(mr.T(), savedConfig.SpaceFields.Guid)
-			assert.Empty(mr.T(), savedConfig.AccessToken)
-			assert.Empty(mr.T(), savedConfig.RefreshToken)
+			assert.Empty(mr.T(), c.Config.Target)
+			assert.Empty(mr.T(), c.Config.OrganizationFields.Guid)
+			assert.Empty(mr.T(), c.Config.SpaceFields.Guid)
+			assert.Empty(mr.T(), c.Config.AccessToken)
+			assert.Empty(mr.T(), c.Config.RefreshToken)
 
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Failed"},
 			})
 		})
+
 		It("TestUnsuccessfullyLoggingInWithOrgFindByNameErr", func() {
+			c := setUpLoginTestContext()
 
-			c := LoginTestContext{
-				Flags:  []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"},
-				Inputs: []string{"api.example.com", "user@example.com", "password"},
-			}
+			c.Flags = []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"}
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
+			c.orgRepo.FindByNameErr = true
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.FindByNameErr = true
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Empty(mr.T(), savedConfig.OrganizationFields.Guid)
-			assert.Empty(mr.T(), savedConfig.SpaceFields.Guid)
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Empty(mr.T(), c.Config.OrganizationFields.Guid)
+			assert.Empty(mr.T(), c.Config.SpaceFields.Guid)
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Failed"},
 			})
 		})
+
 		It("TestUnsuccessfullyLoggingInWithSpaceFindByNameErr", func() {
+			c := setUpLoginTestContext()
 
-			c := LoginTestContext{
-				Flags:  []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"},
-				Inputs: []string{"api.example.com", "user@example.com", "password"},
-			}
+			c.Flags = []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"}
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
+			c.spaceRepo.FindByNameErr = true
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.spaceRepo.FindByNameErr = true
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
-
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "my-org-guid")
-			assert.Empty(mr.T(), savedConfig.SpaceFields.Guid)
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "my-org-guid")
+			assert.Empty(mr.T(), c.Config.SpaceFields.Guid)
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Failed"},
 			})
 		})
-		It("TestSuccessfullyLoggingInWithoutTargetOrg", func() {
 
-			c := LoginTestContext{
-				Inputs: []string{"api.example.com", "user@example.com", "password", ""},
-			}
+		It("TestSuccessfullyLoggingInWithoutTargetOrg", func() {
+			c := setUpLoginTestContext()
+
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", ""}
 
 			org1 := maker.NewOrg(maker.Overrides{"name": "org1"})
 			org2 := maker.NewOrg(maker.Overrides{"name": "org2"})
+			c.orgRepo.Organizations = []cf.Organization{org1, org2}
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.Organizations = []cf.Organization{org1, org2}
-			})
+			callLogin(c)
 
-			savedConfig := testconfig.SavedConfiguration
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Select an org (or press enter to skip):"},
 			})
 			testassert.SliceDoesNotContain(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Select a space", "or press enter to skip"},
 			})
-
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 		})
-		It("TestSuccessfullyLoggingInWithoutTargetSpace", func() {
 
-			c := LoginTestContext{
-				Inputs: []string{"api.example.com", "user@example.com", "password", ""},
-			}
+		It("TestSuccessfullyLoggingInWithoutTargetSpace", func() {
+			c := setUpLoginTestContext()
+
+			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", ""}
 
 			org := cf.Organization{}
 			org.Guid = "some-org-guid"
@@ -526,12 +475,11 @@ func init() {
 			space1 := maker.NewSpace(maker.Overrides{"name": "some-space", "guid": "some-space-guid"})
 			space2 := maker.NewSpace(maker.Overrides{"name": "other-space", "guid": "other-space-guid"})
 
-			callLogin(mr.T(), &c, func(c *LoginTestContext) {
-				c.orgRepo.Organizations = []cf.Organization{org}
-				c.spaceRepo.Spaces = []cf.Space{space1, space2}
-			})
+			c.orgRepo.Organizations = []cf.Organization{org}
+			c.spaceRepo.Spaces = []cf.Space{space1, space2}
 
-			savedConfig := testconfig.SavedConfiguration
+			callLogin(c)
+
 			testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 				{"Select a space (or press enter to skip):"},
 			})
@@ -539,11 +487,11 @@ func init() {
 				{"FAILED"},
 			})
 
-			assert.Equal(mr.T(), savedConfig.Target, "api.example.com")
-			assert.Equal(mr.T(), savedConfig.OrganizationFields.Guid, "some-org-guid")
-			assert.Equal(mr.T(), savedConfig.SpaceFields.Guid, "")
-			assert.Equal(mr.T(), savedConfig.AccessToken, "my_access_token")
-			assert.Equal(mr.T(), savedConfig.RefreshToken, "my_refresh_token")
+			assert.Equal(mr.T(), c.Config.Target, "api.example.com")
+			assert.Equal(mr.T(), c.Config.OrganizationFields.Guid, "some-org-guid")
+			assert.Equal(mr.T(), c.Config.SpaceFields.Guid, "")
+			assert.Equal(mr.T(), c.Config.AccessToken, "my_access_token")
+			assert.Equal(mr.T(), c.Config.RefreshToken, "my_refresh_token")
 		})
 	})
 }

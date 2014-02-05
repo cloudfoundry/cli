@@ -4,10 +4,46 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
+	"testhelpers/maker"
 )
 
 func init() {
 	Describe("Testing with ginkgo", func() {
+
+		// TODO - test ClearTokens et al
+		It("has acccessor methods for all config fields", func() {
+			config := NewConfigReadWriteCloser(&Configuration{})
+
+			config.SetApiEndpoint("http://api.the-endpoint")
+			assert.Equal(mr.T(), config.ApiEndpoint(), "http://api.the-endpoint")
+
+			config.SetApiVersion("3")
+			assert.Equal(mr.T(), config.ApiVersion(), "3")
+
+			config.SetAuthorizationEndpoint("http://auth.the-endpoint")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint(), "http://auth.the-endpoint")
+
+			config.SetLoggregatorEndpoint("http://logs.the-endpoint")
+			assert.Equal(mr.T(), config.LoggregatorEndpoint(), "http://logs.the-endpoint")
+
+			config.SetAccessToken("the-token")
+			assert.Equal(mr.T(), config.AccessToken(), "the-token")
+
+			config.SetRefreshToken("the-token")
+			assert.Equal(mr.T(), config.RefreshToken(), "the-token")
+
+			organization := maker.NewOrgFields(maker.Overrides{"name": "the-org"})
+			config.SetOrganizationFields(organization)
+			assert.Equal(mr.T(), config.OrganizationFields(), organization)
+
+			space := maker.NewSpaceFields(maker.Overrides{"name": "the-space"})
+			config.SetSpaceFields(space)
+			assert.Equal(mr.T(), config.SpaceFields(), space)
+
+			config.SetApplicationStartTimeout(5)
+			assert.Equal(mr.T(), config.ApplicationStartTimeout(), 5)
+		})
+
 		It("TestUserEmailWithAValidAccessToken", func() {
 
 			config := Configuration{

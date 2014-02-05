@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
-	testconfig "testhelpers/configuration"
 	testmanifest "testhelpers/manifest"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -51,16 +50,15 @@ func init() {
 			for _, cmdName := range availableCmdNames() {
 				ui := &testterm.FakeUI{}
 				config := &configuration.Configuration{}
-				configRepo := testconfig.FakeConfigRepository{}
 				manifestRepo := &testmanifest.FakeManifestRepository{}
 
-				repoLocator := api.NewRepositoryLocator(config, configRepo, map[string]net.Gateway{
+				repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
 					"auth":             net.NewUAAGateway(),
 					"cloud-controller": net.NewCloudControllerGateway(),
 					"uaa":              net.NewUAAGateway(),
 				})
 
-				cmdFactory := commands.NewFactory(ui, config, configRepo, manifestRepo, repoLocator)
+				cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
 				cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: mr.T()}
 				app, _ := NewApp(cmdRunner)
 				app.Run([]string{"", cmdName})

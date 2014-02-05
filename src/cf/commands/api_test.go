@@ -29,7 +29,7 @@ func init() {
 				Target:     "https://api.run.pivotal.io",
 				ApiVersion: "2.0",
 			}
-			endpointRepo := &testapi.FakeEndpointRepo{}
+			endpointRepo := &testapi.FakeEndpointRepo{Config: config}
 
 			ui := callApi([]string{}, config, endpointRepo)
 
@@ -38,10 +38,10 @@ func init() {
 				{"https://api.run.pivotal.io", "2.0"},
 			})
 		})
-		It("TestApiWhenChangingTheEndpoint", func() {
 
-			endpointRepo := &testapi.FakeEndpointRepo{}
+		It("TestApiWhenChangingTheEndpoint", func() {
 			config := &configuration.Configuration{}
+			endpointRepo := &testapi.FakeEndpointRepo{Config: config}
 
 			ui := callApi([]string{"http://example.com"}, config, endpointRepo)
 
@@ -51,10 +51,10 @@ func init() {
 				{"OK"},
 			})
 		})
-		It("TestApiWithTrailingSlash", func() {
 
-			endpointRepo := &testapi.FakeEndpointRepo{}
+		It("TestApiWithTrailingSlash", func() {
 			config := &configuration.Configuration{}
+			endpointRepo := &testapi.FakeEndpointRepo{Config: config}
 
 			ui := callApi([]string{"https://example.com/"}, config, endpointRepo)
 

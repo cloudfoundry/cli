@@ -10,87 +10,77 @@ import (
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
-	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
 
 func testSuccessfulAuthenticate(t mr.TestingT, args []string) (ui *testterm.FakeUI) {
-	configRepo := testconfig.FakeConfigRepository{}
-	configRepo.Delete()
-	config, _ := configRepo.Get()
+	config := &configuration.Configuration{}
 
 	auth := &testapi.FakeAuthenticationRepository{
 		AccessToken:  "my_access_token",
 		RefreshToken: "my_refresh_token",
-		ConfigRepo:   configRepo,
+		Config:       config,
 	}
-	ui = callAuthenticate(
-		args,
-		configRepo,
-		auth,
-	)
 
-	savedConfig := testconfig.SavedConfiguration
+	ui = callAuthenticate(args, config, auth)
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{config.Target},
 		{"OK"},
 	})
 
-	assert.Equal(t, savedConfig.AccessToken, "my_access_token")
-	assert.Equal(t, savedConfig.RefreshToken, "my_refresh_token")
+	assert.Equal(t, config.AccessToken, "my_access_token")
+	assert.Equal(t, config.RefreshToken, "my_refresh_token")
 	assert.Equal(t, auth.Email, "user@example.com")
 	assert.Equal(t, auth.Password, "password")
 
 	return
 }
 
-func callAuthenticate(args []string, configRepo configuration.ConfigurationRepository, auth api.AuthenticationRepository) (ui *testterm.FakeUI) {
+func callAuthenticate(args []string, config *configuration.Configuration, auth api.AuthenticationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("auth", args)
-	cmd := NewAuthenticate(ui, configRepo, auth)
+	cmd := NewAuthenticate(ui, config, auth)
 	testcmd.RunCommand(cmd, ctxt, &testreq.FakeReqFactory{})
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestAuthenticateFailsWithUsage", func() {
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Delete()
+			config := &configuration.Configuration{}
 
 			auth := &testapi.FakeAuthenticationRepository{
 				AccessToken:  "my_access_token",
 				RefreshToken: "my_refresh_token",
-				ConfigRepo:   configRepo,
+				Config:       config,
 			}
 
-			ui := callAuthenticate([]string{}, configRepo, auth)
+			ui := callAuthenticate([]string{}, config, auth)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callAuthenticate([]string{"my-username"}, configRepo, auth)
+			ui = callAuthenticate([]string{"my-username"}, config, auth)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callAuthenticate([]string{"my-username", "my-password"}, configRepo, auth)
+			ui = callAuthenticate([]string{"my-username", "my-password"}, config, auth)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
-		It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {
 
+		It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {
 			testSuccessfulAuthenticate(mr.T(), []string{"user@example.com", "password"})
 		})
-		It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
 
-			configRepo := testconfig.FakeConfigRepository{}
-			configRepo.Delete()
-			config, _ := configRepo.Get()
+		It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
+			config := &configuration.Configuration{}
 
 			ui := callAuthenticate(
 				[]string{
 					"foo@example.com",
 					"bar",
 				},
-				configRepo,
-				&testapi.FakeAuthenticationRepository{AuthError: true, ConfigRepo: configRepo},
+				config,
+				&testapi.FakeAuthenticationRepository{AuthError: true, Config: config},
 			)
 
 			assert.Equal(mr.T(), len(ui.Outputs), 4)

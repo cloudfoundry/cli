@@ -23,24 +23,27 @@ func callRenameSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
+
 	space2 := cf.SpaceFields{}
 	space2.Name = "my-space"
+
 	org := cf.OrganizationFields{}
 	org.Name = "my-org"
+
 	config := &configuration.Configuration{
 		SpaceFields:        space2,
 		OrganizationFields: org,
 		AccessToken:        token,
 	}
 
-	configRepo := testconfig.FakeConfigRepository{}
-	configRepo.EnsureInitialized()
-	cmd := NewRenameSpace(ui, config, spaceRepo, configRepo)
+	cmd := NewRenameSpace(ui, config, spaceRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
+
 		It("TestRenameSpaceFailsWithUsage", func() {
 			reqFactory := &testreq.FakeReqFactory{}
 			spaceRepo := &testapi.FakeSpaceRepository{}
@@ -51,6 +54,7 @@ func init() {
 			ui = callRenameSpace(mr.T(), []string{"foo"}, reqFactory, spaceRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 		})
+
 		It("TestRenameSpaceRequirements", func() {
 
 			spaceRepo := &testapi.FakeSpaceRepository{}
@@ -68,6 +72,7 @@ func init() {
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 			assert.Equal(mr.T(), reqFactory.SpaceName, "my-space")
 		})
+
 		It("TestRenameSpaceRun", func() {
 			spaceRepo := &testapi.FakeSpaceRepository{}
 			space := cf.Space{}

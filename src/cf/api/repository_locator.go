@@ -35,11 +35,11 @@ type RepositoryLocator struct {
 	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
 }
 
-func NewRepositoryLocator(config *configuration.Configuration, configRepo configuration.ConfigurationRepository, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
+func NewRepositoryLocator(config *configuration.Configuration, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
 	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	uaaGateway := gatewaysByName["uaa"]
-	loc.authRepo = NewUAAAuthenticationRepository(authGateway, configRepo)
+	loc.authRepo = NewUAAAuthenticationRepository(authGateway, config)
 
 	// ensure gateway refreshers are set before passing them by value to repositories
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
@@ -54,7 +54,7 @@ func NewRepositoryLocator(config *configuration.Configuration, configRepo config
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
-	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway, configRepo)
+	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
 	loc.logsRepo = NewLoggregatorLogsRepository(config, loc.endpointRepo)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway, loc.endpointRepo)
