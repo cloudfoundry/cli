@@ -14,15 +14,13 @@ type EndpointRepository interface {
 }
 
 type RemoteEndpointRepository struct {
-	config     *configuration.Configuration
-	gateway    net.Gateway
-	configRepo configuration.ConfigurationRepository
+	config  *configuration.Configuration
+	gateway net.Gateway
 }
 
-func NewEndpointRepository(config *configuration.Configuration, gateway net.Gateway, configRepo configuration.ConfigurationRepository) (repo RemoteEndpointRepository) {
+func NewEndpointRepository(config *configuration.Configuration, gateway net.Gateway) (repo RemoteEndpointRepository) {
 	repo.config = config
 	repo.gateway = gateway
-	repo.configRepo = configRepo
 	return
 }
 
@@ -64,7 +62,7 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse
 	}
 
 	if endpoint != repo.config.Target {
-		repo.configRepo.ClearSession()
+		repo.config.ClearSession()
 	}
 
 	repo.config.Target = endpoint
@@ -72,10 +70,6 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse
 	repo.config.AuthorizationEndpoint = serverResponse.AuthorizationEndpoint
 	repo.config.LoggregatorEndPoint = serverResponse.LoggregatorEndpoint
 
-	err := repo.configRepo.Save()
-	if err != nil {
-		apiResponse = net.NewApiResponseWithMessage(err.Error())
-	}
 	return
 }
 

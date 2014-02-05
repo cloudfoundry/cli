@@ -15,45 +15,44 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func deleteOrg(t mr.TestingT, confirmation string, args []string, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
-	reqFactory := &testreq.FakeReqFactory{}
-	configRepo := &testconfig.FakeConfigRepository{}
-	configRepo.EnsureInitialized()
-
-	ui = &testterm.FakeUI{
-		Inputs: []string{confirmation},
-	}
-	ctxt := testcmd.NewContext("delete-org", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	spaceFields := cf.SpaceFields{}
-	spaceFields.Name = "my-space"
-
-	orgFields := cf.OrganizationFields{}
-	orgFields.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        spaceFields,
-		OrganizationFields: orgFields,
-		AccessToken:        token,
-	}
-
-	cmd := NewDeleteOrg(ui, config, orgRepo, configRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
-		It("TestDeleteOrgConfirmingWithY", func() {
+		var config *configuration.Configuration
+		var ui *testterm.FakeUI
+		var reqFactory *testreq.FakeReqFactory
+		var orgRepo *testapi.FakeOrgRepository
+
+		BeforeEach(func() {
+			reqFactory = &testreq.FakeReqFactory{}
+
+			ui = &testterm.FakeUI{}
+
+			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+				Username: "my-user",
+			})
+			assert.NoError(mr.T(), err)
+
+			spaceFields := cf.SpaceFields{}
+			spaceFields.Name = "my-space"
+
+			orgFields := cf.OrganizationFields{}
+			orgFields.Name = "my-org"
+
+			config = &configuration.Configuration{}
+			config.SpaceFields = spaceFields
+			config.OrganizationFields = orgFields
+			config.AccessToken = token
+
 			org := cf.Organization{}
 			org.Name = "org-to-delete"
 			org.Guid = "org-to-delete-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
+			orgRepo = &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
+		})
 
-			ui := deleteOrg(mr.T(), "y", []string{org.Name}, orgRepo)
+		It("TestDeleteOrgConfirmingWithY", func() {
+			ui.Inputs = []string{"y"}
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
 			testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 				{"Really delete"},
@@ -66,14 +65,12 @@ func init() {
 			assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
 			assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 		})
+
 		It("TestDeleteOrgConfirmingWithYes", func() {
+			ui.Inputs = []string{"Yes"}
 
-			org := cf.Organization{}
-			org.Name = "org-to-delete"
-			org.Guid = "org-to-delete-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
-
-			ui := deleteOrg(mr.T(), "Yes", []string{"org-to-delete"}, orgRepo)
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
 			testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 				{"Really delete", "org-to-delete"},
@@ -86,41 +83,24 @@ func init() {
 			assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
 			assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 		})
+
 		It("TestDeleteTargetedOrganizationClearsConfig", func() {
-
-			configRepo := &testconfig.FakeConfigRepository{}
-			config, _ := configRepo.Get()
-
-			organizationFields := cf.OrganizationFields{}
-			organizationFields.Name = "org-to-delete"
-			organizationFields.Guid = "org-to-delete-guid"
-			config.OrganizationFields = organizationFields
+			config.OrganizationFields = orgRepo.Organizations[0].OrganizationFields
 
 			spaceFields := cf.SpaceFields{}
 			spaceFields.Name = "space-to-delete"
 			config.SpaceFields = spaceFields
-			configRepo.Save()
 
-			org := cf.Organization{}
-			org.OrganizationFields = organizationFields
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
-			deleteOrg(mr.T(), "Yes", []string{"org-to-delete"}, orgRepo)
+			ui.Inputs = []string{"Yes"}
 
-			updatedConfig, err := configRepo.Get()
-			assert.NoError(mr.T(), err)
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-			assert.Equal(mr.T(), updatedConfig.OrganizationFields, cf.OrganizationFields{})
-			assert.Equal(mr.T(), updatedConfig.SpaceFields, cf.SpaceFields{})
+			assert.Equal(mr.T(), config.OrganizationFields, cf.OrganizationFields{})
+			assert.Equal(mr.T(), config.SpaceFields, cf.SpaceFields{})
 		})
+
 		It("TestDeleteUntargetedOrganizationDoesNotClearConfig", func() {
-
-			org := cf.Organization{}
-			org.Name = "org-to-delete"
-			org.Guid = "org-to-delete-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
-
-			configRepo := &testconfig.FakeConfigRepository{}
-			config, _ := configRepo.Get()
 			otherOrgFields := cf.OrganizationFields{}
 			otherOrgFields.Guid = "some-other-org-guid"
 			otherOrgFields.Name = "some-other-org"
@@ -129,24 +109,20 @@ func init() {
 			spaceFields := cf.SpaceFields{}
 			spaceFields.Name = "some-other-space"
 			config.SpaceFields = spaceFields
-			configRepo.Save()
 
-			deleteOrg(mr.T(), "Yes", []string{"org-to-delete"}, orgRepo)
+			ui.Inputs = []string{"Yes"}
 
-			updatedConfig, err := configRepo.Get()
-			assert.NoError(mr.T(), err)
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-			assert.Equal(mr.T(), updatedConfig.OrganizationFields.Name, "some-other-org")
-			assert.Equal(mr.T(), updatedConfig.SpaceFields.Name, "some-other-space")
+			assert.Equal(mr.T(), config.OrganizationFields.Name, "some-other-org")
+			assert.Equal(mr.T(), config.SpaceFields.Name, "some-other-space")
 		})
+
 		It("TestDeleteOrgWithForceOption", func() {
-
-			org := cf.Organization{}
-			org.Name = "org-to-delete"
-			org.Guid = "org-to-delete-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
-
-			ui := deleteOrg(mr.T(), "Yes", []string{"-f", "org-to-delete"}, orgRepo)
+			ui.Inputs = []string{"Yes"}
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"-f", "org-to-delete"}), reqFactory)
 
 			assert.Equal(mr.T(), len(ui.Prompts), 0)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -156,19 +132,20 @@ func init() {
 			assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
 			assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 		})
-		It("TestDeleteOrgCommandFailsWithUsage", func() {
 
-			orgRepo := &testapi.FakeOrgRepository{}
-			ui := deleteOrg(mr.T(), "Yes", []string{}, orgRepo)
+		It("FailsWithUsage when 1st argument is omitted", func() {
+			ui.Inputs = []string{"Yes"}
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{}), reqFactory)
 			assert.True(mr.T(), ui.FailedWithUsage)
-
-			ui = deleteOrg(mr.T(), "Yes", []string{"org-to-delete"}, orgRepo)
-			assert.False(mr.T(), ui.FailedWithUsage)
 		})
-		It("TestDeleteOrgWhenOrgDoesNotExist", func() {
 
-			orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
-			ui := deleteOrg(mr.T(), "y", []string{"org-to-delete"}, orgRepo)
+		It("TestDeleteOrgWhenOrgDoesNotExist", func() {
+			orgRepo.FindByNameNotFound = true
+
+			ui.Inputs = []string{"y"}
+			cmd := NewDeleteOrg(ui, config, orgRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
 			assert.Equal(mr.T(), len(ui.Outputs), 3)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{

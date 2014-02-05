@@ -11,19 +11,17 @@ import (
 )
 
 type DeleteOrg struct {
-	ui         terminal.UI
-	config     *configuration.Configuration
-	orgRepo    api.OrganizationRepository
-	orgReq     requirements.OrganizationRequirement
-	configRepo configuration.ConfigurationRepository
+	ui      terminal.UI
+	config  *configuration.Configuration
+	orgRepo api.OrganizationRepository
+	orgReq  requirements.OrganizationRequirement
 }
 
-func NewDeleteOrg(ui terminal.UI, config *configuration.Configuration, sR api.OrganizationRepository, cR configuration.ConfigurationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui terminal.UI, config *configuration.Configuration, sR api.OrganizationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.orgRepo = sR
-	cmd.configRepo = cR
 	return
 }
 
@@ -77,16 +75,10 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
-	config, err := cmd.configRepo.Get()
-	if err != nil {
-		cmd.ui.Failed("Couldn't reset your target. You should logout and log in again.")
-		return
-	}
 
-	if org.Guid == config.OrganizationFields.Guid {
-		config.OrganizationFields = cf.OrganizationFields{}
-		config.SpaceFields = cf.SpaceFields{}
-		cmd.configRepo.Save()
+	if org.Guid == cmd.config.OrganizationFields.Guid {
+		cmd.config.SetOrganizationFields(cf.OrganizationFields{})
+		cmd.config.SetSpaceFields(cf.SpaceFields{})
 	}
 
 	cmd.ui.Ok()

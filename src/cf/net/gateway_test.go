@@ -15,21 +15,18 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
 func testRefreshTokenWithSuccess(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
-	apiResponse := testRefreshToken(t, gateway, endpoint)
+	config, apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.True(t, apiResponse.IsSuccessful())
-
-	savedConfig := testconfig.SavedConfiguration
-	assert.Equal(t, savedConfig.AccessToken, "bearer new-access-token")
-	assert.Equal(t, savedConfig.RefreshToken, "new-refresh-token")
+	assert.Equal(t, config.AccessToken, "bearer new-access-token")
+	assert.Equal(t, config.RefreshToken, "new-refresh-token")
 }
 
 func testRefreshTokenWithError(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
-	apiResponse := testRefreshToken(t, gateway, endpoint)
+	_, apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.False(t, apiResponse.IsSuccessful())
 	assert.Equal(t, apiResponse.ErrorCode, "333")
 }
@@ -59,7 +56,7 @@ var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testne
 	}
 }
 
-func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) (apiResponse ApiResponse) {
+func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) (config *configuration.Configuration, apiResponse ApiResponse) {
 	authEndpoint := func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintln(
 			writer,
@@ -84,24 +81,21 @@ func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc)
 }
 
 func createAuthenticationRepository(t mr.TestingT, apiServer *httptest.Server, authServer *httptest.Server) (*configuration.Configuration, api.AuthenticationRepository) {
-	configRepo := testconfig.FakeConfigRepository{}
-	configRepo.Delete()
-	configRepo.EnsureInitialized()
-	config, err := configRepo.Get()
-	assert.NoError(t, err)
-
+	config := &configuration.Configuration{}
 	config.AuthorizationEndpoint = authServer.URL
 	config.Target = apiServer.URL
 	config.AccessToken = "bearer initial-access-token"
 	config.RefreshToken = "initial-refresh-token"
 
 	authGateway := NewUAAGateway()
-	authenticator := api.NewUAAAuthenticationRepository(authGateway, configRepo)
+	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)
 
 	return config, authenticator
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
+
 		It("TestNewRequest", func() {
 			gateway := NewCloudControllerGateway()
 
@@ -112,8 +106,8 @@ func init() {
 			assert.Equal(mr.T(), request.HttpReq.Header.Get("accept"), "application/json")
 			assert.Equal(mr.T(), request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
 		})
-		It("TestNewRequestWithAFileBody", func() {
 
+		It("TestNewRequestWithAFileBody", func() {
 			gateway := NewCloudControllerGateway()
 
 			body, err := os.Open("../../fixtures/hello_world.txt")
@@ -123,8 +117,8 @@ func init() {
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.Equal(mr.T(), request.HttpReq.ContentLength, 12)
 		})
-		It("TestRefreshingTheTokenWithUAARequest", func() {
 
+		It("TestRefreshingTheTokenWithUAARequest", func() {
 			gateway := NewUAAGateway()
 			endpoint := refreshTokenApiEndPoint(
 				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
@@ -133,8 +127,8 @@ func init() {
 
 			testRefreshTokenWithSuccess(mr.T(), gateway, endpoint)
 		})
-		It("TestRefreshingTheTokenWithUAARequestAndReturningError", func() {
 
+		It("TestRefreshingTheTokenWithUAARequestAndReturningError", func() {
 			gateway := NewUAAGateway()
 			endpoint := refreshTokenApiEndPoint(
 				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
@@ -145,8 +139,8 @@ func init() {
 
 			testRefreshTokenWithError(mr.T(), gateway, endpoint)
 		})
-		It("TestRefreshingTheTokenWithCloudControllerRequest", func() {
 
+		It("TestRefreshingTheTokenWithCloudControllerRequest", func() {
 			gateway := NewCloudControllerGateway()
 			endpoint := refreshTokenApiEndPoint(
 				`{ "code": 1000, "description": "Auth token is invalid" }`,

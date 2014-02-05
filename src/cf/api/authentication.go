@@ -17,15 +17,13 @@ type AuthenticationRepository interface {
 }
 
 type UAAAuthenticationRepository struct {
-	configRepo configuration.ConfigurationRepository
-	config     *configuration.Configuration
-	gateway    net.Gateway
+	config  *configuration.Configuration
+	gateway net.Gateway
 }
 
-func NewUAAAuthenticationRepository(gateway net.Gateway, configRepo configuration.ConfigurationRepository) (uaa UAAAuthenticationRepository) {
+func NewUAAAuthenticationRepository(gateway net.Gateway, config *configuration.Configuration) (uaa UAAAuthenticationRepository) {
 	uaa.gateway = gateway
-	uaa.configRepo = configRepo
-	uaa.config, _ = configRepo.Get()
+	uaa.config = config
 	return
 }
 
@@ -96,10 +94,6 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 
 	uaa.config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
 	uaa.config.RefreshToken = response.RefreshToken
-	err := uaa.configRepo.Save()
-	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error setting configuration", err)
-	}
 
 	return
 }

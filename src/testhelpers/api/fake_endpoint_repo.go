@@ -3,11 +3,9 @@ package api
 import (
 	"cf/configuration"
 	"cf/net"
-	testconfig "testhelpers/configuration"
 )
 
 type FakeEndpointRepo struct {
-	ConfigRepo testconfig.FakeConfigRepository
 	Config     *configuration.Configuration
 
 	UpdateEndpointReceived string
@@ -32,9 +30,7 @@ func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint str
 		return
 	}
 
-	repo.Config, _ = repo.ConfigRepo.Get()
 	repo.Config.Target = endpoint
-	repo.ConfigRepo.Save()
 	finalEndpoint = endpoint
 	return
 }

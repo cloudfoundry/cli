@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"cf"
 	"cf/configuration"
 )
 
@@ -20,27 +19,6 @@ func (repo FakeConfigRepository) EnsureInitialized() {
 	}
 }
 
-func (repo FakeConfigRepository) SetOrganization(org cf.OrganizationFields) (err error) {
-	config, err := repo.Get()
-	if err != nil {
-		return
-	}
-
-	config.OrganizationFields = org
-	config.SpaceFields = cf.SpaceFields{}
-	return repo.Save()
-}
-
-func (repo FakeConfigRepository) SetSpace(space cf.SpaceFields) (err error) {
-	config, err := repo.Get()
-	if err != nil {
-		return
-	}
-
-	config.SpaceFields = space
-	return repo.Save()
-}
-
 func (repo FakeConfigRepository) Get() (c *configuration.Configuration, err error) {
 	repo.EnsureInitialized()
 	return TestConfigurationSingleton, nil
@@ -54,24 +32,6 @@ func (repo FakeConfigRepository) Delete() {
 func (repo FakeConfigRepository) Save() (err error) {
 	SavedConfiguration = *TestConfigurationSingleton
 	return
-}
-
-func (repo FakeConfigRepository) ClearTokens() (err error) {
-	c, _ := repo.Get()
-	c.AccessToken = ""
-	c.RefreshToken = ""
-
-	return nil
-}
-
-func (repo FakeConfigRepository) ClearSession() (err error) {
-	repo.ClearTokens()
-
-	c, _ := repo.Get()
-	c.OrganizationFields = cf.OrganizationFields{}
-	c.SpaceFields = cf.SpaceFields{}
-
-	return nil
 }
 
 func (repo FakeConfigRepository) Login() (c *configuration.Configuration) {

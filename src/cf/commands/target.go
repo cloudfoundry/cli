@@ -12,21 +12,19 @@ import (
 )
 
 type Target struct {
-	ui         terminal.UI
-	config     *configuration.Configuration
-	configRepo configuration.ConfigurationRepository
-	orgRepo    api.OrganizationRepository
-	spaceRepo  api.SpaceRepository
+	ui        terminal.UI
+	config    *configuration.Configuration
+	orgRepo   api.OrganizationRepository
+	spaceRepo api.SpaceRepository
 }
 
 func NewTarget(ui terminal.UI,
-	configRepo configuration.ConfigurationRepository,
+	config *configuration.Configuration,
 	orgRepo api.OrganizationRepository,
 	spaceRepo api.SpaceRepository) (cmd Target) {
 
 	cmd.ui = ui
-	cmd.configRepo = configRepo
-	cmd.config, _ = configRepo.Get()
+	cmd.config = config
 	cmd.orgRepo = orgRepo
 	cmd.spaceRepo = spaceRepo
 
@@ -92,11 +90,7 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 		return
 	}
 
-	err = cmd.configRepo.SetOrganization(org.OrganizationFields)
-	if err != nil {
-		cmd.ui.Failed("Error setting org in config file.\n%s", err)
-		return
-	}
+	cmd.config.SetOrganizationFields(org.OrganizationFields)
 	return
 }
 
@@ -118,18 +112,6 @@ func (cmd Target) setSpace(spaceName string) (err error) {
 		return
 	}
 
-	err = cmd.configRepo.SetSpace(space.SpaceFields)
-	if err != nil {
-		cmd.ui.Failed("Error setting space in config file.\n%s", err)
-		return
-	}
+	cmd.config.SetSpaceFields(space.SpaceFields)
 	return
-}
-
-func (cmd Target) saveConfig() {
-	err := cmd.configRepo.Save()
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
-	}
 }

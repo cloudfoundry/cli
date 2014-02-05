@@ -10,19 +10,17 @@ import (
 )
 
 type RenameSpace struct {
-	ui         terminal.UI
-	config     *configuration.Configuration
-	spaceRepo  api.SpaceRepository
-	spaceReq   requirements.SpaceRequirement
-	configRepo configuration.ConfigurationRepository
+	ui        terminal.UI
+	config    *configuration.Configuration
+	spaceRepo api.SpaceRepository
+	spaceReq  requirements.SpaceRequirement
 }
 
-func NewRenameSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, configRepo configuration.ConfigurationRepository) (cmd *RenameSpace) {
+func NewRenameSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd *RenameSpace) {
 	cmd = new(RenameSpace)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
-	cmd.configRepo = configRepo
 	return
 }
 
@@ -59,7 +57,6 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 
 	if cmd.config.SpaceFields.Guid == space.Guid {
 		cmd.config.SpaceFields.Name = newName
-		cmd.configRepo.Save()
 	}
 
 	cmd.ui.Ok()

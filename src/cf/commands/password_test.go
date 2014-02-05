@@ -3,13 +3,13 @@ package commands_test
 import (
 	"cf"
 	. "cf/commands"
+	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
-	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
@@ -17,14 +17,14 @@ import (
 type passwordDeps struct {
 	ReqFactory *testreq.FakeReqFactory
 	PwdRepo    *testapi.FakePasswordRepo
-	ConfigRepo *testconfig.FakeConfigRepository
+	Config     *configuration.Configuration
 }
 
 func getPasswordDeps() passwordDeps {
 	return passwordDeps{
 		ReqFactory: &testreq.FakeReqFactory{ValidAccessTokenSuccess: true},
 		PwdRepo:    &testapi.FakePasswordRepo{UpdateUnauthorized: true},
-		ConfigRepo: &testconfig.FakeConfigRepository{},
+		Config:     &configuration.Configuration{},
 	}
 }
 
@@ -32,11 +32,12 @@ func callPassword(inputs []string, deps passwordDeps) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{Inputs: inputs}
 
 	ctxt := testcmd.NewContext("passwd", []string{})
-	cmd := NewPassword(ui, deps.PwdRepo, deps.ConfigRepo)
+	cmd := NewPassword(ui, deps.PwdRepo, deps.Config)
 	testcmd.RunCommand(cmd, ctxt, deps.ReqFactory)
 
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestPasswordRequiresValidAccessToken", func() {
@@ -51,8 +52,8 @@ func init() {
 			callPassword([]string{"", "", ""}, deps)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 		})
-		It("TestPasswordCanBeChanged", func() {
 
+		It("TestPasswordCanBeChanged", func() {
 			deps := getPasswordDeps()
 			deps.ReqFactory.ValidAccessTokenSuccess = true
 			deps.PwdRepo.UpdateUnauthorized = false
@@ -73,14 +74,12 @@ func init() {
 			assert.Equal(mr.T(), deps.PwdRepo.UpdateNewPassword, "new-password")
 			assert.Equal(mr.T(), deps.PwdRepo.UpdateOldPassword, "old-password")
 
-			updatedConfig, err := deps.ConfigRepo.Get()
-			assert.NoError(mr.T(), err)
-			assert.Empty(mr.T(), updatedConfig.AccessToken)
-			assert.Equal(mr.T(), updatedConfig.OrganizationFields, cf.OrganizationFields{})
-			assert.Equal(mr.T(), updatedConfig.SpaceFields, cf.SpaceFields{})
+			assert.Empty(mr.T(), deps.Config.AccessToken)
+			assert.Equal(mr.T(), deps.Config.OrganizationFields, cf.OrganizationFields{})
+			assert.Equal(mr.T(), deps.Config.SpaceFields, cf.SpaceFields{})
 		})
-		It("TestPasswordVerification", func() {
 
+		It("TestPasswordVerification", func() {
 			deps := getPasswordDeps()
 			deps.ReqFactory.ValidAccessTokenSuccess = true
 			ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
@@ -97,8 +96,8 @@ func init() {
 
 			assert.Equal(mr.T(), deps.PwdRepo.UpdateNewPassword, "")
 		})
-		It("TestWhenCurrentPasswordDoesNotMatch", func() {
 
+		It("TestWhenCurrentPasswordDoesNotMatch", func() {
 			deps := getPasswordDeps()
 			deps.ReqFactory.ValidAccessTokenSuccess = true
 			deps.PwdRepo.UpdateUnauthorized = true

@@ -20,7 +20,6 @@ const maxChoices = 50
 type Login struct {
 	ui            terminal.UI
 	config        *configuration.Configuration
-	configRepo    configuration.ConfigurationRepository
 	authenticator api.AuthenticationRepository
 	endpointRepo  api.EndpointRepository
 	orgRepo       api.OrganizationRepository
@@ -28,15 +27,14 @@ type Login struct {
 }
 
 func NewLogin(ui terminal.UI,
-	configRepo configuration.ConfigurationRepository,
+	config *configuration.Configuration,
 	authenticator api.AuthenticationRepository,
 	endpointRepo api.EndpointRepository,
 	orgRepo api.OrganizationRepository,
 	spaceRepo api.SpaceRepository) (cmd Login) {
 
 	cmd.ui = ui
-	cmd.configRepo = configRepo
-	cmd.config, _ = configRepo.Get()
+	cmd.config = config
 	cmd.authenticator = authenticator
 	cmd.endpointRepo = endpointRepo
 	cmd.orgRepo = orgRepo
@@ -142,10 +140,7 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 	if orgName == "" {
 		// If the user is changing, clear out the org
 		if userChanged {
-			err = cmd.configRepo.SetOrganization(cf.OrganizationFields{})
-			if err != nil {
-				return
-			}
+			cmd.config.SetOrganizationFields(cf.OrganizationFields{})
 		}
 
 		// Reuse org in config
@@ -209,12 +204,7 @@ func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
 }
 
 func (cmd Login) targetOrganization(org cf.Organization) (err error) {
-	err = cmd.configRepo.SetOrganization(org.OrganizationFields)
-	if err != nil {
-		err = errors.New(fmt.Sprintf("Error setting org %s in config file\n%s", org.Name, err.Error()))
-		return
-	}
-
+	cmd.config.SetOrganizationFields(org.OrganizationFields)
 	cmd.ui.Say("Targeted org %s\n", terminal.EntityNameColor(org.Name))
 	return
 }
@@ -225,10 +215,7 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 	if spaceName == "" {
 		// If user is changing, clear the space
 		if userChanged {
-			err = cmd.configRepo.SetSpace(cf.SpaceFields{})
-			if err != nil {
-				return
-			}
+			cmd.config.SetSpaceFields(cf.SpaceFields{})
 		}
 		// Reuse space in config
 		if cmd.config.HasSpace() && !userChanged {
@@ -294,15 +281,7 @@ func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
 }
 
 func (cmd Login) targetSpace(space cf.Space) (err error) {
-	err = cmd.configRepo.SetSpace(space.SpaceFields)
-	if err != nil {
-		err = errors.New(fmt.Sprintf("Error setting space %s in config file\n%s",
-			terminal.EntityNameColor(space.Name),
-			err.Error(),
-		))
-		return
-	}
-
+	cmd.config.SetSpaceFields(space.SpaceFields)
 	cmd.ui.Say("Targeted space %s\n", terminal.EntityNameColor(space.Name))
 	return
 }

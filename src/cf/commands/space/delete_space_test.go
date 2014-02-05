@@ -21,14 +21,13 @@ func defaultDeleteSpaceSpace() cf.Space {
 	space.Guid = "space-to-delete-guid"
 	return space
 }
+
 func defaultDeleteSpaceReqFactory() *testreq.FakeReqFactory {
 	return &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: defaultDeleteSpaceSpace()}
 }
 
 func deleteSpace(t mr.TestingT, inputs []string, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, spaceRepo *testapi.FakeSpaceRepository) {
 	spaceRepo = &testapi.FakeSpaceRepository{}
-	configRepo := &testconfig.FakeConfigRepository{}
-	configRepo.EnsureInitialized()
 
 	ui = &testterm.FakeUI{
 		Inputs: inputs,
@@ -50,12 +49,14 @@ func deleteSpace(t mr.TestingT, inputs []string, args []string, reqFactory *test
 		AccessToken:        token,
 	}
 
-	cmd := NewDeleteSpace(ui, config, spaceRepo, configRepo)
+	cmd := NewDeleteSpace(ui, config, spaceRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
+
 		It("TestDeleteSpaceRequirements", func() {
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 			deleteSpace(mr.T(), []string{"y"}, []string{"my-space"}, reqFactory)
@@ -70,6 +71,7 @@ func init() {
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 			assert.Equal(mr.T(), reqFactory.SpaceName, "my-space")
 		})
+
 		It("TestDeleteSpaceConfirmingWithY", func() {
 
 			ui, spaceRepo := deleteSpace(mr.T(), []string{"y"}, []string{"space-to-delete"}, defaultDeleteSpaceReqFactory())
@@ -83,6 +85,7 @@ func init() {
 			})
 			assert.Equal(mr.T(), spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
 		})
+
 		It("TestDeleteSpaceConfirmingWithYes", func() {
 
 			ui, spaceRepo := deleteSpace(mr.T(), []string{"Yes"}, []string{"space-to-delete"}, defaultDeleteSpaceReqFactory())
@@ -96,6 +99,7 @@ func init() {
 			})
 			assert.Equal(mr.T(), spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
 		})
+
 		It("TestDeleteSpaceWithForceOption", func() {
 
 			ui, spaceRepo := deleteSpace(mr.T(), []string{}, []string{"-f", "space-to-delete"}, defaultDeleteSpaceReqFactory())
@@ -107,47 +111,44 @@ func init() {
 			})
 			assert.Equal(mr.T(), spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
 		})
+
 		It("TestDeleteSpaceWhenSpaceIsTargeted", func() {
 
 			reqFactory := defaultDeleteSpaceReqFactory()
 			spaceRepo := &testapi.FakeSpaceRepository{}
-			configRepo := &testconfig.FakeConfigRepository{}
 
-			config, _ := configRepo.Get()
+			config := &configuration.Configuration{}
 			config.SpaceFields = defaultDeleteSpaceSpace().SpaceFields
-			configRepo.Save()
 
 			ui := &testterm.FakeUI{}
 			ctxt := testcmd.NewContext("delete", []string{"-f", "space-to-delete"})
 
-			cmd := NewDeleteSpace(ui, config, spaceRepo, configRepo)
+			cmd := NewDeleteSpace(ui, config, spaceRepo)
 			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-			config, _ = configRepo.Get()
 			assert.Equal(mr.T(), config.HasSpace(), false)
 		})
-		It("TestDeleteSpaceWhenSpaceNotTargeted", func() {
 
+		It("TestDeleteSpaceWhenSpaceNotTargeted", func() {
 			reqFactory := defaultDeleteSpaceReqFactory()
 			spaceRepo := &testapi.FakeSpaceRepository{}
-			configRepo := &testconfig.FakeConfigRepository{}
 
-			config, _ := configRepo.Get()
 			otherSpace := cf.SpaceFields{}
 			otherSpace.Name = "do-not-delete"
 			otherSpace.Guid = "do-not-delete-guid"
+
+			config := &configuration.Configuration{}
 			config.SpaceFields = otherSpace
-			configRepo.Save()
 
 			ui := &testterm.FakeUI{}
 			ctxt := testcmd.NewContext("delete", []string{"-f", "space-to-delete"})
 
-			cmd := NewDeleteSpace(ui, config, spaceRepo, configRepo)
+			cmd := NewDeleteSpace(ui, config, spaceRepo)
 			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-			config, _ = configRepo.Get()
 			assert.Equal(mr.T(), config.HasSpace(), true)
 		})
+
 		It("TestDeleteSpaceCommandWith", func() {
 
 			ui, _ := deleteSpace(mr.T(), []string{"Yes"}, []string{}, defaultDeleteSpaceReqFactory())

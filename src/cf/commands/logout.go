@@ -8,13 +8,13 @@ import (
 )
 
 type Logout struct {
-	ui         terminal.UI
-	configRepo configuration.ConfigurationRepository
+	ui     terminal.UI
+	config *configuration.Configuration
 }
 
-func NewLogout(ui terminal.UI, configRepo configuration.ConfigurationRepository) (cmd Logout) {
+func NewLogout(ui terminal.UI, config *configuration.Configuration) (cmd Logout) {
 	cmd.ui = ui
-	cmd.configRepo = configRepo
+	cmd.config = config
 	return
 }
 
@@ -24,12 +24,6 @@ func (cmd Logout) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 
 func (cmd Logout) Run(c *cli.Context) {
 	cmd.ui.Say("Logging out...")
-	err := cmd.configRepo.ClearSession()
-
-	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
-	}
-
+	cmd.config.ClearSession()
 	cmd.ui.Ok()
 }

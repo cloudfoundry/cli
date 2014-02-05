@@ -3,12 +3,9 @@ package api
 import (
 	"cf/configuration"
 	"cf/net"
-	testconfig "testhelpers/configuration"
 )
 
 type FakeAuthenticationRepository struct {
-	ConfigRepo testconfig.FakeConfigRepository
-
 	Config   *configuration.Configuration
 	Email    string
 	Password string
@@ -19,7 +16,6 @@ type FakeAuthenticationRepository struct {
 }
 
 func (auth *FakeAuthenticationRepository) Authenticate(email string, password string) (apiResponse net.ApiResponse) {
-	auth.Config, _ = auth.ConfigRepo.Get()
 	auth.Email = email
 	auth.Password = password
 
@@ -34,7 +30,6 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 
 	auth.Config.AccessToken = auth.AccessToken
 	auth.Config.RefreshToken = auth.RefreshToken
-	auth.ConfigRepo.Save()
 
 	return
 }

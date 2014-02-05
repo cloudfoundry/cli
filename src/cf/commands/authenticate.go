@@ -14,14 +14,12 @@ import (
 type Authenticate struct {
 	ui            terminal.UI
 	config        *configuration.Configuration
-	configRepo    configuration.ConfigurationRepository
 	authenticator api.AuthenticationRepository
 }
 
-func NewAuthenticate(ui terminal.UI, configRepo configuration.ConfigurationRepository, authenticator api.AuthenticationRepository) (cmd Authenticate) {
+func NewAuthenticate(ui terminal.UI, config *configuration.Configuration, authenticator api.AuthenticationRepository) (cmd Authenticate) {
 	cmd.ui = ui
-	cmd.configRepo = configRepo
-	cmd.config, _ = configRepo.Get()
+	cmd.config = config
 	cmd.authenticator = authenticator
 	return
 }
