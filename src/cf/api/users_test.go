@@ -72,7 +72,6 @@ func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, 
 }
 
 func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
-
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     path,
@@ -177,7 +176,7 @@ func createUsersRepo(t mr.TestingT, ccReqs []testnet.TestRequest, uaaReqs []test
 	return
 }
 func init() {
-	Describe("Testing with ginkgo", func() {
+	Describe("UserRepository", func() {
 		It("TestListUsersInOrgForRole", func() {
 			ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
@@ -205,8 +204,8 @@ func init() {
 			assert.Equal(mr.T(), users[1].Guid, "user-2-guid")
 			assert.Equal(mr.T(), users[1].Username, "Super user 2")
 		})
-		It("TestListUsersInSpaceForRole", func() {
 
+		It("TestListUsersInSpaceForRole", func() {
 			ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/spaces/my-space-guid/managers")
 
 			cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(mr.T(), ccReqs, uaaReqs)
@@ -233,12 +232,9 @@ func init() {
 			assert.Equal(mr.T(), users[1].Guid, "user-2-guid")
 			assert.Equal(mr.T(), users[1].Username, "Super user 2")
 		})
+
 		It("TestFindByUsername", func() {
-
-			usersResponse := `{ "resources": [
-        { "id": "my-guid", "userName": "my-full-username" }
-    ]}`
-
+			usersResponse := `{ "resources": [{ "id": "my-guid", "userName": "my-full-username" }]}`
 			uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/Users?attributes=id,userName&filter=userName+Eq+%22damien%2Buser1%40pivotallabs.com%22",
@@ -257,8 +253,8 @@ func init() {
 			expectedUserFields.Guid = "my-guid"
 			assert.Equal(mr.T(), user, expectedUserFields)
 		})
-		It("TestFindByUsernameWhenNotFound", func() {
 
+		It("TestFindByUsernameWhenNotFound", func() {
 			uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/Users?attributes=id,userName&filter=userName+Eq+%22my-user%22",
@@ -273,8 +269,8 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsError())
 			assert.True(mr.T(), apiResponse.IsNotFound())
 		})
-		It("TestCreateUser", func() {
 
+		It("TestCreateUser", func() {
 			ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/users",
@@ -308,8 +304,8 @@ func init() {
 			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		})
-		It("TestDeleteUser", func() {
 
+		It("TestDeleteUser", func() {
 			ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/users/my-user-guid",
@@ -331,14 +327,12 @@ func init() {
 			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 		})
-		It("TestDeleteUserWhenNotFoundOnTheCloudController", func() {
 
+		It("TestDeleteUserWhenNotFoundOnTheCloudController", func() {
 			ccReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "DELETE",
-				Path:   "/v2/users/my-user-guid",
-				Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{
-		  "code": 20003, "description": "The user could not be found"
-		}`},
+				Method:   "DELETE",
+				Path:     "/v2/users/my-user-guid",
+				Response: testnet.TestResponse{Status: http.StatusNotFound, Body: `{"code": 20003, "description": "The user could not be found"}`},
 			})
 
 			uaaReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -356,65 +350,96 @@ func init() {
 			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 		})
-		It("TestSetOrgRoleToOrgManager", func() {
 
+		It("TestSetOrgRoleToOrgManager", func() {
 			testSetOrgRoleWithValidRole(mr.T(), "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
 		})
-		It("TestSetOrgRoleToBillingManager", func() {
 
+		It("TestSetOrgRoleToBillingManager", func() {
 			testSetOrgRoleWithValidRole(mr.T(), "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
 		})
-		It("TestSetOrgRoleToOrgAuditor", func() {
 
+		It("TestSetOrgRoleToOrgAuditor", func() {
 			testSetOrgRoleWithValidRole(mr.T(), "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
 		})
-		It("TestSetOrgRoleWithInvalidRole", func() {
 
+		It("TestSetOrgRoleWithInvalidRole", func() {
 			repo := createUsersRepoWithoutEndpoints()
 			apiResponse := repo.SetOrgRole("user-guid", "org-guid", "foo")
 
 			assert.False(mr.T(), apiResponse.IsSuccessful())
 			assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
 		})
-		It("TestUnsetOrgRoleFromOrgManager", func() {
 
+		It("TestUnsetOrgRoleFromOrgManager", func() {
 			testUnsetOrgRoleWithValidRole(mr.T(), "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
 		})
-		It("TestUnsetOrgRoleFromBillingManager", func() {
 
+		It("TestUnsetOrgRoleFromBillingManager", func() {
 			testUnsetOrgRoleWithValidRole(mr.T(), "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
 		})
-		It("TestUnsetOrgRoleFromOrgAuditor", func() {
 
+		It("TestUnsetOrgRoleFromOrgAuditor", func() {
 			testUnsetOrgRoleWithValidRole(mr.T(), "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
 		})
-		It("TestUnsetOrgRoleWithInvalidRole", func() {
 
+		It("TestUnsetOrgRoleWithInvalidRole", func() {
 			repo := createUsersRepoWithoutEndpoints()
 			apiResponse := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
 
 			assert.False(mr.T(), apiResponse.IsSuccessful())
 			assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
 		})
-		It("TestSetSpaceRoleToSpaceManager", func() {
 
+		It("TestSetSpaceRoleToSpaceManager", func() {
 			testSetSpaceRoleWithValidRole(mr.T(), "SpaceManager", "/v2/spaces/my-space-guid/managers/my-user-guid")
 		})
-		It("TestSetSpaceRoleToSpaceDeveloper", func() {
 
+		It("TestSetSpaceRoleToSpaceDeveloper", func() {
 			testSetSpaceRoleWithValidRole(mr.T(), "SpaceDeveloper", "/v2/spaces/my-space-guid/developers/my-user-guid")
 		})
-		It("TestSetSpaceRoleToSpaceAuditor", func() {
 
+		It("TestSetSpaceRoleToSpaceAuditor", func() {
 			testSetSpaceRoleWithValidRole(mr.T(), "SpaceAuditor", "/v2/spaces/my-space-guid/auditors/my-user-guid")
 		})
-		It("TestSetSpaceRoleWithInvalidRole", func() {
 
+		It("TestSetSpaceRoleWithInvalidRole", func() {
 			repo := createUsersRepoWithoutEndpoints()
 			apiResponse := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
 
 			assert.False(mr.T(), apiResponse.IsSuccessful())
 			assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
+		})
+
+		It("lists all users in the org", func() {
+			t := mr.T()
+			ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/users")
+
+			cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
+			defer cc.Close()
+			defer uaa.Close()
+
+			stopChan := make(chan bool)
+			defer close(stopChan)
+			usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", cf.ORG_USER, stopChan)
+
+			users := []cf.UserFields{}
+			for chunk := range usersChan {
+				users = append(users, chunk...)
+			}
+			apiResponse := <-statusChan
+
+			assert.True(t, ccHandler.AllRequestsCalled())
+			assert.True(t, uaaHandler.AllRequestsCalled())
+			assert.True(t, apiResponse.IsSuccessful())
+
+			assert.Equal(t, len(users), 3)
+			assert.Equal(t, users[0].Guid, "user-1-guid")
+			assert.Equal(t, users[0].Username, "Super user 1")
+			assert.Equal(t, users[1].Guid, "user-2-guid")
+			assert.Equal(t, users[1].Username, "Super user 2")
+			assert.Equal(t, users[2].Guid, "user-3-guid")
+			assert.Equal(t, users[2].Username, "Super user 3")
 		})
 	})
 }
