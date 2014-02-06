@@ -91,9 +91,7 @@ func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestReque
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
-	buildpack = models.Buildpack{}
-	buildpack.Name = "my-cool-buildpack"
-	buildpack.Guid = "my-cool-buildpack-guid"
+	buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 
 	apiResponse = repo.UploadBuildpack(buildpack, dir)
 	assert.True(t, handler.AllRequestsCalled())

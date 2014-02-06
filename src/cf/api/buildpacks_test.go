@@ -102,19 +102,20 @@ func init() {
 			buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
 
 			one := 1
-			buildpack := models.Buildpack{}
-			buildpack.Guid = "buildpack1-guid"
-			buildpack.Name = "Buildpack1"
-			buildpack.Position = &one
-			buildpack.Filename = "firstbp.zip"
-
 			two := 2
-			buildpack2 := models.Buildpack{}
-			buildpack2.Guid = "buildpack2-guid"
-			buildpack2.Name = "Buildpack2"
-			buildpack2.Position = &two
-
-			expectedBuildpacks := []models.Buildpack{buildpack, buildpack2}
+			expectedBuildpacks := []models.Buildpack{
+				models.Buildpack{
+					Guid:     "buildpack1-guid",
+					Name:     "Buildpack1",
+					Position: &one,
+					Filename: "firstbp.zip",
+				},
+				models.Buildpack{
+					Guid:     "buildpack2-guid",
+					Name:     "Buildpack2",
+					Position: &two,
+				},
+			}
 
 			buildpacks := []models.Buildpack{}
 			for chunk := range buildpacksChan {

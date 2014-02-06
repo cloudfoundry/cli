@@ -7,6 +7,7 @@ func NewQuotaFields(name string, memory uint64) (q QuotaFields) {
 }
 
 type QuotaFields struct {
-	BasicFields
+	Guid        string
+	Name        string
 	MemoryLimit uint64 // in Megabytes
 }

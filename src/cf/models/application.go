@@ -36,7 +36,8 @@ type AppSummary struct {
 }
 
 type ApplicationFields struct {
-	BasicFields
+	Guid             string
+	Name             string
 	BuildpackUrl     string
 	Command          string
 	DiskQuota        uint64 // in Megabytes
