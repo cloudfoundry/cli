@@ -385,7 +385,7 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 	return
 }
 
-func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
+func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []cf.AppParams) {
 	m := cmd.instantiateManifest(c)
 
 	appParams, err := cf.NewAppParamsFromContext(c)
@@ -436,7 +436,7 @@ func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
 	return
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, m *manifest.Manifest) (appSet cf.AppSet, err error) {
+func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, m *manifest.Manifest) (appSet []cf.AppParams, err error) {
 	if len(m.Applications) > 1 {
 		if contextParams.Name != nil {
 			var app cf.AppParams
@@ -447,11 +447,11 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 				return
 			}
 
-			m.Applications = cf.AppSet{app}
+			m.Applications = []cf.AppParams{app}
 		}
 	}
 
-	appSet = make(cf.AppSet, 0, len(m.Applications))
+	appSet = make([]cf.AppParams, 0, len(m.Applications))
 	if len(m.Applications) == 0 {
 		if contextParams.Name == nil || *contextParams.Name == "" {
 			cmd.ui.FailWithUsage(c, "push")
@@ -468,7 +468,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 	return
 }
 
-func addApp(apps *cf.AppSet, app cf.AppParams) (err error) {
+func addApp(apps *[]cf.AppParams, app cf.AppParams) (err error) {
 	if app.Name == nil {
 		err = errors.New("app name is a required field")
 	}

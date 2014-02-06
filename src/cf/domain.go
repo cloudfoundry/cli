@@ -257,8 +257,6 @@ func (app *AppParams) Equals(otherParams *AppParams) bool {
 	return reflect.DeepEqual(*app, *otherParams)
 }
 
-type AppSet []AppParams
-
 type AppFileFields struct {
 	Path string
 	Sha1 string
