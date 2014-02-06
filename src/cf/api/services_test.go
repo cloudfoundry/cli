@@ -5,12 +5,15 @@ import (
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	testapi "testhelpers/api"
+	"testhelpers/maker"
 	testnet "testhelpers/net"
 )
 
@@ -174,6 +177,7 @@ func createServiceRepoWithConfig(t mr.TestingT, reqs []testnet.TestRequest, conf
 	repo = NewCloudControllerServiceRepository(config, gateway)
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestGetServiceOfferingsWhenNotTargetingASpace", func() {
@@ -300,6 +304,7 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsError())
 			assert.True(mr.T(), apiResponse.IsNotFound())
 		})
+
 		It("TestDeleteServiceWithoutServiceBindings", func() {
 
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -338,7 +343,6 @@ func init() {
 			assert.Equal(mr.T(), apiResponse.Message, "Cannot delete service instance, apps are still bound to it")
 		})
 		It("TestRenameService", func() {
-
 			path := "/v2/service_instances/my-service-instance-guid"
 			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
@@ -350,11 +354,98 @@ func init() {
 			testRenameService(mr.T(), path, serviceInstance)
 		})
 		It("TestRenameServiceWhenServiceIsUserProvided", func() {
-
 			path := "/v2/user_provided_service_instances/my-service-instance-guid"
 			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 			testRenameService(mr.T(), path, serviceInstance)
+		})
+
+		It("finds service offerings by label and provider", func() {
+			t := mr.T()
+			_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+				Response: testnet.TestResponse{
+					Status: 200,
+					Body: `{
+			"next_url": null,
+			"resources": [
+				{
+				  "metadata": {
+					"guid": "offering-1-guid"
+				  },
+				  "entity": {
+					"label": "offering-1",
+					"provider": "provider-1",
+					"description": "offering 1 description",
+					"version" : "1.0",
+					"service_plans": []
+				  }
+				}
+			]
+		}`,
+				},
+			}})
+
+			offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+			assert.Equal(t, offering.Guid, "offering-1-guid")
+			assert.True(t, apiResponse.IsSuccessful())
+		})
+
+		It("returns an error if the offering cannot be found", func() {
+			t := mr.T()
+			_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+				Response: testnet.TestResponse{
+					Status: 200,
+					Body: `{
+			"next_url": null,
+			"resources": []
+		}`,
+				},
+			}})
+
+			offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+			assert.True(t, apiResponse.IsNotFound())
+			assert.Equal(t, offering.Guid, "")
+		})
+
+		It("handles api errors when finding service offerings", func() {
+			t := mr.T()
+			_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+				Response: testnet.TestResponse{
+					Status: 400,
+					Body: `{
+			"code": 10005,
+			"description": "The query parameter is invalid"
+		}`,
+				},
+			}})
+
+			_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+			assert.True(t, apiResponse.IsError())
+			assert.Equal(t, apiResponse.ErrorCode, "10005")
+		})
+
+		It("purges service offerings", func() {
+			t := mr.T()
+			_, handler, repo := createServiceRepo(t, []testnet.TestRequest{{
+				Method: "DELETE",
+				Path:   "/v2/services/the-service-guid?purge=true",
+				Response: testnet.TestResponse{
+					Status: 204,
+				},
+			}})
+
+			offering := maker.NewServiceOffering("the-offering")
+			offering.Guid = "the-service-guid"
+
+			apiResponse := repo.PurgeServiceOffering(offering)
+			assert.True(t, apiResponse.IsSuccessful())
+			assert.True(t, handler.AllRequestsCalled())
 		})
 	})
 }

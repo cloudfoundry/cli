@@ -1,6 +1,7 @@
 package cf
 
 const (
+	BAD_QUERY_PARAM             = "10005"
 	USER_EXISTS                 = "20002"
 	USER_NOT_FOUND              = "20003"
 	ORG_EXISTS                  = "30002"
