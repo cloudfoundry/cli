@@ -75,7 +75,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 
 	users, apiResponse := repo.updateOrFindUsersWithUAAPath([]cf.UserFields{}, path)
 	if len(users) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("UserFields %s not found", username)
+		apiResponse = net.NewNotFoundApiResponse("User %s not found", username)
 		return
 	}
 
