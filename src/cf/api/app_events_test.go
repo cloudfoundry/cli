@@ -106,8 +106,9 @@ func setupEventTest(t mr.TestingT, requests []testnet.TestRequest) (deps eventTe
 func teardownEventTest(deps eventTestDependencies) {
 	deps.server.Close()
 }
+
 func init() {
-	Describe("Testing with ginkgo", func() {
+	Describe("App Events Repo", func() {
 		It("TestListOldV2EventsWhenNewV2ApiNotFound", func() {
 			deps := setupEventTest(mr.T(), []testnet.TestRequest{
 				newV2NotFoundRequest,
@@ -118,19 +119,17 @@ func init() {
 
 			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			event1 := models.EventFields{}
-			event1.Name = "app crashed"
-			event1.Description = "instance: 1, reason: app instance exited, exit_status: 1"
-			event1.Timestamp = testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
-
-			event2 := models.EventFields{}
-			event2.Name = "app crashed"
-			event2.Description = "instance: 2, reason: app instance was stopped, exit_status: 2"
-			event2.Timestamp = testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00")
-
 			expectedEvents := []models.EventFields{
-				event1,
-				event2,
+				models.EventFields{
+					Name:        "app crashed",
+					Description: "instance: 1, reason: app instance exited, exit_status: 1",
+					Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"),
+				},
+				models.EventFields{
+					Name:        "app crashed",
+					Description: "instance: 2, reason: app instance was stopped, exit_status: 2",
+					Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00"),
+				},
 			}
 
 			list := []models.EventFields{}
@@ -143,8 +142,8 @@ func init() {
 			assert.Equal(mr.T(), list, expectedEvents)
 			assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		})
-		It("TestListEventsUsingNewEndpoint", func() {
 
+		It("TestListEventsUsingNewEndpoint", func() {
 			pageOneNewV2Request := testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/events?q=actee%3Amy-app-guid",
@@ -224,8 +223,8 @@ func init() {
 			assert.Equal(mr.T(), events[1].Guid, "event-2-guid")
 			assert.Equal(mr.T(), events[1].Name, "app.crash")
 		})
-		It("TestListOldV2EventsApiError", func() {
 
+		It("TestListOldV2EventsApiError", func() {
 			deps := setupEventTest(mr.T(), []testnet.TestRequest{
 				newV2NotFoundRequest,
 				firstPageOldV2EventsRequest,
@@ -244,40 +243,39 @@ func init() {
 			firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 			assert.NoError(mr.T(), err)
 
-			event1 := models.EventFields{}
-			event1.Name = "app crashed"
-			event1.Description = "instance: 1, reason: app instance exited, exit_status: 1"
-			event1.Timestamp = firstExpectedTime
-
 			expectedEvents := []models.EventFields{
-				event1,
+				models.EventFields{
+					Name:        "app crashed",
+					Description: "instance: 1, reason: app instance exited, exit_status: 1",
+					Timestamp:   firstExpectedTime,
+				},
 			}
 
 			assert.Equal(mr.T(), list, expectedEvents)
 			assert.True(mr.T(), apiResponse.IsNotSuccessful())
 			assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		})
-		It("TestUnmarshalNewCrashEvent", func() {
 
+		It("TestUnmarshalNewCrashEvent", func() {
 			resource := new(EventResourceNewV2)
 			err := json.Unmarshal([]byte(`
-	{
-	  "metadata": {
-	  	"guid":"event-1-guid"
-	  },
-	  "entity": {
-	  	"timestamp": "2013-10-07T16:51:07+00:00",
-	  	"type": "app.crash",
-	  	"metadata": {
-	  	  "instance": "50dd66d3f8874b35988d23a25d19bfa0",
-	  	  "index": 3,
-	  	  "exit_status": -1,
-	  	  "exit_description": "unknown",
-	  	  "reason": "CRASHED"
-	  	}
-	  }
-	}
-	`), &resource)
+			{
+			  "metadata": {
+				"guid":"event-1-guid"
+			  },
+			  "entity": {
+				"timestamp": "2013-10-07T16:51:07+00:00",
+				"type": "app.crash",
+				"metadata": {
+				  "instance": "50dd66d3f8874b35988d23a25d19bfa0",
+				  "index": 3,
+				  "exit_status": -1,
+				  "exit_description": "unknown",
+				  "reason": "CRASHED"
+				}
+			  }
+			}
+			`), &resource)
 
 			assert.NoError(mr.T(), err)
 
@@ -287,28 +285,28 @@ func init() {
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"))
 			assert.Equal(mr.T(), eventFields.Description, `index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`)
 		})
-		It("TestUnmarshalUpdateAppEvent", func() {
 
+		It("TestUnmarshalUpdateAppEvent", func() {
 			resource := new(EventResourceNewV2)
 			err := json.Unmarshal([]byte(`
-    {
-      "metadata": {
-        "guid": "event-1-guid"
-      },
-      "entity": {
-        "type": "audit.app.update",
-        "timestamp": "2014-01-21T00:20:11+00:00",
-        "metadata": {
-          "request": {
-            "command": "PRIVATE DATA HIDDEN",
-            "instances": 1,
-            "memory": 256,
-            "environment_json": "PRIVATE DATA HIDDEN"
-          }
-        }
-      }
-    }
-	`), &resource)
+			{
+			  "metadata": {
+				"guid": "event-1-guid"
+			  },
+			  "entity": {
+				"type": "audit.app.update",
+				"timestamp": "2014-01-21T00:20:11+00:00",
+				"metadata": {
+				  "request": {
+					"command": "PRIVATE DATA HIDDEN",
+					"instances": 1,
+					"memory": 256,
+					"environment_json": "PRIVATE DATA HIDDEN"
+				  }
+				}
+			  }
+			}
+			`), &resource)
 
 			assert.NoError(mr.T(), err)
 
@@ -320,21 +318,21 @@ func init() {
 
 			resource = new(EventResourceNewV2)
 			err = json.Unmarshal([]byte(`
-    {
-      "metadata": {
-        "guid": "event-1-guid"
-      },
-      "entity": {
-        "type": "audit.app.update",
-        "timestamp": "2014-01-21T00:20:11+00:00",
-        "metadata": {
-          "request": {
-          	"state": "STOPPED"
-          }
-        }
-      }
-    }
-	`), &resource)
+			{
+			  "metadata": {
+				"guid": "event-1-guid"
+			  },
+			  "entity": {
+				"type": "audit.app.update",
+				"timestamp": "2014-01-21T00:20:11+00:00",
+				"metadata": {
+				  "request": {
+					"state": "STOPPED"
+				  }
+				}
+			  }
+			}
+			`), &resource)
 
 			assert.NoError(mr.T(), err)
 
@@ -344,25 +342,25 @@ func init() {
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
 			assert.Equal(mr.T(), eventFields.Description, `state: STOPPED`)
 		})
-		It("TestUnmarshalDeleteAppEvent", func() {
 
+		It("TestUnmarshalDeleteAppEvent", func() {
 			resource := new(EventResourceNewV2)
 			err := json.Unmarshal([]byte(`
-    {
-      "metadata": {
-        "guid": "event-2-guid"
-      },
-      "entity": {
-        "type": "audit.app.delete-request",
-        "timestamp": "2014-01-21T18:39:09+00:00",
-        "metadata": {
-          "request": {
-            "recursive": true
-          }
-        }
-      }
-    }
-	`), &resource)
+			{
+			  "metadata": {
+				"guid": "event-2-guid"
+			  },
+			  "entity": {
+				"type": "audit.app.delete-request",
+				"timestamp": "2014-01-21T18:39:09+00:00",
+				"metadata": {
+				  "request": {
+					"recursive": true
+				  }
+				}
+			  }
+			}
+			`), &resource)
 
 			assert.NoError(mr.T(), err)
 
@@ -372,31 +370,31 @@ func init() {
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00"))
 			assert.Equal(mr.T(), eventFields.Description, "recursive: true")
 		})
-		It("TestUnmarshalNewV2CreateEvent", func() {
 
+		It("TestUnmarshalNewV2CreateEvent", func() {
 			resource := new(EventResourceNewV2)
 			err := json.Unmarshal([]byte(`
-	{
-      "metadata": {
-        "guid": "event-1-guid"
-      },
-      "entity": {
-        "type": "audit.app.create",
-        "timestamp": "2014-01-22T19:34:16+00:00",
-        "metadata": {
-          "request": {
-            "name": "java-warz",
-            "space_guid": "6cc20fec-0dee-4843-b875-b124bfee791a",
-            "production": false,
-            "environment_json": "PRIVATE DATA HIDDEN",
-            "instances": 1,
-            "disk_quota": 1024,
-            "state": "STOPPED",
-            "console": false
-          }
-        }
-      }
-	}`), &resource)
+			{
+			  "metadata": {
+				"guid": "event-1-guid"
+			  },
+			  "entity": {
+				"type": "audit.app.create",
+				"timestamp": "2014-01-22T19:34:16+00:00",
+				"metadata": {
+				  "request": {
+					"name": "java-warz",
+					"space_guid": "6cc20fec-0dee-4843-b875-b124bfee791a",
+					"production": false,
+					"environment_json": "PRIVATE DATA HIDDEN",
+					"instances": 1,
+					"disk_quota": 1024,
+					"state": "STOPPED",
+					"console": false
+				  }
+				}
+			  }
+			}`), &resource)
 
 			assert.NoError(mr.T(), err)
 
