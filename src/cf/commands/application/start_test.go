@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
@@ -22,8 +23,8 @@ import (
 )
 
 var (
-	defaultAppForStart        = cf.Application{}
-	defaultInstanceReponses   = [][]cf.AppInstanceFields{}
+	defaultAppForStart        = models.Application{}
+	defaultInstanceReponses   = [][]models.AppInstanceFields{}
 	defaultInstanceErrorCodes = []string{"", ""}
 	defaultStartTimeout       = 50 * time.Millisecond
 )
@@ -33,31 +34,31 @@ func init() {
 	defaultAppForStart.Guid = "my-app-guid"
 	defaultAppForStart.InstanceCount = 2
 
-	domain := cf.DomainFields{}
+	domain := models.DomainFields{}
 	domain.Name = "example.com"
 
-	route := cf.RouteSummary{}
+	route := models.RouteSummary{}
 	route.Host = "my-app"
 	route.Domain = domain
 
-	defaultAppForStart.Routes = []cf.RouteSummary{route}
+	defaultAppForStart.Routes = []models.RouteSummary{route}
 
-	instance1 := cf.AppInstanceFields{}
-	instance1.State = cf.InstanceStarting
+	instance1 := models.AppInstanceFields{}
+	instance1.State = models.InstanceStarting
 
-	instance2 := cf.AppInstanceFields{}
-	instance2.State = cf.InstanceStarting
+	instance2 := models.AppInstanceFields{}
+	instance2.State = models.InstanceStarting
 
-	instance3 := cf.AppInstanceFields{}
-	instance3.State = cf.InstanceRunning
+	instance3 := models.AppInstanceFields{}
+	instance3.State = models.InstanceRunning
 
-	instance4 := cf.AppInstanceFields{}
-	instance4.State = cf.InstanceStarting
+	instance4 := models.AppInstanceFields{}
+	instance4.State = models.InstanceStarting
 
-	defaultInstanceReponses = [][]cf.AppInstanceFields{
-		[]cf.AppInstanceFields{instance1, instance2},
-		[]cf.AppInstanceFields{instance1, instance2},
-		[]cf.AppInstanceFields{instance3, instance4},
+	defaultInstanceReponses = [][]models.AppInstanceFields{
+		[]models.AppInstanceFields{instance1, instance2},
+		[]models.AppInstanceFields{instance1, instance2},
+		[]models.AppInstanceFields{instance3, instance4},
 	}
 }
 
@@ -74,14 +75,14 @@ func callStart(args []string, config *configuration.Configuration, reqFactory *t
 	return
 }
 
-func startAppWithInstancesAndErrors(t mr.TestingT, displayApp ApplicationDisplayer, app cf.Application, instances [][]cf.AppInstanceFields, errorCodes []string, startTimeout time.Duration) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
+func startAppWithInstancesAndErrors(t mr.TestingT, displayApp ApplicationDisplayer, app models.Application, instances [][]models.AppInstanceFields, errorCodes []string, startTimeout time.Duration) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
 	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -142,8 +143,8 @@ func init() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appRepo := &testapi.FakeApplicationRepository{}
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{
-				GetInstancesResponses: [][]cf.AppInstanceFields{
-					[]cf.AppInstanceFields{},
+				GetInstancesResponses: [][]models.AppInstanceFields{
+					[]models.AppInstanceFields{},
 				},
 				GetInstancesErrorCodes: []string{""},
 			}
@@ -217,12 +218,12 @@ func init() {
 
 			displayApp := &testcmd.FakeAppDisplayer{}
 			app := defaultAppForStart
-			app.Routes = []cf.RouteSummary{}
-			appInstance := cf.AppInstanceFields{}
-			appInstance.State = cf.InstanceRunning
-			instances := [][]cf.AppInstanceFields{
-				[]cf.AppInstanceFields{appInstance},
-				[]cf.AppInstanceFields{appInstance},
+			app.Routes = []models.RouteSummary{}
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceRunning
+			instances := [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{appInstance},
+				[]models.AppInstanceFields{appInstance},
 			}
 
 			errorCodes := []string{""}
@@ -241,24 +242,24 @@ func init() {
 			mr.T().Parallel()
 
 			displayApp := &testcmd.FakeAppDisplayer{}
-			appInstance := cf.AppInstanceFields{}
-			appInstance.State = cf.InstanceDown
-			appInstance2 := cf.AppInstanceFields{}
-			appInstance2.State = cf.InstanceStarting
-			appInstance3 := cf.AppInstanceFields{}
-			appInstance3.State = cf.InstanceStarting
-			appInstance4 := cf.AppInstanceFields{}
-			appInstance4.State = cf.InstanceStarting
-			appInstance5 := cf.AppInstanceFields{}
-			appInstance5.State = cf.InstanceRunning
-			appInstance6 := cf.AppInstanceFields{}
-			appInstance6.State = cf.InstanceRunning
-			instances := [][]cf.AppInstanceFields{
-				[]cf.AppInstanceFields{},
-				[]cf.AppInstanceFields{},
-				[]cf.AppInstanceFields{appInstance, appInstance2},
-				[]cf.AppInstanceFields{appInstance3, appInstance4},
-				[]cf.AppInstanceFields{appInstance5, appInstance6},
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceDown
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceStarting
+			appInstance5 := models.AppInstanceFields{}
+			appInstance5.State = models.InstanceRunning
+			appInstance6 := models.AppInstanceFields{}
+			appInstance6.State = models.InstanceRunning
+			instances := [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{},
+				[]models.AppInstanceFields{},
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
+				[]models.AppInstanceFields{appInstance5, appInstance6},
 			}
 
 			errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, "", "", ""}
@@ -276,7 +277,7 @@ func init() {
 		XIt("TestStartApplicationWhenStagingFails", func() {
 			// TODO: fix this flakey test
 			displayApp := &testcmd.FakeAppDisplayer{}
-			instances := [][]cf.AppInstanceFields{[]cf.AppInstanceFields{}}
+			instances := [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
 			errorCodes := []string{"170001"}
 
 			ui, _, _, _ := startAppWithInstancesAndErrors(mr.T(), displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
@@ -290,17 +291,17 @@ func init() {
 		})
 		It("TestStartApplicationWhenOneInstanceFlaps", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
-			appInstance := cf.AppInstanceFields{}
-			appInstance.State = cf.InstanceStarting
-			appInstance2 := cf.AppInstanceFields{}
-			appInstance2.State = cf.InstanceStarting
-			appInstance3 := cf.AppInstanceFields{}
-			appInstance3.State = cf.InstanceStarting
-			appInstance4 := cf.AppInstanceFields{}
-			appInstance4.State = cf.InstanceFlapping
-			instances := [][]cf.AppInstanceFields{
-				[]cf.AppInstanceFields{appInstance, appInstance2},
-				[]cf.AppInstanceFields{appInstance3, appInstance4},
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceStarting
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceFlapping
+			instances := [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
 			}
 
 			errorCodes := []string{"", ""}
@@ -319,22 +320,22 @@ func init() {
 			mr.T().Parallel()
 
 			displayApp := &testcmd.FakeAppDisplayer{}
-			appInstance := cf.AppInstanceFields{}
-			appInstance.State = cf.InstanceStarting
-			appInstance2 := cf.AppInstanceFields{}
-			appInstance2.State = cf.InstanceStarting
-			appInstance3 := cf.AppInstanceFields{}
-			appInstance3.State = cf.InstanceStarting
-			appInstance4 := cf.AppInstanceFields{}
-			appInstance4.State = cf.InstanceDown
-			appInstance5 := cf.AppInstanceFields{}
-			appInstance5.State = cf.InstanceDown
-			appInstance6 := cf.AppInstanceFields{}
-			appInstance6.State = cf.InstanceDown
-			instances := [][]cf.AppInstanceFields{
-				[]cf.AppInstanceFields{appInstance, appInstance2},
-				[]cf.AppInstanceFields{appInstance3, appInstance4},
-				[]cf.AppInstanceFields{appInstance5, appInstance6},
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceStarting
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceDown
+			appInstance5 := models.AppInstanceFields{}
+			appInstance5.State = models.InstanceDown
+			appInstance6 := models.AppInstanceFields{}
+			appInstance6.State = models.InstanceDown
+			instances := [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
+				[]models.AppInstanceFields{appInstance5, appInstance6},
 			}
 
 			errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, cf.APP_NOT_STAGED}
@@ -356,7 +357,7 @@ func init() {
 
 			config := &configuration.Configuration{}
 			displayApp := &testcmd.FakeAppDisplayer{}
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
@@ -378,7 +379,7 @@ func init() {
 
 			displayApp := &testcmd.FakeAppDisplayer{}
 			config := &configuration.Configuration{}
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.State = "started"
@@ -402,9 +403,9 @@ func init() {
 
 			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{Username: "my-user"})
 			assert.NoError(mr.T(), err)
-			space2 := cf.SpaceFields{}
+			space2 := models.SpaceFields{}
 			space2.Name = "my-space"
-			org2 := cf.OrganizationFields{}
+			org2 := models.OrganizationFields{}
 			org2.Name = "my-org"
 			config := &configuration.Configuration{
 				SpaceFields:             space2,

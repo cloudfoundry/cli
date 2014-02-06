@@ -1,22 +1,22 @@
 package requirements
 
 import (
-	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/terminal"
 )
 
 type ApplicationRequirement interface {
 	Requirement
-	GetApplication() cf.Application
+	GetApplication() models.Application
 }
 
 type applicationApiRequirement struct {
 	name        string
 	ui          terminal.UI
 	appRepo     api.ApplicationRepository
-	application cf.Application
+	application models.Application
 }
 
 func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRepository) (req *applicationApiRequirement) {
@@ -39,6 +39,6 @@ func (req *applicationApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *applicationApiRequirement) GetApplication() cf.Application {
+func (req *applicationApiRequirement) GetApplication() models.Application {
 	return req.application
 }

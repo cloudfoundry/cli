@@ -1,10 +1,10 @@
 package space_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/space"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -44,21 +44,21 @@ func init() {
 		})
 		It("TestListingSpaces", func() {
 
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "space1"
-			space2 := cf.Space{}
+			space2 := models.Space{}
 			space2.Name = "space2"
-			space3 := cf.Space{}
+			space3 := models.Space{}
 			space3.Name = "space3"
 			spaceRepo := &testapi.FakeSpaceRepository{
-				Spaces: []cf.Space{space, space2, space3},
+				Spaces: []models.Space{space, space2, space3},
 			}
 			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 				Username: "my-user",
 			})
 
 			assert.NoError(mr.T(), err)
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			config := &configuration.Configuration{
 				OrganizationFields: org,
@@ -77,14 +77,14 @@ func init() {
 		It("TestListingSpacesWhenNoSpaces", func() {
 
 			spaceRepo := &testapi.FakeSpaceRepository{
-				Spaces: []cf.Space{},
+				Spaces: []models.Space{},
 			}
 			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
 				Username: "my-user",
 			})
 
 			assert.NoError(mr.T(), err)
-			org2 := cf.OrganizationFields{}
+			org2 := models.OrganizationFields{}
 			org2.Name = "my-org"
 			config := &configuration.Configuration{
 				OrganizationFields: org2,

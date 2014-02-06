@@ -1,9 +1,9 @@
 package space_test
 
 import (
-	"cf"
 	. "cf/commands/space"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,10 +24,10 @@ func callRenameSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 	})
 	assert.NoError(t, err)
 
-	space2 := cf.SpaceFields{}
+	space2 := models.SpaceFields{}
 	space2.Name = "my-space"
 
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -75,7 +75,7 @@ func init() {
 
 		It("TestRenameSpaceRun", func() {
 			spaceRepo := &testapi.FakeSpaceRepository{}
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}

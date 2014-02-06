@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	"cf"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -18,33 +18,33 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestServices", func() {
 
-			plan := cf.ServicePlanFields{}
+			plan := models.ServicePlanFields{}
 			plan.Guid = "spark-guid"
 			plan.Name = "spark"
 
-			offering := cf.ServiceOfferingFields{}
+			offering := models.ServiceOfferingFields{}
 			offering.Label = "cleardb"
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service-1"
 			serviceInstance.ServicePlan = plan
 			serviceInstance.ApplicationNames = []string{"cli1", "cli2"}
 			serviceInstance.ServiceOffering = offering
 
-			plan2 := cf.ServicePlanFields{}
+			plan2 := models.ServicePlanFields{}
 			plan2.Guid = "spark-guid-2"
 			plan2.Name = "spark-2"
 
-			serviceInstance2 := cf.ServiceInstance{}
+			serviceInstance2 := models.ServiceInstance{}
 			serviceInstance2.Name = "my-service-2"
 			serviceInstance2.ServicePlan = plan2
 			serviceInstance2.ApplicationNames = []string{"cli1"}
 			serviceInstance2.ServiceOffering = offering
 
-			serviceInstance3 := cf.ServiceInstance{}
+			serviceInstance3 := models.ServiceInstance{}
 			serviceInstance3.Name = "my-service-provided-by-user"
 
-			serviceInstances := []cf.ServiceInstance{serviceInstance, serviceInstance2, serviceInstance3}
+			serviceInstances := []models.ServiceInstance{serviceInstance, serviceInstance2, serviceInstance3}
 			serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
 				GetSummariesInCurrentSpaceInstances: serviceInstances,
 			}
@@ -54,9 +54,9 @@ func init() {
 				Username: "my-user",
 			})
 			assert.NoError(mr.T(), err)
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Name = "my-space"
 			config := &configuration.Configuration{
 				SpaceFields:        space,
@@ -77,7 +77,7 @@ func init() {
 		})
 		It("TestEmptyServicesList", func() {
 
-			serviceInstances := []cf.ServiceInstance{}
+			serviceInstances := []models.ServiceInstance{}
 			serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
 				GetSummariesInCurrentSpaceInstances: serviceInstances,
 			}
@@ -87,9 +87,9 @@ func init() {
 				Username: "my-user",
 			})
 			assert.NoError(mr.T(), err)
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Name = "my-space"
 			config := &configuration.Configuration{
 				SpaceFields:        space,

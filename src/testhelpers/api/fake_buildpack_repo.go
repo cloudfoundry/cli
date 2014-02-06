@@ -1,30 +1,31 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
+	"cf"
 )
 
 type FakeBuildpackRepository struct {
-	Buildpacks []cf.Buildpack
+	Buildpacks []models.Buildpack
 
 	FindByNameNotFound    bool
 	FindByNameName        string
-	FindByNameBuildpack   cf.Buildpack
+	FindByNameBuildpack   models.Buildpack
 	FindByNameApiResponse net.ApiResponse
 
 	CreateBuildpackExists bool
-	CreateBuildpack       cf.Buildpack
+	CreateBuildpack       models.Buildpack
 	CreateApiResponse     net.ApiResponse
 
 	DeleteBuildpackGuid string
 	DeleteApiResponse   net.ApiResponse
 
-	UpdateBuildpack cf.Buildpack
+	UpdateBuildpack models.Buildpack
 }
 
-func (repo *FakeBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse) {
-	buildpacksChan = make(chan []cf.Buildpack, 4)
+func (repo *FakeBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []models.Buildpack, statusChan chan net.ApiResponse) {
+	buildpacksChan = make(chan []models.Buildpack, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
@@ -51,7 +52,7 @@ func (repo *FakeBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksC
 	return
 }
 
-func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	buildpack = repo.FindByNameBuildpack
 
@@ -62,12 +63,12 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack cf.Build
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, net.NewApiResponse("Buildpack already exists", cf.BUILDPACK_EXISTS, 400)
 	}
 
-	repo.CreateBuildpack = cf.Buildpack{BasicFields: cf.BasicFields{Name: name}, Position: position, Enabled: enabled, Locked: locked}
+	repo.CreateBuildpack = models.Buildpack{BasicFields: models.BasicFields{Name: name}, Position: position, Enabled: enabled, Locked: locked}
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
@@ -77,7 +78,7 @@ func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiResponse n
 	return
 }
 
-func (repo *FakeBuildpackRepository) Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse) {
 	repo.UpdateBuildpack = buildpack
 	return
 }

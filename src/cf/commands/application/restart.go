@@ -1,7 +1,7 @@
 package application
 
 import (
-	"cf"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -16,7 +16,7 @@ type Restart struct {
 }
 
 type ApplicationRestarter interface {
-	ApplicationRestart(app cf.Application)
+	ApplicationRestart(app models.Application)
 }
 
 func NewRestart(ui terminal.UI, starter ApplicationStarter, stopper ApplicationStopper) (cmd *Restart) {
@@ -49,7 +49,7 @@ func (cmd *Restart) Run(c *cli.Context) {
 	cmd.ApplicationRestart(app)
 }
 
-func (cmd *Restart) ApplicationRestart(app cf.Application) {
+func (cmd *Restart) ApplicationRestart(app models.Application) {
 	stoppedApp, err := cmd.stopper.ApplicationStop(app)
 	if err != nil {
 		cmd.ui.Failed(err.Error())

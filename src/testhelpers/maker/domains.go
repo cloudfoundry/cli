@@ -1,10 +1,10 @@
 package maker
 
-import "cf"
+import "cf/models"
 
 var domainGuid func() string = guidGenerator("domain")
 
-func NewSharedDomain(overrides Overrides) (domain cf.Domain) {
+func NewSharedDomain(overrides Overrides) (domain models.Domain) {
 	domain.Name = "new-domain"
 	domain.Guid = domainGuid()
 	domain.Shared = true
@@ -18,7 +18,7 @@ func NewSharedDomain(overrides Overrides) (domain cf.Domain) {
 	return
 }
 
-func NewPrivateDomain(overrides Overrides) (domain cf.Domain) {
+func NewPrivateDomain(overrides Overrides) (domain models.Domain) {
 	domain.Name = "new-domain"
 	domain.Guid = domainGuid()
 	domain.Shared = false

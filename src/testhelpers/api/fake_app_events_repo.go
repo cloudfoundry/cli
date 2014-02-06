@@ -1,14 +1,14 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 	"cf/api"
 )
 
 type FakeAppEventsRepo struct {
 	AppGuid string
-	Events  []cf.EventFields
+	Events  []models.EventFields
 	ApiResponse net.ApiResponse
 }
 

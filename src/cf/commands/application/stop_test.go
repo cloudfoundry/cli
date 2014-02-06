@@ -1,10 +1,10 @@
 package application_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,9 +24,9 @@ func callStop(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, 
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -41,7 +41,7 @@ func callStop(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, 
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestStopCommandFailsWithUsage", func() {
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
@@ -55,7 +55,7 @@ func init() {
 		})
 		It("TestStopApplication", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
@@ -73,7 +73,7 @@ func init() {
 		})
 		It("TestStopApplicationWhenStopFails", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
@@ -90,7 +90,7 @@ func init() {
 		})
 		It("TestStopApplicationIsAlreadyStopped", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.State = "stopped"
@@ -106,11 +106,11 @@ func init() {
 		})
 		It("TestApplicationStopReturnsUpdatedApp", func() {
 
-			appToStop := cf.Application{}
+			appToStop := models.Application{}
 			appToStop.Name = "my-app"
 			appToStop.Guid = "my-app-guid"
 			appToStop.State = "started"
-			expectedStoppedApp := cf.Application{}
+			expectedStoppedApp := models.Application{}
 			expectedStoppedApp.Name = "my-stopped-app"
 			expectedStoppedApp.Guid = "my-stopped-app-guid"
 			expectedStoppedApp.State = "stopped"
@@ -125,7 +125,7 @@ func init() {
 		})
 		It("TestApplicationStopReturnsUpdatedAppWhenAppIsAlreadyStopped", func() {
 
-			appToStop := cf.Application{}
+			appToStop := models.Application{}
 			appToStop.Name = "my-app"
 			appToStop.Guid = "my-app-guid"
 			appToStop.State = "stopped"

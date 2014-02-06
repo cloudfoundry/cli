@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callDeleteUser(t mr.TestingT, args []string, userRepo *testapi.FakeUserRepo
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -42,7 +42,7 @@ func deleteWithConfirmation(t mr.TestingT, confirmation string) (ui *testterm.Fa
 	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
-	user2 := cf.UserFields{}
+	user2 := models.UserFields{}
 	user2.Username = "my-found-user"
 	user2.Guid = "my-found-user-guid"
 	userRepo = &testapi.FakeUserRepository{
@@ -53,9 +53,9 @@ func deleteWithConfirmation(t mr.TestingT, confirmation string) (ui *testterm.Fa
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	org2 := cf.OrganizationFields{}
+	org2 := models.OrganizationFields{}
 	org2.Name = "my-org"
-	space2 := cf.SpaceFields{}
+	space2 := models.SpaceFields{}
 	space2.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space2,
@@ -146,7 +146,7 @@ func init() {
 		})
 		It("TestDeleteUserWithForceOption", func() {
 
-			foundUserFields := cf.UserFields{}
+			foundUserFields := models.UserFields{}
 			foundUserFields.Guid = "my-found-user-guid"
 			userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: foundUserFields}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}

@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"cf"
 	. "cf/commands/organization"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,10 +24,10 @@ func callCreateOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 	})
 	assert.NoError(t, err)
 
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 
-	organization := cf.OrganizationFields{}
+	organization := models.OrganizationFields{}
 	organization.Name = "my-org"
 
 	config := &configuration.Configuration{

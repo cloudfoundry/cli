@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 
 		It("TestApplicationReqExecute", func() {
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}

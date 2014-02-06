@@ -1,30 +1,30 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 )
 
 type FakeApplicationRepository struct {
-	FindAllApps []cf.Application
+	FindAllApps []models.Application
 
 	ReadName     string
-	ReadApp      cf.Application
+	ReadApp      models.Application
 	ReadErr      bool
 	ReadAuthErr  bool
 	ReadNotFound bool
 
-	CreateAppParams []cf.AppParams
+	CreateAppParams []models.AppParams
 
-	UpdateParams    cf.AppParams
+	UpdateParams    models.AppParams
 	UpdateAppGuid   string
-	UpdateAppResult cf.Application
+	UpdateAppResult models.Application
 	UpdateErr       bool
 
 	DeletedAppGuid string
 }
 
-func (repo *FakeApplicationRepository) Read(name string) (app cf.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiResponse net.ApiResponse) {
 	repo.ReadName = name
 	app = repo.ReadApp
 
@@ -41,16 +41,16 @@ func (repo *FakeApplicationRepository) Read(name string) (app cf.Application, ap
 	return
 }
 
-func (repo *FakeApplicationRepository) CreatedAppParams() (params cf.AppParams) {
+func (repo *FakeApplicationRepository) CreatedAppParams() (params models.AppParams) {
 	if len(repo.CreateAppParams) > 0 {
 		params = repo.CreateAppParams[0]
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiResponse net.ApiResponse) {
 	if repo.CreateAppParams == nil {
-		repo.CreateAppParams = []cf.AppParams{}
+		repo.CreateAppParams = []models.AppParams{}
 	}
 
 	repo.CreateAppParams = append(repo.CreateAppParams, params)
@@ -85,7 +85,7 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 	return
 }
 
-func (repo *FakeApplicationRepository) Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse net.ApiResponse) {
 	repo.UpdateAppGuid = appGuid
 	repo.UpdateParams = params
 	updatedApp = repo.UpdateAppResult

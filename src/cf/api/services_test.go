@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -138,7 +138,7 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
 		}
   	]}`}})
 
-func testRenameService(t mr.TestingT, endpointPath string, serviceInstance cf.ServiceInstance) {
+func testRenameService(t mr.TestingT, endpointPath string, serviceInstance models.ServiceInstance) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     endpointPath,
@@ -155,7 +155,7 @@ func testRenameService(t mr.TestingT, endpointPath string, serviceInstance cf.Se
 }
 
 func createServiceRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	space2 := cf.SpaceFields{}
+	space2 := models.SpaceFields{}
 	space2.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -195,7 +195,7 @@ func init() {
 				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
 				Response: multipleOfferingsResponse,
 			})
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
 			config := &configuration.Configuration{
 				AccessToken: "BEARER my_access_token",
@@ -310,7 +310,7 @@ func init() {
 
 			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
 			defer ts.Close()
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 			apiResponse := repo.DeleteService(serviceInstance)
 			assert.True(mr.T(), handler.AllRequestsCalled())
@@ -320,18 +320,18 @@ func init() {
 
 			_, _, repo := createServiceRepo(mr.T(), []testnet.TestRequest{})
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 
-			binding := cf.ServiceBindingFields{}
+			binding := models.ServiceBindingFields{}
 			binding.Url = "/v2/service_bindings/service-binding-1-guid"
 			binding.AppGuid = "app-1-guid"
 
-			binding2 := cf.ServiceBindingFields{}
+			binding2 := models.ServiceBindingFields{}
 			binding2.Url = "/v2/service_bindings/service-binding-2-guid"
 			binding2.AppGuid = "app-2-guid"
 
-			serviceInstance.ServiceBindings = []cf.ServiceBindingFields{binding, binding2}
+			serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 
 			apiResponse := repo.DeleteService(serviceInstance)
 			assert.True(mr.T(), apiResponse.IsNotSuccessful())
@@ -340,10 +340,10 @@ func init() {
 		It("TestRenameService", func() {
 
 			path := "/v2/service_instances/my-service-instance-guid"
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 
-			plan := cf.ServicePlanFields{}
+			plan := models.ServicePlanFields{}
 			plan.Guid = "some-plan-guid"
 			serviceInstance.ServicePlan = plan
 
@@ -352,7 +352,7 @@ func init() {
 		It("TestRenameServiceWhenServiceIsUserProvided", func() {
 
 			path := "/v2/user_provided_service_instances/my-service-instance-guid"
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 			testRenameService(mr.T(), path, serviceInstance)
 		})

@@ -1,7 +1,7 @@
 package configuration
 
 import (
-	"cf"
+	"cf/models"
 	"time"
 )
 
@@ -23,8 +23,8 @@ type ConfigReader interface {
 	LoggregatorEndpoint() string
 	AccessToken() string
 	RefreshToken() string
-	OrganizationFields() cf.OrganizationFields
-	SpaceFields() cf.SpaceFields
+	OrganizationFields() models.OrganizationFields
+	SpaceFields() models.SpaceFields
 	ApplicationStartTimeout() time.Duration
 
 	HasSpace() bool
@@ -42,8 +42,8 @@ type ConfigReadWriter interface {
 	SetLoggregatorEndpoint(string)
 	SetAccessToken(string)
 	SetRefreshToken(string)
-	SetOrganizationFields(cf.OrganizationFields)
-	SetSpaceFields(cf.SpaceFields)
+	SetOrganizationFields(models.OrganizationFields)
+	SetSpaceFields(models.SpaceFields)
 	SetApplicationStartTimeout(time.Duration)
 }
 
@@ -77,11 +77,11 @@ func (c *config) RefreshToken() string {
 	return c.config.RefreshToken
 }
 
-func (c *config) OrganizationFields() cf.OrganizationFields {
+func (c *config) OrganizationFields() models.OrganizationFields {
 	return c.config.OrganizationFields
 }
 
-func (c *config) SpaceFields() cf.SpaceFields {
+func (c *config) SpaceFields() models.SpaceFields {
 	return c.config.SpaceFields
 }
 
@@ -139,11 +139,11 @@ func (c *config) SetRefreshToken(token string) {
 	c.config.RefreshToken = token
 }
 
-func (c *config) SetOrganizationFields(org cf.OrganizationFields) {
+func (c *config) SetOrganizationFields(org models.OrganizationFields) {
 	c.config.OrganizationFields = org
 }
 
-func (c *config) SetSpaceFields(space cf.SpaceFields) {
+func (c *config) SetSpaceFields(space models.SpaceFields) {
 	c.config.SpaceFields = space
 }
 

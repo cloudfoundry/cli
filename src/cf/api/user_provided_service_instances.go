@@ -2,8 +2,8 @@ package api
 
 import (
 	"bytes"
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"encoding/json"
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 type UserProvidedServiceInstanceRepository interface {
 	Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse)
-	Update(serviceInstanceFields cf.ServiceInstanceFields) (apiResponse net.ApiResponse)
+	Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse net.ApiResponse)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -50,7 +50,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields cf.ServiceInstanceFields) (apiResponse net.ApiResponse) {
+func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstanceFields.Guid)
 
 	type RequestBody struct {

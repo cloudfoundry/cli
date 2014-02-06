@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"strings"
@@ -10,7 +10,7 @@ import (
 
 type ServiceBindingRepository interface {
 	Create(instanceGuid, appGuid string) (apiResponse net.ApiResponse)
-	Delete(instance cf.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse)
+	Delete(instance models.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceBindingRepository struct {
@@ -33,7 +33,7 @@ func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceBindingRepository) Delete(instance cf.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse) {
 	var path string
 
 	for _, binding := range instance.ServiceBindings {

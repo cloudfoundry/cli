@@ -1,10 +1,10 @@
 package service_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -26,9 +26,9 @@ func callDeleteService(t mr.TestingT, confirmation string, args []string, reqFac
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -43,7 +43,7 @@ func callDeleteService(t mr.TestingT, confirmation string, args []string, reqFac
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestDeleteServiceCommandWithY", func() {
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service"
 			serviceInstance.Guid = "my-service-guid"
 			reqFactory := &testreq.FakeReqFactory{}
@@ -63,7 +63,7 @@ func init() {
 		})
 		It("TestDeleteServiceCommandWithYes", func() {
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service"
 			serviceInstance.Guid = "my-service-guid"
 			reqFactory := &testreq.FakeReqFactory{}

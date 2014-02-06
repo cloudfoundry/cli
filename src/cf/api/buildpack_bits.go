@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fileutils"
 	"fmt"
@@ -13,7 +14,7 @@ import (
 )
 
 type BuildpackBitsRepository interface {
-	UploadBuildpack(buildpack cf.Buildpack, dir string) (apiResponse net.ApiResponse)
+	UploadBuildpack(buildpack models.Buildpack, dir string) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerBuildpackBitsRepository struct {
@@ -29,7 +30,7 @@ func NewCloudControllerBuildpackBitsRepository(config *configuration.Configurati
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.Buildpack, dir string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) (apiResponse net.ApiResponse) {
 	fileutils.TempFile("buildpack", func(zipFile *os.File, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
@@ -48,7 +49,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack cf.
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack cf.Buildpack, zipFile *os.File, filename string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, zipFile *os.File, filename string) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, buildpack.Guid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {

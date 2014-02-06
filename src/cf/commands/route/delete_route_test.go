@@ -1,9 +1,9 @@
 package route_test
 
 import (
-	"cf"
 	. "cf/commands/route"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -25,9 +25,9 @@ func callDeleteRoute(t mr.TestingT, confirmation string, args []string, reqFacto
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -68,11 +68,11 @@ func init() {
 		})
 		It("TestDeleteRouteWithConfirmation", func() {
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Guid = "domain-guid"
 			domain.Name = "example.com"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			route := cf.Route{}
+			route := models.Route{}
 			route.Guid = "route-guid"
 			route.Host = "my-host"
 			route.Domain = domain
@@ -94,11 +94,11 @@ func init() {
 		})
 		It("TestDeleteRouteWithForce", func() {
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Guid = "domain-guid"
 			domain.Name = "example.com"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			route := cf.Route{}
+			route := models.Route{}
 			route.Guid = "route-guid"
 			route.Host = "my-host"
 			route.Domain = domain

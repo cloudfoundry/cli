@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -17,7 +17,7 @@ import (
 
 func deleteApp(t mr.TestingT, confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) {
 
-	app := cf.Application{}
+	app := models.Application{}
 	app.Name = "app-to-delete"
 	app.Guid = "app-to-delete-guid"
 
@@ -32,9 +32,9 @@ func deleteApp(t mr.TestingT, confirmation string, args []string) (ui *testterm.
 	})
 	assert.NoError(t, err)
 
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -80,7 +80,7 @@ func init() {
 		})
 		It("TestDeleteWithForceOption", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "app-to-delete"
 			app.Guid = "app-to-delete-guid"
 

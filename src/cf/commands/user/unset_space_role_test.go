@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -30,9 +30,9 @@ func callUnsetSpaceRole(t mr.TestingT, args []string, spaceRepo *testapi.FakeSpa
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	space2 := cf.SpaceFields{}
+	space2 := models.SpaceFields{}
 	space2.Name = "my-space"
-	org2 := cf.OrganizationFields{}
+	org2 := models.OrganizationFields{}
 	org2.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space2,
@@ -82,10 +82,10 @@ func init() {
 		})
 		It("TestUnsetSpaceRole", func() {
 
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Username = "some-user"
 			user.Guid = "some-user-guid"
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "some-org"
 			org.Guid = "some-org-guid"
 
@@ -93,7 +93,7 @@ func init() {
 			reqFactory.LoginSuccess = true
 			reqFactory.UserFields = user
 			reqFactory.Organization = org
-			spaceRepo.FindByNameInOrgSpace = cf.Space{}
+			spaceRepo.FindByNameInOrgSpace = models.Space{}
 			spaceRepo.FindByNameInOrgSpace.Name = "some-space"
 			spaceRepo.FindByNameInOrgSpace.Guid = "some-space-guid"
 
@@ -108,7 +108,7 @@ func init() {
 				{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "current-user"},
 				{"OK"},
 			})
-			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleRole, cf.SPACE_MANAGER)
+			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleRole, models.SPACE_MANAGER)
 			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
 			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
 		})

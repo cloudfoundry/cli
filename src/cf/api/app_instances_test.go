@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -62,7 +62,7 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
 
 func createAppInstancesRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		SpaceFields: space,
@@ -90,8 +90,8 @@ func init() {
 
 			assert.Equal(mr.T(), len(instances), 2)
 
-			assert.Equal(mr.T(), instances[0].State, cf.InstanceRunning)
-			assert.Equal(mr.T(), instances[1].State, cf.InstanceStarting)
+			assert.Equal(mr.T(), instances[0].State, models.InstanceRunning)
+			assert.Equal(mr.T(), instances[1].State, models.InstanceStarting)
 
 			instance0 := instances[0]
 			assert.Equal(mr.T(), instance0.Since, time.Unix(1379522342, 0))

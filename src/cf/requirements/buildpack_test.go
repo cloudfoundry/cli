@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestBuildpackReqExecute", func() {
 
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-buildpack"
 			buildpack.Guid = "my-buildpack-guid"
 			buildpackRepo := &testapi.FakeBuildpackRepository{FindByNameBuildpack: buildpack}

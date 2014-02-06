@@ -1,7 +1,7 @@
 package api
 
 import (
-	"cf"
+	"cf/models"
 	"cf/net"
 	"net/http"
 	"time"
@@ -9,11 +9,11 @@ import (
 
 type FakeAppInstancesRepo struct {
 	GetInstancesAppGuid    string
-	GetInstancesResponses  [][]cf.AppInstanceFields
+	GetInstancesResponses  [][]models.AppInstanceFields
 	GetInstancesErrorCodes []string
 }
 
-func (repo *FakeAppInstancesRepo) GetInstances(appGuid string) (instances []cf.AppInstanceFields, apiResponse net.ApiResponse) {
+func (repo *FakeAppInstancesRepo) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse net.ApiResponse) {
 	repo.GetInstancesAppGuid = appGuid
 	time.Sleep(1 * time.Millisecond) //needed for Windows only, otherwise it thinks error codes are not assigned
 

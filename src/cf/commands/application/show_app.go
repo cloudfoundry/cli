@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	"cf/configuration"
 	"cf/formatters"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -22,7 +23,7 @@ type ShowApp struct {
 }
 
 type ApplicationDisplayer interface {
-	ShowApp(app cf.Application)
+	ShowApp(app models.Application)
 }
 
 func NewShowApp(ui terminal.UI, config *configuration.Configuration, appSummaryRepo api.AppSummaryRepository, appInstancesRepo api.AppInstancesRepository) (cmd *ShowApp) {
@@ -56,7 +57,7 @@ func (cmd *ShowApp) Run(c *cli.Context) {
 	cmd.ShowApp(app)
 }
 
-func (cmd *ShowApp) ShowApp(app cf.Application) {
+func (cmd *ShowApp) ShowApp(app models.Application) {
 
 	cmd.ui.Say("Showing health and status for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
@@ -75,7 +76,7 @@ func (cmd *ShowApp) ShowApp(app cf.Application) {
 		return
 	}
 
-	var instances []cf.AppInstanceFields
+	var instances []models.AppInstanceFields
 	instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
 	if apiResponse.IsNotSuccessful() && !appIsStopped {
 		cmd.ui.Failed(apiResponse.Message)

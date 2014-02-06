@@ -1,7 +1,7 @@
 package application
 
 import (
-	"cf"
+	"cf/models"
 	"cf/terminal"
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
@@ -110,7 +110,7 @@ func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logCont
 	return
 }
 
-func coloredAppState(app cf.ApplicationFields) string {
+func coloredAppState(app models.ApplicationFields) string {
 	appState := strings.ToLower(app.State)
 
 	if app.RunningInstances == 0 {
@@ -128,7 +128,7 @@ func coloredAppState(app cf.ApplicationFields) string {
 	return appState
 }
 
-func coloredAppInstances(app cf.ApplicationFields) string {
+func coloredAppInstances(app models.ApplicationFields) string {
 	healthString := fmt.Sprintf("%d/%d", app.RunningInstances, app.InstanceCount)
 
 	if app.RunningInstances == 0 {
@@ -146,7 +146,7 @@ func coloredAppInstances(app cf.ApplicationFields) string {
 	return healthString
 }
 
-func coloredInstanceState(instance cf.AppInstanceFields) (colored string) {
+func coloredInstanceState(instance models.AppInstanceFields) (colored string) {
 	state := string(instance.State)
 	switch state {
 	case "started", "running":

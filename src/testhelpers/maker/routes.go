@@ -1,6 +1,6 @@
 package maker
 
-import "cf"
+import "cf/models"
 
 var routeGuid func() string
 
@@ -8,7 +8,7 @@ func init() {
 	routeGuid = guidGenerator("route")
 }
 
-func NewRouteFields(overrides Overrides) (route cf.RouteFields) {
+func NewRouteFields(overrides Overrides) (route models.RouteFields) {
 	route.Guid = routeGuid()
 	route.Host = "route-host"
 
@@ -23,7 +23,7 @@ func NewRouteFields(overrides Overrides) (route cf.RouteFields) {
 	return
 }
 
-func NewRoute(overrides Overrides) (route cf.Route) {
+func NewRoute(overrides Overrides) (route models.Route) {
 	route.RouteFields = NewRouteFields(overrides)
 	return
 }

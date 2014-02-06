@@ -1,9 +1,9 @@
 package route
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -12,7 +12,7 @@ import (
 )
 
 type RouteCreator interface {
-	CreateRoute(hostName string, domain cf.DomainFields, space cf.SpaceFields) (route cf.Route, apiResponse net.ApiResponse)
+	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse net.ApiResponse)
 }
 
 type CreateRoute struct {
@@ -66,7 +66,7 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, domain cf.DomainFields, space cf.SpaceFields) (route cf.Route, apiResponse net.ApiResponse) {
+func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse net.ApiResponse) {
 	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
 		terminal.EntityNameColor(domain.UrlForHost(hostName)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),

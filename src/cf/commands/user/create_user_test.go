@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -30,9 +30,9 @@ func callCreateUser(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,

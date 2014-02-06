@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,10 +15,10 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestSpaceReqExecute", func() {
 
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "awesome-sauce-space"
 			space.Guid = "my-space-guid"
-			spaceRepo := &testapi.FakeSpaceRepository{Spaces: []cf.Space{space}}
+			spaceRepo := &testapi.FakeSpaceRepository{Spaces: []models.Space{space}}
 			ui := new(testterm.FakeUI)
 
 			spaceReq := NewSpaceRequirement("awesome-sauce-space", ui, spaceRepo)

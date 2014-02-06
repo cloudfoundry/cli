@@ -1,9 +1,9 @@
 package servicebroker_test
 
 import (
-	"cf"
 	. "cf/commands/servicebroker"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callRenameServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.F
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -70,7 +70,7 @@ func init() {
 		It("TestRenameServiceBroker", func() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			broker := cf.ServiceBroker{}
+			broker := models.ServiceBroker{}
 			broker.Name = "my-found-broker"
 			broker.Guid = "my-found-broker-guid"
 			repo := &testapi.FakeServiceBrokerRepo{

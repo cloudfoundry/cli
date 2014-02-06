@@ -1,9 +1,9 @@
 package serviceauthtoken_test
 
 import (
-	"cf"
 	. "cf/commands/serviceauthtoken"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callUpdateServiceAuthToken(t mr.TestingT, args []string, reqFactory *testre
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -72,7 +72,7 @@ func init() {
 		})
 		It("TestUpdateServiceAuthToken", func() {
 
-			foundAuthToken := cf.ServiceAuthTokenFields{}
+			foundAuthToken := models.ServiceAuthTokenFields{}
 			foundAuthToken.Guid = "found-auth-token-guid"
 			foundAuthToken.Label = "found label"
 			foundAuthToken.Provider = "found provider"
@@ -82,7 +82,7 @@ func init() {
 			args := []string{"a label", "a provider", "a value"}
 
 			ui := callUpdateServiceAuthToken(mr.T(), args, reqFactory, authTokenRepo)
-			expectedAuthToken := cf.ServiceAuthTokenFields{}
+			expectedAuthToken := models.ServiceAuthTokenFields{}
 			expectedAuthToken.Guid = "found-auth-token-guid"
 			expectedAuthToken.Label = "found label"
 			expectedAuthToken.Provider = "found provider"

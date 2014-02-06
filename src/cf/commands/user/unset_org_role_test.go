@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callUnsetOrgRole(t mr.TestingT, args []string, userRepo *testapi.FakeUserRe
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	org2 := cf.OrganizationFields{}
+	org2 := models.OrganizationFields{}
 	org2.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -75,10 +75,10 @@ func init() {
 		It("TestUnsetOrgRole", func() {
 
 			userRepo := &testapi.FakeUserRepository{}
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Username = "some-user"
 			user.Guid = "some-user-guid"
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "some-org"
 			org.Guid = "some-org-guid"
 			reqFactory := &testreq.FakeReqFactory{
@@ -95,7 +95,7 @@ func init() {
 				{"OK"},
 			})
 
-			assert.Equal(mr.T(), userRepo.UnsetOrgRoleRole, cf.ORG_MANAGER)
+			assert.Equal(mr.T(), userRepo.UnsetOrgRoleRole, models.ORG_MANAGER)
 			assert.Equal(mr.T(), userRepo.UnsetOrgRoleUserGuid, "some-user-guid")
 			assert.Equal(mr.T(), userRepo.UnsetOrgRoleOrganizationGuid, "some-org-guid")
 		})

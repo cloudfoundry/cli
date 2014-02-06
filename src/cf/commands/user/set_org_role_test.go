@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callSetOrgRole(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	org2 := cf.OrganizationFields{}
+	org2 := models.OrganizationFields{}
 	org2.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -73,10 +73,10 @@ func init() {
 		})
 		It("TestSetOrgRole", func() {
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Guid = "my-org-guid"
 			org.Name = "my-org"
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Guid = "my-user-guid"
 			user.Username = "my-user"
 			reqFactory := &testreq.FakeReqFactory{
@@ -94,7 +94,7 @@ func init() {
 			})
 			assert.Equal(mr.T(), userRepo.SetOrgRoleUserGuid, "my-user-guid")
 			assert.Equal(mr.T(), userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
-			assert.Equal(mr.T(), userRepo.SetOrgRoleRole, cf.ORG_MANAGER)
+			assert.Equal(mr.T(), userRepo.SetOrgRoleRole, models.ORG_MANAGER)
 		})
 	})
 }

@@ -1,9 +1,9 @@
 package route_test
 
 import (
-	"cf"
 	. "cf/commands/route"
 	"cf/configuration"
+	"cf/models"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -25,9 +25,9 @@ func callMapRoute(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFacto
 	})
 	assert.NoError(t, err)
 
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -66,15 +66,15 @@ func init() {
 		})
 		It("TestMapRouteWhenBinding", func() {
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Guid = "my-domain-guid"
 			domain.Name = "example.com"
-			route := cf.Route{}
+			route := models.Route{}
 			route.Guid = "my-route-guid"
 			route.Host = "foo"
 			route.Domain = domain.DomainFields
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Guid = "my-app-guid"
 			app.Name = "my-app"
 
@@ -94,13 +94,13 @@ func init() {
 		})
 		It("TestMapRouteWhenRouteNotReserved", func() {
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "my-domain.com"
-			route := cf.Route{}
+			route := models.Route{}
 			route.Guid = "my-app-guid"
 			route.Host = "my-host"
 			route.Domain = domain
-			app := cf.Application{}
+			app := models.Application{}
 			app.Guid = "my-app-guid"
 			app.Name = "my-app"
 

@@ -1,9 +1,9 @@
 package application
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -60,7 +60,7 @@ func (cmd *Logs) Run(c *cli.Context) {
 	cmd.displayLogMessages(logChan)
 }
 
-func (cmd *Logs) recentLogsFor(app cf.Application, logChan chan *logmessage.Message) {
+func (cmd *Logs) recentLogsFor(app models.Application, logChan chan *logmessage.Message) {
 	onConnect := func() {
 		cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
 			terminal.EntityNameColor(app.Name),
@@ -77,7 +77,7 @@ func (cmd *Logs) recentLogsFor(app cf.Application, logChan chan *logmessage.Mess
 	}
 }
 
-func (cmd *Logs) tailLogsFor(app cf.Application, logChan chan *logmessage.Message) {
+func (cmd *Logs) tailLogsFor(app models.Application, logChan chan *logmessage.Message) {
 	onConnect := func() {
 		cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
 			terminal.EntityNameColor(app.Name),

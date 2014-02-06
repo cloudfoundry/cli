@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"net/url"
@@ -17,7 +17,7 @@ type StackResource struct {
 	Entity StackEntity
 }
 
-func (resource StackResource) ToFields() (fields cf.Stack) {
+func (resource StackResource) ToFields() (fields models.Stack) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
 	fields.Description = resource.Entity.Description
@@ -30,8 +30,8 @@ type StackEntity struct {
 }
 
 type StackRepository interface {
-	FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse)
-	FindAll() (stacks []cf.Stack, apiResponse net.ApiResponse)
+	FindByName(name string) (stack models.Stack, apiResponse net.ApiResponse)
+	FindAll() (stacks []models.Stack, apiResponse net.ApiResponse)
 }
 
 type CloudControllerStackRepository struct {
@@ -45,7 +45,7 @@ func NewCloudControllerStackRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Stack, apiResponse net.ApiResponse) {
+func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.Target, url.QueryEscape("name:"+name))
 	stacks, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
@@ -61,12 +61,12 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack cf.Sta
 	return
 }
 
-func (repo CloudControllerStackRepository) FindAll() (stacks []cf.Stack, apiResponse net.ApiResponse) {
+func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
 	return repo.findAllWithPath(path)
 }
 
-func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []cf.Stack, apiResponse net.ApiResponse) {
+func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiResponse net.ApiResponse) {
 	resources := new(PaginatedStackResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {

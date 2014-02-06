@@ -1,22 +1,22 @@
 package requirements
 
 import (
-	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/terminal"
 )
 
 type ServiceInstanceRequirement interface {
 	Requirement
-	GetServiceInstance() cf.ServiceInstance
+	GetServiceInstance() models.ServiceInstance
 }
 
 type serviceInstanceApiRequirement struct {
 	name            string
 	ui              terminal.UI
 	serviceRepo     api.ServiceRepository
-	serviceInstance cf.ServiceInstance
+	serviceInstance models.ServiceInstance
 }
 
 func NewServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRepository) (req *serviceInstanceApiRequirement) {
@@ -39,6 +39,6 @@ func (req *serviceInstanceApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *serviceInstanceApiRequirement) GetServiceInstance() cf.ServiceInstance {
+func (req *serviceInstanceApiRequirement) GetServiceInstance() models.ServiceInstance {
 	return req.serviceInstance
 }

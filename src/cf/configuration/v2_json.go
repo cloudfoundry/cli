@@ -1,7 +1,7 @@
 package configuration
 
 import (
-	"cf"
+	"cf/models"
 	"encoding/json"
 	"time"
 )
@@ -14,8 +14,8 @@ type configJsonV2 struct {
 	LoggregatorEndpoint     string
 	AccessToken             string
 	RefreshToken            string
-	OrganizationFields      cf.OrganizationFields
-	SpaceFields             cf.SpaceFields
+	OrganizationFields      models.OrganizationFields
+	SpaceFields             models.SpaceFields
 	ApplicationStartTimeout time.Duration // will be used as seconds
 }
 

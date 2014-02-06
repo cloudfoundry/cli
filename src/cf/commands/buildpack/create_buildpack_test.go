@@ -1,8 +1,8 @@
 package buildpack_test
 
 import (
-	"cf"
 	. "cf/commands/buildpack"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -32,7 +32,7 @@ func init() {
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 			repo, bitsRepo := getRepositories()
 
-			repo.FindByNameBuildpack = cf.Buildpack{}
+			repo.FindByNameBuildpack = models.Buildpack{}
 			callCreateBuildpack([]string{"my-buildpack", "my-dir", "0"}, reqFactory, repo, bitsRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 

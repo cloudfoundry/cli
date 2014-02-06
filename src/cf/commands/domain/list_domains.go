@@ -1,9 +1,9 @@
 package domain
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -69,7 +69,7 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 }
 
 func domainsCallback(table terminal.Table, noDomains *bool) api.ListDomainsCallback {
-	return api.ListDomainsCallback(func(domains []cf.Domain) bool {
+	return api.ListDomainsCallback(func(domains []models.Domain) bool {
 		rows := [][]string{}
 		for _, domain := range domains {
 			rows = append(rows, []string{domain.Name, domainStatusString(domain)})
@@ -80,7 +80,7 @@ func domainsCallback(table terminal.Table, noDomains *bool) api.ListDomainsCallb
 	})
 }
 
-func domainStatusString(domain cf.Domain) string {
+func domainStatusString(domain models.Domain) string {
 	if domain.Shared {
 		return "shared"
 	} else {

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 )
@@ -12,22 +12,22 @@ type ServiceInstancesSummaries struct {
 	ServiceInstances []ServiceInstanceSummary `json:"services"`
 }
 
-func (resource ServiceInstancesSummaries) ToModels() (instances []cf.ServiceInstance) {
+func (resource ServiceInstancesSummaries) ToModels() (instances []models.ServiceInstance) {
 	for _, instanceSummary := range resource.ServiceInstances {
 		applicationNames := resource.findApplicationNamesForInstance(instanceSummary.Name)
 
 		planSummary := instanceSummary.ServicePlan
-		servicePlan := cf.ServicePlanFields{}
+		servicePlan := models.ServicePlanFields{}
 		servicePlan.Name = planSummary.Name
 		servicePlan.Guid = planSummary.Guid
 
 		offeringSummary := planSummary.ServiceOffering
-		serviceOffering := cf.ServiceOfferingFields{}
+		serviceOffering := models.ServiceOfferingFields{}
 		serviceOffering.Label = offeringSummary.Label
 		serviceOffering.Provider = offeringSummary.Provider
 		serviceOffering.Version = offeringSummary.Version
 
-		instance := cf.ServiceInstance{}
+		instance := models.ServiceInstance{}
 		instance.Name = instanceSummary.Name
 		instance.ApplicationNames = applicationNames
 		instance.ServicePlan = servicePlan
@@ -74,7 +74,7 @@ type ServiceOfferingSummary struct {
 }
 
 type ServiceSummaryRepository interface {
-	GetSummariesInCurrentSpace() (instances []cf.ServiceInstance, apiResponse net.ApiResponse)
+	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceSummaryRepository struct {
@@ -88,7 +88,7 @@ func NewCloudControllerServiceSummaryRepository(config *configuration.Configurat
 	return
 }
 
-func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []cf.ServiceInstance, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.SpaceFields.Guid)
 	resource := new(ServiceInstancesSummaries)
 

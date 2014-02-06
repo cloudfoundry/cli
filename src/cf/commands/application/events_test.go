@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -31,9 +31,9 @@ func callEvents(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -69,23 +69,23 @@ func init() {
 			assert.NoError(mr.T(), err)
 
 			reqFactory, eventsRepo := getEventsDependencies()
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			reqFactory.Application = app
 
-			event1 := cf.EventFields{}
+			event1 := models.EventFields{}
 			event1.Guid = "event-guid-1"
 			event1.Name = "app crashed"
 			event1.Timestamp = timestamp
 			event1.Description = "reason: app instance exited, exit_status: 78"
 
-			event2 := cf.EventFields{}
+			event2 := models.EventFields{}
 			event2.Guid = "event-guid-2"
 			event2.Name = "app crashed"
 			event2.Timestamp = timestamp
 			event2.Description = "reason: app instance was stopped, exit_status: 77"
 
-			eventsRepo.Events = []cf.EventFields{
+			eventsRepo.Events = []models.EventFields{
 				event1,
 				event2,
 			}
@@ -102,7 +102,7 @@ func init() {
 		It("TestEventsWhenNoEventsAvailable", func() {
 
 			reqFactory, eventsRepo := getEventsDependencies()
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			reqFactory.Application = app
 

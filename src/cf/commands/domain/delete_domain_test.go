@@ -1,9 +1,9 @@
 package domain_test
 
 import (
-	"cf"
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -27,10 +27,10 @@ func callDeleteDomain(t mr.TestingT, args []string, inputs []string, reqFactory 
 	})
 	assert.NoError(t, err)
 
-	spaceFields := cf.SpaceFields{}
+	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
-	orgFields := cf.OrganizationFields{}
+	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        spaceFields,
@@ -61,7 +61,7 @@ func init() {
 		})
 		It("TestDeleteDomainSuccess", func() {
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
@@ -84,7 +84,7 @@ func init() {
 		})
 		It("TestDeleteDomainNoConfirmation", func() {
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
@@ -142,7 +142,7 @@ func init() {
 		})
 		It("TestDeleteDomainDeleteError", func() {
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
@@ -166,7 +166,7 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{

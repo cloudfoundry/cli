@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"net/url"
@@ -19,7 +20,7 @@ type ServiceBrokerResource struct {
 	Entity ServiceBrokerEntity
 }
 
-func (resource ServiceBrokerResource) ToFields() (fields cf.ServiceBroker) {
+func (resource ServiceBrokerResource) ToFields() (fields models.ServiceBroker) {
 	fields.Name = resource.Entity.Name
 	fields.Guid = resource.Metadata.Guid
 	fields.Url = resource.Entity.Url
@@ -37,10 +38,10 @@ type ServiceBrokerEntity struct {
 }
 
 type ServiceBrokerRepository interface {
-	ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse)
-	FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse)
+	ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []models.ServiceBroker, statusChan chan net.ApiResponse)
+	FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse net.ApiResponse)
 	Create(name, url, username, password string) (apiResponse net.ApiResponse)
-	Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse)
+	Update(serviceBroker models.ServiceBroker) (apiResponse net.ApiResponse)
 	Rename(guid, name string) (apiResponse net.ApiResponse)
 	Delete(guid string) (apiResponse net.ApiResponse)
 }
@@ -56,8 +57,8 @@ func NewCloudControllerServiceBrokerRepository(config *configuration.Configurati
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse) {
-	serviceBrokersChan = make(chan []cf.ServiceBroker, 4)
+func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []models.ServiceBroker, statusChan chan net.ApiResponse) {
+	serviceBrokersChan = make(chan []models.ServiceBroker, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
@@ -70,7 +71,7 @@ func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan 
 				break loop
 			default:
 				var (
-					serviceBrokers []cf.ServiceBroker
+					serviceBrokers []models.ServiceBroker
 					apiResponse    net.ApiResponse
 				)
 				serviceBrokers, path, apiResponse = repo.findNextWithPath(path)
@@ -94,7 +95,7 @@ func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan 
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/v2/service_brokers?q=%s", url.QueryEscape("name:"+name))
 	serviceBrokers, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
@@ -110,7 +111,7 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) findNextWithPath(path string) (serviceBrokers []cf.ServiceBroker, nextUrl string, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBrokerRepository) findNextWithPath(path string) (serviceBrokers []models.ServiceBroker, nextUrl string, apiResponse net.ApiResponse) {
 	resources := new(PaginatedServiceBrokerResources)
 
 	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, resources)
@@ -134,7 +135,7 @@ func (repo CloudControllerServiceBrokerRepository) Create(name, url, username, p
 	return repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceBrokerRepository) Update(serviceBroker models.ServiceBroker) (apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_brokers/%s", repo.config.Target, serviceBroker.Guid)
 	body := fmt.Sprintf(
 		`{"broker_url":"%s","auth_username":"%s","auth_password":"%s"}`,

@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"net/url"
@@ -18,7 +19,7 @@ type ServiceOfferingResource struct {
 	Entity   ServiceOfferingEntity
 }
 
-func (resource ServiceOfferingResource) ToFields() (fields cf.ServiceOfferingFields) {
+func (resource ServiceOfferingResource) ToFields() (fields models.ServiceOfferingFields) {
 	fields.Label = resource.Entity.Label
 	fields.Version = resource.Entity.Version
 	fields.Provider = resource.Entity.Provider
@@ -28,10 +29,10 @@ func (resource ServiceOfferingResource) ToFields() (fields cf.ServiceOfferingFie
 	return
 }
 
-func (resource ServiceOfferingResource) ToModel() (offering cf.ServiceOffering) {
+func (resource ServiceOfferingResource) ToModel() (offering models.ServiceOffering) {
 	offering.ServiceOfferingFields = resource.ToFields()
 	for _, p := range resource.Entity.ServicePlans {
-		servicePlan := cf.ServicePlanFields{}
+		servicePlan := models.ServicePlanFields{}
 		servicePlan.Name = p.Entity.Name
 		servicePlan.Guid = p.Metadata.Guid
 		offering.Plans = append(offering.Plans, servicePlan)
@@ -53,7 +54,7 @@ type ServicePlanResource struct {
 	Entity   ServicePlanEntity
 }
 
-func (resource ServicePlanResource) ToFields() (fields cf.ServicePlanFields) {
+func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
 	return
@@ -73,18 +74,18 @@ type ServiceInstanceResource struct {
 	Entity   ServiceInstanceEntity
 }
 
-func (resource ServiceInstanceResource) ToFields() (fields cf.ServiceInstanceFields) {
+func (resource ServiceInstanceResource) ToFields() (fields models.ServiceInstanceFields) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
 	return
 }
 
-func (resource ServiceInstanceResource) ToModel() (instance cf.ServiceInstance) {
+func (resource ServiceInstanceResource) ToModel() (instance models.ServiceInstance) {
 	instance.ServiceInstanceFields = resource.ToFields()
 	instance.ServicePlan = resource.Entity.ServicePlan.ToFields()
 	instance.ServiceOffering = resource.Entity.ServicePlan.Entity.ServiceOffering.ToFields()
 
-	instance.ServiceBindings = []cf.ServiceBindingFields{}
+	instance.ServiceBindings = []models.ServiceBindingFields{}
 	for _, bindingResource := range resource.Entity.ServiceBindings {
 		instance.ServiceBindings = append(instance.ServiceBindings, bindingResource.ToFields())
 	}
@@ -102,7 +103,7 @@ type ServiceBindingResource struct {
 	Entity   ServiceBindingEntity
 }
 
-func (resource ServiceBindingResource) ToFields() (fields cf.ServiceBindingFields) {
+func (resource ServiceBindingResource) ToFields() (fields models.ServiceBindingFields) {
 	fields.Url = resource.Metadata.Url
 	fields.Guid = resource.Metadata.Guid
 	fields.AppGuid = resource.Entity.AppGuid
@@ -114,11 +115,11 @@ type ServiceBindingEntity struct {
 }
 
 type ServiceRepository interface {
-	GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse)
-	FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse)
+	GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse)
+	FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse)
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
-	RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse)
-	DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse)
+	RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse)
+	DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceRepository struct {
@@ -132,7 +133,7 @@ func NewCloudControllerServiceRepository(config *configuration.Configuration, ga
 	return
 }
 
-func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.Target)
 	spaceGuid := repo.config.SpaceFields.Guid
 
@@ -153,7 +154,7 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings cf
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=%s&inline-relations-depth=2", repo.config.Target, repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
 
 	resources := new(PaginatedServiceInstanceResources)
@@ -195,7 +196,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 	return
 }
 
-func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
 
@@ -205,7 +206,7 @@ func (repo CloudControllerServiceRepository) RenameService(instance cf.ServiceIn
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceRepository) DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse) {
 	if len(instance.ServiceBindings) > 0 {
 		return net.NewApiResponseWithMessage("Cannot delete service instance, apps are still bound to it")
 	}

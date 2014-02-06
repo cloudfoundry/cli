@@ -1,9 +1,9 @@
 package application
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -55,7 +55,7 @@ func (cmd *Events) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"time", "event", "description"})
 	noEvents := true
 
-	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, api.ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
+	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, api.ListEventsCallback(func(events []models.EventFields) (fetchNext bool) {
 		rows := [][]string{}
 		for _, event := range events {
 			rows = append(rows, []string{

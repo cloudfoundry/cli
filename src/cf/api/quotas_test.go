@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -47,7 +47,7 @@ func init() {
 			quota, apiResponse := repo.FindByName("my-quota")
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			expectedQuota := cf.QuotaFields{}
+			expectedQuota := models.QuotaFields{}
 			expectedQuota.Guid = "my-quota-guid"
 			expectedQuota.Name = "my-remote-quota"
 			expectedQuota.MemoryLimit = 1024

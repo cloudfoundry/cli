@@ -1,8 +1,8 @@
 package configuration_test
 
 import (
-	"cf"
 	. "cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -45,8 +45,8 @@ func init() {
 					LoggregatorEndPoint:     "logs.example.com",
 					AccessToken:             "the-access-token",
 					RefreshToken:            "the-refresh-token",
-					OrganizationFields:      cf.OrganizationFields{BasicFields: cf.BasicFields{Name: "the-org"}},
-					SpaceFields:             cf.SpaceFields{BasicFields: cf.BasicFields{Name: "the-space"}},
+					OrganizationFields:      models.OrganizationFields{BasicFields: models.BasicFields{Name: "the-org"}},
+					SpaceFields:             models.SpaceFields{BasicFields: models.BasicFields{Name: "the-space"}},
 					ApplicationStartTimeout: 5,
 				}))
 			})

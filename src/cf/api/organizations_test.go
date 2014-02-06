@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -63,7 +63,7 @@ func init() {
 			defer close(stopChan)
 			orgsChan, statusChan := repo.ListOrgs(stopChan)
 
-			orgs := []cf.Organization{}
+			orgs := []models.Organization{}
 			for chunk := range orgsChan {
 				orgs = append(orgs, chunk...)
 			}
@@ -127,7 +127,7 @@ func init() {
 
 			ts, handler, repo := createOrganizationRepo(mr.T(), req)
 			defer ts.Close()
-			existingOrg := cf.Organization{}
+			existingOrg := models.Organization{}
 			existingOrg.Guid = "org1-guid"
 			existingOrg.Name = "Org1"
 

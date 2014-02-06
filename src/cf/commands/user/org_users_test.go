@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callOrgUsers(args []string, reqFactory *testreq.FakeReqFactory, userRepo *t
 		Username: "my-user",
 	})
 	assert.NoError(mr.T(), err)
-	org3 := cf.OrganizationFields{}
+	org3 := models.OrganizationFields{}
 	org3.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -68,23 +68,23 @@ func init() {
 		})
 
 		It("TestOrgUsers", func() {
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "Found Org"
 			org.Guid = "found-org-guid"
 
 			userRepo := &testapi.FakeUserRepository{}
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Username = "user1"
-			user2 := cf.UserFields{}
+			user2 := models.UserFields{}
 			user2.Username = "user2"
-			user3 := cf.UserFields{}
+			user3 := models.UserFields{}
 			user3.Username = "user3"
-			user4 := cf.UserFields{}
+			user4 := models.UserFields{}
 			user4.Username = "user4"
-			userRepo.ListUsersByRole = map[string][]cf.UserFields{
-				cf.ORG_MANAGER:     []cf.UserFields{user, user2},
-				cf.BILLING_MANAGER: []cf.UserFields{user4},
-				cf.ORG_AUDITOR:     []cf.UserFields{user3},
+			userRepo.ListUsersByRole = map[string][]models.UserFields{
+				models.ORG_MANAGER:     []models.UserFields{user, user2},
+				models.BILLING_MANAGER: []models.UserFields{user4},
+				models.ORG_AUDITOR:     []models.UserFields{user3},
 			}
 
 			reqFactory := &testreq.FakeReqFactory{
@@ -109,17 +109,17 @@ func init() {
 
 		It("lists all org users", func() {
 			t := mr.T()
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "Found Org"
 			org.Guid = "found-org-guid"
 
 			userRepo := &testapi.FakeUserRepository{}
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Username = "user1"
-			user2 := cf.UserFields{}
+			user2 := models.UserFields{}
 			user2.Username = "user2"
-			userRepo.ListUsersByRole = map[string][]cf.UserFields{
-				cf.ORG_USER: []cf.UserFields{user, user2},
+			userRepo.ListUsersByRole = map[string][]models.UserFields{
+				models.ORG_USER: []models.UserFields{user, user2},
 			}
 
 			reqFactory := &testreq.FakeReqFactory{

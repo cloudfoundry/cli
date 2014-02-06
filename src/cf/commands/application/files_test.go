@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callFiles(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory,
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -44,15 +44,15 @@ func init() {
 			args := []string{"my-app", "/foo"}
 			appFilesRepo := &testapi.FakeAppFilesRepo{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: cf.Application{}}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
 			callFiles(mr.T(), args, reqFactory, appFilesRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: cf.Application{}}
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
 			callFiles(mr.T(), args, reqFactory, appFilesRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
 			callFiles(mr.T(), args, reqFactory, appFilesRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
@@ -60,7 +60,7 @@ func init() {
 		It("TestFilesFailsWithUsage", func() {
 
 			appFilesRepo := &testapi.FakeAppFilesRepo{}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: cf.Application{}}
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
 			ui := callFiles(mr.T(), []string{}, reqFactory, appFilesRepo)
 
 			assert.True(mr.T(), ui.FailedWithUsage)
@@ -68,7 +68,7 @@ func init() {
 		})
 		It("TestListingDirectoryEntries", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-found-app"
 			app.Guid = "my-app-guid"
 
@@ -89,7 +89,7 @@ func init() {
 		})
 		It("TestListingFilesWithTemplateTokens", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-found-app"
 			app.Guid = "my-app-guid"
 

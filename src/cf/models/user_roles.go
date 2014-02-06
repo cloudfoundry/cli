@@ -1,4 +1,4 @@
-package cf
+package models
 
 const (
 	ORG_USER        = "OrgUser"

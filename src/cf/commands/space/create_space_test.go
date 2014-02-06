@@ -1,10 +1,10 @@
 package space_test
 
 import (
-	"cf"
 	. "cf/commands/space"
 	"cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -19,9 +19,9 @@ import (
 
 var (
 	defaultReqFactory *testreq.FakeReqFactory
-	configSpace       cf.SpaceFields
-	configOrg         cf.OrganizationFields
-	defaultSpace      cf.Space
+	configSpace       models.SpaceFields
+	configOrg         models.OrganizationFields
+	defaultSpace      models.Space
 	defaultSpaceRepo  *testapi.FakeSpaceRepository
 	defaultOrgRepo    *testapi.FakeOrgRepository
 	defaultUserRepo   *testapi.FakeUserRepository
@@ -29,15 +29,15 @@ var (
 
 func resetSpaceDefaults() {
 	defaultReqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-	configOrg = cf.OrganizationFields{}
+	configOrg = models.OrganizationFields{}
 	configOrg.Name = "my-org"
 	configOrg.Guid = "my-org-guid"
 
-	configSpace = cf.SpaceFields{}
+	configSpace = models.SpaceFields{}
 	configSpace.Name = "config-space"
 	configSpace.Guid = "config-space-guid"
 
-	defaultSpace = cf.Space{}
+	defaultSpace = models.Space{}
 	defaultSpace.Name = "my-space"
 	defaultSpace.Guid = "my-space-guid"
 	defaultSpace.Organization = configOrg
@@ -110,8 +110,8 @@ func init() {
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Creating space", "my-space", "my-org", "my-user"},
 				{"OK"},
-				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
-				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]},
+				{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
+				{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
 				{"TIP"},
 			})
 
@@ -119,22 +119,22 @@ func init() {
 			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, "my-org-guid")
 			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
 			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, models.SPACE_DEVELOPER)
 		})
 		It("TestCreateSpaceInOrg", func() {
 
 			resetSpaceDefaults()
 
 			org := maker.NewOrg(maker.Overrides{"name": "other-org"})
-			defaultOrgRepo.Organizations = []cf.Organization{org}
+			defaultOrgRepo.Organizations = []models.Organization{org}
 
 			ui := callCreateSpace(mr.T(), []string{"-o", "other-org", "my-space"}, defaultReqFactory, defaultSpaceRepo, defaultOrgRepo, defaultUserRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Creating space", "my-space", "other-org", "my-user"},
 				{"OK"},
-				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
-				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_DEVELOPER]},
+				{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
+				{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_DEVELOPER]},
 				{"TIP"},
 			})
 
@@ -142,7 +142,7 @@ func init() {
 			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, org.Guid)
 			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
 			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, cf.SPACE_DEVELOPER)
+			assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, models.SPACE_DEVELOPER)
 		})
 		It("TestCreateSpaceInOrgWhenTheOrgDoesNotExist", func() {
 
@@ -186,7 +186,7 @@ func init() {
 				{"my-space", "already exists"},
 			})
 			testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
-				{"Assigning", "my-user", "my-space", cf.SpaceRoleToUserInput[cf.SPACE_MANAGER]},
+				{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
 			})
 
 			assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")

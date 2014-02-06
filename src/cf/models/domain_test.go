@@ -1,7 +1,7 @@
-package cf_test
+package models_test
 
 import (
-	. "cf"
+	. "cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"

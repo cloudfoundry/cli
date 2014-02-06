@@ -1,9 +1,9 @@
 package serviceauthtoken_test
 
 import (
-	"cf"
 	. "cf/commands/serviceauthtoken"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callCreateServiceAuthToken(t mr.TestingT, args []string, reqFactory *testre
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -82,7 +82,7 @@ func init() {
 				{"OK"},
 			})
 
-			authToken := cf.ServiceAuthTokenFields{}
+			authToken := models.ServiceAuthTokenFields{}
 			authToken.Label = "a label"
 			authToken.Provider = "a provider"
 			authToken.Token = "a value"

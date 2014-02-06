@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -22,7 +23,7 @@ type BindService struct {
 }
 
 type ServiceBinder interface {
-	BindApplication(app cf.Application, serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse)
+	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
 func NewBindService(ui terminal.UI, config *configuration.Configuration, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
@@ -77,7 +78,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
 }
 
-func (cmd *BindService) BindApplication(app cf.Application, serviceInstance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse net.ApiResponse) {
 	apiResponse = cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid)
 	return
 }

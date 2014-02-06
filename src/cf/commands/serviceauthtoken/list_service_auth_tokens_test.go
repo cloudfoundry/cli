@@ -1,9 +1,9 @@
 package serviceauthtoken_test
 
 import (
-	"cf"
 	. "cf/commands/serviceauthtoken"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callListServiceAuthTokens(t mr.TestingT, reqFactory *testreq.FakeReqFactory
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -56,13 +56,13 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 			authTokenRepo := &testapi.FakeAuthTokenRepo{}
-			authToken := cf.ServiceAuthTokenFields{}
+			authToken := models.ServiceAuthTokenFields{}
 			authToken.Label = "a label"
 			authToken.Provider = "a provider"
-			authToken2 := cf.ServiceAuthTokenFields{}
+			authToken2 := models.ServiceAuthTokenFields{}
 			authToken2.Label = "a second label"
 			authToken2.Provider = "a second provider"
-			authTokenRepo.FindAllAuthTokens = []cf.ServiceAuthTokenFields{authToken, authToken2}
+			authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{authToken, authToken2}
 
 			ui := callListServiceAuthTokens(mr.T(), reqFactory, authTokenRepo)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{

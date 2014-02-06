@@ -1,9 +1,9 @@
 package space_test
 
 import (
-	"cf"
 	. "cf/commands/space"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -15,8 +15,8 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func defaultDeleteSpaceSpace() cf.Space {
-	space := cf.Space{}
+func defaultDeleteSpaceSpace() models.Space {
+	space := models.Space{}
 	space.Name = "space-to-delete"
 	space.Guid = "space-to-delete-guid"
 	return space
@@ -39,9 +39,9 @@ func deleteSpace(t mr.TestingT, inputs []string, args []string, reqFactory *test
 	})
 	assert.NoError(t, err)
 
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -133,7 +133,7 @@ func init() {
 			reqFactory := defaultDeleteSpaceReqFactory()
 			spaceRepo := &testapi.FakeSpaceRepository{}
 
-			otherSpace := cf.SpaceFields{}
+			otherSpace := models.SpaceFields{}
 			otherSpace.Name = "do-not-delete"
 			otherSpace.Guid = "do-not-delete-guid"
 

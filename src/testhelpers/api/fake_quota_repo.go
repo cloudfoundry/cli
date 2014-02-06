@@ -1,15 +1,15 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 )
 
 type FakeQuotaRepository struct {
-	FindAllQuotas []cf.QuotaFields
+	FindAllQuotas []models.QuotaFields
 
 	FindByNameName     string
-	FindByNameQuota    cf.QuotaFields
+	FindByNameQuota    models.QuotaFields
 	FindByNameNotFound bool
 	FindByNameErr      bool
 
@@ -17,13 +17,13 @@ type FakeQuotaRepository struct {
 	UpdateQuotaGuid string
 }
 
-func (repo *FakeQuotaRepository) FindAll() (quotas []cf.QuotaFields, apiResponse net.ApiResponse) {
+func (repo *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
 	quotas = repo.FindAllQuotas
 
 	return
 }
 
-func (repo *FakeQuotaRepository) FindByName(name string) (quota cf.QuotaFields, apiResponse net.ApiResponse) {
+func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	quota = repo.FindByNameQuota
 

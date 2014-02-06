@@ -1,9 +1,9 @@
 package serviceauthtoken
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -39,7 +39,7 @@ func (cmd CreateServiceAuthTokenFields) GetRequirements(reqFactory requirements.
 func (cmd CreateServiceAuthTokenFields) Run(c *cli.Context) {
 	cmd.ui.Say("Creating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
-	serviceAuthTokenRepo := cf.ServiceAuthTokenFields{
+	serviceAuthTokenRepo := models.ServiceAuthTokenFields{
 		Label:    c.Args()[0],
 		Provider: c.Args()[1],
 		Token:    c.Args()[2],

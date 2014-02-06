@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -96,7 +96,7 @@ var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		Body:   createApplicationResponse},
 })
 
-func defaultAppParams() cf.AppParams {
+func defaultAppParams() models.AppParams {
 	name := "my-cool-app"
 	buildpackUrl := "buildpack-url"
 	spaceGuid := "some-space-guid"
@@ -105,7 +105,7 @@ func defaultAppParams() cf.AppParams {
 	memory := uint64(2048)
 	instanceCount := 3
 
-	return cf.AppParams{
+	return models.AppParams{
 		Name:          &name,
 		BuildpackUrl:  &buildpackUrl,
 		SpaceGuid:     &spaceGuid,
@@ -137,7 +137,7 @@ var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 
 func createAppRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
@@ -194,7 +194,7 @@ func init() {
 			defer ts.Close()
 
 			envParams := map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
-			params := cf.AppParams{EnvironmentVars: &envParams}
+			params := models.AppParams{EnvironmentVars: &envParams}
 
 			_, apiResponse := repo.Update("app1-guid", params)
 
@@ -212,7 +212,7 @@ func init() {
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-cool-app"
 			app.Guid = "my-cool-app-guid"
 			assert.Equal(mr.T(), createdApp, app)
@@ -243,7 +243,7 @@ func init() {
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{updateApplicationRequest})
 			defer ts.Close()
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Guid = "my-app-guid"
 			app.Name = "my-cool-app"
 			app.BuildpackUrl = "buildpack-url"
@@ -274,7 +274,7 @@ func init() {
 			defer ts.Close()
 
 			emptyString := ""
-			app := cf.AppParams{Command: &emptyString}
+			app := models.AppParams{Command: &emptyString}
 
 			_, apiResponse := repo.Update("my-app-guid", app)
 			assert.True(mr.T(), handler.AllRequestsCalled())

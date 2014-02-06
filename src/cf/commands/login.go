@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -140,7 +140,7 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 	if orgName == "" {
 		// If the user is changing, clear out the org
 		if userChanged {
-			cmd.config.SetOrganizationFields(cf.OrganizationFields{})
+			cmd.config.SetOrganizationFields(models.OrganizationFields{})
 		}
 
 		// Reuse org in config
@@ -153,7 +153,7 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 
 		orgsChan, statusChan := cmd.orgRepo.ListOrgs(stopChan)
 
-		availableOrgs := []cf.Organization{}
+		availableOrgs := []models.Organization{}
 
 		for orgs := range orgsChan {
 			availableOrgs = append(availableOrgs, orgs...)
@@ -182,7 +182,7 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 		return
 	}
 
-	var org cf.Organization
+	var org models.Organization
 	var apiResponse net.ApiResponse
 	org, apiResponse = cmd.orgRepo.FindByName(orgName)
 	if apiResponse.IsNotSuccessful() {
@@ -194,7 +194,7 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 	return cmd.targetOrganization(org)
 }
 
-func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
+func (cmd Login) promptForOrgName(orgs []models.Organization) string {
 	orgNames := []string{}
 	for _, org := range orgs {
 		orgNames = append(orgNames, org.Name)
@@ -203,7 +203,7 @@ func (cmd Login) promptForOrgName(orgs []cf.Organization) string {
 	return cmd.promptForName(orgNames, "Select an org (or press enter to skip):", "Org")
 }
 
-func (cmd Login) targetOrganization(org cf.Organization) (err error) {
+func (cmd Login) targetOrganization(org models.Organization) (err error) {
 	cmd.config.SetOrganizationFields(org.OrganizationFields)
 	cmd.ui.Say("Targeted org %s\n", terminal.EntityNameColor(org.Name))
 	return
@@ -215,7 +215,7 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 	if spaceName == "" {
 		// If user is changing, clear the space
 		if userChanged {
-			cmd.config.SetSpaceFields(cf.SpaceFields{})
+			cmd.config.SetSpaceFields(models.SpaceFields{})
 		}
 		// Reuse space in config
 		if cmd.config.HasSpace() && !userChanged {
@@ -227,7 +227,7 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 
 		spacesChan, statusChan := cmd.spaceRepo.ListSpaces(stopChan)
 
-		var availableSpaces []cf.Space
+		var availableSpaces []models.Space
 
 		for spaces := range spacesChan {
 			availableSpaces = append(availableSpaces, spaces...)
@@ -258,7 +258,7 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 		return
 	}
 
-	var space cf.Space
+	var space models.Space
 	var apiResponse net.ApiResponse
 	space, apiResponse = cmd.spaceRepo.FindByName(spaceName)
 	if apiResponse.IsNotSuccessful() {
@@ -271,7 +271,7 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 	return
 }
 
-func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
+func (cmd Login) promptForSpaceName(spaces []models.Space) string {
 	spaceNames := []string{}
 	for _, space := range spaces {
 		spaceNames = append(spaceNames, space.Name)
@@ -280,7 +280,7 @@ func (cmd Login) promptForSpaceName(spaces []cf.Space) string {
 	return cmd.promptForName(spaceNames, "Select a space (or press enter to skip):", "Space")
 }
 
-func (cmd Login) targetSpace(space cf.Space) (err error) {
+func (cmd Login) targetSpace(space models.Space) (err error) {
 	cmd.config.SetSpaceFields(space.SpaceFields)
 	cmd.ui.Say("Targeted space %s\n", terminal.EntityNameColor(space.Name))
 	return

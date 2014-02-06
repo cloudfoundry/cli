@@ -1,8 +1,8 @@
 package manifest
 
 import (
-	"cf"
 	"cf/formatters"
+	"cf/models"
 	"errors"
 	"fmt"
 	"generic"
@@ -12,7 +12,7 @@ import (
 )
 
 type Manifest struct {
-	Applications []cf.AppParams
+	Applications []models.AppParams
 }
 
 func NewEmptyManifest() (m *Manifest) {
@@ -61,7 +61,7 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 	return
 }
 
-func mapToAppSet(basePath string, data generic.Map) (appSet []cf.AppParams, errs ManifestErrors) {
+func mapToAppSet(basePath string, data generic.Map) (appSet []models.AppParams, errs ManifestErrors) {
 	if data.Has("applications") {
 		appMaps, ok := data.Get("applications").([]interface{})
 		if !ok {
@@ -93,8 +93,8 @@ func mapToAppSet(basePath string, data generic.Map) (appSet []cf.AppParams, errs
 	return
 }
 
-func mapToAppParams(basePath string, yamlMap generic.Map) (appParams cf.AppParams, errs ManifestErrors) {
-	appParams = cf.NewEmptyAppParams()
+func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppParams, errs ManifestErrors) {
+	appParams = models.NewEmptyAppParams()
 
 	errs = checkForNulls(yamlMap)
 	if !errs.Empty() {

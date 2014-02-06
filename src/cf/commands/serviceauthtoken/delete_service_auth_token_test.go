@@ -1,9 +1,9 @@
 package serviceauthtoken_test
 
 import (
-	"cf"
 	. "cf/commands/serviceauthtoken"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -25,9 +25,9 @@ func callDeleteServiceAuthToken(t mr.TestingT, args []string, inputs []string, r
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -72,7 +72,7 @@ func init() {
 		})
 		It("TestDeleteServiceAuthToken", func() {
 
-			expectedToken := cf.ServiceAuthTokenFields{}
+			expectedToken := models.ServiceAuthTokenFields{}
 			expectedToken.Label = "a label"
 			expectedToken.Provider = "a provider"
 
@@ -104,11 +104,11 @@ func init() {
 				{"Are you sure you want to delete", "a label", "a provider"},
 			})
 			assert.Equal(mr.T(), len(ui.Outputs), 0)
-			assert.Equal(mr.T(), authTokenRepo.DeletedServiceAuthTokenFields, cf.ServiceAuthTokenFields{})
+			assert.Equal(mr.T(), authTokenRepo.DeletedServiceAuthTokenFields, models.ServiceAuthTokenFields{})
 		})
 		It("TestDeleteServiceAuthTokenWithY", func() {
 
-			expectedToken := cf.ServiceAuthTokenFields{}
+			expectedToken := models.ServiceAuthTokenFields{}
 			expectedToken.Label = "a label"
 			expectedToken.Provider = "a provider"
 
@@ -132,7 +132,7 @@ func init() {
 		})
 		It("TestDeleteServiceAuthTokenWithForce", func() {
 
-			expectedToken := cf.ServiceAuthTokenFields{}
+			expectedToken := models.ServiceAuthTokenFields{}
 			expectedToken.Label = "a label"
 			expectedToken.Provider = "a provider"
 

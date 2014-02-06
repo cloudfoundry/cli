@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,10 +15,10 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestOrgReqExecute", func() {
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-org-name"
 			org.Guid = "my-org-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
+			orgRepo := &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
 			ui := new(testterm.FakeUI)
 
 			orgReq := NewOrganizationRequirement("my-org-name", ui, orgRepo)

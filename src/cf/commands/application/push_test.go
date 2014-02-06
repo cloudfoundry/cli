@@ -1,10 +1,10 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/manifest"
+	"cf/models"
 	"cf/net"
 	"errors"
 	"generic"
@@ -37,8 +37,8 @@ func singleAppManifest() *manifest.Manifest {
 	path := "/some/path/from/manifest"
 
 	return &manifest.Manifest{
-		Applications: []cf.AppParams{
-			cf.AppParams{
+		Applications: []models.AppParams{
+			models.AppParams{
 				Name:               &name,
 				Memory:             &memory,
 				InstanceCount:      &instances,
@@ -62,15 +62,15 @@ func manifestWithServicesAndEnv() *manifest.Manifest {
 	name1 := "app1"
 	name2 := "app2"
 	return &manifest.Manifest{
-		Applications: []cf.AppParams{
-			cf.AppParams{
+		Applications: []models.AppParams{
+			models.AppParams{
 				Name:     &name1,
 				Services: &[]string{"app1-service", "global-service"},
 				EnvironmentVars: &map[string]string{
 					"SOMETHING": "definitely-something",
 				},
 			},
-			cf.AppParams{
+			models.AppParams{
 				Name:     &name2,
 				Services: &[]string{"app2-service", "global-service"},
 				EnvironmentVars: &map[string]string{
@@ -103,7 +103,7 @@ func getPushDependencies() (deps pushDependencies) {
 
 	deps.domainRepo = &testapi.FakeDomainRepository{}
 	sharedDomain := maker.NewSharedDomain(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-	deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
+	deps.domainRepo.ListSharedDomainsDomains = []models.Domain{sharedDomain}
 
 	deps.routeRepo = &testapi.FakeRouteRepository{}
 	deps.stackRepo = &testapi.FakeStackRepository{}
@@ -186,18 +186,18 @@ func init() {
 		It("TestPushingAppWithOldV2DomainsEndpoint", func() {
 			deps := getPushDependencies()
 
-			privateDomain := cf.Domain{}
+			privateDomain := models.Domain{}
 			privateDomain.Shared = false
 			privateDomain.Name = "private.cf-app.com"
 			privateDomain.Guid = "private-domain-guid"
 
-			sharedDomain := cf.Domain{}
+			sharedDomain := models.Domain{}
 			sharedDomain.Name = "shared.cf-app.com"
 			sharedDomain.Shared = true
 			sharedDomain.Guid = "shared-domain-guid"
 
 			deps.domainRepo.ListSharedDomainsApiResponse = net.NewNotFoundApiResponse("whoopsie")
-			deps.domainRepo.ListDomainsDomains = []cf.Domain{privateDomain, sharedDomain}
+			deps.domainRepo.ListDomainsDomains = []models.Domain{privateDomain, sharedDomain}
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
@@ -280,7 +280,7 @@ func init() {
 
 			deps := getPushDependencies()
 
-			route := cf.Route{}
+			route := models.Route{}
 			route.Guid = "my-route-guid"
 			route.Host = "my-new-app"
 			route.Domain = deps.domainRepo.ListSharedDomainsDomains[0].DomainFields
@@ -305,10 +305,10 @@ func init() {
 		It("TestPushingAppWithCustomFlags", func() {
 
 			deps := getPushDependencies()
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "bar.cf-app.com"
 			domain.Guid = "bar-domain-guid"
-			stack := cf.Stack{}
+			stack := models.Stack{}
 			stack.Name = "customLinux"
 			stack.Guid = "custom-linux-guid"
 
@@ -382,7 +382,7 @@ func init() {
 
 			deps := getPushDependencies()
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
 			existingApp.Command = "unicorn -c config/unicorn.rb -D"
@@ -423,7 +423,7 @@ func init() {
 
 		It("TestPushingAppWithSingleAppManifest", func() {
 			deps := getPushDependencies()
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "manifest-example.com"
 			domain.Guid = "bar-domain-guid"
 			deps.domainRepo.FindByNameDomain = domain
@@ -710,7 +710,7 @@ func init() {
 		It("TestPushingAppWithNoRoute", func() {
 
 			deps := getPushDependencies()
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "bar.cf-app.com"
 			domain.Guid = "bar-domain-guid"
 
@@ -730,12 +730,12 @@ func init() {
 		It("TestPushingAppWithNoHostname", func() {
 
 			deps := getPushDependencies()
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "bar.cf-app.com"
 			domain.Guid = "bar-domain-guid"
 			domain.Shared = true
 
-			deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{domain}
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
@@ -823,17 +823,17 @@ func init() {
 		It("TestPushingAppWhenItAlreadyExistsAndChangingOptions", func() {
 			deps := getPushDependencies()
 
-			existingRoute := cf.RouteSummary{}
+			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
-			existingApp.Routes = []cf.RouteSummary{existingRoute}
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
 			deps.appRepo.ReadApp = existingApp
 
-			stack := cf.Stack{}
+			stack := models.Stack{}
 			stack.Name = "differentStack"
 			stack.Guid = "differentStack-guid"
 			deps.stackRepo.FindByNameStack = stack
@@ -859,20 +859,20 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "example.com"
 			domain.Guid = "domain-guid"
 
-			existingRoute := cf.RouteSummary{}
+			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
 			existingRoute.Domain = domain
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
-			existingApp.Routes = []cf.RouteSummary{existingRoute}
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
-			foundRoute := cf.Route{}
+			foundRoute := models.Route{}
 			foundRoute.RouteFields = existingRoute.RouteFields
 			foundRoute.Domain = existingRoute.Domain
 
@@ -891,19 +891,19 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "example.com"
 
-			existingRoute := cf.RouteSummary{}
+			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
 			existingRoute.Domain = domain
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
-			existingApp.Routes = []cf.RouteSummary{existingRoute}
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
-			foundDomain := cf.Domain{}
+			foundDomain := models.Domain{}
 			foundDomain.Guid = "domain-guid"
 			foundDomain.Name = "newdomain.com"
 
@@ -931,17 +931,17 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "example.com"
 
-			existingRoute := cf.RouteSummary{}
+			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "foo"
 			existingRoute.Domain = domain
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
-			existingApp.Routes = []cf.RouteSummary{existingRoute}
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
 			deps.appRepo.ReadApp = existingApp
 			deps.appRepo.UpdateAppResult = existingApp
@@ -959,24 +959,24 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "example.com"
 			domain.Guid = "domain-guid"
 			domain.Shared = true
 
-			existingRoute := cf.RouteSummary{}
+			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
 			existingRoute.Domain = domain.DomainFields
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
-			existingApp.Routes = []cf.RouteSummary{existingRoute}
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
 			deps.appRepo.ReadApp = existingApp
 			deps.appRepo.UpdateAppResult = existingApp
 			deps.routeRepo.FindByHostAndDomainNotFound = true
-			deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{domain}
 
 			ui := callPush(mr.T(), []string{"-n", "new-host", "existing-app"}, deps)
 
@@ -994,7 +994,7 @@ func init() {
 		It("TestPushingAppWhenItAlreadyExistsAndNoRouteFlagIsPresent", func() {
 
 			deps := getPushDependencies()
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
 
@@ -1019,24 +1019,24 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "example.com"
 			domain.Guid = "domain-guid"
 			domain.Shared = true
 
-			existingRoute := cf.RouteSummary{}
+			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
 			existingRoute.Domain = domain.DomainFields
 
-			existingApp := cf.Application{}
+			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
 			existingApp.Guid = "existing-app-guid"
-			existingApp.Routes = []cf.RouteSummary{existingRoute}
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
 			deps.appRepo.ReadApp = existingApp
 			deps.appRepo.UpdateAppResult = existingApp
 			deps.routeRepo.FindByHostAndDomainNotFound = true
-			deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{domain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{domain}
 
 			ui := callPush(mr.T(), []string{"--no-hostname", "existing-app"}, deps)
 
@@ -1058,13 +1058,13 @@ func init() {
 
 			deps := getPushDependencies()
 
-			sharedDomain := cf.Domain{}
+			sharedDomain := models.Domain{}
 			sharedDomain.Name = "foo.cf-app.com"
 			sharedDomain.Shared = true
 			sharedDomain.Guid = "foo-domain-guid"
 
 			deps.routeRepo.FindByHostAndDomainErr = true
-			deps.domainRepo.ListSharedDomainsDomains = []cf.Domain{sharedDomain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{sharedDomain}
 			deps.appRepo.ReadApp = maker.NewApp(maker.Overrides{"name": "existing-app", "guid": "existing-app-guid"})
 			deps.appRepo.UpdateAppResult = deps.appRepo.ReadApp
 

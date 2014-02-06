@@ -3,6 +3,7 @@ package buildpack
 import (
 	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -67,7 +68,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	cmd.ui.Ok()
 }
 
-func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
 		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())

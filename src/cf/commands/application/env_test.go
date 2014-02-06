@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -39,7 +39,7 @@ func callEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (
 }
 
 func getEnvDependencies() (reqFactory *testreq.FakeReqFactory) {
-	app := cf.Application{}
+	app := models.Application{}
 	app.Name = "my-app"
 	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 	return

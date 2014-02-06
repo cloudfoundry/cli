@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"net/url"
@@ -19,13 +20,13 @@ type SpaceResource struct {
 	Entity   SpaceEntity
 }
 
-func (resource SpaceResource) ToFields() (fields cf.SpaceFields) {
+func (resource SpaceResource) ToFields() (fields models.SpaceFields) {
 	fields.Guid = resource.Metadata.Guid
 	fields.Name = resource.Entity.Name
 	return
 }
 
-func (resource SpaceResource) ToModel() (space cf.Space) {
+func (resource SpaceResource) ToModel() (space models.Space) {
 	space.SpaceFields = resource.ToFields()
 	for _, app := range resource.Entity.Applications {
 		space.Applications = append(space.Applications, app.ToFields())
@@ -52,10 +53,10 @@ type SpaceEntity struct {
 }
 
 type SpaceRepository interface {
-	ListSpaces(stop chan bool) (spacesChan chan []cf.Space, statusChan chan net.ApiResponse)
-	FindByName(name string) (space cf.Space, apiResponse net.ApiResponse)
-	FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse)
-	Create(name string, orgGuid string) (space cf.Space, apiResponse net.ApiResponse)
+	ListSpaces(stop chan bool) (spacesChan chan []models.Space, statusChan chan net.ApiResponse)
+	FindByName(name string) (space models.Space, apiResponse net.ApiResponse)
+	FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse)
+	Create(name string, orgGuid string) (space models.Space, apiResponse net.ApiResponse)
 	Rename(spaceGuid, newName string) (apiResponse net.ApiResponse)
 	Delete(spaceGuid string) (apiResponse net.ApiResponse)
 }
@@ -71,8 +72,8 @@ func NewCloudControllerSpaceRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []cf.Space, statusChan chan net.ApiResponse) {
-	spacesChan = make(chan []cf.Space, 4)
+func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []models.Space, statusChan chan net.ApiResponse) {
+	spacesChan = make(chan []models.Space, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
@@ -85,7 +86,7 @@ func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesCha
 				break loop
 			default:
 				var (
-					spaces      []cf.Space
+					spaces      []models.Space
 					apiResponse net.ApiResponse
 				)
 				spaces, path, apiResponse = repo.findNextWithPath(path)
@@ -109,11 +110,11 @@ func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesCha
 	return
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space cf.Space, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiResponse net.ApiResponse) {
 	return repo.FindByNameInOrg(name, repo.config.OrganizationFields.Guid)
 }
 
-func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name)))
 
 	spaces, _, apiResponse := repo.findNextWithPath(path)
@@ -130,7 +131,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces []cf.Space, nextUrl string, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces []models.Space, nextUrl string, apiResponse net.ApiResponse) {
 	resources := new(PaginatedSpaceResources)
 	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, resources)
 	if apiResponse.IsNotSuccessful() {
@@ -145,7 +146,7 @@ func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space cf.Space, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.Target)
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(SpaceResource)

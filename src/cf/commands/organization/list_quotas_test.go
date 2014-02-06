@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"cf"
 	"cf/commands/organization"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,10 +24,10 @@ func callListQuotas(t mr.TestingT, reqFactory *testreq.FakeReqFactory, quotaRepo
 	})
 	assert.NoError(t, err)
 
-	spaceFields := cf.SpaceFields{}
+	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
-	orgFields := cf.OrganizationFields{}
+	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -55,11 +55,11 @@ func init() {
 		})
 		It("TestListQuotas", func() {
 
-			quota := cf.QuotaFields{}
+			quota := models.QuotaFields{}
 			quota.Name = "quota-name"
 			quota.MemoryLimit = 1024
 
-			quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []cf.QuotaFields{quota}}
+			quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []models.QuotaFields{quota}}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 			ui := callListQuotas(mr.T(), reqFactory, quotaRepo)
 

@@ -1,9 +1,9 @@
 package domain_test
 
 import (
-	"cf"
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -25,10 +25,10 @@ func callListDomains(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 	})
 	assert.NoError(t, err)
 
-	spaceFields := cf.SpaceFields{}
+	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
-	orgFields := cf.OrganizationFields{}
+	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -68,26 +68,26 @@ func init() {
 		})
 		It("TestListDomains", func() {
 
-			orgFields := cf.OrganizationFields{}
+			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 			orgFields.Guid = "my-org-guid"
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-			domain1 := cf.Domain{}
+			domain1 := models.Domain{}
 			domain1.Shared = true
 			domain1.Name = "Domain1"
 
-			domain2 := cf.Domain{}
+			domain2 := models.Domain{}
 			domain2.Shared = false
 			domain2.Name = "Domain2"
 
-			domain3 := cf.Domain{}
+			domain3 := models.Domain{}
 			domain3.Shared = false
 			domain3.Name = "Domain3"
 
 			domainRepo := &testapi.FakeDomainRepository{
-				ListSharedDomainsDomains: []cf.Domain{domain1},
-				ListDomainsForOrgDomains: []cf.Domain{domain2, domain3},
+				ListSharedDomainsDomains: []models.Domain{domain1},
+				ListDomainsForOrgDomains: []models.Domain{domain2, domain3},
 			}
 
 			ui := callListDomains(mr.T(), []string{}, reqFactory, domainRepo)
@@ -104,7 +104,7 @@ func init() {
 		})
 		It("TestListDomainsWhenThereAreNone", func() {
 
-			orgFields := cf.OrganizationFields{}
+			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 			orgFields.Guid = "my-org-guid"
 
@@ -120,7 +120,7 @@ func init() {
 		})
 		It("TestListDomainsSharedDomainsFails", func() {
 
-			orgFields := cf.OrganizationFields{}
+			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 			orgFields.Guid = "my-org-guid"
 
@@ -140,18 +140,18 @@ func init() {
 		})
 		It("TestListDomainsSharedDomainsTriesOldEndpointOn404", func() {
 
-			orgFields := cf.OrganizationFields{}
+			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 			orgFields.Guid = "my-org-guid"
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "ze-domain"
 
 			domainRepo := &testapi.FakeDomainRepository{
 				ListSharedDomainsApiResponse: net.NewNotFoundApiResponse("whoops! misplaced yr domainz"),
-				ListDomainsForOrgDomains:     []cf.Domain{domain},
+				ListDomainsForOrgDomains:     []models.Domain{domain},
 			}
 			ui := callListDomains(mr.T(), []string{}, reqFactory, domainRepo)
 
@@ -162,7 +162,7 @@ func init() {
 		})
 		It("TestListDomainsOrgDomainsFails", func() {
 
-			orgFields := cf.OrganizationFields{}
+			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 			orgFields.Guid = "my-org-guid"
 

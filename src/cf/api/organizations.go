@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"net/url"
@@ -26,7 +27,7 @@ type PaginatedOrganizationResources struct {
 	NextUrl   string `json:"next_url"`
 }
 
-func (resource OrganizationResource) ToFields() (fields cf.OrganizationFields) {
+func (resource OrganizationResource) ToFields() (fields models.OrganizationFields) {
 	fields.Name = resource.Entity.Name
 	fields.Guid = resource.Metadata.Guid
 
@@ -34,16 +35,16 @@ func (resource OrganizationResource) ToFields() (fields cf.OrganizationFields) {
 	return
 }
 
-func (resource OrganizationResource) ToModel() (org cf.Organization) {
+func (resource OrganizationResource) ToModel() (org models.Organization) {
 	org.OrganizationFields = resource.ToFields()
 
-	spaces := []cf.SpaceFields{}
+	spaces := []models.SpaceFields{}
 	for _, s := range resource.Entity.Spaces {
 		spaces = append(spaces, s.ToFields())
 	}
 	org.Spaces = spaces
 
-	domains := []cf.DomainFields{}
+	domains := []models.DomainFields{}
 	for _, d := range resource.Entity.Domains {
 		domains = append(domains, d.ToFields())
 	}
@@ -53,8 +54,8 @@ func (resource OrganizationResource) ToModel() (org cf.Organization) {
 }
 
 type OrganizationRepository interface {
-	ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse)
-	FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse)
+	ListOrgs(stop chan bool) (orgsChan chan []models.Organization, statusChan chan net.ApiResponse)
+	FindByName(name string) (org models.Organization, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(orgGuid string, name string) (apiResponse net.ApiResponse)
 	Delete(orgGuid string) (apiResponse net.ApiResponse)
@@ -71,8 +72,8 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse) {
-	orgsChan = make(chan []cf.Organization, 4)
+func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgsChan chan []models.Organization, statusChan chan net.ApiResponse) {
+	orgsChan = make(chan []models.Organization, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
@@ -85,7 +86,7 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgs
 				break loop
 			default:
 				var (
-					organizations []cf.Organization
+					organizations []models.Organization
 					apiResponse   net.ApiResponse
 				)
 				organizations, path, apiResponse = repo.findNextWithPath(path)
@@ -109,7 +110,7 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgs
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) (orgs []cf.Organization, nextUrl string, apiResponse net.ApiResponse) {
+func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) (orgs []models.Organization, nextUrl string, apiResponse net.ApiResponse) {
 	orgResources := new(PaginatedOrganizationResources)
 
 	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, orgResources)
@@ -125,7 +126,7 @@ func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) 
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name)))
 
 	orgs, _, apiResponse := repo.findNextWithPath(path)

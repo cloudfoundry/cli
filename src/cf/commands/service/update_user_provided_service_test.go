@@ -1,10 +1,10 @@
 package service_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,9 +24,9 @@ func callUpdateUserProvidedService(t mr.TestingT, args []string, reqFactory *tes
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -69,7 +69,7 @@ func init() {
 		It("TestUpdateUserProvidedServiceWhenNoFlagsArePresent", func() {
 
 			args := []string{"service-name"}
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "found-service-name"
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:    true,
@@ -87,7 +87,7 @@ func init() {
 		It("TestUpdateUserProvidedServiceWithJson", func() {
 
 			args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "found-service-name"
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:    true,
@@ -108,7 +108,7 @@ func init() {
 		It("TestUpdateUserProvidedServiceWithoutJson", func() {
 
 			args := []string{"-l", "syslog://example.com", "service-name"}
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "found-service-name"
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:    true,
@@ -125,7 +125,7 @@ func init() {
 		It("TestUpdateUserProvidedServiceWithInvalidJson", func() {
 
 			args := []string{"-p", `{"foo":"ba`, "service-name"}
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "found-service-name"
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:    true,
@@ -145,9 +145,9 @@ func init() {
 		It("TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided", func() {
 
 			args := []string{"-p", `{"foo":"bar"}`, "service-name"}
-			plan := cf.ServicePlanFields{}
+			plan := models.ServicePlanFields{}
 			plan.Guid = "my-plan-guid"
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "found-service-name"
 			serviceInstance.ServicePlan = plan
 
