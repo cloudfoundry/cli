@@ -5,9 +5,9 @@ import (
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	"github.com/stretchr/testify/assert"
-
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"time"
 )
@@ -39,7 +39,7 @@ func getMsgString(message *logmessage.Message) string {
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestPriorityQueue", func() {
-			pq := NewSortedMessageQueue(10 * time.Millisecond)
+			pq := NewSortedMessageQueue(10*time.Millisecond, time.Now)
 
 			msg3 := logMessageWithTime(mr.T(), "message 3", int64(130))
 			pq.PushMessage(msg3)
@@ -56,43 +56,41 @@ func init() {
 			assert.Equal(mr.T(), getMsgString(pq.PopMessage()), getMsgString(msg4))
 		})
 		It("TestPopOnEmptyQueue", func() {
-
-			pq := NewSortedMessageQueue(10 * time.Millisecond)
+			pq := NewSortedMessageQueue(10*time.Millisecond, time.Now)
 
 			var msg *logmessage.Message
 			msg = nil
 			assert.Equal(mr.T(), pq.PopMessage(), msg)
 		})
-		It("TestNextTimestamp", func() {
 
-			pq := NewSortedMessageQueue(5 * time.Second)
+		FIt("TestNextTimestamp", func() {
+			currentTime := time.Unix(5, 0)
+			clock := func() time.Time {
+				return currentTime
+			}
 
+			pq := NewSortedMessageQueue(5*time.Second, clock)
 			assert.Equal(mr.T(), pq.NextTimestamp(), MAX_INT64)
 
 			msg2 := logMessageWithTime(mr.T(), "message 2", int64(130))
 			pq.PushMessage(msg2)
-			timeNowWhenInsertingMessage1 := time.Now()
 
-			time.Sleep(50 * time.Millisecond)
-
+			currentTime = time.Unix(6, 0)
 			msg1 := logMessageWithTime(mr.T(), "message 1", int64(100))
 			pq.PushMessage(msg1)
+			Expect(pq.NextTimestamp()).To(Equal(time.Unix(11, 0).UnixNano()))
 
-			allowedDelta := (20 * time.Microsecond).Nanoseconds()
+			readMessage := pq.PopMessage().GetLogMessage()
+			Expect(readMessage.GetTimestamp()).To(Equal(int64(100)))
+			Expect(pq.NextTimestamp()).To(Equal(time.Unix(10, 0).UnixNano()))
 
-			timeWhenOutputtable := time.Now().Add(5 * time.Second).UnixNano()
-			assert.True(mr.T(), pq.NextTimestamp()-timeWhenOutputtable < allowedDelta)
-			assert.True(mr.T(), pq.NextTimestamp()-timeWhenOutputtable > -allowedDelta)
-
-			pq.PopMessage()
-
-			timeWhenOutputtable = timeNowWhenInsertingMessage1.Add(5 * time.Second).UnixNano()
-			assert.True(mr.T(), pq.NextTimestamp()-timeWhenOutputtable < allowedDelta)
-			assert.True(mr.T(), pq.NextTimestamp()-timeWhenOutputtable > -allowedDelta)
+			readMessage = pq.PopMessage().GetLogMessage()
+			Expect(readMessage.GetTimestamp()).To(Equal(int64(130)))
+			assert.Equal(mr.T(), pq.NextTimestamp(), MAX_INT64)
 		})
-		It("TestStableSort", func() {
 
-			pq := NewSortedMessageQueue(10 * time.Millisecond)
+		It("TestStableSort", func() {
+			pq := NewSortedMessageQueue(10*time.Millisecond, time.Now)
 
 			msg1 := logMessageWithTime(mr.T(), "message first", int64(109))
 			pq.PushMessage(msg1)
