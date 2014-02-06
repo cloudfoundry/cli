@@ -61,7 +61,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := models.NewEmptyAppParams()
+	params := models.AppParams{}
 	shouldRestart := false
 
 	if c.String("m") != "" {

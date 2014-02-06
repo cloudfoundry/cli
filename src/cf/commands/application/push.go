@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -32,7 +33,7 @@ type Push struct {
 	serviceRepo    api.ServiceRepository
 	stackRepo      api.StackRepository
 	appBitsRepo    api.ApplicationBitsRepository
-	globalServices models.ServiceInstanceSet
+	globalServices []models.ServiceInstance
 }
 
 func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository,
@@ -388,7 +389,7 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppParams) {
 	m := cmd.instantiateManifest(c)
 
-	appParams, err := models.NewAppParamsFromContext(c)
+	appParams, err := newAppParamsFromContext(c)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
@@ -489,5 +490,73 @@ func findAppWithNameInManifest(name string, m *manifest.Manifest) (app models.Ap
 	}
 
 	err = errors.New("Could not find named app in manifest")
+	return
+}
+
+func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err error) {
+	if len(c.Args()) > 0 {
+		appParams.Name = &c.Args()[0]
+	}
+
+	if c.String("b") != "" {
+		buildpack := c.String("b")
+		appParams.BuildpackUrl = &buildpack
+	}
+
+	if c.String("m") != "" {
+		var memory uint64
+		memory, err = formatters.ToMegabytes(c.String("m"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid memory param: %s\n%s", c.String("m"), err))
+			return
+		}
+		appParams.Memory = &memory
+	}
+
+	if c.String("c") != "" {
+		command := c.String("c")
+		appParams.Command = &command
+	}
+
+	if c.String("c") == "null" {
+		emptyStr := ""
+		appParams.Command = &emptyStr
+	}
+
+	if c.String("i") != "" {
+		var instances int
+		instances, err = strconv.Atoi(c.String("i"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid instances param: %s\n%s", c.String("i"), err))
+			return
+		}
+		appParams.InstanceCount = &instances
+	}
+
+	if c.String("s") != "" {
+		stackName := c.String("s")
+		appParams.StackName = &stackName
+	}
+
+	if c.String("t") != "" {
+		var timeout int
+		timeout, err = strconv.Atoi(c.String("t"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Invalid timeout param: %s\n%s", c.String("t"), err))
+			return
+		}
+
+		appParams.HealthCheckTimeout = &timeout
+	}
+
+	if c.String("p") != "" {
+		var path string
+		path, err = filepath.Abs(c.String("p"))
+		if err != nil {
+			err = errors.New(fmt.Sprintf("Error finding app path: %s", err))
+			return
+		}
+		appParams.Path = &path
+	}
 	return
 }
