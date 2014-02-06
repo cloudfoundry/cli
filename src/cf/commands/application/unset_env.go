@@ -7,7 +7,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
-	"generic"
 	"github.com/codegangsta/cli"
 )
 
@@ -54,19 +53,18 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	appParams := app.ToParams()
-	envParams := appParams.Get("env").(generic.Map)
+	envParams := app.EnvironmentVars
 
-	if !envParams.Has(varName) {
+	if _, ok := envParams[varName]; !ok {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Env variable %s was not set.", varName)
 		return
 	}
 
-	envParams.Delete(varName)
+	delete(envParams, varName)
 
 	updateParams := cf.NewEmptyAppParams()
-	updateParams.Set("env", envParams)
+	updateParams.EnvironmentVars = &envParams
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)
 

@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
-	"generic"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -79,10 +78,11 @@ func init() {
 
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
-
-			envParams := appRepo.UpdateParams.Get("env").(generic.Map)
-			assert.Equal(mr.T(), envParams.Get("foo").(string), "bar")
+			assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+				"foo": "bar",
+			})
 		})
+
 		It("TestUnsetEnvWhenUnsettingTheEnvFails", func() {
 
 			app := cf.Application{}

@@ -4,9 +4,9 @@ import (
 	"cf/formatters"
 	"errors"
 	"fmt"
-	"generic"
 	"github.com/codegangsta/cli"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -74,19 +74,20 @@ type Application struct {
 }
 
 func (model Application) ToParams() (params AppParams) {
-	params = NewAppParams(generic.NewMap(map[interface{}]interface{}{
-		"guid":       model.Guid,
-		"name":       model.Name,
-		"buildpack":  model.BuildpackUrl,
-		"command":    model.Command,
-		"disk_quota": model.DiskQuota,
-		"instances":  model.InstanceCount,
-		"memory":     model.Memory,
-		"state":      strings.ToUpper(model.State),
-		"stack_guid": model.Stack.Guid,
-		"space_guid": model.SpaceGuid,
-		"env":        generic.NewMap(model.EnvironmentVars),
-	}))
+	state := strings.ToUpper(model.State)
+	params = AppParams{
+		Guid:            &model.Guid,
+		Name:            &model.Name,
+		BuildpackUrl:    &model.BuildpackUrl,
+		Command:         &model.Command,
+		DiskQuota:       &model.DiskQuota,
+		InstanceCount:   &model.InstanceCount,
+		Memory:          &model.Memory,
+		State:           &state,
+		StackGuid:       &model.Stack.Guid,
+		SpaceGuid:       &model.SpaceGuid,
+		EnvironmentVars: &model.EnvironmentVars,
+	}
 
 	return
 }
@@ -96,25 +97,102 @@ type AppSummary struct {
 	RouteSummaries []RouteSummary
 }
 
-type AppParams generic.Map
-
-func NewEmptyAppParams() AppParams {
-	return generic.NewMap()
+type AppParams struct {
+	BuildpackUrl       *string
+	Command            *string
+	DiskQuota          *uint64
+	Domain             *string
+	EnvironmentVars    *map[string]string
+	Guid               *string
+	HealthCheckTimeout *int
+	Host               *string
+	InstanceCount      *int
+	Memory             *uint64
+	Name               *string
+	NoRoute            *bool
+	Path               *string
+	RunningInstances   *int
+	Services           *[]string
+	SpaceGuid          *string
+	StackGuid          *string
+	StackName          *string
+	State              *string
 }
 
-func NewAppParams(data generic.Map) AppParams {
-	return data
+func (app *AppParams) Merge(other *AppParams) {
+	if other.BuildpackUrl != nil {
+		app.BuildpackUrl = other.BuildpackUrl
+	}
+	if other.Command != nil {
+		app.Command = other.Command
+	}
+	if other.DiskQuota != nil {
+		app.DiskQuota = other.DiskQuota
+	}
+	if other.Domain != nil {
+		app.Domain = other.Domain
+	}
+	if other.EnvironmentVars != nil {
+		app.EnvironmentVars = other.EnvironmentVars
+	}
+	if other.Guid != nil {
+		app.Guid = other.Guid
+	}
+	if other.HealthCheckTimeout != nil {
+		app.HealthCheckTimeout = other.HealthCheckTimeout
+	}
+	if other.Host != nil {
+		app.Host = other.Host
+	}
+	if other.InstanceCount != nil {
+		app.InstanceCount = other.InstanceCount
+	}
+	if other.Memory != nil {
+		app.Memory = other.Memory
+	}
+	if other.Name != nil {
+		app.Name = other.Name
+	}
+	if other.NoRoute != nil {
+		app.NoRoute = other.NoRoute
+	}
+	if other.Path != nil {
+		app.Path = other.Path
+	}
+	if other.RunningInstances != nil {
+		app.RunningInstances = other.RunningInstances
+	}
+	if other.Services != nil {
+		app.Services = other.Services
+	}
+	if other.SpaceGuid != nil {
+		app.SpaceGuid = other.SpaceGuid
+	}
+	if other.StackGuid != nil {
+		app.StackGuid = other.StackGuid
+	}
+	if other.StackName != nil {
+		app.StackName = other.StackName
+	}
+	if other.State != nil {
+		app.State = other.State
+	}
+}
+
+func NewEmptyAppParams() AppParams {
+	return AppParams{}
 }
 
 func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
-	appParams = NewEmptyAppParams()
+	appParams = AppParams{}
 
 	if len(c.Args()) > 0 {
-		appParams.Set("name", c.Args()[0])
+		appParams.Name = &c.Args()[0]
 	}
 
 	if c.String("b") != "" {
-		appParams.Set("buildpack", c.String("b"))
+		buildpack := c.String("b")
+		appParams.BuildpackUrl = &buildpack
 	}
 
 	if c.String("m") != "" {
@@ -124,15 +202,17 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 			err = errors.New(fmt.Sprintf("Invalid memory param: %s\n%s", c.String("m"), err))
 			return
 		}
-		appParams.Set("memory", memory)
+		appParams.Memory = &memory
 	}
 
 	if c.String("c") != "" {
-		appParams.Set("command", c.String("c"))
+		command := c.String("c")
+		appParams.Command = &command
 	}
 
 	if c.String("c") == "null" {
-		appParams.Set("command", "")
+		emptyStr := ""
+		appParams.Command = &emptyStr
 	}
 
 	if c.String("i") != "" {
@@ -142,11 +222,12 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 			err = errors.New(fmt.Sprintf("Invalid instances param: %s\n%s", c.String("i"), err))
 			return
 		}
-		appParams.Set("instances", instances)
+		appParams.InstanceCount = &instances
 	}
 
 	if c.String("s") != "" {
-		appParams.Set("stack", c.String("s"))
+		stackName := c.String("s")
+		appParams.StackName = &stackName
 	}
 
 	if c.String("t") != "" {
@@ -157,7 +238,7 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 			return
 		}
 
-		appParams.Set("health_check_timeout", timeout)
+		appParams.HealthCheckTimeout = &timeout
 	}
 
 	if c.String("p") != "" {
@@ -167,9 +248,13 @@ func NewAppParamsFromContext(c *cli.Context) (appParams AppParams, err error) {
 			err = errors.New(fmt.Sprintf("Error finding app path: %s", err))
 			return
 		}
-		appParams.Set("path", path)
+		appParams.Path = &path
 	}
 	return
+}
+
+func (app *AppParams) Equals(otherParams *AppParams) bool {
+	return reflect.DeepEqual(*app, *otherParams)
 }
 
 type AppSet []AppParams

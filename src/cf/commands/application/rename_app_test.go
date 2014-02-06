@@ -68,7 +68,7 @@ func init() {
 			ui := callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-			assert.Equal(mr.T(), appRepo.UpdateParams.Get("name"), "my-new-app")
+			assert.Equal(mr.T(), *appRepo.UpdateParams.Name, "my-new-app")
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
 				{"OK"},

@@ -5,7 +5,6 @@ import (
 	. "cf/api"
 	"cf/configuration"
 	"cf/net"
-	"generic"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -97,16 +96,24 @@ var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		Body:   createApplicationResponse},
 })
 
-func defaultAppParams() (params cf.AppParams) {
-	params = cf.NewEmptyAppParams()
-	params.Set("name", "my-cool-app")
-	params.Set("buildpack", "buildpack-url")
-	params.Set("space_guid", "some-space-guid")
-	params.Set("stack_guid", "some-stack-guid")
-	params.Set("command", "some-command")
-	params.Set("memory", uint64(2048))
-	params.Set("instances", 3)
-	return
+func defaultAppParams() cf.AppParams {
+	name := "my-cool-app"
+	buildpackUrl := "buildpack-url"
+	spaceGuid := "some-space-guid"
+	stackGuid := "some-stack-guid"
+	command := "some-command"
+	memory := uint64(2048)
+	instanceCount := 3
+
+	return cf.AppParams{
+		Name:          &name,
+		BuildpackUrl:  &buildpackUrl,
+		SpaceGuid:     &spaceGuid,
+		StackGuid:     &stackGuid,
+		Command:       &command,
+		Memory:        &memory,
+		InstanceCount: &instanceCount,
+	}
 }
 
 var updateApplicationResponse = `
@@ -160,6 +167,7 @@ func init() {
 			assert.Equal(mr.T(), app.Routes[0].Domain.Name, "cfapps.io")
 			assert.Equal(mr.T(), app.Stack.Name, "awesome-stacks-ahoy")
 		})
+
 		It("TestFindByNameWhenAppIsNotFound", func() {
 
 			request := testapi.NewCloudControllerTestRequest(findAppRequest)
@@ -173,8 +181,8 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsError())
 			assert.True(mr.T(), apiResponse.IsNotFound())
 		})
-		It("TestSetEnv", func() {
 
+		It("TestSetEnv", func() {
 			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/apps/app1-guid",
@@ -185,11 +193,8 @@ func init() {
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
 			defer ts.Close()
 
-			envParams := generic.NewMap()
-			envParams.Set("DATABASE_URL", "mysql://example.com/my-db")
-
-			params := cf.NewEmptyAppParams()
-			params.Set("env", envParams)
+			envParams := map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
+			params := cf.AppParams{EnvironmentVars: &envParams}
 
 			_, apiResponse := repo.Update("app1-guid", params)
 
@@ -213,34 +218,21 @@ func init() {
 			assert.Equal(mr.T(), createdApp, app)
 		})
 
-		It("TestCreateApplicationWhitelistsKeys", func() {
-
-			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{createApplicationRequest})
-			defer ts.Close()
-
-			params := defaultAppParams()
-			params.Set("foo", "bar")
-			_, apiResponse := repo.Create(params)
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
 		It("TestCreateApplicationWithoutBuildpackStackOrCommand", func() {
-
 			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/apps",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":1,"memory":128,"space_guid":"some-space-guid"}`),
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"memory":2048,"space_guid":"some-space-guid"}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 			})
 
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
 			defer ts.Close()
 
-			params := cf.NewEmptyAppParams()
-			params.Set("name", "my-cool-app")
-			params.Set("space_guid", "some-space-guid")
-			params.Set("memory", uint64(128))
-			params.Set("instances", 1)
+			params := defaultAppParams()
+			params.BuildpackUrl = nil
+			params.StackGuid = nil
+			params.Command = nil
 
 			_, apiResponse := repo.Create(params)
 			assert.True(mr.T(), handler.AllRequestsCalled())
@@ -271,7 +263,6 @@ func init() {
 		})
 
 		It("TestUpdateApplicationSetCommandToNull", func() {
-
 			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/apps/my-app-guid",
@@ -282,15 +273,15 @@ func init() {
 			ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
 			defer ts.Close()
 
-			app := cf.NewEmptyAppParams()
-			app.Set("command", "")
+			emptyString := ""
+			app := cf.AppParams{Command: &emptyString}
 
 			_, apiResponse := repo.Update("my-app-guid", app)
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		})
-		It("TestDeleteApplication", func() {
 
+		It("TestDeleteApplication", func() {
 			deleteApplicationRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
 				Path:     "/v2/apps/my-cool-app-guid?recursive=true",
