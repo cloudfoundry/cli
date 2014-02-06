@@ -49,9 +49,8 @@ func init() {
 				for _, msg := range messagesSent {
 					conn.Write(msg)
 				}
-				time.Sleep(time.Duration(20) * time.Millisecond)
-				conn.Close()
 			}
+
 			websocketServer := httptest.NewTLSServer(websocket.Handler(websocketEndpoint))
 			defer websocketServer.Close()
 
