@@ -25,13 +25,12 @@ type EventResourceOldV2 struct {
 }
 
 func (resource EventResourceOldV2) ToFields() interface{} {
-	event := models.EventFields{}
-	description := fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus))
-	event.Guid = resource.Metadata.Guid
-	event.Name = "app crashed"
-	event.Timestamp = resource.Entity.Timestamp
-	event.Description = description
-	return event
+	return models.EventFields{
+		Guid:        resource.Metadata.Guid,
+		Name:        "app crashed",
+		Timestamp:   resource.Entity.Timestamp,
+		Description: fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus)),
+	}
 }
 
 type EventResourceNewV2 struct {
@@ -58,18 +57,17 @@ var KNOWN_METADATA_KEYS = []string{
 }
 
 func (resource EventResourceNewV2) ToFields() interface{} {
-	event := models.EventFields{}
-	event.Guid = resource.Metadata.Guid
-	event.Name = resource.Entity.Type
-	event.Timestamp = resource.Entity.Timestamp
-
 	metadata := generic.NewMap(resource.Entity.Metadata)
 	if metadata.Has("request") {
 		metadata = generic.NewMap(metadata.Get("request"))
 	}
-	event.Description = formatDescription(metadata, KNOWN_METADATA_KEYS)
 
-	return event
+	return models.EventFields{
+		Guid:        resource.Metadata.Guid,
+		Name:        resource.Entity.Type,
+		Timestamp:   resource.Entity.Timestamp,
+		Description: formatDescription(metadata, KNOWN_METADATA_KEYS),
+	}
 }
 
 func formatDescription(metadata generic.Map, keys []string) string {
