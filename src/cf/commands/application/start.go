@@ -117,10 +117,8 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := models.NewEmptyAppParams()
 	state := "STARTED"
-	params.State = &state
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

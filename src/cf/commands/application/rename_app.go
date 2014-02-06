@@ -41,18 +41,17 @@ func (cmd *RenameApp) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd *RenameApp) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	new_name := c.Args()[1]
+	newName := c.Args()[1]
 
 	cmd.ui.Say("Renaming app %s to %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(new_name),
+		terminal.EntityNameColor(newName),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := models.NewEmptyAppParams()
-	params.Name = &new_name
+	params := models.AppParams{Name: &newName}
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, params)
 	if apiResponse.IsNotSuccessful() {

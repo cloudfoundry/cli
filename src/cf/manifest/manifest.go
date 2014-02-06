@@ -94,8 +94,6 @@ func mapToAppSet(basePath string, data generic.Map) (appSet []models.AppParams, 
 }
 
 func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppParams, errs ManifestErrors) {
-	appParams = models.NewEmptyAppParams()
-
 	errs = checkForNulls(yamlMap)
 	if !errs.Empty() {
 		return

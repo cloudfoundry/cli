@@ -6,8 +6,8 @@ import (
 )
 
 type FakeAppBinder struct {
-	AppsToBind        models.ApplicationSet
-	InstancesToBindTo models.ServiceInstanceSet
+	AppsToBind        []models.Application
+	InstancesToBindTo []models.ServiceInstance
 }
 
 func (binder *FakeAppBinder) BindApplication(app models.Application, service models.ServiceInstance) (apiResponse net.ApiResponse) {

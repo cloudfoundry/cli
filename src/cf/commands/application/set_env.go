@@ -62,10 +62,7 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue
 
-	updateParams := models.NewEmptyAppParams()
-	updateParams.EnvironmentVars = &envParams
-
-	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)
+	_, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

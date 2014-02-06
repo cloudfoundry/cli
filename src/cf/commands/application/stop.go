@@ -57,11 +57,8 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := models.NewEmptyAppParams()
 	state := "STOPPED"
-	params.State = &state
-
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
+	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
 	if apiResponse.IsNotSuccessful() {
 		err = errors.New(apiResponse.Message)
 		cmd.ui.Failed(apiResponse.Message)
