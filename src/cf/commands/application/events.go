@@ -55,7 +55,7 @@ func (cmd *Events) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"time", "event", "description"})
 	noEvents := true
 
-	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, api.ListEventsCallback(func(events []models.EventFields) (fetchNext bool) {
+	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, func(events []models.EventFields) bool {
 		rows := [][]string{}
 		for _, event := range events {
 			rows = append(rows, []string{
@@ -67,7 +67,7 @@ func (cmd *Events) Run(c *cli.Context) {
 		table.Print(rows)
 		noEvents = false
 		return true
-	}))
+	})
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Failed fetching events.\n%s", apiResponse.Message)
