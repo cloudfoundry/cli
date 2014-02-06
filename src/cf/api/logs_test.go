@@ -63,18 +63,23 @@ func init() {
 			endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(websocketServer.URL, "https", "wss", 1)
 
 			logsRepo := NewLoggregatorLogsRepository(config, endpointRepo)
+
+			connected := false
+			onConnect := func() {
+				connected = true
+			}
+
 			logChan := make(chan *logmessage.Message, 1000)
 
-			go func() {
-				err = logsRepo.RecentLogsFor("my-app-guid", func() {}, logChan)
-				assert.NoError(mr.T(), err)
-				close(logChan)
-			}()
+			err = logsRepo.RecentLogsFor("my-app-guid", onConnect, logChan)
+			close(logChan)
 
 			dumpedMessages := []*logmessage.Message{}
 			for msg := range logChan {
 				dumpedMessages = append(dumpedMessages, msg)
 			}
+
+			assert.NoError(mr.T(), err)
 
 			assert.Equal(mr.T(), len(dumpedMessages), 1)
 			assert.Equal(mr.T(), dumpedMessages[0].GetLogMessage().GetSourceName(), expectedMessage.GetLogMessage().GetSourceName())
