@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	"encoding/json"
 	"fmt"
-	"generic"
 	"net/url"
 	"strings"
 )
@@ -54,63 +53,25 @@ type ApplicationResource struct {
 	Entity ApplicationEntity
 }
 
-func NewApplicationEntityFromAppParams(app cf.AppParams) (entity ApplicationEntity) {
-	if app.Has("buildpack") {
-		buildpack := app.Get("buildpack").(string)
-		entity.Buildpack = &buildpack
+func NewApplicationEntityFromAppParams(app cf.AppParams) ApplicationEntity {
+	entity := ApplicationEntity{
+		Buildpack:          app.BuildpackUrl,
+		Name:               app.Name,
+		SpaceGuid:          app.SpaceGuid,
+		Instances:          app.InstanceCount,
+		Memory:             app.Memory,
+		StackGuid:          app.StackGuid,
+		Command:            app.Command,
+		HealthCheckTimeout: app.HealthCheckTimeout,
 	}
-	if app.Has("name") {
-		name := app.Get("name").(string)
-		entity.Name = &name
-	}
-
-	if app.Has("state") {
-		state := strings.ToUpper(app.Get("state").(string))
+	if app.State != nil {
+		state := strings.ToUpper(*app.State)
 		entity.State = &state
 	}
-
-	if app.Has("space_guid") {
-		spaceGuid := app.Get("space_guid").(string)
-		entity.SpaceGuid = &spaceGuid
+	if app.EnvironmentVars != nil && len(*app.EnvironmentVars) > 0 {
+		entity.EnvironmentJson = app.EnvironmentVars
 	}
-
-	if app.Has("instances") {
-		instances := app.Get("instances").(int)
-		entity.Instances = &instances
-	}
-
-	if app.Has("memory") {
-		memory := app.Get("memory").(uint64)
-		entity.Memory = &memory
-	}
-
-	if app.Has("stack_guid") {
-		stackGuid := app.Get("stack_guid").(string)
-		entity.StackGuid = &stackGuid
-	}
-
-	if app.Has("command") {
-		command := app.Get("command").(string)
-		entity.Command = &command
-	}
-
-	if app.Has("health_check_timeout") {
-		healthCheckTimeout := app.Get("health_check_timeout").(int)
-		entity.HealthCheckTimeout = &healthCheckTimeout
-	}
-
-	if app.Has("env") {
-		envMap := app.Get("env").(generic.Map)
-		if !envMap.IsEmpty() {
-			environmentJson := map[string]string{}
-			generic.Each(envMap, generic.Iterator(func(key, val interface{}) {
-				environmentJson[key.(string)] = val.(string)
-			}))
-			entity.EnvironmentJson = &environmentJson
-		}
-	}
-
-	return
+	return entity
 }
 
 func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {

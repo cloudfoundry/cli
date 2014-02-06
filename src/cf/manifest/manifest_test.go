@@ -21,7 +21,7 @@ func testManifestWithAbsolutePathOnPosix(t mr.TestingT) {
 	}))
 
 	assert.NoError(t, err)
-	assert.Equal(t, m.Applications[0].Get("path"), "/another/path-segment")
+	assert.Equal(t, *m.Applications[0].Path, "/another/path-segment")
 }
 
 func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
@@ -34,8 +34,9 @@ func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
 	}))
 
 	assert.NoError(t, err)
-	assert.Equal(t, m.Applications[0].Get("path"), `C:\another\path`)
+	assert.Equal(t, *m.Applications[0].Path, `C:\another\path`)
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestManifestWithGlobalAndAppSpecificProperties", func() {
@@ -52,9 +53,9 @@ func init() {
 			assert.NoError(mr.T(), err)
 
 			apps := m.Applications
-			assert.Equal(mr.T(), apps[0].Get("instances"), 3)
-			assert.Equal(mr.T(), apps[0].Get("memory").(uint64), uint64(512))
-			assert.True(mr.T(), apps[0].Get("no-route").(bool))
+			assert.Equal(mr.T(), *apps[0].InstanceCount, 3)
+			assert.Equal(mr.T(), *apps[0].Memory, uint64(512))
+			assert.True(mr.T(), *apps[0].NoRoute)
 		})
 
 		It("TestManifestWithInvalidMemory", func() {
@@ -83,15 +84,14 @@ func init() {
 			}))
 
 			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), m.Applications[0].Get("health_check_timeout"), 360)
-			assert.False(mr.T(), m.Applications[0].Has("timeout"))
+			assert.Equal(mr.T(), *m.Applications[0].HealthCheckTimeout, 360)
 		})
 
 		It("TestManifestWithEmptyEnvVarIsInvalid", func() {
 			_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
-				"env": map[string]interface{}{
+				"env": generic.NewMap(map[string]interface{}{
 					"bar": nil,
-				},
+				}),
 				"applications": []interface{}{
 					map[string]interface{}{
 						"name": "bad app",
@@ -122,9 +122,9 @@ func init() {
 
 			assert.NoError(mr.T(), err)
 			if runtime.GOOS == "windows" {
-				assert.Equal(mr.T(), m.Applications[0].Get("path"), "\\some\\another\\path-segment")
+				assert.Equal(mr.T(), *m.Applications[0].Path, "\\some\\another\\path-segment")
 			} else {
-				assert.Equal(mr.T(), m.Applications[0].Get("path"), "/some/another/path-segment")
+				assert.Equal(mr.T(), *m.Applications[0].Path, "/some/another/path-segment")
 			}
 		})
 
@@ -184,7 +184,7 @@ func init() {
 			}))
 
 			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), m.Applications[0].Get("command"), "")
+			assert.Equal(mr.T(), *m.Applications[0].Command, "")
 		})
 
 		It("TestParsingEmptyManifestDoesNotSetCommand", func() {
@@ -195,7 +195,7 @@ func init() {
 			}))
 
 			assert.NoError(mr.T(), err)
-			assert.False(mr.T(), m.Applications[0].Has("command"))
+			assert.Nil(mr.T(), m.Applications[0].Command)
 		})
 	})
 }

@@ -6,3 +6,5 @@ applications:
   host: hello
   domain: cli.cf-app.com
   path: .
+  env:
+    LD_LIBRARY_PATH: /usr/lib/somewhere

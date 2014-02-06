@@ -3,7 +3,6 @@ package api
 import (
 	"cf"
 	"cf/net"
-	"generic"
 )
 
 type FakeApplicationRepository struct {
@@ -56,36 +55,33 @@ func (repo *FakeApplicationRepository) Create(params cf.AppParams) (resultApp cf
 
 	repo.CreateAppParams = append(repo.CreateAppParams, params)
 
-	resultApp.Guid = params.Get("name").(string) + "-guid"
-	resultApp.Name = params.Get("name").(string)
+	resultApp.Guid = *params.Name + "-guid"
+	resultApp.Name = *params.Name
 	resultApp.State = "stopped"
 	resultApp.EnvironmentVars = map[string]string{}
 
-	if params.NotNil("space_guid") {
-		resultApp.SpaceGuid = params.Get("space_guid").(string)
+	if params.SpaceGuid != nil {
+		resultApp.SpaceGuid = *params.SpaceGuid
 	}
-	if params.NotNil("buildpack") {
-		resultApp.BuildpackUrl = params.Get("buildpack").(string)
+	if params.BuildpackUrl != nil {
+		resultApp.BuildpackUrl = *params.BuildpackUrl
 	}
-	if params.NotNil("command") {
-		resultApp.Command = params.Get("command").(string)
+	if params.Command != nil {
+		resultApp.Command = *params.Command
 	}
-	if params.NotNil("disk_quota") {
-		resultApp.DiskQuota = params.Get("disk_quota").(uint64)
+	if params.DiskQuota != nil {
+		resultApp.DiskQuota = *params.DiskQuota
 	}
-	if params.NotNil("instances") {
-		resultApp.InstanceCount = params.Get("instances").(int)
+	if params.InstanceCount != nil {
+		resultApp.InstanceCount = *params.InstanceCount
 	}
-	if params.NotNil("memory") {
-		resultApp.Memory = params.Get("memory").(uint64)
+	if params.Memory != nil {
+		resultApp.Memory = *params.Memory
+	}
+	if params.EnvironmentVars != nil {
+		resultApp.EnvironmentVars = *params.EnvironmentVars
 	}
 
-	if params.NotNil("env") {
-		envVars := params.Get("env").(generic.Map)
-		generic.Each(envVars, func(key, val interface{}) {
-			resultApp.EnvironmentVars[key.(string)] = val.(string)
-		})
-	}
 	return
 }
 

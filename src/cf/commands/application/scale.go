@@ -71,12 +71,13 @@ func (cmd *Scale) Run(c *cli.Context) {
 			cmd.ui.FailWithUsage(c, "scale")
 			return
 		}
-		params.Set("memory", memory)
+		params.Memory = &memory
 		shouldRestart = true
 	}
 
-	if c.Int("i") != -1 {
-		params.Set("instances", c.Int("i"))
+	instances := c.Int("i")
+	if instances != -1 {
+		params.InstanceCount = &instances
 	}
 
 	updatedApp, apiResponse := cmd.appRepo.Update(currentApp.Guid, params)

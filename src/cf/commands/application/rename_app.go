@@ -52,7 +52,7 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 	)
 
 	params := cf.NewEmptyAppParams()
-	params.Set("name", new_name)
+	params.Name = &new_name
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, params)
 	if apiResponse.IsNotSuccessful() {

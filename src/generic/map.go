@@ -132,6 +132,8 @@ func NewMap(data ...interface{}) Map {
 		mapp := ConcreteMap(data)
 		return &mapp
 	}
+
+	fmt.Printf("\n\n map: %T", data)
 	panic("NewMap called with unexpected argument")
 }
 

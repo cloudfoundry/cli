@@ -110,8 +110,8 @@ func init() {
 
 			assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "my-app-guid")
 			assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("memory"), uint64(512))
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("instances"), 5)
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Memory, uint64(512))
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.InstanceCount, 5)
 		})
 		It("TestScaleOnlyInstances", func() {
 
@@ -124,9 +124,9 @@ func init() {
 
 			assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "")
 			assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("instances"), 5)
-			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("disk_quota"))
-			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("memory"))
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.InstanceCount, 5)
+			assert.Nil(mr.T(), deps.appRepo.UpdateParams.DiskQuota)
+			assert.Nil(mr.T(), deps.appRepo.UpdateParams.Memory)
 		})
 		It("TestScaleOnlyMemory", func() {
 
@@ -139,9 +139,9 @@ func init() {
 
 			assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "my-app-guid")
 			assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("memory").(uint64), uint64(512))
-			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("disk_quota"))
-			assert.False(mr.T(), deps.appRepo.UpdateParams.Has("instances"))
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Memory, uint64(512))
+			assert.Nil(mr.T(), deps.appRepo.UpdateParams.DiskQuota)
+			assert.Nil(mr.T(), deps.appRepo.UpdateParams.InstanceCount)
 		})
 	})
 }

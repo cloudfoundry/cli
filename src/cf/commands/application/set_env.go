@@ -7,7 +7,6 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
-	"generic"
 	"github.com/codegangsta/cli"
 )
 
@@ -56,12 +55,14 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	appParams := app.ToParams()
-	envParams := appParams.Get("env").(generic.Map)
-	envParams.Set(varName, varValue)
+	if len(app.EnvironmentVars) == 0 {
+		app.EnvironmentVars = map[string]string{}
+	}
+	envParams := app.EnvironmentVars
+	envParams[varName] = varValue
 
 	updateParams := cf.NewEmptyAppParams()
-	updateParams.Set("env", envParams)
+	updateParams.EnvironmentVars = &envParams
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)
 

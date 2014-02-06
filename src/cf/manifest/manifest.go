@@ -11,23 +11,6 @@ import (
 	"strconv"
 )
 
-var manifestKeys = map[string]func(appParams, yamlMap generic.Map, key string, errs *ManifestErrors){
-	"buildpack":  setStringVal,
-	"disk_quota": setStringVal,
-	"domain":     setStringVal,
-	"host":       setStringVal,
-	"name":       setStringVal,
-	"path":       setStringVal,
-	"stack":      setStringVal,
-	"command":    setStringOrNullVal,
-	"memory":     setBytesVal,
-	"instances":  setIntVal,
-	"timeout":    setTimeoutVal,
-	"no-route":   setBoolVal,
-	"services":   setSliceOrEmptyVal,
-	"env":        setEnvVarOrEmptyMap,
-}
-
 type Manifest struct {
 	Applications cf.AppSet
 }
@@ -118,69 +101,90 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams cf.AppParam
 		return
 	}
 
-	for key, handler := range manifestKeys {
-		if yamlMap.Has(key) {
-			handler(appParams, yamlMap, key, &errs)
-		}
-	}
+	appParams.BuildpackUrl = stringVal(yamlMap, "buildpack", &errs)
+	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
+	appParams.Domain = stringVal(yamlMap, "domain", &errs)
+	appParams.Host = stringVal(yamlMap, "host", &errs)
+	appParams.Name = stringVal(yamlMap, "name", &errs)
+	appParams.Path = stringVal(yamlMap, "path", &errs)
+	appParams.StackName = stringVal(yamlMap, "stack", &errs)
+	appParams.Command = stringOrNullVal(yamlMap, "command", &errs)
+	appParams.Memory = bytesVal(yamlMap, "memory", &errs)
+	appParams.InstanceCount = intVal(yamlMap, "instances", &errs)
+	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
+	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
+	appParams.Services = sliceOrEmptyVal(yamlMap, "services", &errs)
+	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, "env", &errs)
 
-	if appParams.Has("path") {
-		path := appParams.Get("path").(string)
+	if appParams.Path != nil {
+		path := *appParams.Path
 		if filepath.IsAbs(path) {
 			path = filepath.Clean(path)
 		} else {
 			path = filepath.Join(basePath, path)
 		}
-		appParams.Set("path", path)
+		appParams.Path = &path
 	}
 
 	return
 }
 
-func checkForNulls(appParams generic.Map) (errs ManifestErrors) {
-	for key, _ := range manifestKeys {
+func checkForNulls(yamlMap generic.Map) (errs ManifestErrors) {
+	generic.Each(yamlMap, func(key interface{}, value interface{}) {
 		if key == "command" {
-			continue
+			return
 		}
-		if appParams.IsNil(key) {
+		if value == nil {
 			errs = append(errs, errors.New(fmt.Sprintf("%s should not be null", key)))
 		}
-	}
+	})
 
 	return
 }
 
-func setStringVal(appMap generic.Map, yamlMap generic.Map, key string, errs *ManifestErrors) {
+func stringVal(yamlMap generic.Map, key string, errs *ManifestErrors) *string {
 	val := yamlMap.Get(key)
-	stringVal, ok := val.(string)
+	if val == nil {
+		return nil
+	}
+	result, ok := val.(string)
 	if !ok {
 		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string value", key)))
-		return
+		return nil
 	}
-	appMap.Set(key, stringVal)
+	return &result
 }
 
-func setStringOrNullVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+func stringOrNullVal(yamlMap generic.Map, key string, errs *ManifestErrors) *string {
+	if !yamlMap.Has(key) {
+		return nil
+	}
 	switch val := yamlMap.Get(key).(type) {
 	case string:
-		appMap.Set(key, val)
+		return &val
 	case nil:
-		appMap.Set(key, "")
+		empty := ""
+		return &empty
 	default:
 		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string or null value", key)))
+		return nil
 	}
 }
 
-func setBytesVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
-	value, err := formatters.ToMegabytes(yamlMap.Get(key).(string))
+func bytesVal(yamlMap generic.Map, key string, errs *ManifestErrors) *uint64 {
+	yamlVal := yamlMap.Get(key)
+	if yamlVal == nil {
+		return nil
+	}
+	value, err := formatters.ToMegabytes(yamlVal.(string))
 	if err != nil {
 		*errs = append(*errs, errors.New(fmt.Sprintf("Unexpected value for %s :\n%s", key, err.Error())))
-		return
+		return nil
 	}
-	appMap.Set(key, value)
+	return &value
 }
 
-func setIntVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+func intVal(yamlMap generic.Map, key string, errs *ManifestErrors) *int {
 	var (
 		intVal int
 		err    error
@@ -191,81 +195,38 @@ func setIntVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
 		intVal, err = strconv.Atoi(val)
 	case int:
 		intVal = val
+	case nil:
+		return nil
 	default:
 		err = errors.New(fmt.Sprintf("Expected %s to be a number.", key))
 	}
 
 	if err != nil {
 		*errs = append(*errs, err)
-		return
+		return nil
 	}
 
-	appMap.Set(key, intVal)
+	return &intVal
 }
 
-func setTimeoutVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
-	var (
-		intVal int
-		err    error
-	)
-
+func boolVal(yamlMap generic.Map, key string, errs *ManifestErrors) *bool {
 	switch val := yamlMap.Get(key).(type) {
-	case string:
-		intVal, err = strconv.Atoi(val)
-	case int:
-		intVal = val
-	default:
-		err = errors.New("Expected health_check_timeout to be a number.")
-	}
-
-	if err != nil {
-		*errs = append(*errs, err)
-		return
-	}
-
-	appMap.Set("health_check_timeout", intVal)
-}
-
-func setBoolVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
-	switch val := yamlMap.Get(key).(type) {
+	case nil:
+		return nil
 	case bool:
-		appMap.Set(key, val)
+		return &val
 	case string:
 		boolVal := val == "true"
-		appMap.Set(key, boolVal)
+		return &boolVal
 	default:
 		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a boolean.", key)))
+		return nil
 	}
-
-	return
 }
 
-func setEnvVarOrEmptyMap(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
+func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]string {
 	if !yamlMap.Has(key) {
-		appMap.Set(key, generic.NewMap())
-		return
-	}
-
-	envVars := yamlMap.Get(key)
-
-	if !generic.IsMappable(envVars) {
-		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value.", key)))
-		return
-	}
-
-	merrs := validateEnvVars(envVars)
-	if merrs != nil {
-		*errs = append(*errs, merrs)
-		return
-	}
-
-	appMap.Set(key, generic.NewMap(envVars))
-}
-
-func setSliceOrEmptyVal(appMap, yamlMap generic.Map, key string, errs *ManifestErrors) {
-	if !yamlMap.Has(key) {
-		appMap.Set(key, []string{})
-		return
+		return new([]string)
 	}
 
 	var (
@@ -291,16 +252,41 @@ func setSliceOrEmptyVal(appMap, yamlMap generic.Map, key string, errs *ManifestE
 
 	if err != nil {
 		*errs = append(*errs, err)
-		return
+		return nil
 	}
 
-	appMap.Set(key, stringSlice)
-	return
+	return &stringSlice
 }
 
-func validateEnvVars(input interface{}) (errs ManifestErrors) {
-	envVars := generic.NewMap(input)
-	generic.Each(envVars, func(key, value interface{}) {
+func envVarOrEmptyMap(yamlMap generic.Map, key string, errs *ManifestErrors) *map[string]string {
+	switch envVars := yamlMap.Get(key).(type) {
+	case nil:
+		return new(map[string]string)
+	case map[string]interface{}:
+		yamlMap.Set(key, generic.NewMap(yamlMap.Get(key)))
+		return envVarOrEmptyMap(yamlMap, key, errs)
+	case generic.Map:
+		merrs := validateEnvVars(envVars)
+		if merrs != nil {
+			*errs = append(*errs, merrs)
+			return nil
+		}
+
+		result := make(map[string]string, envVars.Count())
+		generic.Each(envVars, func(key, value interface{}) {
+			result[key.(string)] = value.(string)
+		})
+		return &result
+	default:
+		fmt.Printf("\n\n ENV VARS: %#v", envVars)
+
+		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value.", key)))
+		return nil
+	}
+}
+
+func validateEnvVars(input generic.Map) (errs ManifestErrors) {
+	generic.Each(input, func(key, value interface{}) {
 		if value == nil {
 			errs = append(errs, errors.New(fmt.Sprintf("env var '%s' should not be null", key)))
 		}

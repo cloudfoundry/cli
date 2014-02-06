@@ -5,7 +5,6 @@ import (
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
-	"generic"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -39,6 +38,7 @@ func callSetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestSetEnvRequirements", func() {
@@ -62,6 +62,7 @@ func init() {
 			callSetEnv(mr.T(), args, reqFactory, appRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
+
 		It("TestRunWhenApplicationExists", func() {
 
 			app := cf.Application{}
@@ -91,11 +92,12 @@ func init() {
 
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-
-			envParams := appRepo.UpdateParams.Get("env").(generic.Map)
-			assert.Equal(mr.T(), envParams.Get("DATABASE_URL").(string), "mysql://example.com/my-db")
-			assert.Equal(mr.T(), envParams.Get("foo").(string), "bar")
+			assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+				"DATABASE_URL": "mysql://example.com/my-db",
+				"foo":          "bar",
+			})
 		})
+
 		It("TestSetEnvWhenItAlreadyExists", func() {
 
 			app := cf.Application{}
@@ -125,10 +127,11 @@ func init() {
 
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-
-			envParams := appRepo.UpdateParams.Get("env").(generic.Map)
-			assert.Equal(mr.T(), envParams.Get("DATABASE_URL").(string), "mysql://example2.com/my-db")
+			assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+				"DATABASE_URL": "mysql://example2.com/my-db",
+			})
 		})
+
 		It("TestRunWhenSettingTheEnvFails", func() {
 
 			app := cf.Application{}
@@ -149,6 +152,7 @@ func init() {
 				{"Error updating app."},
 			})
 		})
+
 		It("TestSetEnvFailsWithUsage", func() {
 
 			app := cf.Application{}

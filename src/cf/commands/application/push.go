@@ -12,7 +12,6 @@ import (
 	"cf/terminal"
 	"errors"
 	"fmt"
-	"generic"
 	"github.com/codegangsta/cli"
 	"os"
 	"path/filepath"
@@ -68,7 +67,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	appSet := cmd.findAndValidateAppsToPush(c)
 
 	for _, appParams := range appSet {
-		cmd.fetchStackGuid(appParams)
+		cmd.fetchStackGuid(&appParams)
 
 		app := cmd.createOrUpdateApp(appParams)
 
@@ -76,15 +75,15 @@ func (cmd *Push) Run(c *cli.Context) {
 
 		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
-		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, appParams.Get("path").(string), cmd.describeUploadOperation)
+		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, *appParams.Path, cmd.describeUploadOperation)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(fmt.Sprintf("Error uploading application.\n%s", apiResponse.Message))
 			return
 		}
 		cmd.ui.Ok()
 
-		if appParams.Has("services") {
-			cmd.bindAppToServices(appParams.Get("services").([]string), app)
+		if appParams.Services != nil {
+			cmd.bindAppToServices(*appParams.Services, app)
 		}
 
 		cmd.restart(app, appParams, c)
@@ -116,12 +115,12 @@ func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount ui
 	cmd.ui.Say("Uploading from: %s\n%s, %d files", path, humanReadableBytes, fileCount)
 }
 
-func (cmd *Push) fetchStackGuid(appParams cf.AppParams) {
-	if !appParams.Has("stack") {
+func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
+	if appParams.StackName == nil {
 		return
 	}
 
-	stackName := appParams.Get("stack").(string)
+	stackName := *appParams.StackName
 	cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stackName))
 
 	stack, apiResponse := cmd.stackRepo.FindByName(stackName)
@@ -131,7 +130,7 @@ func (cmd *Push) fetchStackGuid(appParams cf.AppParams) {
 	}
 
 	cmd.ui.Ok()
-	appParams.Set("stack_guid", stack.Guid)
+	appParams.StackGuid = &stack.Guid
 }
 
 func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.Context) {
@@ -139,7 +138,7 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.
 		return
 	}
 
-	if params.Has("no-route") && params.Get("no-route") == true {
+	if params.NoRoute != nil && *params.NoRoute {
 		cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
 		return
 	}
@@ -150,15 +149,15 @@ func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.
 	}
 
 	var defaultHostname string
-	if params.Has("host") {
-		defaultHostname = params.Get("host").(string)
+	if params.Host != nil {
+		defaultHostname = *params.Host
 	} else {
 		defaultHostname = hostNameForString(app.Name)
 	}
 
 	var domainName string
-	if params.Has("domain") {
-		domainName = params.Get("domain").(string)
+	if params.Domain != nil {
+		domainName = *params.Domain
 	} else {
 		domainName = c.String("d")
 	}
@@ -207,9 +206,8 @@ func (cmd *Push) restart(app cf.Application, params cf.AppParams, c *cli.Context
 		return
 	}
 
-	if params.Has("health_check_timeout") {
-		timeout := params.Get("health_check_timeout").(int)
-		cmd.starter.SetStartTimeoutSeconds(timeout)
+	if params.HealthCheckTimeout != nil {
+		cmd.starter.SetStartTimeoutSeconds(*params.HealthCheckTimeout)
 	}
 
 	cmd.starter.ApplicationStart(app)
@@ -308,13 +306,12 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 }
 
 func (cmd *Push) createOrUpdateApp(appParams cf.AppParams) (app cf.Application) {
-	if !appParams.Has("name") {
+	if appParams.Name == nil {
 		cmd.ui.Failed("Error: No name found for app")
 		return
 	}
 
-	appName := appParams.Get("name").(string)
-	app, apiResponse := cmd.appRepo.Read(appName)
+	app, apiResponse := cmd.appRepo.Read(*appParams.Name)
 	if apiResponse.IsError() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
@@ -338,10 +335,10 @@ func (cmd *Push) createOrUpdateApp(appParams cf.AppParams) (app cf.Application) 
 }
 
 func (cmd *Push) createApp(appParams cf.AppParams) (app cf.Application, apiResponse net.ApiResponse) {
-	appParams.Set("space_guid", cmd.config.SpaceFields.Guid)
+	appParams.SpaceGuid = &cmd.config.SpaceFields.Guid
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(appParams.Get("name").(string)),
+		terminal.EntityNameColor(*appParams.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
@@ -367,9 +364,12 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	if appParams.Has("env") {
-		mergedEnvVars := generic.Merge(generic.NewMap(app.EnvironmentVars), generic.NewMap(appParams.Get("env")))
-		appParams.Set("env", mergedEnvVars)
+	if appParams.EnvironmentVars != nil {
+		for key, val := range app.EnvironmentVars {
+			if _, ok := (*appParams.EnvironmentVars)[key]; !ok {
+				(*appParams.EnvironmentVars)[key] = val
+			}
+		}
 	}
 
 	var apiResponse net.ApiResponse
@@ -394,7 +394,7 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet cf.AppSet) {
 		return
 	}
 
-	if !appParams.Has("name") && len(m.Applications) > 1 && appParams.Count() > 0 {
+	if appParams.Name == nil && len(m.Applications) > 1 && !appParams.Equals(&cf.AppParams{}) {
 		cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
 		return
 	}
@@ -438,12 +438,12 @@ func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
 
 func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, m *manifest.Manifest) (appSet cf.AppSet, err error) {
 	if len(m.Applications) > 1 {
-		if contextParams.Has("name") {
+		if contextParams.Name != nil {
 			var app cf.AppParams
-			app, err = findAppWithNameInManifest(contextParams.Get("name").(string), m)
+			app, err = findAppWithNameInManifest(*contextParams.Name, m)
 
 			if err != nil {
-				cmd.ui.Failed(fmt.Sprintf("Could not find app named '%s' in manifest", contextParams.Get("name").(string)))
+				cmd.ui.Failed(fmt.Sprintf("Could not find app named '%s' in manifest", *contextParams.Name))
 				return
 			}
 
@@ -453,34 +453,36 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 
 	appSet = make(cf.AppSet, 0, len(m.Applications))
 	if len(m.Applications) == 0 {
-		if !contextParams.Has("name") || contextParams.Get("name") == "" {
+		if contextParams.Name == nil || *contextParams.Name == "" {
 			cmd.ui.FailWithUsage(c, "push")
 			return
 		}
-		appSet = append(appSet, contextParams)
+		err = addApp(&appSet, contextParams)
 	} else {
 		for _, manifestAppParams := range m.Applications {
-			appFields := cf.NewAppParams(generic.Merge(manifestAppParams, contextParams))
-			appSet = append(appSet, appFields)
-		}
-	}
-
-	for _, appParams := range appSet {
-		if !appParams.Has("name") {
-			err = errors.New("app name is a required field")
-		}
-		if !appParams.Has("path") {
-			cwd, _ := os.Getwd()
-			appParams.Set("path", cwd)
+			manifestAppParams.Merge(&contextParams)
+			err = addApp(&appSet, manifestAppParams)
 		}
 	}
 
 	return
 }
 
+func addApp(apps *cf.AppSet, app cf.AppParams) (err error) {
+	if app.Name == nil {
+		err = errors.New("app name is a required field")
+	}
+	if app.Path == nil {
+		cwd, _ := os.Getwd()
+		app.Path = &cwd
+	}
+	*apps = append(*apps, app)
+	return
+}
+
 func findAppWithNameInManifest(name string, m *manifest.Manifest) (app cf.AppParams, err error) {
 	for _, appParams := range m.Applications {
-		if appParams.Has("name") && appParams.Get("name") == name {
+		if appParams.Name != nil && *appParams.Name == name {
 			app = appParams
 			return
 		}

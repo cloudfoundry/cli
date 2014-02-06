@@ -25,45 +25,58 @@ import (
 )
 
 func singleAppManifest() *manifest.Manifest {
+	name := "manifest-app-name"
+	memory := uint64(128)
+	instances := 1
+	host := "manifest-host"
+	domain := "manifest-example.com"
+	stack := "custom-stack"
+	timeout := 360
+	buildpackUrl := "some-buildpack"
+	command := `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`
+	path := "/some/path/from/manifest"
+
 	return &manifest.Manifest{
 		Applications: []cf.AppParams{
-			cf.NewAppParams(generic.NewMap(map[interface{}]interface{}{
-				"name":      "manifest-app-name",
-				"memory":    uint64(128),
-				"instances": 1,
-				"host":      "manifest-host",
-				"domain":    "manifest-example.com",
-				"stack":     "custom-stack",
-				"timeout":   uint64(360),
-				"buildpack": "some-buildpack",
-				"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-				"path":      "/some/path/from/manifest",
-				"env": generic.NewMap(map[string]interface{}{
+			cf.AppParams{
+				Name:               &name,
+				Memory:             &memory,
+				InstanceCount:      &instances,
+				Host:               &host,
+				Domain:             &domain,
+				StackName:          &stack,
+				HealthCheckTimeout: &timeout,
+				BuildpackUrl:       &buildpackUrl,
+				Command:            &command,
+				Path:               &path,
+				EnvironmentVars: &map[string]string{
 					"FOO":  "baz",
 					"PATH": "/u/apps/my-app/bin",
-				}),
-			})),
+				},
+			},
 		},
 	}
 }
 
 func manifestWithServicesAndEnv() *manifest.Manifest {
+	name1 := "app1"
+	name2 := "app2"
 	return &manifest.Manifest{
 		Applications: []cf.AppParams{
-			cf.NewAppParams(generic.NewMap(map[interface{}]interface{}{
-				"name":     "app1",
-				"services": []string{"app1-service", "global-service"},
-				"env": generic.NewMap(map[string]interface{}{
+			cf.AppParams{
+				Name:     &name1,
+				Services: &[]string{"app1-service", "global-service"},
+				EnvironmentVars: &map[string]string{
 					"SOMETHING": "definitely-something",
-				}),
-			})),
-			cf.NewAppParams(generic.NewMap(map[interface{}]interface{}{
-				"name":     "app2",
-				"services": []string{"app2-service", "global-service"},
-				"env": generic.NewMap(map[string]interface{}{
+				},
+			},
+			cf.AppParams{
+				Name:     &name2,
+				Services: &[]string{"app2-service", "global-service"},
+				EnvironmentVars: &map[string]string{
 					"SOMETHING": "nothing",
-				}),
-			})),
+				},
+			},
 		},
 	}
 }
@@ -169,8 +182,8 @@ func init() {
 			testcmd.RunCommand(cmd, ctxt, reqFactory)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
-		It("TestPushingAppWithOldV2DomainsEndpoint", func() {
 
+		It("TestPushingAppWithOldV2DomainsEndpoint", func() {
 			deps := getPushDependencies()
 
 			privateDomain := cf.Domain{}
@@ -207,16 +220,16 @@ func init() {
 				{"OK"},
 			})
 		})
-		It("TestPushingAppWhenItDoesNotExist", func() {
 
+		It("TestPushingAppWhenItDoesNotExist", func() {
 			deps := getPushDependencies()
 
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
 			ui := callPush(mr.T(), []string{"-t", "111", "my-new-app"}, deps)
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name"), "my-new-app")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("space_guid"), "my-space-guid")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "my-new-app")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().SpaceGuid, "my-space-guid")
 
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainHost, "my-new-app")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "my-new-app")
@@ -242,15 +255,15 @@ func init() {
 			assert.Equal(mr.T(), deps.starter.AppToStart.Name, "my-new-app")
 			assert.Equal(mr.T(), deps.starter.Timeout, 111)
 		})
-		It("TestPushingAppWithACrazyName", func() {
 
+		It("TestPushingAppWithACrazyName", func() {
 			deps := getPushDependencies()
 
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
 			ui := callPush(mr.T(), []string{"-t", "111", "Tim's 1st-Crazy__app!"}, deps)
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name"), "Tim's 1st-Crazy__app!")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "Tim's 1st-Crazy__app!")
 
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainHost, "tims-1st-crazy-app")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "tims-1st-crazy-app")
@@ -331,13 +344,13 @@ func init() {
 
 			assert.Equal(mr.T(), deps.stackRepo.FindByNameName, "customLinux")
 
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("command").(string), "unicorn -c config/unicorn.rb -D")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("instances").(int), 3)
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("memory").(uint64), uint64(2048))
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("stack_guid"), "custom-linux-guid")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("health_check_timeout").(int), 1)
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("buildpack"), "https://github.com/heroku/heroku-buildpack-play.git")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "my-new-app")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Command, "unicorn -c config/unicorn.rb -D")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().InstanceCount, 3)
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Memory, uint64(2048))
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().StackGuid, "custom-linux-guid")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().HealthCheckTimeout, 1)
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().BuildpackUrl, "https://github.com/heroku/heroku-buildpack-play.git")
 
 			assert.Equal(mr.T(), deps.domainRepo.FindByNameInCurrentSpaceName, "bar.cf-app.com")
 
@@ -382,8 +395,9 @@ func init() {
 			}
 			_ = callPush(mr.T(), args, deps)
 
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("command"), "")
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Command, "")
 		})
+
 		It("TestPushingAppMergesManifestEnvVarsWithExistingEnvVars", func() {
 
 			deps := getPushDependencies()
@@ -400,14 +414,14 @@ func init() {
 
 			_ = callPush(mr.T(), []string{"existing-app"}, deps)
 
-			updatedAppEnvVars := generic.NewMap(deps.appRepo.UpdateParams.Get("env"))
-			assert.Equal(mr.T(), updatedAppEnvVars.Get("crazy"), "pants")
-			assert.Equal(mr.T(), updatedAppEnvVars.Get("FOO"), "baz")
-			assert.Equal(mr.T(), updatedAppEnvVars.Get("foo"), "manchu")
-			assert.Equal(mr.T(), updatedAppEnvVars.Get("PATH"), "/u/apps/my-app/bin")
+			updatedAppEnvVars := *deps.appRepo.UpdateParams.EnvironmentVars
+			assert.Equal(mr.T(), updatedAppEnvVars["crazy"], "pants")
+			assert.Equal(mr.T(), updatedAppEnvVars["FOO"], "baz")
+			assert.Equal(mr.T(), updatedAppEnvVars["foo"], "manchu")
+			assert.Equal(mr.T(), updatedAppEnvVars["PATH"], "/u/apps/my-app/bin")
 		})
-		It("TestPushingAppWithSingleAppManifest", func() {
 
+		It("TestPushingAppWithSingleAppManifest", func() {
 			deps := getPushDependencies()
 			domain := cf.Domain{}
 			domain.Name = "manifest-example.com"
@@ -426,26 +440,22 @@ func init() {
 				{"manifest-app-name"},
 			})
 
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name").(string), "manifest-app-name")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("memory").(uint64), uint64(128))
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("instances").(int), 1)
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("stack").(string), "custom-stack")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("buildpack").(string), "some-buildpack")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("command").(string), "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "manifest-app-name")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Memory, uint64(128))
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().InstanceCount, 1)
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().StackName, "custom-stack")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().BuildpackUrl, "some-buildpack")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Command, "JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run")
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedDir, "/some/path/from/manifest")
 
-			assert.True(mr.T(), deps.appRepo.CreatedAppParams().Has("env"))
-			envVars := deps.appRepo.CreatedAppParams().Get("env").(generic.Map)
-
-			assert.Equal(mr.T(), 2, envVars.Count())
-			assert.True(mr.T(), envVars.Has("PATH"))
-			assert.True(mr.T(), envVars.Has("FOO"))
-
-			assert.Equal(mr.T(), envVars.Get("PATH").(string), "/u/apps/my-app/bin")
-			assert.Equal(mr.T(), envVars.Get("FOO").(string), "baz")
+			envVars := *deps.appRepo.CreatedAppParams().EnvironmentVars
+			assert.Equal(mr.T(), envVars, map[string]string{
+				"PATH": "/u/apps/my-app/bin",
+				"FOO":  "baz",
+			})
 		})
-		It("TestPushingAppManifestWithErrors", func() {
 
+		It("TestPushingAppManifestWithErrors", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 			deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{
@@ -462,8 +472,8 @@ func init() {
 				{"disk_quota should not be null"},
 			})
 		})
-		It("TestPushingManyAppsFromManifest", func() {
 
+		It("TestPushingManyAppsFromManifest", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 			deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
@@ -478,17 +488,17 @@ func init() {
 
 			firstApp := deps.appRepo.CreateAppParams[0]
 			secondApp := deps.appRepo.CreateAppParams[1]
-			assert.Equal(mr.T(), firstApp.Get("name"), "app1")
-			assert.Equal(mr.T(), secondApp.Get("name"), "app2")
+			assert.Equal(mr.T(), *firstApp.Name, "app1")
+			assert.Equal(mr.T(), *secondApp.Name, "app2")
 
-			envVars := firstApp.Get("env").(generic.Map)
-			assert.Equal(mr.T(), envVars.Get("SOMETHING"), "definitely-something")
+			envVars := *firstApp.EnvironmentVars
+			assert.Equal(mr.T(), envVars["SOMETHING"], "definitely-something")
 
-			envVars = secondApp.Get("env").(generic.Map)
-			assert.Equal(mr.T(), envVars.Get("SOMETHING"), "nothing")
+			envVars = *secondApp.EnvironmentVars
+			assert.Equal(mr.T(), envVars["SOMETHING"], "nothing")
 		})
-		It("TestPushingASingleAppFromAManifestWithManyApps", func() {
 
+		It("TestPushingASingleAppFromAManifestWithManyApps", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 			deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
@@ -501,10 +511,10 @@ func init() {
 				{"Creating", "app1"},
 			})
 			assert.Equal(mr.T(), len(deps.appRepo.CreateAppParams), 1)
-			assert.Equal(mr.T(), deps.appRepo.CreateAppParams[0].Get("name"), "app2")
+			assert.Equal(mr.T(), *deps.appRepo.CreateAppParams[0].Name, "app2")
 		})
-		It("TestNamedAppInAManifestIsNotFound", func() {
 
+		It("TestNamedAppInAManifestIsNotFound", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 			deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
@@ -685,7 +695,7 @@ func init() {
 			})
 
 			assert.Equal(mr.T(), deps.manifestRepo.ReadManifestPath, "")
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name").(string), "app-name")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "app-name")
 		})
 		It("TestPushingWithNoManifestFlagAndMissingAppName", func() {
 
@@ -713,7 +723,7 @@ func init() {
 				"my-new-app",
 			}, deps)
 
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "my-new-app")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "")
 		})
@@ -734,7 +744,7 @@ func init() {
 				"my-new-app",
 			}, deps)
 
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("name").(string), "my-new-app")
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "my-new-app")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "bar-domain-guid")
 		})
@@ -744,7 +754,8 @@ func init() {
 			deps.appRepo.ReadNotFound = true
 
 			workerManifest := singleAppManifest()
-			workerManifest.Applications[0].Set("no-route", true)
+			noRoute := true
+			workerManifest.Applications[0].NoRoute = &noRoute
 			deps.manifestRepo.ReadManifestManifest = workerManifest
 
 			ui := callPush(mr.T(), []string{
@@ -767,7 +778,7 @@ func init() {
 				"my-new-app",
 			}, deps)
 
-			assert.Equal(mr.T(), deps.appRepo.CreatedAppParams().Get("memory").(uint64), uint64(256))
+			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Memory, uint64(256))
 		})
 		It("TestPushingAppWithInvalidMemory", func() {
 
@@ -808,8 +819,8 @@ func init() {
 
 			assert.Equal(mr.T(), deps.stopper.AppToStop.Guid, "")
 		})
-		It("TestPushingAppWhenItAlreadyExistsAndChangingOptions", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsAndChangingOptions", func() {
 			deps := getPushDependencies()
 
 			existingRoute := cf.RouteSummary{}
@@ -837,12 +848,13 @@ func init() {
 			}
 			_ = callPush(mr.T(), args, deps)
 
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("command"), "different start command")
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("instances"), 10)
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("memory"), uint64(1024))
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("buildpack"), "https://github.com/heroku/heroku-buildpack-different.git")
-			assert.Equal(mr.T(), deps.appRepo.UpdateParams.Get("stack_guid"), "differentStack-guid")
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Command, "different start command")
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.InstanceCount, 10)
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Memory, uint64(1024))
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.BuildpackUrl, "https://github.com/heroku/heroku-buildpack-different.git")
+			assert.Equal(mr.T(), *deps.appRepo.UpdateParams.StackGuid, "differentStack-guid")
 		})
+
 		It("TestPushingAppWhenItAlreadyExistsAndDomainIsSpecifiedIsAlreadyBound", func() {
 
 			deps := getPushDependencies()
