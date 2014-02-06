@@ -12,7 +12,7 @@ import (
 )
 
 type Manifest struct {
-	Applications cf.AppSet
+	Applications []cf.AppParams
 }
 
 func NewEmptyManifest() (m *Manifest) {
@@ -61,7 +61,7 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 	return
 }
 
-func mapToAppSet(basePath string, data generic.Map) (appSet cf.AppSet, errs ManifestErrors) {
+func mapToAppSet(basePath string, data generic.Map) (appSet []cf.AppParams, errs ManifestErrors) {
 	if data.Has("applications") {
 		appMaps, ok := data.Get("applications").([]interface{})
 		if !ok {
