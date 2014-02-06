@@ -57,7 +57,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 	trace.Logger.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
 
 	inputChan := make(chan *logmessage.Message, LogBufferSize)
-	messageQueue := NewSortedMessageQueue(printTimeBuffer)
+	messageQueue := NewSortedMessageQueue(printTimeBuffer, time.Now)
 
 	config, err := websocket.NewConfig(location, "http://localhost")
 	if err != nil {

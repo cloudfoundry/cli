@@ -14,16 +14,20 @@ type Item struct {
 }
 
 type SortedMessageQueue struct {
+	clock           func() time.Time
 	printTimeBuffer time.Duration
 	items           []*Item
 }
 
-func NewSortedMessageQueue(printTimeBuffer time.Duration) *SortedMessageQueue {
-	return &SortedMessageQueue{printTimeBuffer: printTimeBuffer}
+func NewSortedMessageQueue(printTimeBuffer time.Duration, clock func() time.Time) *SortedMessageQueue {
+	return &SortedMessageQueue{
+		clock:           clock,
+		printTimeBuffer: printTimeBuffer,
+	}
 }
 
 func (pq *SortedMessageQueue) PushMessage(message *logmessage.Message) {
-	item := &Item{message: message, timestampWhenOutputtable: time.Now().Add(pq.printTimeBuffer).UnixNano()}
+	item := &Item{message: message, timestampWhenOutputtable: pq.clock().Add(pq.printTimeBuffer).UnixNano()}
 	pq.items = append(pq.items, item)
 	pq.insertionSort()
 }
