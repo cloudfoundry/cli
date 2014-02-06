@@ -11,21 +11,22 @@ import (
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testmanifest "testhelpers/manifest"
-	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
 
-func availableCmdNames() (names []string) {
-	reqFactory := &testreq.FakeReqFactory{}
-	cmdRunner := commands.NewRunner(nil, reqFactory)
-	app, _ := NewApp(cmdRunner)
-
-	for _, cliCmd := range app.Commands {
-		if cliCmd.Name != "help" {
-			names = append(names, cliCmd.Name)
-		}
-	}
-	return
+var expectedCommandNames = []string{
+	"api", "app", "apps", "auth", "bind-service", "buildpacks", "create-buildpack",
+	"create-domain", "create-org", "create-route", "create-service", "create-service-auth-token",
+	"create-service-broker", "create-space", "create-user", "create-user-provided-service", "curl",
+	"delete", "delete-buildpack", "delete-domain", "delete-shared-domain", "delete-org", "delete-route",
+	"delete-service", "delete-service-auth-token", "delete-service-broker", "delete-space", "delete-user",
+	"domains", "env", "events", "files", "login", "logout", "logs", "marketplace", "map-route", "org",
+	"org-users", "orgs", "passwd", "purge-service-offering", "push", "quotas", "rename", "rename-org",
+	"rename-service", "rename-service-broker", "rename-space", "restart", "routes", "scale",
+	"service", "service-auth-tokens", "service-brokers", "services", "set-env", "set-org-role", "set-quota",
+	"set-space-role", "create-shared-domain", "space", "space-users", "spaces", "stacks", "start", "stop",
+	"target", "unbind-service", "unmap-route", "unset-env", "unset-org-role", "unset-space-role",
+	"update-buildpack", "update-service-broker", "update-service-auth-token", "update-user-provided-service",
 }
 
 type FakeRunner struct {
@@ -46,24 +47,24 @@ func (runner *FakeRunner) RunCmdByName(cmdName string, c *cli.Context) (err erro
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestCommands", func() {
+			ui := &testterm.FakeUI{}
+			config := &configuration.Configuration{}
+			manifestRepo := &testmanifest.FakeManifestRepository{}
 
-			for _, cmdName := range availableCmdNames() {
-				ui := &testterm.FakeUI{}
-				config := &configuration.Configuration{}
-				manifestRepo := &testmanifest.FakeManifestRepository{}
+			repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
+				"auth":             net.NewUAAGateway(),
+				"cloud-controller": net.NewCloudControllerGateway(),
+				"uaa":              net.NewUAAGateway(),
+			})
 
-				repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
-					"auth":             net.NewUAAGateway(),
-					"cloud-controller": net.NewCloudControllerGateway(),
-					"uaa":              net.NewUAAGateway(),
-				})
+			t := mr.T()
+			cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
+			cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: t}
 
-				cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
-				cmdRunner := &FakeRunner{cmdFactory: cmdFactory, t: mr.T()}
+			for _, cmdName := range expectedCommandNames {
 				app, _ := NewApp(cmdRunner)
 				app.Run([]string{"", cmdName})
-
-				assert.Equal(mr.T(), cmdRunner.cmdName, cmdName)
+				assert.Equal(t, cmdRunner.cmdName, cmdName)
 			}
 		})
 	})

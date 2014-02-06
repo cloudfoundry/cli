@@ -115,6 +115,8 @@ type ServiceBindingEntity struct {
 }
 
 type ServiceRepository interface {
+	PurgeServiceOffering(offering models.ServiceOffering) net.ApiResponse
+	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse)
 	GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse)
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
@@ -212,4 +214,26 @@ func (repo CloudControllerServiceRepository) DeleteService(instance models.Servi
 	}
 	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
+}
+
+func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering models.ServiceOffering) net.ApiResponse {
+	url := fmt.Sprintf("%s/v2/services/%s?purge=true", repo.config.Target, offering.Guid)
+	return repo.gateway.DeleteResource(url, repo.config.AccessToken)
+}
+
+func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvider(label, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/services?q=%s", repo.config.Target, url.QueryEscape("label:"+label+";provider:"+provider))
+
+	resources := new(PaginatedServiceOfferingResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+
+	if apiResponse.IsError() {
+		return
+	} else if len(resources.Resources) == 0 {
+		apiResponse = net.NewNotFoundApiResponse("Service offering not found")
+	} else {
+		offering = resources.Resources[0].ToModel()
+	}
+
+	return
 }
