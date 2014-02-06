@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callSpaceUsers(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org2 := cf.OrganizationFields{}
+	org2 := models.OrganizationFields{}
 	org2.Name = "my-org"
-	space2 := cf.SpaceFields{}
+	space2 := models.SpaceFields{}
 	space2.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space2,
@@ -73,10 +73,10 @@ func init() {
 		})
 		It("TestSpaceUsers", func() {
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "Org1"
 			org.Guid = "org1-guid"
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "Space1"
 			space.Guid = "space1-guid"
 
@@ -84,18 +84,18 @@ func init() {
 			spaceRepo := &testapi.FakeSpaceRepository{FindByNameInOrgSpace: space}
 			userRepo := &testapi.FakeUserRepository{}
 
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Username = "user1"
-			user2 := cf.UserFields{}
+			user2 := models.UserFields{}
 			user2.Username = "user2"
-			user3 := cf.UserFields{}
+			user3 := models.UserFields{}
 			user3.Username = "user3"
-			user4 := cf.UserFields{}
+			user4 := models.UserFields{}
 			user4.Username = "user4"
-			userRepo.ListUsersByRole = map[string][]cf.UserFields{
-				cf.SPACE_MANAGER:   []cf.UserFields{user, user2},
-				cf.SPACE_DEVELOPER: []cf.UserFields{user4},
-				cf.SPACE_AUDITOR:   []cf.UserFields{user3},
+			userRepo.ListUsersByRole = map[string][]models.UserFields{
+				models.SPACE_MANAGER:   []models.UserFields{user, user2},
+				models.SPACE_DEVELOPER: []models.UserFields{user4},
+				models.SPACE_AUDITOR:   []models.UserFields{user3},
 			}
 
 			ui := callSpaceUsers(mr.T(), []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)

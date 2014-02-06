@@ -5,6 +5,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -80,7 +81,7 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 	}
 }
 
-func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestRequest) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestRequest) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
 	ts, handler := testnet.NewTLSServer(t, requests)
 	defer ts.Close()
 
@@ -90,7 +91,7 @@ func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestReque
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
-	buildpack = cf.Buildpack{}
+	buildpack = models.Buildpack{}
 	buildpack.Name = "my-cool-buildpack"
 	buildpack.Guid = "my-cool-buildpack-guid"
 
@@ -105,7 +106,7 @@ func init() {
 			gateway := net.NewCloudControllerGateway()
 
 			repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 
 			apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
 			assert.True(mr.T(), apiResponse.IsNotSuccessful())

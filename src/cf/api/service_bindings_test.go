@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ var deleteBindingReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest
 
 func createServiceBindingRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBindingRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -79,16 +79,16 @@ func init() {
 			ts, handler, repo := createServiceBindingRepo(mr.T(), []testnet.TestRequest{deleteBindingReq})
 			defer ts.Close()
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 
-			binding := cf.ServiceBindingFields{}
+			binding := models.ServiceBindingFields{}
 			binding.Url = "/v2/service_bindings/service-binding-1-guid"
 			binding.AppGuid = "app-1-guid"
-			binding2 := cf.ServiceBindingFields{}
+			binding2 := models.ServiceBindingFields{}
 			binding2.Url = "/v2/service_bindings/service-binding-2-guid"
 			binding2.AppGuid = "app-2-guid"
-			serviceInstance.ServiceBindings = []cf.ServiceBindingFields{binding, binding2}
+			serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 
 			found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
@@ -101,7 +101,7 @@ func init() {
 			ts, handler, repo := createServiceBindingRepo(mr.T(), []testnet.TestRequest{})
 			defer ts.Close()
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Guid = "my-service-instance-guid"
 
 			found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")

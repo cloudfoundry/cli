@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -40,7 +41,7 @@ type Start struct {
 
 type ApplicationStarter interface {
 	SetStartTimeoutSeconds(timeout int)
-	ApplicationStart(app cf.Application) (updatedApp cf.Application, err error)
+	ApplicationStart(app models.Application) (updatedApp models.Application, err error)
 }
 
 func NewStart(ui terminal.UI, config *configuration.Configuration, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
@@ -94,7 +95,7 @@ func (cmd *Start) Run(c *cli.Context) {
 	cmd.ApplicationStart(cmd.appReq.GetApplication())
 }
 
-func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Application, err error) {
+func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Application, err error) {
 	if app.State == "started" {
 		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already started"))
 		return
@@ -116,7 +117,7 @@ func (cmd *Start) ApplicationStart(app cf.Application) (updatedApp cf.Applicatio
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := cf.NewEmptyAppParams()
+	params := models.NewEmptyAppParams()
 	state := "STARTED"
 	params.State = &state
 	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, params)
@@ -143,7 +144,7 @@ func (cmd *Start) SetStartTimeoutSeconds(timeout int) {
 	cmd.StartupTimeout = time.Duration(timeout) * time.Second
 }
 
-func (cmd Start) tailStagingLogs(app cf.Application, startChan chan bool, stopChan chan bool) {
+func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, stopChan chan bool) {
 	logChan := make(chan *logmessage.Message, 1000)
 	go func() {
 		defer close(logChan)
@@ -172,7 +173,7 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 	}
 }
 
-func (cmd Start) waitForInstancesToStage(app cf.Application) {
+func (cmd Start) waitForInstancesToStage(app models.Application) {
 	stagingStartTime := time.Now()
 	_, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
 
@@ -190,7 +191,7 @@ func (cmd Start) waitForInstancesToStage(app cf.Application) {
 	return
 }
 
-func (cmd Start) waitForOneRunningInstance(app cf.Application) {
+func (cmd Start) waitForOneRunningInstance(app models.Application) {
 	var runningCount, startingCount, flappingCount, downCount int
 	startupStartTime := time.Now()
 
@@ -211,13 +212,13 @@ func (cmd Start) waitForOneRunningInstance(app cf.Application) {
 
 		for _, inst := range instances {
 			switch inst.State {
-			case cf.InstanceRunning:
+			case models.InstanceRunning:
 				runningCount++
-			case cf.InstanceStarting:
+			case models.InstanceStarting:
 				startingCount++
-			case cf.InstanceFlapping:
+			case models.InstanceFlapping:
 				flappingCount++
-			case cf.InstanceDown:
+			case models.InstanceDown:
 				downCount++
 			}
 		}

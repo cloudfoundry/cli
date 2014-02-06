@@ -1,8 +1,6 @@
 package maker
 
-import (
-	"cf"
-)
+import "cf/models"
 
 var appGuid func() string
 
@@ -10,7 +8,7 @@ func init() {
 	appGuid = guidGenerator("app")
 }
 
-func NewAppFields(overrides Overrides) (app cf.ApplicationFields) {
+func NewAppFields(overrides Overrides) (app models.ApplicationFields) {
 	app.Name = "app-name"
 	app.Guid = appGuid()
 	app.State = "started"
@@ -30,7 +28,7 @@ func NewAppFields(overrides Overrides) (app cf.ApplicationFields) {
 	return
 }
 
-func NewApp(overrides Overrides) (app cf.Application) {
+func NewApp(overrides Overrides) (app models.Application) {
 
 	app.ApplicationFields = NewAppFields(overrides)
 

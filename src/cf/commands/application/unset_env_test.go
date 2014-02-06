@@ -1,10 +1,10 @@
 package application_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,9 +24,9 @@ func callUnsetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFacto
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -41,7 +41,7 @@ func callUnsetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFacto
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestUnsetEnvRequirements", func() {
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{}
@@ -61,7 +61,7 @@ func init() {
 		})
 		It("TestUnsetEnvWhenApplicationExists", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.EnvironmentVars = map[string]string{"foo": "bar", "DATABASE_URL": "mysql://example.com/my-db"}
@@ -85,7 +85,7 @@ func init() {
 
 		It("TestUnsetEnvWhenUnsettingTheEnvFails", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
@@ -106,7 +106,7 @@ func init() {
 		})
 		It("TestUnsetEnvWhenEnvVarDoesNotExist", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -124,7 +124,7 @@ func init() {
 		})
 		It("TestUnsetEnvFailsWithUsage", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}

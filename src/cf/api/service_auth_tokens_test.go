@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +38,7 @@ func init() {
 
 			ts, handler, repo := createServiceAuthTokenRepo(mr.T(), req)
 			defer ts.Close()
-			authToken := cf.ServiceAuthTokenFields{}
+			authToken := models.ServiceAuthTokenFields{}
 			authToken.Label = "a label"
 			authToken.Provider = "a provider"
 			authToken.Token = "a token"
@@ -116,7 +116,7 @@ func init() {
 
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
-			authToken2 := cf.ServiceAuthTokenFields{}
+			authToken2 := models.ServiceAuthTokenFields{}
 			authToken2.Guid = "mysql-core-guid"
 			authToken2.Label = "mysql"
 			authToken2.Provider = "mysql-core"
@@ -152,7 +152,7 @@ func init() {
 
 			ts, handler, repo := createServiceAuthTokenRepo(mr.T(), req)
 			defer ts.Close()
-			authToken3 := cf.ServiceAuthTokenFields{}
+			authToken3 := models.ServiceAuthTokenFields{}
 			authToken3.Guid = "mysql-core-guid"
 			authToken3.Token = "a value"
 			apiResponse := repo.Update(authToken3)
@@ -170,7 +170,7 @@ func init() {
 
 			ts, handler, repo := createServiceAuthTokenRepo(mr.T(), req)
 			defer ts.Close()
-			authToken4 := cf.ServiceAuthTokenFields{}
+			authToken4 := models.ServiceAuthTokenFields{}
 			authToken4.Guid = "mysql-core-guid"
 			apiResponse := repo.Delete(authToken4)
 

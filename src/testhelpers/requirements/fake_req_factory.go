@@ -1,16 +1,16 @@
 package requirements
 
 import (
-	"cf"
+"cf/models"
 	"cf/requirements"
 )
 
 type FakeReqFactory struct {
 	ApplicationName string
-	Application     cf.Application
+	Application     models.Application
 
 	ServiceInstanceName string
-	ServiceInstance     cf.ServiceInstance
+	ServiceInstance     models.ServiceInstance
 
 	LoginSuccess            bool
 	ValidAccessTokenSuccess bool
@@ -19,23 +19,23 @@ type FakeReqFactory struct {
 	BuildpackSuccess        bool
 
 	SpaceName string
-	Space     cf.Space
+	Space     models.Space
 
 	OrganizationName   string
-	Organization       cf.Organization
-	OrganizationFields cf.OrganizationFields
+	Organization       models.Organization
+	OrganizationFields models.OrganizationFields
 
 	RouteHost   string
 	RouteDomain string
-	Route       cf.Route
+	Route       models.Route
 
 	DomainName string
-	Domain     cf.Domain
+	Domain     models.Domain
 
 	UserUsername string
-	UserFields   cf.UserFields
+	UserFields   models.UserFields
 
-	Buildpack cf.Buildpack
+	Buildpack models.Buildpack
 }
 
 func (f *FakeReqFactory) NewApplicationRequirement(name string) requirements.ApplicationRequirement {
@@ -98,38 +98,38 @@ func (r FakeRequirement) Execute() (success bool) {
 	return r.success
 }
 
-func (r FakeRequirement) GetApplication() cf.Application {
+func (r FakeRequirement) GetApplication() models.Application {
 	return r.factory.Application
 }
 
-func (r FakeRequirement) GetServiceInstance() cf.ServiceInstance {
+func (r FakeRequirement) GetServiceInstance() models.ServiceInstance {
 	return r.factory.ServiceInstance
 }
 
-func (r FakeRequirement) GetSpace() cf.Space {
+func (r FakeRequirement) GetSpace() models.Space {
 	return r.factory.Space
 }
 
-func (r FakeRequirement) GetOrganization() cf.Organization {
+func (r FakeRequirement) GetOrganization() models.Organization {
 	return r.factory.Organization
 }
 
-func (r FakeRequirement) GetOrganizationFields() cf.OrganizationFields {
+func (r FakeRequirement) GetOrganizationFields() models.OrganizationFields {
 	return r.factory.OrganizationFields
 }
 
-func (r FakeRequirement) GetRoute() cf.Route {
+func (r FakeRequirement) GetRoute() models.Route {
 	return r.factory.Route
 }
 
-func (r FakeRequirement) GetDomain() cf.Domain {
+func (r FakeRequirement) GetDomain() models.Domain {
 	return r.factory.Domain
 }
 
-func (r FakeRequirement) GetUser() cf.UserFields {
+func (r FakeRequirement) GetUser() models.UserFields {
 	return r.factory.UserFields
 }
 
-func (r FakeRequirement) GetBuildpack() cf.Buildpack {
+func (r FakeRequirement) GetBuildpack() models.Buildpack {
 	return r.factory.Buildpack
 }

@@ -1,9 +1,9 @@
 package organization
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -77,8 +77,8 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 	}
 
 	if org.Guid == cmd.config.OrganizationFields.Guid {
-		cmd.config.SetOrganizationFields(cf.OrganizationFields{})
-		cmd.config.SetSpaceFields(cf.SpaceFields{})
+		cmd.config.SetOrganizationFields(models.OrganizationFields{})
+		cmd.config.SetSpaceFields(models.SpaceFields{})
 	}
 
 	cmd.ui.Ok()

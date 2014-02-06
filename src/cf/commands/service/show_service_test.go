@@ -1,8 +1,8 @@
 package service_test
 
 import (
-	"cf"
 	. "cf/commands/service"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -49,16 +49,16 @@ func init() {
 		})
 		It("TestShowServiceOutput", func() {
 
-			offering := cf.ServiceOfferingFields{}
+			offering := models.ServiceOfferingFields{}
 			offering.Label = "mysql"
 			offering.DocumentationUrl = "http://documentation.url"
 			offering.Description = "the-description"
 
-			plan := cf.ServicePlanFields{}
+			plan := models.ServicePlanFields{}
 			plan.Guid = "plan-guid"
 			plan.Name = "plan-name"
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "service1"
 			serviceInstance.Guid = "service1-guid"
 			serviceInstance.ServicePlan = plan
@@ -80,7 +80,7 @@ func init() {
 		})
 		It("TestShowUserProvidedServiceOutput", func() {
 
-			serviceInstance2 := cf.ServiceInstance{}
+			serviceInstance2 := models.ServiceInstance{}
 			serviceInstance2.Name = "service1"
 			serviceInstance2.Guid = "service1-guid"
 			reqFactory := &testreq.FakeReqFactory{

@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callRename(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -61,7 +61,7 @@ func init() {
 		It("TestRenameRun", func() {
 
 			appRepo := &testapi.FakeApplicationRepository{}
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}

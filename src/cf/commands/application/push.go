@@ -1,12 +1,12 @@
 package application
 
 import (
-	"cf"
 	"cf/api"
 	"cf/commands/service"
 	"cf/configuration"
 	"cf/formatters"
 	"cf/manifest"
+	"cf/models"
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
@@ -32,7 +32,7 @@ type Push struct {
 	serviceRepo    api.ServiceRepository
 	stackRepo      api.StackRepository
 	appBitsRepo    api.ApplicationBitsRepository
-	globalServices cf.ServiceInstanceSet
+	globalServices models.ServiceInstanceSet
 }
 
 func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository,
@@ -90,7 +90,7 @@ func (cmd *Push) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *Push) bindAppToServices(services []string, app cf.Application) {
+func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 	for _, serviceName := range services {
 		serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName)
 
@@ -115,7 +115,7 @@ func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount ui
 	cmd.ui.Say("Uploading from: %s\n%s, %d files", path, humanReadableBytes, fileCount)
 }
 
-func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
+func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	if appParams.StackName == nil {
 		return
 	}
@@ -133,7 +133,7 @@ func (cmd *Push) fetchStackGuid(appParams *cf.AppParams) {
 	appParams.StackGuid = &stack.Guid
 }
 
-func (cmd *Push) bindAppToRoute(app cf.Application, params cf.AppParams, c *cli.Context) {
+func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams, c *cli.Context) {
 	if c.Bool("no-route") {
 		return
 	}
@@ -194,7 +194,7 @@ func hostNameForString(name string) string {
 	return string(nameBytes)
 }
 
-func (cmd *Push) restart(app cf.Application, params cf.AppParams, c *cli.Context) {
+func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli.Context) {
 	if app.State != "stopped" {
 		cmd.ui.Say("")
 		app, _ = cmd.stopper.ApplicationStop(app)
@@ -213,7 +213,7 @@ func (cmd *Push) restart(app cf.Application, params cf.AppParams, c *cli.Context
 	cmd.starter.ApplicationStart(app)
 }
 
-func (cmd *Push) route(hostName string, domain cf.DomainFields) (route cf.Route) {
+func (cmd *Push) route(hostName string, domain models.DomainFields) (route models.Route) {
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
@@ -233,7 +233,7 @@ func (cmd *Push) route(hostName string, domain cf.DomainFields) (route cf.Route)
 	return
 }
 
-func (cmd *Push) domain(c *cli.Context, domainName string) (domain cf.Domain) {
+func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.Domain) {
 	var apiResponse net.ApiResponse
 
 	if domainName != "" {
@@ -257,9 +257,9 @@ func (cmd *Push) domain(c *cli.Context, domainName string) (domain cf.Domain) {
 	return
 }
 
-func (cmd *Push) findDefaultDomain() (domain cf.Domain, err error) {
+func (cmd *Push) findDefaultDomain() (domain models.Domain, err error) {
 	var foundSharedDomain bool = false
-	listDomainsCallback := api.ListDomainsCallback(func(domains []cf.Domain) bool {
+	listDomainsCallback := api.ListDomainsCallback(func(domains []models.Domain) bool {
 		for _, aDomain := range domains {
 			if aDomain.Shared {
 				foundSharedDomain = true
@@ -305,7 +305,7 @@ func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) 
 	return
 }
 
-func (cmd *Push) createOrUpdateApp(appParams cf.AppParams) (app cf.Application) {
+func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Application) {
 	if appParams.Name == nil {
 		cmd.ui.Failed("Error: No name found for app")
 		return
@@ -334,7 +334,7 @@ func (cmd *Push) createOrUpdateApp(appParams cf.AppParams) (app cf.Application) 
 	return
 }
 
-func (cmd *Push) createApp(appParams cf.AppParams) (app cf.Application, apiResponse net.ApiResponse) {
+func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiResponse net.ApiResponse) {
 	appParams.SpaceGuid = &cmd.config.SpaceFields.Guid
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
@@ -356,7 +356,7 @@ func (cmd *Push) createApp(appParams cf.AppParams) (app cf.Application, apiRespo
 	return
 }
 
-func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedApp cf.Application) {
+func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (updatedApp models.Application) {
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
@@ -385,16 +385,16 @@ func (cmd *Push) updateApp(app cf.Application, appParams cf.AppParams) (updatedA
 	return
 }
 
-func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []cf.AppParams) {
+func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppParams) {
 	m := cmd.instantiateManifest(c)
 
-	appParams, err := cf.NewAppParamsFromContext(c)
+	appParams, err := models.NewAppParamsFromContext(c)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
 	}
 
-	if appParams.Name == nil && len(m.Applications) > 1 && !appParams.Equals(&cf.AppParams{}) {
+	if appParams.Name == nil && len(m.Applications) > 1 && !appParams.Equals(&models.AppParams{}) {
 		cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
 		return
 	}
@@ -436,10 +436,10 @@ func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
 	return
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams cf.AppParams, m *manifest.Manifest) (appSet []cf.AppParams, err error) {
+func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams models.AppParams, m *manifest.Manifest) (appSet []models.AppParams, err error) {
 	if len(m.Applications) > 1 {
 		if contextParams.Name != nil {
-			var app cf.AppParams
+			var app models.AppParams
 			app, err = findAppWithNameInManifest(*contextParams.Name, m)
 
 			if err != nil {
@@ -447,11 +447,11 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 				return
 			}
 
-			m.Applications = []cf.AppParams{app}
+			m.Applications = []models.AppParams{app}
 		}
 	}
 
-	appSet = make([]cf.AppParams, 0, len(m.Applications))
+	appSet = make([]models.AppParams, 0, len(m.Applications))
 	if len(m.Applications) == 0 {
 		if contextParams.Name == nil || *contextParams.Name == "" {
 			cmd.ui.FailWithUsage(c, "push")
@@ -468,7 +468,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 	return
 }
 
-func addApp(apps *[]cf.AppParams, app cf.AppParams) (err error) {
+func addApp(apps *[]models.AppParams, app models.AppParams) (err error) {
 	if app.Name == nil {
 		err = errors.New("app name is a required field")
 	}
@@ -480,7 +480,7 @@ func addApp(apps *[]cf.AppParams, app cf.AppParams) (err error) {
 	return
 }
 
-func findAppWithNameInManifest(name string, m *manifest.Manifest) (app cf.AppParams, err error) {
+func findAppWithNameInManifest(name string, m *manifest.Manifest) (app models.AppParams, err error) {
 	for _, appParams := range m.Applications {
 		if appParams.Name != nil && *appParams.Name == name {
 			app = appParams

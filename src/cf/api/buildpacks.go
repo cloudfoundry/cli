@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"encoding/json"
 	"fmt"
@@ -34,11 +35,11 @@ type BuildpackEntity struct {
 }
 
 type BuildpackRepository interface {
-	FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse)
-	ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse)
-	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse)
+	FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse)
+	ListBuildpacks(stop chan bool) (buildpacksChan chan []models.Buildpack, statusChan chan net.ApiResponse)
+	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse)
 	Delete(buildpackGuid string) (apiResponse net.ApiResponse)
-	Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse)
+	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse)
 }
 
 type CloudControllerBuildpackRepository struct {
@@ -52,8 +53,8 @@ func NewCloudControllerBuildpackRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []cf.Buildpack, statusChan chan net.ApiResponse) {
-	buildpacksChan = make(chan []cf.Buildpack, 4)
+func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []models.Buildpack, statusChan chan net.ApiResponse) {
+	buildpacksChan = make(chan []models.Buildpack, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
@@ -66,7 +67,7 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (b
 				break loop
 			default:
 				var (
-					buildpacks  []cf.Buildpack
+					buildpacks  []models.Buildpack
 					apiResponse net.ApiResponse
 				)
 				buildpacks, path, apiResponse = repo.findNextWithPath(path)
@@ -90,7 +91,7 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (b
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name))
 	buildpacks, _, apiResponse := repo.findNextWithPath(path)
 	if apiResponse.IsNotSuccessful() {
@@ -106,7 +107,7 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (buildpacks []cf.Buildpack, nextUrl string, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (buildpacks []models.Buildpack, nextUrl string, apiResponse net.ApiResponse) {
 	response := new(PaginatedBuildpackResources)
 
 	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, response)
@@ -123,7 +124,7 @@ func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (bu
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse) {
 	path := repo.config.Target + buildpacks_path
 	entity := BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
@@ -148,7 +149,7 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (api
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (updatedBuildpack cf.Buildpack, apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
 
 	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled, "", "", buildpack.Locked}
@@ -169,7 +170,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack cf.Buildpack) (u
 	return
 }
 
-func unmarshallBuildpack(resource BuildpackResource) (buildpack cf.Buildpack) {
+func unmarshallBuildpack(resource BuildpackResource) (buildpack models.Buildpack) {
 	buildpack.Guid = resource.Metadata.Guid
 	buildpack.Name = resource.Entity.Name
 	buildpack.Position = resource.Entity.Position

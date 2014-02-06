@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"strings"
@@ -12,7 +12,7 @@ type ApplicationSummaries struct {
 	Apps []ApplicationFromSummary
 }
 
-func (resource ApplicationSummaries) ToModels() (apps []cf.ApplicationFields) {
+func (resource ApplicationSummaries) ToModels() (apps []models.ApplicationFields) {
 	for _, appSummary := range resource.Apps {
 		apps = append(apps, appSummary.ToFields())
 	}
@@ -32,8 +32,8 @@ type ApplicationFromSummary struct {
 	SpaceGuid        string `json:"space_guid"`
 }
 
-func (resource ApplicationFromSummary) ToFields() (app cf.ApplicationFields) {
-	app = cf.ApplicationFields{}
+func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields) {
+	app = models.ApplicationFields{}
 	app.Guid = resource.Guid
 	app.Name = resource.Name
 	app.State = strings.ToLower(resource.State)
@@ -46,9 +46,9 @@ func (resource ApplicationFromSummary) ToFields() (app cf.ApplicationFields) {
 	return
 }
 
-func (resource ApplicationFromSummary) ToModel() (app cf.AppSummary) {
+func (resource ApplicationFromSummary) ToModel() (app models.AppSummary) {
 	app.ApplicationFields = resource.ToFields()
-	routes := []cf.RouteSummary{}
+	routes := []models.RouteSummary{}
 	for _, route := range resource.Routes {
 		routes = append(routes, route.ToModel())
 	}
@@ -63,8 +63,8 @@ type RouteSummary struct {
 	Domain DomainSummary
 }
 
-func (resource RouteSummary) ToModel() (route cf.RouteSummary) {
-	domain := cf.DomainFields{}
+func (resource RouteSummary) ToModel() (route models.RouteSummary) {
+	domain := models.DomainFields{}
 	domain.Guid = resource.Domain.Guid
 	domain.Name = resource.Domain.Name
 	domain.Shared = resource.Domain.OwningOrganizationGuid != ""
@@ -82,8 +82,8 @@ type DomainSummary struct {
 }
 
 type AppSummaryRepository interface {
-	GetSummariesInCurrentSpace() (apps []cf.AppSummary, apiResponse net.ApiResponse)
-	GetSummary(appGuid string) (summary cf.AppSummary, apiResponse net.ApiResponse)
+	GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse net.ApiResponse)
+	GetSummary(appGuid string) (summary models.AppSummary, apiResponse net.ApiResponse)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -97,7 +97,7 @@ func NewCloudControllerAppSummaryRepository(config *configuration.Configuration,
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []cf.AppSummary, apiResponse net.ApiResponse) {
+func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse net.ApiResponse) {
 	resources := new(ApplicationSummaries)
 
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.SpaceFields.Guid)
@@ -112,7 +112,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary cf.AppSummary, apiResponse net.ApiResponse) {
+func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.AppSummary, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, appGuid)
 	summaryResponse := new(ApplicationFromSummary)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, summaryResponse)

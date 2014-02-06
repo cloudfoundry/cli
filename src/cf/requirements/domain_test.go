@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestDomainReqExecute", func() {
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Name = "example.com"
 			domain.Guid = "domain-guid"
 			domainRepo := &testapi.FakeDomainRepository{FindByNameDomain: domain}

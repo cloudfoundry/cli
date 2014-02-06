@@ -1,14 +1,14 @@
 package commands
 
 import (
-	"cf"
+"cf/models"
 )
 
 type FakeAppRestarter struct {
-	AppToRestart cf.Application
+	AppToRestart models.Application
 }
 
-func (restarter *FakeAppRestarter) ApplicationRestart(appToRestart cf.Application) {
+func (restarter *FakeAppRestarter) ApplicationRestart(appToRestart models.Application) {
 	restarter.AppToRestart = appToRestart
 	return
 }

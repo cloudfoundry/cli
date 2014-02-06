@@ -1,10 +1,10 @@
 package application_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,9 +24,9 @@ func callSetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -42,7 +42,7 @@ func callSetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestSetEnvRequirements", func() {
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			appRepo := &testapi.FakeApplicationRepository{}
@@ -65,7 +65,7 @@ func init() {
 
 		It("TestRunWhenApplicationExists", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.EnvironmentVars = map[string]string{"foo": "bar"}
@@ -100,7 +100,7 @@ func init() {
 
 		It("TestSetEnvWhenItAlreadyExists", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
@@ -134,7 +134,7 @@ func init() {
 
 		It("TestRunWhenSettingTheEnvFails", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -155,7 +155,7 @@ func init() {
 
 		It("TestSetEnvFailsWithUsage", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}

@@ -1,21 +1,21 @@
 package user
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
-var spaceRoles = []string{cf.SPACE_MANAGER, cf.SPACE_DEVELOPER, cf.SPACE_AUDITOR}
+var spaceRoles = []string{models.SPACE_MANAGER, models.SPACE_DEVELOPER, models.SPACE_AUDITOR}
 
 var spaceRoleToDisplayName = map[string]string{
-	cf.SPACE_MANAGER:   "SPACE MANAGER",
-	cf.SPACE_DEVELOPER: "SPACE DEVELOPER",
-	cf.SPACE_AUDITOR:   "SPACE AUDITOR",
+	models.SPACE_MANAGER:   "SPACE MANAGER",
+	models.SPACE_DEVELOPER: "SPACE DEVELOPER",
+	models.SPACE_AUDITOR:   "SPACE AUDITOR",
 }
 
 type SpaceUsers struct {

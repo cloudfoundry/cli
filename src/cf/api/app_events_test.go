@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
@@ -118,23 +118,23 @@ func init() {
 
 			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			event1 := cf.EventFields{}
+			event1 := models.EventFields{}
 			event1.Name = "app crashed"
 			event1.Description = "instance: 1, reason: app instance exited, exit_status: 1"
 			event1.Timestamp = testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 
-			event2 := cf.EventFields{}
+			event2 := models.EventFields{}
 			event2.Name = "app crashed"
 			event2.Description = "instance: 2, reason: app instance was stopped, exit_status: 2"
 			event2.Timestamp = testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00")
 
-			expectedEvents := []cf.EventFields{
+			expectedEvents := []models.EventFields{
 				event1,
 				event2,
 			}
 
-			list := []cf.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
+			list := []models.EventFields{}
+			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []models.EventFields) (fetchNext bool) {
 				list = append(list, events...)
 				return true
 			}))
@@ -209,8 +209,8 @@ func init() {
 
 			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			events := []cf.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(eventPage []cf.EventFields) (fetchNext bool) {
+			events := []models.EventFields{}
+			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(eventPage []models.EventFields) (fetchNext bool) {
 				events = append(events, eventPage...)
 				return true
 			}))
@@ -235,8 +235,8 @@ func init() {
 
 			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			list := []cf.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []cf.EventFields) (fetchNext bool) {
+			list := []models.EventFields{}
+			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []models.EventFields) (fetchNext bool) {
 				list = append(list, events...)
 				return true
 			}))
@@ -244,12 +244,12 @@ func init() {
 			firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 			assert.NoError(mr.T(), err)
 
-			event1 := cf.EventFields{}
+			event1 := models.EventFields{}
 			event1.Name = "app crashed"
 			event1.Description = "instance: 1, reason: app instance exited, exit_status: 1"
 			event1.Timestamp = firstExpectedTime
 
-			expectedEvents := []cf.EventFields{
+			expectedEvents := []models.EventFields{
 				event1,
 			}
 
@@ -281,7 +281,7 @@ func init() {
 
 			assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields().(cf.EventFields)
+			eventFields := resource.ToFields().(models.EventFields)
 			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
 			assert.Equal(mr.T(), eventFields.Name, "app.crash")
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"))
@@ -312,7 +312,7 @@ func init() {
 
 			assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields().(cf.EventFields)
+			eventFields := resource.ToFields().(models.EventFields)
 			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
 			assert.Equal(mr.T(), eventFields.Name, "audit.app.update")
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
@@ -338,7 +338,7 @@ func init() {
 
 			assert.NoError(mr.T(), err)
 
-			eventFields = resource.ToFields().(cf.EventFields)
+			eventFields = resource.ToFields().(models.EventFields)
 			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
 			assert.Equal(mr.T(), eventFields.Name, "audit.app.update")
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
@@ -366,7 +366,7 @@ func init() {
 
 			assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields().(cf.EventFields)
+			eventFields := resource.ToFields().(models.EventFields)
 			assert.Equal(mr.T(), eventFields.Guid, "event-2-guid")
 			assert.Equal(mr.T(), eventFields.Name, "audit.app.delete-request")
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00"))
@@ -400,7 +400,7 @@ func init() {
 
 			assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields().(cf.EventFields)
+			eventFields := resource.ToFields().(models.EventFields)
 			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
 			assert.Equal(mr.T(), eventFields.Name, "audit.app.create")
 			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-22T19:34:16+00:00"))

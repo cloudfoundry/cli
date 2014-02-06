@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"cf"
 	"cf/commands/organization"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,10 +24,10 @@ func callRenameOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 	})
 	assert.NoError(t, err)
 
-	spaceFields := cf.SpaceFields{}
+	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
-	orgFields := cf.OrganizationFields{}
+	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -65,7 +65,7 @@ func init() {
 
 			orgRepo := &testapi.FakeOrgRepository{}
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}

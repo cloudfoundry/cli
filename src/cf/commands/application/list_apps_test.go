@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callApps(t mr.TestingT, appSummaryRepo *testapi.FakeAppSummaryRepo, reqFact
 	})
 	assert.NoError(t, err)
 
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "development"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -41,31 +41,31 @@ func callApps(t mr.TestingT, appSummaryRepo *testapi.FakeAppSummaryRepo, reqFact
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestApps", func() {
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "cfapps.io"
-			domain2 := cf.DomainFields{}
+			domain2 := models.DomainFields{}
 			domain2.Name = "example.com"
 
-			route1 := cf.RouteSummary{}
+			route1 := models.RouteSummary{}
 			route1.Host = "app1"
 			route1.Domain = domain
 
-			route2 := cf.RouteSummary{}
+			route2 := models.RouteSummary{}
 			route2.Host = "app1"
 			route2.Domain = domain2
 
-			app1Routes := []cf.RouteSummary{route1, route2}
+			app1Routes := []models.RouteSummary{route1, route2}
 
-			domain3 := cf.DomainFields{}
+			domain3 := models.DomainFields{}
 			domain3.Name = "cfapps.io"
 
-			route3 := cf.RouteSummary{}
+			route3 := models.RouteSummary{}
 			route3.Host = "app2"
 			route3.Domain = domain3
 
-			app2Routes := []cf.RouteSummary{route3}
+			app2Routes := []models.RouteSummary{route3}
 
-			app := cf.AppSummary{}
+			app := models.AppSummary{}
 			app.Name = "Application-1"
 			app.State = "started"
 			app.RunningInstances = 1
@@ -74,7 +74,7 @@ func init() {
 			app.DiskQuota = 1024
 			app.RouteSummaries = app1Routes
 
-			app2 := cf.AppSummary{}
+			app2 := models.AppSummary{}
 			app2.Name = "Application-2"
 			app2.State = "started"
 			app2.RunningInstances = 1
@@ -83,7 +83,7 @@ func init() {
 			app2.DiskQuota = 1024
 			app2.RouteSummaries = app2Routes
 
-			apps := []cf.AppSummary{app, app2}
+			apps := []models.AppSummary{app, app2}
 
 			appSummaryRepo := &testapi.FakeAppSummaryRepo{
 				GetSummariesInCurrentSpaceApps: apps,
@@ -105,7 +105,7 @@ func init() {
 		It("TestAppsEmptyList", func() {
 
 			appSummaryRepo := &testapi.FakeAppSummaryRepo{
-				GetSummariesInCurrentSpaceApps: []cf.AppSummary{},
+				GetSummariesInCurrentSpaceApps: []models.AppSummary{},
 			}
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}

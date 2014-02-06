@@ -1,32 +1,32 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 	"generic"
 )
 
 type FakeServiceRepo struct {
-	ServiceOfferings []cf.ServiceOffering
+	ServiceOfferings []models.ServiceOffering
 
 	CreateServiceInstanceName     string
 	CreateServiceInstancePlanGuid string
 	CreateServiceAlreadyExists    bool
 
 	FindInstanceByNameName            string
-	FindInstanceByNameServiceInstance cf.ServiceInstance
+	FindInstanceByNameServiceInstance models.ServiceInstance
 	FindInstanceByNameErr             bool
 	FindInstanceByNameNotFound        bool
 
 	FindInstanceByNameMap generic.Map
 
-	DeleteServiceServiceInstance cf.ServiceInstance
+	DeleteServiceServiceInstance models.ServiceInstance
 
-	RenameServiceServiceInstance cf.ServiceInstance
+	RenameServiceServiceInstance models.ServiceInstance
 	RenameServiceNewName         string
 }
 
-func (repo *FakeServiceRepo) GetServiceOfferings() (offerings cf.ServiceOfferings, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
 	offerings = repo.ServiceOfferings
 	return
 }
@@ -39,11 +39,11 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (ident
 	return
 }
 
-func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.ServiceInstance, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse) {
 	repo.FindInstanceByNameName = name
 
 	if repo.FindInstanceByNameMap != nil && repo.FindInstanceByNameMap.Has(name) {
-		instance = repo.FindInstanceByNameMap.Get(name).(cf.ServiceInstance)
+		instance = repo.FindInstanceByNameMap.Get(name).(models.ServiceInstance)
 	} else {
 		instance = repo.FindInstanceByNameServiceInstance
 	}
@@ -59,12 +59,12 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance cf.Servic
 	return
 }
 
-func (repo *FakeServiceRepo) DeleteService(instance cf.ServiceInstance) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse) {
 	repo.DeleteServiceServiceInstance = instance
 	return
 }
 
-func (repo *FakeServiceRepo) RenameService(instance cf.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	repo.RenameServiceServiceInstance = instance
 	repo.RenameServiceNewName = newName
 	return

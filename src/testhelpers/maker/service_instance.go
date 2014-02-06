@@ -1,6 +1,6 @@
 package maker
 
-import "cf"
+import "cf/models"
 
 var serviceInstanceGuid func() string
 
@@ -8,7 +8,7 @@ func init() {
 	serviceInstanceGuid = guidGenerator("services")
 }
 
-func NewServiceInstance(name string) (service cf.ServiceInstance) {
+func NewServiceInstance(name string) (service models.ServiceInstance) {
 	service.Name = name
 	service.Guid = serviceInstanceGuid()
 	return

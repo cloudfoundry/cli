@@ -1,9 +1,9 @@
 package domain_test
 
 import (
-	"cf"
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -63,7 +63,7 @@ func init() {
 		})
 		It("TestCreateDomain", func() {
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "myOrg"
 			org.Guid = "myOrg-guid"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}

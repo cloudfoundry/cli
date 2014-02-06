@@ -1,22 +1,22 @@
 package requirements
 
 import (
-	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/terminal"
 )
 
 type OrganizationRequirement interface {
 	Requirement
-	GetOrganization() cf.Organization
+	GetOrganization() models.Organization
 }
 
 type organizationApiRequirement struct {
 	name    string
 	ui      terminal.UI
 	orgRepo api.OrganizationRepository
-	org     cf.Organization
+	org     models.Organization
 }
 
 func NewOrganizationRequirement(name string, ui terminal.UI, sR api.OrganizationRepository) (req *organizationApiRequirement) {
@@ -39,6 +39,6 @@ func (req *organizationApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *organizationApiRequirement) GetOrganization() cf.Organization {
+func (req *organizationApiRequirement) GetOrganization() models.Organization {
 	return req.org
 }

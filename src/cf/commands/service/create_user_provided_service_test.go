@@ -1,10 +1,10 @@
 package service_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -25,9 +25,9 @@ func callCreateUserProvidedService(t mr.TestingT, args []string, inputs []string
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,

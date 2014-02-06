@@ -5,6 +5,7 @@ import (
 	"cf/api"
 	"cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -87,13 +88,13 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 
 	var err error
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, cf.SPACE_MANAGER, cmd.config.UserGuid(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGuid(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	err = cmd.spaceRoleSetter.SetSpaceRole(space, cf.SPACE_DEVELOPER, cmd.config.UserGuid(), cmd.config.Username())
+	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_DEVELOPER, cmd.config.UserGuid(), cmd.config.Username())
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return

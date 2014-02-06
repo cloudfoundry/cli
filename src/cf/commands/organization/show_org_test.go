@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"cf"
 	. "cf/commands/organization"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,10 +22,10 @@ func callShowOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactor
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	spaceFields := cf.SpaceFields{}
+	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
-	orgFields := cf.OrganizationFields{}
+	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -53,7 +53,7 @@ func init() {
 		})
 		It("TestShowOrgFailsWithUsage", func() {
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 			reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
@@ -68,20 +68,20 @@ func init() {
 		})
 		It("TestRunWhenOrganizationExists", func() {
 
-			developmentSpaceFields := cf.SpaceFields{}
+			developmentSpaceFields := models.SpaceFields{}
 			developmentSpaceFields.Name = "development"
-			stagingSpaceFields := cf.SpaceFields{}
+			stagingSpaceFields := models.SpaceFields{}
 			stagingSpaceFields.Name = "staging"
-			domainFields := cf.DomainFields{}
+			domainFields := models.DomainFields{}
 			domainFields.Name = "cfapps.io"
-			cfAppDomainFields := cf.DomainFields{}
+			cfAppDomainFields := models.DomainFields{}
 			cfAppDomainFields.Name = "cf-app.com"
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
-			org.QuotaDefinition = cf.NewQuotaFields("cantina-quota", 512)
-			org.Spaces = []cf.SpaceFields{developmentSpaceFields, stagingSpaceFields}
-			org.Domains = []cf.DomainFields{domainFields, cfAppDomainFields}
+			org.QuotaDefinition = models.NewQuotaFields("cantina-quota", 512)
+			org.Spaces = []models.SpaceFields{developmentSpaceFields, stagingSpaceFields}
+			org.Domains = []models.DomainFields{domainFields, cfAppDomainFields}
 
 			reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 

@@ -1,9 +1,9 @@
 package commands_test
 
 import (
-	"cf"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -40,20 +40,20 @@ func setUpLoginTestContext() (c *LoginTestContext) {
 	}
 	c.endpointRepo = &testapi.FakeEndpointRepo{Config: c.Config}
 
-	org := cf.Organization{}
+	org := models.Organization{}
 	org.Name = "my-org"
 	org.Guid = "my-org-guid"
 
 	c.orgRepo = &testapi.FakeOrgRepository{
-		Organizations: []cf.Organization{org},
+		Organizations: []models.Organization{org},
 	}
 
-	space := cf.Space{}
+	space := models.Space{}
 	space.Name = "my-space"
 	space.Guid = "my-space-guid"
 
 	c.spaceRepo = &testapi.FakeSpaceRepository{
-		Spaces: []cf.Space{space},
+		Spaces: []models.Space{space},
 	}
 
 	return
@@ -73,24 +73,24 @@ func init() {
 
 			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
 
-			org1 := cf.Organization{}
+			org1 := models.Organization{}
 			org1.Guid = "some-org-guid"
 			org1.Name = "some-org"
 
-			org2 := cf.Organization{}
+			org2 := models.Organization{}
 			org2.Guid = "my-org-guid"
 			org2.Name = "my-org"
 
-			space1 := cf.Space{}
+			space1 := models.Space{}
 			space1.Guid = "my-space-guid"
 			space1.Name = "my-space"
 
-			space2 := cf.Space{}
+			space2 := models.Space{}
 			space2.Guid = "some-space-guid"
 			space2.Name = "some-space"
 
-			c.orgRepo.Organizations = []cf.Organization{org1, org2}
-			c.spaceRepo.Spaces = []cf.Space{space1, space2}
+			c.orgRepo.Organizations = []models.Organization{org1, org2}
+			c.spaceRepo.Spaces = []models.Space{space1, space2}
 
 			callLogin(c)
 
@@ -124,24 +124,24 @@ func init() {
 
 			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"}
 
-			org1 := cf.Organization{}
+			org1 := models.Organization{}
 			org1.Guid = "some-org-guid"
 			org1.Name = "some-org"
 
-			org2 := cf.Organization{}
+			org2 := models.Organization{}
 			org2.Guid = "my-org-guid"
 			org2.Name = "my-org"
 
-			space1 := cf.Space{}
+			space1 := models.Space{}
 			space1.Guid = "my-space-guid"
 			space1.Name = "my-space"
 
-			space2 := cf.Space{}
+			space2 := models.Space{}
 			space2.Guid = "some-space-guid"
 			space2.Name = "some-space"
 
-			c.orgRepo.Organizations = []cf.Organization{org1, org2}
-			c.spaceRepo.Spaces = []cf.Space{space1, space2}
+			c.orgRepo.Organizations = []models.Organization{org1, org2}
+			c.spaceRepo.Spaces = []models.Space{space1, space2}
 
 			callLogin(c)
 
@@ -177,7 +177,7 @@ func init() {
 
 			for i := 0; i < 60; i++ {
 				id := strconv.Itoa(i)
-				org := cf.Organization{}
+				org := models.Organization{}
 				org.Guid = "my-org-guid-" + id
 				org.Name = "my-org-" + id
 				c.orgRepo.Organizations = append(c.orgRepo.Organizations, org)
@@ -185,15 +185,15 @@ func init() {
 
 			c.orgRepo.FindByNameOrganization = c.orgRepo.Organizations[1]
 
-			space1 := cf.Space{}
+			space1 := models.Space{}
 			space1.Guid = "my-space-guid"
 			space1.Name = "my-space"
 
-			space2 := cf.Space{}
+			space2 := models.Space{}
 			space2.Guid = "some-space-guid"
 			space2.Name = "some-space"
 
-			c.spaceRepo.Spaces = []cf.Space{space1, space2}
+			c.spaceRepo.Spaces = []models.Space{space1, space2}
 
 			callLogin(c)
 
@@ -249,7 +249,7 @@ func init() {
 		It("TestSuccessfullyLoggingInWithOrgSetInConfig", func() {
 			c := setUpLoginTestContext()
 
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 			c.Config.OrganizationFields = org
@@ -257,7 +257,7 @@ func init() {
 			c.Flags = []string{"-s", "my-space"}
 			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-			c.orgRepo.FindByNameOrganization = cf.Organization{}
+			c.orgRepo.FindByNameOrganization = models.Organization{}
 
 			callLogin(c)
 
@@ -277,20 +277,20 @@ func init() {
 		It("TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig", func() {
 			c := setUpLoginTestContext()
 
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 			c.Config.OrganizationFields = org
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
 			c.Config.SpaceFields = space
 
 			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-			c.orgRepo.FindByNameOrganization = cf.Organization{}
-			c.spaceRepo.FindByNameInOrgSpace = cf.Space{}
+			c.orgRepo.FindByNameOrganization = models.Organization{}
+			c.spaceRepo.FindByNameInOrgSpace = models.Space{}
 
 			callLogin(c)
 
@@ -310,14 +310,14 @@ func init() {
 		It("TestSuccessfullyLoggingInWithOnlyOneOrg", func() {
 			c := setUpLoginTestContext()
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 
 			c.Flags = []string{"-s", "my-space"}
 			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-			c.orgRepo.FindByNameOrganization = cf.Organization{}
-			c.orgRepo.Organizations = []cf.Organization{org}
+			c.orgRepo.FindByNameOrganization = models.Organization{}
+			c.orgRepo.Organizations = []models.Organization{org}
 
 			callLogin(c)
 
@@ -337,13 +337,13 @@ func init() {
 		It("TestSuccessfullyLoggingInWithOnlyOneSpace", func() {
 			c := setUpLoginTestContext()
 
-			space := cf.Space{}
+			space := models.Space{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
 
 			c.Flags = []string{"-o", "my-org"}
 			c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-			c.spaceRepo.Spaces = []cf.Space{space}
+			c.spaceRepo.Spaces = []models.Space{space}
 
 			callLogin(c)
 
@@ -446,7 +446,7 @@ func init() {
 
 			org1 := maker.NewOrg(maker.Overrides{"name": "org1"})
 			org2 := maker.NewOrg(maker.Overrides{"name": "org2"})
-			c.orgRepo.Organizations = []cf.Organization{org1, org2}
+			c.orgRepo.Organizations = []models.Organization{org1, org2}
 
 			callLogin(c)
 
@@ -468,15 +468,15 @@ func init() {
 
 			c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", ""}
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Guid = "some-org-guid"
 			org.Name = "some-org"
 
 			space1 := maker.NewSpace(maker.Overrides{"name": "some-space", "guid": "some-space-guid"})
 			space2 := maker.NewSpace(maker.Overrides{"name": "other-space", "guid": "other-space-guid"})
 
-			c.orgRepo.Organizations = []cf.Organization{org}
-			c.spaceRepo.Spaces = []cf.Space{space1, space2}
+			c.orgRepo.Organizations = []models.Organization{org}
+			c.spaceRepo.Spaces = []models.Space{space1, space2}
 
 			callLogin(c)
 

@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -71,7 +71,7 @@ var getAppSummariesResponseBody = `
 
 func createAppSummaryRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppSummaryRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		SpaceFields: space,

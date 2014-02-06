@@ -1,22 +1,22 @@
 package user
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
 	"github.com/codegangsta/cli"
 )
 
-var orgRoles = []string{cf.ORG_MANAGER, cf.BILLING_MANAGER, cf.ORG_AUDITOR}
+var orgRoles = []string{models.ORG_MANAGER, models.BILLING_MANAGER, models.ORG_AUDITOR}
 
 var orgRoleToDisplayName = map[string]string{
-	cf.ORG_USER:        "USERS",
-	cf.ORG_MANAGER:     "ORG MANAGER",
-	cf.BILLING_MANAGER: "BILLING MANAGER",
-	cf.ORG_AUDITOR:     "ORG AUDITOR",
+	models.ORG_USER:        "USERS",
+	models.ORG_MANAGER:     "ORG MANAGER",
+	models.BILLING_MANAGER: "BILLING MANAGER",
+	models.ORG_AUDITOR:     "ORG AUDITOR",
 }
 
 type OrgUsers struct {
@@ -59,7 +59,7 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 
 	roles := orgRoles
 	if all {
-		roles = []string{cf.ORG_USER}
+		roles = []string{models.ORG_USER}
 	}
 
 	for _, role := range roles {

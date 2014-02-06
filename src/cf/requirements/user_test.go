@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +14,7 @@ import (
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestUserReqExecute", func() {
-			user := cf.UserFields{}
+			user := models.UserFields{}
 			user.Username = "my-user"
 			user.Guid = "my-user-guid"
 

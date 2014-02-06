@@ -1,31 +1,31 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 	"cf/api"
 )
 
 type FakeDomainRepository struct {
-	FindAllInCurrentSpaceDomains []cf.Domain
+	FindAllInCurrentSpaceDomains []models.Domain
 
 	ListDomainsForOrgDomainsGuid string
-	ListDomainsForOrgDomains     []cf.Domain
+	ListDomainsForOrgDomains     []models.Domain
 	ListDomainsForOrgApiResponse net.ApiResponse
 
-	ListSharedDomainsDomains     []cf.Domain
+	ListSharedDomainsDomains     []models.Domain
 	ListSharedDomainsApiResponse net.ApiResponse
 
-	ListDomainsDomains     []cf.Domain
+	ListDomainsDomains     []models.Domain
 	ListDomainsApiResponse net.ApiResponse
 
-	FindByNameInOrgDomain      cf.Domain
+	FindByNameInOrgDomain      models.Domain
 	FindByNameInOrgApiResponse net.ApiResponse
 
 	FindByNameInCurrentSpaceName string
 
 	FindByNameName     string
-	FindByNameDomain   cf.Domain
+	FindByNameDomain   models.Domain
 	FindByNameNotFound bool
 	FindByNameErr      bool
 
@@ -63,7 +63,7 @@ func (repo *FakeDomainRepository) ListDomains(cb api.ListDomainsCallback) net.Ap
 	return repo.ListDomainsApiResponse
 }
 
-func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
+func (repo *FakeDomainRepository) FindByName(name string) (domain models.Domain, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	domain = repo.FindByNameDomain
 
@@ -77,7 +77,7 @@ func (repo *FakeDomainRepository) FindByName(name string) (domain cf.Domain, api
 	return
 }
 
-func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain cf.Domain, apiResponse net.ApiResponse) {
+func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain models.Domain, apiResponse net.ApiResponse) {
 	repo.FindByNameInCurrentSpaceName = name
 	domain = repo.FindByNameDomain
 
@@ -91,13 +91,13 @@ func (repo *FakeDomainRepository) FindByNameInCurrentSpace(name string) (domain 
 	return
 }
 
-func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrgGuid string) (domain cf.Domain, apiResponse net.ApiResponse) {
+func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrgGuid string) (domain models.Domain, apiResponse net.ApiResponse) {
 	domain = repo.FindByNameInOrgDomain
 	apiResponse = repo.FindByNameInOrgApiResponse
 	return
 }
 
-func (repo *FakeDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain cf.DomainFields, apiResponse net.ApiResponse) {
+func (repo *FakeDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiResponse net.ApiResponse) {
 	repo.CreateDomainName = domainName
 	repo.CreateDomainOwningOrgGuid = owningOrgGuid
 	return

@@ -1,22 +1,22 @@
 package requirements
 
 import (
-	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/terminal"
 )
 
 type UserRequirement interface {
 	Requirement
-	GetUser() cf.UserFields
+	GetUser() models.UserFields
 }
 
 type userApiRequirement struct {
 	username string
 	ui       terminal.UI
 	userRepo api.UserRepository
-	user     cf.UserFields
+	user     models.UserFields
 }
 
 func NewUserRequirement(username string, ui terminal.UI, userRepo api.UserRepository) (req *userApiRequirement) {
@@ -39,6 +39,6 @@ func (req *userApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *userApiRequirement) GetUser() cf.UserFields {
+func (req *userApiRequirement) GetUser() models.UserFields {
 	return req.user
 }

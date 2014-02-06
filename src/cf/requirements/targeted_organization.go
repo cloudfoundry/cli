@@ -3,13 +3,14 @@ package requirements
 import (
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/terminal"
 	"fmt"
 )
 
 type TargetedOrgRequirement interface {
 	Requirement
-	GetOrganizationFields() cf.OrganizationFields
+	GetOrganizationFields() models.OrganizationFields
 }
 
 type targetedOrgApiRequirement struct {
@@ -32,6 +33,6 @@ func (req targetedOrgApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req targetedOrgApiRequirement) GetOrganizationFields() (org cf.OrganizationFields) {
+func (req targetedOrgApiRequirement) GetOrganizationFields() (org models.OrganizationFields) {
 	return req.config.OrganizationFields
 }

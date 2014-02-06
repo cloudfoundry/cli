@@ -1,8 +1,8 @@
 package requirements_test
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestTargetedOrgRequirement", func() {
 			ui := new(testterm.FakeUI)
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 			config := &configuration.Configuration{
@@ -26,7 +26,7 @@ func init() {
 			success := req.Execute()
 			assert.True(mr.T(), success)
 
-			config.OrganizationFields = cf.OrganizationFields{}
+			config.OrganizationFields = models.OrganizationFields{}
 
 			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
 				NewTargetedOrgRequirement(ui, config).Execute()

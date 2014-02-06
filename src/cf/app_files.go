@@ -1,6 +1,7 @@
 package cf
 
 import (
+	"cf/models"
 	"crypto/sha1"
 	"fileutils"
 	"fmt"
@@ -21,7 +22,7 @@ var DefaultIgnoreFiles = []string{
 
 type Globs []glob.Glob
 
-func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
+func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 	dir, err = filepath.Abs(dir)
 	if err != nil {
 		return
@@ -44,7 +45,7 @@ func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 		sha1Bytes := h.Sum(nil)
 		sha1 := fmt.Sprintf("%x", sha1Bytes)
 
-		appFiles = append(appFiles, AppFileFields{
+		appFiles = append(appFiles, models.AppFileFields{
 			Path: fileName,
 			Sha1: sha1,
 			Size: size,
@@ -55,7 +56,7 @@ func AppFilesInDir(dir string) (appFiles []AppFileFields, err error) {
 	return
 }
 
-func CopyFiles(appFiles []AppFileFields, fromDir, toDir string) (err error) {
+func CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err error) {
 	if err != nil {
 		return
 	}

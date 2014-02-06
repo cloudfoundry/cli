@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +16,7 @@ import (
 
 func createUserProvidedServiceInstanceRepo(t mr.TestingT, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo UserProvidedServiceInstanceRepository) {
 	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -86,7 +86,7 @@ func init() {
 				"user":     "me",
 				"password": "secret",
 			}
-			serviceInstance := cf.ServiceInstanceFields{}
+			serviceInstance := models.ServiceInstanceFields{}
 			serviceInstance.Guid = "my-instance-guid"
 			serviceInstance.Params = params
 			serviceInstance.SysLogDrainUrl = "syslog://example.com"
@@ -112,7 +112,7 @@ func init() {
 				"user":     "me",
 				"password": "secret",
 			}
-			serviceInstance := cf.ServiceInstanceFields{}
+			serviceInstance := models.ServiceInstanceFields{}
 			serviceInstance.Guid = "my-instance-guid"
 			serviceInstance.Params = params
 			apiResponse := repo.Update(serviceInstance)
@@ -130,7 +130,7 @@ func init() {
 
 			ts, handler, repo := createUserProvidedServiceInstanceRepo(mr.T(), req)
 			defer ts.Close()
-			serviceInstance := cf.ServiceInstanceFields{}
+			serviceInstance := models.ServiceInstanceFields{}
 			serviceInstance.Guid = "my-instance-guid"
 			serviceInstance.SysLogDrainUrl = "syslog://example.com"
 			apiResponse := repo.Update(serviceInstance)

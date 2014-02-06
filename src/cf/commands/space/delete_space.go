@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -73,7 +74,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	cmd.ui.Ok()
 
 	if cmd.config.SpaceFields.Name == spaceName {
-		cmd.config.SetSpaceFields(cf.SpaceFields{})
+		cmd.config.SetSpaceFields(models.SpaceFields{})
 		cmd.ui.Say("TIP: No space targeted, use '%s target -s' to target a space", cf.Name())
 	}
 

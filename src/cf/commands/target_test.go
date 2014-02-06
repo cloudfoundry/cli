@@ -1,10 +1,10 @@
 package commands_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -72,15 +72,15 @@ func init() {
 
 			simulateLogin(config)
 
-			config.SpaceFields = cf.SpaceFields{}
+			config.SpaceFields = models.SpaceFields{}
 			config.SpaceFields.Name = "my-space"
 			config.SpaceFields.Guid = "my-space-guid"
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-organization"
 			org.Guid = "my-organization-guid"
 
-			orgRepo.Organizations = []cf.Organization{org}
+			orgRepo.Organizations = []models.Organization{org}
 			orgRepo.FindByNameOrganization = org
 
 			ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
@@ -96,7 +96,7 @@ func init() {
 
 			simulateLogin(config)
 
-			orgs := []cf.Organization{}
+			orgs := []models.Organization{}
 			orgRepo.Organizations = orgs
 			orgRepo.FindByNameErr = true
 
@@ -108,7 +108,7 @@ func init() {
 			orgRepo, spaceRepo, config, reqFactory := getTargetDependencies()
 
 			simulateLogin(config)
-			config.OrganizationFields = cf.OrganizationFields{}
+			config.OrganizationFields = models.OrganizationFields{}
 			config.OrganizationFields.Guid = "previous-org-guid"
 			config.OrganizationFields.Name = "previous-org"
 
@@ -140,15 +140,15 @@ func init() {
 			orgRepo, spaceRepo, config, reqFactory := getTargetDependencies()
 
 			simulateLogin(config)
-			config.OrganizationFields = cf.OrganizationFields{}
+			config.OrganizationFields = models.OrganizationFields{}
 			config.OrganizationFields.Name = "my-org"
 			config.OrganizationFields.Guid = "my-org-guid"
 
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 
-			spaceRepo.Spaces = []cf.Space{space}
+			spaceRepo.Spaces = []models.Space{space}
 			spaceRepo.FindByNameSpace = space
 
 			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
@@ -162,7 +162,7 @@ func init() {
 			orgRepo, spaceRepo, config, reqFactory := getTargetDependencies()
 
 			simulateLogin(config)
-			config.OrganizationFields = cf.OrganizationFields{}
+			config.OrganizationFields = models.OrganizationFields{}
 			config.OrganizationFields.Name = "my-org"
 			config.OrganizationFields.Guid = "my-org-guid"
 
@@ -183,7 +183,7 @@ func init() {
 			orgRepo, spaceRepo, config, reqFactory := getTargetDependencies()
 
 			simulateLogin(config)
-			config.OrganizationFields = cf.OrganizationFields{}
+			config.OrganizationFields = models.OrganizationFields{}
 			config.OrganizationFields.Name = "my-org"
 			config.OrganizationFields.Guid = "my-org-guid"
 
@@ -202,15 +202,15 @@ func init() {
 
 			simulateLogin(config)
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-organization"
 			org.Guid = "my-organization-guid"
-			orgRepo.Organizations = []cf.Organization{org}
+			orgRepo.Organizations = []models.Organization{org}
 
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
-			spaceRepo.Spaces = []cf.Space{space}
+			spaceRepo.Spaces = []models.Space{space}
 
 			ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
 
@@ -226,10 +226,10 @@ func init() {
 
 			simulateLogin(config)
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "my-organization"
 			org.Guid = "my-organization-guid"
-			orgRepo.Organizations = []cf.Organization{org}
+			orgRepo.Organizations = []models.Organization{org}
 
 			spaceRepo.FindByNameErr = true
 

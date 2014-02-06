@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"encoding/json"
 	"fmt"
@@ -20,13 +20,13 @@ type AppRouteResource struct {
 	Entity AppRouteEntity
 }
 
-func (resource AppRouteResource) ToFields() (route cf.RouteFields) {
+func (resource AppRouteResource) ToFields() (route models.RouteFields) {
 	route.Guid = resource.Metadata.Guid
 	route.Host = resource.Entity.Host
 	return
 }
 
-func (resource AppRouteResource) ToModel() (route cf.RouteSummary) {
+func (resource AppRouteResource) ToModel() (route models.RouteSummary) {
 	route.RouteFields = resource.ToFields()
 	route.Domain.Guid = resource.Entity.Domain.Metadata.Guid
 	route.Domain.Name = resource.Entity.Domain.Entity.Name
@@ -53,7 +53,7 @@ type ApplicationResource struct {
 	Entity ApplicationEntity
 }
 
-func NewApplicationEntityFromAppParams(app cf.AppParams) ApplicationEntity {
+func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 	entity := ApplicationEntity{
 		Buildpack:          app.BuildpackUrl,
 		Name:               app.Name,
@@ -74,7 +74,7 @@ func NewApplicationEntityFromAppParams(app cf.AppParams) ApplicationEntity {
 	return entity
 }
 
-func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
+func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 	entity := resource.Entity
 	app.Guid = resource.Metadata.Guid
 
@@ -99,7 +99,7 @@ func (resource ApplicationResource) ToFields() (app cf.ApplicationFields) {
 	return
 }
 
-func (resource ApplicationResource) ToModel() (app cf.Application) {
+func (resource ApplicationResource) ToModel() (app models.Application) {
 	app.ApplicationFields = resource.ToFields()
 
 	entity := resource.Entity
@@ -121,9 +121,9 @@ type PaginatedApplicationResources struct {
 }
 
 type ApplicationRepository interface {
-	Create(params cf.AppParams) (createdApp cf.Application, apiResponse net.ApiResponse)
-	Read(name string) (app cf.Application, apiResponse net.ApiResponse)
-	Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse)
+	Create(params models.AppParams) (createdApp models.Application, apiResponse net.ApiResponse)
+	Read(name string) (app models.Application, apiResponse net.ApiResponse)
+	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse net.ApiResponse)
 	Delete(appGuid string) (apiResponse net.ApiResponse)
 }
 
@@ -138,7 +138,7 @@ func NewCloudControllerApplicationRepository(config *configuration.Configuration
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(params cf.AppParams) (createdApp cf.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiResponse net.ApiResponse) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Failed to marshal JSON", err)
@@ -156,7 +156,7 @@ func (repo CloudControllerApplicationRepository) Create(params cf.AppParams) (cr
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Read(name string) (app cf.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.Target, repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
 	appResources := new(PaginatedApplicationResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, appResources)
@@ -174,7 +174,7 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app cf.Appli
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Update(appGuid string, params cf.AppParams) (updatedApp cf.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse net.ApiResponse) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
 		apiResponse = net.NewApiResponseWithError("Failed to marshal JSON", err)
@@ -192,7 +192,7 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params c
 	return
 }
 
-func (repo CloudControllerApplicationRepository) formatAppJSON(input cf.AppParams) (data string, err error) {
+func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppParams) (data string, err error) {
 	appResource := NewApplicationEntityFromAppParams(input)
 	bytes, err := json.Marshal(appResource)
 	data = string(bytes)

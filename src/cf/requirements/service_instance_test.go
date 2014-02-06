@@ -1,7 +1,7 @@
 package requirements_test
 
 import (
-	"cf"
+	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +15,7 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestServiceInstanceReqExecute", func() {
 
-			instance := cf.ServiceInstance{}
+			instance := models.ServiceInstance{}
 			instance.Name = "my-service"
 			instance.Guid = "my-service-guid"
 			repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}

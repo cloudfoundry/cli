@@ -1,9 +1,9 @@
 package servicebroker_test
 
 import (
-	"cf"
 	. "cf/commands/servicebroker"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callDeleteServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.F
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -39,7 +39,7 @@ func callDeleteServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.F
 }
 
 func deleteServiceBroker(t mr.TestingT, confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) {
-	serviceBroker := cf.ServiceBroker{}
+	serviceBroker := models.ServiceBroker{}
 	serviceBroker.Name = "service-broker-to-delete"
 	serviceBroker.Guid = "service-broker-to-delete-guid"
 
@@ -53,9 +53,9 @@ func deleteServiceBroker(t mr.TestingT, confirmation string, args []string) (ui 
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space2 := cf.SpaceFields{}
+	space2 := models.SpaceFields{}
 	space2.Name = "my-space"
-	org2 := cf.OrganizationFields{}
+	org2 := models.OrganizationFields{}
 	org2.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space2,
@@ -123,7 +123,7 @@ func init() {
 		})
 		It("TestDeleteWithForceOption", func() {
 
-			serviceBroker := cf.ServiceBroker{}
+			serviceBroker := models.ServiceBroker{}
 			serviceBroker.Name = "service-broker-to-delete"
 			serviceBroker.Guid = "service-broker-to-delete-guid"
 

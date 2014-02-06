@@ -1,9 +1,9 @@
 package servicebroker_test
 
 import (
-	"cf"
 	. "cf/commands/servicebroker"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,9 +22,9 @@ func callListServiceBrokers(t mr.TestingT, args []string, serviceBrokerRepo *tes
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -41,19 +41,19 @@ func callListServiceBrokers(t mr.TestingT, args []string, serviceBrokerRepo *tes
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestListServiceBrokers", func() {
-			broker := cf.ServiceBroker{}
+			broker := models.ServiceBroker{}
 			broker.Name = "service-broker-to-list-a"
 			broker.Guid = "service-broker-to-list-guid-a"
 			broker.Url = "http://service-a-url.com"
-			broker2 := cf.ServiceBroker{}
+			broker2 := models.ServiceBroker{}
 			broker2.Name = "service-broker-to-list-b"
 			broker2.Guid = "service-broker-to-list-guid-b"
 			broker2.Url = "http://service-b-url.com"
-			broker3 := cf.ServiceBroker{}
+			broker3 := models.ServiceBroker{}
 			broker3.Name = "service-broker-to-list-c"
 			broker3.Guid = "service-broker-to-list-guid-c"
 			broker3.Url = "http://service-c-url.com"
-			serviceBrokers := []cf.ServiceBroker{broker, broker2, broker3}
+			serviceBrokers := []models.ServiceBroker{broker, broker2, broker3}
 
 			repo := &testapi.FakeServiceBrokerRepo{
 				ServiceBrokers: serviceBrokers,
@@ -72,7 +72,7 @@ func init() {
 		It("TestListingServiceBrokersWhenNoneExist", func() {
 
 			repo := &testapi.FakeServiceBrokerRepo{
-				ServiceBrokers: []cf.ServiceBroker{},
+				ServiceBrokers: []models.ServiceBroker{},
 			}
 
 			ui := callListServiceBrokers(mr.T(), []string{}, repo)

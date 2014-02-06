@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -67,11 +67,11 @@ func init() {
 			ts, repo := createEndpointRepoForUpdate(config, validApiInfoEndpoint)
 			defer ts.Close()
 
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 
@@ -93,11 +93,11 @@ func init() {
 			ts, repo := createEndpointRepoForUpdate(config, validApiInfoEndpoint)
 			defer ts.Close()
 
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			org.Guid = "my-org-guid"
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 

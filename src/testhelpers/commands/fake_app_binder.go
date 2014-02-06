@@ -1,16 +1,16 @@
 package commands
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 )
 
 type FakeAppBinder struct {
-	AppsToBind        cf.ApplicationSet
-	InstancesToBindTo cf.ServiceInstanceSet
+	AppsToBind        models.ApplicationSet
+	InstancesToBindTo models.ServiceInstanceSet
 }
 
-func (binder *FakeAppBinder) BindApplication(app cf.Application, service cf.ServiceInstance) (apiResponse net.ApiResponse) {
+func (binder *FakeAppBinder) BindApplication(app models.Application, service models.ServiceInstance) (apiResponse net.ApiResponse) {
 	binder.AppsToBind = append(binder.AppsToBind, app)
 	binder.InstancesToBindTo = append(binder.InstancesToBindTo, service)
 

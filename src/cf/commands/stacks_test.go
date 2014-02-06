@@ -1,9 +1,9 @@
 package commands_test
 
 import (
-	"cf"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,10 +24,10 @@ func callStacks(t mr.TestingT, stackRepo *testapi.FakeStackRepository) (ui *test
 	})
 	assert.NoError(t, err)
 
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 
 	config := &configuration.Configuration{
@@ -44,16 +44,16 @@ func callStacks(t mr.TestingT, stackRepo *testapi.FakeStackRepository) (ui *test
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestStacks", func() {
-			stack1 := cf.Stack{}
+			stack1 := models.Stack{}
 			stack1.Name = "Stack-1"
 			stack1.Description = "Stack 1 Description"
 
-			stack2 := cf.Stack{}
+			stack2 := models.Stack{}
 			stack2.Name = "Stack-2"
 			stack2.Description = "Stack 2 Description"
 
 			stackRepo := &testapi.FakeStackRepository{
-				FindAllStacks: []cf.Stack{stack1, stack2},
+				FindAllStacks: []models.Stack{stack1, stack2},
 			}
 
 			ui := callStacks(mr.T(), stackRepo)

@@ -1,9 +1,9 @@
 package application
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,7 +11,7 @@ import (
 )
 
 type ApplicationStopper interface {
-	ApplicationStop(app cf.Application) (updatedApp cf.Application, err error)
+	ApplicationStop(app models.Application) (updatedApp models.Application, err error)
 }
 
 type Stop struct {
@@ -43,7 +43,7 @@ func (cmd *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 	return
 }
 
-func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application, err error) {
+func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Application, err error) {
 	if app.State == "stopped" {
 		updatedApp = app
 		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already stopped"))
@@ -57,7 +57,7 @@ func (cmd *Stop) ApplicationStop(app cf.Application) (updatedApp cf.Application,
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := cf.NewEmptyAppParams()
+	params := models.NewEmptyAppParams()
 	state := "STOPPED"
 	params.State = &state
 

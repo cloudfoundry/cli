@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -149,9 +149,9 @@ func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
 
 func createDomainRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
 	ts, handler = testnet.NewTLSServer(t, reqs)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Guid = "my-org-guid"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 
 	config := &configuration.Configuration{
@@ -170,8 +170,8 @@ func init() {
 			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
 			defer ts.Close()
 
-			receivedDomains := []cf.Domain{}
-			apiResponse := repo.ListSharedDomains(ListDomainsCallback(func(domains []cf.Domain) bool {
+			receivedDomains := []models.Domain{}
+			apiResponse := repo.ListSharedDomains(ListDomainsCallback(func(domains []models.Domain) bool {
 				receivedDomains = append(receivedDomains, domains...)
 				return true
 			}))
@@ -187,8 +187,8 @@ func init() {
 			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{notFoundDomainsRequest, oldEndpointDomainsRequest})
 			defer ts.Close()
 
-			receivedDomains := []cf.Domain{}
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+			receivedDomains := []models.Domain{}
+			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
 				receivedDomains = append(receivedDomains, domains...)
 				return true
 			}))
@@ -203,8 +203,8 @@ func init() {
 			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
 			defer ts.Close()
 
-			receivedDomains := []cf.Domain{}
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+			receivedDomains := []models.Domain{}
+			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
 				receivedDomains = append(receivedDomains, domains...)
 				return true
 			}))
@@ -221,7 +221,7 @@ func init() {
 			defer ts.Close()
 
 			wasCalled := false
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
 				wasCalled = true
 				return true
 			}))
@@ -241,8 +241,8 @@ func init() {
 			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{emptyDomainsRequest})
 			defer ts.Close()
 
-			receivedDomains := []cf.Domain{}
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []cf.Domain) bool {
+			receivedDomains := []models.Domain{}
+			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
 				receivedDomains = append(receivedDomains, domains...)
 				return true
 			}))

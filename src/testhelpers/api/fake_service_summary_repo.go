@@ -1,15 +1,15 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 )
 
 type FakeServiceSummaryRepo struct {
-	GetSummariesInCurrentSpaceInstances []cf.ServiceInstance
+	GetSummariesInCurrentSpaceInstances []models.ServiceInstance
 }
 
-func (repo *FakeServiceSummaryRepo) GetSummariesInCurrentSpace() (instances []cf.ServiceInstance, apiResponse net.ApiResponse) {
+func (repo *FakeServiceSummaryRepo) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse net.ApiResponse) {
 	instances = repo.GetSummariesInCurrentSpaceInstances
 	return
 }

@@ -1,9 +1,9 @@
 package space_test
 
 import (
-	"cf"
 	. "cf/commands/space"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -22,7 +22,7 @@ func callShowSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		AccessToken:        token,
@@ -52,25 +52,25 @@ func init() {
 		})
 		It("TestShowSpaceInfoSuccess", func() {
 
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 
-			app := cf.ApplicationFields{}
+			app := models.ApplicationFields{}
 			app.Name = "app1"
 			app.Guid = "app1-guid"
-			apps := []cf.ApplicationFields{app}
+			apps := []models.ApplicationFields{app}
 
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "domain1"
 			domain.Guid = "domain1-guid"
-			domains := []cf.DomainFields{domain}
+			domains := []models.DomainFields{domain}
 
-			serviceInstance := cf.ServiceInstanceFields{}
+			serviceInstance := models.ServiceInstanceFields{}
 			serviceInstance.Name = "service1"
 			serviceInstance.Guid = "service1-guid"
-			services := []cf.ServiceInstanceFields{serviceInstance}
+			services := []models.ServiceInstanceFields{serviceInstance}
 
-			space := cf.Space{}
+			space := models.Space{}
 			space.Name = "space1"
 			space.Organization = org
 			space.Applications = apps

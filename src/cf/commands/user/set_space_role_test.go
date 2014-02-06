@@ -1,9 +1,9 @@
 package user_test
 
 import (
-	"cf"
 	. "cf/commands/user"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -30,9 +30,9 @@ func callSetSpaceRole(t mr.TestingT, args []string, reqFactory *testreq.FakeReqF
 		Username: "current-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	org.Guid = "my-org-guid"
 
@@ -84,7 +84,7 @@ func init() {
 		})
 		It("TestSetSpaceRole", func() {
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Guid = "my-org-guid"
 			org.Name = "my-org"
 
@@ -92,12 +92,12 @@ func init() {
 
 			reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 			reqFactory.LoginSuccess = true
-			reqFactory.UserFields = cf.UserFields{}
+			reqFactory.UserFields = models.UserFields{}
 			reqFactory.UserFields.Guid = "my-user-guid"
 			reqFactory.UserFields.Username = "my-user"
 			reqFactory.Organization = org
 
-			spaceRepo.FindByNameInOrgSpace = cf.Space{}
+			spaceRepo.FindByNameInOrgSpace = models.Space{}
 			spaceRepo.FindByNameInOrgSpace.Guid = "my-space-guid"
 			spaceRepo.FindByNameInOrgSpace.Name = "my-space"
 			spaceRepo.FindByNameInOrgSpace.Organization = org.OrganizationFields
@@ -114,7 +114,7 @@ func init() {
 
 			assert.Equal(mr.T(), userRepo.SetSpaceRoleUserGuid, "my-user-guid")
 			assert.Equal(mr.T(), userRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-			assert.Equal(mr.T(), userRepo.SetSpaceRoleRole, cf.SPACE_MANAGER)
+			assert.Equal(mr.T(), userRepo.SetSpaceRoleRole, models.SPACE_MANAGER)
 		})
 	})
 }

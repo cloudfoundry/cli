@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -61,7 +62,7 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue
 
-	updateParams := cf.NewEmptyAppParams()
+	updateParams := models.NewEmptyAppParams()
 	updateParams.EnvironmentVars = &envParams
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)

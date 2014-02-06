@@ -1,9 +1,9 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
@@ -32,9 +32,9 @@ func callLogs(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, 
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -72,7 +72,7 @@ func init() {
 		})
 		It("TestLogsOutputsRecentLogs", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 
@@ -99,7 +99,7 @@ func init() {
 		})
 		It("TestLogsEscapeFormattingVerbs", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 
@@ -119,7 +119,7 @@ func init() {
 		})
 		It("TestLogsTailsTheAppLogs", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 

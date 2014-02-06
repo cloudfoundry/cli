@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"cf"
 	"cf/commands/organization"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -38,17 +38,17 @@ func init() {
 		})
 		It("TestListAllPagesOfOrgs", func() {
 
-			org1 := cf.Organization{}
+			org1 := models.Organization{}
 			org1.Name = "Organization-1"
 
-			org2 := cf.Organization{}
+			org2 := models.Organization{}
 			org2.Name = "Organization-2"
 
-			org3 := cf.Organization{}
+			org3 := models.Organization{}
 			org3.Name = "Organization-3"
 
 			orgRepo := &testapi.FakeOrgRepository{
-				Organizations: []cf.Organization{org1, org2, org3},
+				Organizations: []models.Organization{org1, org2, org3},
 			}
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
@@ -69,7 +69,7 @@ func init() {
 		})
 		It("TestListNoOrgs", func() {
 
-			orgs := []cf.Organization{}
+			orgs := []models.Organization{}
 			orgRepo := &testapi.FakeOrgRepository{
 				Organizations: orgs,
 			}

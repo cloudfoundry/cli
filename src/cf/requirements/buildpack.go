@@ -1,22 +1,22 @@
 package requirements
 
 import (
-	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/terminal"
 )
 
 type BuildpackRequirement interface {
 	Requirement
-	GetBuildpack() cf.Buildpack
+	GetBuildpack() models.Buildpack
 }
 
 type buildpackApiRequirement struct {
 	name          string
 	ui            terminal.UI
 	buildpackRepo api.BuildpackRepository
-	buildpack     cf.Buildpack
+	buildpack     models.Buildpack
 }
 
 func NewBuildpackRequirement(name string, ui terminal.UI, bR api.BuildpackRepository) (req *buildpackApiRequirement) {
@@ -39,6 +39,6 @@ func (req *buildpackApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *buildpackApiRequirement) GetBuildpack() cf.Buildpack {
+func (req *buildpackApiRequirement) GetBuildpack() models.Buildpack {
 	return req.buildpack
 }

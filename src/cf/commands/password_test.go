@@ -1,9 +1,9 @@
 package commands_test
 
 import (
-	"cf"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -75,8 +75,8 @@ func init() {
 			assert.Equal(mr.T(), deps.PwdRepo.UpdateOldPassword, "old-password")
 
 			assert.Empty(mr.T(), deps.Config.AccessToken)
-			assert.Equal(mr.T(), deps.Config.OrganizationFields, cf.OrganizationFields{})
-			assert.Equal(mr.T(), deps.Config.SpaceFields, cf.SpaceFields{})
+			assert.Equal(mr.T(), deps.Config.OrganizationFields, models.OrganizationFields{})
+			assert.Equal(mr.T(), deps.Config.SpaceFields, models.SpaceFields{})
 		})
 
 		It("TestPasswordVerification", func() {

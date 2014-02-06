@@ -1,6 +1,6 @@
 package maker
 
-import "cf"
+import "cf/models"
 
 var routeSummaryGuid func() string
 
@@ -8,7 +8,7 @@ func init() {
 	routeSummaryGuid = guidGenerator("route-summary")
 }
 
-func NewRouteSummary(overrides Overrides) (routeSummary cf.RouteSummary) {
+func NewRouteSummary(overrides Overrides) (routeSummary models.RouteSummary) {
 	routeSummary.Guid = routeSummaryGuid()
 	routeSummary.Host = "route-host"
 

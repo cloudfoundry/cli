@@ -5,6 +5,7 @@ import (
 	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fileutils"
 	"fmt"
@@ -144,7 +145,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	return
 }
 
-func testUploadApp(t mr.TestingT, dir string, requests []testnet.TestRequest) (app cf.Application, apiResponse net.ApiResponse) {
+func testUploadApp(t mr.TestingT, dir string, requests []testnet.TestRequest) (app models.Application, apiResponse net.ApiResponse) {
 	ts, handler := testnet.NewTLSServer(t, requests)
 	defer ts.Close()
 

@@ -1,10 +1,10 @@
 package service_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,9 +24,9 @@ func callBindService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -41,10 +41,10 @@ func callBindService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestBindCommand", func() {
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service"
 			serviceInstance.Guid = "my-service-guid"
 			reqFactory := &testreq.FakeReqFactory{
@@ -68,10 +68,10 @@ func init() {
 		})
 		It("TestBindCommandIfServiceIsAlreadyBound", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "my-service"
 			serviceInstance.Guid = "my-service-guid"
 			reqFactory := &testreq.FakeReqFactory{

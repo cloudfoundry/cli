@@ -2,17 +2,18 @@ package api
 
 import (
 	"cf"
+"cf/models"
 	"cf/net"
 )
 
 type FakeRouteRepository struct {
 	FindByHostHost  string
 	FindByHostErr   bool
-	FindByHostRoute cf.Route
+	FindByHostRoute models.Route
 
 	FindByHostAndDomainHost     string
 	FindByHostAndDomainDomain   string
-	FindByHostAndDomainRoute    cf.Route
+	FindByHostAndDomainRoute    models.Route
 	FindByHostAndDomainErr      bool
 	FindByHostAndDomainNotFound bool
 
@@ -22,7 +23,7 @@ type FakeRouteRepository struct {
 	CreateInSpaceHost         string
 	CreateInSpaceDomainGuid   string
 	CreateInSpaceSpaceGuid    string
-	CreateInSpaceCreatedRoute cf.Route
+	CreateInSpaceCreatedRoute models.Route
 	CreateInSpaceErr          bool
 
 	BoundRouteGuid string
@@ -32,13 +33,13 @@ type FakeRouteRepository struct {
 	UnboundAppGuid   string
 
 	ListErr bool
-	Routes  []cf.Route
+	Routes  []models.Route
 
 	DeleteRouteGuid string
 }
 
-func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []cf.Route, statusChan chan net.ApiResponse) {
-	routesChan = make(chan []cf.Route, 4)
+func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []models.Route, statusChan chan net.ApiResponse) {
+	routesChan = make(chan []models.Route, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	if repo.ListErr {
@@ -72,7 +73,7 @@ func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []c
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) FindByHost(host string) (route models.Route, apiResponse net.ApiResponse) {
 	repo.FindByHostHost = host
 
 	if repo.FindByHostErr {
@@ -83,7 +84,7 @@ func (repo *FakeRouteRepository) FindByHost(host string) (route cf.Route, apiRes
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route cf.Route, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route models.Route, apiResponse net.ApiResponse) {
 	repo.FindByHostAndDomainHost = host
 	repo.FindByHostAndDomainDomain = domain
 
@@ -99,7 +100,7 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	return
 }
 
-func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute models.Route, apiResponse net.ApiResponse) {
 	repo.CreatedHost = host
 	repo.CreatedDomainGuid = domainGuid
 
@@ -108,7 +109,7 @@ func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute c
 	return
 }
 
-func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute cf.Route, apiResponse net.ApiResponse) {
+func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiResponse net.ApiResponse) {
 	repo.CreateInSpaceHost = host
 	repo.CreateInSpaceDomainGuid = domainGuid
 	repo.CreateInSpaceSpaceGuid = spaceGuid

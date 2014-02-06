@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"generic"
@@ -25,7 +25,7 @@ type EventResourceOldV2 struct {
 }
 
 func (resource EventResourceOldV2) ToFields() interface{} {
-	event := cf.EventFields{}
+	event := models.EventFields{}
 	description := fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus))
 	event.Guid = resource.Metadata.Guid
 	event.Name = "app crashed"
@@ -58,7 +58,7 @@ var KNOWN_METADATA_KEYS = []string{
 }
 
 func (resource EventResourceNewV2) ToFields() interface{} {
-	event := cf.EventFields{}
+	event := models.EventFields{}
 	event.Guid = resource.Metadata.Guid
 	event.Name = resource.Entity.Type
 	event.Timestamp = resource.Entity.Timestamp
@@ -100,7 +100,7 @@ func String(val interface{}) string {
 	}
 }
 
-type ListEventsCallback func(events []cf.EventFields) (fetchNext bool)
+type ListEventsCallback func(events []models.EventFields) (fetchNext bool)
 
 type AppEventsRepository interface {
 	ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse
@@ -148,9 +148,9 @@ func (repo CloudControllerAppEventsRepository) listEvents(path string, eventReso
 			return
 		}
 
-		events := make([]cf.EventFields, 0, len(eventResources.Resources()))
+		events := make([]models.EventFields, 0, len(eventResources.Resources()))
 		for _, resource := range eventResources.Resources() {
-			events = append(events, resource.ToFields().(cf.EventFields))
+			events = append(events, resource.ToFields().(models.EventFields))
 		}
 
 		if len(events) > 0 {

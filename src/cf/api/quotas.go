@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"net/url"
@@ -18,7 +18,7 @@ type QuotaResource struct {
 	Entity QuotaEntity
 }
 
-func (resource QuotaResource) ToFields() (quota cf.QuotaFields) {
+func (resource QuotaResource) ToFields() (quota models.QuotaFields) {
 	quota.Guid = resource.Metadata.Guid
 	quota.Name = resource.Entity.Name
 	quota.MemoryLimit = resource.Entity.MemoryLimit
@@ -31,8 +31,8 @@ type QuotaEntity struct {
 }
 
 type QuotaRepository interface {
-	FindAll() (quotas []cf.QuotaFields, apiResponse net.ApiResponse)
-	FindByName(name string) (quota cf.QuotaFields, apiResponse net.ApiResponse)
+	FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse)
+	FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse)
 	Update(orgGuid, quotaGuid string) (apiResponse net.ApiResponse)
 }
 
@@ -47,7 +47,7 @@ func NewCloudControllerQuotaRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []cf.QuotaFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
 	resources := new(PaginatedQuotaResources)
 
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
@@ -62,12 +62,12 @@ func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas 
 	return
 }
 
-func (repo CloudControllerQuotaRepository) FindAll() (quotas []cf.QuotaFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.Target)
 	return repo.findAllWithPath(path)
 }
 
-func (repo CloudControllerQuotaRepository) FindByName(name string) (quota cf.QuotaFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/quota_definitions?q=%s", repo.config.Target, url.QueryEscape("name:"+name))
 	quotas, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {

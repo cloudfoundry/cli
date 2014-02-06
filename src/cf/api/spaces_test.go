@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -15,7 +15,7 @@ import (
 	testnet "testhelpers/net"
 )
 
-func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
+func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -109,7 +109,7 @@ func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(
 	return
 }
 
-func testSpacesDidNotFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (cf.Space, net.ApiResponse)) {
+func testSpacesDidNotFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
@@ -139,10 +139,10 @@ var defaultCreateSpaceResponse = `{
 
 func createSpacesRepo(t mr.TestingT, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
 	ts, handler = testnet.NewTLSServer(t, reqs)
-	org4 := cf.OrganizationFields{}
+	org4 := models.OrganizationFields{}
 	org4.Guid = "some-org-guid"
 
-	space5 := cf.SpaceFields{}
+	space5 := models.SpaceFields{}
 	space5.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken:        "BEARER my_access_token",
@@ -201,7 +201,7 @@ func init() {
 			defer close(stopChan)
 			spacesChan, statusChan := repo.ListSpaces(stopChan)
 
-			spaces := []cf.Space{}
+			spaces := []models.Space{}
 			for chunk := range spacesChan {
 				spaces = append(spaces, chunk...)
 			}
@@ -240,7 +240,7 @@ func init() {
 		It("TestSpacesFindByName", func() {
 
 			testSpacesFindByNameWithOrg(mr.T(), "some-org-guid",
-				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
 					return repo.FindByName(spaceName)
 				},
 			)
@@ -248,7 +248,7 @@ func init() {
 		It("TestSpacesFindByNameInOrg", func() {
 
 			testSpacesFindByNameWithOrg(mr.T(), "another-org-guid",
-				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
 					return repo.FindByNameInOrg(spaceName, "another-org-guid")
 				},
 			)
@@ -256,7 +256,7 @@ func init() {
 		It("TestSpacesDidNotFindByName", func() {
 
 			testSpacesDidNotFindByNameWithOrg(mr.T(), "some-org-guid",
-				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
 					return repo.FindByName(spaceName)
 				},
 			)
@@ -264,7 +264,7 @@ func init() {
 		It("TestSpacesDidNotFindByNameInOrg", func() {
 
 			testSpacesDidNotFindByNameWithOrg(mr.T(), "another-org-guid",
-				func(repo SpaceRepository, spaceName string) (cf.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
 					return repo.FindByNameInOrg(spaceName, "another-org-guid")
 				},
 			)

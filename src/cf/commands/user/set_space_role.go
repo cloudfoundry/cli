@@ -1,9 +1,9 @@
 package user
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -11,7 +11,7 @@ import (
 )
 
 type SpaceRoleSetter interface {
-	SetSpaceRole(space cf.Space, role, userGuid, userName string) (err error)
+	SetSpaceRole(space models.Space, role, userGuid, userName string) (err error)
 }
 
 type SetSpaceRole struct {
@@ -52,7 +52,7 @@ func (cmd *SetSpaceRole) GetRequirements(reqFactory requirements.Factory, c *cli
 
 func (cmd *SetSpaceRole) Run(c *cli.Context) {
 	spaceName := c.Args()[2]
-	role := cf.UserInputToSpaceRole[c.Args()[3]]
+	role := models.UserInputToSpaceRole[c.Args()[3]]
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
@@ -69,7 +69,7 @@ func (cmd *SetSpaceRole) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *SetSpaceRole) SetSpaceRole(space cf.Space, role, userGuid, userName string) (err error) {
+func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userName string) (err error) {
 	cmd.ui.Say("Assigning role %s to user %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(role),
 		terminal.EntityNameColor(userName),

@@ -1,10 +1,10 @@
 package service_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -24,9 +24,9 @@ func callCreateService(t mr.TestingT, args []string, inputs []string, serviceRep
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -43,15 +43,15 @@ func callCreateService(t mr.TestingT, args []string, inputs []string, serviceRep
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestCreateService", func() {
-			offering := cf.ServiceOffering{}
+			offering := models.ServiceOffering{}
 			offering.Label = "cleardb"
-			plan := cf.ServicePlanFields{}
+			plan := models.ServicePlanFields{}
 			plan.Name = "spark"
 			plan.Guid = "cleardb-spark-guid"
-			offering.Plans = []cf.ServicePlanFields{plan}
-			offering2 := cf.ServiceOffering{}
+			offering.Plans = []models.ServicePlanFields{plan}
+			offering2 := models.ServiceOffering{}
 			offering2.Label = "postgres"
-			serviceOfferings := []cf.ServiceOffering{offering, offering2}
+			serviceOfferings := []models.ServiceOffering{offering, offering2}
 			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 			ui := callCreateService(mr.T(), []string{"cleardb", "spark", "my-cleardb-service"},
 				[]string{},
@@ -67,15 +67,15 @@ func init() {
 		})
 		It("TestCreateServiceWhenServiceAlreadyExists", func() {
 
-			offering := cf.ServiceOffering{}
+			offering := models.ServiceOffering{}
 			offering.Label = "cleardb"
-			plan := cf.ServicePlanFields{}
+			plan := models.ServicePlanFields{}
 			plan.Name = "spark"
 			plan.Guid = "cleardb-spark-guid"
-			offering.Plans = []cf.ServicePlanFields{plan}
-			offering2 := cf.ServiceOffering{}
+			offering.Plans = []models.ServicePlanFields{plan}
+			offering2 := models.ServiceOffering{}
 			offering2.Label = "postgres"
-			serviceOfferings := []cf.ServiceOffering{offering, offering2}
+			serviceOfferings := []models.ServiceOffering{offering, offering2}
 			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
 			ui := callCreateService(mr.T(), []string{"cleardb", "spark", "my-cleardb-service"},
 				[]string{},

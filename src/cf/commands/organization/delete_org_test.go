@@ -1,9 +1,9 @@
 package organization_test
 
 import (
-	"cf"
 	. "cf/commands/organization"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -32,10 +32,10 @@ func init() {
 			})
 			assert.NoError(mr.T(), err)
 
-			spaceFields := cf.SpaceFields{}
+			spaceFields := models.SpaceFields{}
 			spaceFields.Name = "my-space"
 
-			orgFields := cf.OrganizationFields{}
+			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 
 			config = &configuration.Configuration{}
@@ -43,10 +43,10 @@ func init() {
 			config.OrganizationFields = orgFields
 			config.AccessToken = token
 
-			org := cf.Organization{}
+			org := models.Organization{}
 			org.Name = "org-to-delete"
 			org.Guid = "org-to-delete-guid"
-			orgRepo = &testapi.FakeOrgRepository{Organizations: []cf.Organization{org}}
+			orgRepo = &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
 		})
 
 		It("TestDeleteOrgConfirmingWithY", func() {
@@ -87,7 +87,7 @@ func init() {
 		It("TestDeleteTargetedOrganizationClearsConfig", func() {
 			config.OrganizationFields = orgRepo.Organizations[0].OrganizationFields
 
-			spaceFields := cf.SpaceFields{}
+			spaceFields := models.SpaceFields{}
 			spaceFields.Name = "space-to-delete"
 			config.SpaceFields = spaceFields
 
@@ -96,17 +96,17 @@ func init() {
 			cmd := NewDeleteOrg(ui, config, orgRepo)
 			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-			assert.Equal(mr.T(), config.OrganizationFields, cf.OrganizationFields{})
-			assert.Equal(mr.T(), config.SpaceFields, cf.SpaceFields{})
+			assert.Equal(mr.T(), config.OrganizationFields, models.OrganizationFields{})
+			assert.Equal(mr.T(), config.SpaceFields, models.SpaceFields{})
 		})
 
 		It("TestDeleteUntargetedOrganizationDoesNotClearConfig", func() {
-			otherOrgFields := cf.OrganizationFields{}
+			otherOrgFields := models.OrganizationFields{}
 			otherOrgFields.Guid = "some-other-org-guid"
 			otherOrgFields.Name = "some-other-org"
 			config.OrganizationFields = otherOrgFields
 
-			spaceFields := cf.SpaceFields{}
+			spaceFields := models.SpaceFields{}
 			spaceFields.Name = "some-other-space"
 			config.SpaceFields = spaceFields
 

@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -50,7 +50,7 @@ var serviceInstanceSummariesResponse = testnet.TestResponse{Status: http.StatusO
 
 func createServiceSummaryRepo(t mr.TestingT, req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceSummaryRepository) {
 	ts, handler = testnet.NewTLSServer(t, []testnet.TestRequest{req})
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",

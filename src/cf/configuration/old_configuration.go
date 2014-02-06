@@ -1,7 +1,7 @@
 package configuration
 
 import (
-	"cf"
+	"cf/models"
 	"encoding/json"
 	"time"
 )
@@ -14,8 +14,8 @@ type Configuration struct {
 	LoggregatorEndPoint     string
 	AccessToken             string
 	RefreshToken            string
-	OrganizationFields      cf.OrganizationFields
-	SpaceFields             cf.SpaceFields
+	OrganizationFields      models.OrganizationFields
+	SpaceFields             models.SpaceFields
 	ApplicationStartTimeout time.Duration // will be used as seconds
 }
 
@@ -46,18 +46,18 @@ func (c *Configuration) ClearTokens() {
 	c.RefreshToken = ""
 }
 
-func (c *Configuration) SetOrganizationFields(org cf.OrganizationFields) {
+func (c *Configuration) SetOrganizationFields(org models.OrganizationFields) {
 	c.OrganizationFields = org
 }
 
-func (c *Configuration) SetSpaceFields(space cf.SpaceFields) {
+func (c *Configuration) SetSpaceFields(space models.SpaceFields) {
 	c.SpaceFields = space
 }
 
 func (c *Configuration) ClearSession() {
 	c.ClearTokens()
-	c.OrganizationFields = cf.OrganizationFields{}
-	c.SpaceFields = cf.SpaceFields{}
+	c.OrganizationFields = models.OrganizationFields{}
+	c.SpaceFields = models.SpaceFields{}
 }
 
 func (c *Configuration) HasOrganization() bool {

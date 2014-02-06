@@ -1,8 +1,8 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	"strconv"
@@ -32,7 +32,7 @@ type InstanceStatsApiResponse struct {
 }
 
 type AppInstancesRepository interface {
-	GetInstances(appGuid string) (instances []cf.AppInstanceFields, apiResponse net.ApiResponse)
+	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse net.ApiResponse)
 }
 
 type CloudControllerAppInstancesRepository struct {
@@ -46,7 +46,7 @@ func NewCloudControllerAppInstancesRepository(config *configuration.Configuratio
 	return
 }
 
-func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []cf.AppInstanceFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.Target, appGuid)
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
 	if apiResponse.IsNotSuccessful() {
@@ -60,15 +60,15 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 		return
 	}
 
-	instances = make([]cf.AppInstanceFields, len(instancesResponse), len(instancesResponse))
+	instances = make([]models.AppInstanceFields, len(instancesResponse), len(instancesResponse))
 	for k, v := range instancesResponse {
 		index, err := strconv.Atoi(k)
 		if err != nil {
 			continue
 		}
 
-		instances[index] = cf.AppInstanceFields{
-			State: cf.InstanceState(strings.ToLower(v.State)),
+		instances[index] = models.AppInstanceFields{
+			State: models.InstanceState(strings.ToLower(v.State)),
 			Since: time.Unix(int64(v.Since), 0),
 		}
 	}
@@ -76,7 +76,7 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 	return repo.updateInstancesWithStats(appGuid, instances)
 }
 
-func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []cf.AppInstanceFields) (updatedInst []cf.AppInstanceFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.Target, guid)
 	statsResponse := StatsApiResponse{}
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, &statsResponse)
@@ -84,7 +84,7 @@ func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid 
 		return
 	}
 
-	updatedInst = make([]cf.AppInstanceFields, len(statsResponse), len(statsResponse))
+	updatedInst = make([]models.AppInstanceFields, len(statsResponse), len(statsResponse))
 	for k, v := range statsResponse {
 		index, err := strconv.Atoi(k)
 		if err != nil {

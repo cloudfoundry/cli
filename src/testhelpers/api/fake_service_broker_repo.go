@@ -2,12 +2,13 @@ package api
 
 import (
 	"cf"
+	"cf/models"
 	"cf/net"
 )
 
 type FakeServiceBrokerRepo struct {
 	FindByNameName          string
-	FindByNameServiceBroker cf.ServiceBroker
+	FindByNameServiceBroker models.ServiceBroker
 	FindByNameNotFound      bool
 
 	CreateName     string
@@ -15,16 +16,16 @@ type FakeServiceBrokerRepo struct {
 	CreateUsername string
 	CreatePassword string
 
-	UpdatedServiceBroker     cf.ServiceBroker
+	UpdatedServiceBroker     models.ServiceBroker
 	RenamedServiceBrokerGuid string
 	RenamedServiceBrokerName string
 	DeletedServiceBrokerGuid string
 
-	ServiceBrokers []cf.ServiceBroker
+	ServiceBrokers []models.ServiceBroker
 	ListErr        bool
 }
 
-func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.ServiceBroker, apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 	serviceBroker = repo.FindByNameServiceBroker
 
@@ -35,8 +36,8 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker cf.Ser
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []cf.ServiceBroker, statusChan chan net.ApiResponse) {
-	serviceBrokersChan = make(chan []cf.ServiceBroker, 4)
+func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []models.ServiceBroker, statusChan chan net.ApiResponse) {
+	serviceBrokersChan = make(chan []models.ServiceBroker, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	if repo.ListErr {
@@ -78,7 +79,7 @@ func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) 
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Update(serviceBroker cf.ServiceBroker) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiResponse net.ApiResponse) {
 	repo.UpdatedServiceBroker = serviceBroker
 	return
 }

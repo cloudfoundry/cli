@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"cf"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fileutils"
 	"fmt"
@@ -193,7 +194,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(r *zip.ReadClose
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []cf.AppFileFields, targetFile cf.AppFileFields) []cf.AppFileFields {
+func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []models.AppFileFields, targetFile models.AppFileFields) []models.AppFileFields {
 	for i, file := range appFiles {
 		if file.Path == targetFile.Path {
 			appFiles[i] = appFiles[len(appFiles)-1]

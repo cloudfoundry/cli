@@ -1,9 +1,9 @@
 package service_test
 
 import (
-	"cf"
 	. "cf/commands/service"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callRenameService(t mr.TestingT, args []string, reqFactory *testreq.FakeReq
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -68,7 +68,7 @@ func init() {
 		})
 		It("TestRenameService", func() {
 
-			serviceInstance := cf.ServiceInstance{}
+			serviceInstance := models.ServiceInstance{}
 			serviceInstance.Name = "different-name"
 			serviceInstance.Guid = "different-name-guid"
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}

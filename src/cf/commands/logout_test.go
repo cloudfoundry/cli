@@ -1,9 +1,9 @@
 package commands_test
 
 import (
-	"cf"
 	"cf/commands"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -14,10 +14,10 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestLogoutClearsAccessTokenOrgAndSpace", func() {
 
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "MyOrg"
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Name = "MySpace"
 
 			config := &configuration.Configuration{}
@@ -31,8 +31,8 @@ func init() {
 			l.Run(nil)
 
 			assert.Empty(mr.T(), config.AccessToken)
-			assert.Equal(mr.T(), config.OrganizationFields, cf.OrganizationFields{})
-			assert.Equal(mr.T(), config.SpaceFields, cf.SpaceFields{})
+			assert.Equal(mr.T(), config.OrganizationFields, models.OrganizationFields{})
+			assert.Equal(mr.T(), config.SpaceFields, models.SpaceFields{})
 		})
 	})
 }

@@ -1,6 +1,6 @@
 package maker
 
-import "cf"
+import "cf/models"
 
 var spaceGuid func() string
 
@@ -8,7 +8,7 @@ func init() {
 	spaceGuid = guidGenerator("space")
 }
 
-func NewSpaceFields(overrides Overrides) (space cf.SpaceFields) {
+func NewSpaceFields(overrides Overrides) (space models.SpaceFields) {
 	space.Name = "new-space"
 	space.Guid = spaceGuid()
 
@@ -23,7 +23,7 @@ func NewSpaceFields(overrides Overrides) (space cf.SpaceFields) {
 	return
 }
 
-func NewSpace(overrides Overrides) (space cf.Space) {
+func NewSpace(overrides Overrides) (space models.Space) {
 	space.SpaceFields = NewSpaceFields(overrides)
 	return
 }

@@ -1,25 +1,25 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 	"net/http"
 )
 
 type FakeAppSummaryRepo struct {
-	GetSummariesInCurrentSpaceApps []cf.AppSummary
+	GetSummariesInCurrentSpaceApps []models.AppSummary
 
 	GetSummaryErrorCode string
 	GetSummaryAppGuid   string
-	GetSummarySummary   cf.AppSummary
+	GetSummarySummary   models.AppSummary
 }
 
-func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []cf.AppSummary, apiResponse net.ApiResponse) {
+func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse net.ApiResponse) {
 	apps = repo.GetSummariesInCurrentSpaceApps
 	return
 }
 
-func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary cf.AppSummary, apiResponse net.ApiResponse) {
+func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.AppSummary, apiResponse net.ApiResponse) {
 	repo.GetSummaryAppGuid = appGuid
 	summary = repo.GetSummarySummary
 

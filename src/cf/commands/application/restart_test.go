@@ -1,8 +1,8 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -33,7 +33,7 @@ func init() {
 		})
 		It("TestRestartRequirements", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			starter := &testcmd.FakeAppStarter{}
@@ -53,7 +53,7 @@ func init() {
 		})
 		It("TestRestartApplication", func() {
 
-			app := cf.Application{}
+			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}

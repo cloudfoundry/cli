@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -63,7 +64,7 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 
 	delete(envParams, varName)
 
-	updateParams := cf.NewEmptyAppParams()
+	updateParams := models.NewEmptyAppParams()
 	updateParams.EnvironmentVars = &envParams
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, updateParams)

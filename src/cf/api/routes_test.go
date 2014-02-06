@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -117,7 +117,7 @@ var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, B
 
 func createRoutesRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo CloudControllerRouteRepository, domainRepo *testapi.FakeDomainRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
 		AccessToken: "BEARER my_access_token",
@@ -153,7 +153,7 @@ func init() {
 			defer close(stopChan)
 			routesChan, statusChan := repo.ListRoutes(stopChan)
 
-			routes := []cf.Route{}
+			routes := []models.Route{}
 			for chunk := range routesChan {
 				routes = append(routes, chunk...)
 			}
@@ -232,7 +232,7 @@ func init() {
 			ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
 			defer ts.Close()
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Guid = "my-domain-guid"
 			domainRepo.FindByNameDomain = domain
 
@@ -256,7 +256,7 @@ func init() {
 			ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
 			defer ts.Close()
 
-			domain := cf.Domain{}
+			domain := models.Domain{}
 			domain.Guid = "my-domain-guid"
 			domainRepo.FindByNameDomain = domain
 

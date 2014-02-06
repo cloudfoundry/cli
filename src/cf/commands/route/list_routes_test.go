@@ -1,9 +1,9 @@
 package route_test
 
 import (
-	"cf"
 	. "cf/commands/route"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -25,9 +25,9 @@ func callListRoutes(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -43,39 +43,39 @@ func callListRoutes(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestListingRoutes", func() {
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Name = "example.com"
-			domain2 := cf.DomainFields{}
+			domain2 := models.DomainFields{}
 			domain2.Name = "cfapps.com"
-			domain3 := cf.DomainFields{}
+			domain3 := models.DomainFields{}
 			domain3.Name = "another-example.com"
 
-			app1 := cf.ApplicationFields{}
+			app1 := models.ApplicationFields{}
 			app1.Name = "dora"
-			app2 := cf.ApplicationFields{}
+			app2 := models.ApplicationFields{}
 			app2.Name = "dora2"
 
-			app3 := cf.ApplicationFields{}
+			app3 := models.ApplicationFields{}
 			app3.Name = "my-app"
-			app4 := cf.ApplicationFields{}
+			app4 := models.ApplicationFields{}
 			app4.Name = "my-app2"
 
-			app5 := cf.ApplicationFields{}
+			app5 := models.ApplicationFields{}
 			app5.Name = "july"
 
-			route := cf.Route{}
+			route := models.Route{}
 			route.Host = "hostname-1"
 			route.Domain = domain
-			route.Apps = []cf.ApplicationFields{app1, app2}
-			route2 := cf.Route{}
+			route.Apps = []models.ApplicationFields{app1, app2}
+			route2 := models.Route{}
 			route2.Host = "hostname-2"
 			route2.Domain = domain2
-			route2.Apps = []cf.ApplicationFields{app3, app4}
-			route3 := cf.Route{}
+			route2.Apps = []models.ApplicationFields{app3, app4}
+			route3 := models.Route{}
 			route3.Host = "hostname-3"
 			route3.Domain = domain3
-			route3.Apps = []cf.ApplicationFields{app5}
-			routes := []cf.Route{route, route2, route3}
+			route3.Apps = []models.ApplicationFields{app5}
+			routes := []models.Route{route, route2, route3}
 
 			routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
@@ -91,7 +91,7 @@ func init() {
 		})
 		It("TestListingRoutesWhenNoneExist", func() {
 
-			routes := []cf.Route{}
+			routes := []models.Route{}
 			routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
 			ui := callListRoutes(mr.T(), []string{}, &testreq.FakeReqFactory{}, routeRepo)

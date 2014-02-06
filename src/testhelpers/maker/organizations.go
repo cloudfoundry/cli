@@ -1,6 +1,6 @@
 package maker
 
-import "cf"
+import "cf/models"
 
 var orgGuid func() string
 
@@ -8,7 +8,7 @@ func init() {
 	orgGuid = guidGenerator("org")
 }
 
-func NewOrgFields(overrides Overrides) (org cf.OrganizationFields) {
+func NewOrgFields(overrides Overrides) (org models.OrganizationFields) {
 	org.Name = "new-org"
 	org.Guid = orgGuid()
 
@@ -23,7 +23,7 @@ func NewOrgFields(overrides Overrides) (org cf.OrganizationFields) {
 	return
 }
 
-func NewOrg(overrides Overrides) (org cf.Organization) {
+func NewOrg(overrides Overrides) (org models.Organization) {
 	org.OrganizationFields = NewOrgFields(overrides)
 	return
 }

@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -83,7 +83,7 @@ func init() {
 			defer close(stopChan)
 			serviceBrokersChan, statusChan := repo.ListServiceBrokers(stopChan)
 
-			serviceBrokers := []cf.ServiceBroker{}
+			serviceBrokers := []models.ServiceBroker{}
 			for chunk := range serviceBrokersChan {
 				serviceBrokers = append(serviceBrokers, chunk...)
 			}
@@ -148,7 +148,7 @@ func init() {
 			defer ts.Close()
 
 			foundBroker, apiResponse := repo.FindByName("my-broker")
-			expectedBroker := cf.ServiceBroker{}
+			expectedBroker := models.ServiceBroker{}
 			expectedBroker.Name = "found-name"
 			expectedBroker.Url = "http://found.example.com"
 			expectedBroker.Username = "found-username"
@@ -208,7 +208,7 @@ func init() {
 
 			ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
 			defer ts.Close()
-			serviceBroker := cf.ServiceBroker{}
+			serviceBroker := models.ServiceBroker{}
 			serviceBroker.Guid = "my-guid"
 			serviceBroker.Name = "foobroker"
 			serviceBroker.Url = "http://update.example.com"

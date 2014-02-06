@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -161,7 +161,7 @@ func createUsersRepo(t mr.TestingT, ccReqs []testnet.TestRequest, uaaReqs []test
 		uaa, uaaHandler = testnet.NewTLSServer(t, uaaReqs)
 		uaaTarget = uaa.URL
 	}
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Guid = "some-org-guid"
 	config := &configuration.Configuration{
 		AccessToken:        "BEARER my_access_token",
@@ -186,9 +186,9 @@ func init() {
 
 			stopChan := make(chan bool)
 			defer close(stopChan)
-			usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", cf.ORG_MANAGER, stopChan)
+			usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER, stopChan)
 
-			users := []cf.UserFields{}
+			users := []models.UserFields{}
 			for chunk := range usersChan {
 				users = append(users, chunk...)
 			}
@@ -214,9 +214,9 @@ func init() {
 
 			stopChan := make(chan bool)
 			defer close(stopChan)
-			usersChan, statusChan := repo.ListUsersInSpaceForRole("my-space-guid", cf.SPACE_MANAGER, stopChan)
+			usersChan, statusChan := repo.ListUsersInSpaceForRole("my-space-guid", models.SPACE_MANAGER, stopChan)
 
-			users := []cf.UserFields{}
+			users := []models.UserFields{}
 			for chunk := range usersChan {
 				users = append(users, chunk...)
 			}
@@ -248,7 +248,7 @@ func init() {
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			expectedUserFields := cf.UserFields{}
+			expectedUserFields := models.UserFields{}
 			expectedUserFields.Username = "my-full-username"
 			expectedUserFields.Guid = "my-guid"
 			assert.Equal(mr.T(), user, expectedUserFields)
@@ -421,9 +421,9 @@ func init() {
 
 			stopChan := make(chan bool)
 			defer close(stopChan)
-			usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", cf.ORG_USER, stopChan)
+			usersChan, statusChan := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_USER, stopChan)
 
-			users := []cf.UserFields{}
+			users := []models.UserFields{}
 			for chunk := range usersChan {
 				users = append(users, chunk...)
 			}

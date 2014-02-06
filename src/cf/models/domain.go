@@ -1,4 +1,4 @@
-package cf
+package models
 
 import (
 	"cf/formatters"

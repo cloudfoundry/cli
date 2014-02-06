@@ -2,8 +2,8 @@ package terminal_test
 
 import (
 	"bytes"
-	"cf"
 	"cf/configuration"
+	"cf/models"
 	. "cf/terminal"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -98,7 +98,7 @@ func init() {
 		})
 		It("TestShowConfigurationWhenNoOrgTargeted", func() {
 
-			sf := cf.SpaceFields{}
+			sf := models.SpaceFields{}
 			sf.Guid = "guid"
 			sf.Name = "name"
 
@@ -118,7 +118,7 @@ func init() {
 		})
 		It("TestShowConfigurationWhenNoSpaceTargeted", func() {
 
-			of := cf.OrganizationFields{}
+			of := models.OrganizationFields{}
 			of.Guid = "of-guid"
 			of.Name = "of-name"
 

@@ -1,14 +1,14 @@
 package commands
 
 import (
-	"cf"
+"cf/models"
 )
 
 type FakeAppStopper struct {
-	AppToStop cf.Application
+	AppToStop models.Application
 }
 
-func (stopper *FakeAppStopper) ApplicationStop(app cf.Application) (updatedApp cf.Application, err error) {
+func (stopper *FakeAppStopper) ApplicationStop(app models.Application) (updatedApp models.Application, err error) {
 	stopper.AppToStop = app
 	updatedApp = app
 	return

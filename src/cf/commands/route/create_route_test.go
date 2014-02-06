@@ -1,9 +1,9 @@
 package route_test
 
 import (
-	"cf"
 	. "cf/commands/route"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -23,9 +23,9 @@ func callCreateRoute(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := cf.OrganizationFields{}
+	org := models.OrganizationFields{}
 	org.Name = "my-org"
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	config := &configuration.Configuration{
 		SpaceFields:        space,
@@ -77,17 +77,17 @@ func init() {
 		})
 		It("TestCreateRoute", func() {
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Guid = "domain-guid"
 			domain.Name = "example.com"
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:       true,
 				TargetedOrgSuccess: true,
-				Domain:             cf.Domain{DomainFields: domain},
-				Space:              cf.Space{SpaceFields: space},
+				Domain:             models.Domain{DomainFields: domain},
+				Space:              models.Space{SpaceFields: space},
 			}
 			routeRepo := &testapi.FakeRouteRepository{}
 
@@ -104,20 +104,20 @@ func init() {
 		})
 		It("TestCreateRouteIsIdempotent", func() {
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Guid = "domain-guid"
 			domain.Name = "example.com"
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:       true,
 				TargetedOrgSuccess: true,
-				Domain:             cf.Domain{DomainFields: domain},
-				Space:              cf.Space{SpaceFields: space},
+				Domain:             models.Domain{DomainFields: domain},
+				Space:              models.Space{SpaceFields: space},
 			}
 
-			route := cf.Route{}
+			route := models.Route{}
 			route.Guid = "my-route-guid"
 			route.Host = "host"
 			route.Domain = domain
@@ -141,14 +141,14 @@ func init() {
 		})
 		It("TestRouteCreator", func() {
 
-			space := cf.SpaceFields{}
+			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
-			domain := cf.DomainFields{}
+			domain := models.DomainFields{}
 			domain.Guid = "domain-guid"
 			domain.Name = "example.com"
 
-			createdRoute := cf.Route{}
+			createdRoute := models.Route{}
 			createdRoute.Host = "my-host"
 			createdRoute.Guid = "my-route-guid"
 			routeRepo := &testapi.FakeRouteRepository{
@@ -160,7 +160,7 @@ func init() {
 				Username: "my-user",
 			})
 			assert.NoError(mr.T(), err)
-			org := cf.OrganizationFields{}
+			org := models.OrganizationFields{}
 			org.Name = "my-org"
 			config := &configuration.Configuration{
 				OrganizationFields: org,

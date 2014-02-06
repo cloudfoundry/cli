@@ -1,10 +1,10 @@
 package application
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/formatters"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -61,7 +61,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	params := cf.NewEmptyAppParams()
+	params := models.NewEmptyAppParams()
 	shouldRestart := false
 
 	if c.String("m") != "" {

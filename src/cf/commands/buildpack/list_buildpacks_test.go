@@ -1,8 +1,8 @@
 package buildpack_test
 
 import (
-	"cf"
 	"cf/commands/buildpack"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -35,7 +35,7 @@ func init() {
 		})
 		It("TestListBuildpacks", func() {
 
-			buildpackBuilder := func(name string, position int, enabled bool, locked bool) (buildpack cf.Buildpack) {
+			buildpackBuilder := func(name string, position int, enabled bool, locked bool) (buildpack models.Buildpack) {
 				buildpack.Name = name
 				buildpack.Position = &position
 				buildpack.Enabled = &enabled
@@ -43,7 +43,7 @@ func init() {
 				return
 			}
 
-			buildpacks := []cf.Buildpack{
+			buildpacks := []models.Buildpack{
 				buildpackBuilder("Buildpack-1", 5, true, false),
 				buildpackBuilder("Buildpack-2", 10, false, true),
 				buildpackBuilder("Buildpack-3", 15, true, false),
@@ -67,7 +67,7 @@ func init() {
 		})
 		It("TestListingBuildpacksWhenNoneExist", func() {
 
-			buildpacks := []cf.Buildpack{}
+			buildpacks := []models.Buildpack{}
 			buildpackRepo := &testapi.FakeBuildpackRepository{
 				Buildpacks: buildpacks,
 			}

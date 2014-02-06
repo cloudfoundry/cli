@@ -1,8 +1,8 @@
 package buildpack_test
 
 import (
-	"cf"
 	. "cf/commands/buildpack"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -37,7 +37,7 @@ func init() {
 		It("TestDeleteBuildpackSuccess", func() {
 
 			ui := &testterm.FakeUI{Inputs: []string{"y"}}
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-buildpack"
 			buildpack.Guid = "my-buildpack-guid"
 			buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -63,7 +63,7 @@ func init() {
 		It("TestDeleteBuildpackNoConfirmation", func() {
 
 			ui := &testterm.FakeUI{Inputs: []string{"no"}}
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-buildpack"
 			buildpack.Guid = "my-buildpack-guid"
 			buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -85,7 +85,7 @@ func init() {
 		It("TestDeleteBuildpackThatDoesNotExist", func() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-buildpack"
 			buildpack.Guid = "my-buildpack-guid"
 			buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -111,7 +111,7 @@ func init() {
 		It("TestDeleteBuildpackDeleteError", func() {
 
 			ui := &testterm.FakeUI{Inputs: []string{"y"}}
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-buildpack"
 			buildpack.Guid = "my-buildpack-guid"
 			buildpackRepo := &testapi.FakeBuildpackRepository{
@@ -138,7 +138,7 @@ func init() {
 		It("TestDeleteBuildpackForceFlagSkipsConfirmation", func() {
 
 			ui := &testterm.FakeUI{}
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-buildpack"
 			buildpack.Guid = "my-buildpack-guid"
 			buildpackRepo := &testapi.FakeBuildpackRepository{

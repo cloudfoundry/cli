@@ -1,12 +1,13 @@
 package api
 
 import (
-	"cf"
+	"cf/models"
 	"cf/net"
+	"cf"
 )
 
 type FakeOrgRepository struct {
-	Organizations []cf.Organization
+	Organizations []models.Organization
 
 	CreateName      string
 	CreateOrgExists bool
@@ -14,7 +15,7 @@ type FakeOrgRepository struct {
 	FindByNameName         string
 	FindByNameErr          bool
 	FindByNameNotFound     bool
-	FindByNameOrganization cf.Organization
+	FindByNameOrganization models.Organization
 
 	RenameOrganizationGuid string
 	RenameNewName          string
@@ -22,8 +23,8 @@ type FakeOrgRepository struct {
 	DeletedOrganizationGuid string
 }
 
-func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organization, statusChan chan net.ApiResponse) {
-	orgsChan = make(chan []cf.Organization, 4)
+func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []models.Organization, statusChan chan net.ApiResponse) {
+	orgsChan = make(chan []models.Organization, 4)
 	statusChan = make(chan net.ApiResponse, 1)
 
 	go func() {
@@ -50,7 +51,7 @@ func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []cf.Organ
 	return
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org cf.Organization, apiResponse net.ApiResponse) {
+func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization, apiResponse net.ApiResponse) {
 	repo.FindByNameName = name
 
 	var foundOrg bool = false

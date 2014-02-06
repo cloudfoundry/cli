@@ -1,9 +1,9 @@
 package domain_test
 
 import (
-	"cf"
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +17,7 @@ import (
 )
 
 func fakeDomainRepo() *testapi.FakeDomainRepository {
-	domain := cf.Domain{}
+	domain := models.Domain{}
 	domain.Name = "foo.com"
 	domain.Guid = "foo-guid"
 	domain.Shared = true
@@ -50,10 +50,10 @@ func callDeleteSharedDomain(t mr.TestingT, args []string, inputs []string, deps 
 	})
 	assert.NoError(t, err)
 
-	spaceFields := cf.SpaceFields{}
+	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
-	orgFields := cf.OrganizationFields{}
+	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 	config := &configuration.Configuration{
 		SpaceFields:        spaceFields,

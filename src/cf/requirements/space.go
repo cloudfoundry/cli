@@ -1,22 +1,22 @@
 package requirements
 
 import (
-	"cf"
 	"cf/api"
+	"cf/models"
 	"cf/net"
 	"cf/terminal"
 )
 
 type SpaceRequirement interface {
 	Requirement
-	GetSpace() cf.Space
+	GetSpace() models.Space
 }
 
 type spaceApiRequirement struct {
 	name      string
 	ui        terminal.UI
 	spaceRepo api.SpaceRepository
-	space     cf.Space
+	space     models.Space
 }
 
 func NewSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (req *spaceApiRequirement) {
@@ -39,6 +39,6 @@ func (req *spaceApiRequirement) Execute() (success bool) {
 	return true
 }
 
-func (req *spaceApiRequirement) GetSpace() cf.Space {
+func (req *spaceApiRequirement) GetSpace() models.Space {
 	return req.space
 }

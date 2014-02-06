@@ -1,7 +1,7 @@
 package api
 
 import (
-	"cf"
+"cf/models"
 	"cf/net"
 	"net/http"
 )
@@ -11,7 +11,7 @@ type FakeServiceBindingRepo struct {
 	CreateApplicationGuid     string
 	CreateErrorCode           string
 
-	DeleteServiceInstance cf.ServiceInstance
+	DeleteServiceInstance models.ServiceInstance
 	DeleteApplicationGuid string
 	DeleteBindingNotFound bool
 }
@@ -27,7 +27,7 @@ func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiRes
 	return
 }
 
-func (repo *FakeServiceBindingRepo) Delete(instance cf.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse) {
+func (repo *FakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiResponse net.ApiResponse) {
 	repo.DeleteServiceInstance = instance
 	repo.DeleteApplicationGuid = appGuid
 	found = !repo.DeleteBindingNotFound

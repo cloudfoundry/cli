@@ -1,9 +1,9 @@
 package api_test
 
 import (
-	"cf"
 	. "cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -37,7 +37,7 @@ var findBuildpackRequest = testnet.TestRequest{
 
 func createBuildpackRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
 	ts, handler = testnet.NewTLSServer(t, requests)
-	space := cf.SpaceFields{}
+	space := models.SpaceFields{}
 	space.Name = "my-space"
 	space.Guid = "my-space-guid"
 	config := &configuration.Configuration{
@@ -102,21 +102,21 @@ func init() {
 			buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
 
 			one := 1
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Guid = "buildpack1-guid"
 			buildpack.Name = "Buildpack1"
 			buildpack.Position = &one
 			buildpack.Filename = "firstbp.zip"
 
 			two := 2
-			buildpack2 := cf.Buildpack{}
+			buildpack2 := models.Buildpack{}
 			buildpack2.Guid = "buildpack2-guid"
 			buildpack2.Name = "Buildpack2"
 			buildpack2.Position = &two
 
-			expectedBuildpacks := []cf.Buildpack{buildpack, buildpack2}
+			expectedBuildpacks := []models.Buildpack{buildpack, buildpack2}
 
-			buildpacks := []cf.Buildpack{}
+			buildpacks := []models.Buildpack{}
 			for chunk := range buildpacksChan {
 				buildpacks = append(buildpacks, chunk...)
 			}
@@ -157,7 +157,7 @@ func init() {
 
 			ts, handler, repo := createBuildpackRepo(mr.T(), req)
 			defer ts.Close()
-			existingBuildpack := cf.Buildpack{}
+			existingBuildpack := models.Buildpack{}
 			existingBuildpack.Guid = "buildpack1-guid"
 			existingBuildpack.Name = "Buildpack1"
 
@@ -202,7 +202,7 @@ func init() {
 			one := 1
 			createdBuildpack, apiResponse := repo.Create("name with space", &one, nil, nil)
 			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), createdBuildpack, cf.Buildpack{})
+			assert.Equal(mr.T(), createdBuildpack, models.Buildpack{})
 			assert.Equal(mr.T(), apiResponse.ErrorCode, "290003")
 			assert.Contains(mr.T(), apiResponse.Message, "Buildpack is invalid")
 		})
@@ -314,7 +314,7 @@ func init() {
 
 			position := 555
 			enabled := false
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-cool-buildpack"
 			buildpack.Guid = "my-cool-buildpack-guid"
 			buildpack.Position = &position
@@ -353,12 +353,12 @@ func init() {
 			position := 123
 			locked := true
 
-			buildpack := cf.Buildpack{}
+			buildpack := models.Buildpack{}
 			buildpack.Name = "my-cool-buildpack"
 			buildpack.Guid = "my-cool-buildpack-guid"
 			buildpack.Locked = &locked
 
-			expectedBuildpack := cf.Buildpack{}
+			expectedBuildpack := models.Buildpack{}
 			expectedBuildpack.Name = "my-cool-buildpack"
 			expectedBuildpack.Guid = "my-cool-buildpack-guid"
 			expectedBuildpack.Position = &position
