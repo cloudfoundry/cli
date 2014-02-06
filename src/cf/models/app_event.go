@@ -3,7 +3,8 @@ package models
 import "time"
 
 type EventFields struct {
-	BasicFields
+	Guid        string
+	Name        string
 	Timestamp   time.Time
 	Description string
 }

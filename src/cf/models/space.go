@@ -1,7 +1,8 @@
 package models
 
 type SpaceFields struct {
-	BasicFields
+	Guid string
+	Name string
 }
 
 type Space struct {

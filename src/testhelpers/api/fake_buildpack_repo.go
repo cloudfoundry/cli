@@ -68,7 +68,7 @@ func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled 
 		return repo.CreateBuildpack, net.NewApiResponse("Buildpack already exists", cf.BUILDPACK_EXISTS, 400)
 	}
 
-	repo.CreateBuildpack = models.Buildpack{BasicFields: models.BasicFields{Name: name}, Position: position, Enabled: enabled, Locked: locked}
+	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 

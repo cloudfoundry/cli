@@ -3,7 +3,8 @@ package models
 import "fmt"
 
 type DomainFields struct {
-	BasicFields
+	Guid                   string
+	Name                   string
 	OwningOrganizationGuid string
 	Shared                 bool
 }

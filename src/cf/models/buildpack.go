@@ -1,7 +1,8 @@
 package models
 
 type Buildpack struct {
-	BasicFields
+	Guid     string
+	Name     string
 	Position *int
 	Enabled  *bool
 	Key      string

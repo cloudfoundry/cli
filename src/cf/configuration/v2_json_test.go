@@ -45,8 +45,8 @@ func init() {
 					LoggregatorEndPoint:     "logs.example.com",
 					AccessToken:             "the-access-token",
 					RefreshToken:            "the-refresh-token",
-					OrganizationFields:      models.OrganizationFields{BasicFields: models.BasicFields{Name: "the-org"}},
-					SpaceFields:             models.SpaceFields{BasicFields: models.BasicFields{Name: "the-space"}},
+					OrganizationFields:      models.OrganizationFields{Name: "the-org"},
+					SpaceFields:             models.SpaceFields{Name: "the-space"},
 					ApplicationStartTimeout: 5,
 				}))
 			})

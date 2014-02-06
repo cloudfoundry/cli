@@ -1,6 +1,7 @@
 package models
 
 type Stack struct {
-	BasicFields
+	Guid        string
+	Name        string
 	Description string
 }

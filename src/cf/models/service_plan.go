@@ -1,7 +1,8 @@
 package models
 
 type ServicePlanFields struct {
-	BasicFields
+	Guid string
+	Name string
 }
 
 type ServicePlan struct {

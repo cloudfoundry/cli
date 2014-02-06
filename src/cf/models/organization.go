@@ -1,7 +1,8 @@
 package models
 
 type OrganizationFields struct {
-	BasicFields
+	Guid            string
+	Name            string
 	QuotaDefinition QuotaFields
 }
 
