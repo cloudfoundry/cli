@@ -12,6 +12,53 @@ import (
 	"time"
 )
 
+type AppEventsRepository interface {
+	ListEvents(appGuid string, cb func([]models.EventFields) bool) net.ApiResponse
+}
+
+type CloudControllerAppEventsRepository struct {
+	config  *configuration.Configuration
+	gateway net.Gateway
+}
+
+func NewCloudControllerAppEventsRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerAppEventsRepository) {
+	repo.config = config
+	repo.gateway = gateway
+	return
+}
+
+func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func([]models.EventFields) bool) net.ApiResponse {
+	apiResponse := repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid))),
+		EventResourceNewV2{},
+		func(m []interface{}) bool {
+			return cb(convertEvents(m))
+		})
+
+	if apiResponse.IsNotFound() {
+		apiResponse = repo.gateway.ListPaginatedResources(
+			repo.config.Target,
+			repo.config.AccessToken,
+			fmt.Sprintf("/v2/apps/%s/events", appGuid),
+			EventResourceOldV2{},
+			func(m []interface{}) bool {
+				return cb(convertEvents(m))
+			})
+	}
+
+	return apiResponse
+}
+
+func convertEvents(modelSlice []interface{}) []models.EventFields {
+	events := make([]models.EventFields, 0, len(modelSlice))
+	for _, model := range modelSlice {
+		events = append(events, model.(models.EventFields))
+	}
+	return events
+}
+
 const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"
 
 type EventResourceOldV2 struct {
@@ -75,13 +122,13 @@ func formatDescription(metadata generic.Map, keys []string) string {
 	for _, key := range keys {
 		value := metadata.Get(key)
 		if value != nil {
-			parts = append(parts, fmt.Sprintf("%s: %s", key, String(value)))
+			parts = append(parts, fmt.Sprintf("%s: %s", key, formatDescriptionPart(value)))
 		}
 	}
 	return strings.Join(parts, ", ")
 }
 
-func String(val interface{}) string {
+func formatDescriptionPart(val interface{}) string {
 	switch val := val.(type) {
 	case string:
 		return val
@@ -96,69 +143,4 @@ func String(val interface{}) string {
 	default:
 		return fmt.Sprintf("%s", val)
 	}
-}
-
-type ListEventsCallback func(events []models.EventFields) (fetchNext bool)
-
-type AppEventsRepository interface {
-	ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse
-}
-
-type CloudControllerAppEventsRepository struct {
-	config  *configuration.Configuration
-	gateway net.Gateway
-}
-
-func NewCloudControllerAppEventsRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerAppEventsRepository) {
-	repo.config = config
-	repo.gateway = gateway
-	return
-}
-
-func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb ListEventsCallback) (apiResponse net.ApiResponse) {
-	apiResponse = repo.newV2ListEvents(appGuid, cb)
-	if apiResponse.IsNotFound() {
-		apiResponse = repo.oldV2ListEvents(appGuid, cb)
-	}
-	return
-}
-
-func (repo CloudControllerAppEventsRepository) newV2ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse {
-	path := fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid)))
-	return repo.listEvents(path, NewPaginatedResources(EventResourceNewV2{}), cb)
-}
-
-func (repo CloudControllerAppEventsRepository) oldV2ListEvents(appGuid string, cb ListEventsCallback) net.ApiResponse {
-	path := fmt.Sprintf("/v2/apps/%s/events", appGuid)
-	return repo.listEvents(path, NewPaginatedResources(EventResourceOldV2{}), cb)
-}
-
-func (repo CloudControllerAppEventsRepository) listEvents(path string, eventResources PaginatedResources, cb ListEventsCallback) (apiResponse net.ApiResponse) {
-	fetchNext := true
-
-	for fetchNext {
-		var shouldFetch bool
-
-		url := fmt.Sprintf("%s%s", repo.config.Target, path)
-
-		apiResponse = repo.gateway.GetResource(url, repo.config.AccessToken, &eventResources)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-
-		events := make([]models.EventFields, 0, len(eventResources.Resources()))
-		for _, resource := range eventResources.Resources() {
-			events = append(events, resource.ToFields().(models.EventFields))
-		}
-
-		if len(events) > 0 {
-			shouldFetch = cb(events)
-		}
-
-		path = eventResources.NextURL
-
-		fetchNext = shouldFetch && path != ""
-	}
-
-	return
 }

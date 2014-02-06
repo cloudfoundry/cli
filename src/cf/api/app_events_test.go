@@ -133,10 +133,10 @@ func init() {
 			}
 
 			list := []models.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []models.EventFields) (fetchNext bool) {
+			apiResponse := repo.ListEvents("my-app-guid", func(events []models.EventFields) bool {
 				list = append(list, events...)
 				return true
-			}))
+			})
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.Equal(mr.T(), list, expectedEvents)
@@ -209,10 +209,10 @@ func init() {
 			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
 			events := []models.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(eventPage []models.EventFields) (fetchNext bool) {
-				events = append(events, eventPage...)
+			apiResponse := repo.ListEvents("my-app-guid", func(page []models.EventFields) bool {
+				events = append(events, page...)
 				return true
-			}))
+			})
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.True(mr.T(), deps.handler.AllRequestsCalled())
@@ -235,10 +235,10 @@ func init() {
 			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
 			list := []models.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", ListEventsCallback(func(events []models.EventFields) (fetchNext bool) {
-				list = append(list, events...)
+			apiResponse := repo.ListEvents("my-app-guid", func(page []models.EventFields) bool {
+				list = append(list, page...)
 				return true
-			}))
+			})
 
 			firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
 			assert.NoError(mr.T(), err)

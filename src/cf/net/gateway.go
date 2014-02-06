@@ -101,6 +101,41 @@ func (gateway Gateway) DeleteResource(url, accessToken string) (apiResponse ApiR
 	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, &AsyncResponse{})
 }
 
+func (gateway Gateway) ListPaginatedResources(
+	target string,
+	accessToken string,
+	path string,
+	resource ModelResource,
+	cb PaginatedResourcesCallback) (apiResponse ApiResponse) {
+
+	resources := NewPaginatedResources(resource)
+	fetchNext := true
+
+	for fetchNext {
+		var shouldFetch bool
+
+		apiResponse = gateway.GetResource(fmt.Sprintf("%s%s", target, path), accessToken, &resources)
+		if apiResponse.IsNotSuccessful() {
+			return
+		}
+
+		models := make([]interface{}, 0, len(resources.Resources()))
+		for _, resource := range resources.Resources() {
+			models = append(models, resource.ToFields())
+		}
+
+		if len(models) > 0 {
+			shouldFetch = cb(models)
+		}
+
+		path = resources.NextURL
+
+		fetchNext = shouldFetch && path != ""
+	}
+
+	return
+}
+
 func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.ReadSeeker, resource interface{}) (apiResponse ApiResponse) {
 	request, apiResponse := gateway.NewRequest(verb, url, accessToken, body)
 	if apiResponse.IsNotSuccessful() {

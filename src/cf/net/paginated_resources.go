@@ -1,4 +1,4 @@
-package api
+package net
 
 import (
 	"encoding/json"
@@ -6,7 +6,9 @@ import (
 )
 
 func NewPaginatedResources(exampleResource ModelResource) PaginatedResources {
-	return PaginatedResources{Unmarshaler: sliceUnmarshaler{valueType: reflect.TypeOf(exampleResource)}}
+	return PaginatedResources{
+		Unmarshaler: sliceUnmarshaler{valueType: reflect.TypeOf(exampleResource)},
+	}
 }
 
 type PaginatedResources struct {
@@ -14,26 +16,14 @@ type PaginatedResources struct {
 	Unmarshaler sliceUnmarshaler `json:"resources"`
 }
 
+type PaginatedResourcesCallback func([]interface{}) bool
+
 func (pag *PaginatedResources) Resources() []ModelResource {
 	return pag.Unmarshaler.Contents
 }
 
 type ModelResource interface {
 	ToFields() interface{}
-}
-
-type Resource struct {
-	Metadata Metadata
-	Entity   Entity
-}
-
-type Metadata struct {
-	Guid string
-	Url  string
-}
-
-type Entity struct {
-	Name string
 }
 
 type sliceUnmarshaler struct {
