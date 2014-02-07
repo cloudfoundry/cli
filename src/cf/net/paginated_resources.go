@@ -16,8 +16,6 @@ type PaginatedResources struct {
 	Unmarshaler sliceUnmarshaler `json:"resources"`
 }
 
-type PaginatedResourcesCallback func([]interface{}) bool
-
 func (pag *PaginatedResources) Resources() []ModelResource {
 	return pag.Unmarshaler.Contents
 }
