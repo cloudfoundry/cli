@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
@@ -20,11 +19,6 @@ type OrganizationEntity struct {
 type OrganizationResource struct {
 	Resource
 	Entity OrganizationEntity
-}
-
-type PaginatedOrganizationResources struct {
-	Resources []OrganizationResource
-	NextUrl   string `json:"next_url"`
 }
 
 func (resource OrganizationResource) ToFields() (fields models.OrganizationFields) {
@@ -54,7 +48,7 @@ func (resource OrganizationResource) ToModel() (org models.Organization) {
 }
 
 type OrganizationRepository interface {
-	ListOrgs(stop chan bool) (orgsChan chan []models.Organization, statusChan chan net.ApiResponse)
+	ListOrgs(func(models.Organization) bool) (apiResponse net.ApiResponse)
 	FindByName(name string) (org models.Organization, apiResponse net.ApiResponse)
 	Create(name string) (apiResponse net.ApiResponse)
 	Rename(orgGuid string, name string) (apiResponse net.ApiResponse)
@@ -72,74 +66,34 @@ func NewCloudControllerOrganizationRepository(config *configuration.Configuratio
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) ListOrgs(stop chan bool) (orgsChan chan []models.Organization, statusChan chan net.ApiResponse) {
-	orgsChan = make(chan []models.Organization, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		path := "/v2/organizations"
-
-	loop:
-		for path != "" {
-			select {
-			case <-stop:
-				break loop
-			default:
-				var (
-					organizations []models.Organization
-					apiResponse   net.ApiResponse
-				)
-				organizations, path, apiResponse = repo.findNextWithPath(path)
-				if apiResponse.IsNotSuccessful() {
-					statusChan <- apiResponse
-					close(orgsChan)
-					close(statusChan)
-					return
-				}
-
-				if len(organizations) > 0 {
-					orgsChan <- organizations
-				}
-			}
-		}
-		close(orgsChan)
-		close(statusChan)
-		cf.WaitForClose(stop)
-	}()
-
-	return
-}
-
-func (repo CloudControllerOrganizationRepository) findNextWithPath(path string) (orgs []models.Organization, nextUrl string, apiResponse net.ApiResponse) {
-	orgResources := new(PaginatedOrganizationResources)
-
-	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, orgResources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	nextUrl = orgResources.NextUrl
-
-	for _, r := range orgResources.Resources {
-		orgs = append(orgs, r.ToModel())
-	}
-	return
+func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organization) bool) (apiResponse net.ApiResponse) {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		"/v2/organizations",
+		OrganizationResource{},
+		func(resource interface{}) bool {
+			return cb(resource.(OrganizationResource).ToModel())
+		})
 }
 
 func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name)))
+	found := false
+	apiResponse = repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name))),
+		OrganizationResource{},
+		func(resource interface{}) bool {
+			org = resource.(OrganizationResource).ToModel()
+			found = true
+			return false
+		})
 
-	orgs, _, apiResponse := repo.findNextWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
+	if !found {
+		apiResponse = net.NewNotFoundApiResponse("Organization %s not found", name)
 	}
 
-	if len(orgs) != 1 {
-		apiResponse = net.NewNotFoundApiResponse("Org %s not found", name)
-		return
-	}
-
-	org = orgs[0]
 	return
 }
 
