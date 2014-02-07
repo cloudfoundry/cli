@@ -13,7 +13,7 @@ import (
 )
 
 type AppEventsRepository interface {
-	ListEvents(appGuid string, cb func([]models.EventFields) bool) net.ApiResponse
+	ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -27,14 +27,14 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func([]models.EventFields) bool) net.ApiResponse {
+func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse {
 	apiResponse := repo.gateway.ListPaginatedResources(
 		repo.config.Target,
 		repo.config.AccessToken,
 		fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid))),
 		EventResourceNewV2{},
-		func(m []interface{}) bool {
-			return cb(convertEvents(m))
+		func(resource interface{}) bool {
+			return cb(resource.(EventResourceNewV2).ToFields())
 		})
 
 	if apiResponse.IsNotFound() {
@@ -43,20 +43,12 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 			repo.config.AccessToken,
 			fmt.Sprintf("/v2/apps/%s/events", appGuid),
 			EventResourceOldV2{},
-			func(m []interface{}) bool {
-				return cb(convertEvents(m))
+			func(resource interface{}) bool {
+				return cb(resource.(EventResourceOldV2).ToFields())
 			})
 	}
 
 	return apiResponse
-}
-
-func convertEvents(modelSlice []interface{}) []models.EventFields {
-	events := make([]models.EventFields, 0, len(modelSlice))
-	for _, model := range modelSlice {
-		events = append(events, model.(models.EventFields))
-	}
-	return events
 }
 
 const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"
@@ -71,7 +63,7 @@ type EventResourceOldV2 struct {
 	}
 }
 
-func (resource EventResourceOldV2) ToFields() interface{} {
+func (resource EventResourceOldV2) ToFields() models.EventFields {
 	return models.EventFields{
 		Guid:        resource.Metadata.Guid,
 		Name:        "app crashed",
@@ -103,7 +95,7 @@ var KNOWN_METADATA_KEYS = []string{
 	"environment_json",
 }
 
-func (resource EventResourceNewV2) ToFields() interface{} {
+func (resource EventResourceNewV2) ToFields() models.EventFields {
 	metadata := generic.NewMap(resource.Entity.Metadata)
 	if metadata.Has("request") {
 		metadata = generic.NewMap(metadata.Get("request"))

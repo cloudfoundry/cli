@@ -5,42 +5,26 @@ import (
 	"reflect"
 )
 
-func NewPaginatedResources(exampleResource ModelResource) PaginatedResources {
+func NewPaginatedResources(exampleResource interface{}) PaginatedResources {
 	return PaginatedResources{
-		Unmarshaler: sliceUnmarshaler{valueType: reflect.TypeOf(exampleResource)},
+		resourceType: reflect.TypeOf(exampleResource),
 	}
 }
 
 type PaginatedResources struct {
-	NextURL     string           `json:"next_url"`
-	Unmarshaler sliceUnmarshaler `json:"resources"`
+	NextURL        string          `json:"next_url"`
+	ResourcesBytes json.RawMessage `json:"resources"`
+	resourceType   reflect.Type
 }
 
-func (pag *PaginatedResources) Resources() []ModelResource {
-	return pag.Unmarshaler.Contents
-}
+func (this PaginatedResources) Resources() ([]interface{}, error) {
+	slicePtr := reflect.New(reflect.SliceOf(this.resourceType))
+	err := json.Unmarshal([]byte(this.ResourcesBytes), slicePtr.Interface())
+	slice := reflect.Indirect(slicePtr)
 
-type ModelResource interface {
-	ToFields() interface{}
-}
-
-type sliceUnmarshaler struct {
-	valueType reflect.Type
-	Contents  []ModelResource
-}
-
-func (this *sliceUnmarshaler) UnmarshalJSON(input []byte) (err error) {
-	slice := reflect.New(reflect.SliceOf(this.valueType))
-	err = json.Unmarshal(input, slice.Interface())
-	if err != nil {
-		return
+	contents := make([]interface{}, 0, slice.Len())
+	for i := 0; i < slice.Len(); i++ {
+		contents = append(contents, slice.Index(i).Interface())
 	}
-
-	value := reflect.Indirect(slice)
-	contents := make([]ModelResource, 0, value.Len())
-	for i := 0; i < value.Len(); i++ {
-		contents = append(contents, value.Index(i).Interface().(ModelResource))
-	}
-	this.Contents = contents
-	return
+	return contents, err
 }

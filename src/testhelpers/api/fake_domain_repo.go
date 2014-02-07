@@ -38,24 +38,24 @@ type FakeDomainRepository struct {
 	DeleteSharedApiResponse net.ApiResponse
 }
 
-func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, cb func([]models.DomainFields) bool) net.ApiResponse {
+func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) net.ApiResponse {
 	repo.ListDomainsForOrgDomainsGuid = orgGuid
-	if len(repo.ListDomainsForOrgDomains) > 0 {
-		cb(repo.ListDomainsForOrgDomains)
+	for _, d := range repo.ListDomainsForOrgDomains {
+		cb(d)
 	}
 	return repo.ListDomainsForOrgApiResponse
 }
 
-func (repo *FakeDomainRepository) ListSharedDomains(cb func([]models.DomainFields) bool) net.ApiResponse {
-	if len(repo.ListSharedDomainsDomains) > 0 {
-		cb(repo.ListSharedDomainsDomains)
+func (repo *FakeDomainRepository) ListSharedDomains(cb func(models.DomainFields) bool) net.ApiResponse {
+	for _, d := range repo.ListSharedDomainsDomains {
+		cb(d)
 	}
 	return repo.ListSharedDomainsApiResponse
 }
 
-func (repo *FakeDomainRepository) ListDomains(cb func([]models.DomainFields) bool) net.ApiResponse {
-	if len(repo.ListDomainsDomains) > 0 {
-		cb(repo.ListDomainsDomains)
+func (repo *FakeDomainRepository) ListDomains(cb func(models.DomainFields) bool) net.ApiResponse {
+	for _, d := range repo.ListDomainsDomains {
+		cb(d)
 	}
 	return repo.ListDomainsApiResponse
 }

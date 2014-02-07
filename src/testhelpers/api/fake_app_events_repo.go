@@ -11,10 +11,10 @@ type FakeAppEventsRepo struct {
 	ApiResponse net.ApiResponse
 }
 
-func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func([]models.EventFields) bool) net.ApiResponse {
+func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse {
 	repo.AppGuid = appGuid
-	if len(repo.Events) > 0 {
-		cb(repo.Events)
+	for _, e := range repo.Events {
+		cb(e)
 	}
 	return repo.ApiResponse
 }

@@ -55,16 +55,12 @@ func (cmd *Events) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"time", "event", "description"})
 	noEvents := true
 
-	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, func(events []models.EventFields) bool {
-		rows := [][]string{}
-		for _, event := range events {
-			rows = append(rows, []string{
-				event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
-				event.Name,
-				event.Description,
-			})
-		}
-		table.Print(rows)
+	apiResponse := cmd.eventsRepo.ListEvents(app.Guid, func(event models.EventFields) bool {
+		table.Print([][]string{{
+			event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
+			event.Name,
+			event.Description,
+		}})
 		noEvents = false
 		return true
 	})

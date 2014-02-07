@@ -170,8 +170,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListSharedDomains(func(domains []models.DomainFields) bool {
-			receivedDomains = append(receivedDomains, domains...)
+		apiResponse := repo.ListSharedDomains(func(d models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
@@ -187,8 +187,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
-			receivedDomains = append(receivedDomains, domains...)
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
@@ -203,8 +203,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
-			receivedDomains = append(receivedDomains, domains...)
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
@@ -220,7 +220,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		wasCalled := false
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
 			wasCalled = true
 			return true
 		})
@@ -241,8 +241,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
-			receivedDomains = append(receivedDomains, domains...)
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 

@@ -33,30 +33,26 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"buildpack", "position", "enabled", "locked", "filename"})
 	noBuildpacks := true
 
-	apiResponse := cmd.buildpackRepo.ListBuildpacks(func(buildpacks []models.Buildpack) bool {
-		rows := [][]string{}
-		for _, buildpack := range buildpacks {
-			position := ""
-			if buildpack.Position != nil {
-				position = strconv.Itoa(*buildpack.Position)
-			}
-			enabled := ""
-			if buildpack.Enabled != nil {
-				enabled = strconv.FormatBool(*buildpack.Enabled)
-			}
-			locked := ""
-			if buildpack.Locked != nil {
-				locked = strconv.FormatBool(*buildpack.Locked)
-			}
-			rows = append(rows, []string{
-				buildpack.Name,
-				position,
-				enabled,
-				locked,
-				buildpack.Filename,
-			})
+	apiResponse := cmd.buildpackRepo.ListBuildpacks(func(buildpack models.Buildpack) bool {
+		position := ""
+		if buildpack.Position != nil {
+			position = strconv.Itoa(*buildpack.Position)
 		}
-		table.Print(rows)
+		enabled := ""
+		if buildpack.Enabled != nil {
+			enabled = strconv.FormatBool(*buildpack.Enabled)
+		}
+		locked := ""
+		if buildpack.Locked != nil {
+			locked = strconv.FormatBool(*buildpack.Locked)
+		}
+		table.Print([][]string{{
+			buildpack.Name,
+			position,
+			enabled,
+			locked,
+			buildpack.Filename,
+		}})
 		noBuildpacks = false
 		return true
 	})

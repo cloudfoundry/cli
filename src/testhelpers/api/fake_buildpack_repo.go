@@ -24,9 +24,9 @@ type FakeBuildpackRepository struct {
 	UpdateBuildpack models.Buildpack
 }
 
-func (repo *FakeBuildpackRepository) ListBuildpacks(cb func([]models.Buildpack) bool) net.ApiResponse {
-	if len(repo.Buildpacks) > 0 {
-		cb(repo.Buildpacks)
+func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) net.ApiResponse {
+	for _, b := range repo.Buildpacks {
+		cb(b)
 	}
 	return net.NewApiResponseWithStatusCode(200)
 }

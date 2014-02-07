@@ -105,32 +105,28 @@ func (gateway Gateway) ListPaginatedResources(
 	target string,
 	accessToken string,
 	path string,
-	resource ModelResource,
-	cb func([]interface{}) bool) (apiResponse ApiResponse) {
+	resource interface{},
+	cb func(interface{}) bool) (apiResponse ApiResponse) {
 
-	fetchNext := true
-
-	for fetchNext {
-		var shouldFetch bool
-
-		resources := NewPaginatedResources(resource)
-		apiResponse = gateway.GetResource(fmt.Sprintf("%s%s", target, path), accessToken, &resources)
+	for path != "" {
+		pagination := NewPaginatedResources(resource)
+		apiResponse = gateway.GetResource(fmt.Sprintf("%s%s", target, path), accessToken, &pagination)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
 
-		models := make([]interface{}, 0, len(resources.Resources()))
-		for _, resource := range resources.Resources() {
-			models = append(models, resource.ToFields())
+		resources, err := pagination.Resources()
+		if err != nil {
+			return NewApiResponseWithError("Error parsing JSON", err)
 		}
 
-		if len(models) > 0 {
-			shouldFetch = cb(models)
+		for _, resource := range resources {
+			if !cb(resource) {
+				return
+			}
 		}
 
-		path = resources.NextURL
-
-		fetchNext = shouldFetch && path != ""
+		path = pagination.NextURL
 	}
 
 	return

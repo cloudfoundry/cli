@@ -115,8 +115,8 @@ func init() {
 			}
 
 			buildpacks := []models.Buildpack{}
-			apiResponse := repo.ListBuildpacks(func(page []models.Buildpack) bool {
-				buildpacks = append(buildpacks, page...)
+			apiResponse := repo.ListBuildpacks(func(b models.Buildpack) bool {
+				buildpacks = append(buildpacks, b)
 				return true
 			})
 
