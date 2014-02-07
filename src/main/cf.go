@@ -116,7 +116,7 @@ func loadConfig(termUI terminal.UI) (config configuration.ConfigReadWriteCloser,
 	configRepo = configuration.NewConfigurationDiskRepository(configuration.ConfigFilePath())
 	config, err := configRepo.Load()
 	if err != nil {
-		termUI.Failed(fmt.Sprintf("Error loading config file: %s",err))
+		termUI.Failed(fmt.Sprintf("Error loading config file: %s", err))
 		configRepo.Delete()
 		os.Exit(1)
 		return
@@ -124,7 +124,7 @@ func loadConfig(termUI terminal.UI) (config configuration.ConfigReadWriteCloser,
 	return
 }
 
-func saveConfig(termUI terminal.UI,  config configuration.ConfigReadWriteCloser, configRepo configuration.ConfigurationRepository) {
+func saveConfig(termUI terminal.UI, config configuration.ConfigReadWriteCloser, configRepo configuration.ConfigurationRepository) {
 	err := configRepo.Save(config)
 	if err != nil {
 		termUI.Failed("Failed to save config file")

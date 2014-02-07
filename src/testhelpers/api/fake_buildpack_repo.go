@@ -1,9 +1,9 @@
 package api
 
 import (
-"cf/models"
-	"cf/net"
 	"cf"
+	"cf/models"
+	"cf/net"
 )
 
 type FakeBuildpackRepository struct {
@@ -24,32 +24,11 @@ type FakeBuildpackRepository struct {
 	UpdateBuildpack models.Buildpack
 }
 
-func (repo *FakeBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []models.Buildpack, statusChan chan net.ApiResponse) {
-	buildpacksChan = make(chan []models.Buildpack, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		buildpackCount := len(repo.Buildpacks)
-		for i := 0; i < buildpackCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if buildpackCount-i > 1 {
-					buildpacksChan <- repo.Buildpacks[i : i+2]
-				} else {
-					buildpacksChan <- repo.Buildpacks[i:]
-				}
-			}
-		}
-
-		close(buildpacksChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
-	return
+func (repo *FakeBuildpackRepository) ListBuildpacks(cb func([]models.Buildpack) bool) net.ApiResponse {
+	if len(repo.Buildpacks) > 0 {
+		cb(repo.Buildpacks)
+	}
+	return net.NewApiResponseWithStatusCode(200)
 }
 
 func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse) {

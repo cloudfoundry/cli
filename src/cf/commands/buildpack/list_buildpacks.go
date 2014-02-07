@@ -2,6 +2,7 @@ package buildpack
 
 import (
 	"cf/api"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -29,15 +30,10 @@ func (cmd ListBuildpacks) GetRequirements(reqFactory requirements.Factory, c *cl
 func (cmd ListBuildpacks) Run(c *cli.Context) {
 	cmd.ui.Say("Getting buildpacks...\n")
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-
-	buildpackChan, statusChan := cmd.buildpackRepo.ListBuildpacks(stopChan)
-
 	table := cmd.ui.Table([]string{"buildpack", "position", "enabled", "locked", "filename"})
 	noBuildpacks := true
 
-	for buildpacks := range buildpackChan {
+	apiResponse := cmd.buildpackRepo.ListBuildpacks(func(buildpacks []models.Buildpack) bool {
 		rows := [][]string{}
 		for _, buildpack := range buildpacks {
 			position := ""
@@ -62,11 +58,11 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 		}
 		table.Print(rows)
 		noBuildpacks = false
-	}
+		return true
+	})
 
-	apiStatus := <-statusChan
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiResponse.Message)
 		return
 	}
 

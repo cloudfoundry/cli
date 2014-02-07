@@ -20,66 +20,60 @@ func callListBuildpacks(reqFactory *testreq.FakeReqFactory, buildpackRepo *testa
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestListBuildpacksRequirements", func() {
-			buildpackRepo := &testapi.FakeBuildpackRepository{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callListBuildpacks(reqFactory, buildpackRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+var _ = Describe("ListBuildpacks", func() {
+	It("has the right requirements", func() {
+		buildpackRepo := &testapi.FakeBuildpackRepository{}
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-			callListBuildpacks(reqFactory, buildpackRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestListBuildpacks", func() {
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callListBuildpacks(reqFactory, buildpackRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			buildpackBuilder := func(name string, position int, enabled bool, locked bool) (buildpack models.Buildpack) {
-				buildpack.Name = name
-				buildpack.Position = &position
-				buildpack.Enabled = &enabled
-				buildpack.Locked = &locked
-				return
-			}
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callListBuildpacks(reqFactory, buildpackRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
 
-			buildpacks := []models.Buildpack{
-				buildpackBuilder("Buildpack-1", 5, true, false),
-				buildpackBuilder("Buildpack-2", 10, false, true),
-				buildpackBuilder("Buildpack-3", 15, true, false),
-			}
+	It("lists buildpacks", func() {
+		p1 := 5
+		p2 := 10
+		p3 := 15
+		t := true
+		f := false
 
-			buildpackRepo := &testapi.FakeBuildpackRepository{
-				Buildpacks: buildpacks,
-			}
+		buildpackRepo := &testapi.FakeBuildpackRepository{
+			Buildpacks: []models.Buildpack{
+				models.Buildpack{Name: "Buildpack-1", Position: &p1, Enabled: &t, Locked: &f},
+				models.Buildpack{Name: "Buildpack-2", Position: &p2, Enabled: &f, Locked: &t},
+				models.Buildpack{Name: "Buildpack-3", Position: &p3, Enabled: &t, Locked: &f},
+			},
+		}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-			ui := callListBuildpacks(reqFactory, buildpackRepo)
+		ui := callListBuildpacks(reqFactory, buildpackRepo)
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting buildpacks"},
-				{"buildpack", "position", "enabled"},
-				{"Buildpack-1", "5", "true", "false"},
-				{"Buildpack-2", "10", "false", "true"},
-				{"Buildpack-3", "15", "true", "false"},
-			})
-		})
-		It("TestListingBuildpacksWhenNoneExist", func() {
-
-			buildpacks := []models.Buildpack{}
-			buildpackRepo := &testapi.FakeBuildpackRepository{
-				Buildpacks: buildpacks,
-			}
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-
-			ui := callListBuildpacks(reqFactory, buildpackRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting buildpacks"},
-				{"No buildpacks found"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting buildpacks"},
+			{"buildpack", "position", "enabled"},
+			{"Buildpack-1", "5", "true", "false"},
+			{"Buildpack-2", "10", "false", "true"},
+			{"Buildpack-3", "15", "true", "false"},
 		})
 	})
-}
+
+	It("TestListingBuildpacksWhenNoneExist", func() {
+		buildpackRepo := &testapi.FakeBuildpackRepository{
+			Buildpacks: []models.Buildpack{},
+		}
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+
+		ui := callListBuildpacks(reqFactory, buildpackRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting buildpacks"},
+			{"No buildpacks found"},
+		})
+	})
+})
