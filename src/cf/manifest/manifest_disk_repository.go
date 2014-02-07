@@ -90,6 +90,11 @@ func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
 		return
 	}
 
+	if !generic.IsMappable(document) {
+		err = errors.New("Invalid manifest. Expected a map")
+		return
+	}
+
 	yamlMap = generic.NewMap(document)
 	return
 }

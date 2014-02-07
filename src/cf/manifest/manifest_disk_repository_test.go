@@ -4,130 +4,101 @@ import (
 	. "cf/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"os"
 	"path/filepath"
 	"runtime"
 )
 
-func pushingWithAbsoluteUnixPath(t mr.TestingT) {
-	repo := NewManifestDiskRepository()
-	m, err := repo.ReadManifest("../../fixtures/unix-manifest.yml")
+var _ = Describe("ManifestDiskRepository", func() {
+	var repo ManifestRepository
 
-	assert.NoError(t, err)
-	assert.Equal(t, *m.Applications[0].Path, "/absolute/path/to/example-app")
-}
-
-func pushingWithAbsoluteWindowsPath(t mr.TestingT) {
-	repo := NewManifestDiskRepository()
-	m, err := repo.ReadManifest("../../fixtures/windows-manifest.yml")
-
-	assert.NoError(t, err)
-	assert.Equal(t, *m.Applications[0].Path, "C:\\path\\to\\my\\app")
-}
-
-func init() {
-	Describe("ManifestDiskRepository", func() {
-		It("can parse a manifest when provided a valid path", func() {
-			repo := NewManifestDiskRepository()
-			m, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
-
-			assert.True(mr.T(), errs.Empty())
-			assert.Equal(mr.T(), len(m.Applications), 1)
-			assert.Equal(mr.T(), *m.Applications[0].Name, "goodbyte")
-
-			if runtime.GOOS == "windows" {
-				assert.Equal(mr.T(), *m.Applications[0].Path, "..\\..\\fixtures")
-			} else {
-				assert.Equal(mr.T(), *m.Applications[0].Path, "../../fixtures")
-			}
-		})
-
-		It("TestReadManifestWithBadPath", func() {
-			repo := NewManifestDiskRepository()
-			_, errs := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
-
-			assert.False(mr.T(), errs.Empty())
-		})
-
-		It("TestManifestPathsDefaultsToCurrentDirectory", func() {
-			repo := NewManifestDiskRepository()
-
-			cwd, err := os.Getwd()
-			assert.NoError(mr.T(), err)
-
-			path, filename, err := repo.ManifestPath("")
-
-			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), path, cwd)
-			assert.Equal(mr.T(), filename, "manifest.yml")
-		})
-
-		It("TestAppAndManifestPathsIgnoreAppPathWhenManifestPathIsSpecified", func() {
-			repo := NewManifestDiskRepository()
-
-			cwd, err := os.Getwd()
-			assert.NoError(mr.T(), err)
-			expectedDir := filepath.Join(cwd, "..")
-
-			path, filename, err := repo.ManifestPath(expectedDir)
-
-			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), path, expectedDir)
-			assert.Equal(mr.T(), filename, "manifest.yml")
-		})
-
-		It("TestAppAndManifestPathsManifestFileIsDroppedFromAppPath", func() {
-			repo := NewManifestDiskRepository()
-
-			cwd, err := os.Getwd()
-			assert.NoError(mr.T(), err)
-
-			path, filename, err := repo.ManifestPath(filepath.Join(cwd, "example_manifest.yml"))
-
-			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), path, cwd)
-			assert.Equal(mr.T(), filename, "example_manifest.yml")
-		})
-
-		It("converts nested maps to generic maps", func() {
-			repo := NewManifestDiskRepository()
-			m, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
-
-			Expect(errs).To(BeEmpty())
-			Expect(*m.Applications[0].EnvironmentVars).To(Equal(map[string]string{
-				"LD_LIBRARY_PATH": "/usr/lib/somewhere",
-			}))
-		})
-
-		It("TestManifestWithInheritance", func() {
-			repo := NewManifestDiskRepository()
-			m, err := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
-			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), *m.Applications[0].Name, "base-app")
-			assert.Equal(mr.T(), *m.Applications[0].Services, []string{"base-service"})
-			assert.Equal(mr.T(), *m.Applications[0].EnvironmentVars, map[string]string{
-				"foo":                "bar",
-				"will-be-overridden": "my-value",
-			})
-
-			assert.Equal(mr.T(), *m.Applications[1].Name, "my-app")
-
-			env := *m.Applications[1].EnvironmentVars
-			assert.Equal(mr.T(), env["will-be-overridden"], "my-value")
-			assert.Equal(mr.T(), env["foo"], "bar")
-
-			services := *m.Applications[1].Services
-			assert.Equal(mr.T(), services, []string{"base-service", "foo-service"})
-		})
-
-		It("TestPushingWithAbsoluteAppPathFromManifestFile", func() {
-			if runtime.GOOS == "windows" {
-				pushingWithAbsoluteWindowsPath(mr.T())
-			} else {
-				pushingWithAbsoluteUnixPath(mr.T())
-			}
-		})
+	BeforeEach(func() {
+		repo = NewManifestDiskRepository()
 	})
-}
+
+	It("can parse a manifest when provided a valid path", func() {
+		m, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
+
+		Expect(errs).To(BeEmpty())
+		Expect(len(m.Applications)).To(Equal(1))
+		Expect(*m.Applications[0].Name).To(Equal("goodbyte"))
+
+		if runtime.GOOS == "windows" {
+			Expect(*m.Applications[0].Path).To(Equal("..\\..\\fixtures"))
+		} else {
+			Expect(*m.Applications[0].Path).To(Equal("../../fixtures"))
+		}
+	})
+
+	It("returns an error when the path is invalid", func() {
+		_, errs := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
+		Expect(errs).NotTo(BeEmpty())
+	})
+
+	It("returns an error when the manifest does not contain a map", func() {
+		_, errs := repo.ReadManifest("../../fixtures/empty-manifest.yml")
+		Expect(errs).NotTo(BeEmpty())
+	})
+
+	It("looks for manifest.yml in the current directory if the path is not given", func() {
+		cwd, err := os.Getwd()
+		Expect(err).NotTo(HaveOccurred())
+
+		path, filename, err := repo.ManifestPath("")
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(path).To(Equal(cwd))
+		Expect(filename).To(Equal("manifest.yml"))
+	})
+
+	It("looks for manifest.yml when given a path to a directory", func() {
+		dir, err := os.Getwd()
+		Expect(err).NotTo(HaveOccurred())
+
+		path, filename, err := repo.ManifestPath(dir)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(path).To(Equal(dir))
+		Expect(filename).To(Equal("manifest.yml"))
+	})
+
+	It("separates the directory from the filepath when given a file path", func() {
+		cwd, err := os.Getwd()
+		Expect(err).NotTo(HaveOccurred())
+
+		path, filename, err := repo.ManifestPath(filepath.Join(cwd, "example_manifest.yml"))
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(path).To(Equal(cwd))
+		Expect(filename).To(Equal("example_manifest.yml"))
+	})
+
+	It("converts nested maps to generic maps", func() {
+		m, errs := repo.ReadManifest("../../fixtures/different-manifest.yml")
+
+		Expect(errs).To(BeEmpty())
+		Expect(*m.Applications[0].EnvironmentVars).To(Equal(map[string]string{
+			"LD_LIBRARY_PATH": "/usr/lib/somewhere",
+		}))
+	})
+
+	It("merges manifests with their 'inherited' manifests", func() {
+		m, errs := repo.ReadManifest("../../fixtures/inherited-manifest.yml")
+		Expect(errs).To(BeEmpty())
+		Expect(*m.Applications[0].Name).To(Equal("base-app"))
+		Expect(*m.Applications[0].Services).To(Equal([]string{"base-service"}))
+		Expect(*m.Applications[0].EnvironmentVars).To(Equal(map[string]string{
+			"foo":                "bar",
+			"will-be-overridden": "my-value",
+		}))
+
+		Expect(*m.Applications[1].Name).To(Equal("my-app"))
+
+		env := *m.Applications[1].EnvironmentVars
+		Expect(env["will-be-overridden"]).To(Equal("my-value"))
+		Expect(env["foo"]).To(Equal("bar"))
+
+		services := *m.Applications[1].Services
+		Expect(services).To(Equal([]string{"base-service", "foo-service"}))
+	})
+})
