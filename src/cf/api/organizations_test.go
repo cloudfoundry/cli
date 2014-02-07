@@ -59,15 +59,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createOrganizationRepo(mr.T(), firstPageOrgsRequest, secondPageOrgsRequest)
 		defer ts.Close()
 
-		stopChan := make(chan bool)
-		defer close(stopChan)
-		orgsChan, statusChan := repo.ListOrgs(stopChan)
-
 		orgs := []models.Organization{}
-		for chunk := range orgsChan {
-			orgs = append(orgs, chunk...)
-		}
-		apiResponse := <-statusChan
+		apiResponse := repo.ListOrgs(func(o models.Organization) bool {
+			orgs = append(orgs, o)
+			return true
+		})
 
 		assert.Equal(mr.T(), len(orgs), 3)
 		assert.Equal(mr.T(), orgs[0].Guid, "org1-guid")
@@ -87,14 +83,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createOrganizationRepo(mr.T(), emptyOrgsRequest)
 		defer ts.Close()
 
-		stopChan := make(chan bool)
-		defer close(stopChan)
-		orgsChan, statusChan := repo.ListOrgs(stopChan)
+		wasCalled := false
+		apiResponse := repo.ListOrgs(func(o models.Organization) bool {
+			wasCalled = true
+			return false
+		})
 
-		_, ok := <-orgsChan
-		apiResponse := <-statusChan
-
-		assert.False(mr.T(), ok)
+		assert.False(mr.T(), wasCalled)
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 		assert.True(mr.T(), handler.AllRequestsCalled())
 	})

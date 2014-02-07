@@ -23,31 +23,12 @@ type FakeOrgRepository struct {
 	DeletedOrganizationGuid string
 }
 
-func (repo FakeOrgRepository) ListOrgs(stop chan bool) (orgsChan chan []models.Organization, statusChan chan net.ApiResponse) {
-	orgsChan = make(chan []models.Organization, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		orgsCount := len(repo.Organizations)
-		for i := 0; i < orgsCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if orgsCount-i > 1 {
-					orgsChan <- repo.Organizations[i : i+2]
-				} else {
-					orgsChan <- repo.Organizations[i:]
-				}
-			}
+func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiResponse net.ApiResponse) {
+	for _, org := range repo.Organizations {
+		if !cb(org) {
+			break
 		}
-
-		close(orgsChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
+	}
 	return
 }
 

@@ -3,6 +3,7 @@ package organization
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -31,24 +32,15 @@ func (cmd ListOrgs) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 func (cmd ListOrgs) Run(c *cli.Context) {
 	cmd.ui.Say("Getting orgs as %s...\n", terminal.EntityNameColor(cmd.config.Username()))
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-
-	orgsChan, statusChan := cmd.orgRepo.ListOrgs(stopChan)
-
-	table := cmd.ui.Table([]string{"name"})
 	noOrgs := true
+	table := cmd.ui.Table([]string{"name"})
 
-	for orgs := range orgsChan {
-		rows := [][]string{}
-		for _, org := range orgs {
-			rows = append(rows, []string{org.Name})
-		}
-		table.Print(rows)
+	apiStatus := cmd.orgRepo.ListOrgs(func(org models.Organization) bool {
+		table.Print([][]string{{org.Name}})
 		noOrgs = false
-	}
+		return true
+	})
 
-	apiStatus := <-statusChan
 	if apiStatus.IsNotSuccessful() {
 		cmd.ui.Failed("Failed fetching orgs.\n%s", apiStatus.Message)
 		return

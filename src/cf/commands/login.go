@@ -148,22 +148,12 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 			return
 		}
 
-		stopChan := make(chan bool)
-		defer close(stopChan)
-
-		orgsChan, statusChan := cmd.orgRepo.ListOrgs(stopChan)
-
 		availableOrgs := []models.Organization{}
+		apiResponse := cmd.orgRepo.ListOrgs(func(o models.Organization) bool {
+			availableOrgs = append(availableOrgs, o)
+			return len(availableOrgs) < maxChoices
+		})
 
-		for orgs := range orgsChan {
-			availableOrgs = append(availableOrgs, orgs...)
-			if len(availableOrgs) > maxChoices {
-				stopChan <- true
-				break
-			}
-		}
-
-		apiResponse := <-statusChan
 		if apiResponse.IsNotSuccessful() {
 			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiResponse.Message))
 			return
