@@ -37,7 +37,7 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect fu
 		return
 	}
 
-	location := host + fmt.Sprintf("/dump/?app=%s", appGuid)
+	location := fmt.Sprintf("%s/dump/?app=%s", host, appGuid)
 	stopLoggingChan := make(chan bool)
 	defer close(stopLoggingChan)
 
