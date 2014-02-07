@@ -49,29 +49,30 @@ func createBuildpackRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *ht
 	repo = NewCloudControllerBuildpackRepository(config, gateway)
 	return
 }
+
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestBuildpacksListBuildpacks", func() {
+	Describe("Buildpacks repo", func() {
+		It("lists buildpacks", func() {
 			firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/buildpacks",
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body: `{
-			  "next_url": "/v2/buildpacks?page=2",
-			  "resources": [
-			    {
-			      "metadata": {
-			        "guid": "buildpack1-guid"
-			      },
-			      "entity": {
-			        "name": "Buildpack1",
-					"position" : 1,
-					"filename" : "firstbp.zip"
-			      }
-			    }
-			  ]
-			}`},
+					  "next_url": "/v2/buildpacks?page=2",
+					  "resources": [
+						{
+						  "metadata": {
+							"guid": "buildpack1-guid"
+						  },
+						  "entity": {
+							"name": "Buildpack1",
+							"position" : 1,
+							"filename" : "firstbp.zip"
+						  }
+						}
+					  ]
+					}`},
 			})
 
 			secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -80,26 +81,22 @@ func init() {
 				Response: testnet.TestResponse{
 					Status: http.StatusOK,
 					Body: `{
-			  "resources": [
-			    {
-			      "metadata": {
-			        "guid": "buildpack2-guid"
-			      },
-			      "entity": {
-			        "name": "Buildpack2",
-					"position" : 2
-			      }
-			    }
-			  ]
-			}`},
+					  "resources": [
+						{
+						  "metadata": {
+							"guid": "buildpack2-guid"
+						  },
+						  "entity": {
+							"name": "Buildpack2",
+							"position" : 2
+						  }
+						}
+					  ]
+					}`},
 			})
 
 			ts, handler, repo := createBuildpackRepo(mr.T(), firstRequest, secondRequest)
 			defer ts.Close()
-
-			stopChan := make(chan bool)
-			defer close(stopChan)
-			buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
 
 			one := 1
 			two := 2
@@ -118,42 +115,17 @@ func init() {
 			}
 
 			buildpacks := []models.Buildpack{}
-			for chunk := range buildpacksChan {
-				buildpacks = append(buildpacks, chunk...)
-			}
-			apiResponse := <-statusChan
+			apiResponse := repo.ListBuildpacks(func(page []models.Buildpack) bool {
+				buildpacks = append(buildpacks, page...)
+				return true
+			})
 
 			assert.Equal(mr.T(), buildpacks, expectedBuildpacks)
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 		})
-		It("TestBuildpacksListBuildpacksWithNoBuildpacks", func() {
 
-			emptyBuildpacksRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/buildpacks",
-				Response: testnet.TestResponse{
-					Status: http.StatusOK,
-					Body:   `{"resources": []}`,
-				},
-			})
-
-			ts, handler, repo := createBuildpackRepo(mr.T(), emptyBuildpacksRequest)
-			defer ts.Close()
-
-			stopChan := make(chan bool)
-			defer close(stopChan)
-			buildpacksChan, statusChan := repo.ListBuildpacks(stopChan)
-
-			_, ok := <-buildpacksChan
-			apiResponse := <-statusChan
-
-			assert.False(mr.T(), ok)
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
 		It("TestBuildpacksFindByName", func() {
-
 			req := testapi.NewCloudControllerTestRequest(findBuildpackRequest)
 
 			ts, handler, repo := createBuildpackRepo(mr.T(), req)
@@ -171,8 +143,8 @@ func init() {
 			assert.Equal(mr.T(), buildpack.Guid, existingBuildpack.Guid)
 			assert.Equal(mr.T(), *buildpack.Position, 10)
 		})
-		It("TestFindByNameWhenBuildpackIsNotFound", func() {
 
+		It("TestFindByNameWhenBuildpackIsNotFound", func() {
 			req := testapi.NewCloudControllerTestRequest(findBuildpackRequest)
 			req.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
@@ -184,8 +156,8 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsError())
 			assert.True(mr.T(), apiResponse.IsNotFound())
 		})
-		It("TestBuildpackCreateRejectsImproperNames", func() {
 
+		It("TestBuildpackCreateRejectsImproperNames", func() {
 			badRequest := testnet.TestRequest{
 				Method: "POST",
 				Path:   "/v2/buildpacks",
@@ -207,8 +179,8 @@ func init() {
 			assert.Equal(mr.T(), apiResponse.ErrorCode, "290003")
 			assert.Contains(mr.T(), apiResponse.Message, "Buildpack is invalid")
 		})
-		It("TestCreateBuildpackWithPosition", func() {
 
+		It("TestCreateBuildpackWithPosition", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/buildpacks",
@@ -239,8 +211,8 @@ func init() {
 			assert.Equal(mr.T(), "my-cool-buildpack", created.Name)
 			assert.Equal(mr.T(), 999, *created.Position)
 		})
-		It("TestCreateBuildpackEnabled", func() {
 
+		It("TestCreateBuildpackEnabled", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/buildpacks",
@@ -273,8 +245,8 @@ func init() {
 			assert.Equal(mr.T(), "my-cool-buildpack", created.Name)
 			assert.Equal(mr.T(), 999, *created.Position)
 		})
-		It("TestDeleteBuildpack", func() {
 
+		It("TestDeleteBuildpack", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "DELETE",
 				Path:   "/v2/buildpacks/my-cool-buildpack-guid",
@@ -290,8 +262,8 @@ func init() {
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		})
-		It("TestUpdateBuildpack", func() {
 
+		It("TestUpdateBuildpack", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "PUT",
 				Path:    "/v2/buildpacks/my-cool-buildpack-guid",
@@ -299,14 +271,14 @@ func init() {
 				Response: testnet.TestResponse{
 					Status: http.StatusCreated,
 					Body: `{
-				    "metadata": {
-				        "guid": "my-cool-buildpack-guid"
-				    },
-				    "entity": {
-				        "name": "my-cool-buildpack",
+					"metadata": {
+						"guid": "my-cool-buildpack-guid"
+					},
+					"entity": {
+						"name": "my-cool-buildpack",
 						"position":555,
 						"enabled":false
-				    }
+					}
 				}`},
 			})
 
@@ -327,8 +299,8 @@ func init() {
 
 			assert.Equal(mr.T(), buildpack, updated)
 		})
-		It("TestLockBuildpack", func() {
 
+		It("TestLockBuildpack", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "PUT",
 				Path:    "/v2/buildpacks/my-cool-buildpack-guid",
@@ -336,15 +308,15 @@ func init() {
 				Response: testnet.TestResponse{
 					Status: http.StatusCreated,
 					Body: `{
-				
-				    "metadata": {
-				        "guid": "my-cool-buildpack-guid"
-				    },
-				    "entity": {
-				        "name": "my-cool-buildpack",
+
+					"metadata": {
+						"guid": "my-cool-buildpack-guid"
+					},
+					"entity": {
+						"name": "my-cool-buildpack",
 						"position":123,
 						"locked": true
-				    }
+					}
 				}`},
 			})
 

@@ -108,12 +108,12 @@ func (gateway Gateway) ListPaginatedResources(
 	resource ModelResource,
 	cb PaginatedResourcesCallback) (apiResponse ApiResponse) {
 
-	resources := NewPaginatedResources(resource)
 	fetchNext := true
 
 	for fetchNext {
 		var shouldFetch bool
 
+		resources := NewPaginatedResources(resource)
 		apiResponse = gateway.GetResource(fmt.Sprintf("%s%s", target, path), accessToken, &resources)
 		if apiResponse.IsNotSuccessful() {
 			return

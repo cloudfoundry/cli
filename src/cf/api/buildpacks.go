@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"cf"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
@@ -11,32 +10,9 @@ import (
 	"net/url"
 )
 
-const (
-	buildpacks_path = "/v2/buildpacks"
-)
-
-type PaginatedBuildpackResources struct {
-	Resources []BuildpackResource
-	NextUrl   string `json:"next_url"`
-}
-
-type BuildpackResource struct {
-	Resource
-	Entity BuildpackEntity
-}
-
-type BuildpackEntity struct {
-	Name     string `json:"name"`
-	Position *int   `json:"position,omitempty"`
-	Enabled  *bool  `json:"enabled,omitempty"`
-	Key      string `json:"key,omitempty"`
-	Filename string `json:"filename,omitempty"`
-	Locked   *bool  `json:"locked,omitempty"`
-}
-
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse)
-	ListBuildpacks(stop chan bool) (buildpacksChan chan []models.Buildpack, statusChan chan net.ApiResponse)
+	ListBuildpacks(func([]models.Buildpack) bool) net.ApiResponse
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse)
 	Delete(buildpackGuid string) (apiResponse net.ApiResponse)
 	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse)
@@ -53,74 +29,37 @@ func NewCloudControllerBuildpackRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) ListBuildpacks(stop chan bool) (buildpacksChan chan []models.Buildpack, statusChan chan net.ApiResponse) {
-	buildpacksChan = make(chan []models.Buildpack, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		path := buildpacks_path
-
-	loop:
-		for path != "" {
-			select {
-			case <-stop:
-				break loop
-			default:
-				var (
-					buildpacks  []models.Buildpack
-					apiResponse net.ApiResponse
-				)
-				buildpacks, path, apiResponse = repo.findNextWithPath(path)
-				if apiResponse.IsNotSuccessful() {
-					statusChan <- apiResponse
-					close(buildpacksChan)
-					close(statusChan)
-					return
-				}
-
-				if len(buildpacks) > 0 {
-					buildpacksChan <- buildpacks
-				}
+func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func([]models.Buildpack) bool) net.ApiResponse {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		buildpacks_path,
+		&BuildpackResource{},
+		func(results []interface{}) bool {
+			buildpacks := make([]models.Buildpack, 0, len(results))
+			for _, result := range results {
+				buildpacks = append(buildpacks, result.(models.Buildpack))
 			}
-		}
-		close(buildpacksChan)
-		close(statusChan)
-		cf.WaitForClose(stop)
-	}()
-
-	return
+			return cb(buildpacks)
+		})
 }
 
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name))
-	buildpacks, _, apiResponse := repo.findNextWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+	foundIt := false
+	apiResponse = repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name)),
+		&BuildpackResource{},
+		func(results []interface{}) bool {
+			buildpack = results[0].(models.Buildpack)
+			foundIt = true
+			return false
+		})
 
-	if len(buildpacks) == 0 {
+	if !foundIt {
 		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Buildpack", name)
-		return
 	}
-
-	buildpack = buildpacks[0]
-	return
-}
-
-func (repo CloudControllerBuildpackRepository) findNextWithPath(path string) (buildpacks []models.Buildpack, nextUrl string, apiResponse net.ApiResponse) {
-	response := new(PaginatedBuildpackResources)
-
-	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, response)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	nextUrl = response.NextUrl
-
-	for _, r := range response.Resources {
-		buildpacks = append(buildpacks, unmarshallBuildpack(r))
-	}
-
 	return
 }
 
@@ -139,7 +78,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 		return
 	}
 
-	createdBuildpack = unmarshallBuildpack(*resource)
+	createdBuildpack = resource.ToFields().(models.Buildpack)
 	return
 }
 
@@ -166,17 +105,34 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 		return
 	}
 
-	updatedBuildpack = unmarshallBuildpack(*resource)
+	updatedBuildpack = resource.ToFields().(models.Buildpack)
 	return
 }
 
-func unmarshallBuildpack(resource BuildpackResource) (buildpack models.Buildpack) {
-	buildpack.Guid = resource.Metadata.Guid
-	buildpack.Name = resource.Entity.Name
-	buildpack.Position = resource.Entity.Position
-	buildpack.Enabled = resource.Entity.Enabled
-	buildpack.Key = resource.Entity.Key
-	buildpack.Filename = resource.Entity.Filename
-	buildpack.Locked = resource.Entity.Locked
-	return
+const buildpacks_path = "/v2/buildpacks"
+
+func (resource *BuildpackResource) ToFields() interface{} {
+	return models.Buildpack{
+		Guid:     resource.Metadata.Guid,
+		Name:     resource.Entity.Name,
+		Position: resource.Entity.Position,
+		Enabled:  resource.Entity.Enabled,
+		Key:      resource.Entity.Key,
+		Filename: resource.Entity.Filename,
+		Locked:   resource.Entity.Locked,
+	}
+}
+
+type BuildpackResource struct {
+	Metadata Metadata
+	Entity   BuildpackEntity
+}
+
+type BuildpackEntity struct {
+	Name     string `json:"name"`
+	Position *int   `json:"position,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
+	Key      string `json:"key,omitempty"`
+	Filename string `json:"filename,omitempty"`
+	Locked   *bool  `json:"locked,omitempty"`
 }

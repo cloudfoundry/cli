@@ -63,7 +63,7 @@ func init() {
 			assert.Equal(mr.T(), pq.PopMessage(), msg)
 		})
 
-		FIt("TestNextTimestamp", func() {
+		It("TestNextTimestamp", func() {
 			currentTime := time.Unix(5, 0)
 			clock := func() time.Time {
 				return currentTime
