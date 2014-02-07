@@ -19,10 +19,12 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			if len(args) > 0 {
 				cli.ShowCommandHelp(c, args[0])
 			} else {
-				showAppHelp(c.App)
+				showAppHelp(appHelpTemplate, c.App)
 			}
 		},
 	}
+	cli.HelpPrinter = showAppHelp
+	cli.AppHelpTemplate = appHelpTemplate
 
 	app = cli.NewApp()
 	app.Usage = cf.Usage
