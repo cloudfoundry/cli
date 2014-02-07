@@ -259,21 +259,13 @@ func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.Domain
 }
 
 func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
-	var foundSharedDomain bool = false
-	listDomainsCallback := func(domains []models.DomainFields) bool {
-		for _, aDomain := range domains {
-			if aDomain.Shared {
-				foundSharedDomain = true
-				domain = aDomain
-				break
-			}
+	foundIt := false
+	listDomainsCallback := func(aDomain models.DomainFields) bool {
+		if aDomain.Shared {
+			domain = aDomain
+			foundIt = true
 		}
-
-		if foundSharedDomain {
-			return false
-		} else {
-			return true
-		}
+		return !foundIt
 	}
 
 	apiResponse := cmd.domainRepo.ListSharedDomains(listDomainsCallback)
@@ -285,7 +277,7 @@ func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 		err = errors.New(apiResponse.Message)
 	}
 
-	if foundSharedDomain != true {
+	if !foundIt {
 		err = errors.New("Could not find a default domain")
 		return
 	}

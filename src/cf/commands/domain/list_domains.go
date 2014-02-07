@@ -68,13 +68,9 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	}
 }
 
-func domainsCallback(table terminal.Table, noDomains *bool) func([]models.DomainFields) bool {
-	return func(domains []models.DomainFields) bool {
-		rows := [][]string{}
-		for _, domain := range domains {
-			rows = append(rows, []string{domain.Name, domainStatusString(domain)})
-		}
-		table.Print(rows)
+func domainsCallback(table terminal.Table, noDomains *bool) func(models.DomainFields) bool {
+	return func(domain models.DomainFields) bool {
+		table.Print([][]string{{domain.Name, domainStatusString(domain)}})
 		*noDomains = false
 		return true
 	}

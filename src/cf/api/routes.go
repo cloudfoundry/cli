@@ -27,7 +27,7 @@ func (resource RouteResource) ToFields() (fields models.RouteFields) {
 }
 func (resource RouteResource) ToModel() (route models.Route) {
 	route.RouteFields = resource.ToFields()
-	route.Domain = resource.Entity.Domain.ToFields().(models.DomainFields)
+	route.Domain = resource.Entity.Domain.ToFields()
 	route.Space = resource.Entity.Space.ToFields()
 	for _, appResource := range resource.Entity.Apps {
 		route.Apps = append(route.Apps, appResource.ToFields())

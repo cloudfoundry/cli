@@ -9,17 +9,12 @@ import (
 	"strings"
 )
 
-type PaginatedDomainResources struct {
-	NextUrl   string `json:"next_url"`
-	Resources []DomainResource
-}
-
 type DomainResource struct {
 	Resource
 	Entity DomainEntity
 }
 
-func (resource *DomainResource) ToFields() interface{} {
+func (resource DomainResource) ToFields() models.DomainFields {
 	owningOrganizationGuid := resource.Entity.OwningOrganizationGuid
 	return models.DomainFields{
 		Name: resource.Entity.Name,
@@ -35,15 +30,15 @@ type DomainEntity struct {
 }
 
 type DomainRepository interface {
-	ListDomainsForOrg(orgGuid string, cb func([]models.DomainFields) bool) net.ApiResponse
-	ListSharedDomains(cb func([]models.DomainFields) bool) net.ApiResponse
+	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) net.ApiResponse
+	ListSharedDomains(cb func(models.DomainFields) bool) net.ApiResponse
 	FindByName(name string) (domain models.DomainFields, apiResponse net.ApiResponse)
 	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiResponse net.ApiResponse)
 	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiResponse net.ApiResponse)
 	CreateSharedDomain(domainName string) (apiResponse net.ApiResponse)
 	Delete(domainGuid string) (apiResponse net.ApiResponse)
 	DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse)
-	ListDomains(cb func([]models.DomainFields) bool) net.ApiResponse
+	ListDomains(cb func(models.DomainFields) bool) net.ApiResponse
 }
 
 type CloudControllerDomainRepository struct {
@@ -57,15 +52,15 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 	return
 }
 
-func (repo CloudControllerDomainRepository) ListSharedDomains(cb func([]models.DomainFields) bool) net.ApiResponse {
+func (repo CloudControllerDomainRepository) ListSharedDomains(cb func(models.DomainFields) bool) net.ApiResponse {
 	return repo.listDomains("/v2/shared_domains", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomains(cb func([]models.DomainFields) bool) net.ApiResponse {
+func (repo CloudControllerDomainRepository) ListDomains(cb func(models.DomainFields) bool) net.ApiResponse {
 	return repo.listDomains("/v2/domains", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func([]models.DomainFields) bool) net.ApiResponse {
+func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) net.ApiResponse {
 	apiResponse := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
 	if apiResponse.IsNotFound() {
 		apiResponse = repo.listDomains("/v2/domains", cb)
@@ -74,18 +69,14 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb
 	return apiResponse
 }
 
-func (repo CloudControllerDomainRepository) listDomains(path string, cb func([]models.DomainFields) bool) (apiResponse net.ApiResponse) {
+func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiResponse net.ApiResponse) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.Target,
 		repo.config.AccessToken,
 		path,
-		&DomainResource{},
-		func(page []interface{}) bool {
-			domains := make([]models.DomainFields, 0, len(page))
-			for _, item := range page {
-				domains = append(domains, item.(models.DomainFields))
-			}
-			return cb(domains)
+		DomainResource{},
+		func(resource interface{}) bool {
+			return cb(resource.(DomainResource).ToFields())
 		})
 }
 
@@ -116,8 +107,8 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid
 
 func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiResponse net.ApiResponse) {
 	foundDomain := false
-	apiResponse = repo.listDomains(path, func(page []models.DomainFields) bool {
-		domain = page[0]
+	apiResponse = repo.listDomains(path, func(result models.DomainFields) bool {
+		domain = result
 		foundDomain = true
 		return false
 	})
@@ -143,7 +134,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	}
 
 	if apiResponse.IsSuccessful() {
-		createdDomain = resource.ToFields().(models.DomainFields)
+		createdDomain = resource.ToFields()
 	}
 	return
 }

@@ -12,7 +12,7 @@ import (
 
 type BuildpackRepository interface {
 	FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse)
-	ListBuildpacks(func([]models.Buildpack) bool) net.ApiResponse
+	ListBuildpacks(func(models.Buildpack) bool) net.ApiResponse
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse)
 	Delete(buildpackGuid string) (apiResponse net.ApiResponse)
 	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse)
@@ -29,18 +29,14 @@ func NewCloudControllerBuildpackRepository(config *configuration.Configuration, 
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func([]models.Buildpack) bool) net.ApiResponse {
+func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) net.ApiResponse {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.Target,
 		repo.config.AccessToken,
 		buildpacks_path,
-		&BuildpackResource{},
-		func(results []interface{}) bool {
-			buildpacks := make([]models.Buildpack, 0, len(results))
-			for _, result := range results {
-				buildpacks = append(buildpacks, result.(models.Buildpack))
-			}
-			return cb(buildpacks)
+		BuildpackResource{},
+		func(resource interface{}) bool {
+			return cb(resource.(BuildpackResource).ToFields())
 		})
 }
 
@@ -50,9 +46,9 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 		repo.config.Target,
 		repo.config.AccessToken,
 		fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name)),
-		&BuildpackResource{},
-		func(results []interface{}) bool {
-			buildpack = results[0].(models.Buildpack)
+		BuildpackResource{},
+		func(resource interface{}) bool {
+			buildpack = resource.(BuildpackResource).ToFields()
 			foundIt = true
 			return false
 		})
@@ -78,7 +74,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 		return
 	}
 
-	createdBuildpack = resource.ToFields().(models.Buildpack)
+	createdBuildpack = resource.ToFields()
 	return
 }
 
@@ -105,13 +101,13 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 		return
 	}
 
-	updatedBuildpack = resource.ToFields().(models.Buildpack)
+	updatedBuildpack = resource.ToFields()
 	return
 }
 
 const buildpacks_path = "/v2/buildpacks"
 
-func (resource *BuildpackResource) ToFields() interface{} {
+func (resource BuildpackResource) ToFields() models.Buildpack {
 	return models.Buildpack{
 		Guid:     resource.Metadata.Guid,
 		Name:     resource.Entity.Name,
