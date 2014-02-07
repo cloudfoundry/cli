@@ -2,8 +2,8 @@ package assert
 
 import (
 	"fmt"
-	"strings"
 	mr "github.com/tjarratt/mr_t"
+	"strings"
 )
 
 func JSONStringEquals(t mr.TestingT, actual string, expected string, msgAndArgs ...interface{}) bool {

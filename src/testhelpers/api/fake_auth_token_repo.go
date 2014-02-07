@@ -1,7 +1,7 @@
 package api
 
 import (
-"cf/models"
+	"cf/models"
 	"cf/net"
 )
 

@@ -1,7 +1,7 @@
 package api
 
 import (
-"cf/models"
+	"cf/models"
 	"cf/net"
 	"generic"
 )
@@ -25,15 +25,15 @@ type FakeServiceRepo struct {
 	RenameServiceServiceInstance models.ServiceInstance
 	RenameServiceNewName         string
 
-	PurgedServiceOffering models.ServiceOffering
-	PurgeServiceOfferingCalled bool
+	PurgedServiceOffering           models.ServiceOffering
+	PurgeServiceOfferingCalled      bool
 	PurgeServiceOfferingApiResponse net.ApiResponse
 
 	FindServiceOfferingByLabelAndProviderName            string
 	FindServiceOfferingByLabelAndProviderProvider        string
 	FindServiceOfferingByLabelAndProviderServiceOffering models.ServiceOffering
-	FindServiceOfferingByLabelAndProviderApiResponse  	net.ApiResponse
-	FindServiceOfferingByLabelAndProviderCalled 			bool
+	FindServiceOfferingByLabelAndProviderApiResponse     net.ApiResponse
+	FindServiceOfferingByLabelAndProviderCalled          bool
 }
 
 func (repo *FakeServiceRepo) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
@@ -55,7 +55,6 @@ func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provide
 	offering = repo.FindServiceOfferingByLabelAndProviderServiceOffering
 	return
 }
-
 
 func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
 	repo.CreateServiceInstanceName = name
