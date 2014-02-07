@@ -62,12 +62,7 @@ func main() {
 		return
 	}
 
-	args := os.Args
-	if len(args) == 2 && args[1][0] == '-' && args[1] != "-v" && args[1] != "--version" {
-		args[1] = "help"
-	}
-
-	app.Run(args)
+	app.Run(os.Args)
 }
 
 func init() {

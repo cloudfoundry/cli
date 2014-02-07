@@ -265,11 +265,12 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 	return
 }
 
-func showAppHelp(app *cli.App) {
+func showAppHelp(helpTemplate string, appToPrint interface{}) {
+	app := appToPrint.(*cli.App)
 	presenter := newAppPresenter(app)
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	t := template.Must(template.New("help").Parse(appHelpTemplate))
+	t := template.Must(template.New("help").Parse(helpTemplate))
 	t.Execute(w, presenter)
 	w.Flush()
 }
