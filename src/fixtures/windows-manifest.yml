@@ -1,4 +1,0 @@
----
-applications:
- - name: my-app
-   path: C:\path\to\my\app
