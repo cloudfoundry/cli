@@ -232,7 +232,7 @@ func init() {
 			ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
 			defer ts.Close()
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Guid = "my-domain-guid"
 			domainRepo.FindByNameDomain = domain
 
@@ -256,7 +256,7 @@ func init() {
 			ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
 			defer ts.Close()
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Guid = "my-domain-guid"
 			domainRepo.FindByNameDomain = domain
 

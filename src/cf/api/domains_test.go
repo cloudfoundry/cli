@@ -149,252 +149,147 @@ func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
 
 func createDomainRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
 	ts, handler = testnet.NewTLSServer(t, reqs)
-	org := models.OrganizationFields{}
-	org.Guid = "my-org-guid"
-	space := models.SpaceFields{}
-	space.Guid = "my-space-guid"
-
 	config := &configuration.Configuration{
-		AccessToken:        "BEARER my_access_token",
-		Target:             ts.URL,
-		SpaceFields:        space,
-		OrganizationFields: org,
+		AccessToken: "BEARER my_access_token",
+		Target:      ts.URL,
+		SpaceFields: models.SpaceFields{
+			Guid: "my-space-guid",
+		},
+		OrganizationFields: models.OrganizationFields{
+			Guid: "my-org-guid",
+		},
 	}
 	gateway := net.NewCloudControllerGateway()
 	repo = NewCloudControllerDomainRepository(config, gateway)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestListSharedDomains", func() {
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
-			defer ts.Close()
 
-			receivedDomains := []models.Domain{}
-			apiResponse := repo.ListSharedDomains(ListDomainsCallback(func(domains []models.Domain) bool {
-				receivedDomains = append(receivedDomains, domains...)
-				return true
-			}))
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestListSharedDomains", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
+		defer ts.Close()
 
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), len(receivedDomains), 2)
-			assert.Equal(mr.T(), receivedDomains[0].Guid, "shared-domain1-guid")
-			assert.Equal(mr.T(), receivedDomains[1].Guid, "shared-domain2-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
+		receivedDomains := []models.DomainFields{}
+		apiResponse := repo.ListSharedDomains(func(domains []models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, domains...)
+			return true
 		})
-		It("TestDomainListDomainsForOrgWithOldEndpoint", func() {
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{notFoundDomainsRequest, oldEndpointDomainsRequest})
-			defer ts.Close()
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.Equal(mr.T(), len(receivedDomains), 2)
+		assert.Equal(mr.T(), receivedDomains[0].Guid, "shared-domain1-guid")
+		assert.Equal(mr.T(), receivedDomains[1].Guid, "shared-domain2-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+	})
 
-			receivedDomains := []models.Domain{}
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
-				receivedDomains = append(receivedDomains, domains...)
-				return true
-			}))
+	It("TestDomainListDomainsForOrgWithOldEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{notFoundDomainsRequest, oldEndpointDomainsRequest})
+		defer ts.Close()
 
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), len(receivedDomains), 1)
-			assert.Equal(mr.T(), receivedDomains[0].Guid, "domain-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
+		receivedDomains := []models.DomainFields{}
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, domains...)
+			return true
 		})
-		It("TestDomainListDomainsForOrg", func() {
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
-			defer ts.Close()
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.Equal(mr.T(), len(receivedDomains), 1)
+		assert.Equal(mr.T(), receivedDomains[0].Guid, "domain-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+	})
 
-			receivedDomains := []models.Domain{}
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
-				receivedDomains = append(receivedDomains, domains...)
-				return true
-			}))
+	It("TestDomainListDomainsForOrg", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
+		defer ts.Close()
 
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), len(receivedDomains), 3)
-			assert.Equal(mr.T(), receivedDomains[0].Guid, "domain1-guid")
-			assert.Equal(mr.T(), receivedDomains[1].Guid, "domain2-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
+		receivedDomains := []models.DomainFields{}
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, domains...)
+			return true
 		})
-		It("TestListDomainsForOrgWithNoDomains", func() {
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{noDomainsRequest})
-			defer ts.Close()
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.Equal(mr.T(), len(receivedDomains), 3)
+		assert.Equal(mr.T(), receivedDomains[0].Guid, "domain1-guid")
+		assert.Equal(mr.T(), receivedDomains[1].Guid, "domain2-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+	})
 
-			wasCalled := false
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
-				wasCalled = true
-				return true
-			}))
+	It("TestListDomainsForOrgWithNoDomains", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{noDomainsRequest})
+		defer ts.Close()
 
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.False(mr.T(), wasCalled)
-			assert.True(mr.T(), handler.AllRequestsCalled())
+		wasCalled := false
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
+			wasCalled = true
+			return true
 		})
-		It("TestDomainListDomainsForOrgWithNoDomains", func() {
 
-			emptyDomainsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/organizations/my-org-guid/private_domains",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [] }`},
-			})
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.False(mr.T(), wasCalled)
+		assert.True(mr.T(), handler.AllRequestsCalled())
+	})
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{emptyDomainsRequest})
-			defer ts.Close()
-
-			receivedDomains := []models.Domain{}
-			apiResponse := repo.ListDomainsForOrg("my-org-guid", ListDomainsCallback(func(domains []models.Domain) bool {
-				receivedDomains = append(receivedDomains, domains...)
-				return true
-			}))
-
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.True(mr.T(), handler.AllRequestsCalled())
+	It("TestDomainListDomainsForOrgWithNoDomains", func() {
+		emptyDomainsRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/organizations/my-org-guid/private_domains",
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [] }`},
 		})
-		It("TestDomainFindByName", func() {
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "domain2-guid" },
-			  "entity": { "name": "domain2.cf-app.com" }
-			}
-		]}`},
-			})
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{emptyDomainsRequest})
+		defer ts.Close()
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
-			defer ts.Close()
-
-			domain, apiResponse := repo.FindByName("domain2.cf-app.com")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-
-			assert.Equal(mr.T(), domain.Name, "domain2.cf-app.com")
-			assert.Equal(mr.T(), domain.Guid, "domain2-guid")
+		receivedDomains := []models.DomainFields{}
+		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(domains []models.DomainFields) bool {
+			receivedDomains = append(receivedDomains, domains...)
+			return true
 		})
-		It("TestDomainFindByNameInCurrentSpace", func() {
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "domain2-guid" },
-			  "entity": { "name": "domain2.cf-app.com" }
-			}
-		]}`},
-			})
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.True(mr.T(), handler.AllRequestsCalled())
+	})
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
-			defer ts.Close()
-
-			domain, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-
-			assert.Equal(mr.T(), domain.Name, "domain2.cf-app.com")
-			assert.Equal(mr.T(), domain.Guid, "domain2-guid")
+	It("TestDomainFindByName", func() {
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+		{
+		  "metadata": { "guid": "domain2-guid" },
+		  "entity": { "name": "domain2.cf-app.com" }
+		}
+	]}`},
 		})
-		It("TestDomainFindByNameInCurrentSpaceWhenNotFound", func() {
 
-			spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
+		defer ts.Close()
 
-			sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
+		domain, apiResponse := repo.FindByName("domain2.cf-app.com")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{spaceDomainsReq, sharedDomainsReq})
-			defer ts.Close()
+		assert.Equal(mr.T(), domain.Name, "domain2.cf-app.com")
+		assert.Equal(mr.T(), domain.Guid, "domain2-guid")
+	})
 
-			_, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.True(mr.T(), apiResponse.IsNotFound())
-		})
-		It("TestDomainFindByNameInCurrentSpaceWhenFoundAsSharedDomain", func() {
-
-			spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
-
-			sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "shared-domain-guid" },
-			  "entity": {
-			    "name": "shared-domain.cf-app.com",
-				"owning_organization_guid": null
-			  }
-			}
-		]}`},
-			})
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{spaceDomainsReq, sharedDomainsReq})
-			defer ts.Close()
-
-			domain, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-
-			assert.Equal(mr.T(), domain.Name, "shared-domain.cf-app.com")
-			assert.Equal(mr.T(), domain.Guid, "shared-domain-guid")
-		})
-		It("TestDomainFindByNameInCurrentSpaceWhenFoundInDomainsButNotShared", func() {
-
-			spaceDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
-
-			sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/domains?q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "some-domain-guid" },
-			  "entity": {
-			    "name": "some.cf-app.com",
-				"owning_organization_guid": "some-org-guid"
-			  }
-			}
-		]}`},
-			})
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{spaceDomainsReq, sharedDomainsReq})
-			defer ts.Close()
-
-			_, apiResponse := repo.FindByNameInCurrentSpace("domain2.cf-app.com")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.True(mr.T(), apiResponse.IsNotFound())
-		})
-		It("TestDomainFindByNameInOrg", func() {
-
+	Describe("finding a domain by name in an org", func() {
+		It("looks in the org's domains first", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "my-domain-guid" },
-			  "entity": {
-				"name": "my-example.com",
-				"owning_organization_guid": "my-org-guid"
-			  }
-			}
-		]}`},
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+				{
+					"resources": [
+						{
+						  "metadata": { "guid": "my-domain-guid" },
+						  "entity": {
+							"name": "my-example.com",
+							"owning_organization_guid": "my-org-guid"
+						  }
+						}
+					]
+				}`},
 			})
 
 			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
@@ -408,8 +303,44 @@ func init() {
 			assert.Equal(mr.T(), domain.Guid, "my-domain-guid")
 			assert.False(mr.T(), domain.Shared)
 		})
-		It("TestDomainFindByNameInOrgWhenNotFoundOnBothEndpoints", func() {
 
+		It("looks for shared domains if no there are no org-specific domains", func() {
+			orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
+			})
+
+			sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+				{
+					"resources": [
+						{
+						  "metadata": { "guid": "shared-domain-guid" },
+						  "entity": {
+							"name": "shared-example.com",
+							"owning_organization_guid": null
+						  }
+						}
+					]
+				}`},
+			})
+
+			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
+			defer ts.Close()
+
+			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
+			assert.True(mr.T(), handler.AllRequestsCalled())
+			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+
+			assert.Equal(mr.T(), domain.Name, "shared-example.com")
+			assert.Equal(mr.T(), domain.Guid, "shared-domain-guid")
+			assert.True(mr.T(), domain.Shared)
+		})
+
+		It("returns not found when neither endpoint returns a domain", func() {
 			orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
@@ -430,8 +361,8 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsError())
 			assert.True(mr.T(), apiResponse.IsNotFound())
 		})
-		It("TestDomainFindByNameInOrgWhenFoundAsSharedDomain", func() {
 
+		It("returns not found when the global endpoint returns a non-shared domain", func() {
 			orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
@@ -441,48 +372,18 @@ func init() {
 			sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "shared-domain-guid" },
-			  "entity": {
-				"name": "shared-example.com",
-				"owning_organization_guid": null
-			  }
-			}
-		]}`},
-			})
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
-			defer ts.Close()
-
-			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-
-			assert.Equal(mr.T(), domain.Name, "shared-example.com")
-			assert.Equal(mr.T(), domain.Guid, "shared-domain-guid")
-			assert.True(mr.T(), domain.Shared)
-		})
-		It("TestDomainFindByNameInOrgWhenFoundInDomainsButNotShared", func() {
-
-			orgDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/organizations/my-org-guid/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
-
-			sharedDomainsReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-			{
-			  "metadata": { "guid": "shared-domain-guid" },
-			  "entity": {
-				"name": "shared-example.com",
-				"owning_organization_guid": "some-other-org-guid"
-			  }
-			}
-		]}`},
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+				{
+					"resources": [
+						{
+						  "metadata": { "guid": "shared-domain-guid" },
+						  "entity": {
+							"name": "shared-example.com",
+							"owning_organization_guid": "some-other-org-guid"
+						  }
+						}
+					]
+				}`},
 			})
 
 			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
@@ -493,171 +394,171 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsError())
 			assert.True(mr.T(), apiResponse.IsNotFound())
 		})
-		It("TestCreateDomainUsingOldEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "POST",
-					Path:     "/v2/private_domains",
-					Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
-					Response: testnet.TestResponse{Status: http.StatusNotFound},
-				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/domains",
-					Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid", "wildcard": true}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
-				"metadata": { "guid": "abc-123" },
-				"entity": { "name": "example.com" }
-			}`},
-				}),
-			})
-			defer ts.Close()
-
-			createdDomain, apiResponse := repo.Create("example.com", "org-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), createdDomain.Guid, "abc-123")
-		})
-		It("TestCreateDomainUsingNewEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/private_domains",
-					Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
-				"metadata": { "guid": "abc-123" },
-				"entity": { "name": "example.com" }
-			}`},
-				}),
-			})
-			defer ts.Close()
-
-			createdDomain, apiResponse := repo.Create("example.com", "org-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), createdDomain.Guid, "abc-123")
-		})
-		It("TestCreateSharedDomainsWithNewEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/shared_domains",
-					Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-			{
-				"metadata": { "guid": "abc-123" },
-				"entity": { "name": "example.com" }
-			}`},
-				}),
-			})
-			defer ts.Close()
-
-			apiResponse := repo.CreateSharedDomain("example.com")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
-		It("TestCreateSharedDomainsWithOldEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "POST",
-					Path:     "/v2/shared_domains",
-					Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com"}`),
-					Response: testnet.TestResponse{Status: http.StatusNotFound},
-				}),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:  "POST",
-					Path:    "/v2/domains",
-					Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-			{
-				"metadata": { "guid": "abc-123" },
-				"entity": { "name": "example.com" }
-			}`},
-				}),
-			})
-			defer ts.Close()
-
-			apiResponse := repo.CreateSharedDomain("example.com")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
-		It("TestDeleteDomainWithNewEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				deleteDomainReq(http.StatusOK),
-			})
-			defer ts.Close()
-
-			apiResponse := repo.Delete("my-domain-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestDeleteDomainWithOldEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				deleteDomainReq(http.StatusNotFound),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "DELETE",
-					Path:     "/v2/domains/my-domain-guid?recursive=true",
-					Response: testnet.TestResponse{Status: http.StatusOK},
-				}),
-			})
-			defer ts.Close()
-
-			apiResponse := repo.Delete("my-domain-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestDeleteSharedDomainWithNewEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				deleteSharedDomainReq(http.StatusOK),
-			})
-			defer ts.Close()
-
-			apiResponse := repo.DeleteSharedDomain("my-domain-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestDeleteSharedDomainWithOldEndpoint", func() {
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
-				deleteSharedDomainReq(http.StatusNotFound),
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "DELETE",
-					Path:     "/v2/domains/my-domain-guid?recursive=true",
-					Response: testnet.TestResponse{Status: http.StatusOK},
-				}),
-			})
-			defer ts.Close()
-
-			apiResponse := repo.DeleteSharedDomain("my-domain-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestDeleteDomainFailure", func() {
-
-			req := deleteDomainReq(http.StatusBadRequest)
-
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
-			defer ts.Close()
-
-			apiResponse := repo.Delete("my-domain-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		})
 	})
-}
+
+	It("TestCreateDomainUsingOldEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/private_domains",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusNotFound},
+			}),
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/domains",
+				Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid", "wildcard": true}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
+			"metadata": { "guid": "abc-123" },
+			"entity": { "name": "example.com" }
+		}`},
+			}),
+		})
+		defer ts.Close()
+
+		createdDomain, apiResponse := repo.Create("example.com", "org-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), createdDomain.Guid, "abc-123")
+	})
+
+	It("TestCreateDomainUsingNewEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/private_domains",
+				Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated, Body: `{
+			"metadata": { "guid": "abc-123" },
+			"entity": { "name": "example.com" }
+		}`},
+			}),
+		})
+		defer ts.Close()
+
+		createdDomain, apiResponse := repo.Create("example.com", "org-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), createdDomain.Guid, "abc-123")
+	})
+
+	It("TestCreateSharedDomainsWithNewEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/shared_domains",
+				Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+		{
+			"metadata": { "guid": "abc-123" },
+			"entity": { "name": "example.com" }
+		}`},
+			}),
+		})
+		defer ts.Close()
+
+		apiResponse := repo.CreateSharedDomain("example.com")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+	})
+
+	It("TestCreateSharedDomainsWithOldEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/shared_domains",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+				Response: testnet.TestResponse{Status: http.StatusNotFound},
+			}),
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/domains",
+				Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+		{
+			"metadata": { "guid": "abc-123" },
+			"entity": { "name": "example.com" }
+		}`},
+			}),
+		})
+		defer ts.Close()
+
+		apiResponse := repo.CreateSharedDomain("example.com")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+	})
+
+	It("TestDeleteDomainWithNewEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			deleteDomainReq(http.StatusOK),
+		})
+		defer ts.Close()
+
+		apiResponse := repo.Delete("my-domain-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("TestDeleteDomainWithOldEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			deleteDomainReq(http.StatusNotFound),
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/domains/my-domain-guid?recursive=true",
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			}),
+		})
+		defer ts.Close()
+
+		apiResponse := repo.Delete("my-domain-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("TestDeleteSharedDomainWithNewEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			deleteSharedDomainReq(http.StatusOK),
+		})
+		defer ts.Close()
+
+		apiResponse := repo.DeleteSharedDomain("my-domain-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("TestDeleteSharedDomainWithOldEndpoint", func() {
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+			deleteSharedDomainReq(http.StatusNotFound),
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/domains/my-domain-guid?recursive=true",
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			}),
+		})
+		defer ts.Close()
+
+		apiResponse := repo.DeleteSharedDomain("my-domain-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("TestDeleteDomainFailure", func() {
+		req := deleteDomainReq(http.StatusBadRequest)
+
+		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
+		defer ts.Close()
+
+		apiResponse := repo.Delete("my-domain-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+	})
+})

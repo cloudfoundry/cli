@@ -75,20 +75,21 @@ func init() {
 			ui = callCreateRoute(mr.T(), []string{"my-space", "example.com"}, reqFactory, routeRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
-		It("TestCreateRoute", func() {
 
-			space := models.SpaceFields{}
-			space.Guid = "my-space-guid"
-			space.Name = "my-space"
-			domain := models.DomainFields{}
-			domain.Guid = "domain-guid"
-			domain.Name = "example.com"
+		It("creates routes", func() {
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:       true,
 				TargetedOrgSuccess: true,
-				Domain:             models.Domain{DomainFields: domain},
-				Space:              models.Space{SpaceFields: space},
+				Domain: models.DomainFields{
+					Guid: "domain-guid",
+					Name: "example.com",
+				},
+				Space: models.Space{SpaceFields: models.SpaceFields{
+					Guid: "my-space-guid",
+					Name: "my-space",
+				}},
 			}
+
 			routeRepo := &testapi.FakeRouteRepository{}
 
 			ui := callCreateRoute(mr.T(), []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
@@ -102,29 +103,37 @@ func init() {
 			assert.Equal(mr.T(), routeRepo.CreateInSpaceDomainGuid, "domain-guid")
 			assert.Equal(mr.T(), routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
 		})
-		It("TestCreateRouteIsIdempotent", func() {
 
-			space := models.SpaceFields{}
-			space.Guid = "my-space-guid"
-			space.Name = "my-space"
-			domain := models.DomainFields{}
-			domain.Guid = "domain-guid"
-			domain.Name = "example.com"
+		It("is idempotent", func() {
+			domain := models.DomainFields{
+				Guid: "domain-guid",
+				Name: "example.com",
+			}
+
+			space := models.Space{SpaceFields: models.SpaceFields{
+				Guid: "my-space-guid",
+				Name: "my-space",
+			}}
+
 			reqFactory := &testreq.FakeReqFactory{
 				LoginSuccess:       true,
 				TargetedOrgSuccess: true,
-				Domain:             models.Domain{DomainFields: domain},
-				Space:              models.Space{SpaceFields: space},
+				Domain:             domain,
+				Space:              space,
 			}
 
-			route := models.Route{}
-			route.Guid = "my-route-guid"
-			route.Host = "host"
-			route.Domain = domain
-			route.Space = space
 			routeRepo := &testapi.FakeRouteRepository{
-				CreateInSpaceErr:         true,
-				FindByHostAndDomainRoute: route,
+				CreateInSpaceErr: true,
+				FindByHostAndDomainRoute: models.Route{
+					Space: space.SpaceFields,
+					RouteSummary: models.RouteSummary{
+						RouteFields: models.RouteFields{
+							Guid: "my-route-guid",
+							Host: "host",
+						},
+						Domain: domain,
+					},
+				},
 			}
 
 			ui := callCreateRoute(mr.T(), []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)

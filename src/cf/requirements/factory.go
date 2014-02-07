@@ -56,6 +56,7 @@ func (f apiRequirementFactory) NewLoginRequirement() Requirement {
 		f.config,
 	)
 }
+
 func (f apiRequirementFactory) NewValidAccessTokenRequirement() Requirement {
 	return NewValidAccessTokenRequirement(
 		f.ui,
@@ -97,6 +98,7 @@ func (f apiRequirementFactory) NewDomainRequirement(name string) DomainRequireme
 	return NewDomainRequirement(
 		name,
 		f.ui,
+		f.config,
 		f.repoLocator.GetDomainRepository(),
 	)
 }

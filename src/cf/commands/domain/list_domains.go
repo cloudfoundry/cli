@@ -68,8 +68,8 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	}
 }
 
-func domainsCallback(table terminal.Table, noDomains *bool) api.ListDomainsCallback {
-	return api.ListDomainsCallback(func(domains []models.Domain) bool {
+func domainsCallback(table terminal.Table, noDomains *bool) func([]models.DomainFields) bool {
+	return func(domains []models.DomainFields) bool {
 		rows := [][]string{}
 		for _, domain := range domains {
 			rows = append(rows, []string{domain.Name, domainStatusString(domain)})
@@ -77,10 +77,10 @@ func domainsCallback(table terminal.Table, noDomains *bool) api.ListDomainsCallb
 		table.Print(rows)
 		*noDomains = false
 		return true
-	})
+	}
 }
 
-func domainStatusString(domain models.Domain) string {
+func domainStatusString(domain models.DomainFields) string {
 	if domain.Shared {
 		return "shared"
 	} else {

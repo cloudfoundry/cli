@@ -165,7 +165,7 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 
 	hostName := cmd.hostname(c, defaultHostname)
 	domain := cmd.domain(c, domainName)
-	route := cmd.route(hostName, domain.DomainFields)
+	route := cmd.route(hostName, domain)
 
 	for _, boundRoute := range app.Routes {
 		if boundRoute.Guid == route.Guid {
@@ -234,11 +234,11 @@ func (cmd *Push) route(hostName string, domain models.DomainFields) (route model
 	return
 }
 
-func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.Domain) {
+func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.DomainFields) {
 	var apiResponse net.ApiResponse
 
 	if domainName != "" {
-		domain, apiResponse = cmd.domainRepo.FindByNameInCurrentSpace(domainName)
+		domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields.Guid)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 		}
@@ -258,9 +258,9 @@ func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.Domain
 	return
 }
 
-func (cmd *Push) findDefaultDomain() (domain models.Domain, err error) {
+func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 	var foundSharedDomain bool = false
-	listDomainsCallback := api.ListDomainsCallback(func(domains []models.Domain) bool {
+	listDomainsCallback := func(domains []models.DomainFields) bool {
 		for _, aDomain := range domains {
 			if aDomain.Shared {
 				foundSharedDomain = true
@@ -274,7 +274,7 @@ func (cmd *Push) findDefaultDomain() (domain models.Domain, err error) {
 		} else {
 			return true
 		}
-	})
+	}
 
 	apiResponse := cmd.domainRepo.ListSharedDomains(listDomainsCallback)
 	if apiResponse.IsNotFound() {

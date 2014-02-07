@@ -30,7 +30,7 @@ type FakeReqFactory struct {
 	Route       models.Route
 
 	DomainName string
-	Domain     models.Domain
+	Domain     models.DomainFields
 
 	UserUsername string
 	UserFields   models.UserFields
@@ -122,7 +122,7 @@ func (r FakeRequirement) GetRoute() models.Route {
 	return r.factory.Route
 }
 
-func (r FakeRequirement) GetDomain() models.Domain {
+func (r FakeRequirement) GetDomain() models.DomainFields {
 	return r.factory.Domain
 }
 

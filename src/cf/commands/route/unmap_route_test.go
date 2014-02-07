@@ -40,7 +40,7 @@ func callUnmapRoute(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 	return
 }
 func init() {
-	Describe("Testing with ginkgo", func() {
+	Describe("Unmap Route Command", func() {
 		It("TestUnmapRouteFailsWithUsage", func() {
 			reqFactory := &testreq.FakeReqFactory{}
 			routeRepo := &testapi.FakeRouteRepository{}
@@ -54,8 +54,8 @@ func init() {
 			ui = callUnmapRoute(mr.T(), []string{"foo", "bar"}, reqFactory, routeRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
-		It("TestUnmapRouteRequirements", func() {
 
+		It("TestUnmapRouteRequirements", func() {
 			routeRepo := &testapi.FakeRouteRepository{}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
@@ -64,20 +64,23 @@ func init() {
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), reqFactory.DomainName, "my-domain.com")
 		})
+
 		It("TestUnmapRouteWhenUnbinding", func() {
-
-			domain := models.Domain{}
-			domain.Guid = "my-domain-guid"
-			domain.Name = "example.com"
-
-			route := models.Route{}
-			route.Guid = "my-route-guid"
-			route.Host = "foo"
-			route.Domain = domain.DomainFields
-
-			app := models.Application{}
-			app.Guid = "my-app-guid"
-			app.Name = "my-app"
+			domain := models.DomainFields{
+				Guid: "my-domain-guid",
+				Name: "example.com",
+			}
+			route := models.Route{RouteSummary: models.RouteSummary{
+				Domain: domain,
+				RouteFields: models.RouteFields{
+					Guid: "my-route-guid",
+					Host: "foo",
+				},
+			}}
+			app := models.Application{ApplicationFields: models.ApplicationFields{
+				Guid: "my-app-guid",
+				Name: "my-app",
+			}}
 
 			routeRepo := &testapi.FakeRouteRepository{FindByHostAndDomainRoute: route}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app, Domain: domain}

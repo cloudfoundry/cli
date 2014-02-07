@@ -4,7 +4,7 @@ import "cf/models"
 
 var domainGuid func() string = guidGenerator("domain")
 
-func NewSharedDomain(overrides Overrides) (domain models.Domain) {
+func NewSharedDomainFields(overrides Overrides) (domain models.DomainFields) {
 	domain.Name = "new-domain"
 	domain.Guid = domainGuid()
 	domain.Shared = true
@@ -18,7 +18,7 @@ func NewSharedDomain(overrides Overrides) (domain models.Domain) {
 	return
 }
 
-func NewPrivateDomain(overrides Overrides) (domain models.Domain) {
+func NewPrivateDomainFields(overrides Overrides) (domain models.DomainFields) {
 	domain.Name = "new-domain"
 	domain.Guid = domainGuid()
 	domain.Shared = false

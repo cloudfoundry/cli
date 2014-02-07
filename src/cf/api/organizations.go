@@ -46,7 +46,7 @@ func (resource OrganizationResource) ToModel() (org models.Organization) {
 
 	domains := []models.DomainFields{}
 	for _, d := range resource.Entity.Domains {
-		domains = append(domains, d.ToFields())
+		domains = append(domains, d.ToFields().(models.DomainFields))
 	}
 	org.Domains = domains
 
