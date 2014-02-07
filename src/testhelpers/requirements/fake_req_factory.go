@@ -1,7 +1,7 @@
 package requirements
 
 import (
-"cf/models"
+	"cf/models"
 	"cf/requirements"
 )
 

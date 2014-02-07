@@ -2,10 +2,10 @@ package net
 
 import (
 	"fmt"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	mr "github.com/tjarratt/mr_t"
 )
 
 type TestRequest struct {

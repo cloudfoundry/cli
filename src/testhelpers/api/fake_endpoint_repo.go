@@ -6,18 +6,18 @@ import (
 )
 
 type FakeEndpointRepo struct {
-	Config     *configuration.Configuration
+	Config *configuration.Configuration
 
 	UpdateEndpointReceived string
-	UpdateEndpointError net.ApiResponse
+	UpdateEndpointError    net.ApiResponse
 
 	LoggregatorEndpointReturns struct {
-		Endpoint string
+		Endpoint    string
 		ApiResponse net.ApiResponse
 	}
 
 	UAAEndpointReturns struct {
-		Endpoint string
+		Endpoint    string
 		ApiResponse net.ApiResponse
 	}
 }

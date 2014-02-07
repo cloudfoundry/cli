@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	mr "github.com/tjarratt/mr_t"
 )
 
 type JSONMapRequest map[string]interface{}

@@ -10,7 +10,7 @@ import (
 var CommandDidPassRequirements bool
 
 func RunCommand(cmd commands.Command, ctxt *cli.Context, reqFactory *testreq.FakeReqFactory) {
-	defer func(){
+	defer func() {
 		errMsg := recover()
 
 		if errMsg != nil && errMsg != testterm.FailedWasCalled {

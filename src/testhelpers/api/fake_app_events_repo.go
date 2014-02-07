@@ -6,8 +6,8 @@ import (
 )
 
 type FakeAppEventsRepo struct {
-	AppGuid string
-	Events  []models.EventFields
+	AppGuid     string
+	Events      []models.EventFields
 	ApiResponse net.ApiResponse
 }
 

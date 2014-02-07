@@ -1,9 +1,9 @@
 package api
 
 import (
-"cf/models"
-	"cf/net"
 	"cf/api"
+	"cf/models"
+	"cf/net"
 )
 
 type FakeDomainRepository struct {
@@ -34,10 +34,10 @@ type FakeDomainRepository struct {
 
 	CreateSharedDomainName string
 
-	DeleteDomainGuid string
+	DeleteDomainGuid  string
 	DeleteApiResponse net.ApiResponse
 
-	DeleteSharedDomainGuid string
+	DeleteSharedDomainGuid  string
 	DeleteSharedApiResponse net.ApiResponse
 }
 

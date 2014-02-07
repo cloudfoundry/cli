@@ -2,9 +2,9 @@ package assert
 
 import (
 	"fmt"
+	mr "github.com/tjarratt/mr_t"
 	"runtime"
 	"strings"
-	mr "github.com/tjarratt/mr_t"
 )
 
 // Fail reports a failure through
