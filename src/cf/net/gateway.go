@@ -106,7 +106,7 @@ func (gateway Gateway) ListPaginatedResources(
 	accessToken string,
 	path string,
 	resource ModelResource,
-	cb PaginatedResourcesCallback) (apiResponse ApiResponse) {
+	cb func([]interface{}) bool) (apiResponse ApiResponse) {
 
 	fetchNext := true
 
