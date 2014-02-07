@@ -7,77 +7,105 @@ import (
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/gomega"
 	"net/http/httptest"
 	"strings"
 	testapi "testhelpers/api"
 	"time"
 )
 
-func init() {
-	Describe("loggregator logs repository", func() {
-		It("RecentLogsFor writes log messages onto the provided channel", func() {
-			msg := marshalledLogMessageWithTime(mr.T(), "My message", int64(3000))
-			expectedMessage, err := logmessage.ParseMessage(msg)
-			assert.NoError(mr.T(), err)
+var _ = Describe("loggregator logs repository", func() {
 
-			testServer, logsRepo := setupTestServerAndLogsRepo("/dump/", msg)
-			defer testServer.Close()
+	var (
+		logChan        chan *logmessage.Message
+		testServer     *httptest.Server
+		requestHandler *requestHandlerWithExpectedPath
+		logsRepo       *LoggregatorLogsRepository
+		messagesToSend [][]byte
+	)
 
-			logChan := make(chan *logmessage.Message, 1000)
-			err = logsRepo.RecentLogsFor("my-app-guid", func() {}, logChan)
+	BeforeEach(func() {
+		startTime := time.Now()
+		messagesToSend = [][]byte{
+			marshalledLogMessageWithTime("My message 1", startTime.UnixNano()),
+			marshalledLogMessageWithTime("My message 2", startTime.UnixNano()),
+			marshalledLogMessageWithTime("My message 3", startTime.UnixNano()),
+		}
+		logChan = make(chan *logmessage.Message, 1000)
+		testServer, requestHandler, logsRepo = setupTestServerAndLogsRepo(messagesToSend...)
+	})
+
+	AfterEach(func() {
+		testServer.Close()
+	})
+
+	Describe("RecentLogsFor", func() {
+
+		BeforeEach(func() {
+			err := logsRepo.RecentLogsFor("my-app-guid", func() {}, logChan)
+			Expect(err).NotTo(HaveOccurred())
 			close(logChan)
+		})
 
+		It("connects to the dump endpoint", func() {
+			Expect(requestHandler.lastPath).To(Equal("/dump/"))
+		})
+
+		It("writes log messages onto the provided channel", func() {
 			dumpedMessages := []*logmessage.Message{}
 			for msg := range logChan {
 				dumpedMessages = append(dumpedMessages, msg)
 			}
 
-			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), len(dumpedMessages), 1)
-			assert.Equal(mr.T(), dumpedMessages[0].GetLogMessage().GetSourceName(), expectedMessage.GetLogMessage().GetSourceName())
-			assert.Equal(mr.T(), dumpedMessages[0].GetLogMessage().GetMessage(), expectedMessage.GetLogMessage().GetMessage())
-			assert.Equal(mr.T(), dumpedMessages[0].GetLogMessage().GetMessageType(), expectedMessage.GetLogMessage().GetMessageType())
+			Expect(len(dumpedMessages)).To(Equal(3))
+			Expect(dumpedMessages[0]).To(Equal(parseMessage(messagesToSend[0])))
+			Expect(dumpedMessages[1]).To(Equal(parseMessage(messagesToSend[1])))
+			Expect(dumpedMessages[2]).To(Equal(parseMessage(messagesToSend[2])))
+		})
+	})
+
+	Describe("TailLogsFor", func() {
+
+		BeforeEach(func() {
+			err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
+			Expect(err).NotTo(HaveOccurred())
+			close(logChan)
 		})
 
-		It("TailLogsFor writes log messages on the channel in the correct order", func() {
-			startTime := time.Now()
-			messagesSent := [][]byte{
-				marshalledLogMessageWithTime(mr.T(), "My message 1", startTime.UnixNano()),
-				marshalledLogMessageWithTime(mr.T(), "My message 2", startTime.UnixNano()),
-				marshalledLogMessageWithTime(mr.T(), "My message 3", startTime.UnixNano()),
-			}
+		It("connects to the tailing endpoint", func() {
+			Expect(requestHandler.lastPath).To(Equal("/tail/"))
+		})
 
-			testServer, logsRepo := setupTestServerAndLogsRepo("/tail/", messagesSent...)
-			defer testServer.Close()
-
-			logChan := make(chan *logmessage.Message, 1000)
-			controlChan := make(chan bool)
-
-			go func() {
-				defer close(logChan)
-				logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, controlChan, time.Duration(1*time.Second))
-			}()
-
+		It("writes log messages on the channel in the correct order", func() {
 			var messages []string
 			for msg := range logChan {
 				messages = append(messages, string(msg.GetLogMessage().Message))
 			}
 
-			assert.Equal(mr.T(), len(messages), 3)
-			assert.Equal(mr.T(), messages, []string{"My message 1", "My message 2", "My message 3"})
+			Expect(messages).To(Equal([]string{"My message 1", "My message 2", "My message 3"}))
 		})
 	})
+})
+
+func parseMessage(msgBytes []byte) (msg *logmessage.Message) {
+	msg, err := logmessage.ParseMessage(msgBytes)
+	Expect(err).ToNot(HaveOccurred())
+	return
 }
 
-func setupTestServerAndLogsRepo(requestURI string, messages ...[]byte) (testServer *httptest.Server, logsRepo *LoggregatorLogsRepository) {
-	handler := func(conn *websocket.Conn) {
+type requestHandlerWithExpectedPath struct {
+	handlerFunc func(conn *websocket.Conn)
+	lastPath    string
+}
+
+func setupTestServerAndLogsRepo(messages ...[]byte) (testServer *httptest.Server, requestHandler *requestHandlerWithExpectedPath, logsRepo *LoggregatorLogsRepository) {
+	requestHandler = new(requestHandlerWithExpectedPath)
+	requestHandler.handlerFunc = func(conn *websocket.Conn) {
 		request := conn.Request()
-		assert.Equal(mr.T(), request.URL.Path, requestURI)
-		assert.Equal(mr.T(), request.URL.RawQuery, "app=my-app-guid")
-		assert.Equal(mr.T(), request.Method, "GET")
-		assert.Contains(mr.T(), request.Header.Get("Authorization"), "BEARER my_access_token")
+		requestHandler.lastPath = request.URL.Path
+		Expect(request.URL.RawQuery).To(Equal("app=my-app-guid"))
+		Expect(request.Method).To(Equal("GET"))
+		Expect(request.Header.Get("Authorization")).To(ContainSubstring("BEARER my_access_token"))
 
 		for _, msg := range messages {
 			conn.Write(msg)
@@ -85,7 +113,8 @@ func setupTestServerAndLogsRepo(requestURI string, messages ...[]byte) (testServ
 		time.Sleep(time.Duration(50) * time.Millisecond)
 		conn.Close()
 	}
-	testServer = httptest.NewTLSServer(websocket.Handler(handler))
+
+	testServer = httptest.NewTLSServer(websocket.Handler(requestHandler.handlerFunc))
 
 	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
 	endpointRepo := &testapi.FakeEndpointRepo{}
@@ -96,7 +125,7 @@ func setupTestServerAndLogsRepo(requestURI string, messages ...[]byte) (testServ
 	return
 }
 
-func marshalledLogMessageWithTime(t mr.TestingT, messageString string, timestamp int64) []byte {
+func marshalledLogMessageWithTime(messageString string, timestamp int64) []byte {
 	messageType := logmessage.LogMessage_OUT
 	sourceName := "DEA"
 	protoMessage := &logmessage.LogMessage{
@@ -108,7 +137,7 @@ func marshalledLogMessageWithTime(t mr.TestingT, messageString string, timestamp
 	}
 
 	message, err := proto.Marshal(protoMessage)
-	assert.NoError(t, err)
+	Expect(err).ToNot(HaveOccurred())
 
 	return message
 }
