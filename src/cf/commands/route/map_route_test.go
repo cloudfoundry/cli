@@ -66,13 +66,13 @@ func init() {
 		})
 		It("TestMapRouteWhenBinding", func() {
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Guid = "my-domain-guid"
 			domain.Name = "example.com"
 			route := models.Route{}
 			route.Guid = "my-route-guid"
 			route.Host = "foo"
-			route.Domain = domain.DomainFields
+			route.Domain = domain
 
 			app := models.Application{}
 			app.Guid = "my-app-guid"

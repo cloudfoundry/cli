@@ -15,7 +15,3 @@ func (model DomainFields) UrlForHost(host string) string {
 	}
 	return fmt.Sprintf("%s.%s", host, model.Name)
 }
-
-type Domain struct {
-	DomainFields
-}

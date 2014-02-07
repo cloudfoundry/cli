@@ -2,6 +2,7 @@ package requirements
 
 import (
 	"cf/api"
+	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	"cf/terminal"
@@ -9,27 +10,29 @@ import (
 
 type DomainRequirement interface {
 	Requirement
-	GetDomain() models.Domain
+	GetDomain() models.DomainFields
 }
 
 type domainApiRequirement struct {
 	name       string
 	ui         terminal.UI
+	config     *configuration.Configuration
 	domainRepo api.DomainRepository
-	domain     models.Domain
+	domain     models.DomainFields
 }
 
-func NewDomainRequirement(name string, ui terminal.UI, domainRepo api.DomainRepository) (req *domainApiRequirement) {
+func NewDomainRequirement(name string, ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (req *domainApiRequirement) {
 	req = new(domainApiRequirement)
 	req.name = name
 	req.ui = ui
+	req.config = config
 	req.domainRepo = domainRepo
 	return
 }
 
 func (req *domainApiRequirement) Execute() bool {
 	var apiResponse net.ApiResponse
-	req.domain, apiResponse = req.domainRepo.FindByNameInCurrentSpace(req.name)
+	req.domain, apiResponse = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields.Guid)
 
 	if apiResponse.IsNotSuccessful() {
 		req.ui.Failed(apiResponse.Message)
@@ -39,6 +42,6 @@ func (req *domainApiRequirement) Execute() bool {
 	return true
 }
 
-func (req *domainApiRequirement) GetDomain() models.Domain {
+func (req *domainApiRequirement) GetDomain() models.DomainFields {
 	return req.domain
 }

@@ -73,21 +73,21 @@ func init() {
 			orgFields.Guid = "my-org-guid"
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-			domain1 := models.Domain{}
+			domain1 := models.DomainFields{}
 			domain1.Shared = true
 			domain1.Name = "Domain1"
 
-			domain2 := models.Domain{}
+			domain2 := models.DomainFields{}
 			domain2.Shared = false
 			domain2.Name = "Domain2"
 
-			domain3 := models.Domain{}
+			domain3 := models.DomainFields{}
 			domain3.Shared = false
 			domain3.Name = "Domain3"
 
 			domainRepo := &testapi.FakeDomainRepository{
-				ListSharedDomainsDomains: []models.Domain{domain1},
-				ListDomainsForOrgDomains: []models.Domain{domain2, domain3},
+				ListSharedDomainsDomains: []models.DomainFields{domain1},
+				ListDomainsForOrgDomains: []models.DomainFields{domain2, domain3},
 			}
 
 			ui := callListDomains(mr.T(), []string{}, reqFactory, domainRepo)
@@ -146,12 +146,12 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "ze-domain"
 
 			domainRepo := &testapi.FakeDomainRepository{
 				ListSharedDomainsApiResponse: net.NewNotFoundApiResponse("whoops! misplaced yr domainz"),
-				ListDomainsForOrgDomains:     []models.Domain{domain},
+				ListDomainsForOrgDomains:     []models.DomainFields{domain},
 			}
 			ui := callListDomains(mr.T(), []string{}, reqFactory, domainRepo)
 

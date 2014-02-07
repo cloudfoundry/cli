@@ -19,17 +19,14 @@ type DomainResource struct {
 	Entity DomainEntity
 }
 
-func (resource DomainResource) ToFields() (fields models.DomainFields) {
-	fields.Name = resource.Entity.Name
-	fields.Guid = resource.Metadata.Guid
-	fields.OwningOrganizationGuid = resource.Entity.OwningOrganizationGuid
-	fields.Shared = fields.OwningOrganizationGuid == ""
-	return
-}
-
-func (resource DomainResource) ToModel() (domain models.Domain) {
-	domain.DomainFields = resource.ToFields()
-	return
+func (resource *DomainResource) ToFields() interface{} {
+	owningOrganizationGuid := resource.Entity.OwningOrganizationGuid
+	return models.DomainFields{
+		Name: resource.Entity.Name,
+		Guid: resource.Metadata.Guid,
+		OwningOrganizationGuid: owningOrganizationGuid,
+		Shared:                 owningOrganizationGuid == "",
+	}
 }
 
 type DomainEntity struct {
@@ -37,19 +34,16 @@ type DomainEntity struct {
 	OwningOrganizationGuid string `json:"owning_organization_guid"`
 }
 
-type ListDomainsCallback func(domains []models.Domain) (fetchNext bool)
-
 type DomainRepository interface {
-	ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse
-	ListSharedDomains(cb ListDomainsCallback) net.ApiResponse
-	FindByName(name string) (domain models.Domain, apiResponse net.ApiResponse)
-	FindByNameInCurrentSpace(name string) (domain models.Domain, apiResponse net.ApiResponse)
-	FindByNameInOrg(name string, owningOrgGuid string) (domain models.Domain, apiResponse net.ApiResponse)
+	ListDomainsForOrg(orgGuid string, cb func([]models.DomainFields) bool) net.ApiResponse
+	ListSharedDomains(cb func([]models.DomainFields) bool) net.ApiResponse
+	FindByName(name string) (domain models.DomainFields, apiResponse net.ApiResponse)
+	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiResponse net.ApiResponse)
 	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiResponse net.ApiResponse)
 	CreateSharedDomain(domainName string) (apiResponse net.ApiResponse)
 	Delete(domainGuid string) (apiResponse net.ApiResponse)
 	DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse)
-	ListDomains(cb ListDomainsCallback) net.ApiResponse
+	ListDomains(cb func([]models.DomainFields) bool) net.ApiResponse
 }
 
 type CloudControllerDomainRepository struct {
@@ -63,15 +57,15 @@ func NewCloudControllerDomainRepository(config *configuration.Configuration, gat
 	return
 }
 
-func (repo CloudControllerDomainRepository) ListSharedDomains(cb ListDomainsCallback) net.ApiResponse {
+func (repo CloudControllerDomainRepository) ListSharedDomains(cb func([]models.DomainFields) bool) net.ApiResponse {
 	return repo.listDomains("/v2/shared_domains", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomains(cb ListDomainsCallback) net.ApiResponse {
+func (repo CloudControllerDomainRepository) ListDomains(cb func([]models.DomainFields) bool) net.ApiResponse {
 	return repo.listDomains("/v2/domains", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb ListDomainsCallback) net.ApiResponse {
+func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func([]models.DomainFields) bool) net.ApiResponse {
 	apiResponse := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
 	if apiResponse.IsNotFound() {
 		apiResponse = repo.listDomains("/v2/domains", cb)
@@ -80,93 +74,58 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb
 	return apiResponse
 }
 
-func (repo CloudControllerDomainRepository) listDomains(path string, cb ListDomainsCallback) (apiResponse net.ApiResponse) {
-	fetchNext := true
-	for fetchNext {
-		var (
-			domains     []models.Domain
-			shouldFetch bool
-		)
-
-		domains, path, apiResponse = repo.findNextWithPath(path)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-
-		if len(domains) > 0 {
-			shouldFetch = cb(domains)
-		}
-
-		fetchNext = shouldFetch && path != ""
-	}
-	return
+func (repo CloudControllerDomainRepository) listDomains(path string, cb func([]models.DomainFields) bool) (apiResponse net.ApiResponse) {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		path,
+		&DomainResource{},
+		func(page []interface{}) bool {
+			domains := make([]models.DomainFields, 0, len(page))
+			for _, item := range page {
+				domains = append(domains, item.(models.DomainFields))
+			}
+			return cb(domains)
+		})
 }
 
 func (repo CloudControllerDomainRepository) isOrgDomain(orgGuid string, domain models.DomainFields) bool {
 	return orgGuid == domain.OwningOrganizationGuid || domain.Shared
 }
 
-func (repo CloudControllerDomainRepository) findNextWithPath(path string) (domains []models.Domain, nextUrl string, apiResponse net.ApiResponse) {
-	domainResources := new(PaginatedDomainResources)
+func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiResponse net.ApiResponse) {
+	return repo.findOneWithPath(
+		fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name)),
+		name)
+}
 
-	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, domainResources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiResponse net.ApiResponse) {
+	domain, apiResponse = repo.findOneWithPath(
+		fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=%s", orgGuid, url.QueryEscape("name:"+name)),
+		name)
 
-	nextUrl = domainResources.NextUrl
-	for _, r := range domainResources.Resources {
-		domains = append(domains, r.ToModel())
+	if apiResponse.IsNotFound() {
+		domain, apiResponse = repo.FindByName(name)
+		if !domain.Shared {
+			apiResponse = net.NewNotFoundApiResponse("Domain %s not found", name)
+		}
 	}
 
 	return
 }
 
-func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.Domain, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name))
-	domains, _, apiResponse := repo.findNextWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiResponse net.ApiResponse) {
+	foundDomain := false
+	apiResponse = repo.listDomains(path, func(page []models.DomainFields) bool {
+		domain = page[0]
+		foundDomain = true
+		return false
+	})
 
-	if len(domains) > 0 {
-		domain = domains[0]
-	} else {
+	if apiResponse.IsSuccessful() && !foundDomain {
 		apiResponse = net.NewNotFoundApiResponse("Domain %s not found", name)
 	}
-	return
-}
 
-func (repo CloudControllerDomainRepository) FindByNameInCurrentSpace(name string) (domain models.Domain, apiResponse net.ApiResponse) {
-	spacePath := fmt.Sprintf("/v2/spaces/%s/domains?inline-relations-depth=1&q=%s", repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
-	return repo.findOneWithPaths(spacePath, name)
-}
-
-func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.Domain, apiResponse net.ApiResponse) {
-	orgPath := fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=%s", orgGuid, url.QueryEscape("name:"+name))
-	return repo.findOneWithPaths(orgPath, name)
-}
-
-func (repo CloudControllerDomainRepository) findOneWithPaths(scopedPath, name string) (domain models.Domain, apiResponse net.ApiResponse) {
-	domains, _, apiResponse := repo.findNextWithPath(scopedPath)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(domains) == 0 {
-		sharedPath := fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name))
-		domains, _, apiResponse = repo.findNextWithPath(sharedPath)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-
-		if len(domains) == 0 || !domains[0].Shared {
-			apiResponse = net.NewNotFoundApiResponse("Domain '%s' not found", name)
-			return
-		}
-	}
-
-	domain = domains[0]
 	return
 }
 
@@ -184,7 +143,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	}
 
 	if apiResponse.IsSuccessful() {
-		createdDomain = resource.ToFields()
+		createdDomain = resource.ToFields().(models.DomainFields)
 	}
 	return
 }

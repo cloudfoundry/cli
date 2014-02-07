@@ -102,8 +102,8 @@ func getPushDependencies() (deps pushDependencies) {
 	deps.appRepo = &testapi.FakeApplicationRepository{}
 
 	deps.domainRepo = &testapi.FakeDomainRepository{}
-	sharedDomain := maker.NewSharedDomain(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-	deps.domainRepo.ListSharedDomainsDomains = []models.Domain{sharedDomain}
+	sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
+	deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
 
 	deps.routeRepo = &testapi.FakeRouteRepository{}
 	deps.stackRepo = &testapi.FakeStackRepository{}
@@ -122,7 +122,7 @@ func callPush(t mr.TestingT, args []string, deps pushDependencies) (ui *testterm
 		Username: "my-user",
 	})
 	assert.NoError(t, err)
-	org := maker.NewOrgFields(maker.Overrides{"name": "my-org"})
+	org := maker.NewOrgFields(maker.Overrides{"name": "my-org", "guid": "my-org-guid"})
 	space := maker.NewSpaceFields(maker.Overrides{"name": "my-space", "guid": "my-space-guid"})
 
 	config := &configuration.Configuration{
@@ -148,6 +148,7 @@ func callPush(t mr.TestingT, args []string, deps pushDependencies) (ui *testterm
 
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestPushingRequirements", func() {
@@ -186,18 +187,18 @@ func init() {
 		It("TestPushingAppWithOldV2DomainsEndpoint", func() {
 			deps := getPushDependencies()
 
-			privateDomain := models.Domain{}
+			privateDomain := models.DomainFields{}
 			privateDomain.Shared = false
 			privateDomain.Name = "private.cf-app.com"
 			privateDomain.Guid = "private-domain-guid"
 
-			sharedDomain := models.Domain{}
+			sharedDomain := models.DomainFields{}
 			sharedDomain.Name = "shared.cf-app.com"
 			sharedDomain.Shared = true
 			sharedDomain.Guid = "shared-domain-guid"
 
 			deps.domainRepo.ListSharedDomainsApiResponse = net.NewNotFoundApiResponse("whoopsie")
-			deps.domainRepo.ListDomainsDomains = []models.Domain{privateDomain, sharedDomain}
+			deps.domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
@@ -283,7 +284,7 @@ func init() {
 			route := models.Route{}
 			route.Guid = "my-route-guid"
 			route.Host = "my-new-app"
-			route.Domain = deps.domainRepo.ListSharedDomainsDomains[0].DomainFields
+			route.Domain = deps.domainRepo.ListSharedDomainsDomains[0]
 
 			deps.routeRepo.FindByHostAndDomainRoute = route
 			deps.appRepo.ReadNotFound = true
@@ -302,19 +303,18 @@ func init() {
 				{"OK"},
 			})
 		})
+
 		It("TestPushingAppWithCustomFlags", func() {
-
 			deps := getPushDependencies()
-			domain := models.Domain{}
-			domain.Name = "bar.cf-app.com"
-			domain.Guid = "bar-domain-guid"
-			stack := models.Stack{}
-			stack.Name = "customLinux"
-			stack.Guid = "custom-linux-guid"
-
-			deps.domainRepo.FindByNameDomain = domain
+			deps.domainRepo.FindByNameInOrgDomain = models.DomainFields{
+				Name: "bar.cf-app.com",
+				Guid: "bar-domain-guid",
+			}
 			deps.routeRepo.FindByHostAndDomainErr = true
-			deps.stackRepo.FindByNameStack = stack
+			deps.stackRepo.FindByNameStack = models.Stack{
+				Name: "customLinux",
+				Guid: "custom-linux-guid",
+			}
 			deps.appRepo.ReadNotFound = true
 
 			ui := callPush(mr.T(), []string{
@@ -352,7 +352,8 @@ func init() {
 			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().HealthCheckTimeout, 1)
 			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().BuildpackUrl, "https://github.com/heroku/heroku-buildpack-play.git")
 
-			assert.Equal(mr.T(), deps.domainRepo.FindByNameInCurrentSpaceName, "bar.cf-app.com")
+			assert.Equal(mr.T(), deps.domainRepo.FindByNameInOrgName, "bar.cf-app.com")
+			assert.Equal(mr.T(), deps.domainRepo.FindByNameInOrgGuid, "my-org-guid")
 
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "my-hostname")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "bar-domain-guid")
@@ -363,8 +364,8 @@ func init() {
 
 			assert.Equal(mr.T(), deps.starter.AppToStart.Name, "")
 		})
-		It("TestPushingAppWithInvalidTimeout", func() {
 
+		It("TestPushingAppWithInvalidTimeout", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -378,6 +379,7 @@ func init() {
 				{"invalid", "timeout"},
 			})
 		})
+
 		It("TestPushingAppToResetStartCommand", func() {
 
 			deps := getPushDependencies()
@@ -423,10 +425,10 @@ func init() {
 
 		It("TestPushingAppWithSingleAppManifest", func() {
 			deps := getPushDependencies()
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "manifest-example.com"
 			domain.Guid = "bar-domain-guid"
-			deps.domainRepo.FindByNameDomain = domain
+			deps.domainRepo.FindByNameInOrgDomain = domain
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
@@ -710,11 +712,11 @@ func init() {
 		It("TestPushingAppWithNoRoute", func() {
 
 			deps := getPushDependencies()
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "bar.cf-app.com"
 			domain.Guid = "bar-domain-guid"
 
-			deps.domainRepo.FindByNameDomain = domain
+			deps.domainRepo.FindByNameInOrgDomain = domain
 			deps.routeRepo.FindByHostErr = true
 			deps.appRepo.ReadNotFound = true
 
@@ -730,12 +732,12 @@ func init() {
 		It("TestPushingAppWithNoHostname", func() {
 
 			deps := getPushDependencies()
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "bar.cf-app.com"
 			domain.Guid = "bar-domain-guid"
 			domain.Shared = true
 
-			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{domain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.appRepo.ReadNotFound = true
 
@@ -887,8 +889,8 @@ func init() {
 			})
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedAppGuid, "existing-app-guid")
 		})
-		It("TestPushingAppWhenItAlreadyExistsAndDomainSpecifiedIsNotBound", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsAndDomainSpecifiedIsNotBound", func() {
 			deps := getPushDependencies()
 
 			domain := models.DomainFields{}
@@ -903,14 +905,14 @@ func init() {
 			existingApp.Guid = "existing-app-guid"
 			existingApp.Routes = []models.RouteSummary{existingRoute}
 
-			foundDomain := models.Domain{}
+			foundDomain := models.DomainFields{}
 			foundDomain.Guid = "domain-guid"
 			foundDomain.Name = "newdomain.com"
 
 			deps.appRepo.ReadApp = existingApp
 			deps.appRepo.UpdateAppResult = existingApp
 			deps.routeRepo.FindByHostAndDomainNotFound = true
-			deps.domainRepo.FindByNameDomain = foundDomain
+			deps.domainRepo.FindByNameInOrgDomain = foundDomain
 
 			ui := callPush(mr.T(), []string{"-d", "newdomain.com", "existing-app"}, deps)
 
@@ -921,7 +923,8 @@ func init() {
 			})
 
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedAppGuid, "existing-app-guid")
-			assert.Equal(mr.T(), deps.domainRepo.FindByNameInCurrentSpaceName, "newdomain.com")
+			assert.Equal(mr.T(), deps.domainRepo.FindByNameInOrgName, "newdomain.com")
+			assert.Equal(mr.T(), deps.domainRepo.FindByNameInOrgGuid, "my-org-guid")
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainDomain, "newdomain.com")
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainHost, "existing-app")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "existing-app")
@@ -949,7 +952,7 @@ func init() {
 			_ = callPush(mr.T(), []string{"existing-app"}, deps)
 
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedAppGuid, "existing-app-guid")
-			assert.Equal(mr.T(), deps.domainRepo.FindByNameInCurrentSpaceName, "")
+			assert.Equal(mr.T(), deps.domainRepo.FindByNameInOrgName, "")
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainDomain, "")
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
@@ -959,14 +962,14 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "example.com"
 			domain.Guid = "domain-guid"
 			domain.Shared = true
 
 			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
-			existingRoute.Domain = domain.DomainFields
+			existingRoute.Domain = domain
 
 			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
@@ -976,7 +979,7 @@ func init() {
 			deps.appRepo.ReadApp = existingApp
 			deps.appRepo.UpdateAppResult = existingApp
 			deps.routeRepo.FindByHostAndDomainNotFound = true
-			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{domain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 
 			ui := callPush(mr.T(), []string{"-n", "new-host", "existing-app"}, deps)
 
@@ -1009,7 +1012,7 @@ func init() {
 			})
 
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedAppGuid, "existing-app-guid")
-			assert.Equal(mr.T(), deps.domainRepo.FindByNameInCurrentSpaceName, "")
+			assert.Equal(mr.T(), deps.domainRepo.FindByNameInOrgName, "")
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainDomain, "")
 			assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
@@ -1019,14 +1022,14 @@ func init() {
 
 			deps := getPushDependencies()
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "example.com"
 			domain.Guid = "domain-guid"
 			domain.Shared = true
 
 			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"
-			existingRoute.Domain = domain.DomainFields
+			existingRoute.Domain = domain
 
 			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
@@ -1036,7 +1039,7 @@ func init() {
 			deps.appRepo.ReadApp = existingApp
 			deps.appRepo.UpdateAppResult = existingApp
 			deps.routeRepo.FindByHostAndDomainNotFound = true
-			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{domain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 
 			ui := callPush(mr.T(), []string{"--no-hostname", "existing-app"}, deps)
 
@@ -1058,13 +1061,13 @@ func init() {
 
 			deps := getPushDependencies()
 
-			sharedDomain := models.Domain{}
+			sharedDomain := models.DomainFields{}
 			sharedDomain.Name = "foo.cf-app.com"
 			sharedDomain.Shared = true
 			sharedDomain.Guid = "foo-domain-guid"
 
 			deps.routeRepo.FindByHostAndDomainErr = true
-			deps.domainRepo.ListSharedDomainsDomains = []models.Domain{sharedDomain}
+			deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
 			deps.appRepo.ReadApp = maker.NewApp(maker.Overrides{"name": "existing-app", "guid": "existing-app-guid"})
 			deps.appRepo.UpdateAppResult = deps.appRepo.ReadApp
 

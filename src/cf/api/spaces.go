@@ -33,7 +33,7 @@ func (resource SpaceResource) ToModel() (space models.Space) {
 	}
 
 	for _, domainResource := range resource.Entity.Domains {
-		space.Domains = append(space.Domains, domainResource.ToFields())
+		space.Domains = append(space.Domains, domainResource.ToFields().(models.DomainFields))
 	}
 
 	for _, serviceResource := range resource.Entity.ServiceInstances {

@@ -17,7 +17,7 @@ import (
 )
 
 func fakeDomainRepo() *testapi.FakeDomainRepository {
-	domain := models.Domain{}
+	domain := models.DomainFields{}
 	domain.Name = "foo.com"
 	domain.Guid = "foo-guid"
 	domain.Shared = true

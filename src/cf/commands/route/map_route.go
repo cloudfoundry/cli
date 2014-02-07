@@ -53,7 +53,7 @@ func (cmd *MapRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, apiResponse := cmd.routeCreator.CreateRoute(hostName, domain.DomainFields, cmd.config.SpaceFields)
+	route, apiResponse := cmd.routeCreator.CreateRoute(hostName, domain, cmd.config.SpaceFields)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error resolving route:\n%s", apiResponse.Message)
 	}

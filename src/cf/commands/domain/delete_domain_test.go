@@ -61,7 +61,7 @@ func init() {
 		})
 		It("TestDeleteDomainSuccess", func() {
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
@@ -84,7 +84,7 @@ func init() {
 		})
 		It("TestDeleteDomainNoConfirmation", func() {
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
@@ -142,7 +142,7 @@ func init() {
 		})
 		It("TestDeleteDomainDeleteError", func() {
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
@@ -166,7 +166,7 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-			domain := models.Domain{}
+			domain := models.DomainFields{}
 			domain.Name = "foo.com"
 			domain.Guid = "foo-guid"
 			domainRepo := &testapi.FakeDomainRepository{
