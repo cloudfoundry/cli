@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
@@ -9,11 +8,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type PaginatedRouteResources struct {
-	Resources []RouteResource `json:"resources"`
-	NextUrl   string          `json:"next_url"`
-}
 
 type RouteResource struct {
 	Resource
@@ -43,7 +37,7 @@ type RouteEntity struct {
 }
 
 type RouteRepository interface {
-	ListRoutes(stop chan bool) (routesChan chan []models.Route, statusChan chan net.ApiResponse)
+	ListRoutes(cb func(models.Route) bool) (apiResponse net.ApiResponse)
 	FindByHost(host string) (route models.Route, apiResponse net.ApiResponse)
 	FindByHostAndDomain(host, domain string) (route models.Route, apiResponse net.ApiResponse)
 	Create(host, domainGuid string) (createdRoute models.Route, apiResponse net.ApiResponse)
@@ -66,47 +60,35 @@ func NewCloudControllerRouteRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerRouteRepository) ListRoutes(stop chan bool) (routesChan chan []models.Route, statusChan chan net.ApiResponse) {
-	routesChan = make(chan []models.Route, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		path := fmt.Sprintf("/v2/routes?inline-relations-depth=1")
-
-	loop:
-		for path != "" {
-			select {
-			case <-stop:
-				break loop
-			default:
-				var (
-					routes      []models.Route
-					apiResponse net.ApiResponse
-				)
-				routes, path, apiResponse = repo.findNextWithPath(path)
-				if apiResponse.IsNotSuccessful() {
-					statusChan <- apiResponse
-					close(routesChan)
-					close(statusChan)
-					return
-				}
-
-				if len(routes) > 0 {
-					routesChan <- routes
-				}
-			}
-		}
-		close(routesChan)
-		close(statusChan)
-		cf.WaitForClose(stop)
-	}()
-
-	return
+func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool) (apiResponse net.ApiResponse) {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/routes?inline-relations-depth=1"),
+		RouteResource{},
+		func(resource interface{}) bool {
+			return cb(resource.(RouteResource).ToModel())
+		})
 }
 
 func (repo CloudControllerRouteRepository) FindByHost(host string) (route models.Route, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host))
-	return repo.findOneWithPath(path)
+	found := false
+	apiResponse = repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host)),
+		RouteResource{},
+		func(resource interface{}) bool {
+			route = resource.(RouteResource).ToModel()
+			found = true
+			return false
+		})
+
+	if apiResponse.IsSuccessful() && !found {
+		apiResponse = net.NewNotFoundApiResponse("Route with host %s not found", host)
+	}
+
+	return
 }
 
 func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route models.Route, apiResponse net.ApiResponse) {
@@ -115,43 +97,22 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		return
 	}
 
-	path := fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid))
-	route, apiResponse = repo.findOneWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
+	found := false
+	apiResponse = repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid)),
+		RouteResource{},
+		func(resource interface{}) bool {
+			route = resource.(RouteResource).ToModel()
+			found = true
+			return false
+		})
+
+	if apiResponse.IsSuccessful() && !found {
+		apiResponse = net.NewNotFoundApiResponse("Route with host %s not found", host)
 	}
 
-	route.Domain = domain
-	return
-}
-
-func (repo CloudControllerRouteRepository) findOneWithPath(path string) (route models.Route, apiResponse net.ApiResponse) {
-	routes, _, apiResponse := repo.findNextWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	if len(routes) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Route not found")
-		return
-	}
-
-	route = routes[0]
-	return
-}
-
-func (repo CloudControllerRouteRepository) findNextWithPath(path string) (routes []models.Route, nextUrl string, apiResponse net.ApiResponse) {
-	routesResources := new(PaginatedRouteResources)
-	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, routesResources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	nextUrl = routesResources.NextUrl
-
-	for _, routeResponse := range routesResources.Resources {
-		routes = append(routes, routeResponse.ToModel())
-	}
 	return
 }
 

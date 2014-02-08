@@ -110,7 +110,12 @@ var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, B
         	"guid": "my-route-guid"
     	},
     	"entity": {
-       	     "host": "my-cool-app"
+       	     "host": "my-cool-app",
+       	     "domain": {
+       	     	"metadata": {
+       	     		"guid": "my-domain-guid"
+       	     	}
+       	     }
     	}
     }
 ]}`}
@@ -131,229 +136,202 @@ func createRoutesRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httpt
 	repo = NewCloudControllerRouteRepository(config, gateway, domainRepo)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestRoutesListRoutes", func() {
-			firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?inline-relations-depth=1",
-				Response: firstPageRoutesResponse,
-			})
 
-			secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?inline-relations-depth=1&page=2",
-				Response: secondPageRoutesResponse,
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), firstRequest, secondRequest)
-			defer ts.Close()
-
-			stopChan := make(chan bool)
-			defer close(stopChan)
-			routesChan, statusChan := repo.ListRoutes(stopChan)
-
-			routes := []models.Route{}
-			for chunk := range routesChan {
-				routes = append(routes, chunk...)
-			}
-			apiResponse := <-statusChan
-
-			assert.Equal(mr.T(), len(routes), 2)
-			assert.Equal(mr.T(), routes[0].Guid, "route-1-guid")
-			assert.Equal(mr.T(), routes[1].Guid, "route-2-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
+var _ = Describe("route repository", func() {
+	It("lists routes", func() {
+		firstRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/routes?inline-relations-depth=1",
+			Response: firstPageRoutesResponse,
 		})
-		It("TestRoutesListRoutesWithNoRoutes", func() {
 
-			emptyRoutesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?inline-relations-depth=1",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), emptyRoutesRequest)
-			defer ts.Close()
-
-			stopChan := make(chan bool)
-			defer close(stopChan)
-			routesChan, statusChan := repo.ListRoutes(stopChan)
-
-			_, ok := <-routesChan
-			apiResponse := <-statusChan
-
-			assert.False(mr.T(), ok)
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
+		secondRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/routes?inline-relations-depth=1&page=2",
+			Response: secondPageRoutesResponse,
 		})
-		It("TestFindByHost", func() {
 
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?q=host%3Amy-cool-app",
-				Response: findRouteByHostResponse,
-			})
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), firstRequest, secondRequest)
+		defer ts.Close()
 
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			route, apiResponse := repo.FindByHost("my-cool-app")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), route.Host, "my-cool-app")
-			assert.Equal(mr.T(), route.Guid, "my-route-guid")
+		routes := []models.Route{}
+		apiResponse := repo.ListRoutes(func(route models.Route) bool {
+			routes = append(routes, route)
+			return true
 		})
-		It("TestFindByHostWhenHostIsNotFound", func() {
 
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?q=host%3Amy-cool-app",
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: ` { "resources": [ ]}`},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			_, apiResponse := repo.FindByHost("my-cool-app")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestFindByHostAndDomain", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
-				Response: findRouteByHostResponse,
-			})
-
-			ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			domain := models.DomainFields{}
-			domain.Guid = "my-domain-guid"
-			domainRepo.FindByNameDomain = domain
-
-			route, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
-
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.Equal(mr.T(), domainRepo.FindByNameName, "my-domain.com")
-			assert.Equal(mr.T(), route.Host, "my-cool-app")
-			assert.Equal(mr.T(), route.Guid, "my-route-guid")
-			assert.Equal(mr.T(), route.Domain.Guid, domain.Guid)
-		})
-		It("TestFindByHostAndDomainWhenRouteIsNotFound", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
-			})
-
-			ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			domain := models.DomainFields{}
-			domain.Guid = "my-domain-guid"
-			domainRepo.FindByNameDomain = domain
-
-			_, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.True(mr.T(), apiResponse.IsNotFound())
-		})
-		It("TestCreateInSpace", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:  "POST",
-				Path:    "/v2/routes?inline-relations-depth=1",
-				Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-{
-  "metadata": { "guid": "my-route-guid" },
-  "entity": { "host": "my-cool-app" }
-}`},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			createdRoute, apiResponse := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), createdRoute.Guid, "my-route-guid")
-		})
-		It("TestCreateRoute", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:  "POST",
-				Path:    "/v2/routes?inline-relations-depth=1",
-				Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-{
-  "metadata": { "guid": "my-route-guid" },
-  "entity": { "host": "my-cool-app" }
-}`},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			createdRoute, apiResponse := repo.Create("my-cool-app", "my-domain-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-
-			assert.Equal(mr.T(), createdRoute.Guid, "my-route-guid")
-		})
-		It("TestBind", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "PUT",
-				Path:     "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			apiResponse := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestUnbind", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "DELETE",
-				Path:     "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			apiResponse := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestDelete", func() {
-
-			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "DELETE",
-				Path:     "/v2/routes/my-cool-route-guid",
-				Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
-			})
-
-			ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
-			defer ts.Close()
-
-			apiResponse := repo.Delete("my-cool-route-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
+		assert.Equal(mr.T(), len(routes), 2)
+		assert.Equal(mr.T(), routes[0].Guid, "route-1-guid")
+		assert.Equal(mr.T(), routes[1].Guid, "route-2-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
 	})
-}
+
+	It("finds routes by host", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/routes?q=host%3Amy-cool-app",
+			Response: findRouteByHostResponse,
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		route, apiResponse := repo.FindByHost("my-cool-app")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), route.Host, "my-cool-app")
+		assert.Equal(mr.T(), route.Guid, "my-route-guid")
+	})
+
+	It("returns an error when a route is not found with the given host", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/routes?q=host%3Amy-cool-app",
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: ` { "resources": [ ]}`},
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		_, apiResponse := repo.FindByHost("my-cool-app")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("finds a route by host and domain", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
+			Response: findRouteByHostResponse,
+		})
+
+		ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		domain := models.DomainFields{}
+		domain.Guid = "my-domain-guid"
+		domainRepo.FindByNameDomain = domain
+
+		route, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.Equal(mr.T(), domainRepo.FindByNameName, "my-domain.com")
+		assert.Equal(mr.T(), route.Host, "my-cool-app")
+		assert.Equal(mr.T(), route.Guid, "my-route-guid")
+		assert.Equal(mr.T(), route.Domain.Guid, domain.Guid)
+	})
+
+	It("returns 'not found' response when there is no route w/ the given domain and host", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/routes?q=host%3Amy-cool-app%3Bdomain_guid%3Amy-domain-guid",
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
+		})
+
+		ts, handler, repo, domainRepo := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		domain := models.DomainFields{}
+		domain.Guid = "my-domain-guid"
+		domainRepo.FindByNameDomain = domain
+
+		_, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsError())
+		assert.True(mr.T(), apiResponse.IsNotFound())
+	})
+
+	It("creates routes in a given space", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/routes?inline-relations-depth=1",
+			Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+{
+"metadata": { "guid": "my-route-guid" },
+"entity": { "host": "my-cool-app" }
+}`},
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		createdRoute, apiResponse := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), createdRoute.Guid, "my-route-guid")
+	})
+
+	It("creates routes", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/routes?inline-relations-depth=1",
+			Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+{
+"metadata": { "guid": "my-route-guid" },
+"entity": { "host": "my-cool-app" }
+}`},
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		createdRoute, apiResponse := repo.Create("my-cool-app", "my-domain-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+
+		assert.Equal(mr.T(), createdRoute.Guid, "my-route-guid")
+	})
+
+	It("binds routes", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "PUT",
+			Path:     "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		apiResponse := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("unbinds routes", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "DELETE",
+			Path:     "/v2/apps/my-cool-app-guid/routes/my-cool-route-guid",
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		apiResponse := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+
+	It("deletes routes", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "DELETE",
+			Path:     "/v2/routes/my-cool-route-guid",
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: ""},
+		})
+
+		ts, handler, repo, _ := createRoutesRepo(mr.T(), request)
+		defer ts.Close()
+
+		apiResponse := repo.Delete("my-cool-route-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+	})
+})
