@@ -137,7 +137,7 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 }
 
 func (repo CloudControllerServiceRepository) FindServicePlanToMigrateByDescription(v1Description V1ServicePlanDescription, v2Description V2ServicePlanDescription) (v1PlanGuid, v2PlanGuid string, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_plans", repo.config.ApiEndpoint())
+	path := fmt.Sprintf("%s/v2/service_plans?inline-relations-depth=1", repo.config.ApiEndpoint())
 
 	response := new(PaginatedServicePlanResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
