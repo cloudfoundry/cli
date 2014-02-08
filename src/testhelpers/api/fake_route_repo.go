@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/models"
 	"cf/net"
 )
@@ -38,38 +37,16 @@ type FakeRouteRepository struct {
 	DeleteRouteGuid string
 }
 
-func (repo *FakeRouteRepository) ListRoutes(stop chan bool) (routesChan chan []models.Route, statusChan chan net.ApiResponse) {
-	routesChan = make(chan []models.Route, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
+func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiResponse net.ApiResponse) {
 	if repo.ListErr {
-		statusChan <- net.NewApiResponseWithMessage("Error finding all routes")
-		close(routesChan)
-		close(statusChan)
-		return
+		return net.NewApiResponseWithMessage("WHOOPSIE")
 	}
 
-	go func() {
-		routesCount := len(repo.Routes)
-		for i := 0; i < routesCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if routesCount-i > 1 {
-					routesChan <- repo.Routes[i : i+2]
-				} else {
-					routesChan <- repo.Routes[i:]
-				}
-			}
+	for _, route := range repo.Routes {
+		if !cb(route) {
+			break
 		}
-
-		close(routesChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
+	}
 	return
 }
 

@@ -3,6 +3,7 @@ package route
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -32,35 +33,26 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-
-	routesChan, statusChan := cmd.routeRepo.ListRoutes(stopChan)
-
 	table := cmd.ui.Table([]string{"host", "domain", "apps"})
+
 	noRoutes := true
-
-	for routes := range routesChan {
-		rows := [][]string{}
-		for _, route := range routes {
-			appNames := ""
-			for _, app := range route.Apps {
-				appNames = appNames + ", " + app.Name
-			}
-			appNames = strings.TrimPrefix(appNames, ", ")
-			rows = append(rows, []string{
-				route.Host,
-				route.Domain.Name,
-				appNames,
-			})
+	apiResponse := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
+		appNames := ""
+		for _, app := range route.Apps {
+			appNames = appNames + ", " + app.Name
 		}
-		table.Print(rows)
+		appNames = strings.TrimPrefix(appNames, ", ")
+		table.Print([][]string{{
+			route.Host,
+			route.Domain.Name,
+			appNames,
+		}})
 		noRoutes = false
-	}
+		return true
+	})
 
-	apiStatus := <-statusChan
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching routes.\n%s", apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching routes.\n%s", apiResponse.Message)
 		return
 	}
 
