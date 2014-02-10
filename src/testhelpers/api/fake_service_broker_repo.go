@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/models"
 	"cf/net"
 )
@@ -36,39 +35,18 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []models.ServiceBroker, statusChan chan net.ApiResponse) {
-	serviceBrokersChan = make(chan []models.ServiceBroker, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	if repo.ListErr {
-		statusChan <- net.NewApiResponseWithMessage("Error finding all routes")
-		close(serviceBrokersChan)
-		close(statusChan)
-		return
+func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker models.ServiceBroker) bool) net.ApiResponse {
+	for _, broker := range repo.ServiceBrokers {
+		if !callback(broker) {
+			break
+		}
 	}
 
-	go func() {
-		serviceBrokersCount := len(repo.ServiceBrokers)
-		for i := 0; i < serviceBrokersCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if serviceBrokersCount-i > 1 {
-					serviceBrokersChan <- repo.ServiceBrokers[i : i+2]
-				} else {
-					serviceBrokersChan <- repo.ServiceBrokers[i:]
-				}
-			}
-		}
-
-		close(serviceBrokersChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
-	return
+	if repo.ListErr {
+		return net.NewApiResponseWithMessage("Error finding service brokers")
+	} else {
+		return net.NewApiResponseWithStatusCode(200)
+	}
 }
 
 func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiResponse net.ApiResponse) {
