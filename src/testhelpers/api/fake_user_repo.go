@@ -50,42 +50,14 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 	return
 }
 
-func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string, stop chan bool) (usersChan chan []models.UserFields, statusChan chan net.ApiResponse) {
+func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, net.ApiResponse) {
 	repo.ListUsersOrganizationGuid = orgGuid
-	return repo.listUsersForRole(roleName, stop)
+	return repo.ListUsersByRole[roleName], net.NewApiResponseWithStatusCode(200)
 }
 
-func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string, stop chan bool) (usersChan chan []models.UserFields, statusChan chan net.ApiResponse) {
+func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) ([]models.UserFields, net.ApiResponse) {
 	repo.ListUsersSpaceGuid = spaceGuid
-	return repo.listUsersForRole(roleName, stop)
-}
-
-func (repo *FakeUserRepository) listUsersForRole(roleName string, stop chan bool) (usersChan chan []models.UserFields, statusChan chan net.ApiResponse) {
-	usersChan = make(chan []models.UserFields, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		usersCount := len(repo.ListUsersByRole[roleName])
-		for i := 0; i < usersCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if usersCount-i > 1 {
-					usersChan <- repo.ListUsersByRole[roleName][i : i+2]
-				} else {
-					usersChan <- repo.ListUsersByRole[roleName][i:]
-				}
-			}
-		}
-
-		close(usersChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
-	return
+	return repo.ListUsersByRole[roleName], net.NewApiResponseWithStatusCode(200)
 }
 
 func (repo *FakeUserRepository) Create(username, password string) (apiResponse net.ApiResponse) {
