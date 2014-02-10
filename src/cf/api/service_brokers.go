@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
@@ -9,11 +8,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type PaginatedServiceBrokerResources struct {
-	ServiceBrokers []ServiceBrokerResource `json:"resources"`
-	NextUrl        string                  `json:"next_url"`
-}
 
 type ServiceBrokerResource struct {
 	Resource
@@ -38,7 +32,7 @@ type ServiceBrokerEntity struct {
 }
 
 type ServiceBrokerRepository interface {
-	ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []models.ServiceBroker, statusChan chan net.ApiResponse)
+	ListServiceBrokers(callback func(models.ServiceBroker) bool) net.ApiResponse
 	FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse net.ApiResponse)
 	Create(name, url, username, password string) (apiResponse net.ApiResponse)
 	Update(serviceBroker models.ServiceBroker) (apiResponse net.ApiResponse)
@@ -57,73 +51,35 @@ func NewCloudControllerServiceBrokerRepository(config *configuration.Configurati
 	return
 }
 
-func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(stop chan bool) (serviceBrokersChan chan []models.ServiceBroker, statusChan chan net.ApiResponse) {
-	serviceBrokersChan = make(chan []models.ServiceBroker, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		path := "/v2/service_brokers"
-
-	loop:
-		for path != "" {
-			select {
-			case <-stop:
-				break loop
-			default:
-				var (
-					serviceBrokers []models.ServiceBroker
-					apiResponse    net.ApiResponse
-				)
-				serviceBrokers, path, apiResponse = repo.findNextWithPath(path)
-				if apiResponse.IsNotSuccessful() {
-					statusChan <- apiResponse
-					close(serviceBrokersChan)
-					close(statusChan)
-					return
-				}
-
-				if len(serviceBrokers) > 0 {
-					serviceBrokersChan <- serviceBrokers
-				}
-			}
-		}
-		close(serviceBrokersChan)
-		close(statusChan)
-		cf.WaitForClose(stop)
-	}()
-
-	return
+func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(callback func(models.ServiceBroker) bool) net.ApiResponse {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		"/v2/service_brokers",
+		ServiceBrokerResource{},
+		func(resource interface{}) bool {
+			callback(resource.(ServiceBrokerResource).ToFields())
+			return true
+		})
 }
 
 func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/service_brokers?q=%s", url.QueryEscape("name:"+name))
-	serviceBrokers, _, apiResponse := repo.findNextWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
+	foundBroker := false
+	apiResponse = repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/service_brokers?q=%s", url.QueryEscape("name:"+name)),
+		ServiceBrokerResource{},
+		func(resource interface{}) bool {
+			serviceBroker = resource.(ServiceBrokerResource).ToFields()
+			foundBroker = true
+			return false
+		})
 
-	if len(serviceBrokers) == 0 {
+	if !foundBroker {
 		apiResponse = net.NewNotFoundApiResponse("Service Broker '%s' not found", name)
-		return
 	}
 
-	serviceBroker = serviceBrokers[0]
-	return
-}
-
-func (repo CloudControllerServiceBrokerRepository) findNextWithPath(path string) (serviceBrokers []models.ServiceBroker, nextUrl string, apiResponse net.ApiResponse) {
-	resources := new(PaginatedServiceBrokerResources)
-
-	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	nextUrl = resources.NextUrl
-
-	for _, resource := range resources.ServiceBrokers {
-		serviceBrokers = append(serviceBrokers, resource.ToFields())
-	}
 	return
 }
 
