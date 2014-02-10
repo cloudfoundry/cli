@@ -44,7 +44,7 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 	user = repo.FindByUsernameUserFields
 
 	if repo.FindByUsernameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("UserFields not found")
+		apiResponse = net.NewNotFoundApiResponse("User not found")
 	}
 
 	return
@@ -65,7 +65,7 @@ func (repo *FakeUserRepository) Create(username, password string) (apiResponse n
 	repo.CreateUserPassword = password
 
 	if repo.CreateUserExists {
-		apiResponse = net.NewApiResponse("UserFields already exists", cf.USER_EXISTS, 400)
+		apiResponse = net.NewApiResponse("User already exists", cf.USER_EXISTS, 400)
 	}
 
 	return
