@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-type PaginatedUserResources struct {
-	NextUrl   string `json:"next_url"`
-	Resources []UserResource
-}
-
 type UserResource struct {
 	Resource
 	Entity UserEntity
