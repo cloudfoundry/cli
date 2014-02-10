@@ -57,7 +57,7 @@ func (cmd DeleteUserFields) Run(c *cli.Context) {
 	}
 	if apiResponse.IsNotFound() {
 		cmd.ui.Ok()
-		cmd.ui.Warn("UserFields %s does not exist.", username)
+		cmd.ui.Warn("User %s does not exist.", username)
 		return
 	}
 

@@ -292,6 +292,7 @@ var _ = Describe("UserRepository", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsError())
 		assert.True(mr.T(), apiResponse.IsNotFound())
+		assert.Contains(mr.T(), apiResponse.Message, "User my-user not found")
 	})
 
 	It("TestCreateUser", func() {
