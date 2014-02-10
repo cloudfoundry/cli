@@ -3,6 +3,7 @@ package space
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -34,30 +35,20 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
 		terminal.EntityNameColor(cmd.config.Username()))
 
-	stopChan := make(chan bool)
-	defer close(stopChan)
-
-	spacesChan, statusChan := cmd.spaceRepo.ListSpaces(stopChan)
-
+	foundSpaces := false
 	table := cmd.ui.Table([]string{"name"})
-	noSpaces := true
+	apiResponse := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
+		table.Print([][]string{{space.Name}})
+		foundSpaces = true
+		return true
+	})
 
-	for spaces := range spacesChan {
-		rows := [][]string{}
-		for _, space := range spaces {
-			rows = append(rows, []string{space.Name})
-		}
-		table.Print(rows)
-		noSpaces = false
-	}
-
-	apiStatus := <-statusChan
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching spaces.\n%s", apiStatus.Message)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed("Failed fetching spaces.\n%s", apiResponse.Message)
 		return
 	}
 
-	if noSpaces {
+	if !foundSpaces {
 		cmd.ui.Say("No spaces found")
 	}
 }

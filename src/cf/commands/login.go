@@ -212,22 +212,12 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 			return
 		}
 
-		stopChan := make(chan bool)
-		defer close(stopChan)
-
-		spacesChan, statusChan := cmd.spaceRepo.ListSpaces(stopChan)
-
 		var availableSpaces []models.Space
+		apiResponse := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
+			availableSpaces = append(availableSpaces, space)
+			return (len(availableSpaces) < maxChoices)
+		})
 
-		for spaces := range spacesChan {
-			availableSpaces = append(availableSpaces, spaces...)
-			if len(availableSpaces) > maxChoices {
-				stopChan <- true
-				break
-			}
-		}
-
-		apiResponse := <-statusChan
 		if apiResponse.IsNotSuccessful() {
 			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiResponse.Message))
 			cmd.ui.Failed(err.Error())

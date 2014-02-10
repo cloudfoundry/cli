@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
@@ -9,11 +8,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type PaginatedSpaceResources struct {
-	Resources []SpaceResource
-	NextUrl   string `json:"next_url"`
-}
 
 type SpaceResource struct {
 	Metadata Metadata
@@ -53,7 +47,7 @@ type SpaceEntity struct {
 }
 
 type SpaceRepository interface {
-	ListSpaces(stop chan bool) (spacesChan chan []models.Space, statusChan chan net.ApiResponse)
+	ListSpaces(func(models.Space) bool) net.ApiResponse
 	FindByName(name string) (space models.Space, apiResponse net.ApiResponse)
 	FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse)
 	Create(name string, orgGuid string) (space models.Space, apiResponse net.ApiResponse)
@@ -72,42 +66,15 @@ func NewCloudControllerSpaceRepository(config *configuration.Configuration, gate
 	return
 }
 
-func (repo CloudControllerSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []models.Space, statusChan chan net.ApiResponse) {
-	spacesChan = make(chan []models.Space, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		path := fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields.Guid)
-
-	loop:
-		for path != "" {
-			select {
-			case <-stop:
-				break loop
-			default:
-				var (
-					spaces      []models.Space
-					apiResponse net.ApiResponse
-				)
-				spaces, path, apiResponse = repo.findNextWithPath(path)
-				if apiResponse.IsNotSuccessful() {
-					statusChan <- apiResponse
-					close(spacesChan)
-					close(statusChan)
-					return
-				}
-
-				if len(spaces) > 0 {
-					spacesChan <- spaces
-				}
-			}
-		}
-		close(spacesChan)
-		close(statusChan)
-		cf.WaitForClose(stop)
-	}()
-
-	return
+func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) net.ApiResponse {
+	return repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields.Guid),
+		SpaceResource{},
+		func(resource interface{}) bool {
+			return callback(resource.(SpaceResource).ToModel())
+		})
 }
 
 func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiResponse net.ApiResponse) {
@@ -115,34 +82,22 @@ func (repo CloudControllerSpaceRepository) FindByName(name string) (space models
 }
 
 func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name)))
+	foundSpace := false
+	apiResponse = repo.gateway.ListPaginatedResources(
+		repo.config.Target,
+		repo.config.AccessToken,
+		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name))),
+		SpaceResource{},
+		func(resource interface{}) bool {
+			space = resource.(SpaceResource).ToModel()
+			foundSpace = true
+			return false
+		})
 
-	spaces, _, apiResponse := repo.findNextWithPath(path)
-	if apiResponse.IsNotSuccessful() {
-		return
+	if !foundSpace {
+		apiResponse = net.NewNotFoundApiResponse("Space %s not found.", name)
 	}
 
-	if len(spaces) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Space '%s' not found", name)
-		return
-	}
-
-	space = spaces[0]
-	return
-}
-
-func (repo CloudControllerSpaceRepository) findNextWithPath(path string) (spaces []models.Space, nextUrl string, apiResponse net.ApiResponse) {
-	resources := new(PaginatedSpaceResources)
-	apiResponse = repo.gateway.GetResource(repo.config.Target+path, repo.config.AccessToken, resources)
-	if apiResponse.IsNotSuccessful() {
-		return
-	}
-
-	nextUrl = resources.NextUrl
-
-	for _, r := range resources.Resources {
-		spaces = append(spaces, r.ToModel())
-	}
 	return
 }
 

@@ -37,32 +37,13 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space models.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) ListSpaces(stop chan bool) (spacesChan chan []models.Space, statusChan chan net.ApiResponse) {
-	spacesChan = make(chan []models.Space, 4)
-	statusChan = make(chan net.ApiResponse, 1)
-
-	go func() {
-		spacesCount := len(repo.Spaces)
-		for i := 0; i < spacesCount; i += 2 {
-			select {
-			case <-stop:
-				break
-			default:
-				if spacesCount-i > 1 {
-					spacesChan <- repo.Spaces[i : i+2]
-				} else {
-					spacesChan <- repo.Spaces[i:]
-				}
-			}
+func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) net.ApiResponse {
+	for _, space := range repo.Spaces {
+		if !callback(space) {
+			break
 		}
-
-		close(spacesChan)
-		close(statusChan)
-
-		cf.WaitForClose(stop)
-	}()
-
-	return
+	}
+	return net.NewApiResponseWithStatusCode(200)
 }
 
 func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiResponse net.ApiResponse) {
