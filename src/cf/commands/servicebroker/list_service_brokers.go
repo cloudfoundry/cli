@@ -32,7 +32,7 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"name", "url"})
 	foundBrokers := false
 	apiStatus := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
-		table.Print([][]string{{ serviceBroker.Name, serviceBroker.Url, }})
+		table.Print([][]string{{serviceBroker.Name, serviceBroker.Url}})
 		foundBrokers = true
 		return true
 	})

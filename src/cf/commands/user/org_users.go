@@ -63,25 +63,19 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 	}
 
 	for _, role := range roles {
-		stopChan := make(chan bool)
-		defer close(stopChan)
-
 		displayName := orgRoleToDisplayName[role]
 
-		usersChan, statusChan := cmd.userRepo.ListUsersInOrgForRole(org.Guid, role, stopChan)
+		users, apiResponse := cmd.userRepo.ListUsersInOrgForRole(org.Guid, role)
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
 
-		for users := range usersChan {
-			for _, user := range users {
-				cmd.ui.Say("  %s", user.Username)
-			}
+		for _, user := range users {
+			cmd.ui.Say("  %s", user.Username)
 		}
 
-		apiStatus := <-statusChan
-		if apiStatus.IsNotSuccessful() {
-			cmd.ui.Failed("Failed fetching org-users for role %s.\n%s", apiStatus.Message, displayName)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed("Failed fetching org-users for role %s.\n%s", apiResponse.Message, displayName)
 			return
 		}
 	}

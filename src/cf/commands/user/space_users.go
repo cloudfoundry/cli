@@ -65,25 +65,19 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 	)
 
 	for _, role := range spaceRoles {
-		stopChan := make(chan bool)
-		defer close(stopChan)
-
 		displayName := spaceRoleToDisplayName[role]
 
-		usersChan, statusChan := cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role, stopChan)
+		users, apiResponse := cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
 
-		for users := range usersChan {
-			for _, user := range users {
-				cmd.ui.Say("  %s", user.Username)
-			}
+		for _, user := range users {
+			cmd.ui.Say("  %s", user.Username)
 		}
 
-		apiStatus := <-statusChan
-		if apiStatus.IsNotSuccessful() {
-			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiStatus.Message, displayName)
+		if apiResponse.IsNotSuccessful() {
+			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiResponse.Message, displayName)
 			return
 		}
 	}
