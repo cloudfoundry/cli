@@ -6,4 +6,4 @@ SCRIPT_HOME=$( cd "$( dirname "$0" )" && pwd )
 
 base=$SCRIPT_HOME/..
 
-exec env GOPATH=$base $@
+exec env GOPATH=$base "$@"
