@@ -15,64 +15,41 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callCreateRoute(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-route", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewCreateRoute(fakeUI, config, routeRepo)
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestCreateRouteRequirements", func() {
 			routeRepo := &testapi.FakeRouteRepository{}
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-			callCreateRoute(mr.T(), []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+			callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-			callCreateRoute(mr.T(), []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+			callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			callCreateRoute(mr.T(), []string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
+			callCreateRoute([]string{"my-space", "example.com", "-n", "foo"}, reqFactory, routeRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 		})
-		It("TestCreateRouteFailsWithUsage", func() {
 
+		It("TestCreateRouteFailsWithUsage", func() {
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 			routeRepo := &testapi.FakeRouteRepository{}
 
-			ui := callCreateRoute(mr.T(), []string{""}, reqFactory, routeRepo)
+			ui := callCreateRoute([]string{""}, reqFactory, routeRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callCreateRoute(mr.T(), []string{"my-space"}, reqFactory, routeRepo)
+			ui = callCreateRoute([]string{"my-space"}, reqFactory, routeRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callCreateRoute(mr.T(), []string{"my-space", "example.com", "host"}, reqFactory, routeRepo)
+			ui = callCreateRoute([]string{"my-space", "example.com", "host"}, reqFactory, routeRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callCreateRoute(mr.T(), []string{"my-space", "example.com", "-n", "host"}, reqFactory, routeRepo)
+			ui = callCreateRoute([]string{"my-space", "example.com", "-n", "host"}, reqFactory, routeRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 
-			ui = callCreateRoute(mr.T(), []string{"my-space", "example.com"}, reqFactory, routeRepo)
+			ui = callCreateRoute([]string{"my-space", "example.com"}, reqFactory, routeRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
 
@@ -92,7 +69,7 @@ func init() {
 
 			routeRepo := &testapi.FakeRouteRepository{}
 
-			ui := callCreateRoute(mr.T(), []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
+			ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
@@ -136,7 +113,7 @@ func init() {
 				},
 			}
 
-			ui := callCreateRoute(mr.T(), []string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
+			ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Creating route"},
@@ -148,8 +125,8 @@ func init() {
 			assert.Equal(mr.T(), routeRepo.CreateInSpaceDomainGuid, "domain-guid")
 			assert.Equal(mr.T(), routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
 		})
-		It("TestRouteCreator", func() {
 
+		It("TestRouteCreator", func() {
 			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
 			space.Name = "my-space"
@@ -165,18 +142,12 @@ func init() {
 			}
 
 			ui := new(testterm.FakeUI)
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
-			assert.NoError(mr.T(), err)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			config := &configuration.Configuration{
-				OrganizationFields: org,
-				AccessToken:        token,
-			}
+			configRepo := testconfig.NewRepositoryWithAccessToken(configuration.TokenInfo{Username: "my-user"})
+			orgFields := models.OrganizationFields{}
+			orgFields.Name = "my-org"
+			configRepo.SetOrganizationFields(orgFields)
 
-			cmd := NewCreateRoute(ui, config, routeRepo)
+			cmd := NewCreateRoute(ui, configRepo, routeRepo)
 			route, apiResponse := cmd.CreateRoute("my-host", domain, space)
 
 			assert.Equal(mr.T(), route.Guid, createdRoute.Guid)
@@ -193,4 +164,24 @@ func init() {
 			assert.Equal(mr.T(), routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
 		})
 	})
+}
+
+func callCreateRoute(args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (fakeUI *testterm.FakeUI) {
+	fakeUI = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("create-route", args)
+
+	configRepo := testconfig.NewRepositoryWithAccessToken(configuration.TokenInfo{Username: "my-user"})
+
+	spaceFields := models.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := models.OrganizationFields{}
+	orgFields.Name = "my-org"
+	configRepo.SetSpaceFields(spaceFields)
+	configRepo.SetOrganizationFields(orgFields)
+
+	cmd := NewCreateRoute(fakeUI, configRepo, routeRepo)
+
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

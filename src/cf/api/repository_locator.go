@@ -35,7 +35,7 @@ type RepositoryLocator struct {
 	buildpackBitsRepo               CloudControllerBuildpackBitsRepository
 }
 
-func NewRepositoryLocator(config *configuration.Configuration, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
+func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
 	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	uaaGateway := gatewaysByName["uaa"]

@@ -30,24 +30,23 @@ func init() {
 				},
 				"SpaceFields": {
 					"Name": "the-space"
-				},
-				"ApplicationStartTimeout": 5
+				}
 			}`)
 
 			It("returns a populated config object", func() {
-				config, err := ConfigFromJsonV2(json)
-				Expect(err).NotTo(HaveOccurred())
+				configData := NewData()
+				err := JsonUnmarshalV2(json, configData)
 
-				Expect(*config.GetOldConfig()).To(Equal(Configuration{
-					Target:                  "api.example.com",
-					ApiVersion:              "2",
-					AuthorizationEndpoint:   "auth.example.com",
-					LoggregatorEndPoint:     "logs.example.com",
-					AccessToken:             "the-access-token",
-					RefreshToken:            "the-refresh-token",
-					OrganizationFields:      models.OrganizationFields{Name: "the-org"},
-					SpaceFields:             models.SpaceFields{Name: "the-space"},
-					ApplicationStartTimeout: 5,
+				Expect(err).NotTo(HaveOccurred())
+				Expect(configData).To(Equal(&Data{
+					Target:                "api.example.com",
+					ApiVersion:            "2",
+					AuthorizationEndpoint: "auth.example.com",
+					LoggregatorEndPoint:   "logs.example.com",
+					AccessToken:           "the-access-token",
+					RefreshToken:          "the-refresh-token",
+					OrganizationFields:    models.OrganizationFields{Name: "the-org"},
+					SpaceFields:           models.SpaceFields{Name: "the-space"},
 				}))
 			})
 		})

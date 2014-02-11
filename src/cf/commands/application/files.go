@@ -11,12 +11,12 @@ import (
 
 type Files struct {
 	ui           terminal.UI
-	config       *configuration.Configuration
+	config       configuration.Reader
 	appFilesRepo api.AppFilesRepository
 	appReq       requirements.ApplicationRequirement
 }
 
-func NewFiles(ui terminal.UI, config *configuration.Configuration, appFilesRepo api.AppFilesRepository) (cmd *Files) {
+func NewFiles(ui terminal.UI, config configuration.Reader, appFilesRepo api.AppFilesRepository) (cmd *Files) {
 	cmd = new(Files)
 	cmd.ui = ui
 	cmd.config = config
@@ -46,8 +46,8 @@ func (cmd *Files) Run(c *cli.Context) {
 
 	cmd.ui.Say("Getting files for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

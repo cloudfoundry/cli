@@ -6,14 +6,14 @@ import (
 	"cf/models"
 	"cf/net"
 	"encoding/json"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 	testtime "testhelpers/time"
-
-	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
@@ -86,18 +86,18 @@ var newV2NotFoundRequest = testnet.TestRequest{
 type eventTestDependencies struct {
 	server  *httptest.Server
 	handler *testnet.TestHandler
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
 func setupEventTest(t mr.TestingT, requests []testnet.TestRequest) (deps eventTestDependencies) {
 	deps.server, deps.handler = testnet.NewTLSServer(t, requests)
 
-	deps.config = &configuration.Configuration{
-		Target:      deps.server.URL,
-		AccessToken: "BEARER my_access_token",
-	}
+	configRepo := testconfig.NewRepository()
+	configRepo.SetApiEndpoint(deps.server.URL)
+	configRepo.SetAccessToken("BEARER my_access_token")
 
+	deps.config = configRepo
 	deps.gateway = net.NewCloudControllerGateway()
 
 	return

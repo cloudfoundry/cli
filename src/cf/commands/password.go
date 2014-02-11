@@ -11,10 +11,10 @@ import (
 type Password struct {
 	ui      terminal.UI
 	pwdRepo api.PasswordRepository
-	config  *configuration.Configuration
+	config  configuration.ReadWriter
 }
 
-func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config *configuration.Configuration) (cmd Password) {
+func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config configuration.ReadWriter) (cmd Password) {
 	cmd.ui = ui
 	cmd.pwdRepo = pwdRepo
 	cmd.config = config

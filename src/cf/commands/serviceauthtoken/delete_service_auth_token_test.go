@@ -2,7 +2,6 @@ package serviceauthtoken_test
 
 import (
 	. "cf/commands/serviceauthtoken"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -21,19 +20,7 @@ func callDeleteServiceAuthToken(t mr.TestingT, args []string, inputs []string, r
 		Inputs: inputs,
 	}
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewDeleteServiceAuthToken(ui, config, authTokenRepo)
 	ctxt := testcmd.NewContext("delete-service-auth-token", args)

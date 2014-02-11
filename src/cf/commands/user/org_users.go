@@ -21,12 +21,12 @@ var orgRoleToDisplayName = map[string]string{
 
 type OrgUsers struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	orgReq   requirements.OrganizationRequirement
 	userRepo api.UserRepository
 }
 
-func NewOrgUsers(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd *OrgUsers) {
+func NewOrgUsers(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd *OrgUsers) {
 	cmd = new(OrgUsers)
 	cmd.ui = ui
 	cmd.config = config

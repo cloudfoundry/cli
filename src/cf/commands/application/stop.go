@@ -16,12 +16,12 @@ type ApplicationStopper interface {
 
 type Stop struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewStop(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *Stop) {
+func NewStop(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *Stop) {
 	cmd = new(Stop)
 	cmd.ui = ui
 	cmd.config = config
@@ -52,8 +52,8 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 
 	cmd.ui.Say("Stopping app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

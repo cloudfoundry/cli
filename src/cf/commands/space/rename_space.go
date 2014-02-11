@@ -11,12 +11,12 @@ import (
 
 type RenameSpace struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.ReadWriter
 	spaceRepo api.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewRenameSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd *RenameSpace) {
+func NewRenameSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo api.SpaceRepository) (cmd *RenameSpace) {
 	cmd = new(RenameSpace)
 	cmd.ui = ui
 	cmd.config = config
@@ -45,7 +45,7 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming space %s to %s in org %s as %s...",
 		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(newName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -55,8 +55,9 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 		return
 	}
 
-	if cmd.config.SpaceFields.Guid == space.Guid {
-		cmd.config.SpaceFields.Name = newName
+	if cmd.config.SpaceFields().Guid == space.Guid {
+		space.Name = newName
+		cmd.config.SetSpaceFields(space.SpaceFields)
 	}
 
 	cmd.ui.Ok()

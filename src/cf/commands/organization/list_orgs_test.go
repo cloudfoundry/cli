@@ -15,7 +15,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListOrgs(config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
+func callListOrgs(config configuration.Reader, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("orgs", []string{})
 	cmd := organization.NewListOrgs(fakeUI, config, orgRepo)
@@ -24,9 +24,10 @@ func callListOrgs(config *configuration.Configuration, reqFactory *testreq.FakeR
 }
 func init() {
 	Describe("Testing with ginkgo", func() {
+
 		It("TestListOrgsRequirements", func() {
 			orgRepo := &testapi.FakeOrgRepository{}
-			config := &configuration.Configuration{}
+			config := testconfig.NewRepository()
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 			callListOrgs(config, reqFactory, orgRepo)
@@ -36,8 +37,8 @@ func init() {
 			callListOrgs(config, reqFactory, orgRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
-		It("TestListAllPagesOfOrgs", func() {
 
+		It("TestListAllPagesOfOrgs", func() {
 			org1 := models.Organization{}
 			org1.Name = "Organization-1"
 
@@ -52,11 +53,8 @@ func init() {
 			}
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-
 			tokenInfo := configuration.TokenInfo{Username: "my-user"}
-			accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(tokenInfo)
-			assert.NoError(mr.T(), err)
-			config := &configuration.Configuration{AccessToken: accessToken}
+			config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
 
 			ui := callListOrgs(config, reqFactory, orgRepo)
 
@@ -67,19 +65,16 @@ func init() {
 				{"Organization-3"},
 			})
 		})
-		It("TestListNoOrgs", func() {
 
+		It("TestListNoOrgs", func() {
 			orgs := []models.Organization{}
 			orgRepo := &testapi.FakeOrgRepository{
 				Organizations: orgs,
 			}
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-
 			tokenInfo := configuration.TokenInfo{Username: "my-user"}
-			accessToken, err := testconfig.CreateAccessTokenWithTokenInfo(tokenInfo)
-			assert.NoError(mr.T(), err)
-			config := &configuration.Configuration{AccessToken: accessToken}
+			config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
 
 			ui := callListOrgs(config, reqFactory, orgRepo)
 

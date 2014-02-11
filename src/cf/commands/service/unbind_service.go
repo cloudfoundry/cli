@@ -11,13 +11,13 @@ import (
 
 type UnbindService struct {
 	ui                 terminal.UI
-	config             *configuration.Configuration
+	config             configuration.Reader
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewUnbindService(ui terminal.UI, config *configuration.Configuration, serviceBindingRepo api.ServiceBindingRepository) (cmd *UnbindService) {
+func NewUnbindService(ui terminal.UI, config configuration.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *UnbindService) {
 	cmd = new(UnbindService)
 	cmd.ui = ui
 	cmd.config = config
@@ -49,8 +49,8 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	cmd.ui.Say("Unbinding app %s from service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(instance.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

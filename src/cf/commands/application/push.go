@@ -22,7 +22,7 @@ import (
 
 type Push struct {
 	ui             terminal.UI
-	config         *configuration.Configuration
+	config         configuration.Reader
 	manifestRepo   manifest.ManifestRepository
 	starter        ApplicationStarter
 	stopper        ApplicationStopper
@@ -36,7 +36,7 @@ type Push struct {
 	globalServices []models.ServiceInstance
 }
 
-func NewPush(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository,
+func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.ManifestRepository,
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository) (cmd *Push) {
@@ -100,7 +100,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 			return
 		}
 
-		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields.Name, cmd.config.SpaceFields.Name, cmd.config.Username())
+		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, cmd.config.Username())
 		bindResponse := cmd.binder.BindApplication(app, serviceInstance)
 		cmd.ui.Ok()
 
@@ -238,7 +238,7 @@ func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.Domain
 	var apiResponse net.ApiResponse
 
 	if domainName != "" {
-		domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields.Guid)
+		domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields().Guid)
 		if apiResponse.IsNotSuccessful() {
 			cmd.ui.Failed(apiResponse.Message)
 		}
@@ -328,12 +328,13 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 }
 
 func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiResponse net.ApiResponse) {
-	appParams.SpaceGuid = &cmd.config.SpaceFields.Guid
+	spaceGuid := cmd.config.SpaceFields().Guid
+	appParams.SpaceGuid = &spaceGuid
 
 	cmd.ui.Say("Creating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(*appParams.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -352,8 +353,8 @@ func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, 
 func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (updatedApp models.Application) {
 	cmd.ui.Say("Updating app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

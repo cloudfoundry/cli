@@ -29,43 +29,44 @@ func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestLoadingWithNoConfigFile", func() {
 			withFakeHome(mr.T(), func(configPath string) {
-				repo := NewConfigurationDiskRepository(configPath)
-				config, err := repo.Load()
+				repo := NewDiskPersistor(configPath)
+				configData, err := repo.Load()
 				assert.NoError(mr.T(), err)
 
-				assert.Equal(mr.T(), config.ApiEndpoint(), "")
-				assert.Equal(mr.T(), config.ApiVersion(), "")
-				assert.Equal(mr.T(), config.AuthorizationEndpoint(), "")
-				assert.Equal(mr.T(), config.AccessToken(), "")
+				assert.Equal(mr.T(), configData.Target, "")
+				assert.Equal(mr.T(), configData.ApiVersion, "")
+				assert.Equal(mr.T(), configData.AuthorizationEndpoint, "")
+				assert.Equal(mr.T(), configData.AccessToken, "")
 			})
 		})
 
 		It("TestSavingAndLoading", func() {
 			withFakeHome(mr.T(), func(configPath string) {
-				repo := NewConfigurationDiskRepository(configPath)
-				config, err := repo.Load()
+				repo := NewDiskPersistor(configPath)
+				configData, err := repo.Load()
 				assert.NoError(mr.T(), err)
 
-				config.SetApiVersion("3.1.0")
-				config.SetApiEndpoint("https://api.target.example.com")
-				config.SetAuthorizationEndpoint("https://login.target.example.com")
-				config.SetAccessToken("bearer my_access_token")
+				configData.ApiVersion = "3.1.0"
+				configData.Target = "https://api.target.example.com"
+				configData.AuthorizationEndpoint = "https://login.target.example.com"
+				configData.AccessToken = "bearer my_access_token"
 
-				repo.Save(config)
+				err = repo.Save(configData)
+				assert.NoError(mr.T(), err)
 
 				savedConfig, err := repo.Load()
 				assert.NoError(mr.T(), err)
-				assert.Equal(mr.T(), savedConfig, config)
+				assert.Equal(mr.T(), savedConfig, configData)
 			})
 		})
 
 		It("TestReadingOutdatedConfigReturnsNewConfig", func() {
 			withConfigFixture(mr.T(), "outdated-config", func(configPath string) {
-				repo := NewConfigurationDiskRepository(configPath)
-				config, err := repo.Load()
+				repo := NewDiskPersistor(configPath)
+				configData, err := repo.Load()
 
 				assert.NoError(mr.T(), err)
-				assert.Equal(mr.T(), config.ApiEndpoint(), "")
+				assert.Equal(mr.T(), configData.Target, "")
 			})
 		})
 	})

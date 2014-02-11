@@ -42,11 +42,11 @@ type DomainRepository interface {
 }
 
 type CloudControllerDomainRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerDomainRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerDomainRepository) {
+func NewCloudControllerDomainRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerDomainRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -71,8 +71,8 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb
 
 func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiResponse net.ApiResponse) {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.Target,
-		repo.config.AccessToken,
+		repo.config.ApiEndpoint(),
+		repo.config.AccessToken(),
 		path,
 		DomainResource{},
 		func(resource interface{}) bool {
@@ -124,13 +124,13 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid)
 	resource := new(DomainResource)
 
-	path := repo.config.Target + "/v2/private_domains"
-	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
+	path := repo.config.ApiEndpoint() + "/v2/private_domains"
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 
 	if apiResponse.IsNotFound() {
-		path := repo.config.Target + "/v2/domains"
+		path := repo.config.ApiEndpoint() + "/v2/domains"
 		data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s", "wildcard": true}`, domainName, owningOrgGuid)
-		apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
+		apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 	}
 
 	if apiResponse.IsSuccessful() {
@@ -140,36 +140,36 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 }
 
 func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiResponse net.ApiResponse) {
-	path := repo.config.Target + "/v2/shared_domains"
+	path := repo.config.ApiEndpoint() + "/v2/shared_domains"
 	data := strings.NewReader(fmt.Sprintf(`{"name":"%s"}`, domainName))
-	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, data)
+	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
 
 	if apiResponse.IsNotFound() {
-		path := repo.config.Target + "/v2/domains"
+		path := repo.config.ApiEndpoint() + "/v2/domains"
 		data := strings.NewReader(fmt.Sprintf(`{"name":"%s", "wildcard": true}`, domainName))
-		apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, data)
+		apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
 	}
 	return
 }
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.Target, domainGuid)
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
+	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
 	if apiResponse.IsNotFound() {
-		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domainGuid)
-		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
+		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	}
 	return
 }
 
 func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/shared_domains/%s?recursive=true", repo.config.Target, domainGuid)
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+	path := fmt.Sprintf("%s/v2/shared_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
+	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
 	if apiResponse.IsNotFound() {
-		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.Target, domainGuid)
-		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
+		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	}
 	return
 }

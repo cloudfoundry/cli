@@ -12,11 +12,11 @@ import (
 
 type CreateUserFields struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	userRepo api.UserRepository
 }
 
-func NewCreateUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd CreateUserFields) {
+func NewCreateUser(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd CreateUserFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userRepo = userRepo

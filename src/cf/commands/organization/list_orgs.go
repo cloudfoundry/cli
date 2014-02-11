@@ -11,11 +11,11 @@ import (
 
 type ListOrgs struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	orgRepo api.OrganizationRepository
 }
 
-func NewListOrgs(ui terminal.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository) (cmd ListOrgs) {
+func NewListOrgs(ui terminal.UI, config configuration.Reader, orgRepo api.OrganizationRepository) (cmd ListOrgs) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.orgRepo = orgRepo

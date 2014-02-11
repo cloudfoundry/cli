@@ -28,6 +28,7 @@ func init() {
 			assert.Equal(mr.T(), spaceRepo.FindByNameName, "awesome-sauce-space")
 			assert.Equal(mr.T(), spaceReq.GetSpace(), space)
 		})
+
 		It("TestSpaceReqExecuteWhenSpaceNotFound", func() {
 
 			spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}

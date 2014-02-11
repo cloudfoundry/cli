@@ -11,11 +11,11 @@ import (
 
 type ShowSpace struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	spaceReq requirements.SpaceRequirement
 }
 
-func NewShowSpace(ui terminal.UI, config *configuration.Configuration) (cmd *ShowSpace) {
+func NewShowSpace(ui terminal.UI, config configuration.Reader) (cmd *ShowSpace) {
 	cmd = new(ShowSpace)
 	cmd.ui = ui
 	cmd.config = config

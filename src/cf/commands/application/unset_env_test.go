@@ -3,7 +3,6 @@ package application_test
 import (
 	"cf/api"
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -16,28 +15,6 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callUnsetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("unset-env", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewUnsetEnv(ui, config, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestUnsetEnvRequirements", func() {
@@ -48,15 +25,15 @@ func init() {
 			args := []string{"my-app", "DATABASE_URL"}
 
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			callUnsetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
-			callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			callUnsetEnv(args, reqFactory, appRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
-			callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			callUnsetEnv(args, reqFactory, appRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
 		It("TestUnsetEnvWhenApplicationExists", func() {
@@ -69,7 +46,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{}
 
 			args := []string{"my-app", "DATABASE_URL"}
-			ui := callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callUnsetEnv(args, reqFactory, appRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
@@ -96,7 +73,7 @@ func init() {
 			}
 
 			args := []string{"does-not-exist", "DATABASE_URL"}
-			ui := callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callUnsetEnv(args, reqFactory, appRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Removing env variable"},
@@ -113,7 +90,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{}
 
 			args := []string{"my-app", "DATABASE_URL"}
-			ui := callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callUnsetEnv(args, reqFactory, appRepo)
 
 			assert.Equal(mr.T(), len(ui.Outputs), 3)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -131,16 +108,25 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 
 			args := []string{"my-app", "DATABASE_URL"}
-			ui := callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callUnsetEnv(args, reqFactory, appRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 
 			args = []string{"my-app"}
-			ui = callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			ui = callUnsetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
 			args = []string{}
-			ui = callUnsetEnv(mr.T(), args, reqFactory, appRepo)
+			ui = callUnsetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 		})
 	})
+}
+
+func callUnsetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("unset-env", args)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewUnsetEnv(ui, configRepo, appRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

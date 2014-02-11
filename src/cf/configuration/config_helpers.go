@@ -6,8 +6,7 @@ import (
 	"runtime"
 )
 
-// Keep this one public for configtest/configuration.go
-func ConfigFilePath() string {
+func DefaultFilePath() string {
 	var configDir string
 
 	if os.Getenv("CF_HOME") != "" {

@@ -6,7 +6,7 @@ import (
 )
 
 type FakeAuthenticationRepository struct {
-	Config   *configuration.Configuration
+	Config   configuration.ReadWriter
 	Email    string
 	Password string
 
@@ -28,8 +28,8 @@ func (auth *FakeAuthenticationRepository) Authenticate(email string, password st
 		auth.AccessToken = "BEARER some_access_token"
 	}
 
-	auth.Config.AccessToken = auth.AccessToken
-	auth.Config.RefreshToken = auth.RefreshToken
+	auth.Config.SetAccessToken(auth.AccessToken)
+	auth.Config.SetRefreshToken(auth.RefreshToken)
 
 	return
 }

@@ -11,12 +11,12 @@ import (
 
 type DeleteDomain struct {
 	ui         terminal.UI
-	config     *configuration.Configuration
+	config     configuration.Reader
 	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
-func NewDeleteDomain(ui terminal.UI, config *configuration.Configuration, repo api.DomainRepository) (cmd *DeleteDomain) {
+func NewDeleteDomain(ui terminal.UI, config configuration.Reader, repo api.DomainRepository) (cmd *DeleteDomain) {
 	cmd = new(DeleteDomain)
 	cmd.ui = ui
 	cmd.config = config

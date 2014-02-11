@@ -6,7 +6,7 @@ import (
 )
 
 type FakeEndpointRepo struct {
-	Config *configuration.Configuration
+	Config configuration.ReadWriter
 
 	UpdateEndpointReceived string
 	UpdateEndpointError    net.ApiResponse
@@ -30,7 +30,7 @@ func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint str
 		return
 	}
 
-	repo.Config.Target = endpoint
+	repo.Config.SetApiEndpoint(endpoint)
 	finalEndpoint = endpoint
 	return
 }

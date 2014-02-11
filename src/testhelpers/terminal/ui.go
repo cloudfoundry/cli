@@ -95,7 +95,7 @@ func (ui *FakeUI) ClearOutputs() {
 	ui.Outputs = []string{}
 }
 
-func (ui *FakeUI) ShowConfiguration(config *configuration.Configuration) {
+func (ui *FakeUI) ShowConfiguration(config configuration.Reader) {
 	ui.ShowConfigurationCalled = true
 }
 

@@ -13,12 +13,12 @@ import (
 
 type UpdateUserProvidedService struct {
 	ui                              terminal.UI
-	config                          *configuration.Configuration
+	config                          configuration.Reader
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 	serviceInstanceReq              requirements.ServiceInstanceRequirement
 }
 
-func NewUpdateUserProvidedService(ui terminal.UI, config *configuration.Configuration, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd *UpdateUserProvidedService) {
+func NewUpdateUserProvidedService(ui terminal.UI, config configuration.Reader, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd *UpdateUserProvidedService) {
 	cmd = new(UpdateUserProvidedService)
 	cmd.ui = ui
 	cmd.config = config
@@ -66,8 +66,8 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Updating user provided service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(serviceInstance.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

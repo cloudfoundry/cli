@@ -16,7 +16,7 @@ import (
 
 type ShowApp struct {
 	ui               terminal.UI
-	config           *configuration.Configuration
+	config           configuration.Reader
 	appSummaryRepo   api.AppSummaryRepository
 	appInstancesRepo api.AppInstancesRepository
 	appReq           requirements.ApplicationRequirement
@@ -26,7 +26,7 @@ type ApplicationDisplayer interface {
 	ShowApp(app models.Application)
 }
 
-func NewShowApp(ui terminal.UI, config *configuration.Configuration, appSummaryRepo api.AppSummaryRepository, appInstancesRepo api.AppInstancesRepository) (cmd *ShowApp) {
+func NewShowApp(ui terminal.UI, config configuration.Reader, appSummaryRepo api.AppSummaryRepository, appInstancesRepo api.AppInstancesRepository) (cmd *ShowApp) {
 	cmd = new(ShowApp)
 	cmd.ui = ui
 	cmd.config = config
@@ -61,8 +61,8 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 
 	cmd.ui.Say("Showing health and status for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

@@ -15,10 +15,10 @@ type TargetedOrgRequirement interface {
 
 type targetedOrgApiRequirement struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Reader
 }
 
-func NewTargetedOrgRequirement(ui terminal.UI, config *configuration.Configuration) TargetedOrgRequirement {
+func NewTargetedOrgRequirement(ui terminal.UI, config configuration.Reader) TargetedOrgRequirement {
 	return targetedOrgApiRequirement{ui, config}
 }
 
@@ -34,5 +34,5 @@ func (req targetedOrgApiRequirement) Execute() (success bool) {
 }
 
 func (req targetedOrgApiRequirement) GetOrganizationFields() (org models.OrganizationFields) {
-	return req.config.OrganizationFields
+	return req.config.OrganizationFields()
 }

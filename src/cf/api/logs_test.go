@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
@@ -11,6 +10,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	"time"
 )
 
@@ -116,11 +116,12 @@ func setupTestServerAndLogsRepo(messages ...[]byte) (testServer *httptest.Server
 
 	testServer = httptest.NewTLSServer(websocket.Handler(requestHandler.handlerFunc))
 
-	config := &configuration.Configuration{AccessToken: "BEARER my_access_token", Target: "https://localhost"}
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	configRepo.SetApiEndpoint("https://localhost")
 	endpointRepo := &testapi.FakeEndpointRepo{}
 	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(testServer.URL, "https", "wss", 1)
 
-	repo := NewLoggregatorLogsRepository(config, endpointRepo)
+	repo := NewLoggregatorLogsRepository(configRepo, endpointRepo)
 	logsRepo = &repo
 	return
 }

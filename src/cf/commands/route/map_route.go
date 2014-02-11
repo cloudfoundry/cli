@@ -11,14 +11,14 @@ import (
 
 type MapRoute struct {
 	ui           terminal.UI
-	config       *configuration.Configuration
+	config       configuration.Reader
 	routeRepo    api.RouteRepository
 	appReq       requirements.ApplicationRequirement
 	domainReq    requirements.DomainRequirement
 	routeCreator RouteCreator
 }
 
-func NewMapRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository, routeCreator RouteCreator) (cmd *MapRoute) {
+func NewMapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository, routeCreator RouteCreator) (cmd *MapRoute) {
 	cmd = new(MapRoute)
 	cmd.ui = ui
 	cmd.config = config
@@ -53,15 +53,15 @@ func (cmd *MapRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, apiResponse := cmd.routeCreator.CreateRoute(hostName, domain, cmd.config.SpaceFields)
+	route, apiResponse := cmd.routeCreator.CreateRoute(hostName, domain, cmd.config.SpaceFields())
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed("Error resolving route:\n%s", apiResponse.Message)
 	}
 	cmd.ui.Say("Adding route %s to app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(route.URL()),
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

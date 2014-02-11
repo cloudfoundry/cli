@@ -9,11 +9,12 @@ import (
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
+	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
 
-func callApi(args []string, config *configuration.Configuration, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
+func callApi(args []string, config configuration.Reader, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
 	cmd := NewApi(ui, config, endpointRepo)
@@ -22,13 +23,14 @@ func callApi(args []string, config *configuration.Configuration, endpointRepo *t
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
+
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestApiWithoutArgument", func() {
-			config := &configuration.Configuration{
-				Target:     "https://api.run.pivotal.io",
-				ApiVersion: "2.0",
-			}
+			config := testconfig.NewRepository()
+			config.SetApiEndpoint("https://api.run.pivotal.io")
+			config.SetApiVersion("2.0")
+
 			endpointRepo := &testapi.FakeEndpointRepo{Config: config}
 
 			ui := callApi([]string{}, config, endpointRepo)
@@ -40,7 +42,7 @@ func init() {
 		})
 
 		It("TestApiWhenChangingTheEndpoint", func() {
-			config := &configuration.Configuration{}
+			config := testconfig.NewRepository()
 			endpointRepo := &testapi.FakeEndpointRepo{Config: config}
 
 			ui := callApi([]string{"http://example.com"}, config, endpointRepo)
@@ -53,7 +55,7 @@ func init() {
 		})
 
 		It("TestApiWithTrailingSlash", func() {
-			config := &configuration.Configuration{}
+			config := testconfig.NewRepository()
 			endpointRepo := &testapi.FakeEndpointRepo{Config: config}
 
 			ui := callApi([]string{"https://example.com/"}, config, endpointRepo)
@@ -64,5 +66,6 @@ func init() {
 				{"OK"},
 			})
 		})
+
 	})
 }

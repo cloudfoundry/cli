@@ -2,10 +2,8 @@ package route_test
 
 import (
 	. "cf/commands/route"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -15,31 +13,6 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListRoutes(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {
-
-	ui = &testterm.FakeUI{}
-
-	ctxt := testcmd.NewContext("routes", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewListRoutes(ui, config, routeRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestListingRoutes", func() {
@@ -79,7 +52,7 @@ func init() {
 
 			routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
-			ui := callListRoutes(mr.T(), []string{}, &testreq.FakeReqFactory{}, routeRepo)
+			ui := callListRoutes([]string{}, &testreq.FakeReqFactory{}, routeRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Getting routes", "my-user"},
@@ -94,7 +67,7 @@ func init() {
 			routes := []models.Route{}
 			routeRepo := &testapi.FakeRouteRepository{Routes: routes}
 
-			ui := callListRoutes(mr.T(), []string{}, &testreq.FakeReqFactory{}, routeRepo)
+			ui := callListRoutes([]string{}, &testreq.FakeReqFactory{}, routeRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Getting routes"},
@@ -105,7 +78,7 @@ func init() {
 
 			routeRepo := &testapi.FakeRouteRepository{ListErr: true}
 
-			ui := callListRoutes(mr.T(), []string{}, &testreq.FakeReqFactory{}, routeRepo)
+			ui := callListRoutes([]string{}, &testreq.FakeReqFactory{}, routeRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Getting routes"},
@@ -113,4 +86,14 @@ func init() {
 			})
 		})
 	})
+}
+
+func callListRoutes(args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("routes", args)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewListRoutes(ui, configRepo, routeRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+
+	return
 }

@@ -12,11 +12,11 @@ import (
 
 type ShowOrg struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Reader
 	orgReq requirements.OrganizationRequirement
 }
 
-func NewShowOrg(ui terminal.UI, config *configuration.Configuration) (cmd *ShowOrg) {
+func NewShowOrg(ui terminal.UI, config configuration.Reader) (cmd *ShowOrg) {
 	cmd = new(ShowOrg)
 	cmd.ui = ui
 	cmd.config = config

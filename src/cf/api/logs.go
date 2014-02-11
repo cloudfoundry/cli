@@ -20,11 +20,11 @@ type LogsRepository interface {
 }
 
 type LoggregatorLogsRepository struct {
-	config       *configuration.Configuration
+	config       configuration.Reader
 	endpointRepo EndpointRepository
 }
 
-func NewLoggregatorLogsRepository(config *configuration.Configuration, endpointRepo EndpointRepository) (repo LoggregatorLogsRepository) {
+func NewLoggregatorLogsRepository(config configuration.Reader, endpointRepo EndpointRepository) (repo LoggregatorLogsRepository) {
 	repo.config = config
 	repo.endpointRepo = endpointRepo
 	return
@@ -59,15 +59,15 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 	inputChan := make(chan *logmessage.Message, LogBufferSize)
 	messageQueue := NewSortedMessageQueue(printTimeBuffer, time.Now)
 
-	config, err := websocket.NewConfig(location, "http://localhost")
+	wsConfig, err := websocket.NewConfig(location, "http://localhost")
 	if err != nil {
 		return
 	}
 
-	config.Header.Add("Authorization", repo.config.AccessToken)
-	config.TlsConfig = &tls.Config{InsecureSkipVerify: true}
+	wsConfig.Header.Add("Authorization", repo.config.AccessToken())
+	wsConfig.TlsConfig = &tls.Config{InsecureSkipVerify: true}
 
-	ws, err := websocket.DialConfig(config)
+	ws, err := websocket.DialConfig(wsConfig)
 	if err != nil {
 		return
 	}

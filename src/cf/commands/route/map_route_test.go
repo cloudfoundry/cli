@@ -2,7 +2,6 @@ package route_test
 
 import (
 	. "cf/commands/route"
-	"cf/configuration"
 	"cf/models"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
@@ -20,22 +19,8 @@ func callMapRoute(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFacto
 	ui = new(testterm.FakeUI)
 	var ctxt *cli.Context = testcmd.NewContext("map-route", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewMapRoute(ui, config, routeRepo, createRoute)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewMapRoute(ui, configRepo, routeRepo, createRoute)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

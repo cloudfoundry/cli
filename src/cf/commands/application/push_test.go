@@ -2,7 +2,6 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/manifest"
 	"cf/models"
 	"cf/net"
@@ -24,135 +23,10 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func singleAppManifest() *manifest.Manifest {
-	name := "manifest-app-name"
-	memory := uint64(128)
-	instances := 1
-	host := "manifest-host"
-	domain := "manifest-example.com"
-	stack := "custom-stack"
-	timeout := 360
-	buildpackUrl := "some-buildpack"
-	command := `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`
-	path := "/some/path/from/manifest"
-
-	return &manifest.Manifest{
-		Applications: []models.AppParams{
-			models.AppParams{
-				Name:               &name,
-				Memory:             &memory,
-				InstanceCount:      &instances,
-				Host:               &host,
-				Domain:             &domain,
-				StackName:          &stack,
-				HealthCheckTimeout: &timeout,
-				BuildpackUrl:       &buildpackUrl,
-				Command:            &command,
-				Path:               &path,
-				EnvironmentVars: &map[string]string{
-					"FOO":  "baz",
-					"PATH": "/u/apps/my-app/bin",
-				},
-			},
-		},
-	}
-}
-
-func manifestWithServicesAndEnv() *manifest.Manifest {
-	name1 := "app1"
-	name2 := "app2"
-	return &manifest.Manifest{
-		Applications: []models.AppParams{
-			models.AppParams{
-				Name:     &name1,
-				Services: &[]string{"app1-service", "global-service"},
-				EnvironmentVars: &map[string]string{
-					"SOMETHING": "definitely-something",
-				},
-			},
-			models.AppParams{
-				Name:     &name2,
-				Services: &[]string{"app2-service", "global-service"},
-				EnvironmentVars: &map[string]string{
-					"SOMETHING": "nothing",
-				},
-			},
-		},
-	}
-}
-
-type pushDependencies struct {
-	manifestRepo *testmanifest.FakeManifestRepository
-	starter      *testcmd.FakeAppStarter
-	stopper      *testcmd.FakeAppStopper
-	binder       *testcmd.FakeAppBinder
-	appRepo      *testapi.FakeApplicationRepository
-	domainRepo   *testapi.FakeDomainRepository
-	routeRepo    *testapi.FakeRouteRepository
-	stackRepo    *testapi.FakeStackRepository
-	appBitsRepo  *testapi.FakeApplicationBitsRepository
-	serviceRepo  *testapi.FakeServiceRepo
-}
-
-func getPushDependencies() (deps pushDependencies) {
-	deps.manifestRepo = &testmanifest.FakeManifestRepository{}
-	deps.starter = &testcmd.FakeAppStarter{}
-	deps.stopper = &testcmd.FakeAppStopper{}
-	deps.binder = &testcmd.FakeAppBinder{}
-	deps.appRepo = &testapi.FakeApplicationRepository{}
-
-	deps.domainRepo = &testapi.FakeDomainRepository{}
-	sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-	deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
-
-	deps.routeRepo = &testapi.FakeRouteRepository{}
-	deps.stackRepo = &testapi.FakeStackRepository{}
-	deps.appBitsRepo = &testapi.FakeApplicationBitsRepository{}
-	deps.serviceRepo = &testapi.FakeServiceRepo{}
-
-	return
-}
-
-func callPush(t mr.TestingT, args []string, deps pushDependencies) (ui *testterm.FakeUI) {
-
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("push", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := maker.NewOrgFields(maker.Overrides{"name": "my-org", "guid": "my-org-guid"})
-	space := maker.NewSpaceFields(maker.Overrides{"name": "my-space", "guid": "my-space-guid"})
-
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	manifestRepo := deps.manifestRepo
-	starter := deps.starter
-	stopper := deps.stopper
-	binder := deps.binder
-	appRepo := deps.appRepo
-	domainRepo := deps.domainRepo
-	routeRepo := deps.routeRepo
-	stackRepo := deps.stackRepo
-	appBitsRepo := deps.appBitsRepo
-	serviceRepo := deps.serviceRepo
-
-	cmd := NewPush(ui, config, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo)
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-
-	return
-}
-
 var _ = Describe("Push Command", func() {
 	It("TestPushingRequirements", func() {
 		ui := new(testterm.FakeUI)
-		config := &configuration.Configuration{}
+		configRepo := testconfig.NewRepository()
 		deps := getPushDependencies()
 		manifestRepo := deps.manifestRepo
 		starter := deps.starter
@@ -165,7 +39,7 @@ var _ = Describe("Push Command", func() {
 		appBitsRepo := deps.appBitsRepo
 		serviceRepo := deps.serviceRepo
 
-		cmd := NewPush(ui, config, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo)
+		cmd := NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo)
 		ctxt := testcmd.NewContext("push", []string{})
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -1126,3 +1000,108 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 })
+
+func singleAppManifest() *manifest.Manifest {
+	name := "manifest-app-name"
+	memory := uint64(128)
+	instances := 1
+	host := "manifest-host"
+	domain := "manifest-example.com"
+	stack := "custom-stack"
+	timeout := 360
+	buildpackUrl := "some-buildpack"
+	command := `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`
+	path := "/some/path/from/manifest"
+
+	return &manifest.Manifest{
+		Applications: []models.AppParams{
+			models.AppParams{
+				Name:               &name,
+				Memory:             &memory,
+				InstanceCount:      &instances,
+				Host:               &host,
+				Domain:             &domain,
+				StackName:          &stack,
+				HealthCheckTimeout: &timeout,
+				BuildpackUrl:       &buildpackUrl,
+				Command:            &command,
+				Path:               &path,
+				EnvironmentVars: &map[string]string{
+					"FOO":  "baz",
+					"PATH": "/u/apps/my-app/bin",
+				},
+			},
+		},
+	}
+}
+
+func manifestWithServicesAndEnv() *manifest.Manifest {
+	name1 := "app1"
+	name2 := "app2"
+	return &manifest.Manifest{
+		Applications: []models.AppParams{
+			models.AppParams{
+				Name:     &name1,
+				Services: &[]string{"app1-service", "global-service"},
+				EnvironmentVars: &map[string]string{
+					"SOMETHING": "definitely-something",
+				},
+			},
+			models.AppParams{
+				Name:     &name2,
+				Services: &[]string{"app2-service", "global-service"},
+				EnvironmentVars: &map[string]string{
+					"SOMETHING": "nothing",
+				},
+			},
+		},
+	}
+}
+
+type pushDependencies struct {
+	manifestRepo *testmanifest.FakeManifestRepository
+	starter      *testcmd.FakeAppStarter
+	stopper      *testcmd.FakeAppStopper
+	binder       *testcmd.FakeAppBinder
+	appRepo      *testapi.FakeApplicationRepository
+	domainRepo   *testapi.FakeDomainRepository
+	routeRepo    *testapi.FakeRouteRepository
+	stackRepo    *testapi.FakeStackRepository
+	appBitsRepo  *testapi.FakeApplicationBitsRepository
+	serviceRepo  *testapi.FakeServiceRepo
+}
+
+func getPushDependencies() (deps pushDependencies) {
+	deps.manifestRepo = &testmanifest.FakeManifestRepository{}
+	deps.starter = &testcmd.FakeAppStarter{}
+	deps.stopper = &testcmd.FakeAppStopper{}
+	deps.binder = &testcmd.FakeAppBinder{}
+	deps.appRepo = &testapi.FakeApplicationRepository{}
+
+	deps.domainRepo = &testapi.FakeDomainRepository{}
+	sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
+	deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
+
+	deps.routeRepo = &testapi.FakeRouteRepository{}
+	deps.stackRepo = &testapi.FakeStackRepository{}
+	deps.appBitsRepo = &testapi.FakeApplicationBitsRepository{}
+	deps.serviceRepo = &testapi.FakeServiceRepo{}
+
+	return
+}
+
+func callPush(t mr.TestingT, args []string, deps pushDependencies) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("push", args)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+
+	cmd := NewPush(ui, configRepo, deps.manifestRepo, deps.starter,
+		deps.stopper, deps.binder, deps.appRepo, deps.domainRepo,
+		deps.routeRepo, deps.stackRepo, deps.serviceRepo, deps.appBitsRepo)
+
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+
+	return
+}

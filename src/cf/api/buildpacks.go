@@ -19,11 +19,11 @@ type BuildpackRepository interface {
 }
 
 type CloudControllerBuildpackRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerBuildpackRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerBuildpackRepository) {
+func NewCloudControllerBuildpackRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerBuildpackRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -31,8 +31,8 @@ func NewCloudControllerBuildpackRepository(config *configuration.Configuration, 
 
 func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) net.ApiResponse {
 	return repo.gateway.ListPaginatedResources(
-		repo.config.Target,
-		repo.config.AccessToken,
+		repo.config.ApiEndpoint(),
+		repo.config.AccessToken(),
 		buildpacks_path,
 		BuildpackResource{},
 		func(resource interface{}) bool {
@@ -43,8 +43,8 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
 	foundIt := false
 	apiResponse = repo.gateway.ListPaginatedResources(
-		repo.config.Target,
-		repo.config.AccessToken,
+		repo.config.ApiEndpoint(),
+		repo.config.AccessToken(),
 		fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name)),
 		BuildpackResource{},
 		func(resource interface{}) bool {
@@ -60,7 +60,7 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 }
 
 func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse) {
-	path := repo.config.Target + buildpacks_path
+	path := repo.config.ApiEndpoint() + buildpacks_path
 	entity := BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
 	if err != nil {
@@ -69,7 +69,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(BuildpackResource)
-	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, bytes.NewReader(body), resource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -79,13 +79,13 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 }
 
 func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpackGuid)
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken)
+	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpackGuid)
+	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	return
 }
 
 func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s%s/%s", repo.config.Target, buildpacks_path, buildpack.Guid)
+	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
 
 	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled, "", "", buildpack.Locked}
 
@@ -96,7 +96,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	resource := new(BuildpackResource)
-	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, bytes.NewReader(body), resource)
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

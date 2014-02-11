@@ -12,14 +12,14 @@ import (
 type Api struct {
 	ui           terminal.UI
 	endpointRepo api.EndpointRepository
-	config       *configuration.Configuration
+	config       configuration.Reader
 }
 
 type ApiEndpointSetter interface {
 	SetApiEndpoint(endpoint string)
 }
 
-func NewApi(ui terminal.UI, config *configuration.Configuration, endpointRepo api.EndpointRepository) (cmd Api) {
+func NewApi(ui terminal.UI, config configuration.Reader, endpointRepo api.EndpointRepository) (cmd Api) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.endpointRepo = endpointRepo
@@ -34,8 +34,8 @@ func (cmd Api) Run(c *cli.Context) {
 	if len(c.Args()) == 0 {
 		cmd.ui.Say(
 			"API endpoint: %s (API version: %s)",
-			terminal.EntityNameColor(cmd.config.Target),
-			terminal.EntityNameColor(cmd.config.ApiVersion),
+			terminal.EntityNameColor(cmd.config.ApiEndpoint()),
+			terminal.EntityNameColor(cmd.config.ApiVersion()),
 		)
 		return
 	}

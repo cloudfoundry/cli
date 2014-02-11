@@ -2,7 +2,6 @@ package servicebroker_test
 
 import (
 	. "cf/commands/servicebroker"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -17,21 +16,7 @@ import (
 
 func callRenameServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
+	config := testconfig.NewRepositoryWithDefaults()
 	cmd := NewRenameServiceBroker(ui, config, repo)
 	ctxt := testcmd.NewContext("rename-service-broker", args)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

@@ -3,7 +3,6 @@ package service_test
 import (
 	"cf/api"
 	. "cf/commands/service"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -20,19 +19,7 @@ func callBindService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("bind-service", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewBindService(fakeUI, config, serviceBindingRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

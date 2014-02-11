@@ -5,34 +5,41 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/gomega"
+	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
 )
 
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestLogoutClearsAccessTokenOrgAndSpace", func() {
-
+	Describe("logout command", func() {
+		var config configuration.Repository
+		BeforeEach(func() {
 			org := models.OrganizationFields{}
 			org.Name = "MyOrg"
 
 			space := models.SpaceFields{}
 			space.Name = "MySpace"
 
-			config := &configuration.Configuration{}
-			config.AccessToken = "MyAccessToken"
-			config.OrganizationFields = org
-			config.SpaceFields = space
-
+			config = testconfig.NewRepository()
+			config.SetAccessToken("MyAccessToken")
+			config.SetOrganizationFields(org)
+			config.SetSpaceFields(space)
 			ui := new(testterm.FakeUI)
 
 			l := commands.NewLogout(ui, config)
 			l.Run(nil)
+		})
 
-			assert.Empty(mr.T(), config.AccessToken)
-			assert.Equal(mr.T(), config.OrganizationFields, models.OrganizationFields{})
-			assert.Equal(mr.T(), config.SpaceFields, models.SpaceFields{})
+		It("clears access token from the config", func() {
+			Expect(config.AccessToken()).To(Equal(""))
+		})
+
+		It("clears organization fields from the config", func() {
+			Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
+		})
+
+		It("clears space fields from the config", func() {
+			Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
 		})
 	})
 }

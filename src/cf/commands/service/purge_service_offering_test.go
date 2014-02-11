@@ -3,7 +3,6 @@ package service_test
 import (
 	. "cf/commands/service"
 	"cf/configuration"
-	"cf/models"
 	"cf/net"
 	"errors"
 	. "github.com/onsi/ginkgo"
@@ -163,7 +162,7 @@ func init() {
 
 type commandDependencies struct {
 	ui          *testterm.FakeUI
-	config      *configuration.Configuration
+	config      configuration.ReadWriter
 	serviceRepo *testapi.FakeServiceRepo
 	reqFactory  *testreq.FakeReqFactory
 }
@@ -171,16 +170,7 @@ type commandDependencies struct {
 func setupDependencies() (obj commandDependencies) {
 	obj.ui = &testterm.FakeUI{}
 
-	token, _ := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-
-	obj.config = &configuration.Configuration{
-		SpaceFields:        models.SpaceFields{Name: "my-space"},
-		OrganizationFields: models.OrganizationFields{Name: "my-org"},
-		AccessToken:        token,
-	}
-
+	obj.config = testconfig.NewRepository()
 	obj.reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	obj.serviceRepo = new(testapi.FakeServiceRepo)
 	return

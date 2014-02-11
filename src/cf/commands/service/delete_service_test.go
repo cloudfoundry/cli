@@ -3,7 +3,6 @@ package service_test
 import (
 	"cf/api"
 	. "cf/commands/service"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -22,19 +21,7 @@ func callDeleteService(t mr.TestingT, confirmation string, args []string, reqFac
 	}
 	ctxt := testcmd.NewContext("delete-service", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewDeleteService(fakeUI, config, serviceRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

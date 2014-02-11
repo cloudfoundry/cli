@@ -13,11 +13,11 @@ import (
 
 type Curl struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	curlRepo api.CurlRepository
 }
 
-func NewCurl(ui terminal.UI, config *configuration.Configuration, curlRepo api.CurlRepository) (cmd *Curl) {
+func NewCurl(ui terminal.UI, config configuration.Reader, curlRepo api.CurlRepository) (cmd *Curl) {
 	cmd = new(Curl)
 	cmd.ui = ui
 	cmd.config = config

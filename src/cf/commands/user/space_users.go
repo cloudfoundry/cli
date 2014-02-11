@@ -20,13 +20,13 @@ var spaceRoleToDisplayName = map[string]string{
 
 type SpaceUsers struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	spaceRepo api.SpaceRepository
 	userRepo  api.UserRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSpaceUsers(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
+func NewSpaceUsers(ui terminal.UI, config configuration.Reader, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *SpaceUsers) {
 	cmd = new(SpaceUsers)
 	cmd.ui = ui
 	cmd.config = config

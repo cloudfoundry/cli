@@ -17,11 +17,11 @@ type AppEventsRepository interface {
 }
 
 type CloudControllerAppEventsRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerAppEventsRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerAppEventsRepository) {
+func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerAppEventsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -29,8 +29,8 @@ func NewCloudControllerAppEventsRepository(config *configuration.Configuration, 
 
 func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse {
 	apiResponse := repo.gateway.ListPaginatedResources(
-		repo.config.Target,
-		repo.config.AccessToken,
+		repo.config.ApiEndpoint(),
+		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid))),
 		EventResourceNewV2{},
 		func(resource interface{}) bool {
@@ -39,8 +39,8 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 
 	if apiResponse.IsNotFound() {
 		apiResponse = repo.gateway.ListPaginatedResources(
-			repo.config.Target,
-			repo.config.AccessToken,
+			repo.config.ApiEndpoint(),
+			repo.config.AccessToken(),
 			fmt.Sprintf("/v2/apps/%s/events", appGuid),
 			EventResourceOldV2{},
 			func(resource interface{}) bool {

@@ -87,11 +87,11 @@ type AppSummaryRepository interface {
 }
 
 type CloudControllerAppSummaryRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerAppSummaryRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerAppSummaryRepository) {
+func NewCloudControllerAppSummaryRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerAppSummaryRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -100,8 +100,8 @@ func NewCloudControllerAppSummaryRepository(config *configuration.Configuration,
 func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse net.ApiResponse) {
 	resources := new(ApplicationSummaries)
 
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.SpaceFields.Guid)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -113,9 +113,9 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 }
 
 func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.AppSummary, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.Target, appGuid)
+	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.ApiEndpoint(), appGuid)
 	summaryResponse := new(ApplicationFromSummary)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, summaryResponse)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), summaryResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

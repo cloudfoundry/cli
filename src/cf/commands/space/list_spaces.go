@@ -11,11 +11,11 @@ import (
 
 type ListSpaces struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	spaceRepo api.SpaceRepository
 }
 
-func NewListSpaces(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd ListSpaces) {
+func NewListSpaces(ui terminal.UI, config configuration.Reader, spaceRepo api.SpaceRepository) (cmd ListSpaces) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRepo = spaceRepo
@@ -32,7 +32,7 @@ func (cmd ListSpaces) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 
 func (cmd ListSpaces) Run(c *cli.Context) {
 	cmd.ui.Say("Getting spaces in org %s as %s...\n",
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()))
 
 	foundSpaces := false

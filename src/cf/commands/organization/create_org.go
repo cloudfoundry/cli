@@ -12,11 +12,11 @@ import (
 
 type CreateOrg struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	orgRepo api.OrganizationRepository
 }
 
-func NewCreateOrg(ui terminal.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository) (cmd CreateOrg) {
+func NewCreateOrg(ui terminal.UI, config configuration.Reader, orgRepo api.OrganizationRepository) (cmd CreateOrg) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.orgRepo = orgRepo

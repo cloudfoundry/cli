@@ -13,13 +13,13 @@ import (
 
 type Target struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.ReadWriter
 	orgRepo   api.OrganizationRepository
 	spaceRepo api.SpaceRepository
 }
 
 func NewTarget(ui terminal.UI,
-	config *configuration.Configuration,
+	config configuration.ReadWriter,
 	orgRepo api.OrganizationRepository,
 	spaceRepo api.SpaceRepository) (cmd Target) {
 

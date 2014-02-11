@@ -12,11 +12,11 @@ import (
 
 type ListApps struct {
 	ui             terminal.UI
-	config         *configuration.Configuration
+	config         configuration.Reader
 	appSummaryRepo api.AppSummaryRepository
 }
 
-func NewListApps(ui terminal.UI, config *configuration.Configuration, appSummaryRepo api.AppSummaryRepository) (cmd ListApps) {
+func NewListApps(ui terminal.UI, config configuration.Reader, appSummaryRepo api.AppSummaryRepository) (cmd ListApps) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appSummaryRepo = appSummaryRepo
@@ -33,8 +33,8 @@ func (cmd ListApps) GetRequirements(reqFactory requirements.Factory, c *cli.Cont
 
 func (cmd ListApps) Run(c *cli.Context) {
 	cmd.ui.Say("Getting apps in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

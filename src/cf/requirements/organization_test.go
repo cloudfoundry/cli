@@ -28,6 +28,7 @@ func init() {
 			assert.Equal(mr.T(), orgRepo.FindByNameName, "my-org-name")
 			assert.Equal(mr.T(), orgReq.GetOrganization(), org)
 		})
+
 		It("TestOrgReqWhenOrgDoesNotExist", func() {
 
 			orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}

@@ -2,7 +2,6 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,42 +14,10 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func deleteApp(t mr.TestingT, confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) {
-
-	app := models.Application{}
-	app.Name = "app-to-delete"
-	app.Guid = "app-to-delete-guid"
-
-	reqFactory = &testreq.FakeReqFactory{}
-	appRepo = &testapi.FakeApplicationRepository{ReadApp: app}
-	ui = &testterm.FakeUI{
-		Inputs: []string{confirmation},
-	}
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	ctxt := testcmd.NewContext("delete", args)
-	cmd := NewDeleteApp(ui, config, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestDeleteConfirmingWithY", func() {
-			ui, _, appRepo := deleteApp(mr.T(), "y", []string{"app-to-delete"})
+			ui, _, appRepo := deleteApp("y", []string{"app-to-delete"})
 
 			assert.Equal(mr.T(), appRepo.ReadName, "app-to-delete")
 			assert.Equal(mr.T(), appRepo.DeletedAppGuid, "app-to-delete-guid")
@@ -64,7 +31,7 @@ func init() {
 		})
 		It("TestDeleteConfirmingWithYes", func() {
 
-			ui, _, appRepo := deleteApp(mr.T(), "Yes", []string{"app-to-delete"})
+			ui, _, appRepo := deleteApp("Yes", []string{"app-to-delete"})
 
 			assert.Equal(mr.T(), appRepo.ReadName, "app-to-delete")
 			assert.Equal(mr.T(), appRepo.DeletedAppGuid, "app-to-delete-guid")
@@ -90,7 +57,7 @@ func init() {
 			ui := &testterm.FakeUI{}
 			ctxt := testcmd.NewContext("delete", []string{"-f", "app-to-delete"})
 
-			cmd := NewDeleteApp(ui, &configuration.Configuration{}, appRepo)
+			cmd := NewDeleteApp(ui, testconfig.NewRepository(), appRepo)
 			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 			assert.Equal(mr.T(), appRepo.ReadName, "app-to-delete")
@@ -110,7 +77,7 @@ func init() {
 			ui := &testterm.FakeUI{}
 			ctxt := testcmd.NewContext("delete", []string{"-f", "app-to-delete"})
 
-			cmd := NewDeleteApp(ui, &configuration.Configuration{}, appRepo)
+			cmd := NewDeleteApp(ui, testconfig.NewRepository(), appRepo)
 			testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 			assert.Equal(mr.T(), appRepo.ReadName, "app-to-delete")
@@ -124,11 +91,31 @@ func init() {
 		})
 		It("TestDeleteCommandFailsWithUsage", func() {
 
-			ui, _, _ := deleteApp(mr.T(), "Yes", []string{})
+			ui, _, _ := deleteApp("Yes", []string{})
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui, _, _ = deleteApp(mr.T(), "Yes", []string{"app-to-delete"})
+			ui, _, _ = deleteApp("Yes", []string{"app-to-delete"})
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
 	})
+}
+
+func deleteApp(confirmation string, args []string) (ui *testterm.FakeUI, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) {
+
+	app := models.Application{}
+	app.Name = "app-to-delete"
+	app.Guid = "app-to-delete-guid"
+
+	reqFactory = &testreq.FakeReqFactory{}
+	appRepo = &testapi.FakeApplicationRepository{ReadApp: app}
+	ui = &testterm.FakeUI{
+		Inputs: []string{confirmation},
+	}
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+
+	ctxt := testcmd.NewContext("delete", args)
+	cmd := NewDeleteApp(ui, configRepo, appRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

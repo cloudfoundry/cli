@@ -15,14 +15,15 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
 func testRefreshTokenWithSuccess(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	config, apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, config.AccessToken, "bearer new-access-token")
-	assert.Equal(t, config.RefreshToken, "new-refresh-token")
+	assert.Equal(t, config.AccessToken(), "bearer new-access-token")
+	assert.Equal(t, config.RefreshToken(), "new-refresh-token")
 }
 
 func testRefreshTokenWithError(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
@@ -56,7 +57,7 @@ var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testne
 	}
 }
 
-func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) (config *configuration.Configuration, apiResponse ApiResponse) {
+func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) (config configuration.Reader, apiResponse ApiResponse) {
 	authEndpoint := func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintln(
 			writer,
@@ -73,19 +74,19 @@ func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc)
 	config, auth := createAuthenticationRepository(t, apiServer, authServer)
 	gateway.SetTokenRefresher(auth)
 
-	request, apiResponse := gateway.NewRequest("POST", config.Target+"/v2/foo", config.AccessToken, strings.NewReader("expected body"))
+	request, apiResponse := gateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 	assert.False(t, apiResponse.IsNotSuccessful())
 
 	apiResponse = gateway.PerformRequest(request)
 	return
 }
 
-func createAuthenticationRepository(t mr.TestingT, apiServer *httptest.Server, authServer *httptest.Server) (*configuration.Configuration, api.AuthenticationRepository) {
-	config := &configuration.Configuration{}
-	config.AuthorizationEndpoint = authServer.URL
-	config.Target = apiServer.URL
-	config.AccessToken = "bearer initial-access-token"
-	config.RefreshToken = "initial-refresh-token"
+func createAuthenticationRepository(t mr.TestingT, apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
+	config := testconfig.NewRepository()
+	config.SetAuthorizationEndpoint(authServer.URL)
+	config.SetApiEndpoint(apiServer.URL)
+	config.SetAccessToken("bearer initial-access-token")
+	config.SetRefreshToken("initial-refresh-token")
 
 	authGateway := NewUAAGateway()
 	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)

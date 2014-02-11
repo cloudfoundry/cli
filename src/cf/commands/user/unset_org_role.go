@@ -12,13 +12,13 @@ import (
 
 type UnsetOrgRole struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	userRepo api.UserRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }
 
-func NewUnsetOrgRole(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd *UnsetOrgRole) {
+func NewUnsetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd *UnsetOrgRole) {
 	cmd = new(UnsetOrgRole)
 	cmd.ui = ui
 	cmd.config = config

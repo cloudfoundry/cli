@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -12,10 +11,159 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
-func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
+var _ = Describe("Space Repository", func() {
+	It("lists all the spaces", func() {
+		firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/organizations/my-org-guid/spaces",
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: `
+				{
+					"next_url": "/v2/organizations/my-org-guid/spaces?page=2",
+					"resources": [
+						{
+							"metadata": {
+								"guid": "acceptance-space-guid"
+							},
+							"entity": {
+								"name": "acceptance"
+							}
+						}
+					]
+				}`}})
+
+		secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/organizations/my-org-guid/spaces?page=2",
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: `
+				{
+					"resources": [
+						{
+							"metadata": {
+								"guid": "staging-space-guid"
+							},
+							"entity": {
+								"name": "staging"
+							}
+						}
+					]
+				}`}})
+
+		ts, handler, repo := createSpacesRepo(firstPageSpacesRequest, secondPageSpacesRequest)
+		defer ts.Close()
+
+		spaces := []models.Space{}
+		apiResponse := repo.ListSpaces(func(space models.Space) bool {
+			spaces = append(spaces, space)
+			return true
+		})
+
+		assert.Equal(mr.T(), len(spaces), 2)
+		assert.Equal(mr.T(), spaces[0].Guid, "acceptance-space-guid")
+		assert.Equal(mr.T(), spaces[1].Guid, "staging-space-guid")
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.True(mr.T(), handler.AllRequestsCalled())
+	})
+
+	Describe("finding spaces by name", func() {
+		It("returns the space", func() {
+			testSpacesFindByNameWithOrg("my-org-guid",
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+					return repo.FindByName(spaceName)
+				},
+			)
+		})
+
+		It("can find spaces in a particular org", func() {
+			testSpacesFindByNameWithOrg("another-org-guid",
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+					return repo.FindByNameInOrg(spaceName, "another-org-guid")
+				},
+			)
+		})
+
+		It("returns a 'not found' response when the space doesn't exist", func() {
+			testSpacesDidNotFindByNameWithOrg("my-org-guid",
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+					return repo.FindByName(spaceName)
+				},
+			)
+		})
+
+		It("returns a 'not found' response when the space doesn't exist in the given org", func() {
+			testSpacesDidNotFindByNameWithOrg("another-org-guid",
+				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+					return repo.FindByNameInOrg(spaceName, "another-org-guid")
+				},
+			)
+		})
+	})
+
+	It("creates spaces", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/spaces",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"my-org-guid"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
+			{
+				"metadata": {
+					"guid": "space-guid"
+				},
+				"entity": {
+					"name": "space-name"
+				}
+			}`},
+		})
+
+		ts, handler, repo := createSpacesRepo(request)
+		defer ts.Close()
+
+		space, apiResponse := repo.Create("space-name", "my-org-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), space.Guid, "space-guid")
+	})
+
+	It("renames spaces", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "PUT",
+			Path:     "/v2/spaces/my-space-guid",
+			Matcher:  testnet.RequestBodyMatcher(`{"name":"new-space-name"}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated},
+		})
+
+		ts, handler, repo := createSpacesRepo(request)
+		defer ts.Close()
+
+		apiResponse := repo.Rename("my-space-guid", "new-space-name")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+	})
+
+	It("deletes spaces", func() {
+		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "DELETE",
+			Path:     "/v2/spaces/my-space-guid?recursive=true",
+			Response: testnet.TestResponse{Status: http.StatusOK},
+		})
+
+		ts, handler, repo := createSpacesRepo(request)
+		defer ts.Close()
+
+		apiResponse := repo.Delete("my-space-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+})
+
+func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -84,9 +232,10 @@ func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(
 		Response: findSpaceByNameResponse,
 	})
 
-	ts, handler, repo := createSpacesRepo(t, request)
+	ts, handler, repo := createSpacesRepo(request)
 	defer ts.Close()
 
+	t := mr.T()
 	space, apiResponse := findByName(repo, "Space1")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
@@ -109,7 +258,7 @@ func testSpacesFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(
 	return
 }
 
-func testSpacesDidNotFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
+func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
@@ -119,177 +268,20 @@ func testSpacesDidNotFindByNameWithOrg(t mr.TestingT, orgGuid string, findByName
 		},
 	})
 
-	ts, handler, repo := createSpacesRepo(t, request)
+	ts, handler, repo := createSpacesRepo(request)
 	defer ts.Close()
 
 	_, apiResponse := findByName(repo, "Space1")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsError())
-	assert.True(t, apiResponse.IsNotFound())
+	assert.True(mr.T(), handler.AllRequestsCalled())
+	assert.False(mr.T(), apiResponse.IsError())
+	assert.True(mr.T(), apiResponse.IsNotFound())
 }
 
-func createSpacesRepo(t mr.TestingT, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
-	ts, handler = testnet.NewTLSServer(t, reqs)
-	org4 := models.OrganizationFields{}
-	org4.Guid = "some-org-guid"
-
-	space5 := models.SpaceFields{}
-	space5.Guid = "my-space-guid"
-	config := &configuration.Configuration{
-		AccessToken:        "BEARER my_access_token",
-		Target:             ts.URL,
-		OrganizationFields: org4,
-		SpaceFields:        space5,
-	}
+func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
+	ts, handler = testnet.NewTLSServer(GinkgoT(), reqs)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerSpaceRepository(config, gateway)
+	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }
-
-var _ = Describe("Space Repository", func() {
-	It("lists all the spaces", func() {
-		firstPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "GET",
-			Path:   "/v2/organizations/some-org-guid/spaces",
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `
-				{
-					"next_url": "/v2/organizations/some-org-guid/spaces?page=2",
-					"resources": [
-						{
-							"metadata": {
-								"guid": "acceptance-space-guid"
-							},
-							"entity": {
-								"name": "acceptance"
-							}
-						}
-					]
-				}`}})
-
-		secondPageSpacesRequest := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "GET",
-			Path:   "/v2/organizations/some-org-guid/spaces?page=2",
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `
-				{
-					"resources": [
-						{
-							"metadata": {
-								"guid": "staging-space-guid"
-							},
-							"entity": {
-								"name": "staging"
-							}
-						}
-					]
-				}`}})
-
-		ts, handler, repo := createSpacesRepo(mr.T(), firstPageSpacesRequest, secondPageSpacesRequest)
-		defer ts.Close()
-
-		spaces := []models.Space{}
-		apiResponse := repo.ListSpaces(func(space models.Space) bool {
-			spaces = append(spaces, space)
-			return true
-		})
-
-		assert.Equal(mr.T(), len(spaces), 2)
-		assert.Equal(mr.T(), spaces[0].Guid, "acceptance-space-guid")
-		assert.Equal(mr.T(), spaces[1].Guid, "staging-space-guid")
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.True(mr.T(), handler.AllRequestsCalled())
-	})
-
-	Describe("finding spaces by name", func() {
-		It("returns the space", func() {
-			testSpacesFindByNameWithOrg(mr.T(), "some-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
-					return repo.FindByName(spaceName)
-				},
-			)
-		})
-
-		It("can find spaces in a particular org", func() {
-			testSpacesFindByNameWithOrg(mr.T(), "another-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
-					return repo.FindByNameInOrg(spaceName, "another-org-guid")
-				},
-			)
-		})
-
-		It("returns a 'not found' response when the space doesn't exist", func() {
-			testSpacesDidNotFindByNameWithOrg(mr.T(), "some-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
-					return repo.FindByName(spaceName)
-				},
-			)
-		})
-
-		It("returns a 'not found' response when the space doesn't exist in the given org", func() {
-			testSpacesDidNotFindByNameWithOrg(mr.T(), "another-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
-					return repo.FindByNameInOrg(spaceName, "another-org-guid")
-				},
-			)
-		})
-	})
-
-	It("creates spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:  "POST",
-			Path:    "/v2/spaces",
-			Matcher: testnet.RequestBodyMatcher(`{"name":"space-name","organization_guid":"some-org-guid"}`),
-			Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
-			{
-				"metadata": {
-					"guid": "space-guid"
-				},
-				"entity": {
-					"name": "space-name"
-				}
-			}`},
-		})
-
-		ts, handler, repo := createSpacesRepo(mr.T(), request)
-		defer ts.Close()
-
-		space, apiResponse := repo.Create("space-name", "some-org-guid")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), space.Guid, "space-guid")
-	})
-
-	It("renames spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "PUT",
-			Path:     "/v2/spaces/my-space-guid",
-			Matcher:  testnet.RequestBodyMatcher(`{"name":"new-space-name"}`),
-			Response: testnet.TestResponse{Status: http.StatusCreated},
-		})
-
-		ts, handler, repo := createSpacesRepo(mr.T(), request)
-		defer ts.Close()
-
-		apiResponse := repo.Rename("my-space-guid", "new-space-name")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-	})
-
-	It("deletes spaces", func() {
-		request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "DELETE",
-			Path:     "/v2/spaces/my-space-guid?recursive=true",
-			Response: testnet.TestResponse{Status: http.StatusOK},
-		})
-
-		ts, handler, repo := createSpacesRepo(mr.T(), request)
-		defer ts.Close()
-
-		apiResponse := repo.Delete("my-space-guid")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-	})
-})

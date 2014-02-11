@@ -12,12 +12,12 @@ import (
 
 type ListDomains struct {
 	ui         terminal.UI
-	config     *configuration.Configuration
+	config     configuration.Reader
 	orgReq     requirements.TargetedOrgRequirement
 	domainRepo api.DomainRepository
 }
 
-func NewListDomains(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *ListDomains) {
+func NewListDomains(ui terminal.UI, config configuration.Reader, domainRepo api.DomainRepository) (cmd *ListDomains) {
 	cmd = new(ListDomains)
 	cmd.ui = ui
 	cmd.config = config

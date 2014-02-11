@@ -3,7 +3,6 @@ package application_test
 import (
 	"cf"
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/formatters"
 	"cf/models"
 	"github.com/stretchr/testify/assert"
@@ -19,80 +18,6 @@ import (
 	"time"
 )
 
-func testDisplayingAppSummaryWithErrorCode(t mr.TestingT, errorCode string) {
-	reqApp := models.Application{}
-	reqApp.Name = "my-app"
-	reqApp.Guid = "my-app-guid"
-
-	domain3 := models.DomainFields{}
-	domain3.Name = "example.com"
-	domain4 := models.DomainFields{}
-	domain4.Name = "example.com"
-
-	route1 := models.RouteSummary{}
-	route1.Host = "my-app"
-	route1.Domain = domain3
-
-	route2 := models.RouteSummary{}
-	route2.Host = "foo"
-	route2.Domain = domain4
-
-	routes := []models.RouteSummary{
-		route1,
-		route2,
-	}
-
-	app := models.ApplicationFields{}
-	app.State = "stopped"
-	app.InstanceCount = 2
-	app.RunningInstances = 0
-	app.Memory = 256
-
-	appSummary := models.AppSummary{}
-	appSummary.ApplicationFields = app
-	appSummary.RouteSummaries = routes
-
-	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary, GetSummaryErrorCode: errorCode}
-	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-	ui := callApp(t, []string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
-
-	assert.Equal(t, appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
-	assert.Equal(t, appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
-
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
-		{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
-		{"state", "stopped"},
-		{"instances", "0/2"},
-		{"usage", "256M x 2 instances"},
-		{"urls", "my-app.example.com, foo.example.com"},
-		{"no running instances"},
-	})
-}
-
-func callApp(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo, appInstancesRepo *testapi.FakeAppInstancesRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("app", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewShowApp(ui, config, appSummaryRepo, appInstancesRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestAppRequirements", func() {
@@ -101,15 +26,15 @@ func init() {
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
-			callApp(mr.T(), args, reqFactory, appSummaryRepo, appInstancesRepo)
+			callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
-			callApp(mr.T(), args, reqFactory, appSummaryRepo, appInstancesRepo)
+			callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-			callApp(mr.T(), args, reqFactory, appSummaryRepo, appInstancesRepo)
+			callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 		})
@@ -118,7 +43,7 @@ func init() {
 			appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-			ui := callApp(mr.T(), []string{}, reqFactory, appSummaryRepo, appInstancesRepo)
+			ui := callApp([]string{}, reqFactory, appSummaryRepo, appInstancesRepo)
 
 			assert.True(mr.T(), ui.FailedWithUsage)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
@@ -173,7 +98,7 @@ func init() {
 			appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary}
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{GetInstancesResponses: [][]models.AppInstanceFields{instances}}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-			ui := callApp(mr.T(), []string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
+			ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
 
 			assert.Equal(mr.T(), appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
 
@@ -196,4 +121,66 @@ func init() {
 			testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_NOT_STAGED)
 		})
 	})
+}
+
+func testDisplayingAppSummaryWithErrorCode(t mr.TestingT, errorCode string) {
+	reqApp := models.Application{}
+	reqApp.Name = "my-app"
+	reqApp.Guid = "my-app-guid"
+
+	domain3 := models.DomainFields{}
+	domain3.Name = "example.com"
+	domain4 := models.DomainFields{}
+	domain4.Name = "example.com"
+
+	route1 := models.RouteSummary{}
+	route1.Host = "my-app"
+	route1.Domain = domain3
+
+	route2 := models.RouteSummary{}
+	route2.Host = "foo"
+	route2.Domain = domain4
+
+	routes := []models.RouteSummary{
+		route1,
+		route2,
+	}
+
+	app := models.ApplicationFields{}
+	app.State = "stopped"
+	app.InstanceCount = 2
+	app.RunningInstances = 0
+	app.Memory = 256
+
+	appSummary := models.AppSummary{}
+	appSummary.ApplicationFields = app
+	appSummary.RouteSummaries = routes
+
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary, GetSummaryErrorCode: errorCode}
+	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
+	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
+	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
+
+	assert.Equal(t, appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
+	assert.Equal(t, appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
+
+	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+		{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
+		{"state", "stopped"},
+		{"instances", "0/2"},
+		{"usage", "256M x 2 instances"},
+		{"urls", "my-app.example.com, foo.example.com"},
+		{"no running instances"},
+	})
+}
+
+func callApp(args []string, reqFactory *testreq.FakeReqFactory, appSummaryRepo *testapi.FakeAppSummaryRepo, appInstancesRepo *testapi.FakeAppInstancesRepo) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	ctxt := testcmd.NewContext("app", args)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewShowApp(ui, configRepo, appSummaryRepo, appInstancesRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+
+	return
 }

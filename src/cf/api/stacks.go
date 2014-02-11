@@ -35,18 +35,18 @@ type StackRepository interface {
 }
 
 type CloudControllerStackRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerStackRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerStackRepository) {
+func NewCloudControllerStackRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerStackRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.Target, url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
 	stacks, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -62,13 +62,13 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack models
 }
 
 func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/stacks", repo.config.Target)
+	path := fmt.Sprintf("%s/v2/stacks", repo.config.ApiEndpoint())
 	return repo.findAllWithPath(path)
 }
 
 func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiResponse net.ApiResponse) {
 	resources := new(PaginatedStackResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

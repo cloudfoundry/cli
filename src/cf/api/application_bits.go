@@ -29,12 +29,12 @@ type ApplicationBitsRepository interface {
 }
 
 type CloudControllerApplicationBitsRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 	zipper  cf.Zipper
 }
 
-func NewCloudControllerApplicationBitsRepository(config *configuration.Configuration, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerApplicationBitsRepository) {
+func NewCloudControllerApplicationBitsRepository(config configuration.Reader, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerApplicationBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper
@@ -91,8 +91,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 }
 
 func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, appGuid)
-
+	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.ApiEndpoint(), appGuid)
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithError("Error creating tmp file: %s", err)
@@ -106,7 +105,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 		}
 
 		var request *net.Request
-		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, requestFile)
+		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}
@@ -218,8 +217,8 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/resource_match", repo.config.Target)
-	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(allAppFilesJson))
+	path := fmt.Sprintf("%s/v2/resource_match", repo.config.ApiEndpoint())
+	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken(), bytes.NewReader(allAppFilesJson))
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

@@ -3,7 +3,6 @@ package application_test
 import (
 	"cf/api"
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -16,28 +15,6 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callStop(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("stop", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewStop(ui, config, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestStopCommandFailsWithUsage", func() {
@@ -47,10 +24,10 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 			reqFactory := &testreq.FakeReqFactory{Application: app}
 
-			ui := callStop(mr.T(), []string{}, reqFactory, appRepo)
+			ui := callStop([]string{}, reqFactory, appRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callStop(mr.T(), []string{"my-app"}, reqFactory, appRepo)
+			ui = callStop([]string{"my-app"}, reqFactory, appRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
 		It("TestStopApplication", func() {
@@ -61,7 +38,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 			args := []string{"my-app"}
 			reqFactory := &testreq.FakeReqFactory{Application: app}
-			ui := callStop(mr.T(), args, reqFactory, appRepo)
+			ui := callStop(args, reqFactory, appRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Stopping app", "my-app", "my-org", "my-space", "my-user"},
@@ -79,7 +56,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
 			args := []string{"my-app"}
 			reqFactory := &testreq.FakeReqFactory{Application: app}
-			ui := callStop(mr.T(), args, reqFactory, appRepo)
+			ui := callStop(args, reqFactory, appRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Stopping", "my-app"},
@@ -97,7 +74,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 			args := []string{"my-app"}
 			reqFactory := &testreq.FakeReqFactory{Application: app}
-			ui := callStop(mr.T(), args, reqFactory, appRepo)
+			ui := callStop(args, reqFactory, appRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"my-app", "is already stopped"},
@@ -116,7 +93,7 @@ func init() {
 			expectedStoppedApp.State = "stopped"
 
 			appRepo := &testapi.FakeApplicationRepository{UpdateAppResult: expectedStoppedApp}
-			config := &configuration.Configuration{}
+			config := testconfig.NewRepository()
 			stopper := NewStop(new(testterm.FakeUI), config, appRepo)
 			actualStoppedApp, err := stopper.ApplicationStop(appToStop)
 
@@ -130,7 +107,7 @@ func init() {
 			appToStop.Guid = "my-app-guid"
 			appToStop.State = "stopped"
 			appRepo := &testapi.FakeApplicationRepository{}
-			config := &configuration.Configuration{}
+			config := testconfig.NewRepository()
 			stopper := NewStop(new(testterm.FakeUI), config, appRepo)
 			updatedApp, err := stopper.ApplicationStop(appToStop)
 
@@ -138,4 +115,14 @@ func init() {
 			assert.Equal(mr.T(), appToStop, updatedApp)
 		})
 	})
+}
+
+func callStop(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("stop", args)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewStop(ui, configRepo, appRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

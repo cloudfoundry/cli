@@ -19,22 +19,16 @@ func callCreateOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 	fakeUI = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-org", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
 	space := models.SpaceFields{}
 	space.Name = "my-space"
 
 	organization := models.OrganizationFields{}
 	organization.Name = "my-org"
 
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: organization,
-		AccessToken:        token,
-	}
+	token := configuration.TokenInfo{Username: "my-user"}
+	config := testconfig.NewRepositoryWithAccessToken(token)
+	config.SetSpaceFields(space)
+	config.SetOrganizationFields(organization)
 
 	cmd := NewCreateOrg(fakeUI, config, orgRepo)
 

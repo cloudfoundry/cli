@@ -11,11 +11,11 @@ import (
 
 type DeleteServiceBroker struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Reader
 	repo   api.ServiceBrokerRepository
 }
 
-func NewDeleteServiceBroker(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd DeleteServiceBroker) {
+func NewDeleteServiceBroker(ui terminal.UI, config configuration.Reader, repo api.ServiceBrokerRepository) (cmd DeleteServiceBroker) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.repo = repo

@@ -13,11 +13,11 @@ import (
 
 type Authenticate struct {
 	ui            terminal.UI
-	config        *configuration.Configuration
+	config        configuration.Reader
 	authenticator api.AuthenticationRepository
 }
 
-func NewAuthenticate(ui terminal.UI, config *configuration.Configuration, authenticator api.AuthenticationRepository) (cmd Authenticate) {
+func NewAuthenticate(ui terminal.UI, config configuration.Reader, authenticator api.AuthenticationRepository) (cmd Authenticate) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authenticator = authenticator
@@ -34,7 +34,7 @@ func (cmd Authenticate) GetRequirements(reqFactory requirements.Factory, c *cli.
 }
 
 func (cmd Authenticate) Run(c *cli.Context) {
-	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.Target))
+	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.ApiEndpoint()))
 
 	username := c.Args()[0]
 	password := c.Args()[1]

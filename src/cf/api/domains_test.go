@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -11,160 +10,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
-var noDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/private_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"next_url": "",
-	"resources": []
-}`},
-})
-
-var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/shared_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"next_url": "/v2/shared_domains?page=2",
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "shared-domain1-guid"
-		  },
-		  "entity": {
-			"name": "shared-example1.com"
- 		  }
-		}
-	]
-}`},
-})
-
-var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/shared_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "shared-domain2-guid"
-		  },
-		  "entity": {
-			"name": "shared-example2.com"
- 		  }
-		}
-	]
-}`},
-})
-
-var notFoundDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:   "GET",
-	Path:     "/v2/organizations/my-org-guid/private_domains",
-	Response: testnet.TestResponse{Status: http.StatusNotFound},
-})
-var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "domain-guid"
-		  },
-		  "entity": {
-			"name": "example.com",
-			"owning_organization_guid": "my-org-guid"
-		  }
-		}
-	]
-}`}})
-
-var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/private_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"next_url": "/v2/organizations/my-org-guid/private_domains?page=2",
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "domain1-guid"
-		  },
-		  "entity": {
-			"name": "example.com",
-			"owning_organization_guid": "my-org-guid"
-		  }
-		},
-		{
-		  "metadata": {
-			"guid": "domain2-guid"
-		  },
-		  "entity": {
-			"name": "some-example.com",
-			"owning_organization_guid": "my-org-guid"
-		  }
-		}
-	]
-}`},
-})
-
-var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/private_domains?page=2",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "domain3-guid"
-		  },
-		  "entity": {
-			"name": "example.com",
-			"owning_organization_guid": "my-org-guid"
-		  }
-		}
-	]
-}`},
-})
-
-func deleteDomainReq(statusCode int) testnet.TestRequest {
-	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "DELETE",
-		Path:     "/v2/private_domains/my-domain-guid?recursive=true",
-		Response: testnet.TestResponse{Status: statusCode},
-	})
-}
-
-func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
-	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "DELETE",
-		Path:     "/v2/shared_domains/my-domain-guid?recursive=true",
-		Response: testnet.TestResponse{Status: statusCode},
-	})
-}
-
-func createDomainRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
-	ts, handler = testnet.NewTLSServer(t, reqs)
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		SpaceFields: models.SpaceFields{
-			Guid: "my-space-guid",
-		},
-		OrganizationFields: models.OrganizationFields{
-			Guid: "my-org-guid",
-		},
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerDomainRepository(config, gateway)
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("DomainRepository", func() {
 	It("TestListSharedDomains", func() {
 		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
 		defer ts.Close()
@@ -562,3 +412,145 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), apiResponse.IsNotSuccessful())
 	})
 })
+
+var noDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/organizations/my-org-guid/private_domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "",
+	"resources": []
+}`},
+})
+
+var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/shared_domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/shared_domains?page=2",
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "shared-domain1-guid"
+		  },
+		  "entity": {
+			"name": "shared-example1.com"
+ 		  }
+		}
+	]
+}`},
+})
+
+var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/shared_domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "shared-domain2-guid"
+		  },
+		  "entity": {
+			"name": "shared-example2.com"
+ 		  }
+		}
+	]
+}`},
+})
+
+var notFoundDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "GET",
+	Path:     "/v2/organizations/my-org-guid/private_domains",
+	Response: testnet.TestResponse{Status: http.StatusNotFound},
+})
+var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`}})
+
+var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/organizations/my-org-guid/private_domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/organizations/my-org-guid/private_domains?page=2",
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain1-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		},
+		{
+		  "metadata": {
+			"guid": "domain2-guid"
+		  },
+		  "entity": {
+			"name": "some-example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`},
+})
+
+var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/organizations/my-org-guid/private_domains?page=2",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain3-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`},
+})
+
+func deleteDomainReq(statusCode int) testnet.TestRequest {
+	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/private_domains/my-domain-guid?recursive=true",
+		Response: testnet.TestResponse{Status: statusCode},
+	})
+}
+
+func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
+	return testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     "/v2/shared_domains/my-domain-guid?recursive=true",
+		Response: testnet.TestResponse{Status: statusCode},
+	})
+}
+
+func createDomainRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
+	ts, handler = testnet.NewTLSServer(t, reqs)
+	config := testconfig.NewRepositoryWithDefaults()
+	config.SetApiEndpoint(ts.URL)
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerDomainRepository(config, gateway)
+	return
+}

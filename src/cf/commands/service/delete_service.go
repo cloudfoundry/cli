@@ -11,12 +11,12 @@ import (
 
 type DeleteService struct {
 	ui                 terminal.UI
-	config             *configuration.Configuration
+	config             configuration.Reader
 	serviceRepo        api.ServiceRepository
 	serviceInstanceReq requirements.ServiceInstanceRequirement
 }
 
-func NewDeleteService(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd *DeleteService) {
+func NewDeleteService(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd *DeleteService) {
 	cmd = new(DeleteService)
 	cmd.ui = ui
 	cmd.config = config
@@ -53,8 +53,8 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(serviceName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

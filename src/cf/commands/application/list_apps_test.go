@@ -2,7 +2,6 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,31 +14,8 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callApps(t mr.TestingT, appSummaryRepo *testapi.FakeAppSummaryRepo, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	space := models.SpaceFields{}
-	space.Name = "development"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	ctxt := testcmd.NewContext("apps", []string{})
-	cmd := NewListApps(ui, config, appSummaryRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-
-	return
-}
 func init() {
-	Describe("Testing with ginkgo", func() {
+	Describe("list-apps command", func() {
 		It("TestApps", func() {
 			domain := models.DomainFields{}
 			domain.Name = "cfapps.io"
@@ -91,12 +67,12 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-			ui := callApps(mr.T(), appSummaryRepo, reqFactory)
+			ui := callApps(appSummaryRepo, reqFactory)
 
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting apps in", "my-org", "development", "my-user"},
+				{"Getting apps in", "my-org", "my-space", "my-user"},
 				{"OK"},
 				{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
 				{"Application-2", "started", "1/2", "256M", "1G", "app2.cfapps.io"},
@@ -110,11 +86,11 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-			ui := callApps(mr.T(), appSummaryRepo, reqFactory)
+			ui := callApps(appSummaryRepo, reqFactory)
 
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting apps in", "my-org", "development", "my-user"},
+				{"Getting apps in", "my-org", "my-space", "my-user"},
 				{"OK"},
 				{"No apps found"},
 			})
@@ -124,7 +100,7 @@ func init() {
 			appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 
-			callApps(mr.T(), appSummaryRepo, reqFactory)
+			callApps(appSummaryRepo, reqFactory)
 
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
@@ -133,9 +109,19 @@ func init() {
 			appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 
-			callApps(mr.T(), appSummaryRepo, reqFactory)
+			callApps(appSummaryRepo, reqFactory)
 
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
 	})
+}
+
+func callApps(appSummaryRepo *testapi.FakeAppSummaryRepo, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+	ui = &testterm.FakeUI{}
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	ctxt := testcmd.NewContext("apps", []string{})
+	cmd := NewListApps(ui, configRepo, appSummaryRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+
+	return
 }

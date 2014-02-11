@@ -14,12 +14,12 @@ import (
 
 type Logs struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	logsRepo api.LogsRepository
 	appReq   requirements.ApplicationRequirement
 }
 
-func NewLogs(ui terminal.UI, config *configuration.Configuration, logsRepo api.LogsRepository) (cmd *Logs) {
+func NewLogs(ui terminal.UI, config configuration.Reader, logsRepo api.LogsRepository) (cmd *Logs) {
 	cmd = new(Logs)
 	cmd.ui = ui
 	cmd.config = config
@@ -64,8 +64,8 @@ func (cmd *Logs) recentLogsFor(app models.Application, logChan chan *logmessage.
 	onConnect := func() {
 		cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
 			terminal.EntityNameColor(app.Name),
-			terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-			terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			terminal.EntityNameColor(cmd.config.Username()),
 		)
 	}
@@ -81,8 +81,8 @@ func (cmd *Logs) tailLogsFor(app models.Application, logChan chan *logmessage.Me
 	onConnect := func() {
 		cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
 			terminal.EntityNameColor(app.Name),
-			terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-			terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			terminal.EntityNameColor(cmd.config.Username()),
 		)
 	}

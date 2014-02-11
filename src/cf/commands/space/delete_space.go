@@ -13,12 +13,12 @@ import (
 
 type DeleteSpace struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.ReadWriter
 	spaceRepo api.SpaceRepository
 	spaceReq  requirements.SpaceRequirement
 }
 
-func NewDeleteSpace(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository) (cmd *DeleteSpace) {
+func NewDeleteSpace(ui terminal.UI, config configuration.ReadWriter, spaceRepo api.SpaceRepository) (cmd *DeleteSpace) {
 	cmd = new(DeleteSpace)
 	cmd.ui = ui
 	cmd.config = config
@@ -48,7 +48,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting space %s in org %s as %s...",
 		terminal.EntityNameColor(spaceName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
@@ -73,7 +73,7 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 
 	cmd.ui.Ok()
 
-	if cmd.config.SpaceFields.Name == spaceName {
+	if cmd.config.SpaceFields().Name == spaceName {
 		cmd.config.SetSpaceFields(models.SpaceFields{})
 		cmd.ui.Say("TIP: No space targeted, use '%s target -s' to target a space", cf.Name())
 	}

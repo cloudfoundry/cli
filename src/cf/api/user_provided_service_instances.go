@@ -15,18 +15,18 @@ type UserProvidedServiceInstanceRepository interface {
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCCUserProvidedServiceInstanceRepository(config *configuration.Configuration, gateway net.Gateway) (repo CCUserProvidedServiceInstanceRepository) {
+func NewCCUserProvidedServiceInstanceRepository(config configuration.Reader, gateway net.Gateway) (repo CCUserProvidedServiceInstanceRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.Target)
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
 
 	type RequestBody struct {
 		Name           string            `json:"name"`
@@ -38,7 +38,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	jsonBytes, err := json.Marshal(RequestBody{
 		Name:           name,
 		Credentials:    params,
-		SpaceGuid:      repo.config.SpaceFields.Guid,
+		SpaceGuid:      repo.config.SpaceFields().Guid,
 		SysLogDrainUrl: drainUrl,
 	})
 
@@ -47,11 +47,11 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 		return
 	}
 
-	return repo.gateway.CreateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
+	return repo.gateway.CreateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, serviceInstanceFields.Guid)
+	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), serviceInstanceFields.Guid)
 
 	type RequestBody struct {
 		Credentials    map[string]string `json:"credentials,omitempty"`
@@ -65,5 +65,5 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		return
 	}
 
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken, bytes.NewReader(jsonBytes))
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
 }

@@ -16,7 +16,7 @@ const AppAlreadyBoundErrorCode = "90003"
 
 type BindService struct {
 	ui                 terminal.UI
-	config             *configuration.Configuration
+	config             configuration.Reader
 	serviceBindingRepo api.ServiceBindingRepository
 	appReq             requirements.ApplicationRequirement
 	serviceInstanceReq requirements.ServiceInstanceRequirement
@@ -26,7 +26,7 @@ type ServiceBinder interface {
 	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse net.ApiResponse)
 }
 
-func NewBindService(ui terminal.UI, config *configuration.Configuration, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
+func NewBindService(ui terminal.UI, config configuration.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
 	cmd = new(BindService)
 	cmd.ui = ui
 	cmd.config = config
@@ -58,8 +58,8 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Say("Binding service %s to app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(serviceInstance.Name),
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

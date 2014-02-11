@@ -26,7 +26,7 @@ type ConcreteFactory struct {
 	cmdsByName map[string]Command
 }
 
-func NewFactory(ui terminal.UI, config *configuration.Configuration, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
+func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo manifest.ManifestRepository, repoLocator api.RepositoryLocator) (factory ConcreteFactory) {
 	factory.cmdsByName = make(map[string]Command)
 
 	factory.cmdsByName["api"] = NewApi(ui, config, repoLocator.GetEndpointRepository())

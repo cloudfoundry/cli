@@ -2,7 +2,6 @@ package space_test
 
 import (
 	. "cf/commands/space"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -18,16 +17,7 @@ func callShowSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("space", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		AccessToken:        token,
-		OrganizationFields: org,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewShowSpace(ui, config)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

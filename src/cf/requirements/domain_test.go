@@ -11,18 +11,18 @@ import (
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
+	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
-	var config *configuration.Configuration
+	var config configuration.ReadWriter
 	var ui *testterm.FakeUI
 
 	BeforeEach(func() {
-		config = &configuration.Configuration{
-			OrganizationFields: models.OrganizationFields{Guid: "the-org-guid"},
-		}
 		ui = new(testterm.FakeUI)
+		config = testconfig.NewRepository()
+		config.SetOrganizationFields(models.OrganizationFields{Guid: "the-org-guid"})
 	})
 
 	It("succeeds when the domain is found", func() {

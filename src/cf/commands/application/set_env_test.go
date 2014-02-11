@@ -3,7 +3,6 @@ package application_test
 import (
 	"cf/api"
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -16,31 +15,8 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callSetEnv(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("set-env", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewSetEnv(ui, config, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
 func init() {
-	Describe("Testing with ginkgo", func() {
+	Describe("set-env command", func() {
 		It("TestSetEnvRequirements", func() {
 			app := models.Application{}
 			app.Name = "my-app"
@@ -49,17 +25,17 @@ func init() {
 			args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 
 			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			callSetEnv(mr.T(), args, reqFactory, appRepo)
+			callSetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
-			callSetEnv(mr.T(), args, reqFactory, appRepo)
+			callSetEnv(args, reqFactory, appRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
 			testcmd.CommandDidPassRequirements = true
 
 			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
-			callSetEnv(mr.T(), args, reqFactory, appRepo)
+			callSetEnv(args, reqFactory, appRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
 
@@ -73,7 +49,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{}
 
 			args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
-			ui := callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callSetEnv(args, reqFactory, appRepo)
 
 			assert.Equal(mr.T(), len(ui.Outputs), 3)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -108,7 +84,7 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{}
 
 			args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
-			ui := callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callSetEnv(args, reqFactory, appRepo)
 
 			assert.Equal(mr.T(), len(ui.Outputs), 3)
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -144,7 +120,7 @@ func init() {
 			}
 
 			args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
-			ui := callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callSetEnv(args, reqFactory, appRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Setting env variable"},
@@ -162,20 +138,29 @@ func init() {
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
 
 			args := []string{"my-app", "DATABASE_URL", "..."}
-			ui := callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui := callSetEnv(args, reqFactory, appRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 
 			args = []string{"my-app", "DATABASE_URL"}
-			ui = callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui = callSetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
 			args = []string{"my-app"}
-			ui = callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui = callSetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
 			args = []string{}
-			ui = callSetEnv(mr.T(), args, reqFactory, appRepo)
+			ui = callSetEnv(args, reqFactory, appRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 		})
 	})
+}
+
+func callSetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("set-env", args)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewSetEnv(ui, configRepo, appRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }
