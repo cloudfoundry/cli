@@ -1,5 +1,4 @@
 #!/bin/bash 
 
 set -e
-
-exec $(dirname $0)/env go $@
+eval $(dirname $0)/go \'$1\' \'$2\' \'$3\' \'$4\' \'$5\' \'$6\'
