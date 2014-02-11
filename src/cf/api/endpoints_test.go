@@ -34,6 +34,24 @@ var validApiInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, infoResponse)
 }
 
+var ApiInfoEndpointWithoutLogURL = func(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/v2/info" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	fmt.Fprintln(w, `
+{
+  "name": "vcap",
+  "build": "2222",
+  "support": "http://support.cloudfoundry.com",
+  "version": 2,
+  "description": "Cloud Foundry sponsored by Pivotal",
+  "authorization_endpoint": "https://login.example.com",
+  "api_version": "42.0.0"
+}`)
+}
+
 var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, `Foo`)
 }
@@ -179,6 +197,7 @@ func init() {
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.Equal(mr.T(), endpoint, "http://api.example.com")
 		})
+
 		It("TestGetLoggregatorEndpoint", func() {
 			config.LoggregatorEndPoint = "wss://loggregator.example.com:4443"
 
@@ -188,6 +207,32 @@ func init() {
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 			assert.Equal(mr.T(), endpoint, "wss://loggregator.example.com:4443")
+		})
+
+		Describe("when the loggregator endpoint is not saved in the config (old CC)", func() {
+			BeforeEach(func() {
+				config.LoggregatorEndPoint = ""
+			})
+
+			It("extrapolates the loggregator URL based on the API URL (SSL API)", func() {
+				config.Target = "https://api.run.pivotal.io"
+
+				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
+
+				endpoint, apiResponse := repo.GetLoggregatorEndpoint()
+				assert.True(mr.T(), apiResponse.IsSuccessful())
+				assert.Equal(mr.T(), endpoint, "wss://loggregator.run.pivotal.io:4443")
+			})
+
+			It("extrapolates the loggregator URL based on the API URL (non-SSL API)", func() {
+				config.Target = "http://api.run.pivotal.io"
+
+				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
+
+				endpoint, apiResponse := repo.GetLoggregatorEndpoint()
+				assert.True(mr.T(), apiResponse.IsSuccessful())
+				assert.Equal(mr.T(), endpoint, "ws://loggregator.run.pivotal.io:80")
+			})
 		})
 
 		It("TestGetUAAEndpoint", func() {
