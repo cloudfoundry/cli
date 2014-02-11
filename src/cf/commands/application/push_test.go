@@ -380,7 +380,6 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("TestPushingAppToResetStartCommand", func() {
-
 		deps := getPushDependencies()
 
 		existingApp := models.Application{}
@@ -400,7 +399,6 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("TestPushingAppMergesManifestEnvVarsWithExistingEnvVars", func() {
-
 		deps := getPushDependencies()
 
 		existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
@@ -411,7 +409,7 @@ var _ = Describe("Push Command", func() {
 		}
 		deps.appRepo.ReadApp = existingApp
 
-		deps.manifestRepo.ReadManifestManifest = singleAppManifest()
+		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
 		_ = callPush(mr.T(), []string{"existing-app"}, deps)
 
@@ -431,7 +429,7 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.appRepo.ReadNotFound = true
 
-		deps.manifestRepo.ReadManifestManifest = singleAppManifest()
+		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
 		ui := callPush(mr.T(), []string{}, deps)
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -459,7 +457,8 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingAppManifestWithErrors", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{
+		deps.manifestRepo.ReadManifestReturns.Path = "/some-path/"
+		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{
 			errors.New("buildpack should not be null"),
 			errors.New("disk_quota should not be null"),
 		}
@@ -477,7 +476,7 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingManyAppsFromManifest", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
+		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
 		ui := callPush(mr.T(), []string{}, deps)
 
@@ -502,7 +501,7 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingASingleAppFromAManifestWithManyApps", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
+		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
 		ui := callPush(mr.T(), []string{"app2"}, deps)
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -518,7 +517,7 @@ var _ = Describe("Push Command", func() {
 	It("TestNamedAppInAManifestIsNotFound", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
+		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
 		ui := callPush(mr.T(), []string{"non-existant-app"}, deps)
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -537,7 +536,7 @@ var _ = Describe("Push Command", func() {
 			"app2-service":   maker.NewServiceInstance("app2-service"),
 		})
 
-		deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
+		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
 		ui := callPush(mr.T(), []string{}, deps)
 		assert.Equal(mr.T(), len(deps.binder.AppsToBind), 4)
@@ -571,7 +570,7 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.serviceRepo.FindInstanceByNameErr = true
-		deps.manifestRepo.ReadManifestManifest = manifestWithServicesAndEnv()
+		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
 		ui := callPush(mr.T(), []string{}, deps)
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -639,8 +638,8 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		deps.manifestRepo.ReadManifestManifest = manifest.NewEmptyManifest()
-		deps.manifestRepo.ManifestPathErr = errors.New("read manifest error")
+		deps.manifestRepo.ReadManifestReturns.Manifest = manifest.NewEmptyManifest()
+		deps.manifestRepo.ReadManifestReturns.Errors = []error{errors.New("read manifest error")}
 
 		ui := callPush(mr.T(), []string{
 			"-f", "bad/manifest/path",
@@ -655,8 +654,9 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingWithDefaultManifestNotFound", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestManifest = singleAppManifest()
-		deps.manifestRepo.ReadManifestErrors = manifest.ManifestErrors{syscall.ENOENT}
+		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
+		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{syscall.ENOENT}
+		deps.manifestRepo.ReadManifestReturns.Path = ""
 
 		ui := callPush(mr.T(), []string{"--no-route", "app-name"}, deps)
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -673,15 +673,16 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingWithManifestInAppDirectory", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestManifest = singleAppManifest()
+		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
+		deps.manifestRepo.ReadManifestReturns.Path = "manifest.yml"
 
 		ui := callPush(mr.T(), []string{"-p", "some/relative/path"}, deps)
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Using manifest file", "manifest.yml"},
 		})
 
-		assert.Equal(mr.T(), deps.manifestRepo.UserSpecifiedPath, "")
-		assert.Equal(mr.T(), deps.manifestRepo.ReadManifestPath, "manifest.yml")
+		cwd, _ := os.Getwd()
+		assert.Equal(mr.T(), deps.manifestRepo.ReadManifestArgs.Path, cwd)
 	})
 
 	It("TestPushingWithNoManifestFlag", func() {
@@ -695,12 +696,11 @@ var _ = Describe("Push Command", func() {
 			{"hacker-manifesto"},
 		})
 
-		assert.Equal(mr.T(), deps.manifestRepo.ReadManifestPath, "")
+		assert.Equal(mr.T(), deps.manifestRepo.ReadManifestArgs.Path, "")
 		assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "app-name")
 	})
 
 	It("TestPushingWithNoManifestFlagAndMissingAppName", func() {
-
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
@@ -758,7 +758,7 @@ var _ = Describe("Push Command", func() {
 		workerManifest := singleAppManifest()
 		noRoute := true
 		workerManifest.Applications[0].NoRoute = &noRoute
-		deps.manifestRepo.ReadManifestManifest = workerManifest
+		deps.manifestRepo.ReadManifestReturns.Manifest = workerManifest
 
 		ui := callPush(mr.T(), []string{
 			"worker-app",

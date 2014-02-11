@@ -5,43 +5,24 @@ import (
 )
 
 type FakeManifestRepository struct {
-	ReadManifestPath     string
-	ReadManifestErrors   manifest.ManifestErrors
-	ReadManifestManifest *manifest.Manifest
-
-	UserSpecifiedPath string
-	ManifestDir       string
-	ManifestFilename  string
-	ManifestPathErr   error
+	ReadManifestArgs struct {
+		Path string
+	}
+	ReadManifestReturns struct {
+		Manifest *manifest.Manifest
+		Path string
+		Errors manifest.ManifestErrors
+	}
 }
 
-func (repo *FakeManifestRepository) ReadManifest(dir string) (m *manifest.Manifest, errs manifest.ManifestErrors) {
-	repo.ReadManifestPath = dir
-	errs = repo.ReadManifestErrors
-
-	if repo.ReadManifestManifest != nil {
-		m = repo.ReadManifestManifest
+func (repo *FakeManifestRepository) ReadManifest(inputPath string) (m *manifest.Manifest, path string, errs manifest.ManifestErrors) {
+	repo.ReadManifestArgs.Path = inputPath
+	if repo.ReadManifestReturns.Manifest != nil {
+		m = repo.ReadManifestReturns.Manifest
 	} else {
 		m = manifest.NewEmptyManifest()
 	}
-	return
-}
-
-func (repo *FakeManifestRepository) ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
-	repo.UserSpecifiedPath = userSpecifiedPath
-
-	if repo.ManifestDir != "" {
-		manifestDir = repo.ManifestDir
-	} else {
-		manifestDir = userSpecifiedPath
-	}
-
-	if repo.ManifestFilename != "" {
-		manifestFilename = repo.ManifestFilename
-	} else {
-		manifestFilename = "manifest.yml"
-	}
-
-	err = repo.ManifestPathErr
+	path = repo.ReadManifestReturns.Path
+	errs = repo.ReadManifestReturns.Errors
 	return
 }

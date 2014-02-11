@@ -401,31 +401,35 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppP
 }
 
 func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
-	basePath, manifestFilename, err := cmd.manifestRepo.ManifestPath(c.String("f"))
-
-	if err != nil {
-		cmd.ui.Failed("%s", err)
-		return
-	}
-
 	if c.Bool("no-manifest") {
 		m = manifest.NewEmptyManifest()
 		return
 	}
 
-	m, errs := cmd.manifestRepo.ReadManifest(filepath.Join(basePath, manifestFilename))
-
-	if !errs.Empty() {
-		if os.IsNotExist(errs[0]) && c.String("f") == "" {
-			m = manifest.NewEmptyManifest()
-			return
-		} else {
-			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+	var path string
+	if c.String("f") != "" {
+		path = c.String("f")
+	} else {
+		var err error
+		path, err = os.Getwd()
+		if err != nil {
+			cmd.ui.Failed("Could not determine the current working directory!", err)
 			return
 		}
 	}
 
-	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(filepath.Join(basePath, manifestFilename)))
+	m, manifestPath, errs := cmd.manifestRepo.ReadManifest(path)
+
+	if !errs.Empty() {
+		if manifestPath == "" && c.String("f") == "" {
+			m = manifest.NewEmptyManifest()
+		} else {
+			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+		}
+		return
+	}
+
+	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(manifestPath))
 	return
 }
 
