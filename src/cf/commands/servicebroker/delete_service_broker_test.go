@@ -2,7 +2,6 @@ package servicebroker_test
 
 import (
 	. "cf/commands/servicebroker"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -18,20 +17,7 @@ import (
 func callDeleteServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("delete-service-broker", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewDeleteServiceBroker(ui, config, repo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
@@ -48,20 +34,7 @@ func deleteServiceBroker(t mr.TestingT, confirmation string, args []string) (ui 
 	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space2 := models.SpaceFields{}
-	space2.Name = "my-space"
-	org2 := models.OrganizationFields{}
-	org2.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space2,
-		OrganizationFields: org2,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	ctxt := testcmd.NewContext("delete-service-broker", args)
 	cmd := NewDeleteServiceBroker(ui, config, repo)

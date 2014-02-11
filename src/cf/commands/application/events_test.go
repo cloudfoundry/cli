@@ -2,55 +2,25 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-
-	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
-func getEventsDependencies() (reqFactory *testreq.FakeReqFactory, eventsRepo *testapi.FakeAppEventsRepo) {
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	eventsRepo = &testapi.FakeAppEventsRepo{}
-	return
-}
-
-func callEvents(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, eventsRepo *testapi.FakeAppEventsRepo) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("events", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewEvents(ui, config, eventsRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestEventsRequirements", func() {
 			reqFactory, eventsRepo := getEventsDependencies()
 
-			callEvents(mr.T(), []string{"my-app"}, reqFactory, eventsRepo)
+			callEvents([]string{"my-app"}, reqFactory, eventsRepo)
 
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
@@ -58,7 +28,7 @@ func init() {
 		It("TestEventsFailsWithUsage", func() {
 
 			reqFactory, eventsRepo := getEventsDependencies()
-			ui := callEvents(mr.T(), []string{}, reqFactory, eventsRepo)
+			ui := callEvents([]string{}, reqFactory, eventsRepo)
 
 			assert.True(mr.T(), ui.FailedWithUsage)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
@@ -90,7 +60,7 @@ func init() {
 				event2,
 			}
 
-			ui := callEvents(mr.T(), []string{"my-app"}, reqFactory, eventsRepo)
+			ui := callEvents([]string{"my-app"}, reqFactory, eventsRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
@@ -106,7 +76,7 @@ func init() {
 			app.Name = "my-app"
 			reqFactory.Application = app
 
-			ui := callEvents(mr.T(), []string{"my-app"}, reqFactory, eventsRepo)
+			ui := callEvents([]string{"my-app"}, reqFactory, eventsRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"events", "my-app"},
@@ -114,4 +84,20 @@ func init() {
 			})
 		})
 	})
+}
+
+func getEventsDependencies() (reqFactory *testreq.FakeReqFactory, eventsRepo *testapi.FakeAppEventsRepo) {
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+	eventsRepo = &testapi.FakeAppEventsRepo{}
+	return
+}
+
+func callEvents(args []string, reqFactory *testreq.FakeReqFactory, eventsRepo *testapi.FakeAppEventsRepo) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("events", args)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewEvents(ui, configRepo, eventsRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

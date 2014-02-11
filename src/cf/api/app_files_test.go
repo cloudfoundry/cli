@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -11,12 +10,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestListFiles", func() {
+	Describe("AppFilesRepository", func() {
+		It("lists files", func() {
 
 			expectedResponse := "file 1\n file 2\n file 3"
 
@@ -53,13 +53,11 @@ func init() {
 			listFilesRedirectServer, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
 			defer listFilesRedirectServer.Close()
 
-			config := &configuration.Configuration{
-				Target:      listFilesRedirectServer.URL,
-				AccessToken: "BEARER my_access_token",
-			}
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetApiEndpoint(listFilesRedirectServer.URL)
 
 			gateway := net.NewCloudControllerGateway()
-			repo := NewCloudControllerAppFilesRepository(config, gateway)
+			repo := NewCloudControllerAppFilesRepository(configRepo, gateway)
 			list, err := repo.ListFiles("my-app-guid", "some/path")
 
 			assert.True(mr.T(), handler.AllRequestsCalled())

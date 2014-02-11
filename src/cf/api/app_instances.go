@@ -36,19 +36,19 @@ type AppInstancesRepository interface {
 }
 
 type CloudControllerAppInstancesRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerAppInstancesRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerAppInstancesRepository) {
+func NewCloudControllerAppInstancesRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerAppInstancesRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.Target, appGuid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken, nil)
+	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid)
+	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken(), nil)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -77,9 +77,9 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 }
 
 func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.Target, guid)
+	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.ApiEndpoint(), guid)
 	statsResponse := StatsApiResponse{}
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, &statsResponse)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), &statsResponse)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

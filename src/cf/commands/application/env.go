@@ -10,11 +10,11 @@ import (
 
 type Env struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Reader
 	appReq requirements.ApplicationRequirement
 }
 
-func NewEnv(ui terminal.UI, config *configuration.Configuration) (cmd *Env) {
+func NewEnv(ui terminal.UI, config configuration.Reader) (cmd *Env) {
 	cmd = new(Env)
 	cmd.ui = ui
 	cmd.config = config
@@ -42,8 +42,8 @@ func (cmd *Env) Run(c *cli.Context) {
 
 	cmd.ui.Say("Getting env variables for app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 	envVars := app.EnvironmentVars

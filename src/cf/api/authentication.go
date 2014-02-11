@@ -17,11 +17,11 @@ type AuthenticationRepository interface {
 }
 
 type UAAAuthenticationRepository struct {
-	config  *configuration.Configuration
+	config  configuration.ReadWriter
 	gateway net.Gateway
 }
 
-func NewUAAAuthenticationRepository(gateway net.Gateway, config *configuration.Configuration) (uaa UAAAuthenticationRepository) {
+func NewUAAAuthenticationRepository(gateway net.Gateway, config configuration.ReadWriter) (uaa UAAAuthenticationRepository) {
 	uaa.gateway = gateway
 	uaa.config = config
 	return
@@ -44,13 +44,13 @@ func (uaa UAAAuthenticationRepository) Authenticate(email string, password strin
 
 func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse) {
 	data := url.Values{
-		"refresh_token": {uaa.config.RefreshToken},
+		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
 		"scope":         {""},
 	}
 
 	apiResponse = uaa.getAuthToken(data)
-	updatedToken = uaa.config.AccessToken
+	updatedToken = uaa.config.AccessToken()
 
 	if apiResponse.IsError() {
 		fmt.Printf("%s\n\n", terminal.NotLoggedInText())
@@ -73,7 +73,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 		Error        uaaErrorResponse `json:"error"`
 	}
 
-	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint)
+	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint())
 	request, apiResponse := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -92,8 +92,8 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 		return
 	}
 
-	uaa.config.AccessToken = fmt.Sprintf("%s %s", response.TokenType, response.AccessToken)
-	uaa.config.RefreshToken = response.RefreshToken
+	uaa.config.SetAccessToken(fmt.Sprintf("%s %s", response.TokenType, response.AccessToken))
+	uaa.config.SetRefreshToken(response.RefreshToken)
 
 	return
 }

@@ -11,12 +11,12 @@ import (
 
 type SetQuota struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	quotaRepo api.QuotaRepository
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewSetQuota(ui terminal.UI, config *configuration.Configuration, quotaRepo api.QuotaRepository) (cmd *SetQuota) {
+func NewSetQuota(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *SetQuota) {
 	cmd = new(SetQuota)
 	cmd.ui = ui
 	cmd.config = config

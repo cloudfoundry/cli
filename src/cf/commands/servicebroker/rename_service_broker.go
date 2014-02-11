@@ -11,11 +11,11 @@ import (
 
 type RenameServiceBroker struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Reader
 	repo   api.ServiceBrokerRepository
 }
 
-func NewRenameServiceBroker(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd RenameServiceBroker) {
+func NewRenameServiceBroker(ui terminal.UI, config configuration.Reader, repo api.ServiceBrokerRepository) (cmd RenameServiceBroker) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.repo = repo

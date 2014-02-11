@@ -14,30 +14,6 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callShowOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("org", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	spaceFields := models.SpaceFields{}
-	spaceFields.Name = "my-space"
-
-	orgFields := models.OrganizationFields{}
-	orgFields.Name = "my-org"
-
-	config := &configuration.Configuration{
-		SpaceFields:        spaceFields,
-		OrganizationFields: orgFields,
-		AccessToken:        token,
-	}
-
-	cmd := NewShowOrg(ui, config)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestShowOrgRequirements", func() {
@@ -100,4 +76,25 @@ func init() {
 			})
 		})
 	})
+}
+
+func callShowOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("org", args)
+
+	token := configuration.TokenInfo{Username: "my-user"}
+
+	spaceFields := models.SpaceFields{}
+	spaceFields.Name = "my-space"
+
+	orgFields := models.OrganizationFields{}
+	orgFields.Name = "my-org"
+
+	configRepo := testconfig.NewRepositoryWithAccessToken(token)
+	configRepo.SetSpaceFields(spaceFields)
+	configRepo.SetOrganizationFields(orgFields)
+
+	cmd := NewShowOrg(ui, configRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

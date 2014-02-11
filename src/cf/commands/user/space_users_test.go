@@ -2,7 +2,6 @@ package user_test
 
 import (
 	. "cf/commands/user"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -18,19 +17,7 @@ import (
 func callSpaceUsers(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org2 := models.OrganizationFields{}
-	org2.Name = "my-org"
-	space2 := models.SpaceFields{}
-	space2.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space2,
-		OrganizationFields: org2,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewSpaceUsers(ui, config, spaceRepo, userRepo)
 	ctxt := testcmd.NewContext("space-users", args)

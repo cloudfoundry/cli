@@ -11,11 +11,11 @@ import (
 
 type UpdateServiceAuthTokenFields struct {
 	ui            terminal.UI
-	config        *configuration.Configuration
+	config        configuration.Reader
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewUpdateServiceAuthToken(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd UpdateServiceAuthTokenFields) {
+func NewUpdateServiceAuthToken(ui terminal.UI, config configuration.Reader, authTokenRepo api.ServiceAuthTokenRepository) (cmd UpdateServiceAuthTokenFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo

@@ -19,7 +19,7 @@ const maxChoices = 50
 
 type Login struct {
 	ui            terminal.UI
-	config        *configuration.Configuration
+	config        configuration.ReadWriter
 	authenticator api.AuthenticationRepository
 	endpointRepo  api.EndpointRepository
 	orgRepo       api.OrganizationRepository
@@ -27,7 +27,7 @@ type Login struct {
 }
 
 func NewLogin(ui terminal.UI,
-	config *configuration.Configuration,
+	config configuration.ReadWriter,
 	authenticator api.AuthenticationRepository,
 	endpointRepo api.EndpointRepository,
 	orgRepo api.OrganizationRepository,
@@ -89,7 +89,7 @@ func (cmd Login) Run(c *cli.Context) {
 func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
 	api := c.String("a")
 	if api == "" {
-		api = cmd.config.Target
+		api = cmd.config.ApiEndpoint()
 	}
 
 	if api == "" {

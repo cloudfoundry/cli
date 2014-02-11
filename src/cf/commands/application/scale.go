@@ -13,13 +13,13 @@ import (
 
 type Scale struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	restarter ApplicationRestarter
 	appReq    requirements.ApplicationRequirement
 	appRepo   api.ApplicationRepository
 }
 
-func NewScale(ui terminal.UI, config *configuration.Configuration, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
+func NewScale(ui terminal.UI, config configuration.Reader, restarter ApplicationRestarter, appRepo api.ApplicationRepository) (cmd *Scale) {
 	cmd = new(Scale)
 	cmd.ui = ui
 	cmd.config = config
@@ -56,8 +56,8 @@ func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()
 	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(currentApp.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

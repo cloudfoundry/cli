@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -11,44 +10,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
-
-var singleBuildpackResponse = testnet.TestResponse{
-	Status: http.StatusOK,
-	Body: `{"resources": [
-		  {
-			  "metadata": {
-				  "guid": "buildpack1-guid"
-			  },
-			  "entity": {
-				  "name": "Buildpack1",
-				  "position": 10
-			  }
-		  }
-		  ]
-	  }`}
-
-var findBuildpackRequest = testnet.TestRequest{
-	Method:   "GET",
-	Path:     "/v2/buildpacks?q=name%3ABuildpack1",
-	Response: singleBuildpackResponse,
-}
-
-func createBuildpackRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	space.Guid = "my-space-guid"
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		SpaceFields: space,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerBuildpackRepository(config, gateway)
-	return
-}
 
 func init() {
 	Describe("Buildpacks repo", func() {
@@ -345,4 +309,34 @@ func init() {
 			assert.Equal(mr.T(), expectedBuildpack, updated)
 		})
 	})
+}
+
+var singleBuildpackResponse = testnet.TestResponse{
+	Status: http.StatusOK,
+	Body: `{"resources": [
+		  {
+			  "metadata": {
+				  "guid": "buildpack1-guid"
+			  },
+			  "entity": {
+				  "name": "Buildpack1",
+				  "position": 10
+			  }
+		  }
+		  ]
+	  }`}
+
+var findBuildpackRequest = testnet.TestRequest{
+	Method:   "GET",
+	Path:     "/v2/buildpacks?q=name%3ABuildpack1",
+	Response: singleBuildpackResponse,
+}
+
+func createBuildpackRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
+	config := testconfig.NewRepositoryWithDefaults()
+	config.SetApiEndpoint(ts.URL)
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerBuildpackRepository(config, gateway)
+	return
 }

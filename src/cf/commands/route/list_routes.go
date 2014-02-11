@@ -13,10 +13,10 @@ import (
 type ListRoutes struct {
 	ui        terminal.UI
 	routeRepo api.RouteRepository
-	config    *configuration.Configuration
+	config    configuration.Reader
 }
 
-func NewListRoutes(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *ListRoutes) {
+func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *ListRoutes) {
 	cmd = new(ListRoutes)
 	cmd.ui = ui
 	cmd.config = config

@@ -37,11 +37,11 @@ type QuotaRepository interface {
 }
 
 type CloudControllerQuotaRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerQuotaRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerQuotaRepository) {
+func NewCloudControllerQuotaRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerQuotaRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -50,7 +50,7 @@ func NewCloudControllerQuotaRepository(config *configuration.Configuration, gate
 func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
 	resources := new(PaginatedQuotaResources)
 
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -63,12 +63,12 @@ func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas 
 }
 
 func (repo CloudControllerQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.Target)
+	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.ApiEndpoint())
 	return repo.findAllWithPath(path)
 }
 
 func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/quota_definitions?q=%s", repo.config.Target, url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("%s/v2/quota_definitions?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
 	quotas, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return
@@ -84,7 +84,7 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 }
 
 func (repo CloudControllerQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.Target, orgGuid)
+	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(data))
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(data))
 }

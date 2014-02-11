@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -25,24 +26,14 @@ func getSetSpaceRoleDeps() (reqFactory *testreq.FakeReqFactory, spaceRepo *testa
 func callSetSpaceRole(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-space-role", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	accessToken, err := testconfig.EncodeAccessToken(configuration.TokenInfo{
 		Username: "current-user",
 	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
+	Expect(err).NotTo(HaveOccurred())
+	configRepo.SetAccessToken(accessToken)
 
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewSetSpaceRole(ui, config, spaceRepo, userRepo)
+	cmd := NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -47,7 +47,7 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 	return
 }
 
-func NewPurgeServiceOffering(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd PurgeServiceOffering) {
+func NewPurgeServiceOffering(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd PurgeServiceOffering) {
 	cmd.ui = ui
 	cmd.serviceRepo = serviceRepo
 	return

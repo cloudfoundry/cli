@@ -11,13 +11,13 @@ import (
 
 type UnmapRoute struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	routeRepo api.RouteRepository
 	appReq    requirements.ApplicationRequirement
 	domainReq requirements.DomainRequirement
 }
 
-func NewUnmapRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *UnmapRoute) {
+func NewUnmapRoute(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *UnmapRoute) {
 	cmd = new(UnmapRoute)
 	cmd.ui = ui
 	cmd.config = config
@@ -58,8 +58,8 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 	cmd.ui.Say("Removing route %s from app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(route.URL()),
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

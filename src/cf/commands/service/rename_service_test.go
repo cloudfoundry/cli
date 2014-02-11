@@ -2,7 +2,6 @@ package service_test
 
 import (
 	. "cf/commands/service"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -19,19 +18,7 @@ func callRenameService(t mr.TestingT, args []string, reqFactory *testreq.FakeReq
 	ui = &testterm.FakeUI{}
 	serviceRepo = &testapi.FakeServiceRepo{}
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewRenameService(ui, config, serviceRepo)
 	ctxt := testcmd.NewContext("rename-service", args)

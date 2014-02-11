@@ -26,11 +26,11 @@ type Factory interface {
 
 type apiRequirementFactory struct {
 	ui          terminal.UI
-	config      *configuration.Configuration
+	config      configuration.Reader
 	repoLocator api.RepositoryLocator
 }
 
-func NewFactory(ui terminal.UI, config *configuration.Configuration, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
+func NewFactory(ui terminal.UI, config configuration.Reader, repoLocator api.RepositoryLocator) (factory apiRequirementFactory) {
 	return apiRequirementFactory{ui, config, repoLocator}
 }
 

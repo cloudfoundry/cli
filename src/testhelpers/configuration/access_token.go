@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-func CreateAccessTokenWithTokenInfo(tokenInfo configuration.TokenInfo) (accessToken string, err error) {
+func EncodeAccessToken(tokenInfo configuration.TokenInfo) (accessToken string, err error) {
 	tokenInfoBytes, err := json.Marshal(tokenInfo)
 	if err != nil {
 		return

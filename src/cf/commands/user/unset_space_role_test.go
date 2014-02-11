@@ -2,7 +2,6 @@ package user_test
 
 import (
 	. "cf/commands/user"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -26,19 +25,7 @@ func callUnsetSpaceRole(t mr.TestingT, args []string, spaceRepo *testapi.FakeSpa
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("unset-space-role", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "current-user",
-	})
-	assert.NoError(t, err)
-	space2 := models.SpaceFields{}
-	space2.Name = "my-space"
-	org2 := models.OrganizationFields{}
-	org2.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space2,
-		OrganizationFields: org2,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewUnsetSpaceRole(ui, config, spaceRepo, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
@@ -80,8 +67,8 @@ func init() {
 			assert.Equal(mr.T(), reqFactory.UserUsername, "username")
 			assert.Equal(mr.T(), reqFactory.OrganizationName, "org")
 		})
-		It("TestUnsetSpaceRole", func() {
 
+		It("TestUnsetSpaceRole", func() {
 			user := models.UserFields{}
 			user.Username = "some-user"
 			user.Guid = "some-user-guid"
@@ -104,8 +91,9 @@ func init() {
 			assert.Equal(mr.T(), spaceRepo.FindByNameInOrgName, "my-space")
 			assert.Equal(mr.T(), spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
 
+			println(ui.DumpOutputs())
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "current-user"},
+				{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
 				{"OK"},
 			})
 			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleRole, models.SPACE_MANAGER)

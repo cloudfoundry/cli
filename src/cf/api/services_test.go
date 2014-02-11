@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	testnet "testhelpers/net"
 )
@@ -61,7 +62,7 @@ var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body
   ]
 }`}
 
-func testGetServiceOfferings(t mr.TestingT, req testnet.TestRequest, config *configuration.Configuration) {
+func testGetServiceOfferings(t mr.TestingT, req testnet.TestRequest, config configuration.ReadWriter) {
 	ts, handler, repo := createServiceRepoWithConfig(t, []testnet.TestRequest{req}, config)
 	defer ts.Close()
 
@@ -158,19 +159,18 @@ func testRenameService(t mr.TestingT, endpointPath string, serviceInstance model
 }
 
 func createServiceRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	space2 := models.SpaceFields{}
-	space2.Guid = "my-space-guid"
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		SpaceFields: space2,
-	}
+	space := models.SpaceFields{}
+	space.Guid = "my-space-guid"
+	config := testconfig.NewRepository()
+	config.SetAccessToken("BEARER my_access_token")
+	config.SetSpaceFields(space)
 	return createServiceRepoWithConfig(t, reqs, config)
 }
 
-func createServiceRepoWithConfig(t mr.TestingT, reqs []testnet.TestRequest, config *configuration.Configuration) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+func createServiceRepoWithConfig(t mr.TestingT, reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
 	if len(reqs) > 0 {
 		ts, handler = testnet.NewTLSServer(t, reqs)
-		config.Target = ts.URL
+		config.SetApiEndpoint(ts.URL)
 	}
 
 	gateway := net.NewCloudControllerGateway()
@@ -180,6 +180,7 @@ func createServiceRepoWithConfig(t mr.TestingT, reqs []testnet.TestRequest, conf
 
 func init() {
 	Describe("Testing with ginkgo", func() {
+
 		It("TestGetServiceOfferingsWhenNotTargetingASpace", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
@@ -187,24 +188,26 @@ func init() {
 				Response: multipleOfferingsResponse,
 			})
 
-			config := &configuration.Configuration{
-				AccessToken: "BEARER my_access_token",
-			}
+			config := testconfig.NewRepository()
+			config.SetAccessToken("BEARER my_access_token")
+
 			testGetServiceOfferings(mr.T(), req, config)
 		})
-		It("TestGetServiceOfferingsWhenTargetingASpace", func() {
 
+		It("TestGetServiceOfferingsWhenTargetingASpace", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
 				Response: multipleOfferingsResponse,
 			})
+
 			space := models.SpaceFields{}
 			space.Guid = "my-space-guid"
-			config := &configuration.Configuration{
-				AccessToken: "BEARER my_access_token",
-				SpaceFields: space,
-			}
+
+			config := testconfig.NewRepository()
+			config.SetAccessToken("BEARER my_access_token")
+			config.SetSpaceFields(space)
+
 			testGetServiceOfferings(mr.T(), req, config)
 		})
 		It("TestCreateServiceInstance", func() {

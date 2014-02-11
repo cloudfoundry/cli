@@ -18,12 +18,12 @@ type BuildpackBitsRepository interface {
 }
 
 type CloudControllerBuildpackBitsRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 	zipper  cf.Zipper
 }
 
-func NewCloudControllerBuildpackBitsRepository(config *configuration.Configuration, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerBuildpackBitsRepository) {
+func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerBuildpackBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper
@@ -50,7 +50,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 }
 
 func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, zipFile *os.File, filename string) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.Target, buildpack.Guid)
+	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
@@ -65,7 +65,7 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.B
 		}
 
 		var request *net.Request
-		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken, requestFile)
+		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 		request.HttpReq.Header.Set("Content-Type", contentType)
 		if apiResponse.IsNotSuccessful() {

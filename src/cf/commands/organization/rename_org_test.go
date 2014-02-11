@@ -2,11 +2,9 @@ package organization_test
 
 import (
 	"cf/commands/organization"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -15,69 +13,64 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("rename-org", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	spaceFields := models.SpaceFields{}
-	spaceFields.Name = "my-space"
-
-	orgFields := models.OrganizationFields{}
-	orgFields.Name = "my-org"
-
-	config := &configuration.Configuration{
-		SpaceFields:        spaceFields,
-		OrganizationFields: orgFields,
-		AccessToken:        token,
-	}
-
-	cmd := organization.NewRenameOrg(ui, config, orgRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestRenameOrgFailsWithUsage", func() {
-			reqFactory := &testreq.FakeReqFactory{}
-			orgRepo := &testapi.FakeOrgRepository{}
+	Describe("rename-org command", func() {
+		var reqFactory *testreq.FakeReqFactory
+		var orgRepo *testapi.FakeOrgRepository
 
-			ui := callRenameOrg(mr.T(), []string{}, reqFactory, orgRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-
-			ui = callRenameOrg(mr.T(), []string{"foo"}, reqFactory, orgRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		BeforeEach(func() {
+			reqFactory = &testreq.FakeReqFactory{}
+			orgRepo = &testapi.FakeOrgRepository{}
 		})
-		It("TestRenameOrgRequirements", func() {
 
-			orgRepo := &testapi.FakeOrgRepository{}
+		It("fails with usage when given less than two args", func() {
+			ui := callRenameOrg([]string{}, reqFactory, orgRepo)
+			Expect(ui.FailedWithUsage).To(BeTrue())
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callRenameOrg(mr.T(), []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-			assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+			ui = callRenameOrg([]string{"foo"}, reqFactory, orgRepo)
+			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
-		It("TestRenameOrgRun", func() {
 
-			orgRepo := &testapi.FakeOrgRepository{}
+		It("fails requirements when not logged in", func() {
+			callRenameOrg([]string{"my-org", "my-new-org"}, reqFactory, orgRepo)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 
-			org := models.Organization{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Organization: org}
-			ui := callRenameOrg(mr.T(), []string{"my-org", "my-new-org"}, reqFactory, orgRepo)
+		Context("when logged in and given an org to rename", func() {
+			var ui *testterm.FakeUI
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Renaming org", "my-org", "my-new-org", "my-user"},
-				{"OK"},
+			BeforeEach(func() {
+				org := models.Organization{}
+				org.Name = "my-org"
+				org.Guid = "my-org-guid"
+				reqFactory.Organization = org
+				reqFactory.LoginSuccess = true
+				ui = callRenameOrg([]string{"my-org", "my-new-org"}, reqFactory, orgRepo)
 			})
 
-			assert.Equal(mr.T(), orgRepo.RenameOrganizationGuid, "my-org-guid")
-			assert.Equal(mr.T(), orgRepo.RenameNewName, "my-new-org")
+			It("pass requirements", func() {
+				Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			})
+
+			It("renames an organization", func() {
+				Expect(reqFactory.OrganizationName).To(Equal("my-org"))
+				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+					{"Renaming org", "my-org", "my-new-org", "my-user"},
+					{"OK"},
+				})
+
+				Expect(orgRepo.RenameOrganizationGuid).To(Equal("my-org-guid"))
+				Expect(orgRepo.RenameNewName).To(Equal("my-new-org"))
+			})
 		})
 	})
+}
+
+func callRenameOrg(args []string, reqFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("rename-org", args)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := organization.NewRenameOrg(ui, configRepo, orgRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

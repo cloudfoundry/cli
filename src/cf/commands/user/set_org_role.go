@@ -12,13 +12,13 @@ import (
 
 type SetOrgRole struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	userRepo api.UserRepository
 	userReq  requirements.UserRequirement
 	orgReq   requirements.OrganizationRequirement
 }
 
-func NewSetOrgRole(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd *SetOrgRole) {
+func NewSetOrgRole(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd *SetOrgRole) {
 	cmd = new(SetOrgRole)
 	cmd.ui = ui
 	cmd.config = config

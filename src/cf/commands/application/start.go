@@ -27,7 +27,7 @@ const LogMessageTypeStaging = "STG"
 
 type Start struct {
 	ui               terminal.UI
-	config           *configuration.Configuration
+	config           configuration.Reader
 	appDisplayer     ApplicationDisplayer
 	appReq           requirements.ApplicationRequirement
 	appRepo          api.ApplicationRepository
@@ -44,7 +44,7 @@ type ApplicationStarter interface {
 	ApplicationStart(app models.Application) (updatedApp models.Application, err error)
 }
 
-func NewStart(ui terminal.UI, config *configuration.Configuration, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
+func NewStart(ui terminal.UI, config configuration.Reader, appDisplayer ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (cmd *Start) {
 	cmd = new(Start)
 	cmd.ui = ui
 	cmd.config = config
@@ -112,8 +112,8 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 
 	cmd.ui.Say("Starting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

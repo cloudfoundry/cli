@@ -2,7 +2,6 @@ package user_test
 
 import (
 	. "cf/commands/user"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -19,19 +18,7 @@ func callSetOrgRole(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFac
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-org-role", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "current-user",
-	})
-	assert.NoError(t, err)
-	org2 := models.OrganizationFields{}
-	org2.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org2,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewSetOrgRole(ui, config, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
@@ -89,7 +76,7 @@ func init() {
 			ui := callSetOrgRole(mr.T(), []string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Assigning role", "OrgManager", "my-user", "my-org", "current-user"},
+				{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
 				{"OK"},
 			})
 			assert.Equal(mr.T(), userRepo.SetOrgRoleUserGuid, "my-user-guid")

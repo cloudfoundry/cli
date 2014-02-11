@@ -11,11 +11,11 @@ import (
 
 type UpdateServiceBroker struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.Reader
 	repo   api.ServiceBrokerRepository
 }
 
-func NewUpdateServiceBroker(ui terminal.UI, config *configuration.Configuration, repo api.ServiceBrokerRepository) (cmd UpdateServiceBroker) {
+func NewUpdateServiceBroker(ui terminal.UI, config configuration.Reader, repo api.ServiceBrokerRepository) (cmd UpdateServiceBroker) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.repo = repo

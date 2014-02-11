@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	"errors"
@@ -15,163 +14,9 @@ import (
 	"net/http/httptest"
 	"net/url"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
-
-func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {
-	nextUrl := rolePath + "?page=2"
-
-	ccReqs = []testnet.TestRequest{
-		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "GET",
-			Path:   rolePath,
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: fmt.Sprintf(`
-				{
-					"next_url": "%s",
-					"resources": [
-						{"metadata": {"guid": "user-1-guid"}, "entity": {}}
-					]
-				}`, nextUrl)}}),
-
-		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "GET",
-			Path:   nextUrl,
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `
-				{
-					"resources": [
-					 	{"metadata": {"guid": "user-2-guid"}, "entity": {}},
-					 	{"metadata": {"guid": "user-3-guid"}, "entity": {}}
-					]
-				}`}}),
-	}
-
-	uaaReqs = []testnet.TestRequest{
-		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "GET",
-			Path: fmt.Sprintf(
-				"/Users?attributes=id,userName&filter=%s",
-				url.QueryEscape(`Id eq "user-1-guid" or Id eq "user-2-guid" or Id eq "user-3-guid"`)),
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `
-				{
-					"resources": [
-						{ "id": "user-1-guid", "userName": "Super user 1" },
-						{ "id": "user-2-guid", "userName": "Super user 2" },
-  						{ "id": "user-3-guid", "userName": "Super user 3" }
-					]
-				}`}})}
-
-	return
-}
-
-func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     path,
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-
-	userReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req, userReq})
-	defer cc.Close()
-
-	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func testUnsetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "DELETE",
-		Path:     path,
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req})
-	defer cc.Close()
-
-	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
-	addToOrgReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-
-	setRoleReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     path,
-		Response: testnet.TestResponse{Status: http.StatusOK},
-	})
-
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{addToOrgReq, setRoleReq})
-	defer cc.Close()
-
-	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
-
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
-}
-
-func createUsersRepoWithoutEndpoints() (repo UserRepository) {
-	_, _, _, _, repo = createUsersRepo(nil, []testnet.TestRequest{}, []testnet.TestRequest{})
-	return
-}
-
-func createUsersRepoWithoutUAAEndpoints(t mr.TestingT, ccReqs []testnet.TestRequest) (cc *httptest.Server, ccHandler *testnet.TestHandler, repo UserRepository) {
-	cc, ccHandler, _, _, repo = createUsersRepo(t, ccReqs, []testnet.TestRequest{})
-	return
-}
-
-func createUsersRepoWithoutCCEndpoints(t mr.TestingT, uaaReqs []testnet.TestRequest) (uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
-	_, _, uaa, uaaHandler, repo = createUsersRepo(t, []testnet.TestRequest{}, uaaReqs)
-	return
-}
-
-func createUsersRepo(t mr.TestingT, ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) (cc *httptest.Server,
-	ccHandler *testnet.TestHandler, uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
-
-	ccTarget := ""
-	uaaTarget := ""
-
-	if len(ccReqs) > 0 {
-		cc, ccHandler = testnet.NewTLSServer(t, ccReqs)
-		ccTarget = cc.URL
-	}
-	if len(uaaReqs) > 0 {
-		uaa, uaaHandler = testnet.NewTLSServer(t, uaaReqs)
-		uaaTarget = uaa.URL
-	}
-	org := models.OrganizationFields{Guid: "some-org-guid"}
-
-	config := &configuration.Configuration{
-		AccessToken:        "BEARER my_access_token",
-		Target:             ccTarget,
-		OrganizationFields: org,
-	}
-	ccGateway := net.NewCloudControllerGateway()
-	uaaGateway := net.NewUAAGateway()
-	endpointRepo := &testapi.FakeEndpointRepo{}
-	endpointRepo.UAAEndpointReturns.Endpoint = uaaTarget
-	repo = NewCloudControllerUserRepository(config, uaaGateway, ccGateway, endpointRepo)
-	return
-}
 
 var _ = Describe("UserRepository", func() {
 	Describe("listing the users with a given role", func() {
@@ -238,18 +83,17 @@ var _ = Describe("UserRepository", func() {
 		It("returns an error when the UAA endpoint cannot be determined", func() {
 			ccReqs, _ := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
-			cc, _ := testnet.NewTLSServer(mr.T(), ccReqs)
-			config := &configuration.Configuration{
-				AccessToken:        "BEARER my_access_token",
-				Target:             cc.URL,
-				OrganizationFields: models.OrganizationFields{Guid: "my-org-guid"},
-			}
+			ts, _ := testnet.NewTLSServer(mr.T(), ccReqs)
+			defer ts.Close()
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			configRepo.SetApiEndpoint(ts.URL)
+
 			ccGateway := net.NewCloudControllerGateway()
 			uaaGateway := net.NewUAAGateway()
 			endpointRepo := &testapi.FakeEndpointRepo{}
 			endpointRepo.UAAEndpointReturns.ApiResponse = net.NewApiResponseWithError("Failed to get endpoint!", errors.New("Failed!"))
 
-			repo := NewCloudControllerUserRepository(config, uaaGateway, ccGateway, endpointRepo)
+			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
 
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
@@ -459,3 +303,154 @@ var _ = Describe("UserRepository", func() {
 		assert.Equal(t, users[2].Username, "Super user 3")
 	})
 })
+
+func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) {
+	nextUrl := rolePath + "?page=2"
+
+	ccReqs = []testnet.TestRequest{
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   rolePath,
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: fmt.Sprintf(`
+				{
+					"next_url": "%s",
+					"resources": [
+						{"metadata": {"guid": "user-1-guid"}, "entity": {}}
+					]
+				}`, nextUrl)}}),
+
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path:   nextUrl,
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: `
+				{
+					"resources": [
+					 	{"metadata": {"guid": "user-2-guid"}, "entity": {}},
+					 	{"metadata": {"guid": "user-3-guid"}, "entity": {}}
+					]
+				}`}}),
+	}
+
+	uaaReqs = []testnet.TestRequest{
+		testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method: "GET",
+			Path: fmt.Sprintf(
+				"/Users?attributes=id,userName&filter=%s",
+				url.QueryEscape(`Id eq "user-1-guid" or Id eq "user-2-guid" or Id eq "user-3-guid"`)),
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: `
+				{
+					"resources": [
+						{ "id": "user-1-guid", "userName": "Super user 1" },
+						{ "id": "user-2-guid", "userName": "Super user 2" },
+  						{ "id": "user-3-guid", "userName": "Super user 3" }
+					]
+				}`}})}
+
+	return
+}
+
+func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	userReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req, userReq})
+	defer cc.Close()
+
+	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func testUnsetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "DELETE",
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req})
+	defer cc.Close()
+
+	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
+	addToOrgReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	setRoleReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     path,
+		Response: testnet.TestResponse{Status: http.StatusOK},
+	})
+
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{addToOrgReq, setRoleReq})
+	defer cc.Close()
+
+	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
+
+	assert.True(t, handler.AllRequestsCalled())
+	assert.True(t, apiResponse.IsSuccessful())
+}
+
+func createUsersRepoWithoutEndpoints() (repo UserRepository) {
+	_, _, _, _, repo = createUsersRepo(nil, []testnet.TestRequest{}, []testnet.TestRequest{})
+	return
+}
+
+func createUsersRepoWithoutUAAEndpoints(t mr.TestingT, ccReqs []testnet.TestRequest) (cc *httptest.Server, ccHandler *testnet.TestHandler, repo UserRepository) {
+	cc, ccHandler, _, _, repo = createUsersRepo(t, ccReqs, []testnet.TestRequest{})
+	return
+}
+
+func createUsersRepoWithoutCCEndpoints(t mr.TestingT, uaaReqs []testnet.TestRequest) (uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
+	_, _, uaa, uaaHandler, repo = createUsersRepo(t, []testnet.TestRequest{}, uaaReqs)
+	return
+}
+
+func createUsersRepo(t mr.TestingT, ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) (cc *httptest.Server,
+	ccHandler *testnet.TestHandler, uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
+
+	ccTarget := ""
+	uaaTarget := ""
+
+	if len(ccReqs) > 0 {
+		cc, ccHandler = testnet.NewTLSServer(t, ccReqs)
+		ccTarget = cc.URL
+	}
+	if len(uaaReqs) > 0 {
+		uaa, uaaHandler = testnet.NewTLSServer(t, uaaReqs)
+		uaaTarget = uaa.URL
+	}
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	configRepo.SetApiEndpoint(ccTarget)
+	ccGateway := net.NewCloudControllerGateway()
+	uaaGateway := net.NewUAAGateway()
+	endpointRepo := &testapi.FakeEndpointRepo{}
+	endpointRepo.UAAEndpointReturns.Endpoint = uaaTarget
+	repo = NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
+	return
+}

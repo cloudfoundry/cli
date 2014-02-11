@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -15,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callMarketplaceServices(t mr.TestingT, config *configuration.Configuration, serviceRepo *testapi.FakeServiceRepo) (ui *testterm.FakeUI) {
+func callMarketplaceServices(t mr.TestingT, config configuration.Reader, serviceRepo *testapi.FakeServiceRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	ctxt := testcmd.NewContext("marketplace", []string{})
@@ -25,9 +24,18 @@ func callMarketplaceServices(t mr.TestingT, config *configuration.Configuration,
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestMarketplaceServices", func() {
+
+var _ = Describe("Testing Marketplace Services", func() {
+
+	var config configuration.ReadWriter
+
+	Context("when the user is logged in", func() {
+
+		BeforeEach(func() {
+			config = testconfig.NewRepositoryWithDefaults()
+		})
+
+		It("lists the correct service offerings", func() {
 			plan := models.ServicePlanFields{}
 			plan.Name = "service-plan-a"
 			plan2 := models.ServicePlanFields{}
@@ -50,23 +58,8 @@ func init() {
 			serviceOfferings := []models.ServiceOffering{offering, offering2}
 			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
-			assert.NoError(mr.T(), err)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
-			space := models.SpaceFields{}
-			space.Name = "my-space"
-			space.Guid = "my-space-guid"
-			config := &configuration.Configuration{
-				SpaceFields:        space,
-				OrganizationFields: org,
-				AccessToken:        token,
-			}
-
 			ui := callMarketplaceServices(mr.T(), config, serviceRepo)
+
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Getting services from marketplace in org", "my-org", "my-space", "my-user"},
 				{"OK"},
@@ -75,12 +68,18 @@ func init() {
 				{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
 			})
 		})
-		It("TestMarketplaceServicesWhenNotLoggedIn", func() {
 
+	})
+
+	Context("when user is not logged in", func() {
+
+		BeforeEach(func() {
+			config = testconfig.NewRepository()
+		})
+
+		It("fails gracefully when user is not logged in", func() {
 			serviceOfferings := []models.ServiceOffering{}
 			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
-
-			config := &configuration.Configuration{}
 
 			ui := callMarketplaceServices(mr.T(), config, serviceRepo)
 
@@ -93,5 +92,6 @@ func init() {
 				{"service", "plans", "description"},
 			})
 		})
+
 	})
-}
+})

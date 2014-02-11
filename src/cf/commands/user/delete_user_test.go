@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -17,22 +18,14 @@ import (
 
 func callDeleteUser(t mr.TestingT, args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	accessToken, err := testconfig.EncodeAccessToken(configuration.TokenInfo{
 		Username: "current-user",
 	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	Expect(err).NotTo(HaveOccurred())
+	configRepo.SetAccessToken(accessToken)
 
-	cmd := NewDeleteUser(ui, config, userRepo)
+	cmd := NewDeleteUser(ui, configRepo, userRepo)
 	ctxt := testcmd.NewContext("delete-user", args)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
@@ -49,21 +42,14 @@ func deleteWithConfirmation(t mr.TestingT, confirmation string) (ui *testterm.Fa
 		FindByUsernameUserFields: user2,
 	}
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	accessToken, err := testconfig.EncodeAccessToken(configuration.TokenInfo{
 		Username: "current-user",
 	})
-	assert.NoError(t, err)
-	org2 := models.OrganizationFields{}
-	org2.Name = "my-org"
-	space2 := models.SpaceFields{}
-	space2.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space2,
-		OrganizationFields: org2,
-		AccessToken:        token,
-	}
+	Expect(err).NotTo(HaveOccurred())
+	configRepo.SetAccessToken(accessToken)
 
-	cmd := NewDeleteUser(ui, config, userRepo)
+	cmd := NewDeleteUser(ui, configRepo, userRepo)
 
 	ctxt := testcmd.NewContext("delete-user", []string{"my-user"})
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
@@ -86,8 +72,8 @@ func init() {
 			ui = callDeleteUser(mr.T(), []string{"foo", "bar"}, userRepo, reqFactory)
 			assert.True(mr.T(), ui.FailedWithUsage)
 		})
-		It("TestDeleteUserRequirements", func() {
 
+		It("TestDeleteUserRequirements", func() {
 			userRepo := &testapi.FakeUserRepository{}
 			reqFactory := &testreq.FakeReqFactory{}
 			args := []string{"-f", "my-user"}
@@ -100,8 +86,8 @@ func init() {
 			callDeleteUser(mr.T(), args, userRepo, reqFactory)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 		})
-		It("TestDeleteUserWhenConfirmingWithY", func() {
 
+		It("TestDeleteUserWhenConfirmingWithY", func() {
 			ui, userRepo := deleteWithConfirmation(mr.T(), "Y")
 
 			assert.Equal(mr.T(), len(ui.Outputs), 2)
@@ -117,8 +103,8 @@ func init() {
 			assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
 			assert.Equal(mr.T(), userRepo.DeleteUserGuid, "my-found-user-guid")
 		})
-		It("TestDeleteUserWhenConfirmingWithYes", func() {
 
+		It("TestDeleteUserWhenConfirmingWithYes", func() {
 			ui, userRepo := deleteWithConfirmation(mr.T(), "Yes")
 
 			assert.Equal(mr.T(), len(ui.Outputs), 2)
@@ -134,8 +120,8 @@ func init() {
 			assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
 			assert.Equal(mr.T(), userRepo.DeleteUserGuid, "my-found-user-guid")
 		})
-		It("TestDeleteUserWhenNotConfirming", func() {
 
+		It("TestDeleteUserWhenNotConfirming", func() {
 			ui, userRepo := deleteWithConfirmation(mr.T(), "Nope")
 
 			assert.Equal(mr.T(), len(ui.Outputs), 0)
@@ -144,8 +130,8 @@ func init() {
 			assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "")
 			assert.Equal(mr.T(), userRepo.DeleteUserGuid, "")
 		})
-		It("TestDeleteUserWithForceOption", func() {
 
+		It("TestDeleteUserWithForceOption", func() {
 			foundUserFields := models.UserFields{}
 			foundUserFields.Guid = "my-found-user-guid"
 			userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: foundUserFields}
@@ -163,8 +149,8 @@ func init() {
 			assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
 			assert.Equal(mr.T(), userRepo.DeleteUserGuid, "my-found-user-guid")
 		})
-		It("TestDeleteUserWhenUserNotFound", func() {
 
+		It("TestDeleteUserWhenUserNotFound", func() {
 			userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
 			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 

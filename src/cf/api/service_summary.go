@@ -78,21 +78,21 @@ type ServiceSummaryRepository interface {
 }
 
 type CloudControllerServiceSummaryRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceSummaryRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerServiceSummaryRepository) {
+func NewCloudControllerServiceSummaryRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerServiceSummaryRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.Target, repo.config.SpaceFields.Guid)
+	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
 	resource := new(ServiceInstancesSummaries)
 
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resource)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

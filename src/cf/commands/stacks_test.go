@@ -2,11 +2,8 @@ package commands_test
 
 import (
 	. "cf/commands"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,36 +11,18 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callStacks(t mr.TestingT, stackRepo *testapi.FakeStackRepository) (ui *testterm.FakeUI) {
+func callStacks(stackRepo *testapi.FakeStackRepository) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-
 	ctxt := testcmd.NewContext("stacks", []string{})
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewStacks(ui, config, stackRepo)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewStacks(ui, configRepo, stackRepo)
 	testcmd.RunCommand(cmd, ctxt, nil)
 
 	return
 }
 func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestStacks", func() {
+	Describe("stacks command", func() {
+		It("lists the stacks", func() {
 			stack1 := models.Stack{}
 			stack1.Name = "Stack-1"
 			stack1.Description = "Stack 1 Description"
@@ -56,10 +35,8 @@ func init() {
 				FindAllStacks: []models.Stack{stack1, stack2},
 			}
 
-			ui := callStacks(mr.T(), stackRepo)
-
-			assert.Equal(mr.T(), len(ui.Outputs), 6)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			ui := callStacks(stackRepo)
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 				{"Getting stacks in org", "my-org", "my-space", "my-user"},
 				{"OK"},
 				{"Stack-1", "Stack 1 Description"},

@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -11,21 +10,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
-
-func createServiceBrokerRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBrokerRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
-
-	config := &configuration.Configuration{
-		Target:      ts.URL,
-		AccessToken: "BEARER my_access_token",
-	}
-
-	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerServiceBrokerRepository(config, gateway)
-	return
-}
 
 var _ = Describe("Service Brokers Repo", func() {
 	It("TestServiceBrokersListServiceBrokers", func() {
@@ -77,7 +64,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), firstRequest, secondRequest)
+		ts, handler, repo := createServiceBrokerRepo(firstRequest, secondRequest)
 		defer ts.Close()
 
 		serviceBrokers := []models.ServiceBroker{}
@@ -116,7 +103,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: responseBody},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
+		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
 		foundBroker, apiResponse := repo.FindByName("my-broker")
@@ -139,7 +126,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [ ] }`},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
+		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
 		_, apiResponse := repo.FindByName("my-broker")
@@ -159,7 +146,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
+		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Create("foobroker", "http://example.com", "foouser", "password")
@@ -178,7 +165,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
+		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 		serviceBroker := models.ServiceBroker{}
 		serviceBroker.Guid = "my-guid"
@@ -201,7 +188,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
+		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Rename("my-guid", "update-foobroker")
@@ -217,7 +204,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			Response: testnet.TestResponse{Status: http.StatusNoContent},
 		})
 
-		ts, handler, repo := createServiceBrokerRepo(mr.T(), req)
+		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-guid")
@@ -226,3 +213,12 @@ var _ = Describe("Service Brokers Repo", func() {
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 	})
 })
+
+func createServiceBrokerRepo(requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBrokerRepository) {
+	ts, handler = testnet.NewTLSServer(GinkgoT(), requests)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	configRepo.SetApiEndpoint(ts.URL)
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
+	return
+}

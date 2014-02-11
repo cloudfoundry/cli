@@ -3,7 +3,6 @@ package service_test
 import (
 	"cf/api"
 	. "cf/commands/service"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -20,19 +19,7 @@ func callCreateService(t mr.TestingT, args []string, inputs []string, serviceRep
 	fakeUI = &testterm.FakeUI{Inputs: inputs}
 	ctxt := testcmd.NewContext("create-service", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
+	config := testconfig.NewRepositoryWithDefaults()
 
 	cmd := NewCreateService(fakeUI, config, serviceRepo)
 	reqFactory := &testreq.FakeReqFactory{}

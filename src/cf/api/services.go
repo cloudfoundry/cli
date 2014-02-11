@@ -125,26 +125,26 @@ type ServiceRepository interface {
 }
 
 type CloudControllerServiceRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerServiceRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerServiceRepository) {
+func NewCloudControllerServiceRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerServiceRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.Target)
-	spaceGuid := repo.config.SpaceFields.Guid
+	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.ApiEndpoint())
+	spaceGuid := repo.config.SpaceFields().Guid
 
 	if spaceGuid != "" {
-		path = fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.Target, spaceGuid)
+		path = fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.ApiEndpoint(), spaceGuid)
 	}
 
 	resources := new(PaginatedServiceOfferingResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -157,10 +157,10 @@ func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings mo
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=%s&inline-relations-depth=2", repo.config.Target, repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=%s&inline-relations-depth=2", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
 
 	resources := new(PaginatedServiceInstanceResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -176,13 +176,13 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 }
 
 func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_instances", repo.config.Target)
+	path := fmt.Sprintf("%s/v2/service_instances", repo.config.ApiEndpoint())
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s", "async": true}`,
-		name, planGuid, repo.config.SpaceFields.Guid,
+		name, planGuid, repo.config.SpaceFields().Guid,
 	)
 
-	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken, strings.NewReader(data))
+	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken(), strings.NewReader(data))
 
 	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
 
@@ -200,32 +200,32 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 
 func (repo CloudControllerServiceRepository) RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
+	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.ApiEndpoint(), instance.Guid)
 
 	if instance.IsUserProvided() {
-		path = fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.Target, instance.Guid)
+		path = fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), instance.Guid)
 	}
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceRepository) DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse) {
 	if len(instance.ServiceBindings) > 0 {
 		return net.NewApiResponseWithMessage("Cannot delete service instance, apps are still bound to it")
 	}
-	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.Target, instance.Guid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
+	path := fmt.Sprintf("%s/v2/service_instances/%s", repo.config.ApiEndpoint(), instance.Guid)
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
 }
 
 func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering models.ServiceOffering) net.ApiResponse {
-	url := fmt.Sprintf("%s/v2/services/%s?purge=true", repo.config.Target, offering.Guid)
-	return repo.gateway.DeleteResource(url, repo.config.AccessToken)
+	url := fmt.Sprintf("%s/v2/services/%s?purge=true", repo.config.ApiEndpoint(), offering.Guid)
+	return repo.gateway.DeleteResource(url, repo.config.AccessToken())
 }
 
 func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvider(label, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/services?q=%s", repo.config.Target, url.QueryEscape("label:"+label+";provider:"+provider))
+	path := fmt.Sprintf("%s/v2/services?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("label:"+label+";provider:"+provider))
 
 	resources := new(PaginatedServiceOfferingResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, resources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 
 	if apiResponse.IsError() {
 		return

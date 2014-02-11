@@ -29,7 +29,7 @@ type UI interface {
 	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
 	ConfigFailure(err error)
-	ShowConfiguration(*configuration.Configuration)
+	ShowConfiguration(configuration.Reader)
 	LoadingIndication()
 	Wait(duration time.Duration)
 	DisplayTable(table [][]string)
@@ -108,10 +108,10 @@ func (c terminalUI) ConfigFailure(err error) {
 	c.Failed("Please use '%s api' to set an API endpoint and then '%s login' to login.", cf.Name(), cf.Name())
 }
 
-func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
+func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
 	ui.Say("API endpoint: %s (API version: %s)",
-		EntityNameColor(config.Target),
-		EntityNameColor(config.ApiVersion))
+		EntityNameColor(config.ApiEndpoint()),
+		EntityNameColor(config.ApiVersion()))
 
 	if !config.IsLoggedIn() {
 		ui.Say(NotLoggedInText())
@@ -126,14 +126,14 @@ func (ui terminalUI) ShowConfiguration(config *configuration.Configuration) {
 	}
 
 	if config.HasOrganization() {
-		ui.Say("Org:          %s", EntityNameColor(config.OrganizationFields.Name))
+		ui.Say("Org:          %s", EntityNameColor(config.OrganizationFields().Name))
 	} else {
 		command := fmt.Sprintf("%s target -o Org", cf.Name())
 		ui.Say("Org:          No org targeted, use '%s'", CommandColor(command))
 	}
 
 	if config.HasSpace() {
-		ui.Say("Space:        %s", EntityNameColor(config.SpaceFields.Name))
+		ui.Say("Space:        %s", EntityNameColor(config.SpaceFields().Name))
 	} else {
 		command := fmt.Sprintf("%s target -s SPACE", cf.Name())
 		ui.Say("Space:        No space targeted, use '%s'", CommandColor(command))

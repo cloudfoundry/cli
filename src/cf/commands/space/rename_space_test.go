@@ -2,7 +2,6 @@ package space_test
 
 import (
 	. "cf/commands/space"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -18,25 +17,8 @@ import (
 func callRenameSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-space", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	space2 := models.SpaceFields{}
-	space2.Name = "my-space"
-
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-
-	config := &configuration.Configuration{
-		SpaceFields:        space2,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewRenameSpace(ui, config, spaceRepo)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewRenameSpace(ui, configRepo, spaceRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

@@ -11,11 +11,11 @@ import (
 
 type CreateServiceBroker struct {
 	ui                terminal.UI
-	config            *configuration.Configuration
+	config            configuration.Reader
 	serviceBrokerRepo api.ServiceBrokerRepository
 }
 
-func NewCreateServiceBroker(ui terminal.UI, config *configuration.Configuration, serviceBrokerRepo api.ServiceBrokerRepository) (cmd CreateServiceBroker) {
+func NewCreateServiceBroker(ui terminal.UI, config configuration.Reader, serviceBrokerRepo api.ServiceBrokerRepository) (cmd CreateServiceBroker) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceBrokerRepo = serviceBrokerRepo

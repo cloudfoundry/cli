@@ -2,7 +2,6 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -15,28 +14,6 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRename(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("rename", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewRenameApp(ui, config, appRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestRenameAppFailsWithUsage", func() {
@@ -75,4 +52,14 @@ func init() {
 			})
 		})
 	})
+}
+
+func callRename(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("rename", args)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewRenameApp(ui, configRepo, appRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

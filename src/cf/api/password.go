@@ -12,12 +12,12 @@ type PasswordRepository interface {
 }
 
 type CloudControllerPasswordRepository struct {
-	config       *configuration.Configuration
+	config       configuration.Reader
 	gateway      net.Gateway
 	endpointRepo EndpointRepository
 }
 
-func NewCloudControllerPasswordRepository(config *configuration.Configuration, gateway net.Gateway, endpointRepo EndpointRepository) (repo CloudControllerPasswordRepository) {
+func NewCloudControllerPasswordRepository(config configuration.Reader, gateway net.Gateway, endpointRepo EndpointRepository) (repo CloudControllerPasswordRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.endpointRepo = endpointRepo
@@ -33,5 +33,5 @@ func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new str
 	path := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())
 	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
 
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken, strings.NewReader(body))
+	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
 }

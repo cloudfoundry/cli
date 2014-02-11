@@ -11,11 +11,11 @@ import (
 
 type ListServices struct {
 	ui                 terminal.UI
-	config             *configuration.Configuration
+	config             configuration.Reader
 	serviceSummaryRepo api.ServiceSummaryRepository
 }
 
-func NewListServices(ui terminal.UI, config *configuration.Configuration, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
+func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummaryRepo api.ServiceSummaryRepository) (cmd ListServices) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceSummaryRepo = serviceSummaryRepo
@@ -28,8 +28,8 @@ func (cmd ListServices) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd ListServices) Run(c *cli.Context) {
 	cmd.ui.Say("Getting services in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

@@ -10,11 +10,11 @@ import (
 
 type ListServiceAuthTokens struct {
 	ui            terminal.UI
-	config        *configuration.Configuration
+	config        configuration.Reader
 	authTokenRepo api.ServiceAuthTokenRepository
 }
 
-func NewListServiceAuthTokens(ui terminal.UI, config *configuration.Configuration, authTokenRepo api.ServiceAuthTokenRepository) (cmd ListServiceAuthTokens) {
+func NewListServiceAuthTokens(ui terminal.UI, config configuration.Reader, authTokenRepo api.ServiceAuthTokenRepository) (cmd ListServiceAuthTokens) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.authTokenRepo = authTokenRepo

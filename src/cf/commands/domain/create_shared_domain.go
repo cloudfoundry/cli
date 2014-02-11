@@ -11,12 +11,12 @@ import (
 
 type CreateSharedDomain struct {
 	ui         terminal.UI
-	config     *configuration.Configuration
+	config     configuration.Reader
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewCreateSharedDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *CreateSharedDomain) {
+func NewCreateSharedDomain(ui terminal.UI, config configuration.Reader, domainRepo api.DomainRepository) (cmd *CreateSharedDomain) {
 	cmd = new(CreateSharedDomain)
 	cmd.ui = ui
 	cmd.config = config

@@ -10,11 +10,11 @@ import (
 
 type Stacks struct {
 	ui         terminal.UI
-	config     *configuration.Configuration
+	config     configuration.Reader
 	stacksRepo api.StackRepository
 }
 
-func NewStacks(ui terminal.UI, config *configuration.Configuration, stacksRepo api.StackRepository) (cmd *Stacks) {
+func NewStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.StackRepository) (cmd *Stacks) {
 	cmd = new(Stacks)
 	cmd.ui = ui
 	cmd.config = config
@@ -28,8 +28,8 @@ func (cmd *Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Conte
 
 func (cmd *Stacks) Run(c *cli.Context) {
 	cmd.ui.Say("Getting stacks in org %s / space %s as %s...",
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

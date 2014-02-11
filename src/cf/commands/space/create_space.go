@@ -14,14 +14,14 @@ import (
 
 type CreateSpace struct {
 	ui              terminal.UI
-	config          *configuration.Configuration
+	config          configuration.Reader
 	spaceRepo       api.SpaceRepository
 	orgRepo         api.OrganizationRepository
 	userRepo        api.UserRepository
 	spaceRoleSetter user.SpaceRoleSetter
 }
 
-func NewCreateSpace(ui terminal.UI, config *configuration.Configuration, spaceRoleSetter user.SpaceRoleSetter, spaceRepo api.SpaceRepository, orgRepo api.OrganizationRepository, userRepo api.UserRepository) (cmd CreateSpace) {
+func NewCreateSpace(ui terminal.UI, config configuration.Reader, spaceRoleSetter user.SpaceRoleSetter, spaceRepo api.SpaceRepository, orgRepo api.OrganizationRepository, userRepo api.UserRepository) (cmd CreateSpace) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.spaceRoleSetter = spaceRoleSetter
@@ -51,8 +51,8 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	orgName := c.String("o")
 	orgGuid := ""
 	if orgName == "" {
-		orgName = cmd.config.OrganizationFields.Name
-		orgGuid = cmd.config.OrganizationFields.Guid
+		orgName = cmd.config.OrganizationFields().Name
+		orgGuid = cmd.config.OrganizationFields().Guid
 	}
 
 	cmd.ui.Say("Creating space %s in org %s as %s...",

@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -11,20 +10,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
-
-func createOrganizationRepo(t mr.TestingT, reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
-	ts, handler = testnet.NewTLSServer(t, reqs)
-
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerOrganizationRepository(config, gateway)
-	return
-}
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestOrganizationsListOrgs", func() {
@@ -56,7 +44,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	]}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), firstPageOrgsRequest, secondPageOrgsRequest)
+		ts, handler, repo := createOrganizationRepo(firstPageOrgsRequest, secondPageOrgsRequest)
 		defer ts.Close()
 
 		orgs := []models.Organization{}
@@ -80,7 +68,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), emptyOrgsRequest)
+		ts, handler, repo := createOrganizationRepo(emptyOrgsRequest)
 		defer ts.Close()
 
 		wasCalled := false
@@ -120,7 +108,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	}]}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), req)
+		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 		existingOrg := models.Organization{}
 		existingOrg.Guid = "org1-guid"
@@ -149,7 +137,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), req)
+		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
 		_, apiResponse := repo.FindByName("org1")
@@ -166,7 +154,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), req)
+		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Create("my-org")
@@ -182,7 +170,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), req)
+		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Rename("my-org-guid", "my-new-org")
@@ -198,7 +186,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		ts, handler, repo := createOrganizationRepo(mr.T(), req)
+		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-org-guid")
@@ -206,3 +194,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 	})
 })
+
+func createOrganizationRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
+	ts, handler = testnet.NewTLSServer(GinkgoT(), reqs)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	configRepo.SetApiEndpoint(ts.URL)
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
+	return
+}

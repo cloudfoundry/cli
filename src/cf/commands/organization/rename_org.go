@@ -11,12 +11,12 @@ import (
 
 type RenameOrg struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	orgRepo api.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewRenameOrg(ui terminal.UI, config *configuration.Configuration, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
+func NewRenameOrg(ui terminal.UI, config configuration.Reader, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
 	cmd = new(RenameOrg)
 	cmd.ui = ui
 	cmd.config = config

@@ -17,7 +17,7 @@ import (
 
 func init() {
 	Describe("Testing with ginkgo", func() {
-		var config *configuration.Configuration
+		var config configuration.ReadWriter
 		var ui *testterm.FakeUI
 		var reqFactory *testreq.FakeReqFactory
 		var orgRepo *testapi.FakeOrgRepository
@@ -27,21 +27,16 @@ func init() {
 
 			ui = &testterm.FakeUI{}
 
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
-			assert.NoError(mr.T(), err)
-
 			spaceFields := models.SpaceFields{}
 			spaceFields.Name = "my-space"
 
 			orgFields := models.OrganizationFields{}
 			orgFields.Name = "my-org"
 
-			config = &configuration.Configuration{}
-			config.SpaceFields = spaceFields
-			config.OrganizationFields = orgFields
-			config.AccessToken = token
+			token := configuration.TokenInfo{Username: "my-user"}
+			config = testconfig.NewRepositoryWithAccessToken(token)
+			config.SetSpaceFields(spaceFields)
+			config.SetOrganizationFields(orgFields)
 
 			org := models.Organization{}
 			org.Name = "org-to-delete"
@@ -85,38 +80,38 @@ func init() {
 		})
 
 		It("TestDeleteTargetedOrganizationClearsConfig", func() {
-			config.OrganizationFields = orgRepo.Organizations[0].OrganizationFields
+			config.SetOrganizationFields(orgRepo.Organizations[0].OrganizationFields)
 
 			spaceFields := models.SpaceFields{}
 			spaceFields.Name = "space-to-delete"
-			config.SpaceFields = spaceFields
+			config.SetSpaceFields(spaceFields)
 
 			ui.Inputs = []string{"Yes"}
 
 			cmd := NewDeleteOrg(ui, config, orgRepo)
 			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-			assert.Equal(mr.T(), config.OrganizationFields, models.OrganizationFields{})
-			assert.Equal(mr.T(), config.SpaceFields, models.SpaceFields{})
+			assert.Equal(mr.T(), config.OrganizationFields(), models.OrganizationFields{})
+			assert.Equal(mr.T(), config.SpaceFields(), models.SpaceFields{})
 		})
 
 		It("TestDeleteUntargetedOrganizationDoesNotClearConfig", func() {
 			otherOrgFields := models.OrganizationFields{}
 			otherOrgFields.Guid = "some-other-org-guid"
 			otherOrgFields.Name = "some-other-org"
-			config.OrganizationFields = otherOrgFields
+			config.SetOrganizationFields(otherOrgFields)
 
 			spaceFields := models.SpaceFields{}
 			spaceFields.Name = "some-other-space"
-			config.SpaceFields = spaceFields
+			config.SetSpaceFields(spaceFields)
 
 			ui.Inputs = []string{"Yes"}
 
 			cmd := NewDeleteOrg(ui, config, orgRepo)
 			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-			assert.Equal(mr.T(), config.OrganizationFields.Name, "some-other-org")
-			assert.Equal(mr.T(), config.SpaceFields.Name, "some-other-space")
+			assert.Equal(mr.T(), config.OrganizationFields().Name, "some-other-org")
+			assert.Equal(mr.T(), config.SpaceFields().Name, "some-other-space")
 		})
 
 		It("TestDeleteOrgWithForceOption", func() {

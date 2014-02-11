@@ -12,11 +12,11 @@ import (
 
 type MarketplaceServices struct {
 	ui          terminal.UI
-	config      *configuration.Configuration
+	config      configuration.Reader
 	serviceRepo api.ServiceRepository
 }
 
-func NewMarketplaceServices(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd MarketplaceServices) {
+func NewMarketplaceServices(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd MarketplaceServices) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
@@ -30,8 +30,8 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	if cmd.config.HasSpace() {
 		cmd.ui.Say("Getting services from marketplace in org %s / space %s as %s...",
-			terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-			terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			terminal.EntityNameColor(cmd.config.Username()),
 		)
 	} else {

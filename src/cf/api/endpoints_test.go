@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	testconfig "testhelpers/configuration"
 )
 
 var validApiInfoEndpoint = func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request
 	fmt.Fprintln(w, `Foo`)
 }
 
-func createEndpointRepoForUpdate(config *configuration.Configuration, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+func createEndpointRepoForUpdate(config configuration.ReadWriter, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
 	if endpoint != nil {
 		ts = httptest.NewTLSServer(http.HandlerFunc(endpoint))
 	}
@@ -64,7 +65,7 @@ func createEndpointRepoForUpdate(config *configuration.Configuration, endpoint f
 	return ts, NewEndpointRepository(config, gateway)
 }
 
-func createInsecureEndpointRepoForUpdate(config *configuration.Configuration, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
+func createInsecureEndpointRepoForUpdate(config configuration.ReadWriter, endpoint func(w http.ResponseWriter, r *http.Request)) (ts *httptest.Server, repo EndpointRepository) {
 	if endpoint != nil {
 		ts = httptest.NewServer(http.HandlerFunc(endpoint))
 	}
@@ -74,11 +75,10 @@ func createInsecureEndpointRepoForUpdate(config *configuration.Configuration, en
 
 func init() {
 	Describe("Testing with ginkgo", func() {
-		var config *configuration.Configuration
+		var config configuration.ReadWriter
 
 		BeforeEach(func() {
-			config = &configuration.Configuration{}
-			config.AccessToken = `BEARER eyJhbGciOiJSUzI1NiJ9.eyJqdGkiOiJjNDE4OTllNS1kZTE1LTQ5NGQtYWFiNC04ZmNlYzUxN2UwMDUiLCJzdWIiOiI3NzJkZGEzZi02NjlmLTQyNzYtYjJiZC05MDQ4NmFiZTFmNmYiLCJzY29wZSI6WyJjbG91ZF9jb250cm9sbGVyLnJlYWQiLCJjbG91ZF9jb250cm9sbGVyLndyaXRlIiwib3BlbmlkIiwicGFzc3dvcmQud3JpdGUiXSwiY2xpZW50X2lkIjoiY2YiLCJjaWQiOiJjZiIsImdyYW50X3R5cGUiOiJwYXNzd29yZCIsInVzZXJfaWQiOiI3NzJkZGEzZi02NjlmLTQyNzYtYjJiZC05MDQ4NmFiZTFmNmYiLCJ1c2VyX25hbWUiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJpYXQiOjEzNzcwMjgzNTYsImV4cCI6MTM3NzAzNTU1NiwiaXNzIjoiaHR0cHM6Ly91YWEuYXJib3JnbGVuLmNmLWFwcC5jb20vb2F1dGgvdG9rZW4iLCJhdWQiOlsib3BlbmlkIiwiY2xvdWRfY29udHJvbGxlciIsInBhc3N3b3JkIl19.kjFJHi0Qir9kfqi2eyhHy6kdewhicAFu8hrPR1a5AxFvxGB45slKEjuP0_72cM_vEYICgZn3PcUUkHU9wghJO9wjZ6kiIKK1h5f2K9g-Iprv9BbTOWUODu1HoLIvg2TtGsINxcRYy_8LW1RtvQc1b4dBPoopaEH4no-BIzp0E5E`
+			config = testconfig.NewRepository()
 		})
 
 		It("TestUpdateEndpointWhenUrlIsValidHttpsInfoEndpoint", func() {
@@ -93,16 +93,16 @@ func init() {
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 
-			config.OrganizationFields = org
-			config.SpaceFields = space
+			config.SetOrganizationFields(org)
+			config.SetSpaceFields(space)
 
 			repo.UpdateEndpoint(ts.URL)
 
-			assert.Equal(mr.T(), config.AccessToken, "")
-			assert.Equal(mr.T(), config.AuthorizationEndpoint, "https://login.example.com")
-			assert.Equal(mr.T(), config.LoggregatorEndPoint, "wss://loggregator.foo.example.org:4443")
-			assert.Equal(mr.T(), config.Target, ts.URL)
-			assert.Equal(mr.T(), config.ApiVersion, "42.0.0")
+			assert.Equal(mr.T(), config.AccessToken(), "")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
+			assert.Equal(mr.T(), config.LoggregatorEndpoint(), "wss://loggregator.foo.example.org:4443")
+			assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)
+			assert.Equal(mr.T(), config.ApiVersion(), "42.0.0")
 			assert.False(mr.T(), config.HasOrganization())
 			assert.False(mr.T(), config.HasSpace())
 		})
@@ -119,18 +119,18 @@ func init() {
 			space.Name = "my-space"
 			space.Guid = "my-space-guid"
 
-			config.Target = ts.URL
-			config.AccessToken = "some access token"
-			config.RefreshToken = "some refresh token"
-			config.OrganizationFields = org
-			config.SpaceFields = space
+			config.SetApiEndpoint(ts.URL)
+			config.SetAccessToken("some access token")
+			config.SetRefreshToken("some refresh token")
+			config.SetOrganizationFields(org)
+			config.SetSpaceFields(space)
 
 			repo.UpdateEndpoint(ts.URL)
 
-			assert.Equal(mr.T(), config.OrganizationFields, org)
-			assert.Equal(mr.T(), config.SpaceFields, space)
-			assert.Equal(mr.T(), config.AccessToken, "some access token")
-			assert.Equal(mr.T(), config.RefreshToken, "some refresh token")
+			assert.Equal(mr.T(), config.OrganizationFields(), org)
+			assert.Equal(mr.T(), config.SpaceFields(), space)
+			assert.Equal(mr.T(), config.AccessToken(), "some access token")
+			assert.Equal(mr.T(), config.RefreshToken(), "some refresh token")
 		})
 
 		It("TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpsEndpointExists", func() {
@@ -143,10 +143,10 @@ func init() {
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			assert.Equal(mr.T(), config.AccessToken, "")
-			assert.Equal(mr.T(), config.AuthorizationEndpoint, "https://login.example.com")
-			assert.Equal(mr.T(), config.Target, ts.URL)
-			assert.Equal(mr.T(), config.ApiVersion, "42.0.0")
+			assert.Equal(mr.T(), config.AccessToken(), "")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
+			assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)
+			assert.Equal(mr.T(), config.ApiVersion(), "42.0.0")
 		})
 
 		It("TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpEndpointExists", func() {
@@ -160,10 +160,10 @@ func init() {
 
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			assert.Equal(mr.T(), config.AccessToken, "")
-			assert.Equal(mr.T(), config.AuthorizationEndpoint, "https://login.example.com")
-			assert.Equal(mr.T(), config.Target, ts.URL)
-			assert.Equal(mr.T(), config.ApiVersion, "42.0.0")
+			assert.Equal(mr.T(), config.AccessToken(), "")
+			assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
+			assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)
+			assert.Equal(mr.T(), config.ApiVersion(), "42.0.0")
 		})
 
 		It("TestUpdateEndpointWhenEndpointReturns404", func() {
@@ -188,7 +188,7 @@ func init() {
 		})
 
 		It("TestGetCloudControllerEndpoint", func() {
-			config.Target = "http://api.example.com"
+			config.SetApiEndpoint("http://api.example.com")
 
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
@@ -199,7 +199,7 @@ func init() {
 		})
 
 		It("TestGetLoggregatorEndpoint", func() {
-			config.LoggregatorEndPoint = "wss://loggregator.example.com:4443"
+			config.SetLoggregatorEndpoint("wss://loggregator.example.com:4443")
 
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
@@ -211,11 +211,11 @@ func init() {
 
 		Describe("when the loggregator endpoint is not saved in the config (old CC)", func() {
 			BeforeEach(func() {
-				config.LoggregatorEndPoint = ""
+				config.SetLoggregatorEndpoint("")
 			})
 
 			It("extrapolates the loggregator URL based on the API URL (SSL API)", func() {
-				config.Target = "https://api.run.pivotal.io"
+				config.SetApiEndpoint("https://api.run.pivotal.io")
 
 				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
@@ -225,7 +225,7 @@ func init() {
 			})
 
 			It("extrapolates the loggregator URL based on the API URL (non-SSL API)", func() {
-				config.Target = "http://api.run.pivotal.io"
+				config.SetApiEndpoint("http://api.run.pivotal.io")
 
 				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
@@ -236,7 +236,8 @@ func init() {
 		})
 
 		It("TestGetUAAEndpoint", func() {
-			config.AuthorizationEndpoint = "https://login.example.com"
+			config := testconfig.NewRepository()
+			config.SetAuthorizationEndpoint("https://login.example.com")
 
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
@@ -247,7 +248,7 @@ func init() {
 		})
 
 		It("TestEndpointsReturnAnErrorWhenMissing", func() {
-			config = &configuration.Configuration{}
+			config := testconfig.NewRepository()
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			_, response := repo.GetLoggregatorEndpoint()

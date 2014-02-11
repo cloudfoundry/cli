@@ -12,12 +12,12 @@ import (
 
 type Events struct {
 	ui         terminal.UI
-	config     *configuration.Configuration
+	config     configuration.Reader
 	appReq     requirements.ApplicationRequirement
 	eventsRepo api.AppEventsRepository
 }
 
-func NewEvents(ui terminal.UI, config *configuration.Configuration, eventsRepo api.AppEventsRepository) (cmd *Events) {
+func NewEvents(ui terminal.UI, config configuration.Reader, eventsRepo api.AppEventsRepository) (cmd *Events) {
 	cmd = new(Events)
 	cmd.ui = ui
 	cmd.config = config
@@ -47,8 +47,8 @@ func (cmd *Events) Run(c *cli.Context) {
 
 	cmd.ui.Say("Getting events for app %s in org %s / space %s as %s...\n",
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

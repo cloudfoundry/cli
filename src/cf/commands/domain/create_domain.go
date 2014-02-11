@@ -11,12 +11,12 @@ import (
 
 type CreateDomain struct {
 	ui         terminal.UI
-	config     *configuration.Configuration
+	config     configuration.Reader
 	domainRepo api.DomainRepository
 	orgReq     requirements.OrganizationRequirement
 }
 
-func NewCreateDomain(ui terminal.UI, config *configuration.Configuration, domainRepo api.DomainRepository) (cmd *CreateDomain) {
+func NewCreateDomain(ui terminal.UI, config configuration.Reader, domainRepo api.DomainRepository) (cmd *CreateDomain) {
 	cmd = new(CreateDomain)
 	cmd.ui = ui
 	cmd.config = config

@@ -9,10 +9,10 @@ import (
 
 type Logout struct {
 	ui     terminal.UI
-	config *configuration.Configuration
+	config configuration.ReadWriter
 }
 
-func NewLogout(ui terminal.UI, config *configuration.Configuration) (cmd Logout) {
+func NewLogout(ui terminal.UI, config configuration.ReadWriter) (cmd Logout) {
 	cmd.ui = ui
 	cmd.config = config
 	return

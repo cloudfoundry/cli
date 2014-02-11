@@ -12,12 +12,12 @@ import (
 
 type DeleteOrg struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.ReadWriter
 	orgRepo api.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewDeleteOrg(ui terminal.UI, config *configuration.Configuration, sR api.OrganizationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, sR api.OrganizationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
 	cmd.config = config
@@ -76,7 +76,7 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		return
 	}
 
-	if org.Guid == cmd.config.OrganizationFields.Guid {
+	if org.Guid == cmd.config.OrganizationFields().Guid {
 		cmd.config.SetOrganizationFields(models.OrganizationFields{})
 		cmd.config.SetSpaceFields(models.SpaceFields{})
 	}

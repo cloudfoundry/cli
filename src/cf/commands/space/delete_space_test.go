@@ -2,7 +2,6 @@ package space_test
 
 import (
 	. "cf/commands/space"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -33,23 +32,8 @@ func deleteSpace(t mr.TestingT, inputs []string, args []string, reqFactory *test
 		Inputs: inputs,
 	}
 	ctxt := testcmd.NewContext("delete-space", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewDeleteSpace(ui, config, spaceRepo)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewDeleteSpace(ui, configRepo, spaceRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
@@ -117,8 +101,8 @@ func init() {
 			reqFactory := defaultDeleteSpaceReqFactory()
 			spaceRepo := &testapi.FakeSpaceRepository{}
 
-			config := &configuration.Configuration{}
-			config.SpaceFields = defaultDeleteSpaceSpace().SpaceFields
+			config := testconfig.NewRepository()
+			config.SetSpaceFields(defaultDeleteSpaceSpace().SpaceFields)
 
 			ui := &testterm.FakeUI{}
 			ctxt := testcmd.NewContext("delete", []string{"-f", "space-to-delete"})
@@ -137,8 +121,8 @@ func init() {
 			otherSpace.Name = "do-not-delete"
 			otherSpace.Guid = "do-not-delete-guid"
 
-			config := &configuration.Configuration{}
-			config.SpaceFields = otherSpace
+			config := testconfig.NewRepository()
+			config.SetSpaceFields(otherSpace)
 
 			ui := &testterm.FakeUI{}
 			ctxt := testcmd.NewContext("delete", []string{"-f", "space-to-delete"})

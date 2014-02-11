@@ -17,13 +17,13 @@ type RouteCreator interface {
 
 type CreateRoute struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	routeRepo api.RouteRepository
 	spaceReq  requirements.SpaceRequirement
 	domainReq requirements.DomainRequirement
 }
 
-func NewCreateRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *CreateRoute) {
+func NewCreateRoute(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *CreateRoute) {
 	cmd = new(CreateRoute)
 	cmd.ui = ui
 	cmd.config = config
@@ -69,7 +69,7 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse net.ApiResponse) {
 	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
 		terminal.EntityNameColor(domain.UrlForHost(hostName)),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(space.Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)

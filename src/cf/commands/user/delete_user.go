@@ -11,11 +11,11 @@ import (
 
 type DeleteUserFields struct {
 	ui       terminal.UI
-	config   *configuration.Configuration
+	config   configuration.Reader
 	userRepo api.UserRepository
 }
 
-func NewDeleteUser(ui terminal.UI, config *configuration.Configuration, userRepo api.UserRepository) (cmd DeleteUserFields) {
+func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd DeleteUserFields) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userRepo = userRepo

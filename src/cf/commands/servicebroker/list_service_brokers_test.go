@@ -2,10 +2,8 @@ package servicebroker_test
 
 import (
 	. "cf/commands/servicebroker"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -17,21 +15,7 @@ import (
 
 func callListServiceBrokers(t mr.TestingT, args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
+	config := testconfig.NewRepositoryWithDefaults()
 	ctxt := testcmd.NewContext("service-brokers", args)
 	cmd := NewListServiceBrokers(ui, config, serviceBrokerRepo)
 	testcmd.RunCommand(cmd, ctxt, &testreq.FakeReqFactory{})

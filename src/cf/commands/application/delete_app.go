@@ -11,12 +11,12 @@ import (
 
 type DeleteApp struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewDeleteApp(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *DeleteApp) {
+func NewDeleteApp(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *DeleteApp) {
 	cmd = new(DeleteApp)
 	cmd.ui = ui
 	cmd.config = config
@@ -51,8 +51,8 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(appName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

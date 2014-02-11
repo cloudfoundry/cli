@@ -2,7 +2,6 @@ package terminal_test
 
 import (
 	"bytes"
-	"cf/configuration"
 	"cf/models"
 	. "cf/terminal"
 	. "github.com/onsi/ginkgo"
@@ -12,6 +11,7 @@ import (
 	"os"
 	"strings"
 	testassert "testhelpers/assert"
+	testconfig "testhelpers/configuration"
 )
 
 func simulateStdin(input string, block func(r io.Reader)) {
@@ -84,9 +84,7 @@ func init() {
 			})
 		})
 		It("TestShowConfigurationWhenNoOrgAndSpaceTargeted", func() {
-
-			config := &configuration.Configuration{AccessToken: "speak, friend, and enter."}
-
+			config := testconfig.NewRepository()
 			output := captureOutput(func() {
 				ui := NewUI(os.Stdin)
 				ui.ShowConfiguration(config)
@@ -102,10 +100,7 @@ func init() {
 			sf.Guid = "guid"
 			sf.Name = "name"
 
-			config := &configuration.Configuration{
-				AccessToken: "speak, friend, and enter.",
-				SpaceFields: sf,
-			}
+			config := testconfig.NewRepository()
 
 			output := captureOutput(func() {
 				ui := NewUI(os.Stdin)
@@ -122,10 +117,7 @@ func init() {
 			of.Guid = "of-guid"
 			of.Name = "of-name"
 
-			config := &configuration.Configuration{
-				AccessToken:        "speak, friend, and enter.",
-				OrganizationFields: of,
-			}
+			config := testconfig.NewRepository()
 
 			output := captureOutput(func() {
 				ui := NewUI(os.Stdin)

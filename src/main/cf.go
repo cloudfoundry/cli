@@ -18,43 +18,53 @@ import (
 	"strings"
 )
 
-func main() {
-	defer func() {
-		err := recover()
-		if err != nil {
-			switch err := err.(type) {
-			case error:
-				displayCrashDialog(err.Error())
-			case string:
-				displayCrashDialog(err)
-			default:
-				displayCrashDialog("An unexpected type of error")
-			}
-		}
-	}()
+type cliDependencies struct {
+	termUI         terminal.UI
+	configRepo     configuration.Repository
+	manifestRepo   manifest.ManifestRepository
+	apiRepoLocator api.RepositoryLocator
+}
 
+func setupDependencies() (deps *cliDependencies) {
 	fileutils.SetTmpPathPrefix("cf")
 
 	if os.Getenv("CF_COLOR") == "" {
 		os.Setenv("CF_COLOR", "true")
 	}
 
-	termUI := terminal.NewUI(os.Stdin)
+	deps = new(cliDependencies)
 
-	config, configRepo := loadConfig(termUI)
-	defer saveConfig(termUI, config, configRepo)
+	deps.termUI = terminal.NewUI(os.Stdin)
 
-	oldConfig := config.GetOldConfig()
+	deps.manifestRepo = manifest.NewManifestDiskRepository()
 
-	manifestRepo := manifest.NewManifestDiskRepository()
-	repoLocator := api.NewRepositoryLocator(oldConfig, map[string]net.Gateway{
+	deps.configRepo = configuration.NewRepositoryFromFilepath(configuration.DefaultFilePath(), func(err error) {
+		if err != nil {
+			deps.termUI.Failed(fmt.Sprintf("Config error: %s", err))
+		}
+	})
+
+	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, map[string]net.Gateway{
 		"auth":             net.NewUAAGateway(),
 		"cloud-controller": net.NewCloudControllerGateway(),
 		"uaa":              net.NewUAAGateway(),
 	})
 
-	cmdFactory := commands.NewFactory(termUI, oldConfig, manifestRepo, repoLocator)
-	reqFactory := requirements.NewFactory(termUI, oldConfig, repoLocator)
+	return
+}
+
+func teardownDependencies(deps *cliDependencies) {
+	deps.configRepo.Close()
+}
+
+func main() {
+	defer handlePanics()
+
+	deps := setupDependencies()
+	defer teardownDependencies(deps)
+
+	cmdFactory := commands.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)
+	reqFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
 	cmdRunner := commands.NewRunner(cmdFactory, reqFactory)
 
 	app, err := app.NewApp(cmdRunner)
@@ -107,22 +117,17 @@ OPTIONS:
 
 }
 
-func loadConfig(termUI terminal.UI) (config configuration.ConfigReadWriteCloser, configRepo configuration.ConfigurationRepository) {
-	configRepo = configuration.NewConfigurationDiskRepository(configuration.ConfigFilePath())
-	config, err := configRepo.Load()
+func handlePanics() {
+	err := recover()
 	if err != nil {
-		termUI.Failed(fmt.Sprintf("Error loading config file: %s", err))
-		configRepo.Delete()
-		os.Exit(1)
-		return
-	}
-	return
-}
-
-func saveConfig(termUI terminal.UI, config configuration.ConfigReadWriteCloser, configRepo configuration.ConfigurationRepository) {
-	err := configRepo.Save(config)
-	if err != nil {
-		termUI.Failed("Failed to save config file")
+		switch err := err.(type) {
+		case error:
+			displayCrashDialog(err.Error())
+		case string:
+			displayCrashDialog(err)
+		default:
+			displayCrashDialog("An unexpected type of error")
+		}
 	}
 }
 

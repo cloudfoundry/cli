@@ -3,7 +3,6 @@ package space_test
 import (
 	. "cf/commands/space"
 	"cf/commands/user"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
@@ -54,20 +53,9 @@ func callCreateSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-space", args)
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-		UserGuid: "my-user-guid",
-	})
-	assert.NoError(t, err)
-
-	config := &configuration.Configuration{
-		SpaceFields:        configSpace,
-		OrganizationFields: configOrg,
-		AccessToken:        token,
-	}
-
-	spaceRoleSetter := user.NewSetSpaceRole(ui, config, spaceRepo, userRepo)
-	cmd := NewCreateSpace(ui, config, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	spaceRoleSetter := user.NewSetSpaceRole(ui, configRepo, spaceRepo, userRepo)
+	cmd := NewCreateSpace(ui, configRepo, spaceRoleSetter, spaceRepo, orgRepo, userRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }

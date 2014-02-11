@@ -2,7 +2,6 @@ package api_test
 
 import (
 	. "cf/api"
-	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -11,144 +10,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
+	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
-var singleAppResponse = testnet.TestResponse{
-	Status: http.StatusOK,
-	Body: `
-{
-  "resources": [
-    {
-      "metadata": {
-        "guid": "app1-guid"
-      },
-      "entity": {
-        "name": "My App",
-        "environment_json": {
-      		"foo": "bar",
-      		"baz": "boom"
-    	},
-        "memory": 128,
-        "instances": 1,
-        "state": "STOPPED",
-        "stack": {
-			"metadata": {
-				  "guid": "app1-route-guid"
-				},
-			"entity": {
-			  "name": "awesome-stacks-ahoy"
-			  }
-        },
-        "routes": [
-      	  {
-      	    "metadata": {
-      	      "guid": "app1-route-guid"
-      	    },
-      	    "entity": {
-      	      "host": "app1",
-      	      "domain": {
-      	      	"metadata": {
-      	      	  "guid": "domain1-guid"
-      	      	},
-      	      	"entity": {
-      	      	  "name": "cfapps.io"
-      	      	}
-      	      }
-      	    }
-      	  }
-        ]
-      }
-    }
-  ]
-}`}
-
-var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:   "GET",
-	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
-	Response: singleAppResponse,
-})
-
-var createApplicationResponse = `
-{
-    "metadata": {
-        "guid": "my-cool-app-guid"
-    },
-    "entity": {
-        "name": "my-cool-app"
-    }
-}`
-
-var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "POST",
-	Path:   "/v2/apps",
-	Matcher: testnet.RequestBodyMatcher(`{
-	"name":"my-cool-app",
-	"instances":3,
-	"buildpack":"buildpack-url",
-	"memory":2048,
-	"space_guid":"some-space-guid",
-	"stack_guid":"some-stack-guid",
-	"command":"some-command"
-	}`),
-	Response: testnet.TestResponse{
-		Status: http.StatusCreated,
-		Body:   createApplicationResponse},
-})
-
-func defaultAppParams() models.AppParams {
-	name := "my-cool-app"
-	buildpackUrl := "buildpack-url"
-	spaceGuid := "some-space-guid"
-	stackGuid := "some-stack-guid"
-	command := "some-command"
-	memory := uint64(2048)
-	instanceCount := 3
-
-	return models.AppParams{
-		Name:          &name,
-		BuildpackUrl:  &buildpackUrl,
-		SpaceGuid:     &spaceGuid,
-		StackGuid:     &stackGuid,
-		Command:       &command,
-		Memory:        &memory,
-		InstanceCount: &instanceCount,
-	}
-}
-
-var updateApplicationResponse = `
-{
-    "metadata": {
-        "guid": "my-cool-app-guid"
-    },
-    "entity": {
-        "name": "my-cool-app"
-    }
-}`
-
-var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:  "PUT",
-	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
-	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"space_guid":"some-space-guid","state":"STARTED","stack_guid":"some-stack-guid","command":"some-command"}`),
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body:   updateApplicationResponse},
-})
-
-func createAppRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	space.Guid = "my-space-guid"
-	config := &configuration.Configuration{
-		AccessToken: "BEARER my_access_token",
-		Target:      ts.URL,
-		SpaceFields: space,
-	}
-	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerApplicationRepository(config, gateway)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestFindByName", func() {
@@ -296,4 +161,134 @@ func init() {
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		})
 	})
+}
+
+var singleAppResponse = testnet.TestResponse{
+	Status: http.StatusOK,
+	Body: `
+{
+  "resources": [
+    {
+      "metadata": {
+        "guid": "app1-guid"
+      },
+      "entity": {
+        "name": "My App",
+        "environment_json": {
+      		"foo": "bar",
+      		"baz": "boom"
+    	},
+        "memory": 128,
+        "instances": 1,
+        "state": "STOPPED",
+        "stack": {
+			"metadata": {
+				  "guid": "app1-route-guid"
+				},
+			"entity": {
+			  "name": "awesome-stacks-ahoy"
+			  }
+        },
+        "routes": [
+      	  {
+      	    "metadata": {
+      	      "guid": "app1-route-guid"
+      	    },
+      	    "entity": {
+      	      "host": "app1",
+      	      "domain": {
+      	      	"metadata": {
+      	      	  "guid": "domain1-guid"
+      	      	},
+      	      	"entity": {
+      	      	  "name": "cfapps.io"
+      	      	}
+      	      }
+      	    }
+      	  }
+        ]
+      }
+    }
+  ]
+}`}
+
+var findAppRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "GET",
+	Path:     "/v2/spaces/my-space-guid/apps?q=name%3AMy+App&inline-relations-depth=1",
+	Response: singleAppResponse,
+})
+
+var createApplicationResponse = `
+{
+    "metadata": {
+        "guid": "my-cool-app-guid"
+    },
+    "entity": {
+        "name": "my-cool-app"
+    }
+}`
+
+var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "POST",
+	Path:   "/v2/apps",
+	Matcher: testnet.RequestBodyMatcher(`{
+	"name":"my-cool-app",
+	"instances":3,
+	"buildpack":"buildpack-url",
+	"memory":2048,
+	"space_guid":"some-space-guid",
+	"stack_guid":"some-stack-guid",
+	"command":"some-command"
+	}`),
+	Response: testnet.TestResponse{
+		Status: http.StatusCreated,
+		Body:   createApplicationResponse},
+})
+
+func defaultAppParams() models.AppParams {
+	name := "my-cool-app"
+	buildpackUrl := "buildpack-url"
+	spaceGuid := "some-space-guid"
+	stackGuid := "some-stack-guid"
+	command := "some-command"
+	memory := uint64(2048)
+	instanceCount := 3
+
+	return models.AppParams{
+		Name:          &name,
+		BuildpackUrl:  &buildpackUrl,
+		SpaceGuid:     &spaceGuid,
+		StackGuid:     &stackGuid,
+		Command:       &command,
+		Memory:        &memory,
+		InstanceCount: &instanceCount,
+	}
+}
+
+var updateApplicationResponse = `
+{
+    "metadata": {
+        "guid": "my-cool-app-guid"
+    },
+    "entity": {
+        "name": "my-cool-app"
+    }
+}`
+
+var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:  "PUT",
+	Path:    "/v2/apps/my-app-guid?inline-relations-depth=1",
+	Matcher: testnet.RequestBodyMatcher(`{"name":"my-cool-app","instances":3,"buildpack":"buildpack-url","memory":2048,"space_guid":"some-space-guid","state":"STARTED","stack_guid":"some-stack-guid","command":"some-command"}`),
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body:   updateApplicationResponse},
+})
+
+func createAppRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
+	ts, handler = testnet.NewTLSServer(t, requests)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	configRepo.SetApiEndpoint(ts.URL)
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
+	return
 }

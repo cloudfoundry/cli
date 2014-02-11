@@ -16,7 +16,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callSpaces(args []string, reqFactory *testreq.FakeReqFactory, config *configuration.Configuration, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
+func callSpaces(args []string, reqFactory *testreq.FakeReqFactory, config configuration.Reader, spaceRepo api.SpaceRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("spaces", args)
 
@@ -24,79 +24,64 @@ func callSpaces(args []string, reqFactory *testreq.FakeReqFactory, config *confi
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestSpacesRequirements", func() {
-			spaceRepo := &testapi.FakeSpaceRepository{}
-			config := &configuration.Configuration{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			callSpaces([]string{}, reqFactory, config, spaceRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+var _ = Describe("Testing with ginkgo", func() {
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-			callSpaces([]string{}, reqFactory, config, spaceRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	It("TestSpacesRequirements", func() {
+		spaceRepo := &testapi.FakeSpaceRepository{}
+		config := testconfig.NewRepository()
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-			callSpaces([]string{}, reqFactory, config, spaceRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestListingSpaces", func() {
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		callSpaces([]string{}, reqFactory, config, spaceRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			space := models.Space{}
-			space.Name = "space1"
-			space2 := models.Space{}
-			space2.Name = "space2"
-			space3 := models.Space{}
-			space3.Name = "space3"
-			spaceRepo := &testapi.FakeSpaceRepository{
-				Spaces: []models.Space{space, space2, space3},
-			}
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callSpaces([]string{}, reqFactory, config, spaceRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			assert.NoError(mr.T(), err)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			config := &configuration.Configuration{
-				OrganizationFields: org,
-				AccessToken:        token,
-			}
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callSpaces([]string{}, reqFactory, config, spaceRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting spaces in org", "my-org", "my-user"},
-				{"space1"},
-				{"space2"},
-				{"space3"},
-			})
-		})
-		It("TestListingSpacesWhenNoSpaces", func() {
+	It("TestListingSpaces", func() {
+		space := models.Space{}
+		space.Name = "space1"
+		space2 := models.Space{}
+		space2.Name = "space2"
+		space3 := models.Space{}
+		space3.Name = "space3"
+		spaceRepo := &testapi.FakeSpaceRepository{
+			Spaces: []models.Space{space, space2, space3},
+		}
 
-			spaceRepo := &testapi.FakeSpaceRepository{
-				Spaces: []models.Space{},
-			}
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
+		config := testconfig.NewRepositoryWithDefaults()
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-			assert.NoError(mr.T(), err)
-			org2 := models.OrganizationFields{}
-			org2.Name = "my-org"
-			config := &configuration.Configuration{
-				OrganizationFields: org2,
-				AccessToken:        token,
-			}
+		ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting spaces in org", "my-org", "my-user"},
-				{"No spaces found"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting spaces in org", "my-org", "my-user"},
+			{"space1"},
+			{"space2"},
+			{"space3"},
 		})
 	})
-}
+
+	It("TestListingSpacesWhenNoSpaces", func() {
+		spaceRepo := &testapi.FakeSpaceRepository{
+			Spaces: []models.Space{},
+		}
+
+		configRepo := testconfig.NewRepositoryWithDefaults()
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+
+		ui := callSpaces([]string{}, reqFactory, configRepo, spaceRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting spaces in org", "my-org", "my-user"},
+			{"No spaces found"},
+		})
+	})
+
+})

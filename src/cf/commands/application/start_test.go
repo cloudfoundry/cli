@@ -8,7 +8,9 @@ import (
 	"cf/models"
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	"os"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -16,113 +18,58 @@ import (
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-
-	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
-var (
-	defaultAppForStart        = models.Application{}
-	defaultInstanceReponses   = [][]models.AppInstanceFields{}
-	defaultInstanceErrorCodes = []string{"", ""}
-	defaultStartTimeout       = 50 * time.Millisecond
-)
-
-func init() {
-	defaultAppForStart.Name = "my-app"
-	defaultAppForStart.Guid = "my-app-guid"
-	defaultAppForStart.InstanceCount = 2
-
-	domain := models.DomainFields{}
-	domain.Name = "example.com"
-
-	route := models.RouteSummary{}
-	route.Host = "my-app"
-	route.Domain = domain
-
-	defaultAppForStart.Routes = []models.RouteSummary{route}
-
-	instance1 := models.AppInstanceFields{}
-	instance1.State = models.InstanceStarting
-
-	instance2 := models.AppInstanceFields{}
-	instance2.State = models.InstanceStarting
-
-	instance3 := models.AppInstanceFields{}
-	instance3.State = models.InstanceRunning
-
-	instance4 := models.AppInstanceFields{}
-	instance4.State = models.InstanceStarting
-
-	defaultInstanceReponses = [][]models.AppInstanceFields{
-		[]models.AppInstanceFields{instance1, instance2},
-		[]models.AppInstanceFields{instance1, instance2},
-		[]models.AppInstanceFields{instance3, instance4},
-	}
-}
-
-func callStart(args []string, config *configuration.Configuration, reqFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("start", args)
-
-	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
-	cmd.StagingTimeout = 5 * time.Millisecond
-	cmd.StartupTimeout = config.ApplicationStartTimeout
-	cmd.PingerThrottle = 5 * time.Millisecond
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
-func startAppWithInstancesAndErrors(t mr.TestingT, displayApp ApplicationDisplayer, app models.Application, instances [][]models.AppInstanceFields, errorCodes []string, startTimeout time.Duration) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-
-	config := &configuration.Configuration{
-		SpaceFields:             space,
-		OrganizationFields:      org,
-		AccessToken:             token,
-		ApplicationStartTimeout: startTimeout,
-	}
-
-	appRepo = &testapi.FakeApplicationRepository{
-		ReadApp:         app,
-		UpdateAppResult: app,
-	}
-	appInstancesRepo = &testapi.FakeAppInstancesRepo{
-		GetInstancesResponses:  instances,
-		GetInstancesErrorCodes: errorCodes,
-	}
-
-	logRepo := &testapi.FakeLogsRepository{
-		TailLogMessages: []*logmessage.Message{
-			NewLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
-			NewLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
-		},
-	}
-
-	args := []string{"my-app"}
-	reqFactory = &testreq.FakeReqFactory{Application: app}
-	ui = callStart(args, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
-		It("TestStartCommandDefaultTimeouts", func() {
+		var (
+			defaultAppForStart        = models.Application{}
+			defaultInstanceReponses   = [][]models.AppInstanceFields{}
+			defaultInstanceErrorCodes = []string{"", ""}
+			defaultStartTimeout       = 50 * time.Millisecond
+		)
 
-			cmd := NewStart(new(testterm.FakeUI), &configuration.Configuration{}, &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+		BeforeEach(func() {
+			defaultAppForStart.Name = "my-app"
+			defaultAppForStart.Guid = "my-app-guid"
+			defaultAppForStart.InstanceCount = 2
+
+			domain := models.DomainFields{}
+			domain.Name = "example.com"
+
+			route := models.RouteSummary{}
+			route.Host = "my-app"
+			route.Domain = domain
+
+			defaultAppForStart.Routes = []models.RouteSummary{route}
+
+			instance1 := models.AppInstanceFields{}
+			instance1.State = models.InstanceStarting
+
+			instance2 := models.AppInstanceFields{}
+			instance2.State = models.InstanceStarting
+
+			instance3 := models.AppInstanceFields{}
+			instance3.State = models.InstanceRunning
+
+			instance4 := models.AppInstanceFields{}
+			instance4.State = models.InstanceStarting
+
+			defaultInstanceReponses = [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{instance1, instance2},
+				[]models.AppInstanceFields{instance1, instance2},
+				[]models.AppInstanceFields{instance3, instance4},
+			}
+		})
+
+		It("TestStartCommandDefaultTimeouts", func() {
+			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
 			assert.Equal(mr.T(), cmd.StagingTimeout, 15*time.Minute)
 			assert.Equal(mr.T(), cmd.StartupTimeout, 5*time.Minute)
 		})
-		It("TestStartCommandSetsTimeoutsFromEnv", func() {
 
+		It("TestStartCommandSetsTimeoutsFromEnv", func() {
 			oldStaging := os.Getenv("CF_STAGING_TIMEOUT")
 			oldStart := os.Getenv("CF_STARTUP_TIMEOUT")
 			defer func() {
@@ -132,14 +79,13 @@ func init() {
 
 			os.Setenv("CF_STAGING_TIMEOUT", "6")
 			os.Setenv("CF_STARTUP_TIMEOUT", "3")
-			cmd := NewStart(new(testterm.FakeUI), &configuration.Configuration{}, &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+			cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
 			assert.Equal(mr.T(), cmd.StagingTimeout, 6*time.Minute)
 			assert.Equal(mr.T(), cmd.StartupTimeout, 3*time.Minute)
 		})
-		It("TestStartCommandFailsWithUsage", func() {
-			mr.T().Parallel()
 
-			config := &configuration.Configuration{}
+		It("TestStartCommandFailsWithUsage", func() {
+			config := testconfig.NewRepository()
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appRepo := &testapi.FakeApplicationRepository{}
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{
@@ -158,11 +104,10 @@ func init() {
 			ui = callStart([]string{"my-app"}, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
-		It("TestStartApplication", func() {
-			mr.T().Parallel()
 
+		It("TestStartApplication", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
-			ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(mr.T(), displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, defaultStartTimeout)
+			ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, defaultStartTimeout)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"my-app", "my-org", "my-space", "my-user"},
@@ -175,9 +120,8 @@ func init() {
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
 			assert.Equal(mr.T(), displayApp.AppToDisplay, defaultAppForStart)
 		})
-		It("TestStartApplicationOnlyShowsCurrentStagingLogs", func() {
-			mr.T().Parallel()
 
+		It("TestStartApplicationOnlyShowsCurrentStagingLogs", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
 			appRepo := &testapi.FakeApplicationRepository{
@@ -202,7 +146,7 @@ func init() {
 				},
 			}
 
-			ui := callStart([]string{"my-app"}, &configuration.Configuration{}, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+			ui := callStart([]string{"my-app"}, testconfig.NewRepository(), reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Log Line 2"},
@@ -213,9 +157,8 @@ func init() {
 				{"Log Line 4"},
 			})
 		})
-		It("TestStartApplicationWhenAppHasNoURL", func() {
-			mr.T().Parallel()
 
+		It("TestStartApplicationWhenAppHasNoURL", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			app := defaultAppForStart
 			app.Routes = []models.RouteSummary{}
@@ -227,7 +170,7 @@ func init() {
 			}
 
 			errorCodes := []string{""}
-			ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(mr.T(), displayApp, app, instances, errorCodes, defaultStartTimeout)
+			ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(displayApp, app, instances, errorCodes, defaultStartTimeout)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"my-app"},
@@ -238,9 +181,8 @@ func init() {
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
 		})
-		It("TestStartApplicationWhenAppIsStillStaging", func() {
-			mr.T().Parallel()
 
+		It("TestStartApplicationWhenAppIsStillStaging", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appInstance := models.AppInstanceFields{}
 			appInstance.State = models.InstanceDown
@@ -264,7 +206,7 @@ func init() {
 
 			errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, "", "", ""}
 
-			ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(mr.T(), displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
+			ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
 			assert.Equal(mr.T(), appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
 
@@ -274,13 +216,14 @@ func init() {
 				{"0 of 2 instances running", "2 starting"},
 			})
 		})
+
 		XIt("TestStartApplicationWhenStagingFails", func() {
 			// TODO: fix this flakey test
 			displayApp := &testcmd.FakeAppDisplayer{}
 			instances := [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
 			errorCodes := []string{"170001"}
 
-			ui, _, _, _ := startAppWithInstancesAndErrors(mr.T(), displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
+			ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"my-app"},
@@ -289,6 +232,7 @@ func init() {
 				{"Error staging app"},
 			})
 		})
+
 		It("TestStartApplicationWhenOneInstanceFlaps", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appInstance := models.AppInstanceFields{}
@@ -306,7 +250,7 @@ func init() {
 
 			errorCodes := []string{"", ""}
 
-			ui, _, _, _ := startAppWithInstancesAndErrors(mr.T(), displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
+			ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"my-app"},
@@ -316,9 +260,8 @@ func init() {
 				{"Start unsuccessful"},
 			})
 		})
-		It("TestStartApplicationWhenStartTimesOut", func() {
-			mr.T().Parallel()
 
+		It("TestStartApplicationWhenStartTimesOut", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			appInstance := models.AppInstanceFields{}
 			appInstance.State = models.InstanceStarting
@@ -340,7 +283,7 @@ func init() {
 
 			errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, cf.APP_NOT_STAGED}
 
-			ui, _, _, _ := startAppWithInstancesAndErrors(mr.T(), displayApp, defaultAppForStart, instances, errorCodes, 0)
+			ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, 0)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"Starting", "my-app"},
@@ -352,10 +295,9 @@ func init() {
 				{"instances running"},
 			})
 		})
-		It("TestStartApplicationWhenStartFails", func() {
-			mr.T().Parallel()
 
-			config := &configuration.Configuration{}
+		It("TestStartApplicationWhenStartFails", func() {
+			config := testconfig.NewRepository()
 			displayApp := &testcmd.FakeAppDisplayer{}
 			app := models.Application{}
 			app.Name = "my-app"
@@ -374,11 +316,10 @@ func init() {
 			})
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
 		})
-		It("TestStartApplicationIsAlreadyStarted", func() {
-			mr.T().Parallel()
 
+		It("TestStartApplicationIsAlreadyStarted", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
-			config := &configuration.Configuration{}
+			config := testconfig.NewRepository()
 			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
@@ -398,22 +339,9 @@ func init() {
 
 			assert.Equal(mr.T(), appRepo.UpdateAppGuid, "")
 		})
+
 		It("TestStartApplicationWithLoggingFailure", func() {
-			mr.T().Parallel()
-
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{Username: "my-user"})
-			assert.NoError(mr.T(), err)
-			space2 := models.SpaceFields{}
-			space2.Name = "my-space"
-			org2 := models.OrganizationFields{}
-			org2.Name = "my-org"
-			config := &configuration.Configuration{
-				SpaceFields:             space2,
-				OrganizationFields:      org2,
-				AccessToken:             token,
-				ApplicationStartTimeout: 2,
-			}
-
+			configRepo := testconfig.NewRepositoryWithDefaults()
 			displayApp := &testcmd.FakeAppDisplayer{}
 
 			appRepo := &testapi.FakeApplicationRepository{ReadApp: defaultAppForStart}
@@ -428,7 +356,7 @@ func init() {
 
 			reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
 
-			ui := callStart([]string{"my-app"}, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+			ui := callStart([]string{"my-app"}, configRepo, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				testassert.Line{"error tailing logs"},
@@ -436,4 +364,41 @@ func init() {
 			})
 		})
 	})
+}
+
+func callStart(args []string, config configuration.Reader, reqFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("start", args)
+
+	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
+	cmd.StagingTimeout = 5 * time.Millisecond
+	cmd.StartupTimeout = 5 * time.Millisecond
+	cmd.PingerThrottle = 5 * time.Millisecond
+
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
+}
+
+func startAppWithInstancesAndErrors(displayApp ApplicationDisplayer, app models.Application, instances [][]models.AppInstanceFields, errorCodes []string, startTimeout time.Duration) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	appRepo = &testapi.FakeApplicationRepository{
+		ReadApp:         app,
+		UpdateAppResult: app,
+	}
+	appInstancesRepo = &testapi.FakeAppInstancesRepo{
+		GetInstancesResponses:  instances,
+		GetInstancesErrorCodes: errorCodes,
+	}
+
+	logRepo := &testapi.FakeLogsRepository{
+		TailLogMessages: []*logmessage.Message{
+			NewLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
+			NewLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
+		},
+	}
+
+	args := []string{"my-app"}
+	reqFactory = &testreq.FakeReqFactory{Application: app}
+	ui = callStart(args, configRepo, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+	return
 }

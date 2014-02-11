@@ -2,8 +2,6 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
-	"cf/models"
 	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
@@ -16,43 +14,6 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-type scaleDependencies struct {
-	reqFactory *testreq.FakeReqFactory
-	restarter  *testcmd.FakeAppRestarter
-	appRepo    *testapi.FakeApplicationRepository
-}
-
-func getScaleDependencies() (deps scaleDependencies) {
-	deps = scaleDependencies{
-		reqFactory: &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true},
-		restarter:  &testcmd.FakeAppRestarter{},
-		appRepo:    &testapi.FakeApplicationRepository{},
-	}
-	return
-}
-
-func callScale(t mr.TestingT, args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("scale", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewScale(ui, config, deps.restarter, deps.appRepo)
-	testcmd.RunCommand(cmd, ctxt, deps.reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestScaleRequirements", func() {
@@ -144,4 +105,28 @@ func init() {
 			assert.Nil(mr.T(), deps.appRepo.UpdateParams.InstanceCount)
 		})
 	})
+}
+
+type scaleDependencies struct {
+	reqFactory *testreq.FakeReqFactory
+	restarter  *testcmd.FakeAppRestarter
+	appRepo    *testapi.FakeApplicationRepository
+}
+
+func getScaleDependencies() (deps scaleDependencies) {
+	deps = scaleDependencies{
+		reqFactory: &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true},
+		restarter:  &testcmd.FakeAppRestarter{},
+		appRepo:    &testapi.FakeApplicationRepository{},
+	}
+	return
+}
+
+func callScale(t mr.TestingT, args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("scale", args)
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewScale(ui, configRepo, deps.restarter, deps.appRepo)
+	testcmd.RunCommand(cmd, ctxt, deps.reqFactory)
+	return
 }

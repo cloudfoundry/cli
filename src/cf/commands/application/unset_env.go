@@ -13,12 +13,12 @@ import (
 
 type UnsetEnv struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewUnsetEnv(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *UnsetEnv) {
+func NewUnsetEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *UnsetEnv) {
 	cmd = new(UnsetEnv)
 	cmd.ui = ui
 	cmd.config = config
@@ -49,8 +49,8 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	cmd.ui.Say("Removing env variable %s from app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(varName),
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

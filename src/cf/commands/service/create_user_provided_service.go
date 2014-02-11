@@ -13,11 +13,11 @@ import (
 
 type CreateUserProvidedService struct {
 	ui                              terminal.UI
-	config                          *configuration.Configuration
+	config                          configuration.Reader
 	userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository
 }
 
-func NewCreateUserProvidedService(ui terminal.UI, config *configuration.Configuration, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
+func NewCreateUserProvidedService(ui terminal.UI, config configuration.Reader, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (cmd CreateUserProvidedService) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userProvidedServiceInstanceRepo = userProvidedServiceInstanceRepo
@@ -49,8 +49,8 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating user provided service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

@@ -11,11 +11,11 @@ import (
 
 type ListQuotas struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	quotaRepo api.QuotaRepository
 }
 
-func NewListQuotas(ui terminal.UI, config *configuration.Configuration, quotaRepo api.QuotaRepository) (cmd *ListQuotas) {
+func NewListQuotas(ui terminal.UI, config configuration.Reader, quotaRepo api.QuotaRepository) (cmd *ListQuotas) {
 	cmd = new(ListQuotas)
 	cmd.ui = ui
 	cmd.config = config

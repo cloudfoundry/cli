@@ -17,20 +17,20 @@ type CurlRepository interface {
 }
 
 type CloudControllerCurlRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerCurlRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerCurlRepository) {
+func NewCloudControllerCurlRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerCurlRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
 }
 
 func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/%s", repo.config.Target, strings.TrimLeft(path, "/"))
+	url := fmt.Sprintf("%s/%s", repo.config.ApiEndpoint(), strings.TrimLeft(path, "/"))
 
-	req, apiResponse := repo.gateway.NewRequest(method, url, repo.config.AccessToken, strings.NewReader(body))
+	req, apiResponse := repo.gateway.NewRequest(method, url, repo.config.AccessToken(), strings.NewReader(body))
 	if apiResponse.IsNotSuccessful() {
 		return
 	}

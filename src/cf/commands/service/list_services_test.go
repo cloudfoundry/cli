@@ -2,10 +2,8 @@ package service_test
 
 import (
 	. "cf/commands/service"
-	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -49,22 +47,9 @@ func init() {
 				GetSummariesInCurrentSpaceInstances: serviceInstances,
 			}
 			ui := &testterm.FakeUI{}
+			configRepo := testconfig.NewRepositoryWithDefaults()
 
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
-			assert.NoError(mr.T(), err)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			space := models.SpaceFields{}
-			space.Name = "my-space"
-			config := &configuration.Configuration{
-				SpaceFields:        space,
-				OrganizationFields: org,
-				AccessToken:        token,
-			}
-
-			cmd := NewListServices(ui, config, serviceSummaryRepo)
+			cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
 			cmd.Run(testcmd.NewContext("services", []string{}))
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -82,22 +67,9 @@ func init() {
 				GetSummariesInCurrentSpaceInstances: serviceInstances,
 			}
 			ui := &testterm.FakeUI{}
+			configRepo := testconfig.NewRepositoryWithDefaults()
 
-			token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-				Username: "my-user",
-			})
-			assert.NoError(mr.T(), err)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			space := models.SpaceFields{}
-			space.Name = "my-space"
-			config := &configuration.Configuration{
-				SpaceFields:        space,
-				OrganizationFields: org,
-				AccessToken:        token,
-			}
-
-			cmd := NewListServices(ui, config, serviceSummaryRepo)
+			cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
 			cmd.Run(testcmd.NewContext("services", []string{}))
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{

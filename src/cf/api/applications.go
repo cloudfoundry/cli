@@ -128,11 +128,11 @@ type ApplicationRepository interface {
 }
 
 type CloudControllerApplicationRepository struct {
-	config  *configuration.Configuration
+	config  configuration.Reader
 	gateway net.Gateway
 }
 
-func NewCloudControllerApplicationRepository(config *configuration.Configuration, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
+func NewCloudControllerApplicationRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerApplicationRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	return
@@ -145,9 +145,9 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/apps", repo.config.Target)
+	path := fmt.Sprintf("%s/v2/apps", repo.config.ApiEndpoint())
 	resource := new(ApplicationResource)
-	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
+	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -157,9 +157,9 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 }
 
 func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.Target, repo.config.SpaceFields.Guid, url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
 	appResources := new(PaginatedApplicationResources)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken, appResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), appResources)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -181,9 +181,9 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params m
 		return
 	}
 
-	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.Target, appGuid)
+	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.ApiEndpoint(), appGuid)
 	resource := new(ApplicationResource)
-	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken, strings.NewReader(data), resource)
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
@@ -200,6 +200,6 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppP
 }
 
 func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.Target, appGuid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken)
+	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.ApiEndpoint(), appGuid)
+	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
 }

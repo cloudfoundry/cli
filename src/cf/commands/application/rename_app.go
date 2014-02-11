@@ -12,12 +12,12 @@ import (
 
 type RenameApp struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewRenameApp(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *RenameApp) {
+func NewRenameApp(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *RenameApp) {
 	cmd = new(RenameApp)
 	cmd.ui = ui
 	cmd.config = config
@@ -46,8 +46,8 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 	cmd.ui.Say("Renaming app %s to %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(app.Name),
 		terminal.EntityNameColor(newName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

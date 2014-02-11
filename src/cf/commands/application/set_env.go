@@ -13,12 +13,12 @@ import (
 
 type SetEnv struct {
 	ui      terminal.UI
-	config  *configuration.Configuration
+	config  configuration.Reader
 	appRepo api.ApplicationRepository
 	appReq  requirements.ApplicationRequirement
 }
 
-func NewSetEnv(ui terminal.UI, config *configuration.Configuration, appRepo api.ApplicationRepository) (cmd *SetEnv) {
+func NewSetEnv(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *SetEnv) {
 	cmd = new(SetEnv)
 	cmd.ui = ui
 	cmd.config = config
@@ -51,8 +51,8 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 		terminal.EntityNameColor(varName),
 		terminal.EntityNameColor(varValue),
 		terminal.EntityNameColor(app.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

@@ -19,22 +19,16 @@ func callListQuotas(t mr.TestingT, reqFactory *testreq.FakeReqFactory, quotaRepo
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("quotas", []string{})
 
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-
 	spaceFields := models.SpaceFields{}
 	spaceFields.Name = "my-space"
 
 	orgFields := models.OrganizationFields{}
 	orgFields.Name = "my-org"
 
-	config := &configuration.Configuration{
-		SpaceFields:        spaceFields,
-		OrganizationFields: orgFields,
-		AccessToken:        token,
-	}
+	token := configuration.TokenInfo{Username: "my-user"}
+	config := testconfig.NewRepositoryWithAccessToken(token)
+	config.SetSpaceFields(spaceFields)
+	config.SetOrganizationFields(orgFields)
 
 	cmd := organization.NewListQuotas(fakeUI, config, quotaRepo)
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

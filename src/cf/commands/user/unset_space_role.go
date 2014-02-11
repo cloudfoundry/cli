@@ -12,14 +12,14 @@ import (
 
 type UnsetSpaceRole struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	spaceRepo api.SpaceRepository
 	userRepo  api.UserRepository
 	userReq   requirements.UserRequirement
 	orgReq    requirements.OrganizationRequirement
 }
 
-func NewUnsetSpaceRole(ui terminal.UI, config *configuration.Configuration, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
+func NewUnsetSpaceRole(ui terminal.UI, config configuration.Reader, spaceRepo api.SpaceRepository, userRepo api.UserRepository) (cmd *UnsetSpaceRole) {
 	cmd = new(UnsetSpaceRole)
 	cmd.ui = ui
 	cmd.config = config

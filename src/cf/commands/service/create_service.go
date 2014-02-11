@@ -13,11 +13,11 @@ import (
 
 type CreateService struct {
 	ui          terminal.UI
-	config      *configuration.Configuration
+	config      configuration.Reader
 	serviceRepo api.ServiceRepository
 }
 
-func NewCreateService(ui terminal.UI, config *configuration.Configuration, serviceRepo api.ServiceRepository) (cmd CreateService) {
+func NewCreateService(ui terminal.UI, config configuration.Reader, serviceRepo api.ServiceRepository) (cmd CreateService) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.serviceRepo = serviceRepo
@@ -41,8 +41,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating service %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields.Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 

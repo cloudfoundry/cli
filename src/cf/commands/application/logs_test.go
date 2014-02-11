@@ -2,59 +2,29 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/configuration"
 	"cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	. "github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
+	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-
-	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
-func getLogsDependencies() (reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) {
-	logsRepo = &testapi.FakeLogsRepository{}
-	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
-	return
-}
-
-func callLogs(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("logs", args)
-
-	token, err := testconfig.CreateAccessTokenWithTokenInfo(configuration.TokenInfo{
-		Username: "my-user",
-	})
-	assert.NoError(t, err)
-	space := models.SpaceFields{}
-	space.Name = "my-space"
-	org := models.OrganizationFields{}
-	org.Name = "my-org"
-	config := &configuration.Configuration{
-		SpaceFields:        space,
-		OrganizationFields: org,
-		AccessToken:        token,
-	}
-
-	cmd := NewLogs(ui, config, logsRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
 func init() {
 	Describe("Testing with ginkgo", func() {
 		It("TestLogsFailWithUsage", func() {
 			reqFactory, logsRepo := getLogsDependencies()
 
-			ui := callLogs(mr.T(), []string{}, reqFactory, logsRepo)
+			ui := callLogs([]string{}, reqFactory, logsRepo)
 			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callLogs(mr.T(), []string{"foo"}, reqFactory, logsRepo)
+			ui = callLogs([]string{"foo"}, reqFactory, logsRepo)
 			assert.False(mr.T(), ui.FailedWithUsage)
 		})
 		It("TestLogsRequirements", func() {
@@ -62,12 +32,12 @@ func init() {
 			reqFactory, logsRepo := getLogsDependencies()
 
 			reqFactory.LoginSuccess = true
-			callLogs(mr.T(), []string{"my-app"}, reqFactory, logsRepo)
+			callLogs([]string{"my-app"}, reqFactory, logsRepo)
 			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 
 			reqFactory.LoginSuccess = false
-			callLogs(mr.T(), []string{"my-app"}, reqFactory, logsRepo)
+			callLogs([]string{"my-app"}, reqFactory, logsRepo)
 			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 		})
 		It("TestLogsOutputsRecentLogs", func() {
@@ -87,7 +57,7 @@ func init() {
 			reqFactory.Application = app
 			logsRepo.RecentLogs = recentLogs
 
-			ui := callLogs(mr.T(), []string{"--recent", "my-app"}, reqFactory, logsRepo)
+			ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
 
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), app.Guid, logsRepo.AppLoggedGuid)
@@ -111,7 +81,7 @@ func init() {
 			reqFactory.Application = app
 			logsRepo.RecentLogs = recentLogs
 
-			ui := callLogs(mr.T(), []string{"--recent", "my-app"}, reqFactory, logsRepo)
+			ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
 
 			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 				{"hello%2Bworld%v"},
@@ -131,7 +101,7 @@ func init() {
 			reqFactory.Application = app
 			logsRepo.TailLogMessages = logs
 
-			ui := callLogs(mr.T(), []string{"my-app"}, reqFactory, logsRepo)
+			ui := callLogs([]string{"my-app"}, reqFactory, logsRepo)
 
 			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 			assert.Equal(mr.T(), app.Guid, logsRepo.AppLoggedGuid)
@@ -141,4 +111,20 @@ func init() {
 			})
 		})
 	})
+}
+
+func getLogsDependencies() (reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) {
+	logsRepo = &testapi.FakeLogsRepository{}
+	reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+	return
+}
+
+func callLogs(args []string, reqFactory *testreq.FakeReqFactory, logsRepo *testapi.FakeLogsRepository) (ui *testterm.FakeUI) {
+	ui = new(testterm.FakeUI)
+	ctxt := testcmd.NewContext("logs", args)
+
+	configRepo := testconfig.NewRepositoryWithDefaults()
+	cmd := NewLogs(ui, configRepo, logsRepo)
+	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	return
 }

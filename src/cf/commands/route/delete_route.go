@@ -11,11 +11,11 @@ import (
 
 type DeleteRoute struct {
 	ui        terminal.UI
-	config    *configuration.Configuration
+	config    configuration.Reader
 	routeRepo api.RouteRepository
 }
 
-func NewDeleteRoute(ui terminal.UI, config *configuration.Configuration, routeRepo api.RouteRepository) (cmd *DeleteRoute) {
+func NewDeleteRoute(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *DeleteRoute) {
 	cmd = new(DeleteRoute)
 	cmd.ui = ui
 	cmd.config = config
