@@ -68,8 +68,9 @@ var _ = Describe("ManifestDiskRepository", func() {
 		})
 
 		It("returns the path to the manifest", func() {
-			_, path, _ := repo.ReadManifest("../../fixtures/manifests/empty-manifest.yml")
-			Expect(path).To(Equal("../../fixtures/manifests/empty-manifest.yml"))
+			inputPath := filepath.Clean("../../fixtures/manifests/empty-manifest.yml")
+			_, path, _ := repo.ReadManifest(inputPath)
+			Expect(path).To(Equal(inputPath))
 		})
 	})
 
