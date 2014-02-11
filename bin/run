@@ -1,4 +1,4 @@
 #!/bin/bash
 
 set -e
-$(dirname $0)/go run -race $(dirname $0)/../src/main/cf.go $*
+$(dirname $0)/go run -race $(dirname $0)/../src/main/cf.go "$@"
