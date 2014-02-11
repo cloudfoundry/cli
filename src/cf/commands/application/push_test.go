@@ -277,8 +277,8 @@ func init() {
 				{"FAILED"},
 			})
 		})
-		It("TestPushingAppWhenItDoesNotExistButRouteExists", func() {
 
+		It("TestPushingAppWhenItDoesNotExistButRouteExists", func() {
 			deps := getPushDependencies()
 
 			route := models.Route{}
@@ -527,8 +527,8 @@ func init() {
 			})
 			assert.Equal(mr.T(), len(deps.appRepo.CreateAppParams), 0)
 		})
-		It("TestPushingWithBindingMergedServices", func() {
 
+		It("TestPushingWithBindingMergedServices", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -567,8 +567,8 @@ func init() {
 				{"OK"},
 			})
 		})
-		It("TestPushWithServicesThatAreNotFound", func() {
 
+		It("TestPushWithServicesThatAreNotFound", func() {
 			deps := getPushDependencies()
 			deps.routeRepo.FindByHostAndDomainErr = true
 			deps.serviceRepo.FindInstanceByNameErr = true
@@ -580,8 +580,8 @@ func init() {
 				{"Could not find service", "app1-service", "app1"},
 			})
 		})
-		It("TestPushingAppWithPath", func() {
 
+		It("TestPushingAppWithPath", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -595,8 +595,8 @@ func init() {
 
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedDir, absPath)
 		})
-		It("TestPushingAppWithPathToZipFile", func() {
 
+		It("TestPushingAppWithPathToZipFile", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -610,8 +610,8 @@ func init() {
 
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedDir, absPath)
 		})
-		It("TestPushingWithDefaultAppPath", func() {
 
+		It("TestPushingWithDefaultAppPath", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -621,8 +621,8 @@ func init() {
 			assert.NoError(mr.T(), err)
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedDir, dir)
 		})
-		It("TestPushingWithRelativeAppPath", func() {
 
+		It("TestPushingWithRelativeAppPath", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -635,8 +635,8 @@ func init() {
 			assert.NoError(mr.T(), err)
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedDir, filepath.Join(dir, "../../../fixtures/example-app"))
 		})
-		It("TestPushingWithBadManifestPath", func() {
 
+		It("TestPushingWithBadManifestPath", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -652,8 +652,8 @@ func init() {
 				{"read manifest error"},
 			})
 		})
-		It("TestPushingWithDefaultManifestNotFound", func() {
 
+		It("TestPushingWithDefaultManifestNotFound", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 			deps.manifestRepo.ReadManifestManifest = singleAppManifest()
@@ -670,8 +670,8 @@ func init() {
 				{"FAILED"},
 			})
 		})
-		It("TestPushingWithManifestInAppDirectory", func() {
 
+		It("TestPushingWithManifestInAppDirectory", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 			deps.manifestRepo.ReadManifestManifest = singleAppManifest()
@@ -684,8 +684,8 @@ func init() {
 			assert.Equal(mr.T(), deps.manifestRepo.UserSpecifiedPath, "")
 			assert.Equal(mr.T(), deps.manifestRepo.ReadManifestPath, "manifest.yml")
 		})
-		It("TestPushingWithNoManifestFlag", func() {
 
+		It("TestPushingWithNoManifestFlag", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -699,6 +699,7 @@ func init() {
 			assert.Equal(mr.T(), deps.manifestRepo.ReadManifestPath, "")
 			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Name, "app-name")
 		})
+
 		It("TestPushingWithNoManifestFlagAndMissingAppName", func() {
 
 			deps := getPushDependencies()
@@ -709,8 +710,8 @@ func init() {
 				{"FAILED"},
 			})
 		})
-		It("TestPushingAppWithNoRoute", func() {
 
+		It("TestPushingAppWithNoRoute", func() {
 			deps := getPushDependencies()
 			domain := models.DomainFields{}
 			domain.Name = "bar.cf-app.com"
@@ -729,8 +730,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "")
 		})
-		It("TestPushingAppWithNoHostname", func() {
 
+		It("TestPushingAppWithNoHostname", func() {
 			deps := getPushDependencies()
 			domain := models.DomainFields{}
 			domain.Name = "bar.cf-app.com"
@@ -750,8 +751,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "bar-domain-guid")
 		})
-		It("TestPushingAppAsWorker", func() {
 
+		It("TestPushingAppAsWorker", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -770,8 +771,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.BoundAppGuid, "")
 			assert.Equal(mr.T(), deps.routeRepo.BoundRouteGuid, "")
 		})
-		It("TestPushingAppWithMemoryInMegaBytes", func() {
 
+		It("TestPushingAppWithMemoryInMegaBytes", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -782,8 +783,8 @@ func init() {
 
 			assert.Equal(mr.T(), *deps.appRepo.CreatedAppParams().Memory, uint64(256))
 		})
-		It("TestPushingAppWithInvalidMemory", func() {
 
+		It("TestPushingAppWithInvalidMemory", func() {
 			deps := getPushDependencies()
 			deps.appRepo.ReadNotFound = true
 
@@ -797,8 +798,8 @@ func init() {
 				{"invalid", "memory"},
 			})
 		})
-		It("TestPushingAppWhenItAlreadyExistsAndNothingIsSpecified", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsAndNothingIsSpecified", func() {
 			deps := getPushDependencies()
 			existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
 			deps.appRepo.ReadApp = existingApp
@@ -809,8 +810,8 @@ func init() {
 			assert.Equal(mr.T(), deps.stopper.AppToStop.Guid, existingApp.Guid)
 			assert.Equal(mr.T(), deps.appBitsRepo.UploadedAppGuid, existingApp.Guid)
 		})
-		It("TestPushingAppWhenItIsStopped", func() {
 
+		It("TestPushingAppWhenItIsStopped", func() {
 			deps := getPushDependencies()
 			stoppedApp := maker.NewApp(maker.Overrides{"state": "stopped", "name": "stopped-app"})
 
@@ -858,7 +859,6 @@ func init() {
 		})
 
 		It("TestPushingAppWhenItAlreadyExistsAndDomainIsSpecifiedIsAlreadyBound", func() {
-
 			deps := getPushDependencies()
 
 			domain := models.DomainFields{}
@@ -930,8 +930,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "existing-app")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "domain-guid")
 		})
-		It("TestPushingAppWithNoFlagsWhenAppIsAlreadyBoundToDomain", func() {
 
+		It("TestPushingAppWithNoFlagsWhenAppIsAlreadyBoundToDomain", func() {
 			deps := getPushDependencies()
 
 			domain := models.DomainFields{}
@@ -958,8 +958,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "")
 		})
-		It("TestPushingAppWhenItAlreadyExistsAndHostIsSpecified", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsAndHostIsSpecified", func() {
 			deps := getPushDependencies()
 
 			domain := models.DomainFields{}
@@ -994,8 +994,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "new-host")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "domain-guid")
 		})
-		It("TestPushingAppWhenItAlreadyExistsAndNoRouteFlagIsPresent", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsAndNoRouteFlagIsPresent", func() {
 			deps := getPushDependencies()
 			existingApp := models.Application{}
 			existingApp.Name = "existing-app"
@@ -1018,8 +1018,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "")
 		})
-		It("TestPushingAppWhenItAlreadyExistsAndNoHostFlagIsPresent", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsAndNoHostFlagIsPresent", func() {
 			deps := getPushDependencies()
 
 			domain := models.DomainFields{}
@@ -1057,8 +1057,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "")
 			assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "domain-guid")
 		})
-		It("TestPushingAppWhenItAlreadyExistsWithoutARouteCreatesADefaultDomain", func() {
 
+		It("TestPushingAppWhenItAlreadyExistsWithoutARouteCreatesADefaultDomain", func() {
 			deps := getPushDependencies()
 
 			sharedDomain := models.DomainFields{}
@@ -1090,8 +1090,8 @@ func init() {
 			assert.Equal(mr.T(), deps.routeRepo.BoundAppGuid, "existing-app-guid")
 			assert.Equal(mr.T(), deps.routeRepo.BoundRouteGuid, "existing-app-route-guid")
 		})
-		It("TestPushingAppWithInvalidPath", func() {
 
+		It("TestPushingAppWithInvalidPath", func() {
 			deps := getPushDependencies()
 			deps.appBitsRepo.UploadAppErr = true
 
@@ -1102,8 +1102,8 @@ func init() {
 				{"FAILED"},
 			})
 		})
-		It("TestPushingAppDescribesUpload", func() {
 
+		It("TestPushingAppDescribesUpload", func() {
 			deps := getPushDependencies()
 
 			deps.appRepo.ReadNotFound = true
@@ -1117,8 +1117,8 @@ func init() {
 				{"61M", "11 files"},
 			})
 		})
-		It("TestPushingWithNoManifestAndNoName", func() {
 
+		It("TestPushingWithNoManifestAndNoName", func() {
 			deps := getPushDependencies()
 
 			ui := callPush(mr.T(), []string{}, deps)
