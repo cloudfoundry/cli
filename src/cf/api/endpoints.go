@@ -3,6 +3,7 @@ package api
 import (
 	"cf/configuration"
 	"cf/net"
+	"regexp"
 	"strings"
 )
 
@@ -75,11 +76,15 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse
 
 func (repo RemoteEndpointRepository) GetLoggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse) {
 	if repo.config.LoggregatorEndPoint == "" {
-		apiResponse = net.NewApiResponseWithMessage("Loggregator endpoint missing from config file")
-		return
+		if repo.config.Target == "" {
+			apiResponse = net.NewApiResponseWithMessage("Loggregator endpoint missing from config file")
+		} else {
+			endpoint = defaultLoggregatorEndpoint(repo.config.Target)
+		}
+	} else {
+		endpoint = repo.config.LoggregatorEndPoint
 	}
 
-	endpoint = repo.config.LoggregatorEndPoint
 	return
 }
 
@@ -103,3 +108,15 @@ func (repo RemoteEndpointRepository) GetUAAEndpoint() (endpoint string, apiRespo
 
 	return
 }
+
+// TODO - remove
+func defaultLoggregatorEndpoint(apiEndpoint string) string {
+	url := endpointDomainRegex.ReplaceAllString(apiEndpoint, "ws${1}://loggregator.${2}")
+	if url[0:3] == "wss" {
+		return url + ":4443"
+	} else {
+		return url + ":80"
+	}
+}
+
+var endpointDomainRegex = regexp.MustCompile(`^http(s?)://[^\.]+\.(.+)\/?`)
