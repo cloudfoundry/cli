@@ -11,8 +11,7 @@ import (
 )
 
 type ManifestRepository interface {
-	ReadManifest(path string) (manifest *Manifest, errs ManifestErrors)
-	ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error)
+	ReadManifest(string) (manifest *Manifest, path string, errors ManifestErrors)
 }
 
 type ManifestDiskRepository struct{}
@@ -21,16 +20,18 @@ func NewManifestDiskRepository() (repo ManifestRepository) {
 	return ManifestDiskRepository{}
 }
 
-func (repo ManifestDiskRepository) ReadManifest(path string) (m *Manifest, errs ManifestErrors) {
+func (repo ManifestDiskRepository) ReadManifest(inputPath string) (m *Manifest, manifestPath string, errs ManifestErrors) {
 	m = NewEmptyManifest()
 
-	basePath, _, err := repo.ManifestPath(path)
+	basePath, fileName, err := repo.manifestPath(inputPath)
 	if err != nil {
 		errs = append(errs, err)
 		return
 	}
 
-	mapp, err := repo.readAllYAMLFiles(path)
+	manifestPath = filepath.Join(basePath, fileName)
+
+	mapp, err := repo.readAllYAMLFiles(manifestPath)
 	if err != nil {
 		errs = append(errs, err)
 		return
@@ -40,6 +41,7 @@ func (repo ManifestDiskRepository) ReadManifest(path string) (m *Manifest, errs 
 	if !errs.Empty() {
 		return
 	}
+
 	return
 }
 
@@ -99,15 +101,7 @@ func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
 	return
 }
 
-func (repo ManifestDiskRepository) ManifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
-	if userSpecifiedPath == "" {
-		userSpecifiedPath, err = os.Getwd()
-		if err != nil {
-			err = errors.New("Error finding current directory: " + err.Error())
-			return
-		}
-	}
-
+func (repo ManifestDiskRepository) manifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
 	fileInfo, err := os.Stat(userSpecifiedPath)
 	if err != nil {
 		err = errors.New("Error finding manifest path: " + err.Error())

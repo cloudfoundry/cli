@@ -1,6 +1,6 @@
 ---
 applications:
-- name: goodbyte
+- name: from-different-manifest
   memory: 128M
   instances: 1
   host: hello
