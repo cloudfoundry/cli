@@ -7,6 +7,8 @@ import (
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
+	"encoding/json"
+	"errors"
 	"fileutils"
 	"fmt"
 	"io"
@@ -46,12 +48,13 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 			return
 		}
 
+		var presentResourcesJson []byte
 		repo.sourceDir(appDir, func(sourceDir string, sourceErr error) {
 			if sourceErr != nil {
 				err = sourceErr
 				return
 			}
-			err = repo.copyUploadableFiles(sourceDir, uploadDir)
+			presentResourcesJson, err = repo.copyUploadableFiles(sourceDir, uploadDir)
 		})
 
 		if err != nil {
@@ -78,7 +81,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 			}
 			cb(appDir, uint64(stat.Size()), cf.CountFiles(uploadDir))
 
-			apiResponse = repo.uploadBits(appGuid, zipFile)
+			apiResponse = repo.uploadBits(appGuid, zipFile, presentResourcesJson)
 			if apiResponse.IsNotSuccessful() {
 				return
 			}
@@ -87,7 +90,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiResponse net.ApiResponse) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.Target, appGuid)
 
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
@@ -96,7 +99,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 			return
 		}
 
-		boundary, err := repo.writeUploadBody(zipFile, requestFile)
+		boundary, err := repo.writeUploadBody(zipFile, requestFile, presentResourcesJson)
 		if err != nil {
 			apiResponse = net.NewApiResponseWithError("Error writing to tmp file: %s", err)
 			return
@@ -141,15 +144,21 @@ func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb
 	})
 }
 
-func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir string, uploadDir string) (err error) {
+func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir string, uploadDir string) (presentResourcesJson []byte, err error) {
 	// Find which files need to be uploaded
 	allAppFiles, err := cf.AppFilesInDir(appDir)
 	if err != nil {
 		return
 	}
 
+	appFilesToUpload, presentResourcesJson, apiResponse := repo.getFilesToUpload(allAppFiles)
+	if apiResponse.IsNotSuccessful() {
+		err = errors.New(apiResponse.Message)
+		return
+	}
+
 	// Copy files into a temporary directory and return it
-	err = cf.CopyFiles(allAppFiles, appDir, uploadDir)
+	err = cf.CopyFiles(appFilesToUpload, appDir, uploadDir)
 	if err != nil {
 		return
 	}
@@ -193,6 +202,51 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(r *zip.ReadClose
 
 	return
 }
+func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiResponse net.ApiResponse) {
+	appFilesRequest := []AppFileResource{}
+	for _, file := range allAppFiles {
+		appFilesRequest = append(appFilesRequest, AppFileResource{
+			Path: file.Path,
+			Sha1: file.Sha1,
+			Size: file.Size,
+		})
+	}
+
+	allAppFilesJson, err := json.Marshal(appFilesRequest)
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Failed to create json for resource_match request", err)
+		return
+	}
+
+	path := fmt.Sprintf("%s/v2/resource_match", repo.config.Target)
+	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken, bytes.NewReader(allAppFilesJson))
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	presentResourcesJson, _, apiResponse = repo.gateway.PerformRequestForResponseBytes(req)
+
+	fileResource := []AppFileResource{}
+	err = json.Unmarshal(presentResourcesJson, &fileResource)
+
+	if err != nil {
+		apiResponse = net.NewApiResponseWithError("Failed to unmarshal json response from resource_match request", err)
+		return
+	}
+
+	appFilesToUpload = make([]models.AppFileFields, len(allAppFiles))
+	copy(appFilesToUpload, allAppFiles)
+	for _, file := range fileResource {
+		appFile := models.AppFileFields{
+			Path: file.Path,
+			Sha1: file.Sha1,
+			Size: file.Size,
+		}
+		appFilesToUpload = repo.deleteAppFile(appFilesToUpload, appFile)
+	}
+
+	return
+}
 
 func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []models.AppFileFields, targetFile models.AppFileFields) []models.AppFileFields {
 	for i, file := range appFiles {
@@ -204,7 +258,7 @@ func (repo CloudControllerApplicationBitsRepository) deleteAppFile(appFiles []mo
 	return appFiles
 }
 
-func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File) (boundary string, err error) {
+func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, presentResourcesJson []byte) (boundary string, err error) {
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
 
@@ -215,7 +269,7 @@ func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os
 		return
 	}
 
-	_, err = io.Copy(part, bytes.NewBufferString("[]"))
+	_, err = io.Copy(part, bytes.NewBuffer(presentResourcesJson))
 	if err != nil {
 		return
 	}
