@@ -9,7 +9,6 @@ import (
 	"generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"os"
 	"path/filepath"
@@ -165,8 +164,8 @@ var _ = Describe("Push Command", func() {
 
 		ui := callPush(mr.T(), []string{"my-new-app"}, deps)
 
-		assert.Empty(mr.T(), deps.routeRepo.CreatedHost)
-		assert.Empty(mr.T(), deps.routeRepo.CreatedDomainGuid)
+		Expect(deps.routeRepo.CreatedHost).To(BeEmpty())
+		Expect(deps.routeRepo.CreatedDomainGuid).To(BeEmpty())
 		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
 		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
 		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))

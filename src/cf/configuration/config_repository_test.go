@@ -5,8 +5,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	testconfig "testhelpers/configuration"
 	"testhelpers/maker"
 	"time"
@@ -85,11 +83,11 @@ var _ = Describe("ConfigurationRepository", func() {
 
 	It("User has an invalid Access Token", func() {
 		config.SetAccessToken("bearer")
-		assert.Empty(mr.T(), config.UserGuid())
-		assert.Empty(mr.T(), config.UserEmail())
+		Expect(config.UserGuid()).To(BeEmpty())
+		Expect(config.UserEmail()).To(BeEmpty())
 
 		config.SetAccessToken("bearer eyJhbGciOiJSUzI1NiJ9")
-		assert.Empty(mr.T(), config.UserGuid())
-		assert.Empty(mr.T(), config.UserEmail())
+		Expect(config.UserGuid()).To(BeEmpty())
+		Expect(config.UserEmail()).To(BeEmpty())
 	})
 })
