@@ -112,7 +112,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
 	appParams.Services = sliceOrEmptyVal(yamlMap, "services", &errs)
-	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, "env", &errs)
+	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 
 	if appParams.Path != nil {
 		path := *appParams.Path
@@ -256,13 +256,15 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]s
 	return &stringSlice
 }
 
-func envVarOrEmptyMap(yamlMap generic.Map, key string, errs *ManifestErrors) *map[string]string {
+func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]string {
+	key := "env"
 	switch envVars := yamlMap.Get(key).(type) {
 	case nil:
-		return new(map[string]string)
+		aMap := make(map[string]string, 0)
+		return &aMap
 	case map[string]interface{}:
 		yamlMap.Set(key, generic.NewMap(yamlMap.Get(key)))
-		return envVarOrEmptyMap(yamlMap, key, errs)
+		return envVarOrEmptyMap(yamlMap, errs)
 	case generic.Map:
 		merrs := validateEnvVars(envVars)
 		if merrs != nil {
@@ -276,8 +278,6 @@ func envVarOrEmptyMap(yamlMap generic.Map, key string, errs *ManifestErrors) *ma
 		})
 		return &result
 	default:
-		fmt.Printf("\n\n ENV VARS: %#v", envVars)
-
 		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value.", key)))
 		return nil
 	}
