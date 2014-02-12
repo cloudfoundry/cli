@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -97,7 +98,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		repo.UpdateEndpoint(ts.URL)
 
-		assert.Equal(mr.T(), config.AccessToken(), "")
+		Expect(config.AccessToken()).To(Equal(""))
 		assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
 		assert.Equal(mr.T(), config.LoggregatorEndpoint(), "wss://loggregator.foo.example.org:4443")
 		assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)

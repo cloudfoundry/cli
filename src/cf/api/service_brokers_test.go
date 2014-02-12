@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -73,7 +74,7 @@ var _ = Describe("Service Brokers Repo", func() {
 			return true
 		})
 
-		assert.Equal(mr.T(), len(serviceBrokers), 2)
+		Expect(len(serviceBrokers)).To(Equal(2))
 		assert.Equal(mr.T(), serviceBrokers[0].Guid, "found-guid-1")
 		assert.Equal(mr.T(), serviceBrokers[1].Guid, "found-guid-2")
 		assert.True(mr.T(), handler.AllRequestsCalled())

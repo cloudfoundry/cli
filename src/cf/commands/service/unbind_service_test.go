@@ -5,6 +5,7 @@ import (
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -41,7 +42,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
 		ui := callUnbindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{

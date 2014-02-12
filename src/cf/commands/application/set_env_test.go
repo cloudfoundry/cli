@@ -5,6 +5,7 @@ import (
 	. "cf/commands/application"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -50,7 +51,7 @@ var _ = Describe("set-env command", func() {
 		args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 		ui := callSetEnv(args, reqFactory, appRepo)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{
 				"Setting env variable",

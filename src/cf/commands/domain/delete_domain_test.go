@@ -6,6 +6,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -44,7 +45,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteDomain([]string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.DeleteDomainGuid, "foo-guid")
+		Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"delete", "foo.com"},

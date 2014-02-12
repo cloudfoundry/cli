@@ -5,6 +5,7 @@ import (
 	"cf/trace"
 	"fileutils"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
@@ -24,7 +25,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		logger.Print("hello world")
 
 		result, _ := ioutil.ReadAll(stdOut)
-		assert.Equal(mr.T(), string(result), "")
+		Expect(string(result)).To(Equal(""))
 	})
 	It("TestTraceSetToTrue", func() {
 

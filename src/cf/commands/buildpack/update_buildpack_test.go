@@ -3,6 +3,7 @@ package buildpack_test
 import (
 	. "cf/commands/buildpack"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -60,7 +61,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Equal(mr.T(), *repo.UpdateBuildpack.Position, 999)
+		Expect(*repo.UpdateBuildpack.Position).To(Equal(999))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Updating buildpack", "my-buildpack"},
 			{"OK"},

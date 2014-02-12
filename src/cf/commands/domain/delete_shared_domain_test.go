@@ -6,6 +6,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -38,7 +39,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.domainRepo.FindByNameInOrgApiResponse = net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
-		assert.Equal(mr.T(), deps.domainRepo.DeleteDomainGuid, "")
+		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},

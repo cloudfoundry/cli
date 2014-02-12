@@ -3,13 +3,14 @@ package formatters_test
 import (
 	. "cf/formatters"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestByteSize", func() {
-		assert.Equal(mr.T(), ByteSize(100*MEGABYTE), "100M")
+		Expect(ByteSize(100 * MEGABYTE)).To(Equal("100M"))
 		assert.Equal(mr.T(), ByteSize(uint64(100.5*MEGABYTE)), "100.5M")
 	})
 

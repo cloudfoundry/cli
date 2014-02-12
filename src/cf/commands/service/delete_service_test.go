@@ -5,6 +5,7 @@ import (
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -46,7 +47,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), serviceRepo.DeleteServiceServiceInstance, serviceInstance)
+		Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
 	})
 	It("TestDeleteServiceCommandWithYes", func() {
 

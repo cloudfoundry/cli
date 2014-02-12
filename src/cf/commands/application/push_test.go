@@ -8,6 +8,7 @@ import (
 	"errors"
 	"generic"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"os"
@@ -77,7 +78,7 @@ var _ = Describe("Push Command", func() {
 
 		ui := callPush(mr.T(), []string{"-t", "111", "my-new-app"}, deps)
 
-		assert.Equal(mr.T(), deps.routeRepo.FindByHostAndDomainHost, "my-new-app")
+		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
 		assert.Equal(mr.T(), deps.routeRepo.CreatedHost, "my-new-app")
 		assert.Equal(mr.T(), deps.routeRepo.CreatedDomainGuid, "shared-domain-guid")
 		assert.Equal(mr.T(), deps.routeRepo.BoundAppGuid, "my-new-app-guid")

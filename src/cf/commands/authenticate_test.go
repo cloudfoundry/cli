@@ -5,6 +5,7 @@ import (
 	. "cf/commands"
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -51,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			&testapi.FakeAuthenticationRepository{AuthError: true, Config: config},
 		)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 4)
+		Expect(len(ui.Outputs)).To(Equal(4))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{config.ApiEndpoint()},
 			{"Authenticating..."},

@@ -3,6 +3,7 @@ package models_test
 import (
 	. "cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 )
@@ -19,7 +20,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestRouteURL", func() {
 		route.Host = "foo"
-		assert.Equal(mr.T(), route.URL(), "foo.example.com")
+		Expect(route.URL()).To(Equal("foo.example.com"))
 	})
 
 	It("TestRouteURLWithoutHost", func() {

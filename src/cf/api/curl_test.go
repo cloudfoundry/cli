@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -111,7 +112,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Method: "POST",
 			Path:   "/v2/endpoint",
 			Matcher: func(t mr.TestingT, req *http.Request) {
-				assert.Equal(mr.T(), req.Header.Get("content-type"), "ascii/cats")
+				Expect(req.Header.Get("content-type")).To(Equal("ascii/cats"))
 				assert.Equal(mr.T(), req.Header.Get("x-something-else"), "5")
 			},
 			Response: testnet.TestResponse{

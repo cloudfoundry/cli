@@ -90,7 +90,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteUserWhenConfirmingWithY", func() {
 		ui, userRepo := deleteWithConfirmation(mr.T(), "Y")
 
-		assert.Equal(mr.T(), len(ui.Outputs), 2)
+		Expect(len(ui.Outputs)).To(Equal(2))
 		assert.Equal(mr.T(), len(ui.Prompts), 1)
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Really delete", "my-user"},

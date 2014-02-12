@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -22,7 +23,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		app, apiResponse := repo.Read("My App")
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), app.Name, "My App")
+		Expect(app.Name).To(Equal("My App"))
 		assert.Equal(mr.T(), app.Guid, "app1-guid")
 		assert.Equal(mr.T(), app.Memory, uint64(128))
 		assert.Equal(mr.T(), app.InstanceCount, 1)

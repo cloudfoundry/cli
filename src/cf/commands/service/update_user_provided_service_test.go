@@ -5,6 +5,7 @@ import (
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -51,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "service-name")
+		Expect(reqFactory.ServiceInstanceName).To(Equal("service-name"))
 	})
 	It("TestUpdateUserProvidedServiceWhenNoFlagsArePresent", func() {
 

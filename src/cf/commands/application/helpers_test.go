@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 
 	. "github.com/onsi/ginkgo"
@@ -28,7 +29,7 @@ func createMessage(t mr.TestingT, protoMsg *logmessage.LogMessage, sourceName *s
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestTimestampFormat", func() {
-		assert.Equal(mr.T(), TIMESTAMP_FORMAT, "2006-01-02T15:04:05.00-0700")
+		Expect(TIMESTAMP_FORMAT).To(Equal("2006-01-02T15:04:05.00-0700"))
 	})
 	It("TestLogMessageOutput", func() {
 

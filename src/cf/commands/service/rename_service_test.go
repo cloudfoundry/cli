@@ -4,6 +4,7 @@ import (
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -51,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
 		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
 	})
 	It("TestRenameService", func() {
 

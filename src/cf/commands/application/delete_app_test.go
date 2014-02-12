@@ -4,6 +4,7 @@ import (
 	. "cf/commands/application"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -18,7 +19,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteConfirmingWithY", func() {
 		ui, _, appRepo := deleteApp("y", []string{"app-to-delete"})
 
-		assert.Equal(mr.T(), appRepo.ReadName, "app-to-delete")
+		Expect(appRepo.ReadName).To(Equal("app-to-delete"))
 		assert.Equal(mr.T(), appRepo.DeletedAppGuid, "app-to-delete-guid")
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Really delete"},

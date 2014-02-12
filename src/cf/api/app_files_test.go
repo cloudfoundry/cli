@@ -5,6 +5,7 @@ import (
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -61,6 +62,6 @@ var _ = Describe("AppFilesRepository", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), err.IsNotSuccessful())
-		assert.Equal(mr.T(), list, expectedResponse)
+		Expect(list).To(Equal(expectedResponse))
 	})
 })

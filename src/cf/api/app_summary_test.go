@@ -4,6 +4,7 @@ import (
 	. "cf/api"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -28,7 +29,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), 2, len(apps))
+		Expect(2).To(Equal(len(apps)))
 
 		app1 := apps[0]
 		assert.Equal(mr.T(), app1.Name, "app1")

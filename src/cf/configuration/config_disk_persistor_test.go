@@ -4,6 +4,7 @@ import (
 	. "cf/configuration"
 	"fileutils"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"os"
@@ -32,7 +33,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			configData, err := repo.Load()
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), configData.Target, "")
+			Expect(configData.Target).To(Equal(""))
 			assert.Equal(mr.T(), configData.ApiVersion, "")
 			assert.Equal(mr.T(), configData.AuthorizationEndpoint, "")
 			assert.Equal(mr.T(), configData.AccessToken, "")

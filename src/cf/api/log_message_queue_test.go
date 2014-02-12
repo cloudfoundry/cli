@@ -50,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		msg1 := logMessageWithTime(mr.T(), "message 1", int64(110))
 		pq.PushMessage(msg1)
 
-		assert.Equal(mr.T(), getMsgString(pq.PopMessage()), getMsgString(msg1))
+		Expect(getMsgString(pq.PopMessage())).To(Equal(getMsgString(msg1)))
 		assert.Equal(mr.T(), getMsgString(pq.PopMessage()), getMsgString(msg2))
 		assert.Equal(mr.T(), getMsgString(pq.PopMessage()), getMsgString(msg3))
 		assert.Equal(mr.T(), getMsgString(pq.PopMessage()), getMsgString(msg4))

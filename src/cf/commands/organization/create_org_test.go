@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -69,7 +70,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Creating org", "my-org", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), orgRepo.CreateName, "my-org")
+		Expect(orgRepo.CreateName).To(Equal("my-org"))
 	})
 	It("TestCreateOrgWhenAlreadyExists", func() {
 

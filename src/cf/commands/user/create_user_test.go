@@ -46,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 			{"TIP"},
 		})
-		assert.Equal(mr.T(), defaultUserRepo.CreateUserUsername, "my-user")
+		Expect(defaultUserRepo.CreateUserUsername).To(Equal("my-user"))
 	})
 
 	It("TestCreateUserWhenItAlreadyExists", func() {

@@ -4,6 +4,7 @@ import (
 	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -24,7 +25,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		success := userReq.Execute()
 
 		assert.True(mr.T(), success)
-		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "foo")
+		Expect(userRepo.FindByUsernameUsername).To(Equal("foo"))
 		assert.Equal(mr.T(), userReq.GetUser(), user)
 	})
 

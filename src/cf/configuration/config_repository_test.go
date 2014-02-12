@@ -4,6 +4,7 @@ import (
 	. "cf/configuration"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testconfig "testhelpers/configuration"
@@ -50,7 +51,7 @@ var _ = Describe("ConfigurationRepository", func() {
 	// TODO - test ClearTokens et al
 	It("has acccessor methods for all config fields", func() {
 		config.SetApiEndpoint("http://api.the-endpoint")
-		assert.Equal(mr.T(), config.ApiEndpoint(), "http://api.the-endpoint")
+		Expect(config.ApiEndpoint()).To(Equal("http://api.the-endpoint"))
 
 		config.SetApiVersion("3")
 		assert.Equal(mr.T(), config.ApiVersion(), "3")

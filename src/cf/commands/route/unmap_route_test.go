@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -36,7 +37,7 @@ var _ = Describe("Unmap Route Command", func() {
 
 		callUnmapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		assert.Equal(mr.T(), reqFactory.DomainName, "my-domain.com")
 	})
 

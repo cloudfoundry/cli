@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	. "cf/terminal"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"io"
@@ -49,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				ui.Say("Hello")
 			})
 
-			assert.Equal(mr.T(), "Hello", strings.Join(output, ""))
+			Expect("Hello").To(Equal(strings.Join(output, "")))
 		})
 	})
 	It("TestSayWithStringWithFormat", func() {

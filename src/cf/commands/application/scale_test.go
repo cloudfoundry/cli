@@ -3,6 +3,7 @@ package application_test
 import (
 	. "cf/commands/application"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -33,7 +34,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.TargetedSpaceSuccess = true
 		callScale(mr.T(), args, deps)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		assert.Equal(mr.T(), deps.reqFactory.ApplicationName, "my-app")
+		Expect(deps.reqFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestScaleFailsWithUsage", func() {
 

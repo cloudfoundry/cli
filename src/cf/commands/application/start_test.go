@@ -9,6 +9,7 @@ import (
 	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"os"
@@ -64,7 +65,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestStartCommandDefaultTimeouts", func() {
 		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
-		assert.Equal(mr.T(), cmd.StagingTimeout, 15*time.Minute)
+		Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
 		assert.Equal(mr.T(), cmd.StartupTimeout, 5*time.Minute)
 	})
 

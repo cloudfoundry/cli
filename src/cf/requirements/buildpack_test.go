@@ -4,6 +4,7 @@ import (
 	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -24,7 +25,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		success := buildpackReq.Execute()
 
 		assert.True(mr.T(), success)
-		assert.Equal(mr.T(), buildpackRepo.FindByNameName, "foo")
+		Expect(buildpackRepo.FindByNameName).To(Equal("foo"))
 		assert.Equal(mr.T(), buildpackReq.GetBuildpack(), buildpack)
 	})
 	It("TestBuildpackReqExecuteWhenBuildpackNotFound", func() {

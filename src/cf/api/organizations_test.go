@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -53,7 +54,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			return true
 		})
 
-		assert.Equal(mr.T(), len(orgs), 3)
+		Expect(len(orgs)).To(Equal(3))
 		assert.Equal(mr.T(), orgs[0].Guid, "org1-guid")
 		assert.Equal(mr.T(), orgs[1].Guid, "org2-guid")
 		assert.Equal(mr.T(), orgs[2].Guid, "org3-guid")

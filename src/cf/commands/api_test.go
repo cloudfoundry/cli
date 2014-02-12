@@ -4,6 +4,7 @@ import (
 	. "cf/commands"
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -34,7 +35,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callApi([]string{}, config, endpointRepo)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 1)
+		Expect(len(ui.Outputs)).To(Equal(1))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"https://api.run.pivotal.io", "2.0"},
 		})

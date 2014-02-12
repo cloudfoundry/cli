@@ -4,6 +4,7 @@ import (
 	. "cf/api"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -65,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		stack, apiResponse := repo.FindByName("linux")
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), stack.Name, "custom-linux")
+		Expect(stack.Name).To(Equal("custom-linux"))
 		assert.Equal(mr.T(), stack.Guid, "custom-linux-guid")
 	})
 

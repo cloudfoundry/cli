@@ -4,6 +4,7 @@ import (
 	. "cf/commands/buildpack"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -97,7 +98,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callCreateBuildpack([]string{"--enable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 		assert.NotNil(mr.T(), repo.CreateBuildpack.Enabled)
-		assert.Equal(mr.T(), *repo.CreateBuildpack.Enabled, true)
+		Expect(*repo.CreateBuildpack.Enabled).To(Equal(true))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"creating buildpack", "my-buildpack"},

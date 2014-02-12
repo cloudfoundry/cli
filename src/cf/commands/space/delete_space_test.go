@@ -4,6 +4,7 @@ import (
 	. "cf/commands/space"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -52,7 +53,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		deleteSpace(mr.T(), []string{"y"}, []string{"my-space"}, reqFactory)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		assert.Equal(mr.T(), reqFactory.SpaceName, "my-space")
+		Expect(reqFactory.SpaceName).To(Equal("my-space"))
 	})
 
 	It("TestDeleteSpaceConfirmingWithY", func() {

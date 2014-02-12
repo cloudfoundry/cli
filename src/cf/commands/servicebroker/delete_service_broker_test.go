@@ -4,6 +4,7 @@ import (
 	. "cf/commands/servicebroker"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -67,7 +68,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, repo := deleteServiceBroker(mr.T(), "y", []string{"service-broker-to-delete"})
 
-		assert.Equal(mr.T(), repo.FindByNameName, "service-broker-to-delete")
+		Expect(repo.FindByNameName).To(Equal("service-broker-to-delete"))
 		assert.Equal(mr.T(), repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
 		assert.Equal(mr.T(), len(ui.Outputs), 2)
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{

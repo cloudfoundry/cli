@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -56,7 +57,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Deleting", "org-to-delete"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
+		Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
 		assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
 	})
 

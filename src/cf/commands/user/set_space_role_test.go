@@ -70,7 +70,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callSetSpaceRole(mr.T(), args, reqFactory, spaceRepo, userRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-		assert.Equal(mr.T(), reqFactory.UserUsername, "username")
+		Expect(reqFactory.UserUsername).To(Equal("username"))
 		assert.Equal(mr.T(), reqFactory.OrganizationName, "org")
 	})
 	It("TestSetSpaceRole", func() {

@@ -3,6 +3,7 @@ package servicebroker_test
 import (
 	. "cf/commands/servicebroker"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -59,7 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), serviceBrokerRepo.CreateName, "my-broker")
+		Expect(serviceBrokerRepo.CreateName).To(Equal("my-broker"))
 		assert.Equal(mr.T(), serviceBrokerRepo.CreateUrl, "http://example.com")
 		assert.Equal(mr.T(), serviceBrokerRepo.CreateUsername, "my username")
 		assert.Equal(mr.T(), serviceBrokerRepo.CreatePassword, "my password")

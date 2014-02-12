@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -62,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), apiResponse.ErrorCode, "90003")
+		Expect(apiResponse.ErrorCode).To(Equal("90003"))
 	})
 
 	It("TestDeleteServiceBinding", func() {

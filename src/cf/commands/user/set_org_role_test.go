@@ -4,6 +4,7 @@ import (
 	. "cf/commands/user"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -55,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-		assert.Equal(mr.T(), reqFactory.UserUsername, "my-user")
+		Expect(reqFactory.UserUsername).To(Equal("my-user"))
 		assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
 	})
 	It("TestSetOrgRole", func() {

@@ -33,7 +33,7 @@ var _ = Describe("UserRepository", func() {
 			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			assert.Equal(mr.T(), len(users), 3)
+			Expect(len(users)).To(Equal(3))
 			assert.Equal(mr.T(), users[0].Guid, "user-1-guid")
 			assert.Equal(mr.T(), users[0].Username, "Super user 1")
 			assert.Equal(mr.T(), users[1].Guid, "user-2-guid")
