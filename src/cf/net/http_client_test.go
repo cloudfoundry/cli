@@ -4,8 +4,6 @@ import (
 	. "cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 )
 
@@ -134,34 +132,34 @@ Server: Apache-Coyote/1.1
 	It("TestPrepareRedirectTransfersAuthorizationHeader", func() {
 
 		originalReq, err := http.NewRequest("GET", "/foo", nil)
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		originalReq.Header.Set("Authorization", "my-auth-token")
 
 		redirectReq, err := http.NewRequest("GET", "/bar", nil)
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		via := []*http.Request{originalReq}
 
 		err = PrepareRedirect(redirectReq, via)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		Expect(redirectReq.Header.Get("Authorization")).To(Equal("my-auth-token"))
 	})
 	It("TestPrepareRedirectFailsAfterOneRedirect", func() {
 
 		firstReq, err := http.NewRequest("GET", "/foo", nil)
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		secondReq, err := http.NewRequest("GET", "/manchu", nil)
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		redirectReq, err := http.NewRequest("GET", "/bar", nil)
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		via := []*http.Request{firstReq, secondReq}
 
 		err = PrepareRedirect(redirectReq, via)
 
-		assert.Error(mr.T(), err)
+		Expect(err).To(HaveOccurred())
 	})
 })

@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -97,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		stopper := NewStop(new(testterm.FakeUI), config, appRepo)
 		actualStoppedApp, err := stopper.ApplicationStop(appToStop)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		Expect(expectedStoppedApp).To(Equal(actualStoppedApp))
 	})
 	It("TestApplicationStopReturnsUpdatedAppWhenAppIsAlreadyStopped", func() {
@@ -111,7 +110,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		stopper := NewStop(new(testterm.FakeUI), config, appRepo)
 		updatedApp, err := stopper.ApplicationStop(appToStop)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		Expect(appToStop).To(Equal(updatedApp))
 	})
 })
