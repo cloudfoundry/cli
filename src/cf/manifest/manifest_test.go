@@ -102,6 +102,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(errs.Error()).To(ContainSubstring("env var 'bar' should not be null"))
 	})
 
+	It("returns an empty map when no env was present in the manifest", func() {
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+			"applications": []interface{}{
+				map[string]interface{}{"name": "no-env-vars"},
+			},
+		}))
+		Expect(errs).To(BeEmpty())
+		Expect(*m.Applications[0].EnvironmentVars).NotTo(BeNil())
+	})
+
 	It("TestManifestWithAbsolutePath", func() {
 		if runtime.GOOS == "windows" {
 			testManifestWithAbsolutePathOnWindows()

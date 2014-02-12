@@ -382,18 +382,18 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppParams) {
 	m := cmd.instantiateManifest(c)
 
-	appParams, err := newAppParamsFromContext(c)
+	contextParams, err := newAppParamsFromContext(c)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 		return
 	}
 
-	if appParams.Name == nil && len(m.Applications) > 1 && !appParams.Equals(&models.AppParams{}) {
+	if contextParams.Name == nil && len(m.Applications) > 1 && !contextParams.Equals(&models.AppParams{}) {
 		cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
 		return
 	}
 
-	appSet, err = cmd.createAppSetFromContextAndManifest(c, appParams, m)
+	appSet, err = cmd.createAppSetFromContextAndManifest(c, contextParams, m)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 	}
