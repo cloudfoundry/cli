@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"strconv"
 	testapi "testhelpers/api"
@@ -323,10 +322,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		callLogin(c)
 
 		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		assert.Empty(mr.T(), c.Config.OrganizationFields().Guid)
-		assert.Empty(mr.T(), c.Config.SpaceFields().Guid)
-		assert.Empty(mr.T(), c.Config.AccessToken())
-		assert.Empty(mr.T(), c.Config.RefreshToken())
+		Expect(c.Config.OrganizationFields().Guid).To(BeEmpty())
+		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
+		Expect(c.Config.AccessToken()).To(BeEmpty())
+		Expect(c.Config.RefreshToken()).To(BeEmpty())
 
 		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 			{"Failed"},
@@ -341,11 +340,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callLogin(c)
 
-		assert.Empty(mr.T(), c.Config.ApiEndpoint())
-		assert.Empty(mr.T(), c.Config.OrganizationFields().Guid)
-		assert.Empty(mr.T(), c.Config.SpaceFields().Guid)
-		assert.Empty(mr.T(), c.Config.AccessToken())
-		assert.Empty(mr.T(), c.Config.RefreshToken())
+		Expect(c.Config.ApiEndpoint()).To(BeEmpty())
+		Expect(c.Config.OrganizationFields().Guid).To(BeEmpty())
+		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
+		Expect(c.Config.AccessToken()).To(BeEmpty())
+		Expect(c.Config.RefreshToken()).To(BeEmpty())
 
 		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
 			{"Failed"},
@@ -362,8 +361,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		callLogin(c)
 
 		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		assert.Empty(mr.T(), c.Config.OrganizationFields().Guid)
-		assert.Empty(mr.T(), c.Config.SpaceFields().Guid)
+		Expect(c.Config.OrganizationFields().Guid).To(BeEmpty())
+		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
 		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
@@ -383,7 +382,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
 		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		assert.Empty(mr.T(), c.Config.SpaceFields().Guid)
+		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
 		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 

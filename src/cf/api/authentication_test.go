@@ -40,7 +40,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Password is incorrect, please try again."))
-		assert.Empty(mr.T(), deps.config.AccessToken())
+		Expect(deps.config.AccessToken()).To(BeEmpty())
 	})
 
 	It("TestServerErrorLoggingIn", func() {
@@ -53,7 +53,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Server error, status code: 500, error code: , message: "))
-		assert.Empty(mr.T(), deps.config.AccessToken())
+		Expect(deps.config.AccessToken()).To(BeEmpty())
 	})
 
 	It("TestLoggingInWithErrorMaskedAsSuccess", func() {
@@ -66,7 +66,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
-		assert.Empty(mr.T(), deps.config.AccessToken())
+		Expect(deps.config.AccessToken()).To(BeEmpty())
 	})
 })
 
