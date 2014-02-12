@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"encoding/json"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -138,7 +139,7 @@ var _ = Describe("App Events Repo", func() {
 		})
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), list, expectedEvents)
+		Expect(list).To(Equal(expectedEvents))
 		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 	})
 

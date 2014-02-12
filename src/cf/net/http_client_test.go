@@ -3,6 +3,7 @@ package net_test
 import (
 	. "cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -29,7 +30,7 @@ Authorization: [PRIVATE DATA HIDDEN]
 This is the body. Please don't get rid of me even though I contain Authorization: and some other text
 	`
 
-		assert.Equal(mr.T(), Sanitize(request), expected)
+		Expect(Sanitize(request)).To(Equal(expected))
 	})
 	It("TestSanitizeRemovesPassword", func() {
 

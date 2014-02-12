@@ -5,6 +5,7 @@ import (
 	"cf/requirements"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testcmd "testhelpers/commands"
@@ -68,7 +69,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		err := runner.RunCmdByName("some-cmd", ctxt)
 
-		assert.Equal(mr.T(), cmdFactory.CmdName, "some-cmd")
+		Expect(cmdFactory.CmdName).To(Equal("some-cmd"))
 
 		assert.True(mr.T(), passingReq.WasExecuted, ctxt)
 		assert.True(mr.T(), failingReq.WasExecuted, ctxt)

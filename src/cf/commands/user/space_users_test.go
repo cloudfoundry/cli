@@ -4,6 +4,7 @@ import (
 	. "cf/commands/user"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -56,7 +57,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callSpaceUsers(mr.T(), args, reqFactory, spaceRepo, userRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-		assert.Equal(mr.T(), "my-org", reqFactory.OrganizationName)
+		Expect("my-org").To(Equal(reqFactory.OrganizationName))
 	})
 	It("TestSpaceUsers", func() {
 

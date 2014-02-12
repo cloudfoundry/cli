@@ -4,6 +4,7 @@ import (
 	"cf/api"
 	. "cf/commands/service"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -40,7 +41,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"baz"},
 		})
 
-		assert.Equal(mr.T(), repo.CreateName, "my-custom-service")
+		Expect(repo.CreateName).To(Equal("my-custom-service"))
 		assert.Equal(mr.T(), repo.CreateParams, map[string]string{
 			"foo": "foo value",
 			"bar": "bar value",

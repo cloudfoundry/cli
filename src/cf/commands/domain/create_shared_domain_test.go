@@ -4,6 +4,7 @@ import (
 	. "cf/commands/domain"
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -42,7 +43,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
 		ui := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.CreateSharedDomainName, "example.com")
+		Expect(domainRepo.CreateSharedDomainName).To(Equal("example.com"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Creating shared domain", "example.com", "my-user"},
 			{"OK"},

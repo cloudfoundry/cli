@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -65,7 +66,7 @@ var _ = Describe("Space Repository", func() {
 			return true
 		})
 
-		assert.Equal(mr.T(), len(spaces), 2)
+		Expect(len(spaces)).To(Equal(2))
 		assert.Equal(mr.T(), spaces[0].Guid, "acceptance-space-guid")
 		assert.Equal(mr.T(), spaces[1].Guid, "staging-space-guid")
 		assert.True(mr.T(), apiResponse.IsSuccessful())

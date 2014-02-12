@@ -4,6 +4,7 @@ import (
 	"cf/manifest"
 	"generic"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"runtime"
@@ -52,7 +53,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.NoError(mr.T(), err)
 
 		apps := m.Applications
-		assert.Equal(mr.T(), *apps[0].InstanceCount, 3)
+		Expect(*apps[0].InstanceCount).To(Equal(3))
 		assert.Equal(mr.T(), *apps[0].Memory, uint64(512))
 		assert.True(mr.T(), *apps[0].NoRoute)
 	})

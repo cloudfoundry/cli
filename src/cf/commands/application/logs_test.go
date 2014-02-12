@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -33,7 +34,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory.LoginSuccess = true
 		callLogs([]string{"my-app"}, reqFactory, logsRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 
 		reqFactory.LoginSuccess = false
 		callLogs([]string{"my-app"}, reqFactory, logsRepo)

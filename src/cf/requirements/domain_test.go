@@ -7,6 +7,7 @@ import (
 	. "cf/requirements"
 	"errors"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -32,7 +33,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		success := domainReq.Execute()
 
 		assert.True(mr.T(), success)
-		assert.Equal(mr.T(), domainRepo.FindByNameInOrgName, "example.com")
+		Expect(domainRepo.FindByNameInOrgName).To(Equal("example.com"))
 		assert.Equal(mr.T(), domainRepo.FindByNameInOrgGuid, "the-org-guid")
 		assert.Equal(mr.T(), domainReq.GetDomain(), domain)
 	})

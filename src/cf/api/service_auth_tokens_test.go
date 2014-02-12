@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -70,7 +71,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
-		assert.Equal(mr.T(), len(authTokens), 2)
+		Expect(len(authTokens)).To(Equal(2))
 
 		assert.Equal(mr.T(), authTokens[0].Label, "mysql")
 		assert.Equal(mr.T(), authTokens[0].Provider, "mysql-core")

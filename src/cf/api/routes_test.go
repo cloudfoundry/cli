@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -37,7 +38,7 @@ var _ = Describe("route repository", func() {
 			return true
 		})
 
-		assert.Equal(mr.T(), len(routes), 2)
+		Expect(len(routes)).To(Equal(2))
 		assert.Equal(mr.T(), routes[0].Guid, "route-1-guid")
 		assert.Equal(mr.T(), routes[1].Guid, "route-2-guid")
 		assert.True(mr.T(), handler.AllRequestsCalled())

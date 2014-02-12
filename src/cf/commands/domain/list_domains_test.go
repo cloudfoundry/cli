@@ -6,6 +6,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -66,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
+		Expect(domainRepo.ListDomainsForOrgDomainsGuid).To(Equal("my-org-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},

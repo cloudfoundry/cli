@@ -4,6 +4,7 @@ import (
 	. "cf/api"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -67,7 +68,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), 1, len(serviceInstances))
+		Expect(1).To(Equal(len(serviceInstances)))
 
 		instance1 := serviceInstances[0]
 		assert.Equal(mr.T(), instance1.Name, "my-service-instance")

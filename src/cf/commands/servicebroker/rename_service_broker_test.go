@@ -4,6 +4,7 @@ import (
 	. "cf/commands/servicebroker"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -65,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callRenameServiceBroker(mr.T(), args, reqFactory, repo)
 
-		assert.Equal(mr.T(), repo.FindByNameName, "my-broker")
+		Expect(repo.FindByNameName).To(Equal("my-broker"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},

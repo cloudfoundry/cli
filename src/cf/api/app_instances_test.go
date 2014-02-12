@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -28,7 +29,7 @@ var _ = Describe("AppInstancesRepo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), err.IsNotSuccessful())
 
-		assert.Equal(mr.T(), len(instances), 2)
+		Expect(len(instances)).To(Equal(2))
 
 		assert.Equal(mr.T(), instances[0].State, models.InstanceRunning)
 		assert.Equal(mr.T(), instances[1].State, models.InstanceStarting)

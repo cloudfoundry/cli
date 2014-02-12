@@ -1,10 +1,9 @@
 package generic_test
 
 import (
+	. "github.com/onsi/gomega"
 	. "generic"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 )
 
 func init() {
@@ -46,7 +45,7 @@ func init() {
 			})
 
 			mergedMap := DeepMerge(map1, map2)
-			assert.Equal(mr.T(), mergedMap, expectedMap)
+			Expect(mergedMap).To(Equal(expectedMap))
 		})
 	})
 }

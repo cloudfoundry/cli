@@ -5,6 +5,7 @@ import (
 	. "cf/commands/application"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -52,7 +53,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
 		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
 			"foo": "bar",

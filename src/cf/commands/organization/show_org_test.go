@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
@@ -63,7 +64,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-org"}
 		ui := callShowOrg(mr.T(), args, reqFactory)
 
-		assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+		Expect(reqFactory.OrganizationName).To(Equal("my-org"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Getting info for org", "my-org", "my-user"},

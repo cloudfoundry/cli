@@ -7,6 +7,7 @@ import (
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
@@ -102,7 +103,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), request.HttpReq.Header.Get("Authorization"), "BEARER my-access-token")
+		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 		assert.Equal(mr.T(), request.HttpReq.Header.Get("accept"), "application/json")
 		assert.Equal(mr.T(), request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
 	})

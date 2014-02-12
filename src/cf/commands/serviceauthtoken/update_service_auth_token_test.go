@@ -4,6 +4,7 @@ import (
 	. "cf/commands/serviceauthtoken"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -80,7 +81,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), authTokenRepo.FindByLabelAndProviderLabel, "a label")
+		Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
 		assert.Equal(mr.T(), authTokenRepo.FindByLabelAndProviderProvider, "a provider")
 		assert.Equal(mr.T(), authTokenRepo.UpdatedServiceAuthTokenFields, expectedAuthToken)
 		assert.Equal(mr.T(), authTokenRepo.UpdatedServiceAuthTokenFields, expectedAuthToken)

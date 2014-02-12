@@ -4,6 +4,7 @@ import (
 	. "cf/commands/application"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -32,7 +33,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestRenameRun", func() {
 

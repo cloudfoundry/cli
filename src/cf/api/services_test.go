@@ -7,6 +7,7 @@ import (
 	"cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -224,7 +225,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), identicalAlreadyExists, false)
+		Expect(identicalAlreadyExists).To(Equal(false))
 	})
 	It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
 

@@ -6,6 +6,7 @@ import (
 	. "cf"
 	"fileutils"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"io"
@@ -13,10 +14,10 @@ import (
 	"path/filepath"
 )
 
-func fileToString(t mr.TestingT, file *os.File) string {
+func fileToString(file *os.File) string {
 	bytesBuf := &bytes.Buffer{}
 	_, err := io.Copy(bytesBuf, file)
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 
 	return string(bytesBuf.Bytes())
 }
@@ -37,7 +38,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			offset, err := zipFile.Seek(0, os.SEEK_CUR)
 			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), offset, 0)
+			Expect(offset).To(Equal(int64(0)))
 
 			fileStat, err := zipFile.Stat()
 			assert.NoError(mr.T(), err)
@@ -82,7 +83,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.zip"), zipFile)
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), fileToString(mr.T(), zipFile), "This is an application zip file\n")
+			assert.Equal(mr.T(), fileToString(zipFile), "This is an application zip file\n")
 		})
 	})
 
@@ -95,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.war"), zipFile)
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), fileToString(mr.T(), zipFile), "This is an application war file\n")
+			assert.Equal(mr.T(), fileToString(zipFile), "This is an application war file\n")
 		})
 	})
 
@@ -108,7 +109,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.jar"), zipFile)
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), fileToString(mr.T(), zipFile), "This is an application jar file\n")
+			assert.Equal(mr.T(), fileToString(zipFile), "This is an application jar file\n")
 		})
 	})
 

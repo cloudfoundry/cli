@@ -5,6 +5,7 @@ import (
 	. "cf/commands/application"
 	"cf/formatters"
 	"cf/models"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -35,7 +36,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
 		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestAppFailsWithUsage", func() {
 

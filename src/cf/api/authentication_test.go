@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"encoding/base64"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -24,7 +25,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsError())
-		assert.Equal(mr.T(), deps.config.AuthorizationEndpoint(), deps.ts.URL)
+		Expect(deps.config.AuthorizationEndpoint()).To(Equal(deps.ts.URL))
 		assert.Equal(mr.T(), deps.config.AccessToken(), "BEARER my_access_token")
 		assert.Equal(mr.T(), deps.config.RefreshToken(), "my_refresh_token")
 	})

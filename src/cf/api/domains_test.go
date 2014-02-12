@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -26,7 +27,7 @@ var _ = Describe("DomainRepository", func() {
 		})
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), len(receivedDomains), 2)
+		Expect(len(receivedDomains)).To(Equal(2))
 		assert.Equal(mr.T(), receivedDomains[0].Guid, "shared-domain1-guid")
 		assert.Equal(mr.T(), receivedDomains[1].Guid, "shared-domain2-guid")
 		assert.True(mr.T(), handler.AllRequestsCalled())

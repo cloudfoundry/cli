@@ -4,6 +4,7 @@ import (
 	. "cf/commands/application"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testcmd "testhelpers/commands"
@@ -61,7 +62,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		stopper := &testcmd.FakeAppStopper{}
 		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
 
-		assert.Equal(mr.T(), stopper.AppToStop, app)
+		Expect(stopper.AppToStop).To(Equal(app))
 		assert.Equal(mr.T(), starter.AppToStart, app)
 	})
 })

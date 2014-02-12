@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -83,7 +84,7 @@ var _ = Describe("Buildpacks repo", func() {
 			return true
 		})
 
-		assert.Equal(mr.T(), buildpacks, expectedBuildpacks)
+		Expect(buildpacks).To(Equal(expectedBuildpacks))
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 	})

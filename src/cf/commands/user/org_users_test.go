@@ -4,6 +4,7 @@ import (
 	. "cf/commands/user"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -50,7 +51,7 @@ var _ = Describe("Listing users in an org", func() {
 		callOrgUsers(args, reqFactory, userRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-		assert.Equal(mr.T(), "Org1", reqFactory.OrganizationName)
+		Expect("Org1").To(Equal(reqFactory.OrganizationName))
 	})
 
 	It("TestOrgUsers", func() {

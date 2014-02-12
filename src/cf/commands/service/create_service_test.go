@@ -5,6 +5,7 @@ import (
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -49,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), serviceRepo.CreateServiceInstanceName, "my-cleardb-service")
+		Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
 		assert.Equal(mr.T(), serviceRepo.CreateServiceInstancePlanGuid, "cleardb-spark-guid")
 	})
 	It("TestCreateServiceWhenServiceAlreadyExists", func() {

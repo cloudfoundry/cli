@@ -5,6 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -49,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"delete", "my-buildpack"},
