@@ -55,9 +55,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+		Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
 			"foo": "bar",
-		})
+		}))
 	})
 
 	It("TestUnsetEnvWhenUnsettingTheEnvFails", func() {

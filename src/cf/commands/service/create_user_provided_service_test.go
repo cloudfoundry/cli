@@ -42,19 +42,19 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(repo.CreateName).To(Equal("my-custom-service"))
-		assert.Equal(mr.T(), repo.CreateParams, map[string]string{
+		Expect(repo.CreateParams).To(Equal(map[string]string{
 			"foo": "foo value",
 			"bar": "bar value",
 			"baz": "baz value",
-		})
+		}))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Creating user provided service", "my-custom-service", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
 	})
-	It("TestCreateUserProvidedServiceWithJson", func() {
 
+	It("TestCreateUserProvidedServiceWithJson", func() {
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 		ui := callCreateUserProvidedService(mr.T(), []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 			[]string{},
@@ -64,11 +64,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.Empty(mr.T(), ui.Prompts)
 
 		Expect(repo.CreateName).To(Equal("my-custom-service"))
-		assert.Equal(mr.T(), repo.CreateParams, map[string]string{
+		Expect(repo.CreateParams).To(Equal(map[string]string{
 			"foo": "foo value",
 			"bar": "bar value",
 			"baz": "baz value",
-		})
+		}))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Creating user provided service"},
