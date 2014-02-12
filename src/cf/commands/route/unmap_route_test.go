@@ -6,7 +6,6 @@ import (
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -62,7 +61,7 @@ var _ = Describe("Unmap Route Command", func() {
 
 		ui := callUnmapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing route", "foo.example.com", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})

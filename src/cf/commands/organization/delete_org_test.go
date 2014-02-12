@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -48,11 +47,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Really delete"},
 		})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "org-to-delete"},
 			{"OK"},
 		})
@@ -66,10 +65,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Really delete", "org-to-delete"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting org", "org-to-delete", "my-user"},
 			{"OK"},
 		})
@@ -119,7 +118,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"-f", "org-to-delete"}), reqFactory)
 
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "org-to-delete"},
 			{"OK"},
 		})
@@ -142,7 +141,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "org-to-delete"},
 			{"OK"},
 			{"org-to-delete", "does not exist."},

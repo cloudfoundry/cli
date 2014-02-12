@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callMarketplaceServices(t mr.TestingT, config configuration.Reader, serviceRepo *testapi.FakeServiceRepo) (ui *testterm.FakeUI) {
+func callMarketplaceServices(config configuration.Reader, serviceRepo *testapi.FakeServiceRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	ctxt := testcmd.NewContext("marketplace", []string{})
@@ -58,9 +57,9 @@ var _ = Describe("Testing Marketplace Services", func() {
 			serviceOfferings := []models.ServiceOffering{offering, offering2}
 			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 
-			ui := callMarketplaceServices(mr.T(), config, serviceRepo)
+			ui := callMarketplaceServices(config, serviceRepo)
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Getting services from marketplace in org", "my-org", "my-space", "my-user"},
 				{"OK"},
 				{"service", "plans", "description"},
@@ -81,14 +80,14 @@ var _ = Describe("Testing Marketplace Services", func() {
 			serviceOfferings := []models.ServiceOffering{}
 			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
 
-			ui := callMarketplaceServices(mr.T(), config, serviceRepo)
+			ui := callMarketplaceServices(config, serviceRepo)
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Getting services from marketplace..."},
 				{"OK"},
 				{"No service offerings found"},
 			})
-			testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 				{"service", "plans", "description"},
 			})
 		})

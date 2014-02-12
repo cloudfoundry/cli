@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -70,7 +69,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "host.example.com", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -114,7 +113,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callCreateRoute([]string{"-n", "host", "my-space", "example.com"}, reqFactory, routeRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route"},
 			{"OK"},
 			{"host.example.com", "already exists"},
@@ -153,7 +152,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})

@@ -2,15 +2,14 @@ package assert
 
 import (
 	"fmt"
-	mr "github.com/tjarratt/mr_t"
 	"strings"
 )
 
-func JSONStringEquals(t mr.TestingT, actual string, expected string, msgAndArgs ...interface{}) bool {
+func JSONStringEquals(actual string, expected string, msgAndArgs ...interface{}) bool {
 	if RemoveWhitespace(actual) == RemoveWhitespace(expected) {
 		return true
 	}
-	Fail(t, fmt.Sprintf("Not equal:\n%s\n%s", actual, expected), msgAndArgs...)
+	Fail(fmt.Sprintf("Not equal:\n%s\n%s", actual, expected), msgAndArgs...)
 	return false
 }
 

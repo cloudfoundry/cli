@@ -4,7 +4,6 @@ import (
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -51,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
 		cmd.Run(testcmd.NewContext("services", []string{}))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting services in org", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"my-service-1", "cleardb", "spark", "cli1, cli2"},
@@ -71,12 +70,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
 		cmd.Run(testcmd.NewContext("services", []string{}))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting services in org", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"No services found"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"name", "service", "plan", "bound apps"},
 		})
 	})

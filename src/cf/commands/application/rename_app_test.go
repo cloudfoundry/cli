@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -19,10 +18,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		appRepo := &testapi.FakeApplicationRepository{}
 
-		ui := callRename(mr.T(), []string{}, reqFactory, appRepo)
+		ui := callRename([]string{}, reqFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRename(mr.T(), []string{"foo"}, reqFactory, appRepo)
+		ui = callRename([]string{"foo"}, reqFactory, appRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRenameRequirements", func() {
@@ -30,7 +29,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		appRepo := &testapi.FakeApplicationRepository{}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
+		callRename([]string{"my-app", "my-new-app"}, reqFactory, appRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 	})
@@ -41,18 +40,18 @@ var _ = Describe("Testing with ginkgo", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
-		ui := callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
+		ui := callRename([]string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		Expect(*appRepo.UpdateParams.Name).To(Equal("my-new-app"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
 	})
 })
 
-func callRename(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
+func callRename(args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("rename", args)
 

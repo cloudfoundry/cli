@@ -195,7 +195,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createOrganizationRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
-	ts, handler = testnet.NewTLSServer(GinkgoT(), reqs)
+	ts, handler = testnet.NewTLSServer(reqs)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)

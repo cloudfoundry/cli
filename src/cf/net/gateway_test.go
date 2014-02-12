@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -19,15 +18,15 @@ import (
 	testnet "testhelpers/net"
 )
 
-func testRefreshTokenWithSuccess(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
-	config, apiResponse := testRefreshToken(t, gateway, endpoint)
+func testRefreshTokenWithSuccess(gateway Gateway, endpoint http.HandlerFunc) {
+	config, apiResponse := testRefreshToken(gateway, endpoint)
 	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
 	Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
 }
 
-func testRefreshTokenWithError(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
-	_, apiResponse := testRefreshToken(t, gateway, endpoint)
+func testRefreshTokenWithError(gateway Gateway, endpoint http.HandlerFunc) {
+	_, apiResponse := testRefreshToken(gateway, endpoint)
 	Expect(apiResponse.IsSuccessful()).To(BeFalse())
 	Expect(apiResponse.ErrorCode).To(Equal("333"))
 }
@@ -57,7 +56,7 @@ var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testne
 	}
 }
 
-func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) (config configuration.Reader, apiResponse ApiResponse) {
+func testRefreshToken(gateway Gateway, endpoint http.HandlerFunc) (config configuration.Reader, apiResponse ApiResponse) {
 	authEndpoint := func(writer http.ResponseWriter, request *http.Request) {
 		fmt.Fprintln(
 			writer,
@@ -71,7 +70,7 @@ func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc)
 	authServer := httptest.NewTLSServer(http.HandlerFunc(authEndpoint))
 	defer authServer.Close()
 
-	config, auth := createAuthenticationRepository(t, apiServer, authServer)
+	config, auth := createAuthenticationRepository(apiServer, authServer)
 	gateway.SetTokenRefresher(auth)
 
 	request, apiResponse := gateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
@@ -81,7 +80,7 @@ func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc)
 	return
 }
 
-func createAuthenticationRepository(t mr.TestingT, apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
+func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
 	config := testconfig.NewRepository()
 	config.SetAuthorizationEndpoint(authServer.URL)
 	config.SetApiEndpoint(apiServer.URL)
@@ -125,7 +124,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			testnet.TestResponse{Status: http.StatusOK},
 		)
 
-		testRefreshTokenWithSuccess(mr.T(), gateway, endpoint)
+		testRefreshTokenWithSuccess(gateway, endpoint)
 	})
 
 	It("TestRefreshingTheTokenWithUAARequestAndReturningError", func() {
@@ -137,7 +136,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}`},
 		)
 
-		testRefreshTokenWithError(mr.T(), gateway, endpoint)
+		testRefreshTokenWithError(gateway, endpoint)
 	})
 
 	It("TestRefreshingTheTokenWithCloudControllerRequest", func() {
@@ -147,7 +146,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			testnet.TestResponse{Status: http.StatusOK},
 		)
 
-		testRefreshTokenWithSuccess(mr.T(), gateway, endpoint)
+		testRefreshTokenWithSuccess(gateway, endpoint)
 	})
 	It("TestRefreshingTheTokenWithCloudControllerRequestAndReturningError", func() {
 
@@ -159,6 +158,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		}`},
 		)
 
-		testRefreshTokenWithError(mr.T(), gateway, endpoint)
+		testRefreshTokenWithError(gateway, endpoint)
 	})
 })

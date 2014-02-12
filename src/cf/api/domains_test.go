@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -16,7 +15,7 @@ import (
 
 var _ = Describe("DomainRepository", func() {
 	It("TestListSharedDomains", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{firstPageSharedDomainsRequest, secondPageSharedDomainsRequest})
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
@@ -33,7 +32,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestDomainListDomainsForOrgWithOldEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{notFoundDomainsRequest, oldEndpointDomainsRequest})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{notFoundDomainsRequest, oldEndpointDomainsRequest})
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
@@ -49,7 +48,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestDomainListDomainsForOrg", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{firstPageDomainsRequest, secondPageDomainsRequest})
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
@@ -66,7 +65,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestListDomainsForOrgWithNoDomains", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{noDomainsRequest})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{noDomainsRequest})
 		defer ts.Close()
 
 		wasCalled := false
@@ -87,7 +86,7 @@ var _ = Describe("DomainRepository", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [] }`},
 		})
 
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{emptyDomainsRequest})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{emptyDomainsRequest})
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
@@ -112,7 +111,7 @@ var _ = Describe("DomainRepository", func() {
 	]}`},
 		})
 
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		domain, apiResponse := repo.FindByName("domain2.cf-app.com")
@@ -142,7 +141,7 @@ var _ = Describe("DomainRepository", func() {
 				}`},
 			})
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
+			ts, handler, repo := createDomainRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
 			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
@@ -178,7 +177,7 @@ var _ = Describe("DomainRepository", func() {
 				}`},
 			})
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
+			ts, handler, repo := createDomainRepo([]testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 			defer ts.Close()
 
 			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
@@ -203,7 +202,7 @@ var _ = Describe("DomainRepository", func() {
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 			})
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
+			ts, handler, repo := createDomainRepo([]testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 			defer ts.Close()
 
 			_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
@@ -236,7 +235,7 @@ var _ = Describe("DomainRepository", func() {
 				}`},
 			})
 
-			ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
+			ts, handler, repo := createDomainRepo([]testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 			defer ts.Close()
 
 			_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
@@ -247,7 +246,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestCreateDomainUsingOldEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/private_domains",
@@ -274,7 +273,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestCreateDomainUsingNewEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/private_domains",
@@ -295,7 +294,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestCreateSharedDomainsWithNewEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:  "POST",
 				Path:    "/v2/shared_domains",
@@ -316,7 +315,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestCreateSharedDomainsWithOldEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/shared_domains",
@@ -343,7 +342,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestDeleteDomainWithNewEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			deleteDomainReq(http.StatusOK),
 		})
 		defer ts.Close()
@@ -355,7 +354,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestDeleteDomainWithOldEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			deleteDomainReq(http.StatusNotFound),
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
@@ -372,7 +371,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestDeleteSharedDomainWithNewEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			deleteSharedDomainReq(http.StatusOK),
 		})
 		defer ts.Close()
@@ -384,7 +383,7 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	It("TestDeleteSharedDomainWithOldEndpoint", func() {
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{
 			deleteSharedDomainReq(http.StatusNotFound),
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "DELETE",
@@ -403,7 +402,7 @@ var _ = Describe("DomainRepository", func() {
 	It("TestDeleteDomainFailure", func() {
 		req := deleteDomainReq(http.StatusBadRequest)
 
-		ts, handler, repo := createDomainRepo(mr.T(), []testnet.TestRequest{req})
+		ts, handler, repo := createDomainRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-domain-guid")
@@ -546,8 +545,8 @@ func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
 	})
 }
 
-func createDomainRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
-	ts, handler = testnet.NewTLSServer(t, reqs)
+func createDomainRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
+	ts, handler = testnet.NewTLSServer(reqs)
 	config := testconfig.NewRepositoryWithDefaults()
 	config.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

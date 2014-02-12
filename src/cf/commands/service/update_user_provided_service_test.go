@@ -64,7 +64,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 		ui := callUpdateUserProvidedService(args, reqFactory, repo)
 
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"No changes"},
@@ -82,7 +82,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 		ui := callUpdateUserProvidedService(args, reqFactory, repo)
 
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"TIP"},
@@ -103,7 +103,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 		ui := callUpdateUserProvidedService(args, reqFactory, repo)
 
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating user provided service"},
 			{"OK"},
 		})
@@ -123,7 +123,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
 
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"JSON is invalid"},
 		})
@@ -147,7 +147,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
 
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"Service Instance is not user provided"},
 		})

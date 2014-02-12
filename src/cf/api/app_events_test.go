@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testconfig "testhelpers/configuration"
@@ -90,8 +89,8 @@ type eventTestDependencies struct {
 	gateway net.Gateway
 }
 
-func setupEventTest(t mr.TestingT, requests []testnet.TestRequest) (deps eventTestDependencies) {
-	deps.server, deps.handler = testnet.NewTLSServer(t, requests)
+func setupEventTest(requests []testnet.TestRequest) (deps eventTestDependencies) {
+	deps.server, deps.handler = testnet.NewTLSServer(requests)
 
 	configRepo := testconfig.NewRepository()
 	configRepo.SetApiEndpoint(deps.server.URL)
@@ -109,7 +108,7 @@ func teardownEventTest(deps eventTestDependencies) {
 
 var _ = Describe("App Events Repo", func() {
 	It("TestListOldV2EventsWhenNewV2ApiNotFound", func() {
-		deps := setupEventTest(mr.T(), []testnet.TestRequest{
+		deps := setupEventTest([]testnet.TestRequest{
 			newV2NotFoundRequest,
 			firstPageOldV2EventsRequest,
 			secondPageOldV2EventsRequest,
@@ -199,7 +198,7 @@ var _ = Describe("App Events Repo", func() {
 			  ]
 			}`}}
 
-		deps := setupEventTest(mr.T(), []testnet.TestRequest{
+		deps := setupEventTest([]testnet.TestRequest{
 			pageOneNewV2Request,
 			pageTwoNewV2Request,
 		})
@@ -224,7 +223,7 @@ var _ = Describe("App Events Repo", func() {
 	})
 
 	It("TestListOldV2EventsApiError", func() {
-		deps := setupEventTest(mr.T(), []testnet.TestRequest{
+		deps := setupEventTest([]testnet.TestRequest{
 			newV2NotFoundRequest,
 			firstPageOldV2EventsRequest,
 			oldV2NotFoundRequest,

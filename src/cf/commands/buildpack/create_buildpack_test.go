@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -46,13 +45,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 		ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
 			{"OK"},
 			{"Uploading buildpack", "my-buildpack"},
 			{"OK"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -64,13 +63,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo.CreateBuildpackExists = true
 		ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
 			{"OK"},
 			{"my-buildpack", "already exists"},
 			{"tip", "update-buildpack"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -80,13 +79,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 		ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
 			{"OK"},
 			{"Uploading buildpack", "my-buildpack"},
 			{"OK"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -99,13 +98,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(repo.CreateBuildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(true))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"creating buildpack", "my-buildpack"},
 			{"OK"},
 			{"uploading buildpack", "my-buildpack"},
 			{"OK"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -134,7 +133,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		bitsRepo.UploadBuildpackErr = true
 		ui := callCreateBuildpack([]string{"my-buildpack", "bogus/path", "5"}, reqFactory, repo, bitsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
 			{"OK"},
 			{"Uploading buildpack"},

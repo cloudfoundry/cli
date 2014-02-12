@@ -7,7 +7,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -60,7 +59,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSpaces([]string{}, reqFactory, config, spaceRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting spaces in org", "my-org", "my-user"},
 			{"space1"},
 			{"space2"},
@@ -78,7 +77,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSpaces([]string{}, reqFactory, configRepo, spaceRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting spaces in org", "my-org", "my-user"},
 			{"No spaces found"},
 		})

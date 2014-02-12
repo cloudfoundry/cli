@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -15,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callDeleteServiceAuthToken(t mr.TestingT, args []string, inputs []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callDeleteServiceAuthToken(args []string, inputs []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{
 		Inputs: inputs,
 	}
@@ -34,13 +33,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		authTokenRepo := &testapi.FakeAuthTokenRepo{}
 		reqFactory := &testreq.FakeReqFactory{}
 
-		ui := callDeleteServiceAuthToken(mr.T(), []string{}, []string{"Y"}, reqFactory, authTokenRepo)
+		ui := callDeleteServiceAuthToken([]string{}, []string{"Y"}, reqFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callDeleteServiceAuthToken(mr.T(), []string{"arg1"}, []string{"Y"}, reqFactory, authTokenRepo)
+		ui = callDeleteServiceAuthToken([]string{"arg1"}, []string{"Y"}, reqFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callDeleteServiceAuthToken(mr.T(), []string{"arg1", "arg2"}, []string{"Y"}, reqFactory, authTokenRepo)
+		ui = callDeleteServiceAuthToken([]string{"arg1", "arg2"}, []string{"Y"}, reqFactory, authTokenRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestDeleteServiceAuthTokenRequirements", func() {
@@ -50,11 +49,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"arg1", "arg2"}
 
 		reqFactory.LoginSuccess = true
-		callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
+		callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory.LoginSuccess = false
-		callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
+		callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestDeleteServiceAuthToken", func() {
@@ -69,8 +68,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}
 
-		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service auth token as", "my-user"},
 			{"OK"},
 		})
@@ -85,9 +84,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}
 
-		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"N"}, reqFactory, authTokenRepo)
+		ui := callDeleteServiceAuthToken(args, []string{"N"}, reqFactory, authTokenRepo)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Are you sure you want to delete", "a label", "a provider"},
 		})
 		Expect(len(ui.Outputs)).To(Equal(0))
@@ -105,12 +104,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}
 
-		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
+		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Are you sure you want to delete", "a label", "a provider"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting"},
 			{"OK"},
 		})
@@ -128,10 +127,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"-f", "a label", "a provider"}
-		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
+		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
 
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting"},
 			{"OK"},
 		})
@@ -146,8 +145,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}
 
-		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service auth token as", "my-user"},
 			{"OK"},
 			{"does not exist"},
@@ -161,8 +160,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}
 
-		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service auth token as", "my-user"},
 			{"FAILED"},
 			{"OH NOES"},

@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
+func callRenameService(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, serviceRepo *testapi.FakeServiceRepo) {
 	ui = &testterm.FakeUI{}
 	serviceRepo = &testapi.FakeServiceRepo{}
 
@@ -32,23 +31,23 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestRenameServiceFailsWithUsage", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 
-		fakeUI, _ := callRenameService(mr.T(), []string{}, reqFactory)
+		fakeUI, _ := callRenameService([]string{}, reqFactory)
 		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 
-		fakeUI, _ = callRenameService(mr.T(), []string{"my-service"}, reqFactory)
+		fakeUI, _ = callRenameService([]string{"my-service"}, reqFactory)
 		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 
-		fakeUI, _ = callRenameService(mr.T(), []string{"my-service", "new-name", "extra"}, reqFactory)
+		fakeUI, _ = callRenameService([]string{"my-service", "new-name", "extra"}, reqFactory)
 		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRenameServiceRequirements", func() {
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-		callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
+		callRenameService([]string{"my-service", "new-name"}, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-		callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
+		callRenameService([]string{"my-service", "new-name"}, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
@@ -59,9 +58,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Name = "different-name"
 		serviceInstance.Guid = "different-name-guid"
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, ServiceInstance: serviceInstance}
-		ui, fakeServiceRepo := callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
+		ui, fakeServiceRepo := callRenameService([]string{"my-service", "new-name"}, reqFactory)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Renaming service", "different-name", "new-name", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})

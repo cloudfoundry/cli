@@ -8,7 +8,6 @@ import (
 	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
@@ -41,7 +40,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("")}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			domainReq.Execute()
 		})
 	})
@@ -50,7 +49,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: net.NewApiResponseWithError("", errors.New(""))}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			domainReq.Execute()
 		})
 	})

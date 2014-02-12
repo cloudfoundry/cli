@@ -36,7 +36,7 @@ var _ = Describe("stacks command", func() {
 		}
 
 		ui := callStacks(stackRepo)
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting stacks in org", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"Stack-1", "Stack 1 Description"},

@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"strconv"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -46,7 +45,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callLogin(c)
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Select an org"},
 			{"1. some-org"},
 			{"2. my-org"},
@@ -97,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callLogin(c)
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Select an org"},
 			{"1. some-org"},
 			{"2. my-org"},
@@ -149,7 +148,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callLogin(c)
 
-		testassert.SliceDoesNotContain(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(c.ui.Outputs, testassert.Lines{
 			{"my-org-2"},
 		})
 		Expect(c.orgRepo.FindByNameName).To(Equal("my-org-1"))
@@ -327,7 +326,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.AccessToken()).To(BeEmpty())
 		Expect(c.Config.RefreshToken()).To(BeEmpty())
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 	})
@@ -346,7 +345,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.AccessToken()).To(BeEmpty())
 		Expect(c.Config.RefreshToken()).To(BeEmpty())
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 	})
@@ -366,7 +365,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 	})
@@ -386,7 +385,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 	})
@@ -402,10 +401,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callLogin(c)
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Select an org (or press enter to skip):"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(c.ui.Outputs, testassert.Lines{
 			{"Select a space", "or press enter to skip"},
 		})
 		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
@@ -432,10 +431,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callLogin(c)
 
-		testassert.SliceContains(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
 			{"Select a space (or press enter to skip):"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), c.ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(c.ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 

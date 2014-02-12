@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callSetOrgRole(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSetOrgRole(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("set-org-role", args)
 
@@ -30,16 +29,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		userRepo := &testapi.FakeUserRepository{}
 
-		ui := callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+		ui := callSetOrgRole([]string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
-		ui = callSetOrgRole(mr.T(), []string{"my-user", "my-org"}, reqFactory, userRepo)
+		ui = callSetOrgRole([]string{"my-user", "my-org"}, reqFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetOrgRole(mr.T(), []string{"my-user"}, reqFactory, userRepo)
+		ui = callSetOrgRole([]string{"my-user"}, reqFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSetOrgRole(mr.T(), []string{}, reqFactory, userRepo)
+		ui = callSetOrgRole([]string{}, reqFactory, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestSetOrgRoleRequirements", func() {
@@ -48,11 +47,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		userRepo := &testapi.FakeUserRepository{}
 
 		reqFactory.LoginSuccess = false
-		callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+		callSetOrgRole([]string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
+		callSetOrgRole([]string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect(reqFactory.UserUsername).To(Equal("my-user"))
@@ -73,9 +72,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		userRepo := &testapi.FakeUserRepository{}
 
-		ui := callSetOrgRole(mr.T(), []string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
+		ui := callSetOrgRole([]string{"some-user", "some-org", "OrgManager"}, reqFactory, userRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
 			{"OK"},
 		})

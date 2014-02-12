@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -70,7 +69,7 @@ var _ = Describe("list-apps command", func() {
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting apps in", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"Application-1", "started", "1/1", "512M", "1G", "app1.cfapps.io", "app1.example.com"},
@@ -88,7 +87,7 @@ var _ = Describe("list-apps command", func() {
 		ui := callApps(appSummaryRepo, reqFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting apps in", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"No apps found"},

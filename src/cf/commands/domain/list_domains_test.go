@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -68,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.ListDomainsForOrgDomainsGuid).To(Equal("my-org-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"name", "status"},
 			{"Domain1", "shared"},
@@ -87,7 +86,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"No domains found"},
 		})
@@ -105,7 +104,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"failed"},
 			{"shared domains"},
@@ -129,7 +128,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"ze-domain"},
 		})
@@ -147,7 +146,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"failed"},
 			{"private domains"},

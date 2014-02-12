@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
@@ -13,7 +12,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callShowSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callShowSpace(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("space", args)
 
@@ -29,15 +28,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-space"}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callShowSpace(mr.T(), args, reqFactory)
+		callShowSpace(args, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callShowSpace(mr.T(), args, reqFactory)
+		callShowSpace(args, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		callShowSpace(mr.T(), args, reqFactory)
+		callShowSpace(args, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestShowSpaceInfoSuccess", func() {
@@ -68,8 +67,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		space.ServiceInstances = services
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
-		ui := callShowSpace(mr.T(), []string{"space1"}, reqFactory)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callShowSpace([]string{"space1"}, reqFactory)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting info for space", "space1", "my-org", "my-user"},
 			{"OK"},
 			{"space1"},

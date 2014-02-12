@@ -67,11 +67,11 @@ var _ = Describe("delete-route command", func() {
 
 			ui := callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Prompts, testassert.Lines{
+			testassert.SliceContains(ui.Prompts, testassert.Lines{
 				{"Really delete", "my-host"},
 			})
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Deleting route", "my-host.example.com"},
 				{"OK"},
 			})
@@ -93,7 +93,7 @@ var _ = Describe("delete-route command", func() {
 
 			Expect(len(ui.Prompts)).To(Equal(0))
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Deleting", "my-host.example.com"},
 				{"OK"},
 			})
@@ -105,7 +105,7 @@ var _ = Describe("delete-route command", func() {
 
 			ui := callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Deleting", "my-host.example.com"},
 				{"OK"},
 				{"my-host", "does not exist"},

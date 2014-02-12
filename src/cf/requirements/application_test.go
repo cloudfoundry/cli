@@ -5,7 +5,6 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
@@ -34,7 +33,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		appReq := NewApplicationRequirement("foo", ui, appRepo)
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			appReq.Execute()
 		})
 	})

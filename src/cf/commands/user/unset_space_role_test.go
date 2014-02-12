@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -21,7 +20,7 @@ func getUnsetSpaceRoleDeps() (reqFactory *testreq.FakeReqFactory, spaceRepo *tes
 	return
 }
 
-func callUnsetSpaceRole(t mr.TestingT, args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callUnsetSpaceRole(args []string, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("unset-space-role", args)
 
@@ -36,19 +35,19 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestUnsetSpaceRoleFailsWithUsage", func() {
 		reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 
-		ui := callUnsetSpaceRole(mr.T(), []string{}, spaceRepo, userRepo, reqFactory)
+		ui := callUnsetSpaceRole([]string{}, spaceRepo, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetSpaceRole(mr.T(), []string{"username"}, spaceRepo, userRepo, reqFactory)
+		ui = callUnsetSpaceRole([]string{"username"}, spaceRepo, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetSpaceRole(mr.T(), []string{"username", "org"}, spaceRepo, userRepo, reqFactory)
+		ui = callUnsetSpaceRole([]string{"username", "org"}, spaceRepo, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetSpaceRole(mr.T(), []string{"username", "org", "space"}, spaceRepo, userRepo, reqFactory)
+		ui = callUnsetSpaceRole([]string{"username", "org", "space"}, spaceRepo, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUnsetSpaceRole(mr.T(), []string{"username", "org", "space", "role"}, spaceRepo, userRepo, reqFactory)
+		ui = callUnsetSpaceRole([]string{"username", "org", "space", "role"}, spaceRepo, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestUnsetSpaceRoleRequirements", func() {
@@ -57,11 +56,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"username", "org", "space", "role"}
 
 		reqFactory.LoginSuccess = false
-		callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
+		callUnsetSpaceRole(args, spaceRepo, userRepo, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
+		callUnsetSpaceRole(args, spaceRepo, userRepo, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect(reqFactory.UserUsername).To(Equal("username"))
@@ -86,13 +85,13 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		args := []string{"my-username", "my-org", "my-space", "SpaceManager"}
 
-		ui := callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
+		ui := callUnsetSpaceRole(args, spaceRepo, userRepo, reqFactory)
 
 		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("some-org-guid"))
 
 		println(ui.DumpOutputs())
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
 			{"OK"},
 		})

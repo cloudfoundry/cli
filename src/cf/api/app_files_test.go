@@ -6,7 +6,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -49,7 +48,7 @@ var _ = Describe("AppFilesRepository", func() {
 			},
 		})
 
-		listFilesRedirectServer, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+		listFilesRedirectServer, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
 		defer listFilesRedirectServer.Close()
 
 		configRepo := testconfig.NewRepositoryWithDefaults()

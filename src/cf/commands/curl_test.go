@@ -50,10 +50,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			Expect(deps.curlRepo.Method).To(Equal("GET"))
 			Expect(deps.curlRepo.Path).To(Equal("/foo"))
-			testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 				{"response for get"},
 			})
-			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"Content-Size:1024"},
 			})
@@ -63,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			runCurlWithInputs(deps, []string{"-X", "post", "/foo"})
 
 			Expect(deps.curlRepo.Method).To(Equal("post"))
-			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 			})
 		})
@@ -72,7 +72,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "/foo"})
 
 			Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat"))
-			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 			})
 		})
@@ -81,7 +81,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "-H", "Content-Length:12", "/foo"})
 
 			Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat\nContent-Length:12"))
-			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 			})
 		})
@@ -91,11 +91,11 @@ var _ = Describe("Testing with ginkgo", func() {
 			deps.curlRepo.ResponseBody = "response for get"
 			runCurlWithInputs(deps, []string{"-i", "/foo"})
 
-			testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 				{"Content-Size:1024"},
 				{"response for get"},
 			})
-			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 			})
 		})
@@ -104,7 +104,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			runCurlWithInputs(deps, []string{"-d", "body content to upload", "/foo"})
 
 			Expect(deps.curlRepo.Body).To(Equal("body content to upload"))
-			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 			})
 		})
@@ -116,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			runCurlWithInputs(deps, []string{"-v", "/foo"})
 			trace.Logger.Print("logging enabled")
 
-			testassert.SliceContains(GinkgoT(), []string{output.String()}, testassert.Lines{
+			testassert.SliceContains([]string{output.String()}, testassert.Lines{
 				{"logging enabled"},
 			})
 		})
@@ -125,7 +125,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			deps.curlRepo.ApiResponse = net.NewApiResponseWithMessage("ooops")
 			runCurlWithInputs(deps, []string{"/foo"})
 
-			testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"ooops"},
 			})

@@ -7,7 +7,6 @@ import (
 	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -52,7 +51,6 @@ var _ = Describe("Purging services", func() {
 	})
 
 	It("works when not given a provider", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		offering := maker.NewServiceOffering("the-service-name")
@@ -66,10 +64,10 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		testassert.SliceContains(t, deps.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 			{"Warning"},
 		})
-		testassert.SliceContains(t, deps.ui.Prompts, testassert.Lines{
+		testassert.SliceContains(deps.ui.Prompts, testassert.Lines{
 			{"Really purge service", "the-service-name"},
 		})
 
@@ -77,7 +75,7 @@ var _ = Describe("Purging services", func() {
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal(""))
 		Expect(deps.serviceRepo.PurgedServiceOffering).To(Equal(offering))
 
-		testassert.SliceContains(t, deps.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 			{"OK"},
 		})
 	})
@@ -114,7 +112,6 @@ var _ = Describe("Purging services", func() {
 	})
 
 	It("fails with an error message when the request fails", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = net.NewApiResponseWithError("oh no!", errors.New("!"))
@@ -125,7 +122,7 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		testassert.SliceContains(t, deps.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"oh no!"},
 		})
@@ -134,7 +131,6 @@ var _ = Describe("Purging services", func() {
 	})
 
 	It("indicates when a service doesn't exist", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = net.NewNotFoundApiResponse("uh oh cant find it")
@@ -145,7 +141,7 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		testassert.SliceContains(t, deps.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
 			{"OK"},
 			{"Service offering", "does not exist"},
 		})

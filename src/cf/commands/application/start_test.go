@@ -10,7 +10,6 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"os"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -108,7 +107,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		displayApp := &testcmd.FakeAppDisplayer{}
 		ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, defaultStartTimeout)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"0 of 2 instances running", "2 starting"},
@@ -147,11 +146,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callStart([]string{"my-app"}, testconfig.NewRepository(), reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Log Line 2"},
 			{"Log Line 3"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"Log Line 1"},
 			{"Log Line 4"},
 		})
@@ -171,7 +170,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		errorCodes := []string{""}
 		ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(displayApp, app, instances, errorCodes, defaultStartTimeout)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app"},
 			{"OK"},
 			{"Started"},
@@ -209,7 +208,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Log Line 1"},
 			{"Log Line 2"},
 			{"0 of 2 instances running", "2 starting"},
@@ -224,7 +223,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app"},
 			{"OK"},
 			{"FAILED"},
@@ -251,7 +250,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app"},
 			{"OK"},
 			{"0 of 2 instances running", "1 starting", "1 failing"},
@@ -284,13 +283,13 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, 0)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Starting", "my-app"},
 			{"OK"},
 			{"FAILED"},
 			{"Start app timeout"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"instances running"},
 		})
 	})
@@ -308,7 +307,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{Application: app}
 		ui := callStart(args, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app"},
 			{"FAILED"},
 			{"Error updating app."},
@@ -332,7 +331,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-app"}
 		ui := callStart(args, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app", "is already started"},
 		})
 
@@ -357,7 +356,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callStart([]string{"my-app"}, configRepo, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			testassert.Line{"error tailing logs"},
 			testassert.Line{"Ooops"},
 		})

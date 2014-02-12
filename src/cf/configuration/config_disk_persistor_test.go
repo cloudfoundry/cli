@@ -5,12 +5,11 @@ import (
 	"fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"os"
 	"path/filepath"
 )
 
-func withFakeHome(t mr.TestingT, callback func(dirPath string)) {
+func withFakeHome(callback func(dirPath string)) {
 	fileutils.TempDir("test-config", func(dir string, err error) {
 		if err != nil {
 			Fail("Couldn't create tmp file")
@@ -19,7 +18,7 @@ func withFakeHome(t mr.TestingT, callback func(dirPath string)) {
 	})
 }
 
-func withConfigFixture(t mr.TestingT, name string, callback func(dirPath string)) {
+func withConfigFixture(name string, callback func(dirPath string)) {
 	cwd, err := os.Getwd()
 	Expect(err).NotTo(HaveOccurred())
 	callback(filepath.Join(cwd, "../../fixtures/config", name, ".cf", "config.json"))
@@ -27,7 +26,7 @@ func withConfigFixture(t mr.TestingT, name string, callback func(dirPath string)
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestLoadingWithNoConfigFile", func() {
-		withFakeHome(mr.T(), func(configPath string) {
+		withFakeHome(func(configPath string) {
 			repo := NewDiskPersistor(configPath)
 			configData, err := repo.Load()
 			Expect(err).NotTo(HaveOccurred())
@@ -40,7 +39,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestSavingAndLoading", func() {
-		withFakeHome(mr.T(), func(configPath string) {
+		withFakeHome(func(configPath string) {
 			repo := NewDiskPersistor(configPath)
 			configData, err := repo.Load()
 			Expect(err).NotTo(HaveOccurred())
@@ -60,7 +59,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestReadingOutdatedConfigReturnsNewConfig", func() {
-		withConfigFixture(mr.T(), "outdated-config", func(configPath string) {
+		withConfigFixture("outdated-config", func(configPath string) {
 			repo := NewDiskPersistor(configPath)
 			configData, err := repo.Load()
 

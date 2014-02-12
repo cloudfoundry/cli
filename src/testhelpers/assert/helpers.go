@@ -2,20 +2,20 @@ package assert
 
 import (
 	"fmt"
-	mr "github.com/tjarratt/mr_t"
 	"runtime"
 	"strings"
+	"github.com/onsi/ginkgo"
 )
 
 // Fail reports a failure through
-func Fail(t mr.TestingT, failureMessage string, msgAndArgs ...interface{}) bool {
+func Fail(failureMessage string, msgAndArgs ...interface{}) bool {
 
 	message := messageFromMsgAndArgs(msgAndArgs...)
 
 	if len(message) > 0 {
-		t.Errorf("\r%s\r\tLocation:\t%s\n\r\tError:\t\t%s\n\r\tMessages:\t%s\n\r", getWhitespaceString(), CallerInfo(), failureMessage, message)
+		ginkgo.Fail(fmt.Sprintf("\r%s\r\tLocation:\t%s\n\r\tError:\t\t%s\n\r\tMessages:\t%s\n\r", getWhitespaceString(), CallerInfo(), failureMessage, message))
 	} else {
-		t.Errorf("\r%s\r\tLocation:\t%s\n\r\tError:\t\t%s\n\r", getWhitespaceString(), CallerInfo(), failureMessage)
+		ginkgo.Fail(fmt.Sprintf("\r%s\r\tLocation:\t%s\n\r\tError:\t\t%s\n\r", getWhitespaceString(), CallerInfo(), failureMessage))
 	}
 
 	return false
@@ -52,17 +52,17 @@ func CallerInfo() string {
 // Takes a slice of errors and asserts that there were none provided
 // When failing, appends error messages together on newlines and
 // provides a count of how many errors were passed in
-func AssertNoErrors(t mr.TestingT, errs []error) {
+func AssertNoErrors(errs []error) {
 	if len(errs) > 0 {
 		var concatErrors string
 		for _, err := range errs {
 			concatErrors = concatErrors + err.Error() + "\n"
 		}
-		t.Errorf("Expected no errors, but there were %d.\n%s", len(errs), concatErrors)
+		ginkgo.Fail(fmt.Sprintf("Expected no errors, but there were %d.\n%s", len(errs), concatErrors))
 	}
 }
 
-func AssertPanic(t mr.TestingT, panicValue interface{}, callback func()) {
+func AssertPanic(panicValue interface{}, callback func()) {
 	defer func() {
 		value := recover()
 		if value != panicValue {
@@ -71,7 +71,7 @@ func AssertPanic(t mr.TestingT, panicValue interface{}, callback func()) {
 	}()
 
 	callback()
-	t.Error("Expected a panic, but got none!")
+	ginkgo.Fail("Expected a panic, but got none!")
 }
 
 // getWhitespaceString returns a string that is long enough to overwrite the default

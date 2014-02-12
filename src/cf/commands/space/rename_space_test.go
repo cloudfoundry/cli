@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository) (ui *testterm.FakeUI) {
+func callRenameSpace(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-space", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()
@@ -29,10 +28,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		spaceRepo := &testapi.FakeSpaceRepository{}
 
-		ui := callRenameSpace(mr.T(), []string{}, reqFactory, spaceRepo)
+		ui := callRenameSpace([]string{}, reqFactory, spaceRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRenameSpace(mr.T(), []string{"foo"}, reqFactory, spaceRepo)
+		ui = callRenameSpace([]string{"foo"}, reqFactory, spaceRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
@@ -41,15 +40,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		spaceRepo := &testapi.FakeSpaceRepository{}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-		callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
+		callRenameSpace([]string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-		callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
+		callRenameSpace([]string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-		callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
+		callRenameSpace([]string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.SpaceName).To(Equal("my-space"))
 	})
@@ -60,9 +59,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		space.Name = "my-space"
 		space.Guid = "my-space-guid"
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
-		ui := callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
+		ui := callRenameSpace([]string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Renaming space", "my-space", "my-new-space", "my-org", "my-user"},
 			{"OK"},
 		})

@@ -124,7 +124,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createUserProvidedServiceInstanceRepo(req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo UserProvidedServiceInstanceRepository) {
-	ts, handler = testnet.NewTLSServer(GinkgoT(), []testnet.TestRequest{req})
+	ts, handler = testnet.NewTLSServer([]testnet.TestRequest{req})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

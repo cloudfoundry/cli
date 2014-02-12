@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -43,7 +42,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
 
 		Expect(domainRepo.CreateSharedDomainName).To(Equal("example.com"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating shared domain", "example.com", "my-user"},
 			{"OK"},
 		})

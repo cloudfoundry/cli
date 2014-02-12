@@ -6,7 +6,6 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -60,7 +59,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 			{"Log Line 1"},
 			{"Log Line 2"},
@@ -82,7 +81,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"hello%2Bworld%v"},
 		})
 	})
@@ -104,7 +103,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 			{"Log Line 1"},
 		})

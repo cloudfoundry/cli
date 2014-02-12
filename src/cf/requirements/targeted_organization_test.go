@@ -5,7 +5,6 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
@@ -25,11 +24,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		config.SetOrganizationFields(models.OrganizationFields{})
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			NewTargetedOrgRequirement(ui, config).Execute()
 		})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"No org targeted"},
 		})

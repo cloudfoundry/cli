@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -16,7 +15,7 @@ import (
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestFindByName", func() {
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{findAppRequest})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{findAppRequest})
 		defer ts.Close()
 
 		app, apiResponse := repo.Read("My App")
@@ -37,7 +36,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		request := testapi.NewCloudControllerTestRequest(findAppRequest)
 		request.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 		defer ts.Close()
 
 		_, apiResponse := repo.Read("My App")
@@ -54,7 +53,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 		defer ts.Close()
 
 		envParams := map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
@@ -67,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestCreateApplication", func() {
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{createApplicationRequest})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{createApplicationRequest})
 		defer ts.Close()
 
 		params := defaultAppParams()
@@ -90,7 +89,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated, Body: createApplicationResponse},
 		})
 
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 		defer ts.Close()
 
 		params := defaultAppParams()
@@ -104,7 +103,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestUpdateApplication", func() {
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{updateApplicationRequest})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{updateApplicationRequest})
 		defer ts.Close()
 
 		app := models.Application{}
@@ -134,7 +133,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: updateApplicationResponse},
 		})
 
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{request})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 		defer ts.Close()
 
 		emptyString := ""
@@ -152,7 +151,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: ""},
 		})
 
-		ts, handler, repo := createAppRepo(mr.T(), []testnet.TestRequest{deleteApplicationRequest})
+		ts, handler, repo := createAppRepo([]testnet.TestRequest{deleteApplicationRequest})
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-cool-app-guid")
@@ -282,8 +281,8 @@ var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 		Body:   updateApplicationResponse},
 })
 
-func createAppRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
+func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
+	ts, handler = testnet.NewTLSServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

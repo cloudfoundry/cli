@@ -31,7 +31,7 @@ var _ = Describe("CloudControllerPasswordRepository", func() {
 })
 
 func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Server, handler *testnet.TestHandler, repo PasswordRepository) {
-	passwordServer, handler = testnet.NewTLSServer(GinkgoT(), []testnet.TestRequest{req})
+	passwordServer, handler = testnet.NewTLSServer([]testnet.TestRequest{req})
 
 	endpointRepo := &testapi.FakeEndpointRepo{}
 	endpointRepo.UAAEndpointReturns.Endpoint = passwordServer.URL

@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -47,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-app", "DATABASE_URL"}
 		ui := callUnsetEnv(args, reqFactory, appRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing env variable", "DATABASE_URL", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -74,7 +73,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"does-not-exist", "DATABASE_URL"}
 		ui := callUnsetEnv(args, reqFactory, appRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing env variable"},
 			{"FAILED"},
 			{"Error updating app."},
@@ -92,7 +91,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callUnsetEnv(args, reqFactory, appRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing env variable"},
 			{"OK"},
 			{"DATABASE_URL", "was not set."},

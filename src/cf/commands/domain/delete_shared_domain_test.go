@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -39,7 +38,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},
 			{"foo.com", "not found"},
@@ -52,7 +51,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"FAILED"},
 			{"foo.com"},
@@ -66,7 +65,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"FAILED"},
 			{"foo.com"},
@@ -79,10 +78,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"shared", "foo.com"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},
 		})
@@ -94,7 +93,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},
 		})

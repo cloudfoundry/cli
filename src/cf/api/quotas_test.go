@@ -65,7 +65,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 })
 
 func createQuotaRepo(req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo QuotaRepository) {
-	ts, handler = testnet.NewTLSServer(GinkgoT(), []testnet.TestRequest{req})
+	ts, handler = testnet.NewTLSServer([]testnet.TestRequest{req})
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)

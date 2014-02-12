@@ -10,7 +10,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -121,7 +120,7 @@ var defaultRequests = []testnet.TestRequest{
 
 var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.yml"}
 
-var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
+var uploadBodyMatcher = func(request *http.Request) {
 	err := request.ParseMultipartForm(4096)
 	if err != nil {
 		Fail(fmt.Sprintf("Failed parsing multipart form %v", err))
@@ -198,7 +197,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 }
 
 func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewTLSServer(GinkgoT(), requests)
+	ts, handler := testnet.NewTLSServer(requests)
 	defer ts.Close()
 
 	configRepo := testconfig.NewRepositoryWithDefaults()

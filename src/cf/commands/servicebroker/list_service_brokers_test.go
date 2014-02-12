@@ -4,7 +4,6 @@ import (
 	. "cf/commands/servicebroker"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -13,7 +12,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListServiceBrokers(t mr.TestingT, args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+func callListServiceBrokers(args []string, serviceBrokerRepo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	config := testconfig.NewRepositoryWithDefaults()
 	ctxt := testcmd.NewContext("service-brokers", args)
@@ -43,9 +42,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ServiceBrokers: serviceBrokers,
 		}
 
-		ui := callListServiceBrokers(mr.T(), []string{}, repo)
+		ui := callListServiceBrokers([]string{}, repo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service brokers as", "my-user"},
 			{"name", "url"},
 			{"service-broker-to-list-a", "http://service-a-url.com"},
@@ -59,9 +58,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ServiceBrokers: []models.ServiceBroker{},
 		}
 
-		ui := callListServiceBrokers(mr.T(), []string{}, repo)
+		ui := callListServiceBrokers([]string{}, repo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service brokers as", "my-user"},
 			{"No service brokers found"},
 		})
@@ -70,9 +69,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		repo := &testapi.FakeServiceBrokerRepo{ListErr: true}
 
-		ui := callListServiceBrokers(mr.T(), []string{}, repo)
+		ui := callListServiceBrokers([]string{}, repo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service brokers as ", "my-user"},
 			{"FAILED"},
 		})

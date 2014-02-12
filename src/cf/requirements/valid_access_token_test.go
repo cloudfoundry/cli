@@ -4,7 +4,6 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
@@ -20,7 +19,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		req := NewValidAccessTokenRequirement(ui, appRepo)
 		success := req.Execute()
 		Expect(success).To(BeFalse())
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
+		testassert.SliceContains(ui.Outputs, testassert.Lines{{"Not logged in."}})
 
 		appRepo.ReadAuthErr = false
 

@@ -14,7 +14,6 @@ import (
 	testterm "testhelpers/terminal"
 
 	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
@@ -101,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Showing health and status", "my-app"},
 			{"state", "started"},
 			{"instances", "2/2"},
@@ -113,15 +112,15 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 	It("TestDisplayingStoppedAppSummary", func() {
 
-		testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_STOPPED)
+		testDisplayingAppSummaryWithErrorCode(cf.APP_STOPPED)
 	})
 	It("TestDisplayingNotStagedAppSummary", func() {
 
-		testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_NOT_STAGED)
+		testDisplayingAppSummaryWithErrorCode(cf.APP_NOT_STAGED)
 	})
 })
 
-func testDisplayingAppSummaryWithErrorCode(t mr.TestingT, errorCode string) {
+func testDisplayingAppSummaryWithErrorCode(errorCode string) {
 	reqApp := models.Application{}
 	reqApp.Name = "my-app"
 	reqApp.Guid = "my-app-guid"
@@ -162,7 +161,7 @@ func testDisplayingAppSummaryWithErrorCode(t mr.TestingT, errorCode string) {
 	Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 	Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+	testassert.SliceContains(ui.Outputs, testassert.Lines{
 		{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},
 		{"state", "stopped"},
 		{"instances", "0/2"},

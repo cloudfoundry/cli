@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -61,7 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callEvents([]string{"my-app"}, reqFactory, eventsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 			{"time", "event", "description"},
 			{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance exited", "78"},
@@ -77,7 +76,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callEvents([]string{"my-app"}, reqFactory, eventsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"events", "my-app"},
 			{"No events", "my-app"},
 		})
