@@ -6,8 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -18,7 +16,7 @@ import (
 
 var _ = Describe("AppInstancesRepo", func() {
 	It("TestAppInstancesGetInstances", func() {
-		ts, handler, repo := createAppInstancesRepo(mr.T(), []testnet.TestRequest{
+		ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
 			appInstancesRequest,
 			appStatsRequest,
 		})
@@ -36,10 +34,10 @@ var _ = Describe("AppInstancesRepo", func() {
 
 		instance0 := instances[0]
 		Expect(instance0.Since).To(Equal(time.Unix(1379522342, 0)))
-		assert.Exactly(mr.T(), instance0.DiskQuota, uint64(1073741824))
-		assert.Exactly(mr.T(), instance0.DiskUsage, uint64(56037376))
-		assert.Exactly(mr.T(), instance0.MemQuota, uint64(67108864))
-		assert.Exactly(mr.T(), instance0.MemUsage, uint64(19218432))
+		Expect(instance0.DiskQuota).To(Equal(uint64(1073741824)))
+		Expect(instance0.DiskUsage).To(Equal(uint64(56037376)))
+		Expect(instance0.MemQuota).To(Equal(uint64(67108864)))
+		Expect(instance0.MemUsage).To(Equal(uint64(19218432)))
 		Expect(instance0.CpuUsage).To(Equal(3.659571249238058e-05))
 	})
 })
@@ -88,8 +86,8 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
   }
 }`}})
 
-func createAppInstancesRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
+func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
+	ts, handler = testnet.NewTLSServer(GinkgoT(), requests)
 	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	configRepo := testconfig.NewRepositoryWithDefaults()

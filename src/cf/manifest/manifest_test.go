@@ -5,14 +5,12 @@ import (
 	"generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"runtime"
 	"strings"
 	testassert "testhelpers/assert"
 )
 
-func testManifestWithAbsolutePathOnPosix(t mr.TestingT) {
+func testManifestWithAbsolutePathOnPosix() {
 	m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
@@ -25,7 +23,7 @@ func testManifestWithAbsolutePathOnPosix(t mr.TestingT) {
 	Expect(*m.Applications[0].Path).To(Equal("/another/path-segment"))
 }
 
-func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
+func testManifestWithAbsolutePathOnWindows() {
 	m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
@@ -106,9 +104,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestManifestWithAbsolutePath", func() {
 		if runtime.GOOS == "windows" {
-			testManifestWithAbsolutePathOnWindows(mr.T())
+			testManifestWithAbsolutePathOnWindows()
 		} else {
-			testManifestWithAbsolutePathOnPosix(mr.T())
+			testManifestWithAbsolutePathOnPosix()
 		}
 	})
 
@@ -156,7 +154,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			"memory", "instances", "timeout", "no-route", "services", "env"}
 
 		for _, key := range manifestKeys {
-			testassert.SliceContains(mr.T(), errorSlice, testassert.Lines{{key, "not be null"}})
+			testassert.SliceContains(GinkgoT(), errorSlice, testassert.Lines{{key, "not be null"}})
 		}
 	})
 
@@ -196,6 +194,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		Expect(errs).To(BeEmpty())
-		assert.Nil(mr.T(), m.Applications[0].Command)
+		Expect(m.Applications[0].Command).To(BeNil())
 	})
 })

@@ -6,15 +6,12 @@ import (
 	"code.google.com/p/gogoprotobuf/proto"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
-	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-
 	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/gomega"
 	"time"
 )
 
-func createMessage(t mr.TestingT, protoMsg *logmessage.LogMessage, sourceName *string, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
+func createMessage(protoMsg *logmessage.LogMessage, sourceName *string, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
 	protoMsg.SourceName = sourceName
 	protoMsg.MessageType = msgType
 
@@ -31,8 +28,8 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestTimestampFormat", func() {
 		Expect(TIMESTAMP_FORMAT).To(Equal("2006-01-02T15:04:05.00-0700"))
 	})
-	It("TestLogMessageOutput", func() {
 
+	It("TestLogMessageOutput", func() {
 		cloud_controller := "API"
 		router := "RTR"
 		uaa := "UAA"
@@ -55,44 +52,44 @@ var _ = Describe("Testing with ginkgo", func() {
 			Timestamp:   &timestamp,
 		}
 
-		msg := createMessage(mr.T(), protoMessage, &cloud_controller, &stdout)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
+		msg := createMessage(protoMessage, &cloud_controller, &stdout)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
 
-		msg = createMessage(mr.T(), protoMessage, &cloud_controller, &stderr)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &cloud_controller, &stderr)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
 		sourceId = "1"
-		msg = createMessage(mr.T(), protoMessage, &router, &stdout)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &router, &stdout)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(mr.T(), protoMessage, &router, &stderr)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &router, &stderr)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
 		sourceId = "2"
-		msg = createMessage(mr.T(), protoMessage, &uaa, &stdout)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &uaa, &stdout)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(mr.T(), protoMessage, &uaa, &stderr)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &uaa, &stderr)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
 		sourceId = "3"
-		msg = createMessage(mr.T(), protoMessage, &dea, &stdout)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &dea, &stdout)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(mr.T(), protoMessage, &dea, &stderr)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &dea, &stderr)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
 		sourceId = "4"
-		msg = createMessage(mr.T(), protoMessage, &wardenContainer, &stdout)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &wardenContainer, &stdout)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(mr.T(), protoMessage, &wardenContainer, &stderr)
-		assert.Contains(mr.T(), LogMessageOutput(msg), fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT)))
+		msg = createMessage(protoMessage, &wardenContainer, &stderr)
+		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 	})
 })

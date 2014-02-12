@@ -6,8 +6,6 @@ import (
 	. "cf/terminal"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"io"
 	"os"
 	"strings"
@@ -42,7 +40,7 @@ func captureOutput(block func()) []string {
 	return strings.Split(buf.String(), "\n")
 }
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("UI", func() {
 	It("TestSayWithStringOnly", func() {
 		simulateStdin("", func(reader io.Reader) {
 			output := captureOutput(func() {
@@ -53,8 +51,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			Expect("Hello").To(Equal(strings.Join(output, "")))
 		})
 	})
-	It("TestSayWithStringWithFormat", func() {
 
+	It("TestSayWithStringWithFormat", func() {
 		simulateStdin("", func(reader io.Reader) {
 			output := captureOutput(func() {
 				ui := NewUI(reader)
@@ -64,26 +62,27 @@ var _ = Describe("Testing with ginkgo", func() {
 			Expect("Hello World!").To(Equal(strings.Join(output, "")))
 		})
 	})
-	It("TestConfirmYes", func() {
 
+	It("TestConfirmYes", func() {
 		simulateStdin("y\n", func(reader io.Reader) {
 			out := captureOutput(func() {
 				ui := NewUI(reader)
-				assert.True(mr.T(), ui.Confirm("Hello %s", "World?"))
+				Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 			})
 
-			testassert.SliceContains(mr.T(), out, testassert.Lines{{"Hello World?"}})
+			testassert.SliceContains(GinkgoT(), out, testassert.Lines{{"Hello World?"}})
 		})
 	})
-	It("TestConfirmNo", func() {
 
+	It("TestConfirmNo", func() {
 		simulateStdin("wat\n", func(reader io.Reader) {
 			_ = captureOutput(func() {
 				ui := NewUI(reader)
-				assert.False(mr.T(), ui.Confirm("Hello %s", "World?"))
+				Expect(ui.Confirm("Hello %s", "World?")).To(BeFalse())
 			})
 		})
 	})
+
 	It("TestShowConfigurationWhenNoOrgAndSpaceTargeted", func() {
 		config := testconfig.NewRepository()
 		output := captureOutput(func() {
@@ -91,12 +90,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			ui.ShowConfiguration(config)
 		})
 
-		testassert.SliceContains(mr.T(), output, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), output, testassert.Lines{
 			{"No", "org", "space", "targeted", "-o ORG", "-s SPACE"},
 		})
 	})
-	It("TestShowConfigurationWhenNoOrgTargeted", func() {
 
+	It("TestShowConfigurationWhenNoOrgTargeted", func() {
 		sf := models.SpaceFields{}
 		sf.Guid = "guid"
 		sf.Name = "name"
@@ -108,12 +107,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			ui.ShowConfiguration(config)
 		})
 
-		testassert.SliceContains(mr.T(), output, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), output, testassert.Lines{
 			{"No", "org", "targeted", "-o ORG"},
 		})
 	})
-	It("TestShowConfigurationWhenNoSpaceTargeted", func() {
 
+	It("TestShowConfigurationWhenNoSpaceTargeted", func() {
 		of := models.OrganizationFields{}
 		of.Guid = "of-guid"
 		of.Name = "of-name"
@@ -125,7 +124,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			ui.ShowConfiguration(config)
 		})
 
-		testassert.SliceContains(mr.T(), output, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), output, testassert.Lines{
 			{"No", "space", "targeted", "-s SPACE"},
 		})
 	})

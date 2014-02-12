@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -97,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 		ui := callCreateBuildpack([]string{"--enable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-		assert.NotNil(mr.T(), repo.CreateBuildpack.Enabled)
+		Expect(repo.CreateBuildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(true))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -116,7 +115,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 		callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-		assert.Nil(mr.T(), repo.CreateBuildpack.Enabled)
+		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
 	})
 	It("TestCreateBuildpackDisabled", func() {
 
@@ -124,7 +123,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 		callCreateBuildpack([]string{"--disable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
-		assert.NotNil(mr.T(), repo.CreateBuildpack.Enabled)
+		Expect(repo.CreateBuildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(false))
 	})
 	It("TestCreateBuildpackWithInvalidPath", func() {
