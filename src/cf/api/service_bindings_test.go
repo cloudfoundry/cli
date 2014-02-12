@@ -6,8 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -40,8 +38,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestCreateServiceBindingIfError", func() {
@@ -61,8 +59,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.ErrorCode).To(Equal("90003"))
 	})
 
@@ -84,9 +82,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.True(mr.T(), found)
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(found).To(BeTrue())
 	})
 
 	It("TestDeleteServiceBindingWhenBindingDoesNotExist", func() {
@@ -100,8 +98,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler.CallCount).To(Equal(0))
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.False(mr.T(), found)
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(found).To(BeFalse())
 	})
 })
 

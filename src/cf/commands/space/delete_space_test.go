@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -44,15 +43,15 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteSpaceRequirements", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 		deleteSpace(mr.T(), []string{"y"}, []string{"my-space"}, reqFactory)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
 		deleteSpace(mr.T(), []string{"y"}, []string{"my-space"}, reqFactory)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		deleteSpace(mr.T(), []string{"y"}, []string{"my-space"}, reqFactory)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.SpaceName).To(Equal("my-space"))
 	})
 
@@ -136,9 +135,9 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteSpaceCommandWith", func() {
 
 		ui, _ := deleteSpace(mr.T(), []string{"Yes"}, []string{}, defaultDeleteSpaceReqFactory())
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui, _ = deleteSpace(mr.T(), []string{"Yes"}, []string{"space-to-delete"}, defaultDeleteSpaceReqFactory())
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 })

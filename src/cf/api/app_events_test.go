@@ -138,9 +138,9 @@ var _ = Describe("App Events Repo", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(list).To(Equal(expectedEvents))
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestListEventsUsingNewEndpoint", func() {
@@ -214,8 +214,8 @@ var _ = Describe("App Events Repo", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 
 		Expect(len(events)).To(Equal(2))
 		Expect(events[0].Guid).To(Equal("event-1-guid"))
@@ -252,8 +252,8 @@ var _ = Describe("App Events Repo", func() {
 		}
 
 		Expect(list).To(Equal(expectedEvents))
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestUnmarshalNewCrashEvent", func() {

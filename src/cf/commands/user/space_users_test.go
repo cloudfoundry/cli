@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -34,13 +33,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		userRepo := &testapi.FakeUserRepository{}
 
 		ui := callSpaceUsers(mr.T(), []string{}, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSpaceUsers(mr.T(), []string{"my-org"}, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSpaceUsers(mr.T(), []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestSpaceUsersRequirements", func() {
 
@@ -51,11 +50,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callSpaceUsers(mr.T(), args, reqFactory, spaceRepo, userRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callSpaceUsers(mr.T(), args, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect("my-org").To(Equal(reqFactory.OrganizationName))
 	})

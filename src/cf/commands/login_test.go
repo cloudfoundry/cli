@@ -69,7 +69,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.orgRepo.FindByNameName).To(Equal("my-org"))
 		Expect(c.spaceRepo.FindByNameName).To(Equal("my-space"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestSuccessfullyLoggingInWithStringPrompts", func() {
@@ -120,7 +120,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.orgRepo.FindByNameName).To(Equal("my-org"))
 		Expect(c.spaceRepo.FindByNameName).To(Equal("my-space"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestLoggingInWithTooManyOrgsDoesNotShowOrgList", func() {
@@ -174,7 +174,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.authRepo.Email).To(Equal("user@example.com"))
 		Expect(c.authRepo.Password).To(Equal("password"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestSuccessfullyLoggingInWithEndpointSetInConfig", func() {
@@ -196,7 +196,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.authRepo.Email).To(Equal("user@example.com"))
 		Expect(c.authRepo.Password).To(Equal("password"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestSuccessfullyLoggingInWithOrgSetInConfig", func() {
@@ -224,7 +224,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.authRepo.Email).To(Equal("user@example.com"))
 		Expect(c.authRepo.Password).To(Equal("password"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig", func() {
@@ -257,7 +257,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.authRepo.Email).To(Equal("user@example.com"))
 		Expect(c.authRepo.Password).To(Equal("password"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestSuccessfullyLoggingInWithOnlyOneOrg", func() {
@@ -284,7 +284,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.authRepo.Email).To(Equal("user@example.com"))
 		Expect(c.authRepo.Password).To(Equal("password"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestSuccessfullyLoggingInWithOnlyOneSpace", func() {
@@ -310,7 +310,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.authRepo.Email).To(Equal("user@example.com"))
 		Expect(c.authRepo.Password).To(Equal("password"))
 
-		assert.True(mr.T(), c.ui.ShowConfigurationCalled)
+		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
 
 	It("TestUnsuccessfullyLoggingInWithAuthError", func() {

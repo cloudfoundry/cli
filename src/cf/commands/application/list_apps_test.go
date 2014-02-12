@@ -4,7 +4,7 @@ import (
 	. "cf/commands/application"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/gomega"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -68,7 +68,7 @@ var _ = Describe("list-apps command", func() {
 
 		ui := callApps(appSummaryRepo, reqFactory)
 
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Getting apps in", "my-org", "my-space", "my-user"},
@@ -87,7 +87,7 @@ var _ = Describe("list-apps command", func() {
 
 		ui := callApps(appSummaryRepo, reqFactory)
 
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Getting apps in", "my-org", "my-space", "my-user"},
 			{"OK"},
@@ -101,7 +101,7 @@ var _ = Describe("list-apps command", func() {
 
 		callApps(appSummaryRepo, reqFactory)
 
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestAppsRequiresASelectedSpaceAndOrg", func() {
 
@@ -110,7 +110,7 @@ var _ = Describe("list-apps command", func() {
 
 		callApps(appSummaryRepo, reqFactory)
 
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 })
 

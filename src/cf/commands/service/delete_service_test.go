@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -85,10 +84,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceRepo := &testapi.FakeServiceRepo{}
 
 		ui := callDeleteService(mr.T(), "", []string{"-f"}, reqFactory, serviceRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callDeleteService(mr.T(), "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestDeleteServiceForceFlagSkipsConfirmation", func() {
 

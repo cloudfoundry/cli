@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -33,16 +32,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 
 		ui := callCreateServiceAuthToken(mr.T(), []string{}, reqFactory, authTokenRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceAuthToken(mr.T(), []string{"arg1"}, reqFactory, authTokenRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceAuthToken(mr.T(), []string{"arg1", "arg2"}, reqFactory, authTokenRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceAuthToken(mr.T(), []string{"arg1", "arg2", "arg3"}, reqFactory, authTokenRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateServiceAuthTokenRequirements", func() {
 
@@ -52,11 +51,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = true
 		callCreateServiceAuthToken(mr.T(), args, reqFactory, authTokenRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory.LoginSuccess = false
 		callCreateServiceAuthToken(mr.T(), args, reqFactory, authTokenRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestCreateServiceAuthToken", func() {
 

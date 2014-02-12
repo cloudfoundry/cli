@@ -74,7 +74,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), passingReq.WasExecuted, ctxt)
 		assert.True(mr.T(), failingReq.WasExecuted, ctxt)
 
-		assert.False(mr.T(), lastReq.WasExecuted)
+		Expect(lastReq.WasExecuted).To(BeFalse())
 		assert.Nil(mr.T(), cmd.WasRunWith)
 
 		assert.Error(mr.T(), err)

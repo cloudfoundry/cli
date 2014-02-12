@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -34,23 +33,23 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 
 		fakeUI, _ := callRenameService(mr.T(), []string{}, reqFactory)
-		assert.True(mr.T(), fakeUI.FailedWithUsage)
+		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 
 		fakeUI, _ = callRenameService(mr.T(), []string{"my-service"}, reqFactory)
-		assert.True(mr.T(), fakeUI.FailedWithUsage)
+		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 
 		fakeUI, _ = callRenameService(mr.T(), []string{"my-service", "new-name", "extra"}, reqFactory)
-		assert.True(mr.T(), fakeUI.FailedWithUsage)
+		Expect(fakeUI.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRenameServiceRequirements", func() {
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
 		callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
 		callRenameService(mr.T(), []string{"my-service", "new-name"}, reqFactory)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
 	})

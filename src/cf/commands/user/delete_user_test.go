@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -64,13 +63,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 
 		ui := callDeleteUser(mr.T(), []string{}, userRepo, reqFactory)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callDeleteUser(mr.T(), []string{"foo"}, userRepo, reqFactory)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		ui = callDeleteUser(mr.T(), []string{"foo", "bar"}, userRepo, reqFactory)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
 	It("TestDeleteUserRequirements", func() {
@@ -80,11 +79,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callDeleteUser(mr.T(), args, userRepo, reqFactory)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callDeleteUser(mr.T(), args, userRepo, reqFactory)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 
 	It("TestDeleteUserWhenConfirmingWithY", func() {

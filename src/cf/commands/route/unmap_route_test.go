@@ -6,7 +6,6 @@ import (
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -22,13 +21,13 @@ var _ = Describe("Unmap Route Command", func() {
 		routeRepo := &testapi.FakeRouteRepository{}
 
 		ui := callUnmapRoute([]string{}, reqFactory, routeRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callUnmapRoute([]string{"foo"}, reqFactory, routeRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callUnmapRoute([]string{"foo", "bar"}, reqFactory, routeRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestUnmapRouteRequirements", func() {
@@ -36,7 +35,7 @@ var _ = Describe("Unmap Route Command", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 		callUnmapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(reqFactory.DomainName).To(Equal("my-domain.com"))
 	})

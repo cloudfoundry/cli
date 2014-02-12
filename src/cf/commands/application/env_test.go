@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -20,20 +19,20 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = true
 		callEnv([]string{"my-app"}, reqFactory)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 
 		reqFactory.LoginSuccess = false
 		callEnv([]string{"my-app"}, reqFactory)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestEnvFailsWithUsage", func() {
 
 		reqFactory := getEnvDependencies()
 		ui := callEnv([]string{}, reqFactory)
 
-		assert.True(mr.T(), ui.FailedWithUsage)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestEnvListsEnvironmentVariables", func() {
 

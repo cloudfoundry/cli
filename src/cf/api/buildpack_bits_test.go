@@ -26,7 +26,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		buildpack := models.Buildpack{}
 
 		apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		assert.Contains(mr.T(), apiResponse.Message, "Invalid buildpack")
 	})
 	It("TestUploadBuildpack", func() {
@@ -40,7 +40,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
 			uploadBuildpackRequest(dir),
 		})
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 	It("TestUploadBuildpackWithAZipFile", func() {
 
@@ -51,7 +51,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
 			uploadBuildpackRequest(dir),
 		})
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 })
 
@@ -131,6 +131,6 @@ func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestReque
 	buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 
 	apiResponse = repo.UploadBuildpack(buildpack, dir)
-	assert.True(t, handler.AllRequestsCalled())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
 	return
 }

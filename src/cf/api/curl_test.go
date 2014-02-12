@@ -54,12 +54,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		headers, body, apiResponse := repo.Request("GET", "/v2/endpoint", "", "")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		assert.Contains(mr.T(), headers, "200")
 		assert.Contains(mr.T(), headers, "Content-Type")
 		assert.Contains(mr.T(), headers, "text/plain")
 		testassert.JSONStringEquals(mr.T(), body, jsonResponse)
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestCurlPostRequest", func() {
@@ -81,8 +81,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestCurlFailingRequest", func() {
@@ -129,15 +129,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
 		println(apiResponse.Message)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestCurlWithInvalidHeaders", func() {
 		deps := newCurlDependencies()
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
-		assert.True(mr.T(), apiResponse.IsError())
+		Expect(apiResponse.IsError()).To(BeTrue())
 		assert.Contains(mr.T(), apiResponse.Message, "headers")
 	})
 })

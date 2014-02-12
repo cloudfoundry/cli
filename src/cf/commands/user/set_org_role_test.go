@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -32,16 +31,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		userRepo := &testapi.FakeUserRepository{}
 
 		ui := callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		ui = callSetOrgRole(mr.T(), []string{"my-user", "my-org"}, reqFactory, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetOrgRole(mr.T(), []string{"my-user"}, reqFactory, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetOrgRole(mr.T(), []string{}, reqFactory, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestSetOrgRoleRequirements", func() {
 
@@ -50,11 +49,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callSetOrgRole(mr.T(), []string{"my-user", "my-org", "my-role"}, reqFactory, userRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect(reqFactory.UserUsername).To(Equal("my-user"))
 		Expect(reqFactory.OrganizationName).To(Equal("my-org"))

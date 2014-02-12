@@ -33,10 +33,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
 		ui := callUpdateUserProvidedService(mr.T(), []string{}, reqFactory, userProvidedServiceInstanceRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callUpdateUserProvidedService(mr.T(), []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceRequirements", func() {
 
@@ -46,11 +46,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect(reqFactory.ServiceInstanceName).To(Equal("service-name"))
 	})

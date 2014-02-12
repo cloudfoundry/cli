@@ -23,15 +23,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		callEvents([]string{"my-app"}, reqFactory, eventsRepo)
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestEventsFailsWithUsage", func() {
 
 		reqFactory, eventsRepo := getEventsDependencies()
 		ui := callEvents([]string{}, reqFactory, eventsRepo)
 
-		assert.True(mr.T(), ui.FailedWithUsage)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestEventsSuccess", func() {
 

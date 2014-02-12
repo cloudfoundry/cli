@@ -26,8 +26,8 @@ var _ = Describe("AppInstancesRepo", func() {
 		appGuid := "my-cool-app-guid"
 
 		instances, err := repo.GetInstances(appGuid)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), err.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(err.IsNotSuccessful()).To(BeFalse())
 
 		Expect(len(instances)).To(Equal(2))
 

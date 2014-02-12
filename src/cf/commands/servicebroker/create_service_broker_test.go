@@ -4,7 +4,6 @@ import (
 	. "cf/commands/servicebroker"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -20,19 +19,19 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceBrokerRepo := &testapi.FakeServiceBrokerRepo{}
 
 		ui := callCreateServiceBroker(mr.T(), []string{}, reqFactory, serviceBrokerRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceBroker(mr.T(), []string{"1arg"}, reqFactory, serviceBrokerRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceBroker(mr.T(), []string{"1arg", "2arg"}, reqFactory, serviceBrokerRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceBroker(mr.T(), []string{"1arg", "2arg", "3arg"}, reqFactory, serviceBrokerRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateServiceBroker(mr.T(), []string{"1arg", "2arg", "3arg", "4arg"}, reqFactory, serviceBrokerRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateServiceBrokerRequirements", func() {
 
@@ -42,11 +41,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callCreateServiceBroker(mr.T(), args, reqFactory, serviceBrokerRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callCreateServiceBroker(mr.T(), args, reqFactory, serviceBrokerRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestCreateServiceBroker", func() {
 

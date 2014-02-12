@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -20,21 +19,21 @@ var _ = Describe("Testing with ginkgo", func() {
 		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
 
 		ui := callCreateUser(mr.T(), []string{}, defaultReqs, defaultUserRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateUser(mr.T(), defaultArgs, defaultReqs, defaultUserRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestCreateUserRequirements", func() {
 		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
 
 		callCreateUser(mr.T(), defaultArgs, defaultReqs, defaultUserRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		notLoggedInReq := &testreq.FakeReqFactory{LoginSuccess: false}
 		callCreateUser(mr.T(), defaultArgs, notLoggedInReq, defaultUserRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	It("TestCreateUser", func() {

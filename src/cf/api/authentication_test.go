@@ -23,8 +23,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
 		apiResponse := auth.Authenticate("foo@example.com", "bar")
 
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsError())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(deps.config.AuthorizationEndpoint()).To(Equal(deps.ts.URL))
 		Expect(deps.config.AccessToken()).To(Equal("BEARER my_access_token"))
 		Expect(deps.config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -37,8 +37,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
 		apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
 
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Password is incorrect, please try again."))
 		assert.Empty(mr.T(), deps.config.AccessToken())
 	})
@@ -50,8 +50,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
 		apiResponse := auth.Authenticate("foo@example.com", "bar")
 
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsError())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Server error, status code: 500, error code: , message: "))
 		assert.Empty(mr.T(), deps.config.AccessToken())
 	})
@@ -63,8 +63,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
 		apiResponse := auth.Authenticate("foo@example.com", "bar")
 
-		assert.True(mr.T(), deps.handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsError())
+		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 		assert.Empty(mr.T(), deps.config.AccessToken())
 	})

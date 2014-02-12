@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -69,8 +68,8 @@ func testGetServiceOfferings(t mr.TestingT, req testnet.TestRequest, config conf
 
 	offerings, apiResponse := repo.GetServiceOfferings()
 
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	Expect(2).To(Equal(len(offerings)))
 
 	firstOffering := offerings[0]
@@ -155,8 +154,8 @@ func testRenameService(t mr.TestingT, endpointPath string, serviceInstance model
 	defer ts.Close()
 
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
-	assert.True(t, handler.AllRequestsCalled())
-	assert.False(t, apiResponse.IsNotSuccessful())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 }
 
 func createServiceRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
@@ -223,8 +222,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(identicalAlreadyExists).To(Equal(false))
 	})
 	It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
@@ -244,8 +243,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(identicalAlreadyExists).To(Equal(true))
 	})
 	It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
@@ -265,8 +264,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(identicalAlreadyExists).To(Equal(false))
 	})
 	It("TestFindInstanceByName", func() {
@@ -276,8 +275,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		instance, apiResponse := repo.FindInstanceByName("my-service")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(instance.Name).To(Equal("my-service"))
 		Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 		Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
@@ -303,9 +302,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		_, apiResponse := repo.FindInstanceByName("my-service")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsError())
-		assert.True(mr.T(), apiResponse.IsNotFound())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
 	It("TestDeleteServiceWithoutServiceBindings", func() {
@@ -321,8 +320,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
 		apiResponse := repo.DeleteService(serviceInstance)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestDeleteServiceWithServiceBindings", func() {
 
@@ -342,7 +341,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 
 		apiResponse := repo.DeleteService(serviceInstance)
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Cannot delete service instance, apps are still bound to it"))
 	})
 	It("TestRenameService", func() {
@@ -392,7 +391,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(offering.Guid).To(Equal("offering-1-guid"))
-		assert.True(t, apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("returns an error if the offering cannot be found", func() {
@@ -410,7 +409,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}})
 
 		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		assert.True(t, apiResponse.IsNotFound())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 		Expect(offering.Guid).To(Equal(""))
 	})
 
@@ -429,7 +428,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}})
 
 		_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		assert.True(t, apiResponse.IsError())
+		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.ErrorCode).To(Equal("10005"))
 	})
 
@@ -447,7 +446,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering.Guid = "the-service-guid"
 
 		apiResponse := repo.PurgeServiceOffering(offering)
-		assert.True(t, apiResponse.IsSuccessful())
-		assert.True(t, handler.AllRequestsCalled())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 })

@@ -5,8 +5,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -65,9 +63,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		serviceInstances, apiResponse := repo.GetSummariesInCurrentSpace()
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(1).To(Equal(len(serviceInstances)))
 
 		instance1 := serviceInstances[0]

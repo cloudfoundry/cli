@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -21,8 +20,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		app, apiResponse := repo.Read("My App")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(app.Name).To(Equal("My App"))
 		Expect(app.Guid).To(Equal("app1-guid"))
 		Expect(app.Memory).To(Equal(uint64(128)))
@@ -42,9 +41,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		_, apiResponse := repo.Read("My App")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsError())
-		assert.True(mr.T(), apiResponse.IsNotFound())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
 	It("TestSetEnv", func() {
@@ -63,8 +62,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.Update("app1-guid", params)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestCreateApplication", func() {
@@ -74,8 +73,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		params := defaultAppParams()
 		createdApp, apiResponse := repo.Create(params)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		app := models.Application{}
 		app.Name = "my-cool-app"
@@ -100,8 +99,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		params.Command = nil
 
 		_, apiResponse := repo.Create(params)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestUpdateApplication", func() {
@@ -121,8 +120,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		updatedApp, apiResponse := repo.Update(app.Guid, app.ToParams())
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(updatedApp.Name).To(Equal("my-cool-app"))
 		Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
 	})
@@ -142,8 +141,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		app := models.AppParams{Command: &emptyString}
 
 		_, apiResponse := repo.Update("my-app-guid", app)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteApplication", func() {
@@ -157,8 +156,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-cool-app-guid")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })
 

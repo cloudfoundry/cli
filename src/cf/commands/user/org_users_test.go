@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -32,10 +31,10 @@ var _ = Describe("Listing users in an org", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		userRepo := &testapi.FakeUserRepository{}
 		ui := callOrgUsers([]string{}, reqFactory, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callOrgUsers([]string{"Org1"}, reqFactory, userRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestOrgUsersRequirements", func() {
@@ -45,11 +44,11 @@ var _ = Describe("Listing users in an org", func() {
 
 		reqFactory.LoginSuccess = false
 		callOrgUsers(args, reqFactory, userRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callOrgUsers(args, reqFactory, userRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect("Org1").To(Equal(reqFactory.OrganizationName))
 	})

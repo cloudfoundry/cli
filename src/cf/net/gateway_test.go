@@ -22,14 +22,14 @@ import (
 
 func testRefreshTokenWithSuccess(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	config, apiResponse := testRefreshToken(t, gateway, endpoint)
-	assert.True(t, apiResponse.IsSuccessful())
+	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
 	Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
 }
 
 func testRefreshTokenWithError(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	_, apiResponse := testRefreshToken(t, gateway, endpoint)
-	assert.False(t, apiResponse.IsSuccessful())
+	Expect(apiResponse.IsSuccessful()).To(BeFalse())
 	Expect(apiResponse.ErrorCode).To(Equal("333"))
 }
 
@@ -76,7 +76,7 @@ func testRefreshToken(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc)
 	gateway.SetTokenRefresher(auth)
 
 	request, apiResponse := gateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-	assert.False(t, apiResponse.IsNotSuccessful())
+	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 	apiResponse = gateway.PerformRequest(request)
 	return
@@ -102,7 +102,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
 		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
@@ -115,7 +115,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.NoError(mr.T(), err)
 		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(request.HttpReq.ContentLength).To(Equal(int64(12)))
 	})
 

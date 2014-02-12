@@ -5,8 +5,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -31,8 +30,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			"user":     "me",
 			"password": "secret",
 		})
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestCreateUserProvidedServiceInstanceWithSyslogDrain", func() {
 
@@ -51,8 +50,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			"user":     "me",
 			"password": "secret",
 		})
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceInstance", func() {
 
@@ -77,8 +76,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.SysLogDrainUrl = "syslog://example.com"
 
 		apiResponse := repo.Update(serviceInstance)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceInstanceWithOnlyParams", func() {
 
@@ -101,8 +100,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "my-instance-guid"
 		serviceInstance.Params = params
 		apiResponse := repo.Update(serviceInstance)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceInstanceWithOnlySysLogDrainUrl", func() {
 
@@ -119,8 +118,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "my-instance-guid"
 		serviceInstance.SysLogDrainUrl = "syslog://example.com"
 		apiResponse := repo.Update(serviceInstance)
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })
 

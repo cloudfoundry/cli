@@ -6,7 +6,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -27,13 +26,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 
 		ui := callAuthenticate([]string{}, config, auth)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callAuthenticate([]string{"my-username"}, config, auth)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callAuthenticate([]string{"my-username", "my-password"}, config, auth)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {

@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -43,10 +42,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 		ui := callCreateOrg(mr.T(), []string{}, reqFactory, orgRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateOrgRequirements", func() {
 
@@ -54,11 +53,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 		callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestCreateOrg", func() {
 

@@ -4,7 +4,7 @@ import (
 	"cf/models"
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/gomega"
 	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
@@ -24,7 +24,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		req := NewTargetedSpaceRequirement(ui, config)
 		success := req.Execute()
-		assert.True(mr.T(), success)
+		Expect(success).To(BeTrue())
 
 		config.SetSpaceFields(models.SpaceFields{})
 

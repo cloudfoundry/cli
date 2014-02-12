@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -26,17 +25,17 @@ var _ = Describe("set-env command", func() {
 
 		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		callSetEnv(args, reqFactory, appRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
 		callSetEnv(args, reqFactory, appRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		testcmd.CommandDidPassRequirements = true
 
 		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
 		callSetEnv(args, reqFactory, appRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	It("TestRunWhenApplicationExists", func() {
@@ -139,19 +138,19 @@ var _ = Describe("set-env command", func() {
 
 		args := []string{"my-app", "DATABASE_URL", "..."}
 		ui := callSetEnv(args, reqFactory, appRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		args = []string{"my-app", "DATABASE_URL"}
 		ui = callSetEnv(args, reqFactory, appRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		args = []string{"my-app"}
 		ui = callSetEnv(args, reqFactory, appRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		args = []string{}
 		ui = callSetEnv(args, reqFactory, appRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 })
 

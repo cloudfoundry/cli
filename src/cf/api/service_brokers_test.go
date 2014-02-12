@@ -6,8 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -77,8 +75,8 @@ var _ = Describe("Service Brokers Repo", func() {
 		Expect(len(serviceBrokers)).To(Equal(2))
 		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
 		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestFindServiceBrokerByName", func() {
@@ -115,8 +113,8 @@ var _ = Describe("Service Brokers Repo", func() {
 		expectedBroker.Password = "found-password"
 		expectedBroker.Guid = "found-guid"
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(foundBroker).To(Equal(expectedBroker))
 	})
 
@@ -132,8 +130,8 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		_, apiResponse := repo.FindByName("my-broker")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsNotFound())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Service Broker 'my-broker' not found"))
 	})
 
@@ -152,8 +150,8 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Create("foobroker", "http://example.com", "foouser", "password")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestUpdateServiceBroker", func() {
@@ -177,8 +175,8 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Update(serviceBroker)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestRenameServiceBroker", func() {
@@ -194,8 +192,8 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Rename("my-guid", "update-foobroker")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestDeleteServiceBroker", func() {
@@ -210,8 +208,8 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Delete("my-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 })
 

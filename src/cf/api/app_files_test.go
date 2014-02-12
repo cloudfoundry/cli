@@ -6,7 +6,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -60,8 +59,8 @@ var _ = Describe("AppFilesRepository", func() {
 		repo := NewCloudControllerAppFilesRepository(configRepo, gateway)
 		list, err := repo.ListFiles("my-app-guid", "some/path")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), err.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(err.IsNotSuccessful()).To(BeFalse())
 		Expect(list).To(Equal(expectedResponse))
 	})
 })

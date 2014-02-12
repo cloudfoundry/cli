@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -27,12 +26,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestDeleteBuildpackSuccess", func() {
 
@@ -100,7 +99,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 		Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
-		assert.True(mr.T(), buildpackRepo.FindByNameNotFound)
+		Expect(buildpackRepo.FindByNameNotFound).To(BeTrue())
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting", "my-buildpack"},

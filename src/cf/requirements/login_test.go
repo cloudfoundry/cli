@@ -3,7 +3,7 @@ package requirements_test
 import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/gomega"
 	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
@@ -18,12 +18,12 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		req := NewLoginRequirement(ui, config)
 		success := req.Execute()
-		assert.True(mr.T(), success)
+		Expect(success).To(BeTrue())
 
 		config.SetAccessToken("")
 		req = NewLoginRequirement(ui, config)
 		success = req.Execute()
-		assert.False(mr.T(), success)
+		Expect(success).To(BeFalse())
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
 	})

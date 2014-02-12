@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -132,7 +131,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui.Inputs = []string{"Yes"}
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{}), reqFactory)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
 	It("TestDeleteOrgWhenOrgDoesNotExist", func() {
