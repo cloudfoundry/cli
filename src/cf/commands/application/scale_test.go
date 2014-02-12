@@ -69,10 +69,10 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "my-app-guid")
-		assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
-		assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Memory, uint64(512))
-		assert.Equal(mr.T(), *deps.appRepo.UpdateParams.InstanceCount, 5)
+		Expect(deps.restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+		Expect(*deps.appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(5))
 	})
 	It("TestScaleOnlyInstances", func() {
 
@@ -83,9 +83,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callScale(mr.T(), []string{"-i", "5", "my-app"}, deps)
 
-		assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "")
-		assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
-		assert.Equal(mr.T(), *deps.appRepo.UpdateParams.InstanceCount, 5)
+		Expect(deps.restarter.AppToRestart.Guid).To(Equal(""))
+		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(5))
 		assert.Nil(mr.T(), deps.appRepo.UpdateParams.DiskQuota)
 		assert.Nil(mr.T(), deps.appRepo.UpdateParams.Memory)
 	})
@@ -98,9 +98,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callScale(mr.T(), []string{"-m", "512M", "my-app"}, deps)
 
-		assert.Equal(mr.T(), deps.restarter.AppToRestart.Guid, "my-app-guid")
-		assert.Equal(mr.T(), deps.appRepo.UpdateAppGuid, "my-app-guid")
-		assert.Equal(mr.T(), *deps.appRepo.UpdateParams.Memory, uint64(512))
+		Expect(deps.restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+		Expect(*deps.appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
 		assert.Nil(mr.T(), deps.appRepo.UpdateParams.DiskQuota)
 		assert.Nil(mr.T(), deps.appRepo.UpdateParams.InstanceCount)
 	})

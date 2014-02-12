@@ -26,7 +26,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(orgRepo.FindByNameName).To(Equal("my-org-name"))
-		assert.Equal(mr.T(), orgReq.GetOrganization(), org)
+		Expect(orgReq.GetOrganization()).To(Equal(org))
 	})
 
 	It("TestOrgReqWhenOrgDoesNotExist", func() {

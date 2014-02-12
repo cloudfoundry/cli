@@ -44,8 +44,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
 		ui := callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-		assert.Equal(mr.T(), *appRepo.UpdateParams.Name, "my-new-app")
+		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
+		Expect(*appRepo.UpdateParams.Name).To(Equal("my-new-app"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
 			{"OK"},

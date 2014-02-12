@@ -63,6 +63,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
 
 		Expect(stopper.AppToStop).To(Equal(app))
-		assert.Equal(mr.T(), starter.AppToStart, app)
+		Expect(starter.AppToStart).To(Equal(app))
 	})
 })

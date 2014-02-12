@@ -7,6 +7,7 @@ import (
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -82,16 +83,16 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 		}
 		defer request.MultipartForm.RemoveAll()
 
-		assert.Equal(t, len(request.MultipartForm.Value), 0, "Should have 0 values")
-		assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
+		Expect(len(request.MultipartForm.Value)).To(Equal(0), "Should have 0 values")
+		Expect(len(request.MultipartForm.File)).To(Equal(1), "Wrong number of files")
 
 		files, ok := request.MultipartForm.File["buildpack"]
 
 		assert.True(t, ok, "Buildpack file part not present")
-		assert.Equal(t, len(files), 1, "Wrong number of files")
+		Expect(len(files)).To(Equal(1), "Wrong number of files")
 
 		buildpackFile := files[0]
-		assert.Equal(t, buildpackFile.Filename, filepath.Base(pathToFile), "Wrong file name")
+		Expect(buildpackFile.Filename).To(Equal(filepath.Base(pathToFile)), "Wrong file name")
 
 		file, err := buildpackFile.Open()
 		if err != nil {
@@ -104,8 +105,8 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 			assert.Fail(t, "Error reading zip content: %s", err.Error())
 		}
 
-		assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
-		assert.Equal(t, zipReader.File[1].Mode(), uint32(0666))
+		Expect(len(zipReader.File)).To(Equal(3), "Wrong number of files in zip")
+		Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0666)))
 
 	nextFile:
 		for _, f := range zipReader.File {

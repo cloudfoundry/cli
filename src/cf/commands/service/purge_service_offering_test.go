@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"errors"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
@@ -30,11 +31,10 @@ var _ = Describe("Purging services", func() {
 
 		assert.False(t, testcmd.CommandDidPassRequirements)
 		assert.True(t, deps.ui.FailedWithUsage)
-		assert.Equal(t, deps.ui.FailedWithUsageCommandName, "purge-service-offering")
+		Expect(deps.ui.FailedWithUsageCommandName).To(Equal("purge-service-offering"))
 	})
 
 	It("works when given -p and a provider name", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		offering := maker.NewServiceOffering("the-service-name")
@@ -48,9 +48,9 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		assert.Equal(t, deps.serviceRepo.FindServiceOfferingByLabelAndProviderName, "the-service-name")
-		assert.Equal(t, deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider, "the-provider")
-		assert.Equal(t, deps.serviceRepo.PurgedServiceOffering, offering)
+		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
+		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal("the-provider"))
+		Expect(deps.serviceRepo.PurgedServiceOffering).To(Equal(offering))
 	})
 
 	It("works when not given a provider", func() {
@@ -75,9 +75,9 @@ var _ = Describe("Purging services", func() {
 			{"Really purge service", "the-service-name"},
 		})
 
-		assert.Equal(t, deps.serviceRepo.FindServiceOfferingByLabelAndProviderName, "the-service-name")
-		assert.Equal(t, deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider, "")
-		assert.Equal(t, deps.serviceRepo.PurgedServiceOffering, offering)
+		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
+		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal(""))
+		Expect(deps.serviceRepo.PurgedServiceOffering).To(Equal(offering))
 
 		testassert.SliceContains(t, deps.ui.Outputs, testassert.Lines{
 			{"OK"},
@@ -85,7 +85,6 @@ var _ = Describe("Purging services", func() {
 	})
 
 	It("exits when the user does not acknowledge the confirmation", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		deps.ui.Inputs = []string{"no"}
@@ -96,12 +95,11 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		assert.Equal(t, deps.serviceRepo.FindServiceOfferingByLabelAndProviderCalled, false)
-		assert.Equal(t, deps.serviceRepo.PurgeServiceOfferingCalled, false)
+		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderCalled).To(Equal(false))
+		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
 
 	It("does not prompt with confirmation when -f is passed", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		offering := maker.NewServiceOffering("the-service-name")
@@ -113,8 +111,8 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		assert.Equal(t, len(deps.ui.Prompts), 0)
-		assert.Equal(t, deps.serviceRepo.PurgeServiceOfferingCalled, true)
+		Expect(len(deps.ui.Prompts)).To(Equal(0))
+		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(true))
 	})
 
 	It("fails with an error message when the request fails", func() {
@@ -134,7 +132,7 @@ var _ = Describe("Purging services", func() {
 			{"oh no!"},
 		})
 
-		assert.Equal(t, deps.serviceRepo.PurgeServiceOfferingCalled, false)
+		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
 
 	It("indicates when a service doesn't exist", func() {
@@ -154,7 +152,7 @@ var _ = Describe("Purging services", func() {
 			{"Service offering", "does not exist"},
 		})
 
-		assert.Equal(t, deps.serviceRepo.PurgeServiceOfferingCalled, false)
+		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
 })
 

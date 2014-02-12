@@ -66,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 		Expect(reqFactory.UserUsername).To(Equal("username"))
-		assert.Equal(mr.T(), reqFactory.OrganizationName, "org")
+		Expect(reqFactory.OrganizationName).To(Equal("org"))
 	})
 
 	It("TestUnsetSpaceRole", func() {
@@ -89,16 +89,16 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
 
-		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgName, "my-space")
-		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
+		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
+		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("some-org-guid"))
 
 		println(ui.DumpOutputs())
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), userRepo.UnsetSpaceRoleRole, models.SPACE_MANAGER)
-		assert.Equal(mr.T(), userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
-		assert.Equal(mr.T(), userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
+		Expect(userRepo.UnsetSpaceRoleRole).To(Equal(models.SPACE_MANAGER))
+		Expect(userRepo.UnsetSpaceRoleUserGuid).To(Equal("some-user-guid"))
+		Expect(userRepo.UnsetSpaceRoleSpaceGuid).To(Equal("some-space-guid"))
 	})
 })

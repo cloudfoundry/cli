@@ -66,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestStartCommandDefaultTimeouts", func() {
 		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
 		Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
-		assert.Equal(mr.T(), cmd.StartupTimeout, 5*time.Minute)
+		Expect(cmd.StartupTimeout).To(Equal(5 * time.Minute))
 	})
 
 	It("TestStartCommandSetsTimeoutsFromEnv", func() {
@@ -80,8 +80,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		os.Setenv("CF_STAGING_TIMEOUT", "6")
 		os.Setenv("CF_STARTUP_TIMEOUT", "3")
 		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
-		assert.Equal(mr.T(), cmd.StagingTimeout, 6*time.Minute)
-		assert.Equal(mr.T(), cmd.StartupTimeout, 3*time.Minute)
+		Expect(cmd.StagingTimeout).To(Equal(6 * time.Minute))
+		Expect(cmd.StartupTimeout).To(Equal(3 * time.Minute))
 	})
 
 	It("TestStartCommandFailsWithUsage", func() {
@@ -116,9 +116,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Started"},
 		})
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
-		assert.Equal(mr.T(), displayApp.AppToDisplay, defaultAppForStart)
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+		Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
 	})
 
 	It("TestStartApplicationOnlyShowsCurrentStagingLogs", func() {
@@ -178,8 +178,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Started"},
 		})
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 	})
 
 	It("TestStartApplicationWhenAppIsStillStaging", func() {
@@ -208,7 +208,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
-		assert.Equal(mr.T(), appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
+		Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Log Line 1"},
@@ -314,7 +314,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"FAILED"},
 			{"Error updating app."},
 		})
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
+		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 	})
 
 	It("TestStartApplicationIsAlreadyStarted", func() {
@@ -337,7 +337,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"my-app", "is already started"},
 		})
 
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "")
+		Expect(appRepo.UpdateAppGuid).To(Equal(""))
 	})
 
 	It("TestStartApplicationWithLoggingFailure", func() {

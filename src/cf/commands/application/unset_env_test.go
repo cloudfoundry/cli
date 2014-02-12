@@ -54,7 +54,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
+		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
 			"foo": "bar",
 		})
@@ -92,7 +92,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-app", "DATABASE_URL"}
 		ui := callUnsetEnv(args, reqFactory, appRepo)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Removing env variable"},
 			{"OK"},

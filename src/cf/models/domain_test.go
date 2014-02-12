@@ -4,8 +4,6 @@ import (
 	. "cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -25,6 +23,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestRouteURLWithoutHost", func() {
 		route.Host = ""
-		assert.Equal(mr.T(), route.URL(), "example.com")
+		Expect(route.URL()).To(Equal("example.com"))
 	})
 })

@@ -22,7 +22,7 @@ func testManifestWithAbsolutePathOnPosix(t mr.TestingT) {
 	}))
 
 	assert.NoError(t, err)
-	assert.Equal(t, *m.Applications[0].Path, "/another/path-segment")
+	Expect(*m.Applications[0].Path).To(Equal("/another/path-segment"))
 }
 
 func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
@@ -35,7 +35,7 @@ func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
 	}))
 
 	assert.NoError(t, err)
-	assert.Equal(t, *m.Applications[0].Path, `C:\another\path`)
+	Expect(*m.Applications[0].Path).To(Equal(`C:\another\path`))
 }
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -54,7 +54,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apps := m.Applications
 		Expect(*apps[0].InstanceCount).To(Equal(3))
-		assert.Equal(mr.T(), *apps[0].Memory, uint64(512))
+		Expect(*apps[0].Memory).To(Equal(uint64(512)))
 		assert.True(mr.T(), *apps[0].NoRoute)
 	})
 
@@ -84,7 +84,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		assert.NoError(mr.T(), err)
-		assert.Equal(mr.T(), *m.Applications[0].HealthCheckTimeout, 360)
+		Expect(*m.Applications[0].HealthCheckTimeout).To(Equal(360))
 	})
 
 	It("TestManifestWithEmptyEnvVarIsInvalid", func() {
@@ -122,9 +122,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.NoError(mr.T(), err)
 		if runtime.GOOS == "windows" {
-			assert.Equal(mr.T(), *m.Applications[0].Path, "\\some\\another\\path-segment")
+			Expect(*m.Applications[0].Path).To(Equal("\\some\\another\\path-segment"))
 		} else {
-			assert.Equal(mr.T(), *m.Applications[0].Path, "/some/another/path-segment")
+			Expect(*m.Applications[0].Path).To(Equal("/some/another/path-segment"))
 		}
 	})
 
@@ -184,7 +184,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		assert.NoError(mr.T(), err)
-		assert.Equal(mr.T(), *m.Applications[0].Command, "")
+		Expect(*m.Applications[0].Command).To(Equal(""))
 	})
 
 	It("TestParsingEmptyManifestDoesNotSetCommand", func() {

@@ -76,7 +76,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "")
+		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal(""))
 
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"delete", "my-buildpack"},
@@ -99,7 +99,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteBuildpack(ui, buildpackRepo)
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), buildpackRepo.FindByNameName, "my-buildpack")
+		Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
 		assert.True(mr.T(), buildpackRepo.FindByNameNotFound)
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
@@ -126,7 +126,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting buildpack", "my-buildpack"},
@@ -152,9 +152,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), buildpackRepo.DeleteBuildpackGuid, "my-buildpack-guid")
+		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting buildpack", "my-buildpack"},
 			{"OK"},

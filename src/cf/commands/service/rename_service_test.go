@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), fakeServiceRepo.RenameServiceServiceInstance, serviceInstance)
-		assert.Equal(mr.T(), fakeServiceRepo.RenameServiceNewName, "new-name")
+		Expect(fakeServiceRepo.RenameServiceServiceInstance).To(Equal(serviceInstance))
+		Expect(fakeServiceRepo.RenameServiceNewName).To(Equal("new-name"))
 	})
 })

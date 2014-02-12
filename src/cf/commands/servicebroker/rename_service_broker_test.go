@@ -73,7 +73,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), repo.RenamedServiceBrokerGuid, "my-found-broker-guid")
-		assert.Equal(mr.T(), repo.RenamedServiceBrokerName, "my-new-broker")
+		Expect(repo.RenamedServiceBrokerGuid).To(Equal("my-found-broker-guid"))
+		Expect(repo.RenamedServiceBrokerName).To(Equal("my-new-broker"))
 	})
 })

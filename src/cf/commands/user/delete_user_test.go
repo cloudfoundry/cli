@@ -91,7 +91,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui, userRepo := deleteWithConfirmation(mr.T(), "Y")
 
 		Expect(len(ui.Outputs)).To(Equal(2))
-		assert.Equal(mr.T(), len(ui.Prompts), 1)
+		Expect(len(ui.Prompts)).To(Equal(1))
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Really delete", "my-user"},
 		})
@@ -100,15 +100,15 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
-		assert.Equal(mr.T(), userRepo.DeleteUserGuid, "my-found-user-guid")
+		Expect(userRepo.FindByUsernameUsername).To(Equal("my-user"))
+		Expect(userRepo.DeleteUserGuid).To(Equal("my-found-user-guid"))
 	})
 
 	It("TestDeleteUserWhenConfirmingWithYes", func() {
 		ui, userRepo := deleteWithConfirmation(mr.T(), "Yes")
 
-		assert.Equal(mr.T(), len(ui.Outputs), 2)
-		assert.Equal(mr.T(), len(ui.Prompts), 1)
+		Expect(len(ui.Outputs)).To(Equal(2))
+		Expect(len(ui.Prompts)).To(Equal(1))
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Really delete", "my-user"},
 		})
@@ -117,18 +117,18 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
-		assert.Equal(mr.T(), userRepo.DeleteUserGuid, "my-found-user-guid")
+		Expect(userRepo.FindByUsernameUsername).To(Equal("my-user"))
+		Expect(userRepo.DeleteUserGuid).To(Equal("my-found-user-guid"))
 	})
 
 	It("TestDeleteUserWhenNotConfirming", func() {
 		ui, userRepo := deleteWithConfirmation(mr.T(), "Nope")
 
-		assert.Equal(mr.T(), len(ui.Outputs), 0)
+		Expect(len(ui.Outputs)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{{"Really delete"}})
 
-		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "")
-		assert.Equal(mr.T(), userRepo.DeleteUserGuid, "")
+		Expect(userRepo.FindByUsernameUsername).To(Equal(""))
+		Expect(userRepo.DeleteUserGuid).To(Equal(""))
 	})
 
 	It("TestDeleteUserWithForceOption", func() {
@@ -139,15 +139,15 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteUser(mr.T(), []string{"-f", "my-user"}, userRepo, reqFactory)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 2)
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Outputs)).To(Equal(2))
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting user", "my-user"},
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
-		assert.Equal(mr.T(), userRepo.DeleteUserGuid, "my-found-user-guid")
+		Expect(userRepo.FindByUsernameUsername).To(Equal("my-user"))
+		Expect(userRepo.DeleteUserGuid).To(Equal("my-found-user-guid"))
 	})
 
 	It("TestDeleteUserWhenUserNotFound", func() {
@@ -156,15 +156,15 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteUser(mr.T(), []string{"-f", "my-user"}, userRepo, reqFactory)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Outputs)).To(Equal(3))
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting user", "my-user"},
 			{"OK"},
 			{"my-user", "does not exist"},
 		})
 
-		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "my-user")
-		assert.Equal(mr.T(), userRepo.DeleteUserGuid, "")
+		Expect(userRepo.FindByUsernameUsername).To(Equal("my-user"))
+		Expect(userRepo.DeleteUserGuid).To(Equal(""))
 	})
 })

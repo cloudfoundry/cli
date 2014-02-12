@@ -61,9 +61,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(serviceBrokerRepo.CreateName).To(Equal("my-broker"))
-		assert.Equal(mr.T(), serviceBrokerRepo.CreateUrl, "http://example.com")
-		assert.Equal(mr.T(), serviceBrokerRepo.CreateUsername, "my username")
-		assert.Equal(mr.T(), serviceBrokerRepo.CreatePassword, "my password")
+		Expect(serviceBrokerRepo.CreateUrl).To(Equal("http://example.com"))
+		Expect(serviceBrokerRepo.CreateUsername).To(Equal("my username"))
+		Expect(serviceBrokerRepo.CreatePassword).To(Equal("my password"))
 	})
 })
 

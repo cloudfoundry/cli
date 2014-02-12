@@ -69,8 +69,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui, _, repo := deleteServiceBroker(mr.T(), "y", []string{"service-broker-to-delete"})
 
 		Expect(repo.FindByNameName).To(Equal("service-broker-to-delete"))
-		assert.Equal(mr.T(), repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
-		assert.Equal(mr.T(), len(ui.Outputs), 2)
+		Expect(repo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
+		Expect(len(ui.Outputs)).To(Equal(2))
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Really delete", "service-broker-to-delete"},
 		})
@@ -83,9 +83,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, repo := deleteServiceBroker(mr.T(), "Yes", []string{"service-broker-to-delete"})
 
-		assert.Equal(mr.T(), repo.FindByNameName, "service-broker-to-delete")
-		assert.Equal(mr.T(), repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
-		assert.Equal(mr.T(), len(ui.Outputs), 2)
+		Expect(repo.FindByNameName).To(Equal("service-broker-to-delete"))
+		Expect(repo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
+		Expect(len(ui.Outputs)).To(Equal(2))
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Really delete", "service-broker-to-delete"},
 		})
@@ -105,10 +105,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := &testapi.FakeServiceBrokerRepo{FindByNameServiceBroker: serviceBroker}
 		ui := callDeleteServiceBroker(mr.T(), []string{"-f", "service-broker-to-delete"}, reqFactory, repo)
 
-		assert.Equal(mr.T(), repo.FindByNameName, "service-broker-to-delete")
-		assert.Equal(mr.T(), repo.DeletedServiceBrokerGuid, "service-broker-to-delete-guid")
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
-		assert.Equal(mr.T(), len(ui.Outputs), 2)
+		Expect(repo.FindByNameName).To(Equal("service-broker-to-delete"))
+		Expect(repo.DeletedServiceBrokerGuid).To(Equal("service-broker-to-delete-guid"))
+		Expect(len(ui.Prompts)).To(Equal(0))
+		Expect(len(ui.Outputs)).To(Equal(2))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting service broker", "service-broker-to-delete", "my-user"},
 			{"OK"},
@@ -120,8 +120,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := &testapi.FakeServiceBrokerRepo{FindByNameNotFound: true}
 		ui := callDeleteServiceBroker(mr.T(), []string{"-f", "service-broker-to-delete"}, reqFactory, repo)
 
-		assert.Equal(mr.T(), repo.FindByNameName, "service-broker-to-delete")
-		assert.Equal(mr.T(), repo.DeletedServiceBrokerGuid, "")
+		Expect(repo.FindByNameName).To(Equal("service-broker-to-delete"))
+		Expect(repo.DeletedServiceBrokerGuid).To(Equal(""))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting service broker", "service-broker-to-delete"},
 			{"OK"},

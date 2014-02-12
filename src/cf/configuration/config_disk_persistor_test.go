@@ -34,9 +34,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			assert.NoError(mr.T(), err)
 
 			Expect(configData.Target).To(Equal(""))
-			assert.Equal(mr.T(), configData.ApiVersion, "")
-			assert.Equal(mr.T(), configData.AuthorizationEndpoint, "")
-			assert.Equal(mr.T(), configData.AccessToken, "")
+			Expect(configData.ApiVersion).To(Equal(""))
+			Expect(configData.AuthorizationEndpoint).To(Equal(""))
+			Expect(configData.AccessToken).To(Equal(""))
 		})
 	})
 
@@ -56,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			savedConfig, err := repo.Load()
 			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), savedConfig, configData)
+			Expect(savedConfig).To(Equal(configData))
 		})
 	})
 
@@ -66,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			configData, err := repo.Load()
 
 			assert.NoError(mr.T(), err)
-			assert.Equal(mr.T(), configData.Target, "")
+			Expect(configData.Target).To(Equal(""))
 		})
 	})
 })

@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 		Expect(stack.Name).To(Equal("custom-linux"))
-		assert.Equal(mr.T(), stack.Guid, "custom-linux-guid")
+		Expect(stack.Guid).To(Equal("custom-linux-guid"))
 	})
 
 	It("TestStacksFindByNameNotFound", func() {
@@ -99,9 +99,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		stacks, apiResponse := repo.FindAll()
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), len(stacks), 2)
-		assert.Equal(mr.T(), stacks[0].Name, "lucid64")
-		assert.Equal(mr.T(), stacks[0].Guid, "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6")
+		Expect(len(stacks)).To(Equal(2))
+		Expect(stacks[0].Name).To(Equal("lucid64"))
+		Expect(stacks[0].Guid).To(Equal("50688ae5-9bfc-4bf6-a4bf-caadb21a32c6"))
 	})
 })
 

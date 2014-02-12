@@ -63,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			assert.Contains(mr.T(), byteString, "hello world")
 
 			result, _ = ioutil.ReadAll(stdOut)
-			assert.Equal(mr.T(), string(result), "")
+			Expect(string(result)).To(Equal(""))
 		})
 	})
 	It("TestTraceSetToInvalidFile", func() {
@@ -83,7 +83,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				logger.Print("hello world")
 
 				result, _ := ioutil.ReadAll(file)
-				assert.Equal(mr.T(), string(result), "")
+				Expect(string(result)).To(Equal(""))
 
 				result, _ = ioutil.ReadAll(stdOut)
 				assert.Contains(mr.T(), string(result), "hello world")

@@ -38,7 +38,7 @@ var _ = Describe("Unmap Route Command", func() {
 		callUnmapRoute([]string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo)
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.Equal(mr.T(), reqFactory.DomainName, "my-domain.com")
+		Expect(reqFactory.DomainName).To(Equal("my-domain.com"))
 	})
 
 	It("TestUnmapRouteWhenUnbinding", func() {
@@ -68,8 +68,8 @@ var _ = Describe("Unmap Route Command", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), routeRepo.UnboundRouteGuid, "my-route-guid")
-		assert.Equal(mr.T(), routeRepo.UnboundAppGuid, "my-app-guid")
+		Expect(routeRepo.UnboundRouteGuid).To(Equal("my-route-guid"))
+		Expect(routeRepo.UnboundAppGuid).To(Equal("my-app-guid"))
 	})
 })
 

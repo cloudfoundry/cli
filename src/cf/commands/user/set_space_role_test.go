@@ -71,7 +71,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 		Expect(reqFactory.UserUsername).To(Equal("username"))
-		assert.Equal(mr.T(), reqFactory.OrganizationName, "org")
+		Expect(reqFactory.OrganizationName).To(Equal("org"))
 	})
 	It("TestSetSpaceRole", func() {
 
@@ -100,11 +100,11 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgName, "some-space")
-		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgOrgGuid, "my-org-guid")
+		Expect(spaceRepo.FindByNameInOrgName).To(Equal("some-space"))
+		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("my-org-guid"))
 
-		assert.Equal(mr.T(), userRepo.SetSpaceRoleUserGuid, "my-user-guid")
-		assert.Equal(mr.T(), userRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-		assert.Equal(mr.T(), userRepo.SetSpaceRoleRole, models.SPACE_MANAGER)
+		Expect(userRepo.SetSpaceRoleUserGuid).To(Equal("my-user-guid"))
+		Expect(userRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
+		Expect(userRepo.SetSpaceRoleRole).To(Equal(models.SPACE_MANAGER))
 	})
 })

@@ -113,7 +113,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Path:   "/v2/endpoint",
 			Matcher: func(t mr.TestingT, req *http.Request) {
 				Expect(req.Header.Get("content-type")).To(Equal("ascii/cats"))
-				assert.Equal(mr.T(), req.Header.Get("x-something-else"), "5")
+				Expect(req.Header.Get("x-something-else")).To(Equal("5"))
 			},
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,

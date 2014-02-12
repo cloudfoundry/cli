@@ -9,6 +9,7 @@ import (
 	"fileutils"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -129,23 +130,23 @@ var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 	}
 	defer request.MultipartForm.RemoveAll()
 
-	assert.Equal(t, len(request.MultipartForm.Value), 1, "Should have 1 value")
+	Expect(len(request.MultipartForm.Value)).To(Equal(1), "Should have 1 value")
 	valuePart, ok := request.MultipartForm.Value["resources"]
 	assert.True(t, ok, "Resource manifest not present")
-	assert.Equal(t, len(valuePart), 1, "Wrong number of values")
+	Expect(len(valuePart)).To(Equal(1), "Wrong number of values")
 
 	resourceManifest := valuePart[0]
 	chompedResourceManifest := strings.Replace(resourceManifest, "\n", "", -1)
-	assert.Equal(t, chompedResourceManifest, matchedResources, "Resources do not match")
+	Expect(chompedResourceManifest).To(Equal(matchedResources), "Resources do not match")
 
-	assert.Equal(t, len(request.MultipartForm.File), 1, "Wrong number of files")
+	Expect(len(request.MultipartForm.File)).To(Equal(1), "Wrong number of files")
 
 	fileHeaders, ok := request.MultipartForm.File["application"]
 	assert.True(t, ok, "Application file part not present")
-	assert.Equal(t, len(fileHeaders), 1, "Wrong number of files")
+	Expect(len(fileHeaders)).To(Equal(1), "Wrong number of files")
 
 	applicationFile := fileHeaders[0]
-	assert.Equal(t, applicationFile.Filename, "application.zip", "Wrong file name")
+	Expect(applicationFile.Filename).To(Equal("application.zip"), "Wrong file name")
 
 	file, err := applicationFile.Open()
 	if err != nil {
@@ -165,8 +166,8 @@ var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 		return
 	}
 
-	assert.Equal(t, len(zipReader.File), 3, "Wrong number of files in zip")
-	assert.Equal(t, zipReader.File[0].Mode(), uint32(expectedPermissionBits))
+	Expect(len(zipReader.File)).To(Equal(3), "Wrong number of files in zip")
+	Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(expectedPermissionBits)))
 
 nextFile:
 	for _, f := range zipReader.File {
@@ -218,9 +219,9 @@ func testUploadApp(t mr.TestingT, dir string, requests []testnet.TestRequest) (a
 		reportedFileCount = fileCount
 	})
 
-	assert.Equal(t, reportedPath, dir)
-	assert.Equal(t, reportedFileCount, uint64(len(expectedApplicationContent)))
-	assert.Equal(t, reportedUploadSize, uint64(759))
+	Expect(reportedPath).To(Equal(dir))
+	Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
+	Expect(reportedUploadSize).To(Equal(uint64(759)))
 	assert.True(t, handler.AllRequestsCalled())
 
 	return

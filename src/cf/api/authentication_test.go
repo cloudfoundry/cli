@@ -26,8 +26,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsError())
 		Expect(deps.config.AuthorizationEndpoint()).To(Equal(deps.ts.URL))
-		assert.Equal(mr.T(), deps.config.AccessToken(), "BEARER my_access_token")
-		assert.Equal(mr.T(), deps.config.RefreshToken(), "my_refresh_token")
+		Expect(deps.config.AccessToken()).To(Equal("BEARER my_access_token"))
+		Expect(deps.config.RefreshToken()).To(Equal("my_refresh_token"))
 	})
 
 	It("TestUnsuccessfullyLoggingIn", func() {
@@ -39,7 +39,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), apiResponse.Message, "Password is incorrect, please try again.")
+		Expect(apiResponse.Message).To(Equal("Password is incorrect, please try again."))
 		assert.Empty(mr.T(), deps.config.AccessToken())
 	})
 
@@ -52,7 +52,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsError())
-		assert.Equal(mr.T(), apiResponse.Message, "Server error, status code: 500, error code: , message: ")
+		Expect(apiResponse.Message).To(Equal("Server error, status code: 500, error code: , message: "))
 		assert.Empty(mr.T(), deps.config.AccessToken())
 	})
 
@@ -65,7 +65,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsError())
-		assert.Equal(mr.T(), apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
+		Expect(apiResponse.Message).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 		assert.Empty(mr.T(), deps.config.AccessToken())
 	})
 })
@@ -100,10 +100,10 @@ var successfulLoginMatcher = func(t mr.TestingT, request *http.Request) {
 		return
 	}
 
-	assert.Equal(t, request.Form.Get("username"), "foo@example.com", "Username did not match.")
-	assert.Equal(t, request.Form.Get("password"), "bar", "Password did not match.")
-	assert.Equal(t, request.Form.Get("grant_type"), "password", "Grant type did not match.")
-	assert.Equal(t, request.Form.Get("scope"), "", "Scope did not mathc.")
+	Expect(request.Form.Get("username")).To(Equal("foo@example.com"), "Username did not match.")
+	Expect(request.Form.Get("password")).To(Equal("bar"), "Password did not match.")
+	Expect(request.Form.Get("grant_type")).To(Equal("password"), "Grant type did not match.")
+	Expect(request.Form.Get("scope")).To(Equal(""), "Scope did not mathc.")
 }
 
 var unsuccessfulLoginRequest = testnet.TestRequest{

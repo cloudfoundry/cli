@@ -75,8 +75,8 @@ var _ = Describe("Service Brokers Repo", func() {
 		})
 
 		Expect(len(serviceBrokers)).To(Equal(2))
-		assert.Equal(mr.T(), serviceBrokers[0].Guid, "found-guid-1")
-		assert.Equal(mr.T(), serviceBrokers[1].Guid, "found-guid-2")
+		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
+		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 	})
@@ -117,7 +117,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), foundBroker, expectedBroker)
+		Expect(foundBroker).To(Equal(expectedBroker))
 	})
 
 	It("TestFindServiceBrokerByNameWheNotFound", func() {
@@ -134,7 +134,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsNotFound())
-		assert.Equal(mr.T(), apiResponse.Message, "Service Broker 'my-broker' not found")
+		Expect(apiResponse.Message).To(Equal("Service Broker 'my-broker' not found"))
 	})
 
 	It("TestCreateServiceBroker", func() {

@@ -82,8 +82,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
-		assert.Equal(mr.T(), authTokenRepo.FindByLabelAndProviderProvider, "a provider")
-		assert.Equal(mr.T(), authTokenRepo.UpdatedServiceAuthTokenFields, expectedAuthToken)
-		assert.Equal(mr.T(), authTokenRepo.UpdatedServiceAuthTokenFields, expectedAuthToken)
+		Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
+		Expect(authTokenRepo.UpdatedServiceAuthTokenFields).To(Equal(expectedAuthToken))
+		Expect(authTokenRepo.UpdatedServiceAuthTokenFields).To(Equal(expectedAuthToken))
 	})
 })

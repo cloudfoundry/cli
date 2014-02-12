@@ -105,10 +105,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal("my-space"))
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, "my-org-guid")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, models.SPACE_DEVELOPER)
+		Expect(defaultSpaceRepo.CreateSpaceOrgGuid).To(Equal("my-org-guid"))
+		Expect(defaultUserRepo.SetSpaceRoleUserGuid).To(Equal("my-user-guid"))
+		Expect(defaultUserRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
+		Expect(defaultUserRepo.SetSpaceRoleRole).To(Equal(models.SPACE_DEVELOPER))
 	})
 	It("TestCreateSpaceInOrg", func() {
 
@@ -127,11 +127,11 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"TIP"},
 		})
 
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "my-space")
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, org.Guid)
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "my-user-guid")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "my-space-guid")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleRole, models.SPACE_DEVELOPER)
+		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal("my-space"))
+		Expect(defaultSpaceRepo.CreateSpaceOrgGuid).To(Equal(org.Guid))
+		Expect(defaultUserRepo.SetSpaceRoleUserGuid).To(Equal("my-user-guid"))
+		Expect(defaultUserRepo.SetSpaceRoleSpaceGuid).To(Equal("my-space-guid"))
+		Expect(defaultUserRepo.SetSpaceRoleRole).To(Equal(models.SPACE_DEVELOPER))
 	})
 	It("TestCreateSpaceInOrgWhenTheOrgDoesNotExist", func() {
 
@@ -146,7 +146,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"cool-organization", "does not exist"},
 		})
 
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")
+		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal(""))
 	})
 	It("TestCreateSpaceInOrgWhenErrorFindingOrg", func() {
 
@@ -161,7 +161,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"error"},
 		})
 
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")
+		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal(""))
 	})
 	It("TestCreateSpaceWhenItAlreadyExists", func() {
 
@@ -178,9 +178,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Assigning", "my-user", "my-space", models.SpaceRoleToUserInput[models.SPACE_MANAGER]},
 		})
 
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceName, "")
-		assert.Equal(mr.T(), defaultSpaceRepo.CreateSpaceOrgGuid, "")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleUserGuid, "")
-		assert.Equal(mr.T(), defaultUserRepo.SetSpaceRoleSpaceGuid, "")
+		Expect(defaultSpaceRepo.CreateSpaceName).To(Equal(""))
+		Expect(defaultSpaceRepo.CreateSpaceOrgGuid).To(Equal(""))
+		Expect(defaultUserRepo.SetSpaceRoleUserGuid).To(Equal(""))
+		Expect(defaultUserRepo.SetSpaceRoleSpaceGuid).To(Equal(""))
 	})
 })

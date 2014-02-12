@@ -60,8 +60,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"file 2"},
 		})
 
-		assert.Equal(mr.T(), appFilesRepo.AppGuid, "my-app-guid")
-		assert.Equal(mr.T(), appFilesRepo.Path, "/foo")
+		Expect(appFilesRepo.AppGuid).To(Equal("my-app-guid"))
+		Expect(appFilesRepo.Path).To(Equal("/foo"))
 	})
 	It("TestListingFilesWithTemplateTokens", func() {
 

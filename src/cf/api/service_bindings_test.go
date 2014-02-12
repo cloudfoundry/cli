@@ -99,7 +99,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
-		assert.Equal(mr.T(), handler.CallCount, 0)
+		Expect(handler.CallCount).To(Equal(0))
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		assert.False(mr.T(), found)
 	})

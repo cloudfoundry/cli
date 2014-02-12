@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Deleting space", "space-to-delete", "my-org", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
+		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
 	})
 
 	It("TestDeleteSpaceConfirmingWithYes", func() {
@@ -81,19 +81,19 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Deleting space", "space-to-delete", "my-org", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
+		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
 	})
 
 	It("TestDeleteSpaceWithForceOption", func() {
 
 		ui, spaceRepo := deleteSpace(mr.T(), []string{}, []string{"-f", "space-to-delete"}, defaultDeleteSpaceReqFactory())
 
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting", "space-to-delete"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), spaceRepo.DeletedSpaceGuid, "space-to-delete-guid")
+		Expect(spaceRepo.DeletedSpaceGuid).To(Equal("space-to-delete-guid"))
 	})
 
 	It("TestDeleteSpaceWhenSpaceIsTargeted", func() {
@@ -110,7 +110,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteSpace(ui, config, spaceRepo)
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), config.HasSpace(), false)
+		Expect(config.HasSpace()).To(Equal(false))
 	})
 
 	It("TestDeleteSpaceWhenSpaceNotTargeted", func() {
@@ -130,7 +130,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteSpace(ui, config, spaceRepo)
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		assert.Equal(mr.T(), config.HasSpace(), true)
+		Expect(config.HasSpace()).To(Equal(true))
 	})
 
 	It("TestDeleteSpaceCommandWith", func() {

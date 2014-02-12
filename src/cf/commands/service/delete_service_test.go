@@ -65,7 +65,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), serviceRepo.DeleteServiceServiceInstance, serviceInstance)
+		Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
 	})
 	It("TestDeleteServiceCommandOnNonExistentService", func() {
 
@@ -97,7 +97,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteService(mr.T(), "", []string{"-f", "foo.com"}, reqFactory, serviceRepo)
 
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting service", "foo.com"},
 			{"OK"},

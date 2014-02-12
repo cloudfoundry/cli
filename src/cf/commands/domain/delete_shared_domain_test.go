@@ -52,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.domainRepo.FindByNameInOrgApiResponse = net.NewApiResponseWithMessage("couldn't find the droids you're lookin for")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
-		assert.Equal(mr.T(), deps.domainRepo.DeleteDomainGuid, "")
+		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"FAILED"},
@@ -66,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.domainRepo.DeleteSharedApiResponse = net.NewApiResponseWithMessage("failed badly")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
-		assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
+		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"FAILED"},
@@ -79,7 +79,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps := getDeleteSharedDomainDeps()
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
-		assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
+		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"shared", "foo.com"},
 		})
@@ -93,8 +93,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps := getDeleteSharedDomainDeps()
 		ui := callDeleteSharedDomain([]string{"-f", "foo.com"}, []string{}, deps)
 
-		assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},

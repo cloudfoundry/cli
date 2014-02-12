@@ -43,16 +43,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"TIP"},
 		})
-		assert.Equal(mr.T(), serviceBindingRepo.CreateServiceInstanceGuid, "my-service-guid")
-		assert.Equal(mr.T(), serviceBindingRepo.CreateApplicationGuid, "my-app-guid")
+		Expect(serviceBindingRepo.CreateServiceInstanceGuid).To(Equal("my-service-guid"))
+		Expect(serviceBindingRepo.CreateApplicationGuid).To(Equal("my-app-guid"))
 	})
 	It("TestBindCommandIfServiceIsAlreadyBound", func() {
 
@@ -69,7 +69,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
 		ui := callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Binding service"},
 			{"OK"},

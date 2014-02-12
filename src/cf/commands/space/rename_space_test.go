@@ -68,7 +68,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), spaceRepo.RenameSpaceGuid, "my-space-guid")
-		assert.Equal(mr.T(), spaceRepo.RenameNewName, "my-new-space")
+		Expect(spaceRepo.RenameSpaceGuid).To(Equal("my-space-guid"))
+		Expect(spaceRepo.RenameNewName).To(Equal("my-new-space"))
 	})
 })

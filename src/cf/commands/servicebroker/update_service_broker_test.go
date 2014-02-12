@@ -88,6 +88,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		expectedServiceBroker.Url = "new-url"
 		expectedServiceBroker.Guid = "my-found-broker-guid"
 
-		assert.Equal(mr.T(), repo.UpdatedServiceBroker, expectedServiceBroker)
+		Expect(repo.UpdatedServiceBroker).To(Equal(expectedServiceBroker))
 	})
 })

@@ -46,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
+		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 	})
 	It("TestStopApplicationWhenStopFails", func() {
 
@@ -63,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"FAILED"},
 			{"Error updating app."},
 		})
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "my-app-guid")
+		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 	})
 	It("TestStopApplicationIsAlreadyStopped", func() {
 
@@ -79,7 +79,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"my-app", "is already stopped"},
 		})
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, "")
+		Expect(appRepo.UpdateAppGuid).To(Equal(""))
 	})
 	It("TestApplicationStopReturnsUpdatedApp", func() {
 
@@ -98,7 +98,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		actualStoppedApp, err := stopper.ApplicationStop(appToStop)
 
 		assert.NoError(mr.T(), err)
-		assert.Equal(mr.T(), expectedStoppedApp, actualStoppedApp)
+		Expect(expectedStoppedApp).To(Equal(actualStoppedApp))
 	})
 	It("TestApplicationStopReturnsUpdatedAppWhenAppIsAlreadyStopped", func() {
 
@@ -112,7 +112,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		updatedApp, err := stopper.ApplicationStop(appToStop)
 
 		assert.NoError(mr.T(), err)
-		assert.Equal(mr.T(), appToStop, updatedApp)
+		Expect(appToStop).To(Equal(updatedApp))
 	})
 })
 

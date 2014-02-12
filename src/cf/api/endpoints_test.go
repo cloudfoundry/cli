@@ -99,10 +99,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo.UpdateEndpoint(ts.URL)
 
 		Expect(config.AccessToken()).To(Equal(""))
-		assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
-		assert.Equal(mr.T(), config.LoggregatorEndpoint(), "wss://loggregator.foo.example.org:4443")
-		assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)
-		assert.Equal(mr.T(), config.ApiVersion(), "42.0.0")
+		Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
+		Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.foo.example.org:4443"))
+		Expect(config.ApiEndpoint()).To(Equal(ts.URL))
+		Expect(config.ApiVersion()).To(Equal("42.0.0"))
 		assert.False(mr.T(), config.HasOrganization())
 		assert.False(mr.T(), config.HasSpace())
 	})
@@ -127,10 +127,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		repo.UpdateEndpoint(ts.URL)
 
-		assert.Equal(mr.T(), config.OrganizationFields(), org)
-		assert.Equal(mr.T(), config.SpaceFields(), space)
-		assert.Equal(mr.T(), config.AccessToken(), "some access token")
-		assert.Equal(mr.T(), config.RefreshToken(), "some refresh token")
+		Expect(config.OrganizationFields()).To(Equal(org))
+		Expect(config.SpaceFields()).To(Equal(space))
+		Expect(config.AccessToken()).To(Equal("some access token"))
+		Expect(config.RefreshToken()).To(Equal("some refresh token"))
 	})
 
 	It("TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpsEndpointExists", func() {
@@ -139,14 +139,14 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		schemelessURL := strings.Replace(ts.URL, "https://", "", 1)
 		endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
-		assert.Equal(mr.T(), "https://"+schemelessURL, endpoint)
+		Expect("https://" + schemelessURL).To(Equal(endpoint))
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
-		assert.Equal(mr.T(), config.AccessToken(), "")
-		assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
-		assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)
-		assert.Equal(mr.T(), config.ApiVersion(), "42.0.0")
+		Expect(config.AccessToken()).To(Equal(""))
+		Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
+		Expect(config.ApiEndpoint()).To(Equal(ts.URL))
+		Expect(config.ApiVersion()).To(Equal("42.0.0"))
 	})
 
 	It("TestUpdateEndpointWhenUrlIsMissingSchemeAndHttpEndpointExists", func() {
@@ -156,14 +156,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		schemelessURL := strings.Replace(ts.URL, "http://", "", 1)
 
 		endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
-		assert.Equal(mr.T(), "http://"+schemelessURL, endpoint)
+		Expect("http://" + schemelessURL).To(Equal(endpoint))
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
-		assert.Equal(mr.T(), config.AccessToken(), "")
-		assert.Equal(mr.T(), config.AuthorizationEndpoint(), "https://login.example.com")
-		assert.Equal(mr.T(), config.ApiEndpoint(), ts.URL)
-		assert.Equal(mr.T(), config.ApiVersion(), "42.0.0")
+		Expect(config.AccessToken()).To(Equal(""))
+		Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
+		Expect(config.ApiEndpoint()).To(Equal(ts.URL))
+		Expect(config.ApiVersion()).To(Equal("42.0.0"))
 	})
 
 	It("TestUpdateEndpointWhenEndpointReturns404", func() {
@@ -195,7 +195,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		endpoint, apiResponse := repo.GetCloudControllerEndpoint()
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), endpoint, "http://api.example.com")
+		Expect(endpoint).To(Equal("http://api.example.com"))
 	})
 
 	It("TestGetLoggregatorEndpoint", func() {
@@ -206,7 +206,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), endpoint, "wss://loggregator.example.com:4443")
+		Expect(endpoint).To(Equal("wss://loggregator.example.com:4443"))
 	})
 
 	Describe("when the loggregator endpoint is not saved in the config (old CC)", func() {
@@ -221,7 +221,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), endpoint, "wss://loggregator.run.pivotal.io:4443")
+			Expect(endpoint).To(Equal("wss://loggregator.run.pivotal.io:4443"))
 		})
 
 		It("extrapolates the loggregator URL based on the API URL (non-SSL API)", func() {
@@ -231,7 +231,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), endpoint, "ws://loggregator.run.pivotal.io:80")
+			Expect(endpoint).To(Equal("ws://loggregator.run.pivotal.io:80"))
 		})
 	})
 
@@ -244,7 +244,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		endpoint, apiResponse := repo.GetUAAEndpoint()
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), endpoint, "https://uaa.example.com")
+		Expect(endpoint).To(Equal("https://uaa.example.com"))
 	})
 
 	It("TestEndpointsReturnAnErrorWhenMissing", func() {

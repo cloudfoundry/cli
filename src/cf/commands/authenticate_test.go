@@ -79,10 +79,10 @@ func testSuccessfulAuthenticate(t mr.TestingT, args []string) (ui *testterm.Fake
 		{"OK"},
 	})
 
-	assert.Equal(t, config.AccessToken(), "my_access_token")
-	assert.Equal(t, config.RefreshToken(), "my_refresh_token")
-	assert.Equal(t, auth.Email, "user@example.com")
-	assert.Equal(t, auth.Password, "password")
+	Expect(config.AccessToken()).To(Equal("my_access_token"))
+	Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
+	Expect(auth.Email).To(Equal("user@example.com"))
+	Expect(auth.Password).To(Equal("password"))
 
 	return
 }

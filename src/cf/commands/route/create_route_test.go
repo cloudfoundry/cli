@@ -77,8 +77,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceDomainGuid, "domain-guid")
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
+		Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+		Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
 	})
 
 	It("is idempotent", func() {
@@ -121,9 +121,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"host.example.com", "already exists"},
 		})
 
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceHost, "host")
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceDomainGuid, "domain-guid")
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
+		Expect(routeRepo.CreateInSpaceHost).To(Equal("host"))
+		Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+		Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
 	})
 
 	It("TestRouteCreator", func() {
@@ -150,7 +150,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewCreateRoute(ui, configRepo, routeRepo)
 		route, apiResponse := cmd.CreateRoute("my-host", domain, space)
 
-		assert.Equal(mr.T(), route.Guid, createdRoute.Guid)
+		Expect(route.Guid).To(Equal(createdRoute.Guid))
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
@@ -159,9 +159,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceHost, "my-host")
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceDomainGuid, "domain-guid")
-		assert.Equal(mr.T(), routeRepo.CreateInSpaceSpaceGuid, "my-space-guid")
+		Expect(routeRepo.CreateInSpaceHost).To(Equal("my-host"))
+		Expect(routeRepo.CreateInSpaceDomainGuid).To(Equal("domain-guid"))
+		Expect(routeRepo.CreateInSpaceSpaceGuid).To(Equal("my-space-guid"))
 	})
 })
 
