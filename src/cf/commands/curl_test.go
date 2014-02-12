@@ -16,124 +16,122 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		var deps curlDependencies
+var _ = Describe("Testing with ginkgo", func() {
+	var deps curlDependencies
 
+	BeforeEach(func() {
+		deps = newCurlDependencies()
+	})
+
+	It("does not pass requirements when not logged in", func() {
+		runCurlWithInputs(deps, []string{"/foo"})
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	})
+
+	Context("when logged in", func() {
 		BeforeEach(func() {
-			deps = newCurlDependencies()
+			deps.reqFactory.LoginSuccess = true
 		})
 
-		It("does not pass requirements when not logged in", func() {
+		It("fails with usage when not given enough input", func() {
+			runCurlWithInputs(deps, []string{})
+			Expect(deps.ui.FailedWithUsage).To(BeTrue())
+		})
+
+		It("passes requirements", func() {
 			runCurlWithInputs(deps, []string{"/foo"})
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		})
 
-		Context("when logged in", func() {
-			BeforeEach(func() {
-				deps.reqFactory.LoginSuccess = true
+		It("makes a get request given an endpoint", func() {
+			deps.curlRepo.ResponseHeader = "Content-Size:1024"
+			deps.curlRepo.ResponseBody = "response for get"
+			runCurlWithInputs(deps, []string{"/foo"})
+
+			Expect(deps.curlRepo.Method).To(Equal("GET"))
+			Expect(deps.curlRepo.Path).To(Equal("/foo"))
+			testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"response for get"},
 			})
-
-			It("fails with usage when not given enough input", func() {
-				runCurlWithInputs(deps, []string{})
-				Expect(deps.ui.FailedWithUsage).To(BeTrue())
+			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"Content-Size:1024"},
 			})
+		})
 
-			It("passes requirements", func() {
-				runCurlWithInputs(deps, []string{"/foo"})
-				Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		It("makes a post request given -X", func() {
+			runCurlWithInputs(deps, []string{"-X", "post", "/foo"})
+
+			Expect(deps.curlRepo.Method).To(Equal("post"))
+			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
 			})
+		})
 
-			It("makes a get request given an endpoint", func() {
-				deps.curlRepo.ResponseHeader = "Content-Size:1024"
-				deps.curlRepo.ResponseBody = "response for get"
-				runCurlWithInputs(deps, []string{"/foo"})
+		It("sends headers given -H", func() {
+			runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "/foo"})
 
-				Expect(deps.curlRepo.Method).To(Equal("GET"))
-				Expect(deps.curlRepo.Path).To(Equal("/foo"))
-				testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"response for get"},
-				})
-				testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"Content-Size:1024"},
-				})
+			Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat"))
+			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
 			})
+		})
 
-			It("makes a post request given -X", func() {
-				runCurlWithInputs(deps, []string{"-X", "post", "/foo"})
+		It("sends multiple headers given multiple -H flags", func() {
+			runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "-H", "Content-Length:12", "/foo"})
 
-				Expect(deps.curlRepo.Method).To(Equal("post"))
-				testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+			Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat\nContent-Length:12"))
+			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
 			})
+		})
 
-			It("sends headers given -H", func() {
-				runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "/foo"})
+		It("prints out the response headers given -i", func() {
+			deps.curlRepo.ResponseHeader = "Content-Size:1024"
+			deps.curlRepo.ResponseBody = "response for get"
+			runCurlWithInputs(deps, []string{"-i", "/foo"})
 
-				Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat"))
-				testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+			testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"Content-Size:1024"},
+				{"response for get"},
 			})
-
-			It("sends multiple headers given multiple -H flags", func() {
-				runCurlWithInputs(deps, []string{"-H", "Content-Type:cat", "-H", "Content-Length:12", "/foo"})
-
-				Expect(deps.curlRepo.Header).To(Equal("Content-Type:cat\nContent-Length:12"))
-				testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
 			})
+		})
 
-			It("prints out the response headers given -i", func() {
-				deps.curlRepo.ResponseHeader = "Content-Size:1024"
-				deps.curlRepo.ResponseBody = "response for get"
-				runCurlWithInputs(deps, []string{"-i", "/foo"})
+		It("sets the request body given -d", func() {
+			runCurlWithInputs(deps, []string{"-d", "body content to upload", "/foo"})
 
-				testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"Content-Size:1024"},
-					{"response for get"},
-				})
-				testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+			Expect(deps.curlRepo.Body).To(Equal("body content to upload"))
+			testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
 			})
+		})
 
-			It("sets the request body given -d", func() {
-				runCurlWithInputs(deps, []string{"-d", "body content to upload", "/foo"})
+		It("prints verbose output given the -v flag", func() {
+			output := bytes.NewBuffer(make([]byte, 1024))
+			trace.SetStdout(output)
 
-				Expect(deps.curlRepo.Body).To(Equal("body content to upload"))
-				testassert.SliceDoesNotContain(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-				})
+			runCurlWithInputs(deps, []string{"-v", "/foo"})
+			trace.Logger.Print("logging enabled")
+
+			testassert.SliceContains(GinkgoT(), []string{output.String()}, testassert.Lines{
+				{"logging enabled"},
 			})
+		})
 
-			It("prints verbose output given the -v flag", func() {
-				output := bytes.NewBuffer(make([]byte, 1024))
-				trace.SetStdout(output)
+		It("prints a failure message when the response is not success", func() {
+			deps.curlRepo.ApiResponse = net.NewApiResponseWithMessage("ooops")
+			runCurlWithInputs(deps, []string{"/foo"})
 
-				runCurlWithInputs(deps, []string{"-v", "/foo"})
-				trace.Logger.Print("logging enabled")
-
-				testassert.SliceContains(GinkgoT(), []string{output.String()}, testassert.Lines{
-					{"logging enabled"},
-				})
-			})
-
-			It("prints a failure message when the response is not success", func() {
-				deps.curlRepo.ApiResponse = net.NewApiResponseWithMessage("ooops")
-				runCurlWithInputs(deps, []string{"/foo"})
-
-				testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"ooops"},
-				})
+			testassert.SliceContains(GinkgoT(), deps.ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"ooops"},
 			})
 		})
 	})
-}
+})
 
 type curlDependencies struct {
 	ui         *testterm.FakeUI

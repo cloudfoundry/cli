@@ -11,31 +11,29 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestServiceInstanceReqExecute", func() {
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestServiceInstanceReqExecute", func() {
 
-			instance := models.ServiceInstance{}
-			instance.Name = "my-service"
-			instance.Guid = "my-service-guid"
-			repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
-			ui := new(testterm.FakeUI)
+		instance := models.ServiceInstance{}
+		instance.Name = "my-service"
+		instance.Guid = "my-service-guid"
+		repo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: instance}
+		ui := new(testterm.FakeUI)
 
-			req := NewServiceInstanceRequirement("foo", ui, repo)
-			success := req.Execute()
+		req := NewServiceInstanceRequirement("foo", ui, repo)
+		success := req.Execute()
 
-			assert.True(mr.T(), success)
-			assert.Equal(mr.T(), repo.FindInstanceByNameName, "foo")
-			assert.Equal(mr.T(), req.GetServiceInstance(), instance)
-		})
-		It("TestServiceInstanceReqExecuteWhenServiceInstanceNotFound", func() {
+		assert.True(mr.T(), success)
+		assert.Equal(mr.T(), repo.FindInstanceByNameName, "foo")
+		assert.Equal(mr.T(), req.GetServiceInstance(), instance)
+	})
+	It("TestServiceInstanceReqExecuteWhenServiceInstanceNotFound", func() {
 
-			repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
-			ui := new(testterm.FakeUI)
+		repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
+		ui := new(testterm.FakeUI)
 
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				NewServiceInstanceRequirement("foo", ui, repo).Execute()
-			})
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			NewServiceInstanceRequirement("foo", ui, repo).Execute()
 		})
 	})
-}
+})

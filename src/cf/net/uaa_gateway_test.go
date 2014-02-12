@@ -16,23 +16,21 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestUAAGatewayErrorHandling", func() {
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestUAAGatewayErrorHandling", func() {
 
-			gateway := NewUAAGateway()
+		gateway := NewUAAGateway()
 
-			ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
-			defer ts.Close()
+		ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
+		defer ts.Close()
 
-			request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-			apiResponse = gateway.PerformRequest(request)
+		apiResponse = gateway.PerformRequest(request)
 
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Contains(mr.T(), apiResponse.Message, "The foo is wrong")
-			assert.Contains(mr.T(), apiResponse.ErrorCode, "foo")
-		})
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Contains(mr.T(), apiResponse.Message, "The foo is wrong")
+		assert.Contains(mr.T(), apiResponse.ErrorCode, "foo")
 	})
-}
+})

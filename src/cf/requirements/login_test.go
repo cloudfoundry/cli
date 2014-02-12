@@ -10,23 +10,21 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestLoginRequirement", func() {
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestLoginRequirement", func() {
 
-			ui := new(testterm.FakeUI)
-			config := testconfig.NewRepositoryWithDefaults()
+		ui := new(testterm.FakeUI)
+		config := testconfig.NewRepositoryWithDefaults()
 
-			req := NewLoginRequirement(ui, config)
-			success := req.Execute()
-			assert.True(mr.T(), success)
+		req := NewLoginRequirement(ui, config)
+		success := req.Execute()
+		assert.True(mr.T(), success)
 
-			config.SetAccessToken("")
-			req = NewLoginRequirement(ui, config)
-			success = req.Execute()
-			assert.False(mr.T(), success)
+		config.SetAccessToken("")
+		req = NewLoginRequirement(ui, config)
+		success = req.Execute()
+		assert.False(mr.T(), success)
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
-		})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
 	})
-}
+})

@@ -23,57 +23,56 @@ func callRenameServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.F
 
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestRenameServiceBrokerFailsWithUsage", func() {
-			reqFactory := &testreq.FakeReqFactory{}
-			repo := &testapi.FakeServiceBrokerRepo{}
 
-			ui := callRenameServiceBroker(mr.T(), []string{}, reqFactory, repo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestRenameServiceBrokerFailsWithUsage", func() {
+		reqFactory := &testreq.FakeReqFactory{}
+		repo := &testapi.FakeServiceBrokerRepo{}
 
-			ui = callRenameServiceBroker(mr.T(), []string{"arg1"}, reqFactory, repo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui := callRenameServiceBroker(mr.T(), []string{}, reqFactory, repo)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callRenameServiceBroker(mr.T(), []string{"arg1", "arg2"}, reqFactory, repo)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestRenameServiceBrokerRequirements", func() {
+		ui = callRenameServiceBroker(mr.T(), []string{"arg1"}, reqFactory, repo)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			reqFactory := &testreq.FakeReqFactory{}
-			repo := &testapi.FakeServiceBrokerRepo{}
-			args := []string{"arg1", "arg2"}
-
-			reqFactory.LoginSuccess = false
-			callRenameServiceBroker(mr.T(), args, reqFactory, repo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-
-			reqFactory.LoginSuccess = true
-			callRenameServiceBroker(mr.T(), args, reqFactory, repo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestRenameServiceBroker", func() {
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			broker := models.ServiceBroker{}
-			broker.Name = "my-found-broker"
-			broker.Guid = "my-found-broker-guid"
-			repo := &testapi.FakeServiceBrokerRepo{
-				FindByNameServiceBroker: broker,
-			}
-			args := []string{"my-broker", "my-new-broker"}
-
-			ui := callRenameServiceBroker(mr.T(), args, reqFactory, repo)
-
-			assert.Equal(mr.T(), repo.FindByNameName, "my-broker")
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
-				{"OK"},
-			})
-
-			assert.Equal(mr.T(), repo.RenamedServiceBrokerGuid, "my-found-broker-guid")
-			assert.Equal(mr.T(), repo.RenamedServiceBrokerName, "my-new-broker")
-		})
+		ui = callRenameServiceBroker(mr.T(), []string{"arg1", "arg2"}, reqFactory, repo)
+		assert.False(mr.T(), ui.FailedWithUsage)
 	})
-}
+	It("TestRenameServiceBrokerRequirements", func() {
+
+		reqFactory := &testreq.FakeReqFactory{}
+		repo := &testapi.FakeServiceBrokerRepo{}
+		args := []string{"arg1", "arg2"}
+
+		reqFactory.LoginSuccess = false
+		callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+		reqFactory.LoginSuccess = true
+		callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestRenameServiceBroker", func() {
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		broker := models.ServiceBroker{}
+		broker.Name = "my-found-broker"
+		broker.Guid = "my-found-broker-guid"
+		repo := &testapi.FakeServiceBrokerRepo{
+			FindByNameServiceBroker: broker,
+		}
+		args := []string{"my-broker", "my-new-broker"}
+
+		ui := callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+
+		assert.Equal(mr.T(), repo.FindByNameName, "my-broker")
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
+			{"OK"},
+		})
+
+		assert.Equal(mr.T(), repo.RenamedServiceBrokerGuid, "my-found-broker-guid")
+		assert.Equal(mr.T(), repo.RenamedServiceBrokerName, "my-new-broker")
+	})
+})

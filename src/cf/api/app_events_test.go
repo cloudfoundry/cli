@@ -107,49 +107,48 @@ func teardownEventTest(deps eventTestDependencies) {
 	deps.server.Close()
 }
 
-func init() {
-	Describe("App Events Repo", func() {
-		It("TestListOldV2EventsWhenNewV2ApiNotFound", func() {
-			deps := setupEventTest(mr.T(), []testnet.TestRequest{
-				newV2NotFoundRequest,
-				firstPageOldV2EventsRequest,
-				secondPageOldV2EventsRequest,
-			})
-			defer teardownEventTest(deps)
+var _ = Describe("App Events Repo", func() {
+	It("TestListOldV2EventsWhenNewV2ApiNotFound", func() {
+		deps := setupEventTest(mr.T(), []testnet.TestRequest{
+			newV2NotFoundRequest,
+			firstPageOldV2EventsRequest,
+			secondPageOldV2EventsRequest,
+		})
+		defer teardownEventTest(deps)
 
-			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
+		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			expectedEvents := []models.EventFields{
-				models.EventFields{
-					Name:        "app crashed",
-					Description: "instance: 1, reason: app instance exited, exit_status: 1",
-					Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"),
-				},
-				models.EventFields{
-					Name:        "app crashed",
-					Description: "instance: 2, reason: app instance was stopped, exit_status: 2",
-					Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00"),
-				},
-			}
+		expectedEvents := []models.EventFields{
+			models.EventFields{
+				Name:        "app crashed",
+				Description: "instance: 1, reason: app instance exited, exit_status: 1",
+				Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"),
+			},
+			models.EventFields{
+				Name:        "app crashed",
+				Description: "instance: 2, reason: app instance was stopped, exit_status: 2",
+				Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00"),
+			},
+		}
 
-			list := []models.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", func(event models.EventFields) bool {
-				list = append(list, event)
-				return true
-			})
-
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), list, expectedEvents)
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		list := []models.EventFields{}
+		apiResponse := repo.ListEvents("my-app-guid", func(event models.EventFields) bool {
+			list = append(list, event)
+			return true
 		})
 
-		It("TestListEventsUsingNewEndpoint", func() {
-			pageOneNewV2Request := testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/events?q=actee%3Amy-app-guid",
-				Response: testnet.TestResponse{
-					Status: http.StatusOK,
-					Body: `{
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.Equal(mr.T(), list, expectedEvents)
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+	})
+
+	It("TestListEventsUsingNewEndpoint", func() {
+		pageOneNewV2Request := testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/events?q=actee%3Amy-app-guid",
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: `{
 			  "total_results": 1,
 			  "total_pages": 1,
 			  "prev_url": null,
@@ -176,12 +175,12 @@ func init() {
 			  ]
 			}`}}
 
-			pageTwoNewV2Request := testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/events?q=actee%3Amy-app-guid&page=2",
-				Response: testnet.TestResponse{
-					Status: http.StatusOK,
-					Body: `{
+		pageTwoNewV2Request := testnet.TestRequest{
+			Method: "GET",
+			Path:   "/v2/events?q=actee%3Amy-app-guid&page=2",
+			Response: testnet.TestResponse{
+				Status: http.StatusOK,
+				Body: `{
 			  "total_results": 1,
 			  "total_pages": 1,
 			  "prev_url": null,
@@ -200,65 +199,65 @@ func init() {
 			  ]
 			}`}}
 
-			deps := setupEventTest(mr.T(), []testnet.TestRequest{
-				pageOneNewV2Request,
-				pageTwoNewV2Request,
-			})
-			defer teardownEventTest(deps)
+		deps := setupEventTest(mr.T(), []testnet.TestRequest{
+			pageOneNewV2Request,
+			pageTwoNewV2Request,
+		})
+		defer teardownEventTest(deps)
 
-			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
+		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			events := []models.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
-				events = append(events, e)
-				return true
-			})
-
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
-
-			assert.Equal(mr.T(), len(events), 2)
-			assert.Equal(mr.T(), events[0].Guid, "event-1-guid")
-			assert.Equal(mr.T(), events[0].Name, "audit.app.update")
-			assert.Equal(mr.T(), events[1].Guid, "event-2-guid")
-			assert.Equal(mr.T(), events[1].Name, "app.crash")
+		events := []models.EventFields{}
+		apiResponse := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
+			events = append(events, e)
+			return true
 		})
 
-		It("TestListOldV2EventsApiError", func() {
-			deps := setupEventTest(mr.T(), []testnet.TestRequest{
-				newV2NotFoundRequest,
-				firstPageOldV2EventsRequest,
-				oldV2NotFoundRequest,
-			})
-			defer teardownEventTest(deps)
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
 
-			repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
+		assert.Equal(mr.T(), len(events), 2)
+		assert.Equal(mr.T(), events[0].Guid, "event-1-guid")
+		assert.Equal(mr.T(), events[0].Name, "audit.app.update")
+		assert.Equal(mr.T(), events[1].Guid, "event-2-guid")
+		assert.Equal(mr.T(), events[1].Name, "app.crash")
+	})
 
-			list := []models.EventFields{}
-			apiResponse := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
-				list = append(list, e)
-				return true
-			})
+	It("TestListOldV2EventsApiError", func() {
+		deps := setupEventTest(mr.T(), []testnet.TestRequest{
+			newV2NotFoundRequest,
+			firstPageOldV2EventsRequest,
+			oldV2NotFoundRequest,
+		})
+		defer teardownEventTest(deps)
 
-			firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
-			assert.NoError(mr.T(), err)
+		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
-			expectedEvents := []models.EventFields{
-				models.EventFields{
-					Name:        "app crashed",
-					Description: "instance: 1, reason: app instance exited, exit_status: 1",
-					Timestamp:   firstExpectedTime,
-				},
-			}
-
-			assert.Equal(mr.T(), list, expectedEvents)
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		list := []models.EventFields{}
+		apiResponse := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
+			list = append(list, e)
+			return true
 		})
 
-		It("TestUnmarshalNewCrashEvent", func() {
-			resource := new(EventResourceNewV2)
-			err := json.Unmarshal([]byte(`
+		firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
+		assert.NoError(mr.T(), err)
+
+		expectedEvents := []models.EventFields{
+			models.EventFields{
+				Name:        "app crashed",
+				Description: "instance: 1, reason: app instance exited, exit_status: 1",
+				Timestamp:   firstExpectedTime,
+			},
+		}
+
+		assert.Equal(mr.T(), list, expectedEvents)
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+	})
+
+	It("TestUnmarshalNewCrashEvent", func() {
+		resource := new(EventResourceNewV2)
+		err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid":"event-1-guid"
@@ -277,18 +276,18 @@ func init() {
 			}
 			`), &resource)
 
-			assert.NoError(mr.T(), err)
+		assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields()
-			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
-			assert.Equal(mr.T(), eventFields.Name, "app.crash")
-			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"))
-			assert.Equal(mr.T(), eventFields.Description, `index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`)
-		})
+		eventFields := resource.ToFields()
+		assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
+		assert.Equal(mr.T(), eventFields.Name, "app.crash")
+		assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"))
+		assert.Equal(mr.T(), eventFields.Description, `index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`)
+	})
 
-		It("TestUnmarshalUpdateAppEvent", func() {
-			resource := new(EventResourceNewV2)
-			err := json.Unmarshal([]byte(`
+	It("TestUnmarshalUpdateAppEvent", func() {
+		resource := new(EventResourceNewV2)
+		err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-1-guid"
@@ -308,16 +307,16 @@ func init() {
 			}
 			`), &resource)
 
-			assert.NoError(mr.T(), err)
+		assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields()
-			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
-			assert.Equal(mr.T(), eventFields.Name, "audit.app.update")
-			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
-			assert.Equal(mr.T(), eventFields.Description, "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN")
+		eventFields := resource.ToFields()
+		assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
+		assert.Equal(mr.T(), eventFields.Name, "audit.app.update")
+		assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
+		assert.Equal(mr.T(), eventFields.Description, "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN")
 
-			resource = new(EventResourceNewV2)
-			err = json.Unmarshal([]byte(`
+		resource = new(EventResourceNewV2)
+		err = json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-1-guid"
@@ -334,18 +333,18 @@ func init() {
 			}
 			`), &resource)
 
-			assert.NoError(mr.T(), err)
+		assert.NoError(mr.T(), err)
 
-			eventFields = resource.ToFields()
-			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
-			assert.Equal(mr.T(), eventFields.Name, "audit.app.update")
-			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
-			assert.Equal(mr.T(), eventFields.Description, `state: STOPPED`)
-		})
+		eventFields = resource.ToFields()
+		assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
+		assert.Equal(mr.T(), eventFields.Name, "audit.app.update")
+		assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00"))
+		assert.Equal(mr.T(), eventFields.Description, `state: STOPPED`)
+	})
 
-		It("TestUnmarshalDeleteAppEvent", func() {
-			resource := new(EventResourceNewV2)
-			err := json.Unmarshal([]byte(`
+	It("TestUnmarshalDeleteAppEvent", func() {
+		resource := new(EventResourceNewV2)
+		err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-2-guid"
@@ -362,18 +361,18 @@ func init() {
 			}
 			`), &resource)
 
-			assert.NoError(mr.T(), err)
+		assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields()
-			assert.Equal(mr.T(), eventFields.Guid, "event-2-guid")
-			assert.Equal(mr.T(), eventFields.Name, "audit.app.delete-request")
-			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00"))
-			assert.Equal(mr.T(), eventFields.Description, "recursive: true")
-		})
+		eventFields := resource.ToFields()
+		assert.Equal(mr.T(), eventFields.Guid, "event-2-guid")
+		assert.Equal(mr.T(), eventFields.Name, "audit.app.delete-request")
+		assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00"))
+		assert.Equal(mr.T(), eventFields.Description, "recursive: true")
+	})
 
-		It("TestUnmarshalNewV2CreateEvent", func() {
-			resource := new(EventResourceNewV2)
-			err := json.Unmarshal([]byte(`
+	It("TestUnmarshalNewV2CreateEvent", func() {
+		resource := new(EventResourceNewV2)
+		err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-1-guid"
@@ -396,13 +395,12 @@ func init() {
 			  }
 			}`), &resource)
 
-			assert.NoError(mr.T(), err)
+		assert.NoError(mr.T(), err)
 
-			eventFields := resource.ToFields()
-			assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
-			assert.Equal(mr.T(), eventFields.Name, "audit.app.create")
-			assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-22T19:34:16+00:00"))
-			assert.Equal(mr.T(), eventFields.Description, "disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN")
-		})
+		eventFields := resource.ToFields()
+		assert.Equal(mr.T(), eventFields.Guid, "event-1-guid")
+		assert.Equal(mr.T(), eventFields.Name, "audit.app.create")
+		assert.Equal(mr.T(), eventFields.Timestamp, testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-22T19:34:16+00:00"))
+		assert.Equal(mr.T(), eventFields.Description, "disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN")
 	})
-}
+})

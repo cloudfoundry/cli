@@ -22,66 +22,65 @@ func callListOrgs(config configuration.Reader, reqFactory *testreq.FakeReqFactor
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
 
-		It("TestListOrgsRequirements", func() {
-			orgRepo := &testapi.FakeOrgRepository{}
-			config := testconfig.NewRepository()
+var _ = Describe("Testing with ginkgo", func() {
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callListOrgs(config, reqFactory, orgRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+	It("TestListOrgsRequirements", func() {
+		orgRepo := &testapi.FakeOrgRepository{}
+		config := testconfig.NewRepository()
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-			callListOrgs(config, reqFactory, orgRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callListOrgs(config, reqFactory, orgRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-		It("TestListAllPagesOfOrgs", func() {
-			org1 := models.Organization{}
-			org1.Name = "Organization-1"
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callListOrgs(config, reqFactory, orgRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
 
-			org2 := models.Organization{}
-			org2.Name = "Organization-2"
+	It("TestListAllPagesOfOrgs", func() {
+		org1 := models.Organization{}
+		org1.Name = "Organization-1"
 
-			org3 := models.Organization{}
-			org3.Name = "Organization-3"
+		org2 := models.Organization{}
+		org2.Name = "Organization-2"
 
-			orgRepo := &testapi.FakeOrgRepository{
-				Organizations: []models.Organization{org1, org2, org3},
-			}
+		org3 := models.Organization{}
+		org3.Name = "Organization-3"
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			tokenInfo := configuration.TokenInfo{Username: "my-user"}
-			config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
+		orgRepo := &testapi.FakeOrgRepository{
+			Organizations: []models.Organization{org1, org2, org3},
+		}
 
-			ui := callListOrgs(config, reqFactory, orgRepo)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		tokenInfo := configuration.TokenInfo{Username: "my-user"}
+		config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting orgs as my-user"},
-				{"Organization-1"},
-				{"Organization-2"},
-				{"Organization-3"},
-			})
-		})
+		ui := callListOrgs(config, reqFactory, orgRepo)
 
-		It("TestListNoOrgs", func() {
-			orgs := []models.Organization{}
-			orgRepo := &testapi.FakeOrgRepository{
-				Organizations: orgs,
-			}
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			tokenInfo := configuration.TokenInfo{Username: "my-user"}
-			config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
-
-			ui := callListOrgs(config, reqFactory, orgRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting orgs as my-user"},
-				{"No orgs found"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting orgs as my-user"},
+			{"Organization-1"},
+			{"Organization-2"},
+			{"Organization-3"},
 		})
 	})
-}
+
+	It("TestListNoOrgs", func() {
+		orgs := []models.Organization{}
+		orgRepo := &testapi.FakeOrgRepository{
+			Organizations: orgs,
+		}
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		tokenInfo := configuration.TokenInfo{Username: "my-user"}
+		config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
+
+		ui := callListOrgs(config, reqFactory, orgRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting orgs as my-user"},
+			{"No orgs found"},
+		})
+	})
+})

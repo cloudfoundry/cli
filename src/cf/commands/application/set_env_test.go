@@ -15,146 +15,144 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("set-env command", func() {
-		It("TestSetEnvRequirements", func() {
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			appRepo := &testapi.FakeApplicationRepository{}
-			args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
+var _ = Describe("set-env command", func() {
+	It("TestSetEnvRequirements", func() {
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		appRepo := &testapi.FakeApplicationRepository{}
+		args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
 
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			callSetEnv(args, reqFactory, appRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		callSetEnv(args, reqFactory, appRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
-			callSetEnv(args, reqFactory, appRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+		callSetEnv(args, reqFactory, appRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			testcmd.CommandDidPassRequirements = true
+		testcmd.CommandDidPassRequirements = true
 
-			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
-			callSetEnv(args, reqFactory, appRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+		callSetEnv(args, reqFactory, appRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+
+	It("TestRunWhenApplicationExists", func() {
+
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		app.EnvironmentVars = map[string]string{"foo": "bar"}
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		appRepo := &testapi.FakeApplicationRepository{}
+
+		args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
+		ui := callSetEnv(args, reqFactory, appRepo)
+
+		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{
+				"Setting env variable",
+				"DATABASE_URL",
+				"mysql://example.com/my-db",
+				"my-app",
+				"my-org",
+				"my-space",
+				"my-user",
+			},
+			{"OK"},
+			{"TIP"},
 		})
 
-		It("TestRunWhenApplicationExists", func() {
-
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			app.EnvironmentVars = map[string]string{"foo": "bar"}
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			appRepo := &testapi.FakeApplicationRepository{}
-
-			args := []string{"my-app", "DATABASE_URL", "mysql://example.com/my-db"}
-			ui := callSetEnv(args, reqFactory, appRepo)
-
-			assert.Equal(mr.T(), len(ui.Outputs), 3)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{
-					"Setting env variable",
-					"DATABASE_URL",
-					"mysql://example.com/my-db",
-					"my-app",
-					"my-org",
-					"my-space",
-					"my-user",
-				},
-				{"OK"},
-				{"TIP"},
-			})
-
-			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-			assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
-				"DATABASE_URL": "mysql://example.com/my-db",
-				"foo":          "bar",
-			})
-		})
-
-		It("TestSetEnvWhenItAlreadyExists", func() {
-
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			appRepo := &testapi.FakeApplicationRepository{}
-
-			args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
-			ui := callSetEnv(args, reqFactory, appRepo)
-
-			assert.Equal(mr.T(), len(ui.Outputs), 3)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{
-					"Setting env variable",
-					"DATABASE_URL",
-					"mysql://example2.com/my-db",
-					"my-app",
-					"my-org",
-					"my-space",
-					"my-user",
-				},
-				{"OK"},
-				{"TIP"},
-			})
-
-			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-			assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
-				"DATABASE_URL": "mysql://example2.com/my-db",
-			})
-		})
-
-		It("TestRunWhenSettingTheEnvFails", func() {
-
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			appRepo := &testapi.FakeApplicationRepository{
-				ReadApp:   app,
-				UpdateErr: true,
-			}
-
-			args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
-			ui := callSetEnv(args, reqFactory, appRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Setting env variable"},
-				{"FAILED"},
-				{"Error updating app."},
-			})
-		})
-
-		It("TestSetEnvFailsWithUsage", func() {
-
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
-
-			args := []string{"my-app", "DATABASE_URL", "..."}
-			ui := callSetEnv(args, reqFactory, appRepo)
-			assert.False(mr.T(), ui.FailedWithUsage)
-
-			args = []string{"my-app", "DATABASE_URL"}
-			ui = callSetEnv(args, reqFactory, appRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-
-			args = []string{"my-app"}
-			ui = callSetEnv(args, reqFactory, appRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-
-			args = []string{}
-			ui = callSetEnv(args, reqFactory, appRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
+		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+			"DATABASE_URL": "mysql://example.com/my-db",
+			"foo":          "bar",
 		})
 	})
-}
+
+	It("TestSetEnvWhenItAlreadyExists", func() {
+
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		appRepo := &testapi.FakeApplicationRepository{}
+
+		args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
+		ui := callSetEnv(args, reqFactory, appRepo)
+
+		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{
+				"Setting env variable",
+				"DATABASE_URL",
+				"mysql://example2.com/my-db",
+				"my-app",
+				"my-org",
+				"my-space",
+				"my-user",
+			},
+			{"OK"},
+			{"TIP"},
+		})
+
+		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
+		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+			"DATABASE_URL": "mysql://example2.com/my-db",
+		})
+	})
+
+	It("TestRunWhenSettingTheEnvFails", func() {
+
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		appRepo := &testapi.FakeApplicationRepository{
+			ReadApp:   app,
+			UpdateErr: true,
+		}
+
+		args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
+		ui := callSetEnv(args, reqFactory, appRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Setting env variable"},
+			{"FAILED"},
+			{"Error updating app."},
+		})
+	})
+
+	It("TestSetEnvFailsWithUsage", func() {
+
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
+
+		args := []string{"my-app", "DATABASE_URL", "..."}
+		ui := callSetEnv(args, reqFactory, appRepo)
+		assert.False(mr.T(), ui.FailedWithUsage)
+
+		args = []string{"my-app", "DATABASE_URL"}
+		ui = callSetEnv(args, reqFactory, appRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+
+		args = []string{"my-app"}
+		ui = callSetEnv(args, reqFactory, appRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+
+		args = []string{}
+		ui = callSetEnv(args, reqFactory, appRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+	})
+})
 
 func callSetEnv(args []string, reqFactory *testreq.FakeReqFactory, appRepo api.ApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)

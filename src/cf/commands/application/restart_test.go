@@ -19,50 +19,49 @@ func callRestart(args []string, reqFactory *testreq.FakeReqFactory, starter Appl
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestRestartCommandFailsWithUsage", func() {
-			reqFactory := &testreq.FakeReqFactory{}
-			starter := &testcmd.FakeAppStarter{}
-			stopper := &testcmd.FakeAppStopper{}
-			ui := callRestart([]string{}, reqFactory, starter, stopper)
-			assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestRestartRequirements", func() {
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestRestartCommandFailsWithUsage", func() {
+		reqFactory := &testreq.FakeReqFactory{}
+		starter := &testcmd.FakeAppStarter{}
+		stopper := &testcmd.FakeAppStopper{}
+		ui := callRestart([]string{}, reqFactory, starter, stopper)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			starter := &testcmd.FakeAppStarter{}
-			stopper := &testcmd.FakeAppStopper{}
-
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-
-			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
-			callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-
-			reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
-			callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestRestartApplication", func() {
-
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-			starter := &testcmd.FakeAppStarter{}
-			stopper := &testcmd.FakeAppStopper{}
-			callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-
-			assert.Equal(mr.T(), stopper.AppToStop, app)
-			assert.Equal(mr.T(), starter.AppToStart, app)
-		})
+		ui = callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+		assert.False(mr.T(), ui.FailedWithUsage)
 	})
-}
+	It("TestRestartRequirements", func() {
+
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		starter := &testcmd.FakeAppStarter{}
+		stopper := &testcmd.FakeAppStopper{}
+
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
+		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
+		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestRestartApplication", func() {
+
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
+		starter := &testcmd.FakeAppStarter{}
+		stopper := &testcmd.FakeAppStopper{}
+		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
+
+		assert.Equal(mr.T(), stopper.AppToStop, app)
+		assert.Equal(mr.T(), starter.AppToStart, app)
+	})
+})

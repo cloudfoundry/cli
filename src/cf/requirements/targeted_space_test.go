@@ -11,44 +11,42 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestSpaceRequirement", func() {
-			ui := new(testterm.FakeUI)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
-			space := models.SpaceFields{}
-			space.Name = "my-space"
-			space.Guid = "my-space-guid"
-			config := testconfig.NewRepositoryWithDefaults()
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestSpaceRequirement", func() {
+		ui := new(testterm.FakeUI)
+		org := models.OrganizationFields{}
+		org.Name = "my-org"
+		org.Guid = "my-org-guid"
+		space := models.SpaceFields{}
+		space.Name = "my-space"
+		space.Guid = "my-space-guid"
+		config := testconfig.NewRepositoryWithDefaults()
 
-			req := NewTargetedSpaceRequirement(ui, config)
-			success := req.Execute()
-			assert.True(mr.T(), success)
+		req := NewTargetedSpaceRequirement(ui, config)
+		success := req.Execute()
+		assert.True(mr.T(), success)
 
-			config.SetSpaceFields(models.SpaceFields{})
+		config.SetSpaceFields(models.SpaceFields{})
 
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				NewTargetedSpaceRequirement(ui, config).Execute()
-			})
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			NewTargetedSpaceRequirement(ui, config).Execute()
+		})
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"No space targeted"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"FAILED"},
+			{"No space targeted"},
+		})
 
-			ui.ClearOutputs()
-			config.SetOrganizationFields(models.OrganizationFields{})
+		ui.ClearOutputs()
+		config.SetOrganizationFields(models.OrganizationFields{})
 
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				NewTargetedSpaceRequirement(ui, config).Execute()
-			})
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			NewTargetedSpaceRequirement(ui, config).Execute()
+		})
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"No org and space targeted"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"FAILED"},
+			{"No org and space targeted"},
 		})
 	})
-}
+})

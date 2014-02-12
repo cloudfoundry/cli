@@ -20,28 +20,27 @@ func callStacks(stackRepo *testapi.FakeStackRepository) (ui *testterm.FakeUI) {
 
 	return
 }
-func init() {
-	Describe("stacks command", func() {
-		It("lists the stacks", func() {
-			stack1 := models.Stack{}
-			stack1.Name = "Stack-1"
-			stack1.Description = "Stack 1 Description"
 
-			stack2 := models.Stack{}
-			stack2.Name = "Stack-2"
-			stack2.Description = "Stack 2 Description"
+var _ = Describe("stacks command", func() {
+	It("lists the stacks", func() {
+		stack1 := models.Stack{}
+		stack1.Name = "Stack-1"
+		stack1.Description = "Stack 1 Description"
 
-			stackRepo := &testapi.FakeStackRepository{
-				FindAllStacks: []models.Stack{stack1, stack2},
-			}
+		stack2 := models.Stack{}
+		stack2.Name = "Stack-2"
+		stack2.Description = "Stack 2 Description"
 
-			ui := callStacks(stackRepo)
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
-				{"Getting stacks in org", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"Stack-1", "Stack 1 Description"},
-				{"Stack-2", "Stack 2 Description"},
-			})
+		stackRepo := &testapi.FakeStackRepository{
+			FindAllStacks: []models.Stack{stack1, stack2},
+		}
+
+		ui := callStacks(stackRepo)
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			{"Getting stacks in org", "my-org", "my-space", "my-user"},
+			{"OK"},
+			{"Stack-1", "Stack 1 Description"},
+			{"Stack-2", "Stack 2 Description"},
 		})
 	})
-}
+})

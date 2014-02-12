@@ -13,59 +13,57 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestEnvRequirements", func() {
-			reqFactory := getEnvDependencies()
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestEnvRequirements", func() {
+		reqFactory := getEnvDependencies()
 
-			reqFactory.LoginSuccess = true
-			callEnv([]string{"my-app"}, reqFactory)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		reqFactory.LoginSuccess = true
+		callEnv([]string{"my-app"}, reqFactory)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
 
-			reqFactory.LoginSuccess = false
-			callEnv([]string{"my-app"}, reqFactory)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestEnvFailsWithUsage", func() {
+		reqFactory.LoginSuccess = false
+		callEnv([]string{"my-app"}, reqFactory)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestEnvFailsWithUsage", func() {
 
-			reqFactory := getEnvDependencies()
-			ui := callEnv([]string{}, reqFactory)
+		reqFactory := getEnvDependencies()
+		ui := callEnv([]string{}, reqFactory)
 
-			assert.True(mr.T(), ui.FailedWithUsage)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestEnvListsEnvironmentVariables", func() {
+		assert.True(mr.T(), ui.FailedWithUsage)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestEnvListsEnvironmentVariables", func() {
 
-			reqFactory := getEnvDependencies()
-			reqFactory.Application.EnvironmentVars = map[string]string{
-				"my-key":  "my-value",
-				"my-key2": "my-value2",
-			}
+		reqFactory := getEnvDependencies()
+		reqFactory.Application.EnvironmentVars = map[string]string{
+			"my-key":  "my-value",
+			"my-key2": "my-value2",
+		}
 
-			ui := callEnv([]string{"my-app"}, reqFactory)
+		ui := callEnv([]string{"my-app"}, reqFactory)
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"my-key", "my-value", "my-key2", "my-value2"},
-			})
-		})
-		It("TestEnvShowsEmptyMessage", func() {
-
-			reqFactory := getEnvDependencies()
-			reqFactory.Application.EnvironmentVars = map[string]string{}
-
-			ui := callEnv([]string{"my-app"}, reqFactory)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting env variables for app", "my-app"},
-				{"OK"},
-				{"No env variables exist"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
+			{"OK"},
+			{"my-key", "my-value", "my-key2", "my-value2"},
 		})
 	})
-}
+	It("TestEnvShowsEmptyMessage", func() {
+
+		reqFactory := getEnvDependencies()
+		reqFactory.Application.EnvironmentVars = map[string]string{}
+
+		ui := callEnv([]string{"my-app"}, reqFactory)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting env variables for app", "my-app"},
+			{"OK"},
+			{"No env variables exist"},
+		})
+	})
+})
 
 func callEnv(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}

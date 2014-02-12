@@ -11,34 +11,32 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestOrgReqExecute", func() {
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestOrgReqExecute", func() {
 
-			org := models.Organization{}
-			org.Name = "my-org-name"
-			org.Guid = "my-org-guid"
-			orgRepo := &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
-			ui := new(testterm.FakeUI)
+		org := models.Organization{}
+		org.Name = "my-org-name"
+		org.Guid = "my-org-guid"
+		orgRepo := &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
+		ui := new(testterm.FakeUI)
 
-			orgReq := NewOrganizationRequirement("my-org-name", ui, orgRepo)
-			success := orgReq.Execute()
+		orgReq := NewOrganizationRequirement("my-org-name", ui, orgRepo)
+		success := orgReq.Execute()
 
-			assert.True(mr.T(), success)
-			assert.Equal(mr.T(), orgRepo.FindByNameName, "my-org-name")
-			assert.Equal(mr.T(), orgReq.GetOrganization(), org)
-		})
+		assert.True(mr.T(), success)
+		assert.Equal(mr.T(), orgRepo.FindByNameName, "my-org-name")
+		assert.Equal(mr.T(), orgReq.GetOrganization(), org)
+	})
 
-		It("TestOrgReqWhenOrgDoesNotExist", func() {
+	It("TestOrgReqWhenOrgDoesNotExist", func() {
 
-			orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
-			ui := new(testterm.FakeUI)
+		orgRepo := &testapi.FakeOrgRepository{FindByNameNotFound: true}
+		ui := new(testterm.FakeUI)
 
-			orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
+		orgReq := NewOrganizationRequirement("foo", ui, orgRepo)
 
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				orgReq.Execute()
-			})
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			orgReq.Execute()
 		})
 	})
-}
+})

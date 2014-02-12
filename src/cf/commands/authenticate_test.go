@@ -15,53 +15,51 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestAuthenticateFailsWithUsage", func() {
-			config := testconfig.NewRepository()
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestAuthenticateFailsWithUsage", func() {
+		config := testconfig.NewRepository()
 
-			auth := &testapi.FakeAuthenticationRepository{
-				AccessToken:  "my_access_token",
-				RefreshToken: "my_refresh_token",
-				Config:       config,
-			}
+		auth := &testapi.FakeAuthenticationRepository{
+			AccessToken:  "my_access_token",
+			RefreshToken: "my_refresh_token",
+			Config:       config,
+		}
 
-			ui := callAuthenticate([]string{}, config, auth)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui := callAuthenticate([]string{}, config, auth)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callAuthenticate([]string{"my-username"}, config, auth)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui = callAuthenticate([]string{"my-username"}, config, auth)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callAuthenticate([]string{"my-username", "my-password"}, config, auth)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
+		ui = callAuthenticate([]string{"my-username", "my-password"}, config, auth)
+		assert.False(mr.T(), ui.FailedWithUsage)
+	})
 
-		It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {
-			testSuccessfulAuthenticate(mr.T(), []string{"user@example.com", "password"})
-		})
+	It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {
+		testSuccessfulAuthenticate(mr.T(), []string{"user@example.com", "password"})
+	})
 
-		It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
-			config := testconfig.NewRepository()
+	It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
+		config := testconfig.NewRepository()
 
-			ui := callAuthenticate(
-				[]string{
-					"foo@example.com",
-					"bar",
-				},
-				config,
-				&testapi.FakeAuthenticationRepository{AuthError: true, Config: config},
-			)
+		ui := callAuthenticate(
+			[]string{
+				"foo@example.com",
+				"bar",
+			},
+			config,
+			&testapi.FakeAuthenticationRepository{AuthError: true, Config: config},
+		)
 
-			assert.Equal(mr.T(), len(ui.Outputs), 4)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{config.ApiEndpoint()},
-				{"Authenticating..."},
-				{"FAILED"},
-				{"Error authenticating"},
-			})
+		assert.Equal(mr.T(), len(ui.Outputs), 4)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{config.ApiEndpoint()},
+			{"Authenticating..."},
+			{"FAILED"},
+			{"Error authenticating"},
 		})
 	})
-}
+})
 
 func testSuccessfulAuthenticate(t mr.TestingT, args []string) (ui *testterm.FakeUI) {
 	config := testconfig.NewRepository()

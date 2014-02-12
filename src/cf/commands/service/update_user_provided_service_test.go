@@ -25,133 +25,132 @@ func callUpdateUserProvidedService(t mr.TestingT, args []string, reqFactory *tes
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestUpdateUserProvidedServiceFailsWithUsage", func() {
-			reqFactory := &testreq.FakeReqFactory{}
-			userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-			ui := callUpdateUserProvidedService(mr.T(), []string{}, reqFactory, userProvidedServiceInstanceRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestUpdateUserProvidedServiceFailsWithUsage", func() {
+		reqFactory := &testreq.FakeReqFactory{}
+		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-			ui = callUpdateUserProvidedService(mr.T(), []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestUpdateUserProvidedServiceRequirements", func() {
+		ui := callUpdateUserProvidedService(mr.T(), []string{}, reqFactory, userProvidedServiceInstanceRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			args := []string{"service-name"}
-			reqFactory := &testreq.FakeReqFactory{}
-			userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+		ui = callUpdateUserProvidedService(mr.T(), []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
+		assert.False(mr.T(), ui.FailedWithUsage)
+	})
+	It("TestUpdateUserProvidedServiceRequirements", func() {
 
-			reqFactory.LoginSuccess = false
-			callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		args := []string{"service-name"}
+		reqFactory := &testreq.FakeReqFactory{}
+		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-			reqFactory.LoginSuccess = true
-			callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory.LoginSuccess = false
+		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "service-name")
-		})
-		It("TestUpdateUserProvidedServiceWhenNoFlagsArePresent", func() {
+		reqFactory.LoginSuccess = true
+		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			args := []string{"service-name"}
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "found-service-name"
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:    true,
-				ServiceInstance: serviceInstance,
-			}
-			repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-			ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
+		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "service-name")
+	})
+	It("TestUpdateUserProvidedServiceWhenNoFlagsArePresent", func() {
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"No changes"},
-			})
-		})
-		It("TestUpdateUserProvidedServiceWithJson", func() {
+		args := []string{"service-name"}
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "found-service-name"
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:    true,
+			ServiceInstance: serviceInstance,
+		}
+		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
 
-			args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "found-service-name"
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:    true,
-				ServiceInstance: serviceInstance,
-			}
-			repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-			ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"TIP"},
-			})
-			assert.Equal(mr.T(), repo.UpdateServiceInstance.Name, serviceInstance.Name)
-			assert.Equal(mr.T(), repo.UpdateServiceInstance.Params, map[string]string{"foo": "bar"})
-			assert.Equal(mr.T(), repo.UpdateServiceInstance.SysLogDrainUrl, "syslog://example.com")
-		})
-		It("TestUpdateUserProvidedServiceWithoutJson", func() {
-
-			args := []string{"-l", "syslog://example.com", "service-name"}
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "found-service-name"
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:    true,
-				ServiceInstance: serviceInstance,
-			}
-			repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-			ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Updating user provided service"},
-				{"OK"},
-			})
-		})
-		It("TestUpdateUserProvidedServiceWithInvalidJson", func() {
-
-			args := []string{"-p", `{"foo":"ba`, "service-name"}
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "found-service-name"
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:    true,
-				ServiceInstance: serviceInstance,
-			}
-			userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-
-			ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
-
-			assert.NotEqual(mr.T(), userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"JSON is invalid"},
-			})
-		})
-		It("TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided", func() {
-
-			args := []string{"-p", `{"foo":"bar"}`, "service-name"}
-			plan := models.ServicePlanFields{}
-			plan.Guid = "my-plan-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "found-service-name"
-			serviceInstance.ServicePlan = plan
-
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:    true,
-				ServiceInstance: serviceInstance,
-			}
-			userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-
-			ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
-
-			assert.NotEqual(mr.T(), userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"Service Instance is not user provided"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
+			{"OK"},
+			{"No changes"},
 		})
 	})
-}
+	It("TestUpdateUserProvidedServiceWithJson", func() {
+
+		args := []string{"-p", `{"foo":"bar"}`, "-l", "syslog://example.com", "service-name"}
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "found-service-name"
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:    true,
+			ServiceInstance: serviceInstance,
+		}
+		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
+			{"OK"},
+			{"TIP"},
+		})
+		assert.Equal(mr.T(), repo.UpdateServiceInstance.Name, serviceInstance.Name)
+		assert.Equal(mr.T(), repo.UpdateServiceInstance.Params, map[string]string{"foo": "bar"})
+		assert.Equal(mr.T(), repo.UpdateServiceInstance.SysLogDrainUrl, "syslog://example.com")
+	})
+	It("TestUpdateUserProvidedServiceWithoutJson", func() {
+
+		args := []string{"-l", "syslog://example.com", "service-name"}
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "found-service-name"
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:    true,
+			ServiceInstance: serviceInstance,
+		}
+		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Updating user provided service"},
+			{"OK"},
+		})
+	})
+	It("TestUpdateUserProvidedServiceWithInvalidJson", func() {
+
+		args := []string{"-p", `{"foo":"ba`, "service-name"}
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "found-service-name"
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:    true,
+			ServiceInstance: serviceInstance,
+		}
+		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+
+		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+
+		assert.NotEqual(mr.T(), userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"FAILED"},
+			{"JSON is invalid"},
+		})
+	})
+	It("TestUpdateUserProvidedServiceWithAServiceInstanceThatIsNotUserProvided", func() {
+
+		args := []string{"-p", `{"foo":"bar"}`, "service-name"}
+		plan := models.ServicePlanFields{}
+		plan.Guid = "my-plan-guid"
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "found-service-name"
+		serviceInstance.ServicePlan = plan
+
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:    true,
+			ServiceInstance: serviceInstance,
+		}
+		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
+
+		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+
+		assert.NotEqual(mr.T(), userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"FAILED"},
+			{"Service Instance is not user provided"},
+		})
+	})
+})

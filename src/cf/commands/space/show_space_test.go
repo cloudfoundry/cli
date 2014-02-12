@@ -23,61 +23,60 @@ func callShowSpace(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestShowSpaceRequirements", func() {
-			args := []string{"my-space"}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-			callShowSpace(mr.T(), args, reqFactory)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestShowSpaceRequirements", func() {
+		args := []string{"my-space"}
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-			callShowSpace(mr.T(), args, reqFactory)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callShowSpace(mr.T(), args, reqFactory)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			callShowSpace(mr.T(), args, reqFactory)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestShowSpaceInfoSuccess", func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callShowSpace(mr.T(), args, reqFactory)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		callShowSpace(mr.T(), args, reqFactory)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestShowSpaceInfoSuccess", func() {
 
-			app := models.ApplicationFields{}
-			app.Name = "app1"
-			app.Guid = "app1-guid"
-			apps := []models.ApplicationFields{app}
+		org := models.OrganizationFields{}
+		org.Name = "my-org"
 
-			domain := models.DomainFields{}
-			domain.Name = "domain1"
-			domain.Guid = "domain1-guid"
-			domains := []models.DomainFields{domain}
+		app := models.ApplicationFields{}
+		app.Name = "app1"
+		app.Guid = "app1-guid"
+		apps := []models.ApplicationFields{app}
 
-			serviceInstance := models.ServiceInstanceFields{}
-			serviceInstance.Name = "service1"
-			serviceInstance.Guid = "service1-guid"
-			services := []models.ServiceInstanceFields{serviceInstance}
+		domain := models.DomainFields{}
+		domain.Name = "domain1"
+		domain.Guid = "domain1-guid"
+		domains := []models.DomainFields{domain}
 
-			space := models.Space{}
-			space.Name = "space1"
-			space.Organization = org
-			space.Applications = apps
-			space.Domains = domains
-			space.ServiceInstances = services
+		serviceInstance := models.ServiceInstanceFields{}
+		serviceInstance.Name = "service1"
+		serviceInstance.Guid = "service1-guid"
+		services := []models.ServiceInstanceFields{serviceInstance}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
-			ui := callShowSpace(mr.T(), []string{"space1"}, reqFactory)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting info for space", "space1", "my-org", "my-user"},
-				{"OK"},
-				{"space1"},
-				{"Org", "my-org"},
-				{"Apps", "app1"},
-				{"Domains", "domain1"},
-				{"Services", "service1"},
-			})
+		space := models.Space{}
+		space.Name = "space1"
+		space.Organization = org
+		space.Applications = apps
+		space.Domains = domains
+		space.ServiceInstances = services
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, Space: space}
+		ui := callShowSpace(mr.T(), []string{"space1"}, reqFactory)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting info for space", "space1", "my-org", "my-user"},
+			{"OK"},
+			{"space1"},
+			{"Org", "my-org"},
+			{"Apps", "app1"},
+			{"Domains", "domain1"},
+			{"Services", "service1"},
 		})
 	})
-}
+})

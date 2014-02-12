@@ -11,32 +11,30 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestSpaceReqExecute", func() {
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestSpaceReqExecute", func() {
 
-			space := models.Space{}
-			space.Name = "awesome-sauce-space"
-			space.Guid = "my-space-guid"
-			spaceRepo := &testapi.FakeSpaceRepository{Spaces: []models.Space{space}}
-			ui := new(testterm.FakeUI)
+		space := models.Space{}
+		space.Name = "awesome-sauce-space"
+		space.Guid = "my-space-guid"
+		spaceRepo := &testapi.FakeSpaceRepository{Spaces: []models.Space{space}}
+		ui := new(testterm.FakeUI)
 
-			spaceReq := NewSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
-			success := spaceReq.Execute()
+		spaceReq := NewSpaceRequirement("awesome-sauce-space", ui, spaceRepo)
+		success := spaceReq.Execute()
 
-			assert.True(mr.T(), success)
-			assert.Equal(mr.T(), spaceRepo.FindByNameName, "awesome-sauce-space")
-			assert.Equal(mr.T(), spaceReq.GetSpace(), space)
-		})
+		assert.True(mr.T(), success)
+		assert.Equal(mr.T(), spaceRepo.FindByNameName, "awesome-sauce-space")
+		assert.Equal(mr.T(), spaceReq.GetSpace(), space)
+	})
 
-		It("TestSpaceReqExecuteWhenSpaceNotFound", func() {
+	It("TestSpaceReqExecuteWhenSpaceNotFound", func() {
 
-			spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
-			ui := new(testterm.FakeUI)
+		spaceRepo := &testapi.FakeSpaceRepository{FindByNameNotFound: true}
+		ui := new(testterm.FakeUI)
 
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				NewSpaceRequirement("foo", ui, spaceRepo).Execute()
-			})
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			NewSpaceRequirement("foo", ui, spaceRepo).Execute()
 		})
 	})
-}
+})

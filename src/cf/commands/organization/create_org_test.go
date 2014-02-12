@@ -35,53 +35,52 @@ func callCreateOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFact
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestCreateOrgFailsWithUsage", func() {
-			orgRepo := &testapi.FakeOrgRepository{}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-			ui := callCreateOrg(mr.T(), []string{}, reqFactory, orgRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestCreateOrgFailsWithUsage", func() {
+		orgRepo := &testapi.FakeOrgRepository{}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-			ui = callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-			assert.False(mr.T(), ui.FailedWithUsage)
+		ui := callCreateOrg(mr.T(), []string{}, reqFactory, orgRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+
+		ui = callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+		assert.False(mr.T(), ui.FailedWithUsage)
+	})
+	It("TestCreateOrgRequirements", func() {
+
+		orgRepo := &testapi.FakeOrgRepository{}
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestCreateOrg", func() {
+
+		orgRepo := &testapi.FakeOrgRepository{}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		ui := callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Creating org", "my-org", "my-user"},
+			{"OK"},
 		})
-		It("TestCreateOrgRequirements", func() {
+		assert.Equal(mr.T(), orgRepo.CreateName, "my-org")
+	})
+	It("TestCreateOrgWhenAlreadyExists", func() {
 
-			orgRepo := &testapi.FakeOrgRepository{}
+		orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		ui := callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-			callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestCreateOrg", func() {
-
-			orgRepo := &testapi.FakeOrgRepository{}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			ui := callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Creating org", "my-org", "my-user"},
-				{"OK"},
-			})
-			assert.Equal(mr.T(), orgRepo.CreateName, "my-org")
-		})
-		It("TestCreateOrgWhenAlreadyExists", func() {
-
-			orgRepo := &testapi.FakeOrgRepository{CreateOrgExists: true}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			ui := callCreateOrg(mr.T(), []string{"my-org"}, reqFactory, orgRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Creating org", "my-org"},
-				{"OK"},
-				{"my-org", "already exists"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Creating org", "my-org"},
+			{"OK"},
+			{"my-org", "already exists"},
 		})
 	})
-}
+})

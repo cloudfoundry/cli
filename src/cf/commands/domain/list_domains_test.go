@@ -16,147 +16,145 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestListDomainsRequirements", func() {
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			domainRepo := &testapi.FakeDomainRepository{}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestListDomainsRequirements", func() {
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		domainRepo := &testapi.FakeDomainRepository{}
 
-			callListDomains([]string{}, reqFactory, domainRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		callListDomains([]string{}, reqFactory, domainRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-			callListDomains([]string{}, reqFactory, domainRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callListDomains([]string{}, reqFactory, domainRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-			callListDomains([]string{}, reqFactory, domainRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestListDomainsFailsWithUsage", func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callListDomains([]string{}, reqFactory, domainRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestListDomainsFailsWithUsage", func() {
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
-			domainRepo := &testapi.FakeDomainRepository{}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+		domainRepo := &testapi.FakeDomainRepository{}
 
-			ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestListDomains", func() {
+		ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+	})
+	It("TestListDomains", func() {
 
-			orgFields := models.OrganizationFields{}
-			orgFields.Name = "my-org"
-			orgFields.Guid = "my-org-guid"
+		orgFields := models.OrganizationFields{}
+		orgFields.Name = "my-org"
+		orgFields.Guid = "my-org-guid"
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-			domain1 := models.DomainFields{}
-			domain1.Shared = true
-			domain1.Name = "Domain1"
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+		domain1 := models.DomainFields{}
+		domain1.Shared = true
+		domain1.Name = "Domain1"
 
-			domain2 := models.DomainFields{}
-			domain2.Shared = false
-			domain2.Name = "Domain2"
+		domain2 := models.DomainFields{}
+		domain2.Shared = false
+		domain2.Name = "Domain2"
 
-			domain3 := models.DomainFields{}
-			domain3.Shared = false
-			domain3.Name = "Domain3"
+		domain3 := models.DomainFields{}
+		domain3.Shared = false
+		domain3.Name = "Domain3"
 
-			domainRepo := &testapi.FakeDomainRepository{
-				ListSharedDomainsDomains: []models.DomainFields{domain1},
-				ListDomainsForOrgDomains: []models.DomainFields{domain2, domain3},
-			}
+		domainRepo := &testapi.FakeDomainRepository{
+			ListSharedDomainsDomains: []models.DomainFields{domain1},
+			ListDomainsForOrgDomains: []models.DomainFields{domain2, domain3},
+		}
 
-			ui := callListDomains([]string{}, reqFactory, domainRepo)
+		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-			assert.Equal(mr.T(), domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
+		assert.Equal(mr.T(), domainRepo.ListDomainsForOrgDomainsGuid, "my-org-guid")
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting domains in org", "my-org", "my-user"},
-				{"name", "status"},
-				{"Domain1", "shared"},
-				{"Domain2", "owned"},
-				{"Domain3", "owned"},
-			})
-		})
-		It("TestListDomainsWhenThereAreNone", func() {
-
-			orgFields := models.OrganizationFields{}
-			orgFields.Name = "my-org"
-			orgFields.Guid = "my-org-guid"
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-			domainRepo := &testapi.FakeDomainRepository{}
-
-			ui := callListDomains([]string{}, reqFactory, domainRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting domains in org", "my-org", "my-user"},
-				{"No domains found"},
-			})
-		})
-		It("TestListDomainsSharedDomainsFails", func() {
-
-			orgFields := models.OrganizationFields{}
-			orgFields.Name = "my-org"
-			orgFields.Guid = "my-org-guid"
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-
-			domainRepo := &testapi.FakeDomainRepository{
-				ListSharedDomainsApiResponse: net.NewApiResponseWithMessage("borked!"),
-			}
-			ui := callListDomains([]string{}, reqFactory, domainRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting domains in org", "my-org", "my-user"},
-				{"failed"},
-				{"shared domains"},
-				{"borked!"},
-			})
-		})
-		It("TestListDomainsSharedDomainsTriesOldEndpointOn404", func() {
-
-			orgFields := models.OrganizationFields{}
-			orgFields.Name = "my-org"
-			orgFields.Guid = "my-org-guid"
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-
-			domain := models.DomainFields{}
-			domain.Name = "ze-domain"
-
-			domainRepo := &testapi.FakeDomainRepository{
-				ListSharedDomainsApiResponse: net.NewNotFoundApiResponse("whoops! misplaced yr domainz"),
-				ListDomainsForOrgDomains:     []models.DomainFields{domain},
-			}
-			ui := callListDomains([]string{}, reqFactory, domainRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting domains in org", "my-org", "my-user"},
-				{"ze-domain"},
-			})
-		})
-		It("TestListDomainsOrgDomainsFails", func() {
-
-			orgFields := models.OrganizationFields{}
-			orgFields.Name = "my-org"
-			orgFields.Guid = "my-org-guid"
-
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-
-			domainRepo := &testapi.FakeDomainRepository{
-				ListDomainsForOrgApiResponse: net.NewApiResponseWithMessage("borked!"),
-			}
-			ui := callListDomains([]string{}, reqFactory, domainRepo)
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting domains in org", "my-org", "my-user"},
-				{"failed"},
-				{"private domains"},
-				{"borked!"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting domains in org", "my-org", "my-user"},
+			{"name", "status"},
+			{"Domain1", "shared"},
+			{"Domain2", "owned"},
+			{"Domain3", "owned"},
 		})
 	})
-}
+	It("TestListDomainsWhenThereAreNone", func() {
+
+		orgFields := models.OrganizationFields{}
+		orgFields.Name = "my-org"
+		orgFields.Guid = "my-org-guid"
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+		domainRepo := &testapi.FakeDomainRepository{}
+
+		ui := callListDomains([]string{}, reqFactory, domainRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting domains in org", "my-org", "my-user"},
+			{"No domains found"},
+		})
+	})
+	It("TestListDomainsSharedDomainsFails", func() {
+
+		orgFields := models.OrganizationFields{}
+		orgFields.Name = "my-org"
+		orgFields.Guid = "my-org-guid"
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+		domainRepo := &testapi.FakeDomainRepository{
+			ListSharedDomainsApiResponse: net.NewApiResponseWithMessage("borked!"),
+		}
+		ui := callListDomains([]string{}, reqFactory, domainRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting domains in org", "my-org", "my-user"},
+			{"failed"},
+			{"shared domains"},
+			{"borked!"},
+		})
+	})
+	It("TestListDomainsSharedDomainsTriesOldEndpointOn404", func() {
+
+		orgFields := models.OrganizationFields{}
+		orgFields.Name = "my-org"
+		orgFields.Guid = "my-org-guid"
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+		domain := models.DomainFields{}
+		domain.Name = "ze-domain"
+
+		domainRepo := &testapi.FakeDomainRepository{
+			ListSharedDomainsApiResponse: net.NewNotFoundApiResponse("whoops! misplaced yr domainz"),
+			ListDomainsForOrgDomains:     []models.DomainFields{domain},
+		}
+		ui := callListDomains([]string{}, reqFactory, domainRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting domains in org", "my-org", "my-user"},
+			{"ze-domain"},
+		})
+	})
+	It("TestListDomainsOrgDomainsFails", func() {
+
+		orgFields := models.OrganizationFields{}
+		orgFields.Name = "my-org"
+		orgFields.Guid = "my-org-guid"
+
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
+
+		domainRepo := &testapi.FakeDomainRepository{
+			ListDomainsForOrgApiResponse: net.NewApiResponseWithMessage("borked!"),
+		}
+		ui := callListDomains([]string{}, reqFactory, domainRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting domains in org", "my-org", "my-user"},
+			{"failed"},
+			{"private domains"},
+			{"borked!"},
+		})
+	})
+})
 
 func callListDomains(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)

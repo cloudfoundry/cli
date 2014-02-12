@@ -7,16 +7,15 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func init() {
-	Describe("Parsing V2 config files", func() {
-		Describe("when the file is not valid", func() {
-			It("returns an error", func() {
+var _ = Describe("Parsing V2 config files", func() {
+	Describe("when the file is not valid", func() {
+		It("returns an error", func() {
 
-			})
 		})
+	})
 
-		Describe("when the file is valid", func() {
-			var json = []byte(`
+	Describe("when the file is valid", func() {
+		var json = []byte(`
 			{
 				"ConfigVersion": 2,
 				"Target": "api.example.com",
@@ -33,22 +32,21 @@ func init() {
 				}
 			}`)
 
-			It("returns a populated config object", func() {
-				configData := NewData()
-				err := JsonUnmarshalV2(json, configData)
+		It("returns a populated config object", func() {
+			configData := NewData()
+			err := JsonUnmarshalV2(json, configData)
 
-				Expect(err).NotTo(HaveOccurred())
-				Expect(configData).To(Equal(&Data{
-					Target:                "api.example.com",
-					ApiVersion:            "2",
-					AuthorizationEndpoint: "auth.example.com",
-					LoggregatorEndPoint:   "logs.example.com",
-					AccessToken:           "the-access-token",
-					RefreshToken:          "the-refresh-token",
-					OrganizationFields:    models.OrganizationFields{Name: "the-org"},
-					SpaceFields:           models.SpaceFields{Name: "the-space"},
-				}))
-			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(configData).To(Equal(&Data{
+				Target:                "api.example.com",
+				ApiVersion:            "2",
+				AuthorizationEndpoint: "auth.example.com",
+				LoggregatorEndPoint:   "logs.example.com",
+				AccessToken:           "the-access-token",
+				RefreshToken:          "the-refresh-token",
+				OrganizationFields:    models.OrganizationFields{Name: "the-org"},
+				SpaceFields:           models.SpaceFields{Name: "the-space"},
+			}))
 		})
 	})
-}
+})

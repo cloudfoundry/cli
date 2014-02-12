@@ -34,35 +34,34 @@ func callListQuotas(t mr.TestingT, reqFactory *testreq.FakeReqFactory, quotaRepo
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestListQuotasRequirements", func() {
-			quotaRepo := &testapi.FakeQuotaRepository{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callListQuotas(mr.T(), reqFactory, quotaRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestListQuotasRequirements", func() {
+		quotaRepo := &testapi.FakeQuotaRepository{}
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-			callListQuotas(mr.T(), reqFactory, quotaRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestListQuotas", func() {
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callListQuotas(mr.T(), reqFactory, quotaRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			quota := models.QuotaFields{}
-			quota.Name = "quota-name"
-			quota.MemoryLimit = 1024
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callListQuotas(mr.T(), reqFactory, quotaRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestListQuotas", func() {
 
-			quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []models.QuotaFields{quota}}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			ui := callListQuotas(mr.T(), reqFactory, quotaRepo)
+		quota := models.QuotaFields{}
+		quota.Name = "quota-name"
+		quota.MemoryLimit = 1024
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Getting quotas as", "my-user"},
-				{"OK"},
-				{"name", "memory limit"},
-				{"quota-name", "1g"},
-			})
+		quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []models.QuotaFields{quota}}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		ui := callListQuotas(mr.T(), reqFactory, quotaRepo)
+
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Getting quotas as", "my-user"},
+			{"OK"},
+			{"name", "memory limit"},
+			{"quota-name", "1g"},
 		})
 	})
-}
+})

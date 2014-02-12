@@ -11,29 +11,27 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestTargetedOrgRequirement", func() {
-			ui := new(testterm.FakeUI)
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
-			config := testconfig.NewRepositoryWithDefaults()
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestTargetedOrgRequirement", func() {
+		ui := new(testterm.FakeUI)
+		org := models.OrganizationFields{}
+		org.Name = "my-org"
+		org.Guid = "my-org-guid"
+		config := testconfig.NewRepositoryWithDefaults()
 
-			req := NewTargetedOrgRequirement(ui, config)
-			success := req.Execute()
-			assert.True(mr.T(), success)
+		req := NewTargetedOrgRequirement(ui, config)
+		success := req.Execute()
+		assert.True(mr.T(), success)
 
-			config.SetOrganizationFields(models.OrganizationFields{})
+		config.SetOrganizationFields(models.OrganizationFields{})
 
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				NewTargetedOrgRequirement(ui, config).Execute()
-			})
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			NewTargetedOrgRequirement(ui, config).Execute()
+		})
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"No org targeted"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"FAILED"},
+			{"No org targeted"},
 		})
 	})
-}
+})

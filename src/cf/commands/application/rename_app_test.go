@@ -14,45 +14,43 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestRenameAppFailsWithUsage", func() {
-			reqFactory := &testreq.FakeReqFactory{}
-			appRepo := &testapi.FakeApplicationRepository{}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestRenameAppFailsWithUsage", func() {
+		reqFactory := &testreq.FakeReqFactory{}
+		appRepo := &testapi.FakeApplicationRepository{}
 
-			ui := callRename(mr.T(), []string{}, reqFactory, appRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui := callRename(mr.T(), []string{}, reqFactory, appRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callRename(mr.T(), []string{"foo"}, reqFactory, appRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestRenameRequirements", func() {
+		ui = callRename(mr.T(), []string{"foo"}, reqFactory, appRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+	})
+	It("TestRenameRequirements", func() {
 
-			appRepo := &testapi.FakeApplicationRepository{}
+		appRepo := &testapi.FakeApplicationRepository{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		})
-		It("TestRenameRun", func() {
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+	})
+	It("TestRenameRun", func() {
 
-			appRepo := &testapi.FakeApplicationRepository{}
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
-			ui := callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
+		appRepo := &testapi.FakeApplicationRepository{}
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, Application: app}
+		ui := callRename(mr.T(), []string{"my-app", "my-new-app"}, reqFactory, appRepo)
 
-			assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
-			assert.Equal(mr.T(), *appRepo.UpdateParams.Name, "my-new-app")
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
-				{"OK"},
-			})
+		assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
+		assert.Equal(mr.T(), *appRepo.UpdateParams.Name, "my-new-app")
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Renaming app", "my-app", "my-new-app", "my-org", "my-space", "my-user"},
+			{"OK"},
 		})
 	})
-}
+})
 
 func callRename(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, appRepo *testapi.FakeApplicationRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)

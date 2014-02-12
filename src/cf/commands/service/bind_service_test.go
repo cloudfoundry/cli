@@ -25,69 +25,68 @@ func callBindService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFa
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestBindCommand", func() {
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "my-service"
-			serviceInstance.Guid = "my-service-guid"
-			reqFactory := &testreq.FakeReqFactory{
-				Application:     app,
-				ServiceInstance: serviceInstance,
-			}
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-			ui := callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-			assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestBindCommand", func() {
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "my-service"
+		serviceInstance.Guid = "my-service-guid"
+		reqFactory := &testreq.FakeReqFactory{
+			Application:     app,
+			ServiceInstance: serviceInstance,
+		}
+		serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+		ui := callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-			assert.Equal(mr.T(), len(ui.Outputs), 3)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
-				{"OK"},
-				{"TIP"},
-			})
-			assert.Equal(mr.T(), serviceBindingRepo.CreateServiceInstanceGuid, "my-service-guid")
-			assert.Equal(mr.T(), serviceBindingRepo.CreateApplicationGuid, "my-app-guid")
+		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+
+		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Binding service", "my-service", "my-app", "my-org", "my-space", "my-user"},
+			{"OK"},
+			{"TIP"},
 		})
-		It("TestBindCommandIfServiceIsAlreadyBound", func() {
+		assert.Equal(mr.T(), serviceBindingRepo.CreateServiceInstanceGuid, "my-service-guid")
+		assert.Equal(mr.T(), serviceBindingRepo.CreateApplicationGuid, "my-app-guid")
+	})
+	It("TestBindCommandIfServiceIsAlreadyBound", func() {
 
-			app := models.Application{}
-			app.Name = "my-app"
-			app.Guid = "my-app-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "my-service"
-			serviceInstance.Guid = "my-service-guid"
-			reqFactory := &testreq.FakeReqFactory{
-				Application:     app,
-				ServiceInstance: serviceInstance,
-			}
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
-			ui := callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
+		app := models.Application{}
+		app.Name = "my-app"
+		app.Guid = "my-app-guid"
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "my-service"
+		serviceInstance.Guid = "my-service-guid"
+		reqFactory := &testreq.FakeReqFactory{
+			Application:     app,
+			ServiceInstance: serviceInstance,
+		}
+		serviceBindingRepo := &testapi.FakeServiceBindingRepo{CreateErrorCode: "90003"}
+		ui := callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-			assert.Equal(mr.T(), len(ui.Outputs), 3)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Binding service"},
-				{"OK"},
-				{"my-app", "is already bound", "my-service"},
-			})
-		})
-		It("TestBindCommandFailsWithUsage", func() {
-
-			reqFactory := &testreq.FakeReqFactory{}
-			serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
-
-			ui := callBindService(mr.T(), []string{"my-service"}, reqFactory, serviceBindingRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-
-			ui = callBindService(mr.T(), []string{"my-app"}, reqFactory, serviceBindingRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
-
-			ui = callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
-			assert.False(mr.T(), ui.FailedWithUsage)
+		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Binding service"},
+			{"OK"},
+			{"my-app", "is already bound", "my-service"},
 		})
 	})
-}
+	It("TestBindCommandFailsWithUsage", func() {
+
+		reqFactory := &testreq.FakeReqFactory{}
+		serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
+
+		ui := callBindService(mr.T(), []string{"my-service"}, reqFactory, serviceBindingRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+
+		ui = callBindService(mr.T(), []string{"my-app"}, reqFactory, serviceBindingRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
+
+		ui = callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
+		assert.False(mr.T(), ui.FailedWithUsage)
+	})
+})

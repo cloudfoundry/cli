@@ -28,32 +28,30 @@ var expectedCommandNames = []string{
 	"update-buildpack", "update-service-broker", "update-service-auth-token", "update-user-provided-service",
 }
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestCommands", func() {
-			ui := &testterm.FakeUI{}
-			config := testconfig.NewRepository()
-			manifestRepo := &testmanifest.FakeManifestRepository{}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestCommands", func() {
+		ui := &testterm.FakeUI{}
+		config := testconfig.NewRepository()
+		manifestRepo := &testmanifest.FakeManifestRepository{}
 
-			repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
-				"auth":             net.NewUAAGateway(),
-				"cloud-controller": net.NewCloudControllerGateway(),
-				"uaa":              net.NewUAAGateway(),
-			})
-
-			cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
-			cmdRunner := &FakeRunner{cmdFactory: cmdFactory}
-
-			for _, cmdName := range expectedCommandNames {
-				app, err := NewApp(cmdRunner)
-				Expect(err).NotTo(HaveOccurred())
-
-				app.Run([]string{"", cmdName})
-				Expect(cmdRunner.cmdName).To(Equal(cmdName))
-			}
+		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
+			"auth":             net.NewUAAGateway(),
+			"cloud-controller": net.NewCloudControllerGateway(),
+			"uaa":              net.NewUAAGateway(),
 		})
+
+		cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)
+		cmdRunner := &FakeRunner{cmdFactory: cmdFactory}
+
+		for _, cmdName := range expectedCommandNames {
+			app, err := NewApp(cmdRunner)
+			Expect(err).NotTo(HaveOccurred())
+
+			app.Run([]string{"", cmdName})
+			Expect(cmdRunner.cmdName).To(Equal(cmdName))
+		}
 	})
-}
+})
 
 type FakeRunner struct {
 	cmdFactory commands.Factory
