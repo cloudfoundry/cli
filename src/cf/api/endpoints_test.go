@@ -8,8 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -103,8 +101,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.foo.example.org:4443"))
 		Expect(config.ApiEndpoint()).To(Equal(ts.URL))
 		Expect(config.ApiVersion()).To(Equal("42.0.0"))
-		assert.False(mr.T(), config.HasOrganization())
-		assert.False(mr.T(), config.HasSpace())
+		Expect(config.HasOrganization()).To(BeFalse())
+		Expect(config.HasSpace()).To(BeFalse())
 	})
 
 	It("TestUpdateEndpointWhenUrlIsAlreadyTargeted", func() {
@@ -141,7 +139,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
 		Expect("https://" + schemelessURL).To(Equal(endpoint))
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(config.AccessToken()).To(Equal(""))
 		Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
@@ -158,7 +156,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
 		Expect("http://" + schemelessURL).To(Equal(endpoint))
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(config.AccessToken()).To(Equal(""))
 		Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
@@ -175,7 +173,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.UpdateEndpoint(ts.URL)
 
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 	})
 
 	It("TestUpdateEndpointWhenEndpointReturnsInvalidJson", func() {
@@ -184,7 +182,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.UpdateEndpoint(ts.URL)
 
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 	})
 
 	It("TestGetCloudControllerEndpoint", func() {
@@ -194,7 +192,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		endpoint, apiResponse := repo.GetCloudControllerEndpoint()
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(endpoint).To(Equal("http://api.example.com"))
 	})
 
@@ -205,7 +203,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(endpoint).To(Equal("wss://loggregator.example.com:4443"))
 	})
 
@@ -220,7 +218,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			endpoint, apiResponse := repo.GetLoggregatorEndpoint()
-			assert.True(mr.T(), apiResponse.IsSuccessful())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			Expect(endpoint).To(Equal("wss://loggregator.run.pivotal.io:4443"))
 		})
 
@@ -230,7 +228,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 			endpoint, apiResponse := repo.GetLoggregatorEndpoint()
-			assert.True(mr.T(), apiResponse.IsSuccessful())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			Expect(endpoint).To(Equal("ws://loggregator.run.pivotal.io:80"))
 		})
 	})
@@ -243,7 +241,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		endpoint, apiResponse := repo.GetUAAEndpoint()
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(endpoint).To(Equal("https://uaa.example.com"))
 	})
 
@@ -252,12 +250,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 		_, response := repo.GetLoggregatorEndpoint()
-		assert.True(mr.T(), response.IsNotSuccessful())
+		Expect(response.IsNotSuccessful()).To(BeTrue())
 
 		_, response = repo.GetCloudControllerEndpoint()
-		assert.True(mr.T(), response.IsNotSuccessful())
+		Expect(response.IsNotSuccessful()).To(BeTrue())
 
 		_, response = repo.GetUAAEndpoint()
-		assert.True(mr.T(), response.IsNotSuccessful())
+		Expect(response.IsNotSuccessful()).To(BeTrue())
 	})
 })

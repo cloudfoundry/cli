@@ -5,8 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
@@ -27,10 +25,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		starter := &testcmd.FakeAppStarter{}
 		stopper := &testcmd.FakeAppStopper{}
 		ui := callRestart([]string{}, reqFactory, starter, stopper)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestRestartRequirements", func() {
 
@@ -42,15 +40,15 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: false, TargetedSpaceSuccess: true}
 		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: false}
 		callRestart([]string{"my-app"}, reqFactory, starter, stopper)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestRestartApplication", func() {
 

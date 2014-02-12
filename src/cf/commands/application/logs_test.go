@@ -6,7 +6,6 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -22,10 +21,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory, logsRepo := getLogsDependencies()
 
 		ui := callLogs([]string{}, reqFactory, logsRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callLogs([]string{"foo"}, reqFactory, logsRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestLogsRequirements", func() {
 
@@ -33,12 +32,12 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = true
 		callLogs([]string{"my-app"}, reqFactory, logsRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 
 		reqFactory.LoginSuccess = false
 		callLogs([]string{"my-app"}, reqFactory, logsRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestLogsOutputsRecentLogs", func() {
 

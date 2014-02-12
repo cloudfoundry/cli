@@ -4,6 +4,7 @@ import (
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
@@ -30,11 +31,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 		apiResponse = gateway.PerformRequest(request)
 
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		assert.Contains(mr.T(), apiResponse.Message, "The host is taken: test1")
 		assert.Contains(mr.T(), apiResponse.ErrorCode, "210003")
 	})
@@ -46,11 +47,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 		apiResponse = gateway.PerformRequest(request)
 
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		assert.Contains(mr.T(), apiResponse.Message, "The token is invalid")
 		assert.Contains(mr.T(), apiResponse.ErrorCode, INVALID_TOKEN_CODE)
 	})

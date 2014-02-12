@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -43,19 +42,19 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory, spaceRepo, userRepo := getSetSpaceRoleDeps()
 
 		ui := callSetSpaceRole(mr.T(), []string{}, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetSpaceRole(mr.T(), []string{"my-user"}, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetSpaceRole(mr.T(), []string{"my-user", "my-org"}, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetSpaceRole(mr.T(), []string{"my-user", "my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callSetSpaceRole(mr.T(), []string{"my-user", "my-org", "my-space", "my-role"}, reqFactory, spaceRepo, userRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestSetSpaceRoleRequirements", func() {
 
@@ -64,11 +63,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callSetSpaceRole(mr.T(), args, reqFactory, spaceRepo, userRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callSetSpaceRole(mr.T(), args, reqFactory, spaceRepo, userRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect(reqFactory.UserUsername).To(Equal("username"))
 		Expect(reqFactory.OrganizationName).To(Equal("org"))

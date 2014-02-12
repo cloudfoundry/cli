@@ -27,15 +27,15 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
 		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
 		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
 		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestAppFailsWithUsage", func() {
@@ -45,8 +45,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
 		ui := callApp([]string{}, reqFactory, appSummaryRepo, appInstancesRepo)
 
-		assert.True(mr.T(), ui.FailedWithUsage)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestDisplayingAppSummary", func() {
 

@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -22,26 +21,26 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 		callCreateDomain([]string{"my-org", "example.com"}, reqFactory, domainRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.OrganizationName).To(Equal("my-org"))
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
 
 		callCreateDomain([]string{"my-org", "example.com"}, reqFactory, domainRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestCreateDomainFailsWithUsage", func() {
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
 		ui := callCreateDomain([]string{""}, reqFactory, domainRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateDomain([]string{"org1"}, reqFactory, domainRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callCreateDomain([]string{"org1", "example.com"}, reqFactory, domainRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestCreateDomain", func() {
 

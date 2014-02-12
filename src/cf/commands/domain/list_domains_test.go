@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -23,15 +22,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
 
 		callListDomains([]string{}, reqFactory, domainRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 		callListDomains([]string{}, reqFactory, domainRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
 		callListDomains([]string{}, reqFactory, domainRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestListDomainsFailsWithUsage", func() {
 
@@ -39,7 +38,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
 
 		ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestListDomains", func() {
 

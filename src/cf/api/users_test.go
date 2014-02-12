@@ -29,9 +29,9 @@ var _ = Describe("UserRepository", func() {
 
 			users, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
-			assert.True(mr.T(), ccHandler.AllRequestsCalled())
-			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
+			Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 			Expect(len(users)).To(Equal(3))
 			Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -49,9 +49,9 @@ var _ = Describe("UserRepository", func() {
 
 			users, apiResponse := repo.ListUsersInSpaceForRole("my-space-guid", models.SPACE_MANAGER)
 
-			assert.True(mr.T(), ccHandler.AllRequestsCalled())
-			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
+			Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 			Expect(len(users)).To(Equal(3))
 			Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -76,7 +76,7 @@ var _ = Describe("UserRepository", func() {
 
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
-			assert.True(mr.T(), ccHandler.AllRequestsCalled())
+			Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
 			Expect(apiResponse.StatusCode).To(Equal(http.StatusGatewayTimeout))
 		})
 
@@ -113,8 +113,8 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		expectedUserFields := models.UserFields{}
 		expectedUserFields.Username = "my-full-username"
@@ -133,9 +133,9 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		_, apiResponse := repo.FindByUsername("my-user")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsError())
-		assert.True(mr.T(), apiResponse.IsNotFound())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 		assert.Contains(mr.T(), apiResponse.Message, "User my-user not found")
 	})
 
@@ -169,9 +169,9 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		apiResponse := repo.Create("my-user", "my-password")
-		assert.True(mr.T(), ccHandler.AllRequestsCalled())
-		assert.True(mr.T(), uaaHandler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteUser", func() {
@@ -192,9 +192,9 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		apiResponse := repo.Delete("my-user-guid")
-		assert.True(mr.T(), ccHandler.AllRequestsCalled())
-		assert.True(mr.T(), uaaHandler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestDeleteUserWhenNotFoundOnTheCloudController", func() {
@@ -215,9 +215,9 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		apiResponse := repo.Delete("my-user-guid")
-		assert.True(mr.T(), ccHandler.AllRequestsCalled())
-		assert.True(mr.T(), uaaHandler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestSetOrgRoleToOrgManager", func() {
@@ -236,7 +236,7 @@ var _ = Describe("UserRepository", func() {
 		repo := createUsersRepoWithoutEndpoints()
 		apiResponse := repo.SetOrgRole("user-guid", "org-guid", "foo")
 
-		assert.False(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeFalse())
 		assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
 	})
 
@@ -256,7 +256,7 @@ var _ = Describe("UserRepository", func() {
 		repo := createUsersRepoWithoutEndpoints()
 		apiResponse := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
 
-		assert.False(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeFalse())
 		assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
 	})
 
@@ -276,7 +276,7 @@ var _ = Describe("UserRepository", func() {
 		repo := createUsersRepoWithoutEndpoints()
 		apiResponse := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
 
-		assert.False(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeFalse())
 		assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
 	})
 
@@ -290,9 +290,9 @@ var _ = Describe("UserRepository", func() {
 
 		users, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_USER)
 
-		assert.True(t, ccHandler.AllRequestsCalled())
-		assert.True(t, uaaHandler.AllRequestsCalled())
-		assert.True(t, apiResponse.IsSuccessful())
+		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(len(users)).To(Equal(3))
 		Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -373,8 +373,8 @@ func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
 
 	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
 
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
 func testUnsetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
@@ -389,8 +389,8 @@ func testUnsetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
 
 	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
 
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
 func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
@@ -411,8 +411,8 @@ func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
 
 	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
 
-	assert.True(t, handler.AllRequestsCalled())
-	assert.True(t, apiResponse.IsSuccessful())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
 func createUsersRepoWithoutEndpoints() (repo UserRepository) {

@@ -5,7 +5,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -26,9 +25,9 @@ var _ = Describe("AppSummaryRepository", func() {
 		defer ts.Close()
 
 		apps, apiResponse := repo.GetSummariesInCurrentSpace()
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(2).To(Equal(len(apps)))
 
 		app1 := apps[0]

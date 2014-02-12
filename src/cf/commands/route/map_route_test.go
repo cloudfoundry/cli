@@ -6,7 +6,6 @@ import (
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -32,13 +31,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		routeRepo := &testapi.FakeRouteRepository{}
 
 		ui := callMapRoute(mr.T(), []string{}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callMapRoute(mr.T(), []string{"foo"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callMapRoute(mr.T(), []string{"foo", "bar"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestMapRouteRequirements", func() {
 
@@ -46,7 +45,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
 		callMapRoute(mr.T(), []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(reqFactory.DomainName).To(Equal("my-domain.com"))
 	})

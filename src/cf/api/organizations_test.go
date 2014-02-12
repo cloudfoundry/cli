@@ -6,8 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -58,8 +56,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(orgs[0].Guid).To(Equal("org1-guid"))
 		Expect(orgs[1].Guid).To(Equal("org2-guid"))
 		Expect(orgs[2].Guid).To(Equal("org3-guid"))
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestOrganizationsListOrgsWithNoOrgs", func() {
@@ -78,9 +76,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			return false
 		})
 
-		assert.False(mr.T(), wasCalled)
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(wasCalled).To(BeFalse())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestOrganizationsFindByName", func() {
@@ -116,8 +114,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		existingOrg.Name = "Org1"
 
 		org, apiResponse := repo.FindByName("Org1")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 		Expect(org.Name).To(Equal(existingOrg.Name))
 		Expect(org.Guid).To(Equal(existingOrg.Guid))
@@ -142,9 +140,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		_, apiResponse := repo.FindByName("org1")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsError())
-		assert.True(mr.T(), apiResponse.IsNotFound())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
 	It("TestCreateOrganization", func() {
@@ -159,8 +157,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Create("my-org")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestRenameOrganization", func() {
@@ -175,8 +173,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Rename("my-org-guid", "my-new-org")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteOrganization", func() {
@@ -191,8 +189,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-org-guid")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })
 

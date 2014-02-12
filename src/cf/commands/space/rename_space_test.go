@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -31,10 +30,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		spaceRepo := &testapi.FakeSpaceRepository{}
 
 		ui := callRenameSpace(mr.T(), []string{}, reqFactory, spaceRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callRenameSpace(mr.T(), []string{"foo"}, reqFactory, spaceRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
 	It("TestRenameSpaceRequirements", func() {
@@ -43,15 +42,15 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
 		callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
 		callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		callRenameSpace(mr.T(), []string{"my-space", "my-new-space"}, reqFactory, spaceRepo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.SpaceName).To(Equal("my-space"))
 	})
 

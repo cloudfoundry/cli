@@ -4,8 +4,7 @@ import (
 	. "cf/api"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -26,8 +25,8 @@ var _ = Describe("CloudControllerPasswordRepository", func() {
 		defer passwordUpdateServer.Close()
 
 		apiResponse := repo.UpdatePassword("old-password", "new-password")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })
 

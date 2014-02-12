@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -26,11 +25,11 @@ var _ = Describe("DomainRepository", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(len(receivedDomains)).To(Equal(2))
 		Expect(receivedDomains[0].Guid).To(Equal("shared-domain1-guid"))
 		Expect(receivedDomains[1].Guid).To(Equal("shared-domain2-guid"))
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestDomainListDomainsForOrgWithOldEndpoint", func() {
@@ -43,10 +42,10 @@ var _ = Describe("DomainRepository", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(len(receivedDomains)).To(Equal(1))
 		Expect(receivedDomains[0].Guid).To(Equal("domain-guid"))
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestDomainListDomainsForOrg", func() {
@@ -59,11 +58,11 @@ var _ = Describe("DomainRepository", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(len(receivedDomains)).To(Equal(3))
 		Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
 		Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestListDomainsForOrgWithNoDomains", func() {
@@ -76,9 +75,9 @@ var _ = Describe("DomainRepository", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.False(mr.T(), wasCalled)
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(wasCalled).To(BeFalse())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestDomainListDomainsForOrgWithNoDomains", func() {
@@ -97,8 +96,8 @@ var _ = Describe("DomainRepository", func() {
 			return true
 		})
 
-		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.True(mr.T(), handler.AllRequestsCalled())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
 	It("TestDomainFindByName", func() {
@@ -117,8 +116,8 @@ var _ = Describe("DomainRepository", func() {
 		defer ts.Close()
 
 		domain, apiResponse := repo.FindByName("domain2.cf-app.com")
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
 		Expect(domain.Guid).To(Equal("domain2-guid"))
@@ -147,12 +146,12 @@ var _ = Describe("DomainRepository", func() {
 			defer ts.Close()
 
 			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 			Expect(domain.Name).To(Equal("my-example.com"))
 			Expect(domain.Guid).To(Equal("my-domain-guid"))
-			assert.False(mr.T(), domain.Shared)
+			Expect(domain.Shared).To(BeFalse())
 		})
 
 		It("looks for shared domains if no there are no org-specific domains", func() {
@@ -183,12 +182,12 @@ var _ = Describe("DomainRepository", func() {
 			defer ts.Close()
 
 			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 			Expect(domain.Name).To(Equal("shared-example.com"))
 			Expect(domain.Guid).To(Equal("shared-domain-guid"))
-			assert.True(mr.T(), domain.Shared)
+			Expect(domain.Shared).To(BeTrue())
 		})
 
 		It("returns not found when neither endpoint returns a domain", func() {
@@ -208,9 +207,9 @@ var _ = Describe("DomainRepository", func() {
 			defer ts.Close()
 
 			_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.True(mr.T(), apiResponse.IsNotFound())
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsError()).To(BeFalse())
+			Expect(apiResponse.IsNotFound()).To(BeTrue())
 		})
 
 		It("returns not found when the global endpoint returns a non-shared domain", func() {
@@ -241,9 +240,9 @@ var _ = Describe("DomainRepository", func() {
 			defer ts.Close()
 
 			_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.True(mr.T(), apiResponse.IsNotFound())
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsError()).To(BeFalse())
+			Expect(apiResponse.IsNotFound()).To(BeTrue())
 		})
 	})
 
@@ -269,8 +268,8 @@ var _ = Describe("DomainRepository", func() {
 
 		createdDomain, apiResponse := repo.Create("example.com", "org-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(createdDomain.Guid).To(Equal("abc-123"))
 	})
 
@@ -290,8 +289,8 @@ var _ = Describe("DomainRepository", func() {
 
 		createdDomain, apiResponse := repo.Create("example.com", "org-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(createdDomain.Guid).To(Equal("abc-123"))
 	})
 
@@ -312,8 +311,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.CreateSharedDomain("example.com")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestCreateSharedDomainsWithOldEndpoint", func() {
@@ -339,8 +338,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.CreateSharedDomain("example.com")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestDeleteDomainWithNewEndpoint", func() {
@@ -351,8 +350,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.Delete("my-domain-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteDomainWithOldEndpoint", func() {
@@ -368,8 +367,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.Delete("my-domain-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteSharedDomainWithNewEndpoint", func() {
@@ -380,8 +379,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.DeleteSharedDomain("my-domain-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteSharedDomainWithOldEndpoint", func() {
@@ -397,8 +396,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.DeleteSharedDomain("my-domain-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
 	It("TestDeleteDomainFailure", func() {
@@ -409,8 +408,8 @@ var _ = Describe("DomainRepository", func() {
 
 		apiResponse := repo.Delete("my-domain-guid")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 	})
 })
 

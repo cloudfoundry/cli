@@ -6,8 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -32,8 +30,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken.Token = "a token"
 		apiResponse := repo.Create(authToken)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 	It("TestServiceAuthFindAll", func() {
 
@@ -68,8 +66,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		authTokens, apiResponse := repo.FindAll()
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(len(authTokens)).To(Equal(2))
 
@@ -102,8 +100,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		serviceAuthToken, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		authToken2 := models.ServiceAuthTokenFields{}
 		authToken2.Guid = "mysql-core-guid"
 		authToken2.Label = "mysql"
@@ -125,9 +123,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.False(mr.T(), apiResponse.IsError())
-		assert.True(mr.T(), apiResponse.IsNotFound())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 	It("TestServiceAuthUpdate", func() {
 
@@ -145,8 +143,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken3.Token = "a value"
 		apiResponse := repo.Update(authToken3)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 	It("TestServiceAuthDelete", func() {
 
@@ -162,8 +160,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken4.Guid = "mysql-core-guid"
 		apiResponse := repo.Delete(authToken4)
 
-		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 })
 

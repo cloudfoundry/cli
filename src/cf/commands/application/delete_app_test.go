@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -92,10 +91,10 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteCommandFailsWithUsage", func() {
 
 		ui, _, _ := deleteApp("Yes", []string{})
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui, _, _ = deleteApp("Yes", []string{"app-to-delete"})
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 })
 

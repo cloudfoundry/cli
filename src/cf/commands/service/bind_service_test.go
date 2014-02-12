@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -82,12 +81,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceBindingRepo := &testapi.FakeServiceBindingRepo{}
 
 		ui := callBindService(mr.T(), []string{"my-service"}, reqFactory, serviceBindingRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callBindService(mr.T(), []string{"my-app"}, reqFactory, serviceBindingRepo)
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui = callBindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 })

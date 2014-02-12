@@ -8,7 +8,6 @@ import (
 	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -32,7 +31,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 		success := domainReq.Execute()
 
-		assert.True(mr.T(), success)
+		Expect(success).To(BeTrue())
 		Expect(domainRepo.FindByNameInOrgName).To(Equal("example.com"))
 		Expect(domainRepo.FindByNameInOrgGuid).To(Equal("the-org-guid"))
 		Expect(domainReq.GetDomain()).To(Equal(domain))

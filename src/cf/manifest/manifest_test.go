@@ -55,7 +55,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		apps := m.Applications
 		Expect(*apps[0].InstanceCount).To(Equal(3))
 		Expect(*apps[0].Memory).To(Equal(uint64(512)))
-		assert.True(mr.T(), *apps[0].NoRoute)
+		Expect(*apps[0].NoRoute).To(BeTrue())
 	})
 
 	It("TestManifestWithInvalidMemory", func() {

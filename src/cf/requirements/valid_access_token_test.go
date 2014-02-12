@@ -3,7 +3,7 @@ package requirements_test
 import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/gomega"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -19,13 +19,13 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		req := NewValidAccessTokenRequirement(ui, appRepo)
 		success := req.Execute()
-		assert.False(mr.T(), success)
+		Expect(success).To(BeFalse())
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{{"Not logged in."}})
 
 		appRepo.ReadAuthErr = false
 
 		req = NewValidAccessTokenRequirement(ui, appRepo)
 		success = req.Execute()
-		assert.True(mr.T(), success)
+		Expect(success).To(BeTrue())
 	})
 })

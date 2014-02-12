@@ -7,7 +7,6 @@ import (
 	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -20,7 +19,6 @@ import (
 
 var _ = Describe("Purging services", func() {
 	It("does not run if the requirements are not met", func() {
-		t := mr.T()
 		deps := setupDependencies()
 
 		testcmd.RunCommand(
@@ -29,8 +27,8 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		assert.False(t, testcmd.CommandDidPassRequirements)
-		assert.True(t, deps.ui.FailedWithUsage)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		Expect(deps.ui.FailedWithUsage).To(BeTrue())
 		Expect(deps.ui.FailedWithUsageCommandName).To(Equal("purge-service-offering"))
 	})
 

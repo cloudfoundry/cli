@@ -222,7 +222,7 @@ func testUploadApp(t mr.TestingT, dir string, requests []testnet.TestRequest) (a
 	Expect(reportedPath).To(Equal(dir))
 	Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
 	Expect(reportedUploadSize).To(Equal(uint64(759)))
-	assert.True(t, handler.AllRequestsCalled())
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
 
 	return
 }
@@ -236,7 +236,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
 		apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
-		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		assert.Contains(mr.T(), apiResponse.Message, filepath.Join("foo", "bar"))
 	})
 
@@ -249,7 +249,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.NoError(mr.T(), err)
 
 		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestCreateUploadDirWithAZipFile", func() {
@@ -258,7 +258,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		dir = filepath.Join(dir, "../../fixtures/example-app.zip")
 
 		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestCreateUploadDirWithAZipLikeFile", func() {
@@ -267,7 +267,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		dir = filepath.Join(dir, "../../fixtures/example-app.azip")
 
 		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
-		assert.True(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
 	It("TestUploadAppFailsWhilePushingBits", func() {
@@ -282,6 +282,6 @@ var _ = Describe("Testing with ginkgo", func() {
 			createProgressEndpoint("failed"),
 		}
 		_, apiResponse := testUploadApp(mr.T(), dir, requests)
-		assert.False(mr.T(), apiResponse.IsSuccessful())
+		Expect(apiResponse.IsSuccessful()).To(BeFalse())
 	})
 })

@@ -23,17 +23,17 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.LoginSuccess = false
 		deps.reqFactory.TargetedSpaceSuccess = true
 		callScale(mr.T(), args, deps)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		deps.reqFactory.LoginSuccess = true
 		deps.reqFactory.TargetedSpaceSuccess = false
 		callScale(mr.T(), args, deps)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		deps.reqFactory.LoginSuccess = true
 		deps.reqFactory.TargetedSpaceSuccess = true
 		callScale(mr.T(), args, deps)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(deps.reqFactory.ApplicationName).To(Equal("my-app"))
 	})
 	It("TestScaleFailsWithUsage", func() {
@@ -42,8 +42,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callScale(mr.T(), []string{}, deps)
 
-		assert.True(mr.T(), ui.FailedWithUsage)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(ui.FailedWithUsage).To(BeTrue())
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestScaleFailsWithoutFlags", func() {
 
@@ -53,7 +53,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.TargetedSpaceSuccess = true
 
 		callScale(mr.T(), args, deps)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestScaleAll", func() {
 

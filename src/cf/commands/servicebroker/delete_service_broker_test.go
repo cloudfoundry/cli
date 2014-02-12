@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -46,10 +45,10 @@ func deleteServiceBroker(t mr.TestingT, confirmation string, args []string) (ui 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteServiceBrokerFailsWithUsage", func() {
 		ui, _, _ := deleteServiceBroker(mr.T(), "y", []string{})
-		assert.True(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeTrue())
 
 		ui, _, _ = deleteServiceBroker(mr.T(), "y", []string{"my-broker"})
-		assert.False(mr.T(), ui.FailedWithUsage)
+		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestDeleteServiceBrokerRequirements", func() {
 
@@ -58,11 +57,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory.LoginSuccess = false
 		callDeleteServiceBroker(mr.T(), []string{"-f", "my-broker"}, reqFactory, repo)
-		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
 		callDeleteServiceBroker(mr.T(), []string{"-f", "my-broker"}, reqFactory, repo)
-		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestDeleteConfirmingWithY", func() {
 
