@@ -323,10 +323,10 @@ var _ = Describe("Push Command", func() {
 		Expect(deps.appBitsRepo.UploadedDir).To(Equal("/some/path/from/manifest"))
 
 		envVars := *deps.appRepo.CreatedAppParams().EnvironmentVars
-		assert.Equal(mr.T(), envVars, map[string]string{
+		Expect(envVars).To(Equal(map[string]string{
 			"PATH": "/u/apps/my-app/bin",
 			"FOO":  "baz",
-		})
+		}))
 	})
 
 	It("TestPushingAppManifestWithErrors", func() {

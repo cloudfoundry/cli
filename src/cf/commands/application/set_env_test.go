@@ -68,10 +68,10 @@ var _ = Describe("set-env command", func() {
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
-		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+		Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
 			"DATABASE_URL": "mysql://example.com/my-db",
 			"foo":          "bar",
-		})
+		}))
 	})
 
 	It("TestSetEnvWhenItAlreadyExists", func() {
@@ -103,9 +103,9 @@ var _ = Describe("set-env command", func() {
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
-		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
+		Expect(*appRepo.UpdateParams.EnvironmentVars).To(Equal(map[string]string{
 			"DATABASE_URL": "mysql://example2.com/my-db",
-		})
+		}))
 	})
 
 	It("TestRunWhenSettingTheEnvFails", func() {
