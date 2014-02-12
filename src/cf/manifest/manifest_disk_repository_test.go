@@ -25,6 +25,15 @@ var _ = Describe("ManifestDiskRepository", func() {
 		})
 	})
 
+	Describe("given a directory that doesn't contain a file called 'manifest.yml", func() {
+		It("returns an error", func() {
+			_, path, errs := repo.ReadManifest("../../fixtures")
+
+			Expect(errs).NotTo(BeEmpty())
+			Expect(path).To(BeEmpty())
+		})
+	})
+
 	Describe("given a path to a file", func() {
 		It("reads the file at that path", func() {
 			m, path, errs := repo.ReadManifest("../../fixtures/manifests/different-manifest.yml")

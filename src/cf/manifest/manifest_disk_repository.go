@@ -25,7 +25,7 @@ func (repo ManifestDiskRepository) ReadManifest(inputPath string) (m *Manifest, 
 
 	basePath, fileName, err := repo.manifestPath(inputPath)
 	if err != nil {
-		errs = append(errs, err)
+		errs = append(errs, errors.New("Error finding manifest: "+err.Error()))
 		return
 	}
 
@@ -104,13 +104,16 @@ func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
 func (repo ManifestDiskRepository) manifestPath(userSpecifiedPath string) (manifestDir, manifestFilename string, err error) {
 	fileInfo, err := os.Stat(userSpecifiedPath)
 	if err != nil {
-		err = errors.New("Error finding manifest path: " + err.Error())
 		return
 	}
 
 	if fileInfo.IsDir() {
 		manifestDir = userSpecifiedPath
 		manifestFilename = "manifest.yml"
+		_, err = os.Stat(filepath.Join(manifestDir, manifestFilename))
+		if err != nil {
+			return
+		}
 	} else {
 		manifestDir = filepath.Dir(userSpecifiedPath)
 		manifestFilename = fileInfo.Name()
