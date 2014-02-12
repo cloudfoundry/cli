@@ -1,7 +1,8 @@
 package glob
 
 import (
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"testing"
 )
 
@@ -38,36 +39,43 @@ var nonMatches = [][]string{
 	{"/a**", "/", "/ba"},
 }
 
-func TestGlobTranslateOk(t *testing.T) {
-	for _, parts := range globs {
-		pat, exp := parts[0], parts[1]
-		got, err := translateGlob(pat)
+var _ = Describe("Glob", func() {
+	It("translates globs to regexes", func() {
+		for _, parts := range globs {
+			pat, exp := parts[0], parts[1]
+			got, err := translateGlob(pat)
 
-		assert.NoError(t, err)
-		assert.Equal(t, exp, got, "expected %q, but got %q from %q", exp, got, pat)
-	}
-}
-
-func TestGlobMatches(t *testing.T) {
-	for _, parts := range matches {
-		pat, paths := parts[0], parts[1:]
-		glob, err := CompileGlob(pat)
-
-		assert.NoError(t, err)
-		for _, path := range paths {
-			assert.True(t, glob.Match(path), "path %q should match %q", pat, path)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(exp).To(Equal(got), "expected %q, but got %q from %q", exp, got, pat)
 		}
-	}
-}
+	})
 
-func TestGlobNonMatches(t *testing.T) {
-	for _, parts := range nonMatches {
-		pat, paths := parts[0], parts[1:]
-		glob, err := CompileGlob(pat)
+	It("creates regexes that match correct file paths", func() {
+		for _, parts := range matches {
+			pat, paths := parts[0], parts[1:]
+			glob, err := CompileGlob(pat)
 
-		assert.NoError(t, err)
-		for _, path := range paths {
-			assert.False(t, glob.Match(path), "path %q should match %q", pat, path)
+			Expect(err).NotTo(HaveOccurred())
+			for _, path := range paths {
+				Expect(glob.Match(path)).To(BeTrue(), "path %q should match %q", pat, path)
+			}
 		}
-	}
+	})
+
+	It("creates regexes that do not match file incorrect file paths", func() {
+		for _, parts := range nonMatches {
+			pat, paths := parts[0], parts[1:]
+			glob, err := CompileGlob(pat)
+
+			Expect(err).NotTo(HaveOccurred())
+			for _, path := range paths {
+				Expect(glob.Match(path)).To(BeFalse(), "path %q should match %q", pat, path)
+			}
+		}
+	})
+})
+
+func TestGlobSuite(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Glob Suite")
 }
