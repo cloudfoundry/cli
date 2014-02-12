@@ -5,8 +5,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 )
@@ -31,7 +29,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse = gateway.PerformRequest(request)
 
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, "The foo is wrong")
-		assert.Contains(mr.T(), apiResponse.ErrorCode, "foo")
+		Expect(apiResponse.Message).To(ContainSubstring("The foo is wrong"))
+		Expect(apiResponse.ErrorCode).To(ContainSubstring("foo"))
 	})
 })

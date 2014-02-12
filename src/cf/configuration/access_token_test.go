@@ -4,8 +4,6 @@ import (
 	. "cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
@@ -15,7 +13,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		decodedInfo, err := DecodeAccessToken(accessToken)
 
 		Expect(err).NotTo(HaveOccurred())
-		assert.Contains(mr.T(), string(decodedInfo), "user1@example.com")
+		Expect(string(decodedInfo)).To(ContainSubstring("user1@example.com"))
 	})
 	It("TestDecodeTokenInfoWhenRestoringPadding", func() {
 
@@ -23,6 +21,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		decodedInfo, err := DecodeAccessToken(accessToken)
 
 		Expect(err).NotTo(HaveOccurred())
-		assert.Contains(mr.T(), string(decodedInfo), "tlang@gopivotal.com")
+		Expect(string(decodedInfo)).To(ContainSubstring("tlang@gopivotal.com"))
 	})
 })

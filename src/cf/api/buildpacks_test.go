@@ -141,7 +141,7 @@ var _ = Describe("Buildpacks repo", func() {
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(createdBuildpack).To(Equal(models.Buildpack{}))
 		Expect(apiResponse.ErrorCode).To(Equal("290003"))
-		assert.Contains(mr.T(), apiResponse.Message, "Buildpack is invalid")
+		Expect(apiResponse.Message).To(ContainSubstring("Buildpack is invalid"))
 	})
 
 	It("TestCreateBuildpackWithPosition", func() {

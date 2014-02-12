@@ -7,8 +7,6 @@ import (
 	"fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"io"
 	"os"
 	"path/filepath"
@@ -118,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			zipper := ApplicationZipper{}
 			err = zipper.Zip("/a/bogus/directory", zipFile)
 			Expect(err).To(HaveOccurred())
-			assert.Contains(mr.T(), err.Error(), "open /a/bogus/directory")
+			Expect(err.Error()).To(ContainSubstring("open /a/bogus/directory"))
 		})
 	})
 

@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	testapi "testhelpers/api"
@@ -55,9 +54,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		headers, body, apiResponse := repo.Request("GET", "/v2/endpoint", "", "")
 
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
-		assert.Contains(mr.T(), headers, "200")
-		assert.Contains(mr.T(), headers, "Content-Type")
-		assert.Contains(mr.T(), headers, "text/plain")
+		Expect(headers).To(ContainSubstring("200"))
+		Expect(headers).To(ContainSubstring("Content-Type"))
+		Expect(headers).To(ContainSubstring("text/plain"))
 		testassert.JSONStringEquals(mr.T(), body, jsonResponse)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
@@ -138,6 +137,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
 		Expect(apiResponse.IsError()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, "headers")
+		Expect(apiResponse.Message).To(ContainSubstring("headers"))
 	})
 })

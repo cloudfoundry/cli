@@ -27,10 +27,10 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 		apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, "Invalid buildpack")
+		Expect(apiResponse.Message).To(ContainSubstring("Invalid buildpack"))
 	})
-	It("TestUploadBuildpack", func() {
 
+	It("TestUploadBuildpack", func() {
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-buildpack")
@@ -42,8 +42,8 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		})
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
-	It("TestUploadBuildpackWithAZipFile", func() {
 
+	It("TestUploadBuildpackWithAZipFile", func() {
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")

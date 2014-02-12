@@ -6,8 +6,6 @@ import (
 	"fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
 	"os"
 	"runtime"
@@ -15,7 +13,6 @@ import (
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestTraceSetToFalse", func() {
-
 		stdOut := bytes.NewBuffer([]byte{})
 		trace.SetStdout(stdOut)
 
@@ -27,8 +24,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		result, _ := ioutil.ReadAll(stdOut)
 		Expect(string(result)).To(Equal(""))
 	})
-	It("TestTraceSetToTrue", func() {
 
+	It("TestTraceSetToTrue", func() {
 		stdOut := bytes.NewBuffer([]byte{})
 		trace.SetStdout(stdOut)
 
@@ -38,10 +35,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		logger.Print("hello world")
 
 		result, _ := ioutil.ReadAll(stdOut)
-		assert.Contains(mr.T(), string(result), "hello world")
+		Expect(string(result)).To(ContainSubstring("hello world"))
 	})
-	It("TestTraceSetToFile", func() {
 
+	It("TestTraceSetToFile", func() {
 		stdOut := bytes.NewBuffer([]byte{})
 		trace.SetStdout(stdOut)
 
@@ -59,15 +56,15 @@ var _ = Describe("Testing with ginkgo", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			byteString := string(result)
-			assert.Contains(mr.T(), byteString, "pre-existing content")
-			assert.Contains(mr.T(), byteString, "hello world")
+			Expect(byteString).To(ContainSubstring("pre-existing content"))
+			Expect(byteString).To(ContainSubstring("hello world"))
 
 			result, _ = ioutil.ReadAll(stdOut)
 			Expect(string(result)).To(Equal(""))
 		})
 	})
-	It("TestTraceSetToInvalidFile", func() {
 
+	It("TestTraceSetToInvalidFile", func() {
 		if runtime.GOOS != "windows" {
 			stdOut := bytes.NewBuffer([]byte{})
 			trace.SetStdout(stdOut)
@@ -86,7 +83,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Expect(string(result)).To(Equal(""))
 
 				result, _ = ioutil.ReadAll(stdOut)
-				assert.Contains(mr.T(), string(result), "hello world")
+				Expect(string(result)).To(ContainSubstring("hello world"))
 			})
 		}
 	})

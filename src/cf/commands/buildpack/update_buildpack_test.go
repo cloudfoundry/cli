@@ -86,9 +86,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.NotNil(mr.T(), repo.UpdateBuildpack.Enabled)
 		Expect(*repo.UpdateBuildpack.Enabled).To(Equal(true))
 
-		assert.Contains(mr.T(), fakeUI.Outputs[0], "Updating buildpack")
-		assert.Contains(mr.T(), fakeUI.Outputs[0], "my-buildpack")
-		assert.Contains(mr.T(), fakeUI.Outputs[1], "OK")
+		Expect(fakeUI.Outputs[0]).To(ContainSubstring("Updating buildpack"))
+		Expect(fakeUI.Outputs[0]).To(ContainSubstring("my-buildpack"))
+		Expect(fakeUI.Outputs[1]).To(ContainSubstring("OK"))
 	})
 	It("TestUpdateBuildpackDisabled", func() {
 
@@ -146,9 +146,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.NotNil(mr.T(), repo.UpdateBuildpack.Locked)
 		Expect(*repo.UpdateBuildpack.Locked).To(Equal(true))
 
-		assert.Contains(mr.T(), ui.Outputs[0], "Updating buildpack")
-		assert.Contains(mr.T(), ui.Outputs[0], "my-buildpack")
-		assert.Contains(mr.T(), ui.Outputs[1], "OK")
+		Expect(ui.Outputs[0]).To(ContainSubstring("Updating buildpack"))
+		Expect(ui.Outputs[0]).To(ContainSubstring("my-buildpack"))
+		Expect(ui.Outputs[1]).To(ContainSubstring("OK"))
 	})
 	It("TestUpdateBuildpackUnlock", func() {
 
@@ -157,9 +157,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"--unlock", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Contains(mr.T(), ui.Outputs[0], "Updating buildpack")
-		assert.Contains(mr.T(), ui.Outputs[0], "my-buildpack")
-		assert.Contains(mr.T(), ui.Outputs[1], "OK")
+		Expect(ui.Outputs[0]).To(ContainSubstring("Updating buildpack"))
+		Expect(ui.Outputs[0]).To(ContainSubstring("my-buildpack"))
+		Expect(ui.Outputs[1]).To(ContainSubstring("OK"))
 	})
 	It("TestUpdateBuildpackInvalidLockWithBits", func() {
 
@@ -168,7 +168,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"--lock", "-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Contains(mr.T(), ui.Outputs[1], "FAILED")
+		Expect(ui.Outputs[1]).To(ContainSubstring("FAILED"))
 	})
 	It("TestUpdateBuildpackInvalidUnlockWithBits", func() {
 
@@ -177,6 +177,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"--unlock", "-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Contains(mr.T(), ui.Outputs[1], "FAILED")
+		Expect(ui.Outputs[1]).To(ContainSubstring("FAILED"))
 	})
 })
