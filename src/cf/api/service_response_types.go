@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/models"
+	"fmt"
 )
 
 type PaginatedServiceOfferingResources struct {
@@ -64,7 +65,8 @@ type ServicePlanEntity struct {
 }
 
 type PaginatedServiceInstanceResources struct {
-	Resources []ServiceInstanceResource
+	TotalResults int `json:"total_results"`
+	Resources    []ServiceInstanceResource
 }
 
 type ServiceInstanceResource struct {
@@ -118,7 +120,15 @@ type V1ServicePlanDescription struct {
 	ServiceProvider string
 }
 
+func (v1PlanDesc V1ServicePlanDescription) String() string {
+	return fmt.Sprintf("%s %s %s", v1PlanDesc.ServiceName, v1PlanDesc.ServiceProvider, v1PlanDesc.ServicePlanName)
+}
+
 type V2ServicePlanDescription struct {
 	ServiceName     string
 	ServicePlanName string
+}
+
+func (v2PlanDesc V2ServicePlanDescription) String() string {
+	return fmt.Sprintf("%s %s", v2PlanDesc.ServiceName, v2PlanDesc.ServicePlanName)
 }

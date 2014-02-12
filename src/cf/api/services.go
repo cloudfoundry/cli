@@ -19,6 +19,7 @@ type ServiceRepository interface {
 	RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 	DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse)
 	FindServicePlanToMigrateByDescription(v1Description V1ServicePlanDescription, v2Description V2ServicePlanDescription) (v1PlanGuid, v2PlanGuid string, apiResponse net.ApiResponse)
+	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse)
 	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) net.ApiResponse
 }
 
@@ -170,12 +171,12 @@ func (repo CloudControllerServiceRepository) FindServicePlanToMigrateByDescripti
 	}
 
 	if v1PlanGuid == "" {
-		apiResponse = net.NewNotFoundApiResponse("Service plan '%s' not found", v1Description.ServicePlanName)
+		apiResponse = net.NewNotFoundApiResponse("Plan %s cannot be found", v1Description)
 		return
 	}
 
 	if v2PlanGuid == "" {
-		apiResponse = net.NewNotFoundApiResponse("Service plan '%s' not found", v2Description.ServicePlanName)
+		apiResponse = net.NewNotFoundApiResponse("Plan %s cannot be found", v2Description)
 		return
 	}
 
@@ -191,5 +192,13 @@ func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1Plan
 	}
 
 	apiResponse = repo.gateway.PerformRequest(request)
+	return
+}
+
+func (repo CloudControllerServiceRepository) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_plans/%s/service_instances?results-per-page=1", repo.config.ApiEndpoint(), v1PlanGuid)
+	response := new(PaginatedServiceInstanceResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
+	count = response.TotalResults
 	return
 }

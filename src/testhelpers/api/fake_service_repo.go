@@ -43,8 +43,12 @@ type FakeServiceRepo struct {
 	V2FoundGuid string
 	FindServicePlanToMigrateByDescriptionResponse net.ApiResponse
 
+	ServiceInstanceCountForServicePlan int
+	ServiceInstanceCountApiResponse net.ApiResponse
+
 	V1GuidToMigrate string
 	V2GuidToMigrate string
+	MigrateServicePlanFromV1ToV2Called bool
 	MigrateServicePlanFromV1ToV2Response net.ApiResponse
 }
 
@@ -117,7 +121,15 @@ func (repo *FakeServiceRepo) FindServicePlanToMigrateByDescription(v1Description
 	return
 }
 
+func (repo *FakeServiceRepo) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse) {
+	count = repo.ServiceInstanceCountForServicePlan
+	apiResponse = repo.ServiceInstanceCountApiResponse
+	return
+}
+
+
 func (repo *FakeServiceRepo) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (apiResponse net.ApiResponse) {
+	repo.MigrateServicePlanFromV1ToV2Called = true
 	repo.V1GuidToMigrate = v1PlanGuid
 	repo.V2GuidToMigrate = v2PlanGuid
 	apiResponse = repo.MigrateServicePlanFromV1ToV2Response
