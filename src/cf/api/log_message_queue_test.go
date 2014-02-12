@@ -7,16 +7,15 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
 func logMessageWithTime(t mr.TestingT, messageString string, timestamp int64) *logmessage.Message {
 	data, err := proto.Marshal(generateMessage(messageString, timestamp))
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 	message, err := logmessage.ParseMessage(data)
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 
 	return message
 }

@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -36,7 +35,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestEventsSuccess", func() {
 
 		timestamp, err := time.Parse(TIMESTAMP_FORMAT, "2000-01-01T00:01:11.00-0000")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		reqFactory, eventsRepo := getEventsDependencies()
 		app := models.Application{}

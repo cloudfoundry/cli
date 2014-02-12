@@ -19,10 +19,10 @@ func createMessage(t mr.TestingT, protoMsg *logmessage.LogMessage, sourceName *s
 	protoMsg.MessageType = msgType
 
 	data, err := proto.Marshal(protoMsg)
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 
 	msg, err = logmessage.ParseMessage(data)
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 
 	return
 }

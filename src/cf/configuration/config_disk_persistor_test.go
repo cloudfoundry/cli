@@ -5,7 +5,6 @@ import (
 	"fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"os"
 	"path/filepath"
@@ -22,7 +21,7 @@ func withFakeHome(t mr.TestingT, callback func(dirPath string)) {
 
 func withConfigFixture(t mr.TestingT, name string, callback func(dirPath string)) {
 	cwd, err := os.Getwd()
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 	callback(filepath.Join(cwd, "../../fixtures/config", name, ".cf", "config.json"))
 }
 
@@ -31,7 +30,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		withFakeHome(mr.T(), func(configPath string) {
 			repo := NewDiskPersistor(configPath)
 			configData, err := repo.Load()
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(configData.Target).To(Equal(""))
 			Expect(configData.ApiVersion).To(Equal(""))
@@ -44,7 +43,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		withFakeHome(mr.T(), func(configPath string) {
 			repo := NewDiskPersistor(configPath)
 			configData, err := repo.Load()
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 
 			configData.ApiVersion = "3.1.0"
 			configData.Target = "https://api.target.example.com"
@@ -52,10 +51,10 @@ var _ = Describe("Testing with ginkgo", func() {
 			configData.AccessToken = "bearer my_access_token"
 
 			err = repo.Save(configData)
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 
 			savedConfig, err := repo.Load()
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(savedConfig).To(Equal(configData))
 		})
 	})
@@ -65,7 +64,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			repo := NewDiskPersistor(configPath)
 			configData, err := repo.Load()
 
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 			Expect(configData.Target).To(Equal(""))
 		})
 	})

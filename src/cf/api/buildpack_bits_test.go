@@ -32,10 +32,10 @@ var _ = Describe("BuildpackBitsRepository", func() {
 	It("TestUploadBuildpack", func() {
 
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-buildpack")
 		err = os.Chmod(filepath.Join(dir, "detect"), 0666)
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
 			uploadBuildpackRequest(dir),
@@ -45,7 +45,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 	It("TestUploadBuildpackWithAZipFile", func() {
 
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
 
 		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{

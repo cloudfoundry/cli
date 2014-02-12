@@ -242,11 +242,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestUploadApp", func() {
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app")
 		err = os.Chmod(filepath.Join(dir, "Gemfile"), permissionsToSet)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
@@ -254,7 +254,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestCreateUploadDirWithAZipFile", func() {
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app.zip")
 
 		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
@@ -263,7 +263,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestCreateUploadDirWithAZipLikeFile", func() {
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app.azip")
 
 		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
@@ -272,7 +272,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestUploadAppFailsWhilePushingBits", func() {
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app")
 
 		requests := []testnet.TestRequest{

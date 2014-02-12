@@ -77,6 +77,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(lastReq.WasExecuted).To(BeFalse())
 		assert.Nil(mr.T(), cmd.WasRunWith)
 
-		assert.Error(mr.T(), err)
+		Expect(err).To(HaveOccurred())
 	})
 })

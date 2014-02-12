@@ -6,7 +6,6 @@ import (
 	"cf/formatters"
 	"cf/models"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -75,10 +74,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		appSummary.RouteSummaries = []models.RouteSummary{route1, route2}
 
 		time1, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		time2, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		appInstance := models.AppInstanceFields{}
 		appInstance.State = models.InstanceRunning

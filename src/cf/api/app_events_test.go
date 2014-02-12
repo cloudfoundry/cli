@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -241,7 +240,7 @@ var _ = Describe("App Events Repo", func() {
 		})
 
 		firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		expectedEvents := []models.EventFields{
 			models.EventFields{
@@ -277,7 +276,7 @@ var _ = Describe("App Events Repo", func() {
 			}
 			`), &resource)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		eventFields := resource.ToFields()
 		Expect(eventFields.Guid).To(Equal("event-1-guid"))
@@ -308,7 +307,7 @@ var _ = Describe("App Events Repo", func() {
 			}
 			`), &resource)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		eventFields := resource.ToFields()
 		Expect(eventFields.Guid).To(Equal("event-1-guid"))
@@ -334,7 +333,7 @@ var _ = Describe("App Events Repo", func() {
 			}
 			`), &resource)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		eventFields = resource.ToFields()
 		Expect(eventFields.Guid).To(Equal("event-1-guid"))
@@ -362,7 +361,7 @@ var _ = Describe("App Events Repo", func() {
 			}
 			`), &resource)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		eventFields := resource.ToFields()
 		Expect(eventFields.Guid).To(Equal("event-2-guid"))
@@ -396,7 +395,7 @@ var _ = Describe("App Events Repo", func() {
 			  }
 			}`), &resource)
 
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		eventFields := resource.ToFields()
 		Expect(eventFields.Guid).To(Equal("event-1-guid"))

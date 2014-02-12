@@ -46,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		trace.SetStdout(stdOut)
 
 		fileutils.TempFile("trace_test", func(file *os.File, err error) {
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 			file.Write([]byte("pre-existing content"))
 
 			os.Setenv(trace.CF_TRACE, file.Name())
@@ -56,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			file.Seek(0, os.SEEK_SET)
 			result, err := ioutil.ReadAll(file)
-			assert.NoError(mr.T(), err)
+			Expect(err).NotTo(HaveOccurred())
 
 			byteString := string(result)
 			assert.Contains(mr.T(), byteString, "pre-existing content")
@@ -73,7 +73,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			trace.SetStdout(stdOut)
 
 			fileutils.TempFile("trace_test", func(file *os.File, err error) {
-				assert.NoError(mr.T(), err)
+				Expect(err).NotTo(HaveOccurred())
 
 				file.Chmod(0000)
 

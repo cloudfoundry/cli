@@ -13,7 +13,7 @@ import (
 )
 
 func testManifestWithAbsolutePathOnPosix(t mr.TestingT) {
-	m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+	m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
 				"path": "/another/path-segment",
@@ -21,12 +21,12 @@ func testManifestWithAbsolutePathOnPosix(t mr.TestingT) {
 		},
 	}))
 
-	assert.NoError(t, err)
+	Expect(errs).To(BeEmpty())
 	Expect(*m.Applications[0].Path).To(Equal("/another/path-segment"))
 }
 
 func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
-	m, err := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[string]interface{}{
+	m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[string]interface{}{
 		"applications": []interface{}{
 			map[string]interface{}{
 				"path": `C:\another\path`,
@@ -34,13 +34,13 @@ func testManifestWithAbsolutePathOnWindows(t mr.TestingT) {
 		},
 	}))
 
-	assert.NoError(t, err)
+	Expect(errs).To(BeEmpty())
 	Expect(*m.Applications[0].Path).To(Equal(`C:\another\path`))
 }
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestManifestWithGlobalAndAppSpecificProperties", func() {
-		m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"instances": "3",
 			"memory":    "512M",
 			"applications": []interface{}{
@@ -50,7 +50,8 @@ var _ = Describe("Testing with ginkgo", func() {
 				},
 			},
 		}))
-		assert.NoError(mr.T(), err)
+
+		Expect(errs).To(BeEmpty())
 
 		apps := m.Applications
 		Expect(*apps[0].InstanceCount).To(Equal(3))
@@ -59,7 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestManifestWithInvalidMemory", func() {
-		_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"instances": "3",
 			"memory":    "512",
 			"applications": []interface{}{
@@ -69,12 +70,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.Error(mr.T(), err)
-		assert.Contains(mr.T(), err.Error(), "memory")
+		Expect(errs).NotTo(BeEmpty())
+		assert.Contains(mr.T(), errs.Error(), "memory")
 	})
 
 	It("TestManifestWithTimeoutSetsHealthCheckTimeout", func() {
-		m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"applications": []interface{}{
 				map[string]interface{}{
 					"name":    "bitcoin-miner",
@@ -83,12 +84,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.NoError(mr.T(), err)
+		Expect(errs).To(BeEmpty())
 		Expect(*m.Applications[0].HealthCheckTimeout).To(Equal(360))
 	})
 
 	It("TestManifestWithEmptyEnvVarIsInvalid", func() {
-		_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"env": generic.NewMap(map[string]interface{}{
 				"bar": nil,
 			}),
@@ -99,8 +100,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.Error(mr.T(), err)
-		assert.Contains(mr.T(), err.Error(), "env var 'bar' should not be null")
+		Expect(errs).NotTo(BeEmpty())
+		assert.Contains(mr.T(), errs.Error(), "env var 'bar' should not be null")
 	})
 
 	It("TestManifestWithAbsolutePath", func() {
@@ -112,7 +113,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestManifestWithRelativePath", func() {
-		m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"applications": []interface{}{
 				map[string]interface{}{
 					"path": "../another/path-segment",
@@ -120,7 +121,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.NoError(mr.T(), err)
+		Expect(errs).To(BeEmpty())
 		if runtime.GOOS == "windows" {
 			Expect(*m.Applications[0].Path).To(Equal("\\some\\another\\path-segment"))
 		} else {
@@ -149,7 +150,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.Error(mr.T(), errs)
+		Expect(errs).NotTo(BeEmpty())
 		errorSlice := strings.Split(errs.Error(), "\n")
 		manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
 			"memory", "instances", "timeout", "no-route", "services", "env"}
@@ -160,7 +161,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestParsingManifestWithPropertiesReturnsErrors", func() {
-		_, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"applications": []interface{}{
 				map[string]interface{}{
 					"env": map[string]interface{}{
@@ -170,12 +171,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.Error(mr.T(), err)
-		assert.Contains(mr.T(), err.Error(), "Properties are not supported. Found property '${foo}'")
+		Expect(errs).NotTo(BeEmpty())
+		assert.Contains(mr.T(), errs.Error(), "Properties are not supported. Found property '${foo}'")
 	})
 
 	It("TestParsingManifestWithNullCommand", func() {
-		m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"applications": []interface{}{
 				map[string]interface{}{
 					"command": nil,
@@ -183,18 +184,18 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		}))
 
-		assert.NoError(mr.T(), err)
+		Expect(errs).To(BeEmpty())
 		Expect(*m.Applications[0].Command).To(Equal(""))
 	})
 
 	It("TestParsingEmptyManifestDoesNotSetCommand", func() {
-		m, err := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
 			"applications": []interface{}{
 				map[string]interface{}{},
 			},
 		}))
 
-		assert.NoError(mr.T(), err)
+		Expect(errs).To(BeEmpty())
 		assert.Nil(mr.T(), m.Applications[0].Command)
 	})
 })

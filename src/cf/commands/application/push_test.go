@@ -459,7 +459,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 
 		absPath, err := filepath.Abs("../../../fixtures/example-app")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		callPush(mr.T(), []string{
 			"-p", absPath,
@@ -474,7 +474,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 
 		absPath, err := filepath.Abs("../../../fixtures/example-app.jar")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 
 		callPush(mr.T(), []string{
 			"-p", absPath,
@@ -491,7 +491,7 @@ var _ = Describe("Push Command", func() {
 		callPush(mr.T(), []string{"app-with-default-path"}, deps)
 
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		Expect(deps.appBitsRepo.UploadedDir).To(Equal(dir))
 	})
 
@@ -505,7 +505,7 @@ var _ = Describe("Push Command", func() {
 		}, deps)
 
 		dir, err := os.Getwd()
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		Expect(deps.appBitsRepo.UploadedDir).To(Equal(filepath.Join(dir, "../../../fixtures/example-app")))
 	})
 

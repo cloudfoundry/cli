@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"io/ioutil"
 	"net/http"
@@ -112,7 +111,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		gateway := NewCloudControllerGateway()
 
 		body, err := os.Open("../../fixtures/hello_world.txt")
-		assert.NoError(mr.T(), err)
+		Expect(err).NotTo(HaveOccurred())
 		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
