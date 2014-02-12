@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -52,7 +51,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callFiles([]string{"my-app", "/foo"}, reqFactory, appFilesRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting files for app", "my-found-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"file 1"},
@@ -73,7 +72,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callFiles([]string{"my-app", "/foo"}, reqFactory, appFilesRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"%s %d %i"},
 		})
 	})

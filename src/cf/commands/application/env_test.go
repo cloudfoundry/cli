@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
@@ -44,7 +43,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callEnv([]string{"my-app"}, reqFactory)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting env variables for app", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"my-key", "my-value", "my-key2", "my-value2"},
@@ -57,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callEnv([]string{"my-app"}, reqFactory)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting env variables for app", "my-app"},
 			{"OK"},
 			{"No env variables exist"},

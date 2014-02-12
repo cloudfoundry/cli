@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListServiceAuthTokens(t mr.TestingT, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
+func callListServiceAuthTokens(reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 
 	config := testconfig.NewRepositoryWithDefaults()
@@ -32,11 +31,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 
 		reqFactory.LoginSuccess = false
-		callListServiceAuthTokens(mr.T(), reqFactory, authTokenRepo)
+		callListServiceAuthTokens(reqFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callListServiceAuthTokens(mr.T(), reqFactory, authTokenRepo)
+		callListServiceAuthTokens(reqFactory, authTokenRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestListServiceAuthTokens", func() {
@@ -51,8 +50,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken2.Provider = "a second provider"
 		authTokenRepo.FindAllAuthTokens = []models.ServiceAuthTokenFields{authToken, authToken2}
 
-		ui := callListServiceAuthTokens(mr.T(), reqFactory, authTokenRepo)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callListServiceAuthTokens(reqFactory, authTokenRepo)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting service auth tokens as", "my-user"},
 			{"OK"},
 			{"label", "provider"},

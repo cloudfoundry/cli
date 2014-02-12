@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
@@ -19,11 +18,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-org"}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callShowOrg(mr.T(), args, reqFactory)
+		callShowOrg(args, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callShowOrg(mr.T(), args, reqFactory)
+		callShowOrg(args, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestShowOrgFailsWithUsage", func() {
@@ -34,11 +33,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 		args := []string{"my-org"}
-		ui := callShowOrg(mr.T(), args, reqFactory)
+		ui := callShowOrg(args, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		args = []string{}
-		ui = callShowOrg(mr.T(), args, reqFactory)
+		ui = callShowOrg(args, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 	It("TestRunWhenOrganizationExists", func() {
@@ -61,11 +60,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{Organization: org, LoginSuccess: true}
 
 		args := []string{"my-org"}
-		ui := callShowOrg(mr.T(), args, reqFactory)
+		ui := callShowOrg(args, reqFactory)
 
 		Expect(reqFactory.OrganizationName).To(Equal("my-org"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting info for org", "my-org", "my-user"},
 			{"OK"},
 			{"my-org"},
@@ -76,7 +75,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func callShowOrg(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callShowOrg(args []string, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("org", args)
 

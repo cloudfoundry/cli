@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callSpaceUsers(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callSpaceUsers(args []string, reqFactory *testreq.FakeReqFactory, spaceRepo *testapi.FakeSpaceRepository, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
 	config := testconfig.NewRepositoryWithDefaults()
@@ -32,13 +31,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		spaceRepo := &testapi.FakeSpaceRepository{}
 		userRepo := &testapi.FakeUserRepository{}
 
-		ui := callSpaceUsers(mr.T(), []string{}, reqFactory, spaceRepo, userRepo)
+		ui := callSpaceUsers([]string{}, reqFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSpaceUsers(mr.T(), []string{"my-org"}, reqFactory, spaceRepo, userRepo)
+		ui = callSpaceUsers([]string{"my-org"}, reqFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callSpaceUsers(mr.T(), []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
+		ui = callSpaceUsers([]string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestSpaceUsersRequirements", func() {
@@ -49,11 +48,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"my-org", "my-space"}
 
 		reqFactory.LoginSuccess = false
-		callSpaceUsers(mr.T(), args, reqFactory, spaceRepo, userRepo)
+		callSpaceUsers(args, reqFactory, spaceRepo, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callSpaceUsers(mr.T(), args, reqFactory, spaceRepo, userRepo)
+		callSpaceUsers(args, reqFactory, spaceRepo, userRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect("my-org").To(Equal(reqFactory.OrganizationName))
@@ -85,13 +84,13 @@ var _ = Describe("Testing with ginkgo", func() {
 			models.SPACE_AUDITOR:   []models.UserFields{user3},
 		}
 
-		ui := callSpaceUsers(mr.T(), []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
+		ui := callSpaceUsers([]string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 
 		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
 		Expect(userRepo.ListUsersSpaceGuid).To(Equal("space1-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting users in org", "Org1", "Space1", "my-user"},
 			{"SPACE MANAGER"},
 			{"user1"},

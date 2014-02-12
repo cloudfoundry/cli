@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -15,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callDeleteUser(t mr.TestingT, args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
+func callDeleteUser(args []string, userRepo *testapi.FakeUserRepository, reqFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	accessToken, err := testconfig.EncodeAccessToken(configuration.TokenInfo{
@@ -30,7 +29,7 @@ func callDeleteUser(t mr.TestingT, args []string, userRepo *testapi.FakeUserRepo
 	return
 }
 
-func deleteWithConfirmation(t mr.TestingT, confirmation string) (ui *testterm.FakeUI, userRepo *testapi.FakeUserRepository) {
+func deleteWithConfirmation(confirmation string) (ui *testterm.FakeUI, userRepo *testapi.FakeUserRepository) {
 	ui = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
@@ -62,13 +61,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		userRepo := &testapi.FakeUserRepository{}
 		reqFactory := &testreq.FakeReqFactory{}
 
-		ui := callDeleteUser(mr.T(), []string{}, userRepo, reqFactory)
+		ui := callDeleteUser([]string{}, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callDeleteUser(mr.T(), []string{"foo"}, userRepo, reqFactory)
+		ui = callDeleteUser([]string{"foo"}, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 
-		ui = callDeleteUser(mr.T(), []string{"foo", "bar"}, userRepo, reqFactory)
+		ui = callDeleteUser([]string{"foo", "bar"}, userRepo, reqFactory)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
@@ -78,23 +77,23 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"-f", "my-user"}
 
 		reqFactory.LoginSuccess = false
-		callDeleteUser(mr.T(), args, userRepo, reqFactory)
+		callDeleteUser(args, userRepo, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callDeleteUser(mr.T(), args, userRepo, reqFactory)
+		callDeleteUser(args, userRepo, reqFactory)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 
 	It("TestDeleteUserWhenConfirmingWithY", func() {
-		ui, userRepo := deleteWithConfirmation(mr.T(), "Y")
+		ui, userRepo := deleteWithConfirmation("Y")
 
 		Expect(len(ui.Outputs)).To(Equal(2))
 		Expect(len(ui.Prompts)).To(Equal(1))
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Really delete", "my-user"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting user", "my-user", "current-user"},
 			{"OK"},
 		})
@@ -104,14 +103,14 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestDeleteUserWhenConfirmingWithYes", func() {
-		ui, userRepo := deleteWithConfirmation(mr.T(), "Yes")
+		ui, userRepo := deleteWithConfirmation("Yes")
 
 		Expect(len(ui.Outputs)).To(Equal(2))
 		Expect(len(ui.Prompts)).To(Equal(1))
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Really delete", "my-user"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting user", "my-user", "current-user"},
 			{"OK"},
 		})
@@ -121,10 +120,10 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestDeleteUserWhenNotConfirming", func() {
-		ui, userRepo := deleteWithConfirmation(mr.T(), "Nope")
+		ui, userRepo := deleteWithConfirmation("Nope")
 
 		Expect(len(ui.Outputs)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{{"Really delete"}})
+		testassert.SliceContains(ui.Prompts, testassert.Lines{{"Really delete"}})
 
 		Expect(userRepo.FindByUsernameUsername).To(Equal(""))
 		Expect(userRepo.DeleteUserGuid).To(Equal(""))
@@ -136,11 +135,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: foundUserFields}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		ui := callDeleteUser(mr.T(), []string{"-f", "my-user"}, userRepo, reqFactory)
+		ui := callDeleteUser([]string{"-f", "my-user"}, userRepo, reqFactory)
 
 		Expect(len(ui.Outputs)).To(Equal(2))
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting user", "my-user"},
 			{"OK"},
 		})
@@ -153,11 +152,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 
-		ui := callDeleteUser(mr.T(), []string{"-f", "my-user"}, userRepo, reqFactory)
+		ui := callDeleteUser([]string{"-f", "my-user"}, userRepo, reqFactory)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting user", "my-user"},
 			{"OK"},
 			{"my-user", "does not exist"},

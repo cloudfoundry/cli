@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -15,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListQuotas(t mr.TestingT, reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (fakeUI *testterm.FakeUI) {
+func callListQuotas(reqFactory *testreq.FakeReqFactory, quotaRepo *testapi.FakeQuotaRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("quotas", []string{})
 
@@ -40,11 +39,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		quotaRepo := &testapi.FakeQuotaRepository{}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callListQuotas(mr.T(), reqFactory, quotaRepo)
+		callListQuotas(reqFactory, quotaRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callListQuotas(mr.T(), reqFactory, quotaRepo)
+		callListQuotas(reqFactory, quotaRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestListQuotas", func() {
@@ -55,9 +54,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		quotaRepo := &testapi.FakeQuotaRepository{FindAllQuotas: []models.QuotaFields{quota}}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		ui := callListQuotas(mr.T(), reqFactory, quotaRepo)
+		ui := callListQuotas(reqFactory, quotaRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting quotas as", "my-user"},
 			{"OK"},
 			{"name", "memory limit"},

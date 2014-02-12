@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -22,7 +21,7 @@ var _ = Describe("UserRepository", func() {
 		It("lists the users in an organization with a given role", func() {
 			ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
-			cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(mr.T(), ccReqs, uaaReqs)
+			cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(ccReqs, uaaReqs)
 			defer cc.Close()
 			defer uaa.Close()
 
@@ -42,7 +41,7 @@ var _ = Describe("UserRepository", func() {
 		It("lists the users in a space with a given role", func() {
 			ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/spaces/my-space-guid/managers")
 
-			cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(mr.T(), ccReqs, uaaReqs)
+			cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(ccReqs, uaaReqs)
 			defer cc.Close()
 			defer uaa.Close()
 
@@ -70,7 +69,7 @@ var _ = Describe("UserRepository", func() {
 				}),
 			}
 
-			cc, ccHandler, _, _, repo := createUsersRepo(mr.T(), ccReqs, []testnet.TestRequest{})
+			cc, ccHandler, _, _, repo := createUsersRepo(ccReqs, []testnet.TestRequest{})
 			defer cc.Close()
 
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
@@ -82,7 +81,7 @@ var _ = Describe("UserRepository", func() {
 		It("returns an error when the UAA endpoint cannot be determined", func() {
 			ccReqs, _ := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
-			ts, _ := testnet.NewTLSServer(mr.T(), ccReqs)
+			ts, _ := testnet.NewTLSServer(ccReqs)
 			defer ts.Close()
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(ts.URL)
@@ -108,7 +107,7 @@ var _ = Describe("UserRepository", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: usersResponse},
 		})
 
-		uaa, handler, repo := createUsersRepoWithoutCCEndpoints(mr.T(), []testnet.TestRequest{uaaReq})
+		uaa, handler, repo := createUsersRepoWithoutCCEndpoints([]testnet.TestRequest{uaaReq})
 		defer uaa.Close()
 
 		user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
@@ -128,7 +127,7 @@ var _ = Describe("UserRepository", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`},
 		})
 
-		uaa, handler, repo := createUsersRepoWithoutCCEndpoints(mr.T(), []testnet.TestRequest{uaaReq})
+		uaa, handler, repo := createUsersRepoWithoutCCEndpoints([]testnet.TestRequest{uaaReq})
 		defer uaa.Close()
 
 		_, apiResponse := repo.FindByUsername("my-user")
@@ -163,7 +162,7 @@ var _ = Describe("UserRepository", func() {
 			},
 		})
 
-		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(mr.T(), []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
+		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo([]testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 		defer cc.Close()
 		defer uaa.Close()
 
@@ -186,7 +185,7 @@ var _ = Describe("UserRepository", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(mr.T(), []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
+		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo([]testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 		defer cc.Close()
 		defer uaa.Close()
 
@@ -209,7 +208,7 @@ var _ = Describe("UserRepository", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(mr.T(), []testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
+		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo([]testnet.TestRequest{ccReq}, []testnet.TestRequest{uaaReq})
 		defer cc.Close()
 		defer uaa.Close()
 
@@ -220,15 +219,15 @@ var _ = Describe("UserRepository", func() {
 	})
 
 	It("TestSetOrgRoleToOrgManager", func() {
-		testSetOrgRoleWithValidRole(mr.T(), "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
+		testSetOrgRoleWithValidRole("OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
 	})
 
 	It("TestSetOrgRoleToBillingManager", func() {
-		testSetOrgRoleWithValidRole(mr.T(), "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
+		testSetOrgRoleWithValidRole("BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
 	})
 
 	It("TestSetOrgRoleToOrgAuditor", func() {
-		testSetOrgRoleWithValidRole(mr.T(), "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
+		testSetOrgRoleWithValidRole("OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
 	})
 
 	It("TestSetOrgRoleWithInvalidRole", func() {
@@ -240,15 +239,15 @@ var _ = Describe("UserRepository", func() {
 	})
 
 	It("TestUnsetOrgRoleFromOrgManager", func() {
-		testUnsetOrgRoleWithValidRole(mr.T(), "OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
+		testUnsetOrgRoleWithValidRole("OrgManager", "/v2/organizations/my-org-guid/managers/my-user-guid")
 	})
 
 	It("TestUnsetOrgRoleFromBillingManager", func() {
-		testUnsetOrgRoleWithValidRole(mr.T(), "BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
+		testUnsetOrgRoleWithValidRole("BillingManager", "/v2/organizations/my-org-guid/billing_managers/my-user-guid")
 	})
 
 	It("TestUnsetOrgRoleFromOrgAuditor", func() {
-		testUnsetOrgRoleWithValidRole(mr.T(), "OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
+		testUnsetOrgRoleWithValidRole("OrgAuditor", "/v2/organizations/my-org-guid/auditors/my-user-guid")
 	})
 
 	It("TestUnsetOrgRoleWithInvalidRole", func() {
@@ -260,15 +259,15 @@ var _ = Describe("UserRepository", func() {
 	})
 
 	It("TestSetSpaceRoleToSpaceManager", func() {
-		testSetSpaceRoleWithValidRole(mr.T(), "SpaceManager", "/v2/spaces/my-space-guid/managers/my-user-guid")
+		testSetSpaceRoleWithValidRole("SpaceManager", "/v2/spaces/my-space-guid/managers/my-user-guid")
 	})
 
 	It("TestSetSpaceRoleToSpaceDeveloper", func() {
-		testSetSpaceRoleWithValidRole(mr.T(), "SpaceDeveloper", "/v2/spaces/my-space-guid/developers/my-user-guid")
+		testSetSpaceRoleWithValidRole("SpaceDeveloper", "/v2/spaces/my-space-guid/developers/my-user-guid")
 	})
 
 	It("TestSetSpaceRoleToSpaceAuditor", func() {
-		testSetSpaceRoleWithValidRole(mr.T(), "SpaceAuditor", "/v2/spaces/my-space-guid/auditors/my-user-guid")
+		testSetSpaceRoleWithValidRole("SpaceAuditor", "/v2/spaces/my-space-guid/auditors/my-user-guid")
 	})
 
 	It("TestSetSpaceRoleWithInvalidRole", func() {
@@ -280,10 +279,9 @@ var _ = Describe("UserRepository", func() {
 	})
 
 	It("lists all users in the org", func() {
-		t := mr.T()
 		ccReqs, uaaReqs := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/users")
 
-		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(t, ccReqs, uaaReqs)
+		cc, ccHandler, uaa, uaaHandler, repo := createUsersRepo(ccReqs, uaaReqs)
 		defer cc.Close()
 		defer uaa.Close()
 
@@ -354,7 +352,7 @@ func createUsersByRoleEndpoints(rolePath string) (ccReqs []testnet.TestRequest, 
 	return
 }
 
-func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
+func testSetOrgRoleWithValidRole(role string, path string) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     path,
@@ -367,7 +365,7 @@ func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
 		Response: testnet.TestResponse{Status: http.StatusOK},
 	})
 
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req, userReq})
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints([]testnet.TestRequest{req, userReq})
 	defer cc.Close()
 
 	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
@@ -376,14 +374,14 @@ func testSetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
 	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
-func testUnsetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
+func testUnsetOrgRoleWithValidRole(role string, path string) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "DELETE",
 		Path:     path,
 		Response: testnet.TestResponse{Status: http.StatusOK},
 	})
 
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{req})
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints([]testnet.TestRequest{req})
 	defer cc.Close()
 
 	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
@@ -392,7 +390,7 @@ func testUnsetOrgRoleWithValidRole(t mr.TestingT, role string, path string) {
 	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
-func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
+func testSetSpaceRoleWithValidRole(role string, path string) {
 	addToOrgReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     "/v2/organizations/my-org-guid/users/my-user-guid",
@@ -405,7 +403,7 @@ func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
 		Response: testnet.TestResponse{Status: http.StatusOK},
 	})
 
-	cc, handler, repo := createUsersRepoWithoutUAAEndpoints(t, []testnet.TestRequest{addToOrgReq, setRoleReq})
+	cc, handler, repo := createUsersRepoWithoutUAAEndpoints([]testnet.TestRequest{addToOrgReq, setRoleReq})
 	defer cc.Close()
 
 	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
@@ -415,32 +413,32 @@ func testSetSpaceRoleWithValidRole(t mr.TestingT, role string, path string) {
 }
 
 func createUsersRepoWithoutEndpoints() (repo UserRepository) {
-	_, _, _, _, repo = createUsersRepo(nil, []testnet.TestRequest{}, []testnet.TestRequest{})
+	_, _, _, _, repo = createUsersRepo([]testnet.TestRequest{}, []testnet.TestRequest{})
 	return
 }
 
-func createUsersRepoWithoutUAAEndpoints(t mr.TestingT, ccReqs []testnet.TestRequest) (cc *httptest.Server, ccHandler *testnet.TestHandler, repo UserRepository) {
-	cc, ccHandler, _, _, repo = createUsersRepo(t, ccReqs, []testnet.TestRequest{})
+func createUsersRepoWithoutUAAEndpoints(ccReqs []testnet.TestRequest) (cc *httptest.Server, ccHandler *testnet.TestHandler, repo UserRepository) {
+	cc, ccHandler, _, _, repo = createUsersRepo(ccReqs, []testnet.TestRequest{})
 	return
 }
 
-func createUsersRepoWithoutCCEndpoints(t mr.TestingT, uaaReqs []testnet.TestRequest) (uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
-	_, _, uaa, uaaHandler, repo = createUsersRepo(t, []testnet.TestRequest{}, uaaReqs)
+func createUsersRepoWithoutCCEndpoints(uaaReqs []testnet.TestRequest) (uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
+	_, _, uaa, uaaHandler, repo = createUsersRepo([]testnet.TestRequest{}, uaaReqs)
 	return
 }
 
-func createUsersRepo(t mr.TestingT, ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) (cc *httptest.Server,
+func createUsersRepo(ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest) (cc *httptest.Server,
 	ccHandler *testnet.TestHandler, uaa *httptest.Server, uaaHandler *testnet.TestHandler, repo UserRepository) {
 
 	ccTarget := ""
 	uaaTarget := ""
 
 	if len(ccReqs) > 0 {
-		cc, ccHandler = testnet.NewTLSServer(t, ccReqs)
+		cc, ccHandler = testnet.NewTLSServer(ccReqs)
 		ccTarget = cc.URL
 	}
 	if len(uaaReqs) > 0 {
-		uaa, uaaHandler = testnet.NewTLSServer(t, uaaReqs)
+		uaa, uaaHandler = testnet.NewTLSServer(uaaReqs)
 		uaaTarget = uaa.URL
 	}
 

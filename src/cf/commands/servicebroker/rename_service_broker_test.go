@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameServiceBroker(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
+func callRenameServiceBroker(args []string, reqFactory *testreq.FakeReqFactory, repo *testapi.FakeServiceBrokerRepo) (ui *testterm.FakeUI) {
 	ui = &testterm.FakeUI{}
 	config := testconfig.NewRepositoryWithDefaults()
 	cmd := NewRenameServiceBroker(ui, config, repo)
@@ -29,13 +28,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		repo := &testapi.FakeServiceBrokerRepo{}
 
-		ui := callRenameServiceBroker(mr.T(), []string{}, reqFactory, repo)
+		ui := callRenameServiceBroker([]string{}, reqFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRenameServiceBroker(mr.T(), []string{"arg1"}, reqFactory, repo)
+		ui = callRenameServiceBroker([]string{"arg1"}, reqFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callRenameServiceBroker(mr.T(), []string{"arg1", "arg2"}, reqFactory, repo)
+		ui = callRenameServiceBroker([]string{"arg1", "arg2"}, reqFactory, repo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestRenameServiceBrokerRequirements", func() {
@@ -45,11 +44,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"arg1", "arg2"}
 
 		reqFactory.LoginSuccess = false
-		callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+		callRenameServiceBroker(args, reqFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+		callRenameServiceBroker(args, reqFactory, repo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 	})
 	It("TestRenameServiceBroker", func() {
@@ -63,11 +62,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		args := []string{"my-broker", "my-new-broker"}
 
-		ui := callRenameServiceBroker(mr.T(), args, reqFactory, repo)
+		ui := callRenameServiceBroker(args, reqFactory, repo)
 
 		Expect(repo.FindByNameName).To(Equal("my-broker"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Renaming service broker", "my-found-broker", "my-new-broker", "my-user"},
 			{"OK"},
 		})

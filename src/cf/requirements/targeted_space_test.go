@@ -5,7 +5,6 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testconfig "testhelpers/configuration"
 	testterm "testhelpers/terminal"
@@ -28,11 +27,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		config.SetSpaceFields(models.SpaceFields{})
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			NewTargetedSpaceRequirement(ui, config).Execute()
 		})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"No space targeted"},
 		})
@@ -40,11 +39,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui.ClearOutputs()
 		config.SetOrganizationFields(models.OrganizationFields{})
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			NewTargetedSpaceRequirement(ui, config).Execute()
 		})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"No org and space targeted"},
 		})

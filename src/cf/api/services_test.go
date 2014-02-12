@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -62,8 +61,8 @@ var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body
   ]
 }`}
 
-func testGetServiceOfferings(t mr.TestingT, req testnet.TestRequest, config configuration.ReadWriter) {
-	ts, handler, repo := createServiceRepoWithConfig(t, []testnet.TestRequest{req}, config)
+func testGetServiceOfferings(req testnet.TestRequest, config configuration.ReadWriter) {
+	ts, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{req}, config)
 	defer ts.Close()
 
 	offerings, apiResponse := repo.GetServiceOfferings()
@@ -142,7 +141,7 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
 		}
   	]}`}})
 
-func testRenameService(t mr.TestingT, endpointPath string, serviceInstance models.ServiceInstance) {
+func testRenameService(endpointPath string, serviceInstance models.ServiceInstance) {
 	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method:   "PUT",
 		Path:     endpointPath,
@@ -150,7 +149,7 @@ func testRenameService(t mr.TestingT, endpointPath string, serviceInstance model
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
 
-	ts, handler, repo := createServiceRepo(t, []testnet.TestRequest{req})
+	ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 	defer ts.Close()
 
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
@@ -158,18 +157,18 @@ func testRenameService(t mr.TestingT, endpointPath string, serviceInstance model
 	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 }
 
-func createServiceRepo(t mr.TestingT, reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
 	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	config := testconfig.NewRepository()
 	config.SetAccessToken("BEARER my_access_token")
 	config.SetSpaceFields(space)
-	return createServiceRepoWithConfig(t, reqs, config)
+	return createServiceRepoWithConfig(reqs, config)
 }
 
-func createServiceRepoWithConfig(t mr.TestingT, reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
 	if len(reqs) > 0 {
-		ts, handler = testnet.NewTLSServer(t, reqs)
+		ts, handler = testnet.NewTLSServer(reqs)
 		config.SetApiEndpoint(ts.URL)
 	}
 
@@ -190,7 +189,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		config := testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
 
-		testGetServiceOfferings(mr.T(), req, config)
+		testGetServiceOfferings(req, config)
 	})
 
 	It("TestGetServiceOfferingsWhenTargetingASpace", func() {
@@ -207,7 +206,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		config.SetAccessToken("BEARER my_access_token")
 		config.SetSpaceFields(space)
 
-		testGetServiceOfferings(mr.T(), req, config)
+		testGetServiceOfferings(req, config)
 	})
 	It("TestCreateServiceInstance", func() {
 
@@ -218,7 +217,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
+		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
@@ -238,7 +237,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		})
 
-		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{errorReq, findServiceInstanceReq})
+		ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq})
 		defer ts.Close()
 
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
@@ -259,7 +258,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 		})
 
-		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{errorReq, findServiceInstanceReq})
+		ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq})
 		defer ts.Close()
 
 		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
@@ -270,7 +269,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 	It("TestFindInstanceByName", func() {
 
-		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{findServiceInstanceReq})
+		ts, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq})
 		defer ts.Close()
 
 		instance, apiResponse := repo.FindInstanceByName("my-service")
@@ -298,7 +297,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
 		})
 
-		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
+		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		_, apiResponse := repo.FindInstanceByName("my-service")
@@ -315,7 +314,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
 
-		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
+		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
@@ -325,7 +324,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 	It("TestDeleteServiceWithServiceBindings", func() {
 
-		_, _, repo := createServiceRepo(mr.T(), []testnet.TestRequest{})
+		_, _, repo := createServiceRepo([]testnet.TestRequest{})
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
@@ -353,18 +352,17 @@ var _ = Describe("Testing with ginkgo", func() {
 		plan.Guid = "some-plan-guid"
 		serviceInstance.ServicePlan = plan
 
-		testRenameService(mr.T(), path, serviceInstance)
+		testRenameService(path, serviceInstance)
 	})
 	It("TestRenameServiceWhenServiceIsUserProvided", func() {
 		path := "/v2/user_provided_service_instances/my-service-instance-guid"
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
-		testRenameService(mr.T(), path, serviceInstance)
+		testRenameService(path, serviceInstance)
 	})
 
 	It("finds service offerings by label and provider", func() {
-		t := mr.T()
-		_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+		_, _, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "GET",
 			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
 			Response: testnet.TestResponse{
@@ -395,8 +393,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("returns an error if the offering cannot be found", func() {
-		t := mr.T()
-		_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+		_, _, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "GET",
 			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
 			Response: testnet.TestResponse{
@@ -414,8 +411,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("handles api errors when finding service offerings", func() {
-		t := mr.T()
-		_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+		_, _, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "GET",
 			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
 			Response: testnet.TestResponse{
@@ -433,8 +429,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("purges service offerings", func() {
-		t := mr.T()
-		_, handler, repo := createServiceRepo(t, []testnet.TestRequest{{
+		_, handler, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "DELETE",
 			Path:   "/v2/services/the-service-guid?purge=true",
 			Response: testnet.TestResponse{

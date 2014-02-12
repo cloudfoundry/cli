@@ -7,7 +7,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -46,11 +45,11 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"delete", "foo.com"},
 		})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com", "my-user"},
 			{"OK"},
 		})
@@ -69,12 +68,12 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"delete", "foo.com"},
 		})
 
 		Expect(len(ui.Outputs)).To(Equal(1))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 		})
 	})
@@ -89,7 +88,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},
 			{"foo.com", "not found"},
@@ -106,7 +105,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"FAILED"},
 			{"foo.com"},
@@ -128,7 +127,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"FAILED"},
 			{"foo.com"},
@@ -149,7 +148,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},
 		})

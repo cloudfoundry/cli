@@ -6,7 +6,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -36,7 +35,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {
-		testSuccessfulAuthenticate(mr.T(), []string{"user@example.com", "password"})
+		testSuccessfulAuthenticate([]string{"user@example.com", "password"})
 	})
 
 	It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
@@ -52,7 +51,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		)
 
 		Expect(len(ui.Outputs)).To(Equal(4))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{config.ApiEndpoint()},
 			{"Authenticating..."},
 			{"FAILED"},
@@ -61,7 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
-func testSuccessfulAuthenticate(t mr.TestingT, args []string) (ui *testterm.FakeUI) {
+func testSuccessfulAuthenticate(args []string) (ui *testterm.FakeUI) {
 	config := testconfig.NewRepository()
 	config.SetApiEndpoint("foo.example.org/authenticate")
 
@@ -73,7 +72,7 @@ func testSuccessfulAuthenticate(t mr.TestingT, args []string) (ui *testterm.Fake
 
 	ui = callAuthenticate(args, config, auth)
 
-	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
+	testassert.SliceContains(ui.Outputs, testassert.Lines{
 		{"foo.example.org/authenticate"},
 		{"OK"},
 	})

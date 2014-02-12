@@ -53,7 +53,7 @@ var _ = Describe("rename-org command", func() {
 
 		It("renames an organization", func() {
 			Expect(reqFactory.OrganizationName).To(Equal("my-org"))
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Renaming org", "my-org", "my-new-org", "my-user"},
 				{"OK"},
 			})

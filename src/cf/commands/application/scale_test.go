@@ -62,7 +62,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callScale([]string{"-i", "5", "-m", "512M", "my-app"}, deps)
 
-		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Scaling", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})

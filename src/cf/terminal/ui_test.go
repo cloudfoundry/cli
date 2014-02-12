@@ -70,7 +70,7 @@ var _ = Describe("UI", func() {
 				Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
 			})
 
-			testassert.SliceContains(GinkgoT(), out, testassert.Lines{{"Hello World?"}})
+			testassert.SliceContains(out, testassert.Lines{{"Hello World?"}})
 		})
 	})
 
@@ -90,7 +90,7 @@ var _ = Describe("UI", func() {
 			ui.ShowConfiguration(config)
 		})
 
-		testassert.SliceContains(GinkgoT(), output, testassert.Lines{
+		testassert.SliceContains(output, testassert.Lines{
 			{"No", "org", "space", "targeted", "-o ORG", "-s SPACE"},
 		})
 	})
@@ -107,7 +107,7 @@ var _ = Describe("UI", func() {
 			ui.ShowConfiguration(config)
 		})
 
-		testassert.SliceContains(GinkgoT(), output, testassert.Lines{
+		testassert.SliceContains(output, testassert.Lines{
 			{"No", "org", "targeted", "-o ORG"},
 		})
 	})
@@ -124,7 +124,7 @@ var _ = Describe("UI", func() {
 			ui.ShowConfiguration(config)
 		})
 
-		testassert.SliceContains(GinkgoT(), output, testassert.Lines{
+		testassert.SliceContains(output, testassert.Lines{
 			{"No", "space", "targeted", "-s SPACE"},
 		})
 	})

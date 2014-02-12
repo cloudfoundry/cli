@@ -5,7 +5,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -21,7 +20,7 @@ var _ = Describe("AppSummaryRepository", func() {
 			Response: testnet.TestResponse{Status: http.StatusOK, Body: getAppSummariesResponseBody},
 		})
 
-		ts, handler, repo := createAppSummaryRepo(mr.T(), []testnet.TestRequest{getAppSummariesRequest})
+		ts, handler, repo := createAppSummaryRepo([]testnet.TestRequest{getAppSummariesRequest})
 		defer ts.Close()
 
 		apps, apiResponse := repo.GetSummariesInCurrentSpace()
@@ -110,8 +109,8 @@ var getAppSummariesResponseBody = `
   ]
 }`
 
-func createAppSummaryRepo(t mr.TestingT, requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppSummaryRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
+func createAppSummaryRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppSummaryRepository) {
+	ts, handler = testnet.NewTLSServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

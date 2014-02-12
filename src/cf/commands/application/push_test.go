@@ -9,7 +9,6 @@ import (
 	"generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"os"
 	"path/filepath"
 	"syscall"
@@ -75,7 +74,7 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{"-t", "111", "my-new-app"}, deps)
+		ui := callPush([]string{"-t", "111", "my-new-app"}, deps)
 
 		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
 		Expect(deps.routeRepo.CreatedHost).To(Equal("my-new-app"))
@@ -83,7 +82,7 @@ var _ = Describe("Push Command", func() {
 		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
 		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating app", "my-new-app", "my-org", "my-space"},
 			{"OK"},
 			{"Creating", "my-new-app.shared.cf-app.com"},
@@ -101,7 +100,7 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{"-t", "111", "my-new-app"}, deps)
+		ui := callPush([]string{"-t", "111", "my-new-app"}, deps)
 		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
 		Expect(*deps.appRepo.CreatedAppParams().SpaceGuid).To(Equal("my-space-guid"))
 
@@ -113,7 +112,7 @@ var _ = Describe("Push Command", func() {
 
 		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating app", "my-new-app", "my-org", "my-space"},
 			{"OK"},
 			{"Creating", "my-new-app.foo.cf-app.com"},
@@ -136,17 +135,17 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{"-t", "111", "Tim's 1st-Crazy__app!"}, deps)
+		ui := callPush([]string{"-t", "111", "Tim's 1st-Crazy__app!"}, deps)
 		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("Tim's 1st-Crazy__app!"))
 
 		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("tims-1st-crazy-app"))
 		Expect(deps.routeRepo.CreatedHost).To(Equal("tims-1st-crazy-app"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating", "tims-1st-crazy-app.foo.cf-app.com"},
 			{"Binding", "tims-1st-crazy-app.foo.cf-app.com"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -162,7 +161,7 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainRoute = route
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{"my-new-app"}, deps)
+		ui := callPush([]string{"my-new-app"}, deps)
 
 		Expect(deps.routeRepo.CreatedHost).To(BeEmpty())
 		Expect(deps.routeRepo.CreatedDomainGuid).To(BeEmpty())
@@ -170,7 +169,7 @@ var _ = Describe("Push Command", func() {
 		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
 		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using", "my-new-app.foo.cf-app.com"},
 			{"Binding", "my-new-app.foo.cf-app.com"},
 			{"OK"},
@@ -190,7 +189,7 @@ var _ = Describe("Push Command", func() {
 		}
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{
+		ui := callPush([]string{
 			"-c", "unicorn -c config/unicorn.rb -D",
 			"-d", "bar.cf-app.com",
 			"-n", "my-hostname",
@@ -203,7 +202,7 @@ var _ = Describe("Push Command", func() {
 			"my-new-app",
 		}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using", "customLinux"},
 			{"OK"},
 			{"Creating app", "my-new-app"},
@@ -242,12 +241,12 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{
+		ui := callPush([]string{
 			"-t", "FooeyTimeout",
 			"my-new-app",
 		}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"invalid", "timeout"},
 		})
@@ -267,7 +266,7 @@ var _ = Describe("Push Command", func() {
 			"-c", "null",
 			"existing-app",
 		}
-		_ = callPush(mr.T(), args, deps)
+		_ = callPush(args, deps)
 
 		Expect(*deps.appRepo.UpdateParams.Command).To(Equal(""))
 	})
@@ -285,7 +284,7 @@ var _ = Describe("Push Command", func() {
 
 		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
-		_ = callPush(mr.T(), []string{"existing-app"}, deps)
+		_ = callPush([]string{"existing-app"}, deps)
 
 		updatedAppEnvVars := *deps.appRepo.UpdateParams.EnvironmentVars
 		Expect(updatedAppEnvVars["crazy"]).To(Equal("pants"))
@@ -305,8 +304,8 @@ var _ = Describe("Push Command", func() {
 
 		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
-		ui := callPush(mr.T(), []string{}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "manifest-host.manifest-example.com"},
 			{"OK"},
 			{"Binding", "manifest-host.manifest-example.com"},
@@ -337,9 +336,9 @@ var _ = Describe("Push Command", func() {
 			errors.New("disk_quota should not be null"),
 		}
 
-		ui := callPush(mr.T(), []string{}, deps)
+		ui := callPush([]string{}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"Error", "reading", "manifest"},
 			{"buildpack should not be null"},
@@ -352,9 +351,9 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush(mr.T(), []string{}, deps)
+		ui := callPush([]string{}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating", "app1"},
 			{"Creating", "app2"},
 		})
@@ -377,11 +376,11 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush(mr.T(), []string{"app2"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"app2"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating", "app2"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"Creating", "app1"},
 		})
 		Expect(len(deps.appRepo.CreateAppParams)).To(Equal(1))
@@ -393,8 +392,8 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush(mr.T(), []string{"non-existant-app"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"non-existant-app"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 		Expect(len(deps.appRepo.CreateAppParams)).To(Equal(0))
@@ -412,7 +411,7 @@ var _ = Describe("Push Command", func() {
 
 		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush(mr.T(), []string{}, deps)
+		ui := callPush([]string{}, deps)
 		Expect(len(deps.binder.AppsToBind)).To(Equal(4))
 		Expect(deps.binder.AppsToBind[0].Name).To(Equal("app1"))
 		Expect(deps.binder.AppsToBind[1].Name).To(Equal("app1"))
@@ -424,7 +423,7 @@ var _ = Describe("Push Command", func() {
 		Expect(deps.binder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
 		Expect(deps.binder.InstancesToBindTo[3].Name).To(Equal("global-service"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating", "app1"},
 			{"OK"},
 			{"Binding service", "app1-service", "app1", "my-org", "my-space", "my-user"},
@@ -446,8 +445,8 @@ var _ = Describe("Push Command", func() {
 		deps.serviceRepo.FindInstanceByNameErr = true
 		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush(mr.T(), []string{}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"Could not find service", "app1-service", "app1"},
 		})
@@ -460,7 +459,7 @@ var _ = Describe("Push Command", func() {
 		absPath, err := filepath.Abs("../../../fixtures/example-app")
 		Expect(err).NotTo(HaveOccurred())
 
-		callPush(mr.T(), []string{
+		callPush([]string{
 			"-p", absPath,
 			"app-with-path",
 		}, deps)
@@ -475,7 +474,7 @@ var _ = Describe("Push Command", func() {
 		absPath, err := filepath.Abs("../../../fixtures/example-app.jar")
 		Expect(err).NotTo(HaveOccurred())
 
-		callPush(mr.T(), []string{
+		callPush([]string{
 			"-p", absPath,
 			"app-with-path",
 		}, deps)
@@ -487,7 +486,7 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		callPush(mr.T(), []string{"app-with-default-path"}, deps)
+		callPush([]string{"app-with-default-path"}, deps)
 
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
@@ -498,7 +497,7 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		callPush(mr.T(), []string{
+		callPush([]string{
 			"-p", "../../../fixtures/example-app",
 			"app-with-relative-path",
 		}, deps)
@@ -515,11 +514,11 @@ var _ = Describe("Push Command", func() {
 		deps.manifestRepo.ReadManifestReturns.Manifest = manifest.NewEmptyManifest()
 		deps.manifestRepo.ReadManifestReturns.Errors = []error{errors.New("read manifest error")}
 
-		ui := callPush(mr.T(), []string{
+		ui := callPush([]string{
 			"-f", "bad/manifest/path",
 		}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"read manifest error"},
 		})
@@ -532,14 +531,14 @@ var _ = Describe("Push Command", func() {
 		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{syscall.ENOENT}
 		deps.manifestRepo.ReadManifestReturns.Path = ""
 
-		ui := callPush(mr.T(), []string{"--no-route", "app-name"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"--no-route", "app-name"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating app", "app-name"},
 			{"OK"},
 			{"Uploading", "app-name"},
 			{"OK"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -550,8 +549,8 @@ var _ = Describe("Push Command", func() {
 		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 		deps.manifestRepo.ReadManifestReturns.Path = "manifest.yml"
 
-		ui := callPush(mr.T(), []string{"-p", "some/relative/path"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"-p", "some/relative/path"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using manifest file", "manifest.yml"},
 		})
 
@@ -563,9 +562,9 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{"--no-route", "--no-manifest", "app-name"}, deps)
+		ui := callPush([]string{"--no-route", "--no-manifest", "app-name"}, deps)
 
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"hacker-manifesto"},
 		})
@@ -578,8 +577,8 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{"--no-route", "--no-manifest"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"--no-route", "--no-manifest"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 		})
 	})
@@ -594,7 +593,7 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostErr = true
 		deps.appRepo.ReadNotFound = true
 
-		callPush(mr.T(), []string{
+		callPush([]string{
 			"--no-route",
 			"my-new-app",
 		}, deps)
@@ -615,7 +614,7 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.appRepo.ReadNotFound = true
 
-		callPush(mr.T(), []string{
+		callPush([]string{
 			"--no-hostname",
 			"my-new-app",
 		}, deps)
@@ -634,11 +633,11 @@ var _ = Describe("Push Command", func() {
 		workerManifest.Applications[0].NoRoute = &noRoute
 		deps.manifestRepo.ReadManifestReturns.Manifest = workerManifest
 
-		ui := callPush(mr.T(), []string{
+		ui := callPush([]string{
 			"worker-app",
 		}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"worker-app", "is a worker", "skipping route creation"},
 		})
 		Expect(deps.routeRepo.BoundAppGuid).To(Equal(""))
@@ -649,7 +648,7 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		callPush(mr.T(), []string{
+		callPush([]string{
 			"-m", "256M",
 			"my-new-app",
 		}, deps)
@@ -661,12 +660,12 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 
-		ui := callPush(mr.T(), []string{
+		ui := callPush([]string{
 			"-m", "abcM",
 			"my-new-app",
 		}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"invalid", "memory"},
 		})
@@ -678,7 +677,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadApp = existingApp
 		deps.appRepo.UpdateAppResult = existingApp
 
-		_ = callPush(mr.T(), []string{"existing-app"}, deps)
+		_ = callPush([]string{"existing-app"}, deps)
 
 		Expect(deps.stopper.AppToStop.Guid).To(Equal(existingApp.Guid))
 		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal(existingApp.Guid))
@@ -691,7 +690,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadApp = stoppedApp
 		deps.appRepo.UpdateAppResult = stoppedApp
 
-		_ = callPush(mr.T(), []string{"stopped-app"}, deps)
+		_ = callPush([]string{"stopped-app"}, deps)
 
 		Expect(deps.stopper.AppToStop.Guid).To(Equal(""))
 	})
@@ -722,7 +721,7 @@ var _ = Describe("Push Command", func() {
 			"-s", "differentStack",
 			"existing-app",
 		}
-		_ = callPush(mr.T(), args, deps)
+		_ = callPush(args, deps)
 
 		Expect(*deps.appRepo.UpdateParams.Command).To(Equal("different start command"))
 		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(10))
@@ -755,9 +754,9 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.UpdateAppResult = existingApp
 		deps.routeRepo.FindByHostAndDomainRoute = foundRoute
 
-		ui := callPush(mr.T(), []string{"-d", "example.com", "existing-app"}, deps)
+		ui := callPush([]string{"-d", "example.com", "existing-app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using route", "existing-app", "example.com"},
 		})
 		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
@@ -787,9 +786,9 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainNotFound = true
 		deps.domainRepo.FindByNameInOrgDomain = foundDomain
 
-		ui := callPush(mr.T(), []string{"-d", "newdomain.com", "existing-app"}, deps)
+		ui := callPush([]string{"-d", "newdomain.com", "existing-app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "existing-app.newdomain.com"},
 			{"OK"},
 			{"Binding", "existing-app.newdomain.com"},
@@ -822,7 +821,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadApp = existingApp
 		deps.appRepo.UpdateAppResult = existingApp
 
-		_ = callPush(mr.T(), []string{"existing-app"}, deps)
+		_ = callPush([]string{"existing-app"}, deps)
 
 		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
 		Expect(deps.domainRepo.FindByNameInOrgName).To(Equal(""))
@@ -854,9 +853,9 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainNotFound = true
 		deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 
-		ui := callPush(mr.T(), []string{"-n", "new-host", "existing-app"}, deps)
+		ui := callPush([]string{"-n", "new-host", "existing-app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "new-host.example.com"},
 			{"OK"},
 			{"Binding", "new-host.example.com"},
@@ -877,9 +876,9 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadApp = existingApp
 		deps.appRepo.UpdateAppResult = existingApp
 
-		ui := callPush(mr.T(), []string{"--no-route", "existing-app"}, deps)
+		ui := callPush([]string{"--no-route", "existing-app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Uploading", "existing-app"},
 			{"OK"},
 		})
@@ -914,14 +913,14 @@ var _ = Describe("Push Command", func() {
 		deps.routeRepo.FindByHostAndDomainNotFound = true
 		deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 
-		ui := callPush(mr.T(), []string{"--no-hostname", "existing-app"}, deps)
+		ui := callPush([]string{"--no-hostname", "existing-app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "example.com"},
 			{"OK"},
 			{"Binding", "example.com"},
 		})
-		testassert.SliceDoesNotContain(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"existing-app.example.com"},
 		})
 
@@ -944,8 +943,8 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadApp = maker.NewApp(maker.Overrides{"name": "existing-app", "guid": "existing-app-guid"})
 		deps.appRepo.UpdateAppResult = deps.appRepo.ReadApp
 
-		ui := callPush(mr.T(), []string{"-t", "111", "existing-app"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"-t", "111", "existing-app"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "existing-app.foo.cf-app.com"},
 			{"OK"},
 			{"Binding", "existing-app.foo.cf-app.com"},
@@ -968,9 +967,9 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appBitsRepo.UploadAppErr = true
 
-		ui := callPush(mr.T(), []string{"app"}, deps)
+		ui := callPush([]string{"app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Uploading"},
 			{"FAILED"},
 		})
@@ -984,8 +983,8 @@ var _ = Describe("Push Command", func() {
 		deps.appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
 		deps.appBitsRepo.CallbackFileCount = 11
 
-		ui := callPush(mr.T(), []string{"appName"}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{"appName"}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Uploading", "path/to/app"},
 			{"61M", "11 files"},
 		})
@@ -994,8 +993,8 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingWithNoManifestAndNoName", func() {
 		deps := getPushDependencies()
 
-		ui := callPush(mr.T(), []string{}, deps)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		ui := callPush([]string{}, deps)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Incorrect Usage"},
 		})
 	})
@@ -1090,7 +1089,7 @@ func getPushDependencies() (deps pushDependencies) {
 	return
 }
 
-func callPush(t mr.TestingT, args []string, deps pushDependencies) (ui *testterm.FakeUI) {
+func callPush(args []string, deps pushDependencies) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("push", args)
 

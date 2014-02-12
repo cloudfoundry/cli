@@ -3,7 +3,6 @@ package net
 import (
 	"encoding/json"
 	"fmt"
-	mr "github.com/tjarratt/mr_t"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
@@ -36,7 +35,7 @@ func bytesToInterface(jsonBytes []byte) (interface{}, error) {
 }
 
 func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
-	return func(t mr.TestingT, request *http.Request) {
+	return func(request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			Fail(fmt.Sprintf("Error reading request body: %s", err))
@@ -58,7 +57,7 @@ func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 }
 
 func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {
-	return func(t mr.TestingT, request *http.Request) {
+	return func(request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			Fail(fmt.Sprintf("Error reading request body: %s", err))

@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testreq "testhelpers/requirements"
@@ -70,7 +69,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callShowService([]string{"service1"}, reqFactory)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Service instance:", "service1"},
 			{"Service: ", "mysql"},
 			{"Plan: ", "plan-name"},
@@ -91,7 +90,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callShowService([]string{"service1"}, reqFactory)
 
 		Expect(len(ui.Outputs)).To(Equal(3))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Service instance: ", "service1"},
 			{"Service: ", "user-provided"},
 		})

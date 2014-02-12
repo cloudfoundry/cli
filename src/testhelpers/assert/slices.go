@@ -2,7 +2,6 @@ package assert
 
 import (
 	"fmt"
-	mr "github.com/tjarratt/mr_t"
 	"strings"
 )
 
@@ -14,7 +13,7 @@ func (line Line) String() string {
 
 type Lines []Line
 
-func SliceContains(t mr.TestingT, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+func SliceContains(actual []string, expected Lines, msgAndArgs ...interface{}) bool {
 	expectedIndex := 0
 	for _, actualValue := range actual {
 		allStringsFound := true
@@ -29,10 +28,10 @@ func SliceContains(t mr.TestingT, actual []string, expected Lines, msgAndArgs ..
 			}
 		}
 	}
-	return Fail(t, fmt.Sprintf("\"%s\" not found", expected[expectedIndex]), msgAndArgs...)
+	return Fail(fmt.Sprintf("\"%s\" not found", expected[expectedIndex]), msgAndArgs...)
 }
 
-func SliceDoesNotContain(t mr.TestingT, actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+func SliceDoesNotContain(actual []string, expected Lines, msgAndArgs ...interface{}) bool {
 	for i, actualValue := range actual {
 		for _, expectedLine := range expected {
 			allStringsFound := true
@@ -40,7 +39,7 @@ func SliceDoesNotContain(t mr.TestingT, actual []string, expected Lines, msgAndA
 				allStringsFound = allStringsFound && strings.Contains(strings.ToLower(actualValue), strings.ToLower(expectedValue))
 			}
 			if allStringsFound {
-				return Fail(t, fmt.Sprintf("\"%s\" found on line %d", expectedLine, i), msgAndArgs...)
+				return Fail(fmt.Sprintf("\"%s\" found on line %d", expectedLine, i), msgAndArgs...)
 			}
 		}
 	}

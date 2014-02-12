@@ -4,7 +4,6 @@ import (
 	. "cf/commands/route"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -53,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callListRoutes([]string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting routes", "my-user"},
 			{"host", "domain", "apps"},
 			{"hostname-1", "example.com", "dora", "dora2"},
@@ -68,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callListRoutes([]string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting routes"},
 			{"No routes found"},
 		})
@@ -79,7 +78,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callListRoutes([]string{}, &testreq.FakeReqFactory{}, routeRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting routes"},
 			{"FAILED"},
 		})

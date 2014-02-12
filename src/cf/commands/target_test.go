@@ -80,7 +80,7 @@ var _ = Describe("target command", func() {
 			orgRepo.FindByNameErr = true
 
 			ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{{"FAILED"}})
+			testassert.SliceContains(ui.Outputs, testassert.Lines{{"FAILED"}})
 		})
 
 		It("TestTargetOrganizationWhenOrgNotFound", func() {
@@ -88,7 +88,7 @@ var _ = Describe("target command", func() {
 
 			ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"my-organization", "not found"},
 			})
@@ -99,7 +99,7 @@ var _ = Describe("target command", func() {
 
 			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"An org must be targeted before targeting a space"},
 			})
@@ -127,7 +127,7 @@ var _ = Describe("target command", func() {
 
 			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"Unable to access space", "my-space"},
 			})
@@ -141,7 +141,7 @@ var _ = Describe("target command", func() {
 
 			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"my-space", "not found"},
 			})
@@ -184,7 +184,7 @@ var _ = Describe("target command", func() {
 			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
 			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 			Expect(config.SpaceFields().Guid).To(Equal(""))
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"Unable to access space", "my-space"},
 			})

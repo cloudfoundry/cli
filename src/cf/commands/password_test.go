@@ -41,13 +41,13 @@ var _ = Describe("password command", func() {
 			deps.PwdRepo.UpdateUnauthorized = false
 			ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
 
-			testassert.SliceContains(GinkgoT(), ui.PasswordPrompts, testassert.Lines{
+			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
 				{"Current Password"},
 				{"New Password"},
 				{"Verify Password"},
 			})
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Changing password..."},
 				{"OK"},
 				{"Please log in again"},
@@ -64,12 +64,12 @@ var _ = Describe("password command", func() {
 		It("fails when the password verification does not match", func() {
 			ui := callPassword([]string{"old-password", "new-password", "new-password-with-error"}, deps)
 
-			testassert.SliceContains(GinkgoT(), ui.PasswordPrompts, testassert.Lines{
+			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
 				{"Current Password"},
 				{"New Password"},
 				{"Verify Password"},
 			})
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"Password verification does not match"},
 			})
@@ -81,13 +81,13 @@ var _ = Describe("password command", func() {
 			deps.PwdRepo.UpdateUnauthorized = true
 			ui := callPassword([]string{"old-password", "new-password", "new-password"}, deps)
 
-			testassert.SliceContains(GinkgoT(), ui.PasswordPrompts, testassert.Lines{
+			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
 				{"Current Password"},
 				{"New Password"},
 				{"Verify Password"},
 			})
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Changing password..."},
 				{"FAILED"},
 				{"Current password did not match"},

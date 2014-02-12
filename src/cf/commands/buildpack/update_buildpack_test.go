@@ -4,7 +4,6 @@ import (
 	. "cf/commands/buildpack"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -48,7 +47,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo, bitsRepo := getRepositories()
 
 		ui := callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating buildpack", "my-buildpack"},
 			{"OK"},
 		})
@@ -61,7 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callUpdateBuildpack([]string{"-i", "999", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 		Expect(*repo.UpdateBuildpack.Position).To(Equal(999))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating buildpack", "my-buildpack"},
 			{"OK"},
 		})
@@ -117,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(bitsRepo.UploadBuildpackPath).To(Equal("buildpack.zip"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating buildpack", "my-buildpack"},
 			{"OK"},
 		})
@@ -130,7 +129,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"-p", "bogus/path", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Updating buildpack", "my-buildpack"},
 			{"FAILED"},
 		})

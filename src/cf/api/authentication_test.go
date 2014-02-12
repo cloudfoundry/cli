@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testconfig "testhelpers/configuration"
@@ -93,7 +92,7 @@ var successfulLoginRequest = testnet.TestRequest{
 } `},
 }
 
-var successfulLoginMatcher = func(t mr.TestingT, request *http.Request) {
+var successfulLoginMatcher = func(request *http.Request) {
 	err := request.ParseForm()
 	if err != nil {
 		Fail(fmt.Sprintf("Failed to parse form: %s", err))
@@ -140,7 +139,7 @@ type authDependencies struct {
 }
 
 func setupAuthDependencies(request testnet.TestRequest) (deps authDependencies) {
-	deps.ts, deps.handler = testnet.NewTLSServer(GinkgoT(), []testnet.TestRequest{request})
+	deps.ts, deps.handler = testnet.NewTLSServer([]testnet.TestRequest{request})
 
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAuthorizationEndpoint(deps.ts.URL)

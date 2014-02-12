@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -44,7 +43,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Status: http.StatusOK,
 				Body:   jsonResponse},
 		})
-		ts, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+		ts, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()
@@ -57,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(headers).To(ContainSubstring("200"))
 		Expect(headers).To(ContainSubstring("Content-Type"))
 		Expect(headers).To(ContainSubstring("text/plain"))
-		testassert.JSONStringEquals(mr.T(), body, jsonResponse)
+		testassert.JSONStringEquals(body, jsonResponse)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -71,7 +70,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Body:   jsonResponse},
 		})
 
-		ts, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+		ts, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()
@@ -94,7 +93,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Body:   jsonResponse},
 		})
 
-		ts, _ := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+		ts, _ := testnet.NewTLSServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()
@@ -103,14 +102,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, body, _ := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
-		testassert.JSONStringEquals(mr.T(), body, jsonResponse)
+		testassert.JSONStringEquals(body, jsonResponse)
 	})
 
 	It("TestCurlWithCustomHeaders", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "POST",
 			Path:   "/v2/endpoint",
-			Matcher: func(t mr.TestingT, req *http.Request) {
+			Matcher: func(req *http.Request) {
 				Expect(req.Header.Get("content-type")).To(Equal("ascii/cats"))
 				Expect(req.Header.Get("x-something-else")).To(Equal("5"))
 			},
@@ -118,7 +117,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Status: http.StatusOK,
 				Body:   jsonResponse},
 		})
-		ts, handler := testnet.NewTLSServer(mr.T(), []testnet.TestRequest{req})
+		ts, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()

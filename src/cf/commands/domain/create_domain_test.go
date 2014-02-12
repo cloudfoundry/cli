@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -53,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(domainRepo.CreateDomainName).To(Equal("example.com"))
 		Expect(domainRepo.CreateDomainOwningOrgGuid).To(Equal("myOrg-guid"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating domain", "example.com", "myOrg", "my-user"},
 			{"OK"},
 		})

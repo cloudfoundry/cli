@@ -2,10 +2,10 @@ package net
 
 import (
 	"fmt"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"github.com/onsi/ginkgo"
 )
 
 type TestRequest struct {
@@ -16,7 +16,7 @@ type TestRequest struct {
 	Response TestResponse
 }
 
-type RequestMatcher func(mr.TestingT, *http.Request)
+type RequestMatcher func(*http.Request)
 
 type TestResponse struct {
 	Body   string
@@ -27,7 +27,6 @@ type TestResponse struct {
 type TestHandler struct {
 	Requests  []TestRequest
 	CallCount int
-	T         mr.TestingT
 }
 
 func (h *TestHandler) AllRequestsCalled() bool {
@@ -83,7 +82,7 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// match custom request matcher
 	if tester.Matcher != nil {
-		tester.Matcher(h.T, r)
+		tester.Matcher(r)
 	}
 
 	// set response headers
@@ -100,16 +99,15 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, tester.Response.Body)
 }
 
-func NewTLSServer(t mr.TestingT, requests []TestRequest) (s *httptest.Server, h *TestHandler) {
+func NewTLSServer(requests []TestRequest) (s *httptest.Server, h *TestHandler) {
 	h = &TestHandler{
 		Requests: requests,
-		T:        t,
 	}
 	s = httptest.NewTLSServer(h)
 	return
 }
 
 func (h *TestHandler) logError(msg string, args ...interface{}) {
-	h.T.Logf(msg, args...)
-	h.T.Fail()
+	println(fmt.Sprintf(msg, args...))
+	ginkgo.Fail("failed")
 }

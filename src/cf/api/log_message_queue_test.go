@@ -7,11 +7,10 @@ import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"time"
 )
 
-func logMessageWithTime(t mr.TestingT, messageString string, timestamp int64) *logmessage.Message {
+func logMessageWithTime(messageString string, timestamp int64) *logmessage.Message {
 	data, err := proto.Marshal(generateMessage(messageString, timestamp))
 	Expect(err).NotTo(HaveOccurred())
 	message, err := logmessage.ParseMessage(data)
@@ -40,13 +39,13 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestPriorityQueue", func() {
 		pq := NewSortedMessageQueue(10*time.Millisecond, time.Now)
 
-		msg3 := logMessageWithTime(mr.T(), "message 3", int64(130))
+		msg3 := logMessageWithTime("message 3", int64(130))
 		pq.PushMessage(msg3)
-		msg2 := logMessageWithTime(mr.T(), "message 2", int64(120))
+		msg2 := logMessageWithTime("message 2", int64(120))
 		pq.PushMessage(msg2)
-		msg4 := logMessageWithTime(mr.T(), "message 4", int64(140))
+		msg4 := logMessageWithTime("message 4", int64(140))
 		pq.PushMessage(msg4)
-		msg1 := logMessageWithTime(mr.T(), "message 1", int64(110))
+		msg1 := logMessageWithTime("message 1", int64(110))
 		pq.PushMessage(msg1)
 
 		Expect(getMsgString(pq.PopMessage())).To(Equal(getMsgString(msg1)))
@@ -71,11 +70,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		pq := NewSortedMessageQueue(5*time.Second, clock)
 		Expect(pq.NextTimestamp()).To(Equal(MAX_INT64))
 
-		msg2 := logMessageWithTime(mr.T(), "message 2", int64(130))
+		msg2 := logMessageWithTime("message 2", int64(130))
 		pq.PushMessage(msg2)
 
 		currentTime = time.Unix(6, 0)
-		msg1 := logMessageWithTime(mr.T(), "message 1", int64(100))
+		msg1 := logMessageWithTime("message 1", int64(100))
 		pq.PushMessage(msg1)
 		Expect(pq.NextTimestamp()).To(Equal(time.Unix(11, 0).UnixNano()))
 
@@ -91,14 +90,14 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestStableSort", func() {
 		pq := NewSortedMessageQueue(10*time.Millisecond, time.Now)
 
-		msg1 := logMessageWithTime(mr.T(), "message first", int64(109))
+		msg1 := logMessageWithTime("message first", int64(109))
 		pq.PushMessage(msg1)
 
 		for i := 1; i < 1000; i++ {
-			msg := logMessageWithTime(mr.T(), fmt.Sprintf("message %d", i), int64(110))
+			msg := logMessageWithTime(fmt.Sprintf("message %d", i), int64(110))
 			pq.PushMessage(msg)
 		}
-		msg2 := logMessageWithTime(mr.T(), "message last", int64(111))
+		msg2 := logMessageWithTime("message last", int64(111))
 		pq.PushMessage(msg2)
 
 		Expect(getMsgString(pq.PopMessage())).To(Equal("message first"))

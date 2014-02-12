@@ -6,7 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -15,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callDeleteService(t mr.TestingT, confirmation string, args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
+func callDeleteService(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{
 		Inputs: []string{confirmation},
 	}
@@ -35,13 +34,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "my-service-guid"
 		reqFactory := &testreq.FakeReqFactory{}
 		serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-		ui := callDeleteService(mr.T(), "Y", []string{"my-service"}, reqFactory, serviceRepo)
+		ui := callDeleteService("Y", []string{"my-service"}, reqFactory, serviceRepo)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Are you sure"},
 		})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -55,11 +54,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "my-service-guid"
 		reqFactory := &testreq.FakeReqFactory{}
 		serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-		ui := callDeleteService(mr.T(), "Yes", []string{"my-service"}, reqFactory, serviceRepo)
+		ui := callDeleteService("Yes", []string{"my-service"}, reqFactory, serviceRepo)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{{"Are you sure"}})
+		testassert.SliceContains(ui.Prompts, testassert.Lines{{"Are you sure"}})
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service", "my-service"},
 			{"OK"},
 		})
@@ -70,9 +69,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		reqFactory := &testreq.FakeReqFactory{}
 		serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
-		ui := callDeleteService(mr.T(), "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
+		ui := callDeleteService("", []string{"-f", "my-service"}, reqFactory, serviceRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service", "my-service"},
 			{"OK"},
 			{"my-service", "does not exist"},
@@ -83,10 +82,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		serviceRepo := &testapi.FakeServiceRepo{}
 
-		ui := callDeleteService(mr.T(), "", []string{"-f"}, reqFactory, serviceRepo)
+		ui := callDeleteService("", []string{"-f"}, reqFactory, serviceRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callDeleteService(mr.T(), "", []string{"-f", "my-service"}, reqFactory, serviceRepo)
+		ui = callDeleteService("", []string{"-f", "my-service"}, reqFactory, serviceRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 	It("TestDeleteServiceForceFlagSkipsConfirmation", func() {
@@ -94,10 +93,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		serviceRepo := &testapi.FakeServiceRepo{}
 
-		ui := callDeleteService(mr.T(), "", []string{"-f", "foo.com"}, reqFactory, serviceRepo)
+		ui := callDeleteService("", []string{"-f", "foo.com"}, reqFactory, serviceRepo)
 
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting service", "foo.com"},
 			{"OK"},
 		})

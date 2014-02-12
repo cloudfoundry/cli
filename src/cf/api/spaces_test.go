@@ -276,7 +276,7 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 }
 
 func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
-	ts, handler = testnet.NewTLSServer(GinkgoT(), reqs)
+	ts, handler = testnet.NewTLSServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

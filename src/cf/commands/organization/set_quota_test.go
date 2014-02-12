@@ -64,7 +64,7 @@ var _ = Describe("set-quota command", func() {
 
 			ui := callSetQuota([]string{"my-org", "my-quota"}, reqFactory, quotaRepo)
 
-			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Setting quota", "my-found-quota", "my-org", "my-user"},
 				{"OK"},
 			})

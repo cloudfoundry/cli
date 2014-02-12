@@ -6,7 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -51,10 +50,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"delete", "my-buildpack"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting buildpack", "my-buildpack"},
 			{"OK"},
 		})
@@ -77,7 +76,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal(""))
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"delete", "my-buildpack"},
 		})
 	})
@@ -101,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
 		Expect(buildpackRepo.FindByNameNotFound).To(BeTrue())
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "my-buildpack"},
 			{"OK"},
 			{"my-buildpack", "does not exist"},
@@ -127,7 +126,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting buildpack", "my-buildpack"},
 			{"FAILED"},
 			{"my-buildpack"},
@@ -154,7 +153,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(buildpackRepo.DeleteBuildpackGuid).To(Equal("my-buildpack-guid"))
 
 		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting buildpack", "my-buildpack"},
 			{"OK"},
 		})

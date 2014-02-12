@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -35,7 +34,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callApi([]string{}, config, endpointRepo)
 
 		Expect(len(ui.Outputs)).To(Equal(1))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"https://api.run.pivotal.io", "2.0"},
 		})
 	})
@@ -47,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callApi([]string{"http://example.com"}, config, endpointRepo)
 
 		Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://example.com"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Setting api endpoint to", "example.com"},
 			{"OK"},
 		})
@@ -60,7 +59,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callApi([]string{"https://example.com/"}, config, endpointRepo)
 
 		Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Setting api endpoint to", "example.com"},
 			{"OK"},
 		})

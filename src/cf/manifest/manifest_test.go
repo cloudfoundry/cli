@@ -154,7 +154,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			"memory", "instances", "timeout", "no-route", "services", "env"}
 
 		for _, key := range manifestKeys {
-			testassert.SliceContains(GinkgoT(), errorSlice, testassert.Lines{{key, "not be null"}})
+			testassert.SliceContains(errorSlice, testassert.Lines{{key, "not be null"}})
 		}
 	})
 

@@ -5,7 +5,6 @@ import (
 	. "cf/commands/service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -14,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callCreateUserProvidedService(t mr.TestingT, args []string, inputs []string, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
+func callCreateUserProvidedService(args []string, inputs []string, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{Inputs: inputs}
 	ctxt := testcmd.NewContext("create-user-provided-service", args)
 	reqFactory := &testreq.FakeReqFactory{}
@@ -29,12 +28,12 @@ func callCreateUserProvidedService(t mr.TestingT, args []string, inputs []string
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateUserProvidedServiceWithParameterList", func() {
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callCreateUserProvidedService(mr.T(), []string{"-p", `"foo, bar, baz"`, "my-custom-service"},
+		ui := callCreateUserProvidedService([]string{"-p", `"foo, bar, baz"`, "my-custom-service"},
 			[]string{"foo value", "bar value", "baz value"},
 			repo,
 		)
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"foo"},
 			{"bar"},
 			{"baz"},
@@ -47,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			"baz": "baz value",
 		}))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user provided service", "my-custom-service", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -55,7 +54,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 	It("TestCreateUserProvidedServiceWithJson", func() {
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callCreateUserProvidedService(mr.T(), []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
+		ui := callCreateUserProvidedService([]string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 			[]string{},
 			repo,
 		)
@@ -69,7 +68,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			"baz": "baz value",
 		}))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user provided service"},
 			{"OK"},
 		})
@@ -77,12 +76,12 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateUserProvidedServiceWithNoSecondArgument", func() {
 
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callCreateUserProvidedService(mr.T(), []string{"my-custom-service"},
+		ui := callCreateUserProvidedService([]string{"my-custom-service"},
 			[]string{},
 			userProvidedServiceInstanceRepo,
 		)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user provided service"},
 			{"OK"},
 		})
@@ -91,12 +90,12 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callCreateUserProvidedService(mr.T(), []string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
+		ui := callCreateUserProvidedService([]string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
 			[]string{},
 			repo,
 		)
 		Expect(repo.CreateDrainUrl).To(Equal("syslog://example.com"))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user provided service"},
 			{"OK"},
 		})

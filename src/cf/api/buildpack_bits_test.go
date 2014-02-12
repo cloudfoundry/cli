@@ -9,7 +9,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,7 +36,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		err = os.Chmod(filepath.Join(dir, "detect"), 0666)
 		Expect(err).NotTo(HaveOccurred())
 
-		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
+		_, apiResponse := testUploadBuildpack(dir, []testnet.TestRequest{
 			uploadBuildpackRequest(dir),
 		})
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
@@ -48,7 +47,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
 
-		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
+		_, apiResponse := testUploadBuildpack(dir, []testnet.TestRequest{
 			uploadBuildpackRequest(dir),
 		})
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
@@ -75,7 +74,7 @@ func uploadBuildpackRequest(filename string) testnet.TestRequest {
 var expectedBuildpackContent = []string{"detect", "compile", "package"}
 
 func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
-	return func(t mr.TestingT, request *http.Request) {
+	return func(request *http.Request) {
 		err := request.ParseMultipartForm(4096)
 		if err != nil {
 			Fail(fmt.Sprintf("Failed parsing multipart form: %s", err))
@@ -120,8 +119,8 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 	}
 }
 
-func testUploadBuildpack(t mr.TestingT, dir string, requests []testnet.TestRequest) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewTLSServer(t, requests)
+func testUploadBuildpack(dir string, requests []testnet.TestRequest) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
+	ts, handler := testnet.NewTLSServer(requests)
 	defer ts.Close()
 
 	configRepo := testconfig.NewRepositoryWithDefaults()

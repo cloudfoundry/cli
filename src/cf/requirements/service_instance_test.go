@@ -5,7 +5,6 @@ import (
 	. "cf/requirements"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testterm "testhelpers/terminal"
@@ -32,7 +31,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
 		ui := new(testterm.FakeUI)
 
-		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+		testassert.AssertPanic(testterm.FailedWasCalled, func() {
 			NewServiceInstanceRequirement("foo", ui, repo).Execute()
 		})
 	})

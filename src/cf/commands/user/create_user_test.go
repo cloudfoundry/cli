@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -18,29 +17,29 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestCreateUserFailsWithUsage", func() {
 		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
 
-		ui := callCreateUser(mr.T(), []string{}, defaultReqs, defaultUserRepo)
+		ui := callCreateUser([]string{}, defaultReqs, defaultUserRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callCreateUser(mr.T(), defaultArgs, defaultReqs, defaultUserRepo)
+		ui = callCreateUser(defaultArgs, defaultReqs, defaultUserRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 
 	It("TestCreateUserRequirements", func() {
 		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
 
-		callCreateUser(mr.T(), defaultArgs, defaultReqs, defaultUserRepo)
+		callCreateUser(defaultArgs, defaultReqs, defaultUserRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		notLoggedInReq := &testreq.FakeReqFactory{LoginSuccess: false}
-		callCreateUser(mr.T(), defaultArgs, notLoggedInReq, defaultUserRepo)
+		callCreateUser(defaultArgs, notLoggedInReq, defaultUserRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	It("TestCreateUser", func() {
 		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
-		ui := callCreateUser(mr.T(), defaultArgs, defaultReqs, defaultUserRepo)
+		ui := callCreateUser(defaultArgs, defaultReqs, defaultUserRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user", "my-user", "current-user"},
 			{"OK"},
 			{"TIP"},
@@ -52,9 +51,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		defaultArgs, defaultReqs, userAlreadyExistsRepo := getCreateUserDefaults()
 		userAlreadyExistsRepo.CreateUserExists = true
 
-		ui := callCreateUser(mr.T(), defaultArgs, defaultReqs, userAlreadyExistsRepo)
+		ui := callCreateUser(defaultArgs, defaultReqs, userAlreadyExistsRepo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user"},
 			{"FAILED"},
 			{"my-user"},
@@ -70,7 +69,7 @@ func getCreateUserDefaults() (defaultArgs []string, defaultReqs *testreq.FakeReq
 	return
 }
 
-func callCreateUser(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
+func callCreateUser(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("create-user", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()

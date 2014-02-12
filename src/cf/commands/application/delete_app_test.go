@@ -5,7 +5,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -20,10 +19,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(appRepo.ReadName).To(Equal("app-to-delete"))
 		Expect(appRepo.DeletedAppGuid).To(Equal("app-to-delete-guid"))
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Really delete"},
 		})
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -35,11 +34,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(appRepo.ReadName).To(Equal("app-to-delete"))
 		Expect(appRepo.DeletedAppGuid).To(Equal("app-to-delete-guid"))
 
-		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"Really delete", "app-to-delete"},
 		})
 		Expect(len(ui.Outputs)).To(Equal(2))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -63,7 +62,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(appRepo.DeletedAppGuid).To(Equal("app-to-delete-guid"))
 		Expect(len(ui.Prompts)).To(Equal(0))
 		Expect(len(ui.Outputs)).To(Equal(2))
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "app-to-delete"},
 			{"OK"},
 		})
@@ -82,7 +81,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(appRepo.ReadName).To(Equal("app-to-delete"))
 		Expect(appRepo.DeletedAppGuid).To(Equal(""))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Deleting", "app-to-delete"},
 			{"OK"},
 			{"app-to-delete", "does not exist"},
