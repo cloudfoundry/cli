@@ -44,10 +44,6 @@ type ServiceOfferingEntity struct {
 	ServicePlans     []ServicePlanResource `json:"service_plans"`
 }
 
-type PaginatedServicePlanResources struct {
-	Resources []ServicePlanResource
-}
-
 type ServicePlanResource struct {
 	Metadata Metadata
 	Entity   ServicePlanEntity
@@ -114,21 +110,16 @@ type ServiceBindingEntity struct {
 	AppGuid string `json:"app_guid"`
 }
 
-type V1ServicePlanDescription struct {
+type ServicePlanDescription struct {
 	ServiceName     string
 	ServicePlanName string
 	ServiceProvider string
 }
 
-func (v1PlanDesc V1ServicePlanDescription) String() string {
-	return fmt.Sprintf("%s %s %s", v1PlanDesc.ServiceName, v1PlanDesc.ServiceProvider, v1PlanDesc.ServicePlanName)
-}
-
-type V2ServicePlanDescription struct {
-	ServiceName     string
-	ServicePlanName string
-}
-
-func (v2PlanDesc V2ServicePlanDescription) String() string {
-	return fmt.Sprintf("%s %s", v2PlanDesc.ServiceName, v2PlanDesc.ServicePlanName)
+func (planDesc ServicePlanDescription) String() string {
+	if planDesc.ServiceProvider == "" {
+		return fmt.Sprintf("%s %s", planDesc.ServiceName, planDesc.ServicePlanName) // v2 plan
+	} else {
+		return fmt.Sprintf("%s %s %s", planDesc.ServiceName, planDesc.ServiceProvider, planDesc.ServicePlanName) // v1 plan
+	}
 }

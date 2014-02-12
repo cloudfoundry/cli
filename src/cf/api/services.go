@@ -18,7 +18,7 @@ type ServiceRepository interface {
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 	DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse)
-	FindServicePlanToMigrateByDescription(v1Description V1ServicePlanDescription, v2Description V2ServicePlanDescription) (v1PlanGuid, v2PlanGuid string, apiResponse net.ApiResponse)
+	FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse)
 	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse)
 	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) net.ApiResponse
 }
@@ -137,48 +137,28 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindServicePlanToMigrateByDescription(v1Description V1ServicePlanDescription, v2Description V2ServicePlanDescription) (v1PlanGuid, v2PlanGuid string, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_plans?inline-relations-depth=1", repo.config.ApiEndpoint())
+func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1&q=label:%s;provider:%s",
+		repo.config.ApiEndpoint(),
+		planDescription.ServiceName,
+		planDescription.ServiceProvider)
 
-	response := new(PaginatedServicePlanResources)
+	response := new(PaginatedServiceOfferingResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	for _, resource := range response.Resources {
-		if v1PlanGuid == "" {
-			serviceOffering := resource.Entity.ServiceOffering.Entity
-
-			matchingPlan := resource.Entity.Name == v1Description.ServicePlanName
-			matchingService := serviceOffering.Label == v1Description.ServiceName
-			matchingProvider := serviceOffering.Provider == v1Description.ServiceProvider
-			if matchingPlan && matchingService && matchingProvider {
-				v1PlanGuid = resource.Metadata.Guid
-			}
-		}
-
-		if v2PlanGuid == "" {
-			serviceOffering := resource.Entity.ServiceOffering.Entity
-
-			matchingPlan := resource.Entity.Name == v2Description.ServicePlanName
-			matchingService := serviceOffering.Label == v2Description.ServiceName
-			matchingProvider := serviceOffering.Provider == ""
-			if matchingPlan && matchingService && matchingProvider {
-				v2PlanGuid = resource.Metadata.Guid
+	for _, serviceOfferingResource := range response.Resources {
+		for _, servicePlanResource := range serviceOfferingResource.Entity.ServicePlans {
+			if servicePlanResource.Entity.Name == planDescription.ServicePlanName {
+				planGuid = servicePlanResource.Metadata.Guid
+				return
 			}
 		}
 	}
 
-	if v1PlanGuid == "" {
-		apiResponse = net.NewNotFoundApiResponse("Plan %s cannot be found", v1Description)
-		return
-	}
-
-	if v2PlanGuid == "" {
-		apiResponse = net.NewNotFoundApiResponse("Plan %s cannot be found", v2Description)
-		return
-	}
+	apiResponse = net.NewNotFoundApiResponse("Plan %s cannot be found", planDescription)
 
 	return
 }

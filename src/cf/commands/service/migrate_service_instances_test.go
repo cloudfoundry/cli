@@ -93,8 +93,7 @@ func init() {
 
 				Context("when the v1 and v2 service instances exists", func() {
 					BeforeEach(func() {
-						serviceRepo.V1FoundGuid = "v1-guid"
-						serviceRepo.V2FoundGuid = "v2-guid"
+						serviceRepo.FindServicePlanByDescriptionResultGuids = []string{"v1-guid", "v2-guid"}
 					})
 
 					It("makes a request to migrate the v1 service instance", func() {
@@ -107,22 +106,22 @@ func init() {
 					It("finds the v1 service plan by its name, provider and service label", func() {
 						testcmd.RunCommand(cmd, context, requirementsFactory)
 
-						expectedV1 := api.V1ServicePlanDescription{
+						expectedV1 := api.ServicePlanDescription{
 							ServicePlanName: "v1-plan-name",
 							ServiceProvider: "v1-provider-name",
 							ServiceName:     "v1-service-name",
 						}
-						Expect(serviceRepo.V1ServicePlanDescription).To(Equal(expectedV1))
+						Expect(serviceRepo.FindServicePlanByDescriptionArguments[0]).To(Equal(expectedV1))
 					})
 
 					It("finds the v2 service plan by its name and service label", func() {
 						testcmd.RunCommand(cmd, context, requirementsFactory)
 
-						expectedV2 := api.V2ServicePlanDescription{
+						expectedV2 := api.ServicePlanDescription{
 							ServicePlanName: "v2-plan-name",
 							ServiceName:     "v2-service-name",
 						}
-						Expect(serviceRepo.V2ServicePlanDescription).To(Equal(expectedV2))
+						Expect(serviceRepo.FindServicePlanByDescriptionArguments[1]).To(Equal(expectedV2))
 					})
 
 					It("notifies the user that the migration was successful", func() {
@@ -135,9 +134,32 @@ func init() {
 					})
 				})
 
-				Context("when finding the plan fails", func() {
+				Context("when finding the v1 plan fails", func() {
 					BeforeEach(func() {
-						serviceRepo.FindServicePlanToMigrateByDescriptionResponse = net.NewApiResponseWithMessage("uh oh")
+						serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewApiResponseWithMessage("uh oh")}
+					})
+
+					It("notifies the user of the failure", func() {
+						testcmd.RunCommand(cmd, context, requirementsFactory)
+
+						testassert.SliceContains(ui.Outputs, testassert.Lines{
+							{"FAILED"},
+							{"uh oh"},
+						})
+					})
+
+					It("does not display the warning", func() {
+						testcmd.RunCommand(cmd, context, requirementsFactory)
+
+						testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+							{"WARNING:", "this operation is to replace a service broker"},
+						})
+					})
+				})
+
+				Context("when finding the v2 plan fails", func() {
+					BeforeEach(func() {
+						serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewSuccessfulApiResponse(), net.NewApiResponseWithMessage("uh oh")}
 					})
 
 					It("notifies the user of the failure", func() {
@@ -175,8 +197,7 @@ func init() {
 
 				Context("when there are no instances to migrate", func() {
 					BeforeEach(func() {
-						serviceRepo.V1FoundGuid = "v1-guid"
-						serviceRepo.V2FoundGuid = "v2-guid"
+						serviceRepo.FindServicePlanByDescriptionResultGuids = []string{"v1-guid", "v2-guid"}
 						serviceRepo.ServiceInstanceCountForServicePlan = 0
 					})
 

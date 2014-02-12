@@ -37,17 +37,23 @@ func (cmd *MigrateServiceInstances) GetRequirements(reqFactory requirements.Fact
 }
 
 func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
-	v1 := api.V1ServicePlanDescription{
+	v1 := api.ServicePlanDescription{
 		ServiceName:     c.Args()[0],
 		ServiceProvider: c.Args()[1],
 		ServicePlanName: c.Args()[2],
 	}
-	v2 := api.V2ServicePlanDescription{
+	v2 := api.ServicePlanDescription{
 		ServiceName:     c.Args()[3],
 		ServicePlanName: c.Args()[4],
 	}
 
-	v1Guid, v2Guid, apiResponse := cmd.serviceRepo.FindServicePlanToMigrateByDescription(v1, v2)
+	v1Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v1)
+	if apiResponse.IsNotSuccessful() {
+		cmd.ui.Failed(apiResponse.Message)
+		return
+	}
+
+	v2Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v2)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
