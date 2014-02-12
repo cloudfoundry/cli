@@ -371,9 +371,9 @@ func callStart(args []string, config configuration.Reader, reqFactory *testreq.F
 	ctxt := testcmd.NewContext("start", args)
 
 	cmd := NewStart(ui, config, displayApp, appRepo, appInstancesRepo, logRepo)
-	cmd.StagingTimeout = 5 * time.Millisecond
-	cmd.StartupTimeout = 5 * time.Millisecond
-	cmd.PingerThrottle = 5 * time.Millisecond
+	cmd.StagingTimeout = 50 * time.Millisecond
+	cmd.StartupTimeout = 50 * time.Millisecond
+	cmd.PingerThrottle = 50 * time.Millisecond
 
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
