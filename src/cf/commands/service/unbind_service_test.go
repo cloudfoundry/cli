@@ -43,14 +43,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callUnbindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Unbinding app", "my-service", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), serviceBindingRepo.DeleteServiceInstance, serviceInstance)
-		assert.Equal(mr.T(), serviceBindingRepo.DeleteApplicationGuid, "my-app-guid")
+		Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
+		Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
 	})
 	It("TestUnbindCommandWhenBindingIsNonExistent", func() {
 
@@ -67,16 +67,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceBindingRepo := &testapi.FakeServiceBindingRepo{DeleteBindingNotFound: true}
 		ui := callUnbindService(mr.T(), []string{"my-app", "my-service"}, reqFactory, serviceBindingRepo)
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "my-service")
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(reqFactory.ServiceInstanceName).To(Equal("my-service"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Unbinding app", "my-service", "my-app"},
 			{"OK"},
 			{"my-service", "my-app", "did not exist"},
 		})
-		assert.Equal(mr.T(), serviceBindingRepo.DeleteServiceInstance, serviceInstance)
-		assert.Equal(mr.T(), serviceBindingRepo.DeleteApplicationGuid, "my-app-guid")
+		Expect(serviceBindingRepo.DeleteServiceInstance).To(Equal(serviceInstance))
+		Expect(serviceBindingRepo.DeleteApplicationGuid).To(Equal("my-app-guid"))
 	})
 	It("TestUnbindCommandFailsWithUsage", func() {
 

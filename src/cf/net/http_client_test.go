@@ -53,7 +53,7 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=password&password=[PRIVATE DATA HIDDEN]&scope=&username=mgehard%2Bcli%40pivotallabs.com
 `
-		assert.Equal(mr.T(), Sanitize(request), expected)
+		Expect(Sanitize(request)).To(Equal(expected))
 	})
 	It("TestSanitizeRemovesOauthTokensFromBody", func() {
 
@@ -91,7 +91,7 @@ Server: Apache-Coyote/1.1
 {"access_token":"[PRIVATE DATA HIDDEN]","token_type":"bearer","refresh_token":"[PRIVATE DATA HIDDEN]","expires_in":43199,"scope":"cloud_controller.read cloud_controller.write openid password.write","jti":"c6a7c136-6497-4faf-8799-4c42e1f3c6f5"}
 `
 
-		assert.Equal(mr.T(), Sanitize(response), expected)
+		Expect(Sanitize(response)).To(Equal(expected))
 	})
 	It("TestSanitizeRemovesServiceAuthTokensFromBody", func() {
 
@@ -129,7 +129,7 @@ Server: Apache-Coyote/1.1
 {"label":"some label","provider":"some provider","token":"[PRIVATE DATA HIDDEN]"}
 `
 
-		assert.Equal(mr.T(), Sanitize(response), expected)
+		Expect(Sanitize(response)).To(Equal(expected))
 	})
 	It("TestPrepareRedirectTransfersAuthorizationHeader", func() {
 
@@ -145,7 +145,7 @@ Server: Apache-Coyote/1.1
 		err = PrepareRedirect(redirectReq, via)
 
 		assert.NoError(mr.T(), err)
-		assert.Equal(mr.T(), redirectReq.Header.Get("Authorization"), "my-auth-token")
+		Expect(redirectReq.Header.Get("Authorization")).To(Equal("my-auth-token"))
 	})
 	It("TestPrepareRedirectFailsAfterOneRedirect", func() {
 

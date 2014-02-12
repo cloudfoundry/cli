@@ -63,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.Empty(mr.T(), ui.Prompts)
 
-		assert.Equal(mr.T(), repo.CreateName, "my-custom-service")
+		Expect(repo.CreateName).To(Equal("my-custom-service"))
 		assert.Equal(mr.T(), repo.CreateParams, map[string]string{
 			"foo": "foo value",
 			"bar": "bar value",
@@ -96,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			[]string{},
 			repo,
 		)
-		assert.Equal(mr.T(), repo.CreateDrainUrl, "syslog://example.com")
+		Expect(repo.CreateDrainUrl).To(Equal("syslog://example.com"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Creating user provided service"},
 			{"OK"},

@@ -89,9 +89,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 			{"TIP"},
 		})
-		assert.Equal(mr.T(), repo.UpdateServiceInstance.Name, serviceInstance.Name)
-		assert.Equal(mr.T(), repo.UpdateServiceInstance.Params, map[string]string{"foo": "bar"})
-		assert.Equal(mr.T(), repo.UpdateServiceInstance.SysLogDrainUrl, "syslog://example.com")
+		Expect(repo.UpdateServiceInstance.Name).To(Equal(serviceInstance.Name))
+		Expect(repo.UpdateServiceInstance.Params).To(Equal(map[string]string{"foo": "bar"}))
+		Expect(repo.UpdateServiceInstance.SysLogDrainUrl).To(Equal("syslog://example.com"))
 	})
 	It("TestUpdateUserProvidedServiceWithoutJson", func() {
 

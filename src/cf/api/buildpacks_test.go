@@ -103,9 +103,9 @@ var _ = Describe("Buildpacks repo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
-		assert.Equal(mr.T(), buildpack.Name, existingBuildpack.Name)
-		assert.Equal(mr.T(), buildpack.Guid, existingBuildpack.Guid)
-		assert.Equal(mr.T(), *buildpack.Position, 10)
+		Expect(buildpack.Name).To(Equal(existingBuildpack.Name))
+		Expect(buildpack.Guid).To(Equal(existingBuildpack.Guid))
+		Expect(*buildpack.Position).To(Equal(10))
 	})
 
 	It("TestFindByNameWhenBuildpackIsNotFound", func() {
@@ -139,8 +139,8 @@ var _ = Describe("Buildpacks repo", func() {
 		one := 1
 		createdBuildpack, apiResponse := repo.Create("name with space", &one, nil, nil)
 		assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), createdBuildpack, models.Buildpack{})
-		assert.Equal(mr.T(), apiResponse.ErrorCode, "290003")
+		Expect(createdBuildpack).To(Equal(models.Buildpack{}))
+		Expect(apiResponse.ErrorCode).To(Equal("290003"))
 		assert.Contains(mr.T(), apiResponse.Message, "Buildpack is invalid")
 	})
 
@@ -172,8 +172,8 @@ var _ = Describe("Buildpacks repo", func() {
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
 		assert.NotNil(mr.T(), created.Guid)
-		assert.Equal(mr.T(), "my-cool-buildpack", created.Name)
-		assert.Equal(mr.T(), 999, *created.Position)
+		Expect("my-cool-buildpack").To(Equal(created.Name))
+		Expect(999).To(Equal(*created.Position))
 	})
 
 	It("TestCreateBuildpackEnabled", func() {
@@ -206,8 +206,8 @@ var _ = Describe("Buildpacks repo", func() {
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
 		assert.NotNil(mr.T(), created.Guid)
-		assert.Equal(mr.T(), "my-cool-buildpack", created.Name)
-		assert.Equal(mr.T(), 999, *created.Position)
+		Expect("my-cool-buildpack").To(Equal(created.Name))
+		Expect(999).To(Equal(*created.Position))
 	})
 
 	It("TestDeleteBuildpack", func() {
@@ -261,7 +261,7 @@ var _ = Describe("Buildpacks repo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-		assert.Equal(mr.T(), buildpack, updated)
+		Expect(buildpack).To(Equal(updated))
 	})
 
 	It("TestLockBuildpack", func() {
@@ -306,7 +306,7 @@ var _ = Describe("Buildpacks repo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-		assert.Equal(mr.T(), expectedBuildpack, updated)
+		Expect(expectedBuildpack).To(Equal(updated))
 	})
 })
 

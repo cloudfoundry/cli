@@ -59,8 +59,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), app.Guid, logsRepo.AppLoggedGuid)
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Connected, dumping recent logs for app", "my-app", "my-org", "my-space", "my-user"},
 			{"Log Line 1"},
@@ -103,8 +103,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callLogs([]string{"my-app"}, reqFactory, logsRepo)
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), app.Guid, logsRepo.AppLoggedGuid)
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(app.Guid).To(Equal(logsRepo.AppLoggedGuid))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 			{"Log Line 1"},

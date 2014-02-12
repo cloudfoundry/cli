@@ -26,7 +26,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(repo.FindInstanceByNameName).To(Equal("foo"))
-		assert.Equal(mr.T(), req.GetServiceInstance(), instance)
+		Expect(req.GetServiceInstance()).To(Equal(instance))
 	})
 	It("TestServiceInstanceReqExecuteWhenServiceInstanceNotFound", func() {
 

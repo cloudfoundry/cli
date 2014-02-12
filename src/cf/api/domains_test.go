@@ -28,8 +28,8 @@ var _ = Describe("DomainRepository", func() {
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 		Expect(len(receivedDomains)).To(Equal(2))
-		assert.Equal(mr.T(), receivedDomains[0].Guid, "shared-domain1-guid")
-		assert.Equal(mr.T(), receivedDomains[1].Guid, "shared-domain2-guid")
+		Expect(receivedDomains[0].Guid).To(Equal("shared-domain1-guid"))
+		Expect(receivedDomains[1].Guid).To(Equal("shared-domain2-guid"))
 		assert.True(mr.T(), handler.AllRequestsCalled())
 	})
 
@@ -44,8 +44,8 @@ var _ = Describe("DomainRepository", func() {
 		})
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), len(receivedDomains), 1)
-		assert.Equal(mr.T(), receivedDomains[0].Guid, "domain-guid")
+		Expect(len(receivedDomains)).To(Equal(1))
+		Expect(receivedDomains[0].Guid).To(Equal("domain-guid"))
 		assert.True(mr.T(), handler.AllRequestsCalled())
 	})
 
@@ -60,9 +60,9 @@ var _ = Describe("DomainRepository", func() {
 		})
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), len(receivedDomains), 3)
-		assert.Equal(mr.T(), receivedDomains[0].Guid, "domain1-guid")
-		assert.Equal(mr.T(), receivedDomains[1].Guid, "domain2-guid")
+		Expect(len(receivedDomains)).To(Equal(3))
+		Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
+		Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
 		assert.True(mr.T(), handler.AllRequestsCalled())
 	})
 
@@ -120,8 +120,8 @@ var _ = Describe("DomainRepository", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 
-		assert.Equal(mr.T(), domain.Name, "domain2.cf-app.com")
-		assert.Equal(mr.T(), domain.Guid, "domain2-guid")
+		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
+		Expect(domain.Guid).To(Equal("domain2-guid"))
 	})
 
 	Describe("finding a domain by name in an org", func() {
@@ -150,8 +150,8 @@ var _ = Describe("DomainRepository", func() {
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-			assert.Equal(mr.T(), domain.Name, "my-example.com")
-			assert.Equal(mr.T(), domain.Guid, "my-domain-guid")
+			Expect(domain.Name).To(Equal("my-example.com"))
+			Expect(domain.Guid).To(Equal("my-domain-guid"))
 			assert.False(mr.T(), domain.Shared)
 		})
 
@@ -186,8 +186,8 @@ var _ = Describe("DomainRepository", func() {
 			assert.True(mr.T(), handler.AllRequestsCalled())
 			assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-			assert.Equal(mr.T(), domain.Name, "shared-example.com")
-			assert.Equal(mr.T(), domain.Guid, "shared-domain-guid")
+			Expect(domain.Name).To(Equal("shared-example.com"))
+			Expect(domain.Guid).To(Equal("shared-domain-guid"))
 			assert.True(mr.T(), domain.Shared)
 		})
 
@@ -271,7 +271,7 @@ var _ = Describe("DomainRepository", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), createdDomain.Guid, "abc-123")
+		Expect(createdDomain.Guid).To(Equal("abc-123"))
 	})
 
 	It("TestCreateDomainUsingNewEndpoint", func() {
@@ -292,7 +292,7 @@ var _ = Describe("DomainRepository", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), createdDomain.Guid, "abc-123")
+		Expect(createdDomain.Guid).To(Equal("abc-123"))
 	})
 
 	It("TestCreateSharedDomainsWithNewEndpoint", func() {

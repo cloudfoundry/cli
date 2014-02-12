@@ -84,7 +84,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		fakeUI := callUpdateBuildpack([]string{"--enable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 		assert.NotNil(mr.T(), repo.UpdateBuildpack.Enabled)
-		assert.Equal(mr.T(), *repo.UpdateBuildpack.Enabled, true)
+		Expect(*repo.UpdateBuildpack.Enabled).To(Equal(true))
 
 		assert.Contains(mr.T(), fakeUI.Outputs[0], "Updating buildpack")
 		assert.Contains(mr.T(), fakeUI.Outputs[0], "my-buildpack")
@@ -98,7 +98,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callUpdateBuildpack([]string{"--disable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 		assert.NotNil(mr.T(), repo.UpdateBuildpack.Enabled)
-		assert.Equal(mr.T(), *repo.UpdateBuildpack.Enabled, false)
+		Expect(*repo.UpdateBuildpack.Enabled).To(Equal(false))
 	})
 	It("TestUpdateBuildpackNoEnable", func() {
 
@@ -116,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"-p", "buildpack.zip", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Equal(mr.T(), bitsRepo.UploadBuildpackPath, "buildpack.zip")
+		Expect(bitsRepo.UploadBuildpackPath).To(Equal("buildpack.zip"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Updating buildpack", "my-buildpack"},
@@ -144,7 +144,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		ui := callUpdateBuildpack([]string{"--lock", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
 		assert.NotNil(mr.T(), repo.UpdateBuildpack.Locked)
-		assert.Equal(mr.T(), *repo.UpdateBuildpack.Locked, true)
+		Expect(*repo.UpdateBuildpack.Locked).To(Equal(true))
 
 		assert.Contains(mr.T(), ui.Outputs[0], "Updating buildpack")
 		assert.Contains(mr.T(), ui.Outputs[0], "my-buildpack")

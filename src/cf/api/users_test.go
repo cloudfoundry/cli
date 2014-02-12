@@ -34,10 +34,10 @@ var _ = Describe("UserRepository", func() {
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
 			Expect(len(users)).To(Equal(3))
-			assert.Equal(mr.T(), users[0].Guid, "user-1-guid")
-			assert.Equal(mr.T(), users[0].Username, "Super user 1")
-			assert.Equal(mr.T(), users[1].Guid, "user-2-guid")
-			assert.Equal(mr.T(), users[1].Username, "Super user 2")
+			Expect(users[0].Guid).To(Equal("user-1-guid"))
+			Expect(users[0].Username).To(Equal("Super user 1"))
+			Expect(users[1].Guid).To(Equal("user-2-guid"))
+			Expect(users[1].Username).To(Equal("Super user 2"))
 		})
 
 		It("lists the users in a space with a given role", func() {
@@ -53,11 +53,11 @@ var _ = Describe("UserRepository", func() {
 			assert.True(mr.T(), uaaHandler.AllRequestsCalled())
 			assert.True(mr.T(), apiResponse.IsSuccessful())
 
-			assert.Equal(mr.T(), len(users), 3)
-			assert.Equal(mr.T(), users[0].Guid, "user-1-guid")
-			assert.Equal(mr.T(), users[0].Username, "Super user 1")
-			assert.Equal(mr.T(), users[1].Guid, "user-2-guid")
-			assert.Equal(mr.T(), users[1].Username, "Super user 2")
+			Expect(len(users)).To(Equal(3))
+			Expect(users[0].Guid).To(Equal("user-1-guid"))
+			Expect(users[0].Username).To(Equal("Super user 1"))
+			Expect(users[1].Guid).To(Equal("user-2-guid"))
+			Expect(users[1].Username).To(Equal("Super user 2"))
 		})
 
 		It("does not make a request to the UAA when the cloud controller returns an error", func() {
@@ -77,7 +77,7 @@ var _ = Describe("UserRepository", func() {
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
 			assert.True(mr.T(), ccHandler.AllRequestsCalled())
-			assert.Equal(mr.T(), apiResponse.StatusCode, http.StatusGatewayTimeout)
+			Expect(apiResponse.StatusCode).To(Equal(http.StatusGatewayTimeout))
 		})
 
 		It("returns an error when the UAA endpoint cannot be determined", func() {
@@ -119,7 +119,7 @@ var _ = Describe("UserRepository", func() {
 		expectedUserFields := models.UserFields{}
 		expectedUserFields.Username = "my-full-username"
 		expectedUserFields.Guid = "my-guid"
-		assert.Equal(mr.T(), user, expectedUserFields)
+		Expect(user).To(Equal(expectedUserFields))
 	})
 
 	It("TestFindByUsernameWhenNotFound", func() {
@@ -294,13 +294,13 @@ var _ = Describe("UserRepository", func() {
 		assert.True(t, uaaHandler.AllRequestsCalled())
 		assert.True(t, apiResponse.IsSuccessful())
 
-		assert.Equal(t, len(users), 3)
-		assert.Equal(t, users[0].Guid, "user-1-guid")
-		assert.Equal(t, users[0].Username, "Super user 1")
-		assert.Equal(t, users[1].Guid, "user-2-guid")
-		assert.Equal(t, users[1].Username, "Super user 2")
-		assert.Equal(t, users[2].Guid, "user-3-guid")
-		assert.Equal(t, users[2].Username, "Super user 3")
+		Expect(len(users)).To(Equal(3))
+		Expect(users[0].Guid).To(Equal("user-1-guid"))
+		Expect(users[0].Username).To(Equal("Super user 1"))
+		Expect(users[1].Guid).To(Equal("user-2-guid"))
+		Expect(users[1].Username).To(Equal("Super user 2"))
+		Expect(users[2].Guid).To(Equal("user-3-guid"))
+		Expect(users[2].Username).To(Equal("Super user 3"))
 	})
 })
 

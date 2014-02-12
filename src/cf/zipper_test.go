@@ -57,20 +57,20 @@ var _ = Describe("Testing with ginkgo", func() {
 				return file.Name, string(buf.Bytes())
 			}
 
-			assert.Equal(mr.T(), len(reader.File), 3)
+			Expect(len(reader.File)).To(Equal(3))
 
 			name, contents := readFileInZip(0)
-			assert.Equal(mr.T(), name, "foo.txt")
-			assert.Equal(mr.T(), contents, "This is a simple text file.")
+			Expect(name).To(Equal("foo.txt"))
+			Expect(contents).To(Equal("This is a simple text file."))
 
 			name, contents = readFileInZip(1)
-			assert.Equal(mr.T(), name, "subDir/bar.txt")
-			assert.Equal(mr.T(), contents, "I am in a subdirectory.")
-			assert.Equal(mr.T(), reader.File[1].FileInfo().Mode(), uint32(0666))
+			Expect(name).To(Equal("subDir/bar.txt"))
+			Expect(contents).To(Equal("I am in a subdirectory."))
+			Expect(reader.File[1].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
 
 			name, contents = readFileInZip(2)
-			assert.Equal(mr.T(), name, "subDir/otherDir/file.txt")
-			assert.Equal(mr.T(), contents, "This file should be present.")
+			Expect(name).To(Equal("subDir/otherDir/file.txt"))
+			Expect(contents).To(Equal("This file should be present."))
 		})
 	})
 
@@ -83,7 +83,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.zip"), zipFile)
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), fileToString(zipFile), "This is an application zip file\n")
+			Expect(fileToString(zipFile)).To(Equal("This is an application zip file\n"))
 		})
 	})
 
@@ -96,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.war"), zipFile)
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), fileToString(zipFile), "This is an application war file\n")
+			Expect(fileToString(zipFile)).To(Equal("This is an application war file\n"))
 		})
 	})
 
@@ -109,7 +109,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.jar"), zipFile)
 			assert.NoError(mr.T(), err)
 
-			assert.Equal(mr.T(), fileToString(zipFile), "This is an application jar file\n")
+			Expect(fileToString(zipFile)).To(Equal("This is an application jar file\n"))
 		})
 	})
 
@@ -128,7 +128,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				zipper := ApplicationZipper{}
 				err = zipper.Zip(emptyDir, zipFile)
 				assert.Error(mr.T(), err)
-				assert.Equal(mr.T(), err.Error(), "Directory is empty")
+				Expect(err.Error()).To(Equal("Directory is empty"))
 			})
 		})
 	})

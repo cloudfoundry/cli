@@ -26,7 +26,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(userRepo.FindByUsernameUsername).To(Equal("foo"))
-		assert.Equal(mr.T(), userReq.GetUser(), user)
+		Expect(userReq.GetUser()).To(Equal(user))
 	})
 
 	It("TestUserReqWhenUserDoesNotExist", func() {

@@ -11,7 +11,7 @@ import (
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestByteSize", func() {
 		Expect(ByteSize(100 * MEGABYTE)).To(Equal("100M"))
-		assert.Equal(mr.T(), ByteSize(uint64(100.5*MEGABYTE)), "100.5M")
+		Expect(ByteSize(uint64(100.5 * MEGABYTE))).To(Equal("100.5M"))
 	})
 
 	It("TestParsesByteAmounts", func() {
@@ -21,19 +21,19 @@ var _ = Describe("Testing with ginkgo", func() {
 		)
 
 		megabytes, err = ToMegabytes("5M")
-		assert.Equal(mr.T(), megabytes, uint64(5))
+		Expect(megabytes).To(Equal(uint64(5)))
 		assert.NoError(mr.T(), err)
 
 		megabytes, err = ToMegabytes("5m")
-		assert.Equal(mr.T(), megabytes, uint64(5))
+		Expect(megabytes).To(Equal(uint64(5)))
 		assert.NoError(mr.T(), err)
 
 		megabytes, err = ToMegabytes("2G")
-		assert.Equal(mr.T(), megabytes, uint64(2*1024))
+		Expect(megabytes).To(Equal(uint64(2 * 1024)))
 		assert.NoError(mr.T(), err)
 
 		megabytes, err = ToMegabytes("3T")
-		assert.Equal(mr.T(), megabytes, uint64(3*1024*1024))
+		Expect(megabytes).To(Equal(uint64(3 * 1024 * 1024)))
 		assert.NoError(mr.T(), err)
 	})
 
@@ -44,19 +44,19 @@ var _ = Describe("Testing with ginkgo", func() {
 		)
 
 		megabytes, err = ToMegabytes("5MB")
-		assert.Equal(mr.T(), megabytes, uint64(5))
+		Expect(megabytes).To(Equal(uint64(5)))
 		assert.NoError(mr.T(), err)
 
 		megabytes, err = ToMegabytes("5mb")
-		assert.Equal(mr.T(), megabytes, uint64(5))
+		Expect(megabytes).To(Equal(uint64(5)))
 		assert.NoError(mr.T(), err)
 
 		megabytes, err = ToMegabytes("2GB")
-		assert.Equal(mr.T(), megabytes, uint64(2*1024))
+		Expect(megabytes).To(Equal(uint64(2 * 1024)))
 		assert.NoError(mr.T(), err)
 
 		megabytes, err = ToMegabytes("3TB")
-		assert.Equal(mr.T(), megabytes, uint64(3*1024*1024))
+		Expect(megabytes).To(Equal(uint64(3 * 1024 * 1024)))
 		assert.NoError(mr.T(), err)
 	})
 

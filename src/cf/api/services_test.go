@@ -71,24 +71,24 @@ func testGetServiceOfferings(t mr.TestingT, req testnet.TestRequest, config conf
 
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, 2, len(offerings))
+	Expect(2).To(Equal(len(offerings)))
 
 	firstOffering := offerings[0]
-	assert.Equal(t, firstOffering.Label, "Offering 1")
-	assert.Equal(t, firstOffering.Version, "1.0")
-	assert.Equal(t, firstOffering.Description, "Offering 1 description")
-	assert.Equal(t, firstOffering.Provider, "Offering 1 provider")
-	assert.Equal(t, firstOffering.Guid, "offering-1-guid")
-	assert.Equal(t, len(firstOffering.Plans), 2)
+	Expect(firstOffering.Label).To(Equal("Offering 1"))
+	Expect(firstOffering.Version).To(Equal("1.0"))
+	Expect(firstOffering.Description).To(Equal("Offering 1 description"))
+	Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
+	Expect(firstOffering.Guid).To(Equal("offering-1-guid"))
+	Expect(len(firstOffering.Plans)).To(Equal(2))
 
 	plan := firstOffering.Plans[0]
-	assert.Equal(t, plan.Name, "Offering 1 Plan 1")
-	assert.Equal(t, plan.Guid, "offering-1-plan-1-guid")
+	Expect(plan.Name).To(Equal("Offering 1 Plan 1"))
+	Expect(plan.Guid).To(Equal("offering-1-plan-1-guid"))
 
 	secondOffering := offerings[1]
-	assert.Equal(t, secondOffering.Label, "Offering 2")
-	assert.Equal(t, secondOffering.Guid, "offering-2-guid")
-	assert.Equal(t, len(secondOffering.Plans), 1)
+	Expect(secondOffering.Label).To(Equal("Offering 2"))
+	Expect(secondOffering.Guid).To(Equal("offering-2-guid"))
+	Expect(len(secondOffering.Plans)).To(Equal(1))
 }
 
 var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -246,7 +246,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), identicalAlreadyExists, true)
+		Expect(identicalAlreadyExists).To(Equal(true))
 	})
 	It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
 
@@ -267,7 +267,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), identicalAlreadyExists, false)
+		Expect(identicalAlreadyExists).To(Equal(false))
 	})
 	It("TestFindInstanceByName", func() {
 
@@ -278,18 +278,18 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), instance.Name, "my-service")
-		assert.Equal(mr.T(), instance.Guid, "my-service-instance-guid")
-		assert.Equal(mr.T(), instance.ServiceOffering.Label, "mysql")
-		assert.Equal(mr.T(), instance.ServiceOffering.DocumentationUrl, "http://info.example.com")
-		assert.Equal(mr.T(), instance.ServiceOffering.Description, "MySQL database")
-		assert.Equal(mr.T(), instance.ServicePlan.Name, "plan-name")
-		assert.Equal(mr.T(), len(instance.ServiceBindings), 2)
+		Expect(instance.Name).To(Equal("my-service"))
+		Expect(instance.Guid).To(Equal("my-service-instance-guid"))
+		Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
+		Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
+		Expect(instance.ServiceOffering.Description).To(Equal("MySQL database"))
+		Expect(instance.ServicePlan.Name).To(Equal("plan-name"))
+		Expect(len(instance.ServiceBindings)).To(Equal(2))
 
 		binding := instance.ServiceBindings[0]
-		assert.Equal(mr.T(), binding.Url, "/v2/service_bindings/service-binding-1-guid")
-		assert.Equal(mr.T(), binding.Guid, "service-binding-1-guid")
-		assert.Equal(mr.T(), binding.AppGuid, "app-1-guid")
+		Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
+		Expect(binding.Guid).To(Equal("service-binding-1-guid"))
+		Expect(binding.AppGuid).To(Equal("app-1-guid"))
 	})
 	It("TestFindInstanceByNameForNonExistentService", func() {
 
@@ -343,7 +343,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.DeleteService(serviceInstance)
 		assert.True(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), apiResponse.Message, "Cannot delete service instance, apps are still bound to it")
+		Expect(apiResponse.Message).To(Equal("Cannot delete service instance, apps are still bound to it"))
 	})
 	It("TestRenameService", func() {
 		path := "/v2/service_instances/my-service-instance-guid"
@@ -391,7 +391,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}})
 
 		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		assert.Equal(t, offering.Guid, "offering-1-guid")
+		Expect(offering.Guid).To(Equal("offering-1-guid"))
 		assert.True(t, apiResponse.IsSuccessful())
 	})
 
@@ -411,7 +411,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		assert.True(t, apiResponse.IsNotFound())
-		assert.Equal(t, offering.Guid, "")
+		Expect(offering.Guid).To(Equal(""))
 	})
 
 	It("handles api errors when finding service offerings", func() {
@@ -430,7 +430,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		assert.True(t, apiResponse.IsError())
-		assert.Equal(t, apiResponse.ErrorCode, "10005")
+		Expect(apiResponse.ErrorCode).To(Equal("10005"))
 	})
 
 	It("purges service offerings", func() {

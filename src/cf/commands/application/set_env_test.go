@@ -66,8 +66,8 @@ var _ = Describe("set-env command", func() {
 			{"TIP"},
 		})
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
 			"DATABASE_URL": "mysql://example.com/my-db",
 			"foo":          "bar",
@@ -86,7 +86,7 @@ var _ = Describe("set-env command", func() {
 		args := []string{"my-app", "DATABASE_URL", "mysql://example2.com/my-db"}
 		ui := callSetEnv(args, reqFactory, appRepo)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{
 				"Setting env variable",
@@ -101,8 +101,8 @@ var _ = Describe("set-env command", func() {
 			{"TIP"},
 		})
 
-		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		assert.Equal(mr.T(), appRepo.UpdateAppGuid, app.Guid)
+		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
+		Expect(appRepo.UpdateAppGuid).To(Equal(app.Guid))
 		assert.Equal(mr.T(), *appRepo.UpdateParams.EnvironmentVars, map[string]string{
 			"DATABASE_URL": "mysql://example2.com/my-db",
 		})

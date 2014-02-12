@@ -23,14 +23,14 @@ import (
 func testRefreshTokenWithSuccess(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	config, apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.True(t, apiResponse.IsSuccessful())
-	assert.Equal(t, config.AccessToken(), "bearer new-access-token")
-	assert.Equal(t, config.RefreshToken(), "new-refresh-token")
+	Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
+	Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
 }
 
 func testRefreshTokenWithError(t mr.TestingT, gateway Gateway, endpoint http.HandlerFunc) {
 	_, apiResponse := testRefreshToken(t, gateway, endpoint)
 	assert.False(t, apiResponse.IsSuccessful())
-	assert.Equal(t, apiResponse.ErrorCode, "333")
+	Expect(apiResponse.ErrorCode).To(Equal("333"))
 }
 
 var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
@@ -104,8 +104,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
-		assert.Equal(mr.T(), request.HttpReq.Header.Get("accept"), "application/json")
-		assert.Equal(mr.T(), request.HttpReq.Header.Get("User-Agent"), "go-cli "+cf.Version+" / "+runtime.GOOS)
+		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
+		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
 	})
 
 	It("TestNewRequestWithAFileBody", func() {
@@ -116,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
 
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), request.HttpReq.ContentLength, 12)
+		Expect(request.HttpReq.ContentLength).To(Equal(int64(12)))
 	})
 
 	It("TestRefreshingTheTokenWithUAARequest", func() {

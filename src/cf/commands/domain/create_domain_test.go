@@ -52,8 +52,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
 		ui := callCreateDomain([]string{"myOrg", "example.com"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.CreateDomainName, "example.com")
-		assert.Equal(mr.T(), domainRepo.CreateDomainOwningOrgGuid, "myOrg-guid")
+		Expect(domainRepo.CreateDomainName).To(Equal("example.com"))
+		Expect(domainRepo.CreateDomainOwningOrgGuid).To(Equal("myOrg-guid"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Creating domain", "example.com", "myOrg", "my-user"},
 			{"OK"},

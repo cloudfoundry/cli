@@ -26,7 +26,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(spaceRepo.FindByNameName).To(Equal("awesome-sauce-space"))
-		assert.Equal(mr.T(), spaceReq.GetSpace(), space)
+		Expect(spaceReq.GetSpace()).To(Equal(space))
 	})
 
 	It("TestSpaceReqExecuteWhenSpaceNotFound", func() {

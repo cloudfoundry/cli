@@ -48,7 +48,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callMapRoute(mr.T(), []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, &testcmd.FakeRouteCreator{})
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		assert.Equal(mr.T(), reqFactory.DomainName, "my-domain.com")
+		Expect(reqFactory.DomainName).To(Equal("my-domain.com"))
 	})
 	It("TestMapRouteWhenBinding", func() {
 
@@ -75,8 +75,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), routeRepo.BoundRouteGuid, "my-route-guid")
-		assert.Equal(mr.T(), routeRepo.BoundAppGuid, "my-app-guid")
+		Expect(routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
+		Expect(routeRepo.BoundAppGuid).To(Equal("my-app-guid"))
 	})
 	It("TestMapRouteWhenRouteNotReserved", func() {
 
@@ -96,6 +96,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callMapRoute(mr.T(), []string{"-n", "my-host", "my-app", "my-domain.com"}, reqFactory, routeRepo, routeCreator)
 
-		assert.Equal(mr.T(), routeCreator.ReservedRoute, route)
+		Expect(routeCreator.ReservedRoute).To(Equal(route))
 	})
 })

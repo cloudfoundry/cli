@@ -61,7 +61,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				ui.Say("Hello %s", "World!")
 			})
 
-			assert.Equal(mr.T(), "Hello World!", strings.Join(output, ""))
+			Expect("Hello World!").To(Equal(strings.Join(output, "")))
 		})
 	})
 	It("TestConfirmYes", func() {

@@ -73,13 +73,13 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(len(authTokens)).To(Equal(2))
 
-		assert.Equal(mr.T(), authTokens[0].Label, "mysql")
-		assert.Equal(mr.T(), authTokens[0].Provider, "mysql-core")
-		assert.Equal(mr.T(), authTokens[0].Guid, "mysql-core-guid")
+		Expect(authTokens[0].Label).To(Equal("mysql"))
+		Expect(authTokens[0].Provider).To(Equal("mysql-core"))
+		Expect(authTokens[0].Guid).To(Equal("mysql-core-guid"))
 
-		assert.Equal(mr.T(), authTokens[1].Label, "postgres")
-		assert.Equal(mr.T(), authTokens[1].Provider, "postgres-core")
-		assert.Equal(mr.T(), authTokens[1].Guid, "postgres-core-guid")
+		Expect(authTokens[1].Label).To(Equal("postgres"))
+		Expect(authTokens[1].Provider).To(Equal("postgres-core"))
+		Expect(authTokens[1].Guid).To(Equal("postgres-core-guid"))
 	})
 	It("TestServiceAuthFindByLabelAndProvider", func() {
 
@@ -108,7 +108,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken2.Guid = "mysql-core-guid"
 		authToken2.Label = "mysql"
 		authToken2.Provider = "mysql-core"
-		assert.Equal(mr.T(), serviceAuthToken, authToken2)
+		Expect(serviceAuthToken).To(Equal(authToken2))
 	})
 	It("TestServiceAuthFindByLabelAndProviderWhenNotFound", func() {
 

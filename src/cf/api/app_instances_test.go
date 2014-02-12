@@ -31,16 +31,16 @@ var _ = Describe("AppInstancesRepo", func() {
 
 		Expect(len(instances)).To(Equal(2))
 
-		assert.Equal(mr.T(), instances[0].State, models.InstanceRunning)
-		assert.Equal(mr.T(), instances[1].State, models.InstanceStarting)
+		Expect(instances[0].State).To(Equal(models.InstanceRunning))
+		Expect(instances[1].State).To(Equal(models.InstanceStarting))
 
 		instance0 := instances[0]
-		assert.Equal(mr.T(), instance0.Since, time.Unix(1379522342, 0))
+		Expect(instance0.Since).To(Equal(time.Unix(1379522342, 0)))
 		assert.Exactly(mr.T(), instance0.DiskQuota, uint64(1073741824))
 		assert.Exactly(mr.T(), instance0.DiskUsage, uint64(56037376))
 		assert.Exactly(mr.T(), instance0.MemQuota, uint64(67108864))
 		assert.Exactly(mr.T(), instance0.MemUsage, uint64(19218432))
-		assert.Equal(mr.T(), instance0.CpuUsage, 3.659571249238058e-05)
+		Expect(instance0.CpuUsage).To(Equal(3.659571249238058e-05))
 	})
 })
 

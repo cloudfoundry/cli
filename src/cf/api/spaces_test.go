@@ -67,8 +67,8 @@ var _ = Describe("Space Repository", func() {
 		})
 
 		Expect(len(spaces)).To(Equal(2))
-		assert.Equal(mr.T(), spaces[0].Guid, "acceptance-space-guid")
-		assert.Equal(mr.T(), spaces[1].Guid, "staging-space-guid")
+		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
+		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 		assert.True(mr.T(), handler.AllRequestsCalled())
 	})
@@ -129,7 +129,7 @@ var _ = Describe("Space Repository", func() {
 		space, apiResponse := repo.Create("space-name", "my-org-guid")
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), space.Guid, "space-guid")
+		Expect(space.Guid).To(Equal("space-guid"))
 	})
 
 	It("renames spaces", func() {
@@ -240,20 +240,20 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	space, apiResponse := findByName(repo, "Space1")
 	assert.True(t, handler.AllRequestsCalled())
 	assert.False(t, apiResponse.IsNotSuccessful())
-	assert.Equal(t, space.Name, "Space1")
-	assert.Equal(t, space.Guid, "space1-guid")
+	Expect(space.Name).To(Equal("Space1"))
+	Expect(space.Guid).To(Equal("space1-guid"))
 
-	assert.Equal(t, space.Organization.Guid, "org1-guid")
+	Expect(space.Organization.Guid).To(Equal("org1-guid"))
 
-	assert.Equal(t, len(space.Applications), 2)
-	assert.Equal(t, space.Applications[0].Guid, "app1-guid")
-	assert.Equal(t, space.Applications[1].Guid, "app2-guid")
+	Expect(len(space.Applications)).To(Equal(2))
+	Expect(space.Applications[0].Guid).To(Equal("app1-guid"))
+	Expect(space.Applications[1].Guid).To(Equal("app2-guid"))
 
-	assert.Equal(t, len(space.Domains), 1)
-	assert.Equal(t, space.Domains[0].Guid, "domain1-guid")
+	Expect(len(space.Domains)).To(Equal(1))
+	Expect(space.Domains[0].Guid).To(Equal("domain1-guid"))
 
-	assert.Equal(t, len(space.ServiceInstances), 1)
-	assert.Equal(t, space.ServiceInstances[0].Guid, "service1-guid")
+	Expect(len(space.ServiceInstances)).To(Equal(1))
+	Expect(space.ServiceInstances[0].Guid).To(Equal("service1-guid"))
 
 	assert.True(t, apiResponse.IsSuccessful())
 	return

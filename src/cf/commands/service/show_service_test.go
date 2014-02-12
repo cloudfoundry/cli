@@ -91,7 +91,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callShowService([]string{"service1"}, reqFactory)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Service instance: ", "service1"},
 			{"Service: ", "user-provided"},

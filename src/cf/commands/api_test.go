@@ -5,7 +5,6 @@ import (
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -47,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callApi([]string{"http://example.com"}, config, endpointRepo)
 
-		assert.Equal(mr.T(), endpointRepo.UpdateEndpointReceived, "http://example.com")
+		Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://example.com"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Setting api endpoint to", "example.com"},
 			{"OK"},
@@ -60,7 +59,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callApi([]string{"https://example.com/"}, config, endpointRepo)
 
-		assert.Equal(mr.T(), endpointRepo.UpdateEndpointReceived, "https://example.com")
+		Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Setting api endpoint to", "example.com"},
 			{"OK"},

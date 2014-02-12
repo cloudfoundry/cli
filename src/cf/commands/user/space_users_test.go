@@ -88,9 +88,9 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callSpaceUsers(mr.T(), []string{"my-org", "my-space"}, reqFactory, spaceRepo, userRepo)
 
-		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgName, "my-space")
-		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgOrgGuid, "org1-guid")
-		assert.Equal(mr.T(), userRepo.ListUsersSpaceGuid, "space1-guid")
+		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
+		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("org1-guid"))
+		Expect(userRepo.ListUsersSpaceGuid).To(Equal("space1-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Getting users in org", "Org1", "Space1", "my-user"},

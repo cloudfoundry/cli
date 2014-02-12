@@ -125,7 +125,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		callCreateBuildpack([]string{"--disable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
 
 		assert.NotNil(mr.T(), repo.CreateBuildpack.Enabled)
-		assert.Equal(mr.T(), *repo.CreateBuildpack.Enabled, false)
+		Expect(*repo.CreateBuildpack.Enabled).To(Equal(false))
 	})
 	It("TestCreateBuildpackWithInvalidPath", func() {
 

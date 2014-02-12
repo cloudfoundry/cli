@@ -26,7 +26,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(buildpackRepo.FindByNameName).To(Equal("foo"))
-		assert.Equal(mr.T(), buildpackReq.GetBuildpack(), buildpack)
+		Expect(buildpackReq.GetBuildpack()).To(Equal(buildpack))
 	})
 	It("TestBuildpackReqExecuteWhenBuildpackNotFound", func() {
 

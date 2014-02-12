@@ -58,7 +58,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 		Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
-		assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
+		Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
 	})
 
 	It("TestDeleteOrgConfirmingWithYes", func() {
@@ -75,8 +75,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
-		assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
+		Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
+		Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
 	})
 
 	It("TestDeleteTargetedOrganizationClearsConfig", func() {
@@ -91,8 +91,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-		assert.Equal(mr.T(), config.OrganizationFields(), models.OrganizationFields{})
-		assert.Equal(mr.T(), config.SpaceFields(), models.SpaceFields{})
+		Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
+		Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
 	})
 
 	It("TestDeleteUntargetedOrganizationDoesNotClearConfig", func() {
@@ -110,8 +110,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-		assert.Equal(mr.T(), config.OrganizationFields().Name, "some-other-org")
-		assert.Equal(mr.T(), config.SpaceFields().Name, "some-other-space")
+		Expect(config.OrganizationFields().Name).To(Equal("some-other-org"))
+		Expect(config.SpaceFields().Name).To(Equal("some-other-space"))
 	})
 
 	It("TestDeleteOrgWithForceOption", func() {
@@ -119,13 +119,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"-f", "org-to-delete"}), reqFactory)
 
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting", "org-to-delete"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
-		assert.Equal(mr.T(), orgRepo.DeletedOrganizationGuid, "org-to-delete-guid")
+		Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
+		Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
 	})
 
 	It("FailsWithUsage when 1st argument is omitted", func() {
@@ -142,13 +142,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), reqFactory)
 
-		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		Expect(len(ui.Outputs)).To(Equal(3))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting", "org-to-delete"},
 			{"OK"},
 			{"org-to-delete", "does not exist."},
 		})
 
-		assert.Equal(mr.T(), orgRepo.FindByNameName, "org-to-delete")
+		Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
 	})
 })

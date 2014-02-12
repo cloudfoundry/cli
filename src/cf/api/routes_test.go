@@ -39,8 +39,8 @@ var _ = Describe("route repository", func() {
 		})
 
 		Expect(len(routes)).To(Equal(2))
-		assert.Equal(mr.T(), routes[0].Guid, "route-1-guid")
-		assert.Equal(mr.T(), routes[1].Guid, "route-2-guid")
+		Expect(routes[0].Guid).To(Equal("route-1-guid"))
+		Expect(routes[1].Guid).To(Equal("route-2-guid"))
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
 	})
@@ -59,8 +59,8 @@ var _ = Describe("route repository", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), route.Host, "my-cool-app")
-		assert.Equal(mr.T(), route.Guid, "my-route-guid")
+		Expect(route.Host).To(Equal("my-cool-app"))
+		Expect(route.Guid).To(Equal("my-route-guid"))
 	})
 
 	It("returns an error when a route is not found with the given host", func() {
@@ -97,10 +97,10 @@ var _ = Describe("route repository", func() {
 
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		assert.True(mr.T(), handler.AllRequestsCalled())
-		assert.Equal(mr.T(), domainRepo.FindByNameName, "my-domain.com")
-		assert.Equal(mr.T(), route.Host, "my-cool-app")
-		assert.Equal(mr.T(), route.Guid, "my-route-guid")
-		assert.Equal(mr.T(), route.Domain.Guid, domain.Guid)
+		Expect(domainRepo.FindByNameName).To(Equal("my-domain.com"))
+		Expect(route.Host).To(Equal("my-cool-app"))
+		Expect(route.Guid).To(Equal("my-route-guid"))
+		Expect(route.Domain.Guid).To(Equal(domain.Guid))
 	})
 
 	It("returns 'not found' response when there is no route w/ the given domain and host", func() {
@@ -143,7 +143,7 @@ var _ = Describe("route repository", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		assert.Equal(mr.T(), createdRoute.Guid, "my-route-guid")
+		Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 	})
 
 	It("creates routes", func() {
@@ -165,7 +165,7 @@ var _ = Describe("route repository", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 
-		assert.Equal(mr.T(), createdRoute.Guid, "my-route-guid")
+		Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 	})
 
 	It("binds routes", func() {

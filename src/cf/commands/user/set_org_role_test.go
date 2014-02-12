@@ -57,7 +57,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
 		Expect(reqFactory.UserUsername).To(Equal("my-user"))
-		assert.Equal(mr.T(), reqFactory.OrganizationName, "my-org")
+		Expect(reqFactory.OrganizationName).To(Equal("my-org"))
 	})
 	It("TestSetOrgRole", func() {
 
@@ -80,8 +80,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Assigning role", "OrgManager", "my-user", "my-org", "my-user"},
 			{"OK"},
 		})
-		assert.Equal(mr.T(), userRepo.SetOrgRoleUserGuid, "my-user-guid")
-		assert.Equal(mr.T(), userRepo.SetOrgRoleOrganizationGuid, "my-org-guid")
-		assert.Equal(mr.T(), userRepo.SetOrgRoleRole, models.ORG_MANAGER)
+		Expect(userRepo.SetOrgRoleUserGuid).To(Equal("my-user-guid"))
+		Expect(userRepo.SetOrgRoleOrganizationGuid).To(Equal("my-org-guid"))
+		Expect(userRepo.SetOrgRoleRole).To(Equal(models.ORG_MANAGER))
 	})
 })

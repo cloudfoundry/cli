@@ -77,8 +77,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
-		assert.Equal(mr.T(), authTokenRepo.FindByLabelAndProviderProvider, "a provider")
-		assert.Equal(mr.T(), authTokenRepo.DeletedServiceAuthTokenFields, expectedToken)
+		Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
+		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(expectedToken))
 	})
 	It("TestDeleteServiceAuthTokenWithN", func() {
 
@@ -91,8 +91,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"Are you sure you want to delete", "a label", "a provider"},
 		})
-		assert.Equal(mr.T(), len(ui.Outputs), 0)
-		assert.Equal(mr.T(), authTokenRepo.DeletedServiceAuthTokenFields, models.ServiceAuthTokenFields{})
+		Expect(len(ui.Outputs)).To(Equal(0))
+		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(models.ServiceAuthTokenFields{}))
 	})
 	It("TestDeleteServiceAuthTokenWithY", func() {
 
@@ -116,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), authTokenRepo.DeletedServiceAuthTokenFields, expectedToken)
+		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(expectedToken))
 	})
 	It("TestDeleteServiceAuthTokenWithForce", func() {
 
@@ -131,13 +131,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		args := []string{"-f", "a label", "a provider"}
 		ui := callDeleteServiceAuthToken(mr.T(), args, []string{"Y"}, reqFactory, authTokenRepo)
 
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting"},
 			{"OK"},
 		})
 
-		assert.Equal(mr.T(), authTokenRepo.DeletedServiceAuthTokenFields, expectedToken)
+		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(expectedToken))
 	})
 	It("TestDeleteServiceAuthTokenWhenTokenDoesNotExist", func() {
 

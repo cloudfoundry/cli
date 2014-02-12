@@ -81,7 +81,7 @@ var _ = Describe("Listing users in an org", func() {
 
 		ui := callOrgUsers([]string{"Org1"}, reqFactory, userRepo)
 
-		assert.Equal(mr.T(), userRepo.ListUsersOrganizationGuid, "found-org-guid")
+		Expect(userRepo.ListUsersOrganizationGuid).To(Equal("found-org-guid"))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Getting users in org", "Found Org", "my-user"},
 			{"ORG MANAGER"},
@@ -116,7 +116,7 @@ var _ = Describe("Listing users in an org", func() {
 
 		ui := callOrgUsers([]string{"-a", "Org1"}, reqFactory, userRepo)
 
-		assert.Equal(t, userRepo.ListUsersOrganizationGuid, "found-org-guid")
+		Expect(userRepo.ListUsersOrganizationGuid).To(Equal("found-org-guid"))
 		testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 			{"Getting users in org", "Found Org", "my-user"},
 			{"USERS"},

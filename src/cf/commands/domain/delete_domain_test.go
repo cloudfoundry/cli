@@ -68,13 +68,13 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteDomain([]string{"foo.com"}, []string{"no"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.DeleteDomainGuid, "")
+		Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
 		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
 			{"delete", "foo.com"},
 		})
 
-		assert.Equal(mr.T(), len(ui.Outputs), 1)
+		Expect(len(ui.Outputs)).To(Equal(1))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 		})
@@ -88,7 +88,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteDomain([]string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.DeleteDomainGuid, "")
+		Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
@@ -105,7 +105,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteDomain([]string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.DeleteDomainGuid, "")
+		Expect(domainRepo.DeleteDomainGuid).To(Equal(""))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
@@ -127,7 +127,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callDeleteDomain([]string{"foo.com"}, []string{"y"}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.DeleteDomainGuid, "foo-guid")
+		Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
@@ -148,8 +148,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		ui := callDeleteDomain([]string{"-f", "foo.com"}, []string{}, reqFactory, domainRepo)
 
-		assert.Equal(mr.T(), domainRepo.DeleteDomainGuid, "foo-guid")
-		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		Expect(domainRepo.DeleteDomainGuid).To(Equal("foo-guid"))
+		Expect(len(ui.Prompts)).To(Equal(0))
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Deleting domain", "foo.com"},
 			{"OK"},

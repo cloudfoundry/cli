@@ -100,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
 		ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
 
-		assert.Equal(mr.T(), appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
+		Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
 
 		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
 			{"Showing health and status", "my-app"},
@@ -160,8 +160,8 @@ func testDisplayingAppSummaryWithErrorCode(t mr.TestingT, errorCode string) {
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
 	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
 
-	assert.Equal(t, appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
-	assert.Equal(t, appInstancesRepo.GetInstancesAppGuid, "my-app-guid")
+	Expect(appSummaryRepo.GetSummaryAppGuid).To(Equal("my-app-guid"))
+	Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
 	testassert.SliceContains(t, ui.Outputs, testassert.Lines{
 		{"Showing health and status", "my-app", "my-org", "my-space", "my-user"},

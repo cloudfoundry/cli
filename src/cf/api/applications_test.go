@@ -24,13 +24,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.False(mr.T(), apiResponse.IsNotSuccessful())
 		Expect(app.Name).To(Equal("My App"))
-		assert.Equal(mr.T(), app.Guid, "app1-guid")
-		assert.Equal(mr.T(), app.Memory, uint64(128))
-		assert.Equal(mr.T(), app.InstanceCount, 1)
-		assert.Equal(mr.T(), app.EnvironmentVars, map[string]string{"foo": "bar", "baz": "boom"})
-		assert.Equal(mr.T(), app.Routes[0].Host, "app1")
-		assert.Equal(mr.T(), app.Routes[0].Domain.Name, "cfapps.io")
-		assert.Equal(mr.T(), app.Stack.Name, "awesome-stacks-ahoy")
+		Expect(app.Guid).To(Equal("app1-guid"))
+		Expect(app.Memory).To(Equal(uint64(128)))
+		Expect(app.InstanceCount).To(Equal(1))
+		Expect(app.EnvironmentVars).To(Equal(map[string]string{"foo": "bar", "baz": "boom"}))
+		Expect(app.Routes[0].Host).To(Equal("app1"))
+		Expect(app.Routes[0].Domain.Name).To(Equal("cfapps.io"))
+		Expect(app.Stack.Name).To(Equal("awesome-stacks-ahoy"))
 	})
 
 	It("TestFindByNameWhenAppIsNotFound", func() {
@@ -80,7 +80,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		app := models.Application{}
 		app.Name = "my-cool-app"
 		app.Guid = "my-cool-app-guid"
-		assert.Equal(mr.T(), createdApp, app)
+		Expect(createdApp).To(Equal(app))
 	})
 
 	It("TestCreateApplicationWithoutBuildpackStackOrCommand", func() {
@@ -123,8 +123,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), handler.AllRequestsCalled())
 		assert.True(mr.T(), apiResponse.IsSuccessful())
-		assert.Equal(mr.T(), updatedApp.Name, "my-cool-app")
-		assert.Equal(mr.T(), updatedApp.Guid, "my-cool-app-guid")
+		Expect(updatedApp.Name).To(Equal("my-cool-app"))
+		Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
 	})
 
 	It("TestUpdateApplicationSetCommandToNull", func() {

@@ -26,7 +26,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(appRepo.ReadName).To(Equal("foo"))
-		assert.Equal(mr.T(), appReq.GetApplication(), app)
+		Expect(appReq.GetApplication()).To(Equal(app))
 	})
 
 	It("TestApplicationReqExecuteWhenApplicationNotFound", func() {

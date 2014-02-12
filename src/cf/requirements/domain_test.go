@@ -34,8 +34,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		assert.True(mr.T(), success)
 		Expect(domainRepo.FindByNameInOrgName).To(Equal("example.com"))
-		assert.Equal(mr.T(), domainRepo.FindByNameInOrgGuid, "the-org-guid")
-		assert.Equal(mr.T(), domainReq.GetDomain(), domain)
+		Expect(domainRepo.FindByNameInOrgGuid).To(Equal("the-org-guid"))
+		Expect(domainReq.GetDomain()).To(Equal(domain))
 	})
 
 	It("fails when the domain is not found", func() {
