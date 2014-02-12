@@ -341,6 +341,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Cannot delete service instance, apps are still bound to it"))
 	})
+
 	It("TestRenameService", func() {
 		path := "/v2/service_instances/my-service-instance-guid"
 		serviceInstance := models.ServiceInstance{}
@@ -352,6 +353,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testRenameService(path, serviceInstance)
 	})
+
 	It("TestRenameServiceWhenServiceIsUserProvided", func() {
 		path := "/v2/user_provided_service_instances/my-service-instance-guid"
 		serviceInstance := models.ServiceInstance{}
@@ -443,6 +445,66 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 
+	Describe("getting the count of service instances for a service plan", func() {
+		var planGuid = "abc123"
+
+		It("returns the number of service instances", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+                    {
+                      "total_results": 9,
+                      "total_pages": 9,
+                      "prev_url": null,
+                      "next_url": "/v2/service_plans/abc123/service_instances?page=2&results-per-page=1",
+                      "resources": [
+                        {
+                          "metadata": {
+                            "guid": "def456",
+                            "url": "/v2/service_instances/def456",
+                            "created_at": "2013-06-06T02:42:55+00:00",
+                            "updated_at": null
+                          },
+                          "entity": {
+                            "name": "pet-db",
+                            "credentials": { "name": "the_name" },
+                            "service_plan_guid": "abc123",
+                            "space_guid": "ghi789",
+                            "dashboard_url": "https://example.com/dashboard",
+                            "type": "managed_service_instance",
+                            "space_url": "/v2/spaces/ghi789",
+                            "service_plan_url": "/v2/service_plans/abc123",
+                            "service_bindings_url": "/v2/service_instances/def456/service_bindings"
+                          }
+                        }
+                      ]
+                    }
+                `},
+			})
+			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			count, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			Expect(count).To(Equal(9))
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		})
+
+		It("returns the API error when one occurs", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
+				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
+			})
+			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			_, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
+
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+		})
+	})
+
 	Describe("migrating service plans", func() {
 		It("returns an error when it cannot find a service plan by name", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -454,18 +516,54 @@ var _ = Describe("Testing with ginkgo", func() {
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			v1 := V1ServicePlanDescription{}
+			v1 := V1ServicePlanDescription{
+				ServicePlanName: "v1-test-plan-name",
+				ServiceProvider: "v1-test-provider",
+				ServiceName:     "v1-test-service",
+			}
 			v2 := V2ServicePlanDescription{}
+
 			_, _, apiResponse := repo.FindServicePlanToMigrateByDescription(v1, v2)
 			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-			Expect(apiResponse.Message).To(ContainSubstring("not found"))
+			Expect(apiResponse.Message).To(ContainSubstring("Plan"))
+			Expect(apiResponse.Message).To(ContainSubstring("v1-test-service v1-test-provider v1-test-plan-name"))
+			Expect(apiResponse.Message).To(ContainSubstring("cannot be found"))
 		})
 
 		It("returns the service plan guid when finding service plan by name", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/service_plans?inline-relations-depth=1",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources":[{"metadata": {"guid": "v1-guid"},"entity": {"name": "v1-panda","service": {"entity": {"label": "v1-elephantsql","provider": "v1-elephantsql"}}}}, {"metadata": {"guid": "v2-guid"},"entity": {"name": "v2-panda","service": {"entity": {"label": "v2-elephantsql","provider": null}}}}]}`},
+				Method: "GET",
+				Path:   "/v2/service_plans?inline-relations-depth=1",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+                    {
+                        "resources": [
+                            {
+                                "metadata": {"guid": "v1-guid"},
+                                "entity": {
+                                    "name": "v1-panda",
+                                    "service": {
+                                        "entity": {
+                                            "label": "v1-elephantsql",
+                                            "provider": "v1-elephantsql"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "metadata": {"guid": "v2-guid"},
+                                "entity": {
+                                    "name": "v2-panda",
+                                    "service": {
+                                        "entity": {
+                                            "label": "v2-elephantsql",
+                                            "provider": null
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                `},
 			})
 
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
