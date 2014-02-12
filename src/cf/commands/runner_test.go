@@ -6,8 +6,6 @@ import (
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	testcmd "testhelpers/commands"
 )
 
@@ -51,9 +49,8 @@ func (r *TestRequirement) Execute() (success bool) {
 	return true
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestRun", func() {
-
+var _ = Describe("Requirements runner", func() {
+	It("runs", func() {
 		passingReq := TestRequirement{Passes: true}
 		failingReq := TestRequirement{Passes: false}
 		lastReq := TestRequirement{Passes: true}
@@ -66,16 +63,15 @@ var _ = Describe("Testing with ginkgo", func() {
 		runner := NewRunner(cmdFactory, nil)
 
 		ctxt := testcmd.NewContext("login", []string{})
-
 		err := runner.RunCmdByName("some-cmd", ctxt)
 
 		Expect(cmdFactory.CmdName).To(Equal("some-cmd"))
 
-		assert.True(mr.T(), passingReq.WasExecuted, ctxt)
-		assert.True(mr.T(), failingReq.WasExecuted, ctxt)
+		Expect(passingReq.WasExecuted).To(BeTrue())
+		Expect(failingReq.WasExecuted).To(BeTrue())
 
 		Expect(lastReq.WasExecuted).To(BeFalse())
-		assert.Nil(mr.T(), cmd.WasRunWith)
+		Expect(cmd.WasRunWith).To(BeNil())
 
 		Expect(err).To(HaveOccurred())
 	})

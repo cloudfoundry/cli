@@ -9,7 +9,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"os"
@@ -89,7 +88,7 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 
 		files, ok := request.MultipartForm.File["buildpack"]
 
-		assert.True(t, ok, "Buildpack file part not present")
+		Expect(ok).To(BeTrue(), "Buildpack file part not present")
 		Expect(len(files)).To(Equal(1), "Wrong number of files")
 
 		buildpackFile := files[0]

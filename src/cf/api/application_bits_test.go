@@ -10,7 +10,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"os"
@@ -132,7 +131,7 @@ var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 
 	Expect(len(request.MultipartForm.Value)).To(Equal(1), "Should have 1 value")
 	valuePart, ok := request.MultipartForm.Value["resources"]
-	assert.True(t, ok, "Resource manifest not present")
+	Expect(ok).To(BeTrue(), "Resource manifest not present")
 	Expect(len(valuePart)).To(Equal(1), "Wrong number of values")
 
 	resourceManifest := valuePart[0]
@@ -142,7 +141,7 @@ var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 	Expect(len(request.MultipartForm.File)).To(Equal(1), "Wrong number of files")
 
 	fileHeaders, ok := request.MultipartForm.File["application"]
-	assert.True(t, ok, "Application file part not present")
+	Expect(ok).To(BeTrue(), "Application file part not present")
 	Expect(len(fileHeaders)).To(Equal(1), "Wrong number of files")
 
 	applicationFile := fileHeaders[0]
@@ -198,8 +197,8 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	return
 }
 
-func testUploadApp(t mr.TestingT, dir string, requests []testnet.TestRequest) (app models.Application, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewTLSServer(t, requests)
+func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiResponse net.ApiResponse) {
+	ts, handler := testnet.NewTLSServer(GinkgoT(), requests)
 	defer ts.Close()
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
@@ -237,7 +236,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, filepath.Join("foo", "bar"))
+		Expect(apiResponse.Message).To(ContainSubstring(filepath.Join("foo", "bar")))
 	})
 
 	It("TestUploadApp", func() {
@@ -248,7 +247,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 
-		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
+		_, apiResponse := testUploadApp(dir, defaultRequests)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -257,7 +256,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app.zip")
 
-		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
+		_, apiResponse := testUploadApp(dir, defaultRequests)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -266,7 +265,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app.azip")
 
-		_, apiResponse := testUploadApp(mr.T(), dir, defaultRequests)
+		_, apiResponse := testUploadApp(dir, defaultRequests)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -281,7 +280,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			createProgressEndpoint("running"),
 			createProgressEndpoint("failed"),
 		}
-		_, apiResponse := testUploadApp(mr.T(), dir, requests)
+		_, apiResponse := testUploadApp(dir, requests)
 		Expect(apiResponse.IsSuccessful()).To(BeFalse())
 	})
 })

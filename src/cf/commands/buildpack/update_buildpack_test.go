@@ -4,7 +4,6 @@ import (
 	. "cf/commands/buildpack"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
@@ -74,7 +73,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Nil(mr.T(), repo.UpdateBuildpack.Position)
+		Expect(repo.UpdateBuildpack.Position).To(BeNil())
 	})
 	It("TestUpdateBuildpackEnabled", func() {
 
@@ -83,7 +82,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		fakeUI := callUpdateBuildpack([]string{"--enable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.NotNil(mr.T(), repo.UpdateBuildpack.Enabled)
+		Expect(repo.UpdateBuildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.UpdateBuildpack.Enabled).To(Equal(true))
 
 		Expect(fakeUI.Outputs[0]).To(ContainSubstring("Updating buildpack"))
@@ -97,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callUpdateBuildpack([]string{"--disable", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.NotNil(mr.T(), repo.UpdateBuildpack.Enabled)
+		Expect(repo.UpdateBuildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.UpdateBuildpack.Enabled).To(Equal(false))
 	})
 	It("TestUpdateBuildpackNoEnable", func() {
@@ -107,7 +106,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		callUpdateBuildpack([]string{"my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.Nil(mr.T(), repo.UpdateBuildpack.Enabled)
+		Expect(repo.UpdateBuildpack.Enabled).To(BeNil())
 	})
 	It("TestUpdateBuildpackPath", func() {
 
@@ -143,7 +142,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui := callUpdateBuildpack([]string{"--lock", "my-buildpack"}, reqFactory, repo, bitsRepo)
 
-		assert.NotNil(mr.T(), repo.UpdateBuildpack.Locked)
+		Expect(repo.UpdateBuildpack.Locked).NotTo(BeNil())
 		Expect(*repo.UpdateBuildpack.Locked).To(Equal(true))
 
 		Expect(ui.Outputs[0]).To(ContainSubstring("Updating buildpack"))

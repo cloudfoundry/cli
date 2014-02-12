@@ -6,8 +6,6 @@ import (
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 	testapi "testhelpers/api"
@@ -59,7 +57,7 @@ var _ = Describe("Buildpacks repo", func() {
 					}`},
 		})
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), firstRequest, secondRequest)
+		ts, handler, repo := createBuildpackRepo(firstRequest, secondRequest)
 		defer ts.Close()
 
 		one := 1
@@ -92,7 +90,7 @@ var _ = Describe("Buildpacks repo", func() {
 	It("TestBuildpacksFindByName", func() {
 		req := testapi.NewCloudControllerTestRequest(findBuildpackRequest)
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 		existingBuildpack := models.Buildpack{}
 		existingBuildpack.Guid = "buildpack1-guid"
@@ -112,7 +110,7 @@ var _ = Describe("Buildpacks repo", func() {
 		req := testapi.NewCloudControllerTestRequest(findBuildpackRequest)
 		req.Response = testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": []}`}
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
 		_, apiResponse := repo.FindByName("Buildpack1")
@@ -134,7 +132,7 @@ var _ = Describe("Buildpacks repo", func() {
 			}`,
 			}}
 
-		ts, _, repo := createBuildpackRepo(mr.T(), badRequest)
+		ts, _, repo := createBuildpackRepo(badRequest)
 		defer ts.Close()
 		one := 1
 		createdBuildpack, apiResponse := repo.Create("name with space", &one, nil, nil)
@@ -162,7 +160,7 @@ var _ = Describe("Buildpacks repo", func() {
 			}`},
 		})
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
 		position := 999
@@ -171,7 +169,7 @@ var _ = Describe("Buildpacks repo", func() {
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
-		assert.NotNil(mr.T(), created.Guid)
+		Expect(created.Guid).NotTo(BeNil())
 		Expect("my-cool-buildpack").To(Equal(created.Name))
 		Expect(999).To(Equal(*created.Position))
 	})
@@ -195,7 +193,7 @@ var _ = Describe("Buildpacks repo", func() {
 			}`},
 		})
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
 		position := 999
@@ -205,7 +203,7 @@ var _ = Describe("Buildpacks repo", func() {
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
-		assert.NotNil(mr.T(), created.Guid)
+		Expect(created.Guid).NotTo(BeNil())
 		Expect("my-cool-buildpack").To(Equal(created.Name))
 		Expect(999).To(Equal(*created.Position))
 	})
@@ -218,7 +216,7 @@ var _ = Describe("Buildpacks repo", func() {
 				Status: http.StatusNoContent,
 			}})
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-cool-buildpack-guid")
@@ -246,7 +244,7 @@ var _ = Describe("Buildpacks repo", func() {
 				}`},
 		})
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
 		position := 555
@@ -284,7 +282,7 @@ var _ = Describe("Buildpacks repo", func() {
 				}`},
 		})
 
-		ts, handler, repo := createBuildpackRepo(mr.T(), req)
+		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
 		position := 123
@@ -331,8 +329,8 @@ var findBuildpackRequest = testnet.TestRequest{
 	Response: singleBuildpackResponse,
 }
 
-func createBuildpackRepo(t mr.TestingT, requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
-	ts, handler = testnet.NewTLSServer(t, requests)
+func createBuildpackRepo(requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
+	ts, handler = testnet.NewTLSServer(GinkgoT(), requests)
 	config := testconfig.NewRepositoryWithDefaults()
 	config.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

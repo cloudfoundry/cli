@@ -4,8 +4,6 @@ import (
 	. "cf/commands/application"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -22,17 +20,17 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		deps.reqFactory.LoginSuccess = false
 		deps.reqFactory.TargetedSpaceSuccess = true
-		callScale(mr.T(), args, deps)
+		callScale(args, deps)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		deps.reqFactory.LoginSuccess = true
 		deps.reqFactory.TargetedSpaceSuccess = false
-		callScale(mr.T(), args, deps)
+		callScale(args, deps)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		deps.reqFactory.LoginSuccess = true
 		deps.reqFactory.TargetedSpaceSuccess = true
-		callScale(mr.T(), args, deps)
+		callScale(args, deps)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(deps.reqFactory.ApplicationName).To(Equal("my-app"))
 	})
@@ -40,7 +38,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		deps := getScaleDependencies()
 
-		ui := callScale(mr.T(), []string{}, deps)
+		ui := callScale([]string{}, deps)
 
 		Expect(ui.FailedWithUsage).To(BeTrue())
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
@@ -52,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.LoginSuccess = true
 		deps.reqFactory.TargetedSpaceSuccess = true
 
-		callScale(mr.T(), args, deps)
+		callScale(args, deps)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 	It("TestScaleAll", func() {
@@ -62,9 +60,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.Application = app
 		deps.appRepo.UpdateAppResult = app
 
-		ui := callScale(mr.T(), []string{"-i", "5", "-m", "512M", "my-app"}, deps)
+		ui := callScale([]string{"-i", "5", "-m", "512M", "my-app"}, deps)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 			{"Scaling", "my-app", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
@@ -81,13 +79,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.Application = app
 		deps.appRepo.UpdateAppResult = app
 
-		callScale(mr.T(), []string{"-i", "5", "my-app"}, deps)
+		callScale([]string{"-i", "5", "my-app"}, deps)
 
 		Expect(deps.restarter.AppToRestart.Guid).To(Equal(""))
 		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(5))
-		assert.Nil(mr.T(), deps.appRepo.UpdateParams.DiskQuota)
-		assert.Nil(mr.T(), deps.appRepo.UpdateParams.Memory)
+		Expect(deps.appRepo.UpdateParams.DiskQuota).To(BeNil())
+		Expect(deps.appRepo.UpdateParams.Memory).To(BeNil())
 	})
 	It("TestScaleOnlyMemory", func() {
 
@@ -96,13 +94,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.reqFactory.Application = app
 		deps.appRepo.UpdateAppResult = app
 
-		callScale(mr.T(), []string{"-m", "512M", "my-app"}, deps)
+		callScale([]string{"-m", "512M", "my-app"}, deps)
 
 		Expect(deps.restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
 		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
 		Expect(*deps.appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
-		assert.Nil(mr.T(), deps.appRepo.UpdateParams.DiskQuota)
-		assert.Nil(mr.T(), deps.appRepo.UpdateParams.InstanceCount)
+		Expect(deps.appRepo.UpdateParams.DiskQuota).To(BeNil())
+		Expect(deps.appRepo.UpdateParams.InstanceCount).To(BeNil())
 	})
 })
 
@@ -121,7 +119,7 @@ func getScaleDependencies() (deps scaleDependencies) {
 	return
 }
 
-func callScale(t mr.TestingT, args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
+func callScale(args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("scale", args)
 	configRepo := testconfig.NewRepositoryWithDefaults()

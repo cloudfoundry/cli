@@ -6,8 +6,6 @@ import (
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -16,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callUpdateUserProvidedService(t mr.TestingT, args []string, reqFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
+func callUpdateUserProvidedService(args []string, reqFactory *testreq.FakeReqFactory, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = &testterm.FakeUI{}
 	ctxt := testcmd.NewContext("update-user-provided-service", args)
 
@@ -32,24 +30,24 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callUpdateUserProvidedService(mr.T(), []string{}, reqFactory, userProvidedServiceInstanceRepo)
+		ui := callUpdateUserProvidedService([]string{}, reqFactory, userProvidedServiceInstanceRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 
-		ui = callUpdateUserProvidedService(mr.T(), []string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
+		ui = callUpdateUserProvidedService([]string{"foo"}, reqFactory, userProvidedServiceInstanceRepo)
 		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestUpdateUserProvidedServiceRequirements", func() {
 
+	It("TestUpdateUserProvidedServiceRequirements", func() {
 		args := []string{"service-name"}
 		reqFactory := &testreq.FakeReqFactory{}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
 		reqFactory.LoginSuccess = false
-		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+		callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
 		reqFactory.LoginSuccess = true
-		callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+		callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
 		Expect(reqFactory.ServiceInstanceName).To(Equal("service-name"))
@@ -64,9 +62,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ServiceInstance: serviceInstance,
 		}
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
+		ui := callUpdateUserProvidedService(args, reqFactory, repo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"No changes"},
@@ -82,9 +80,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ServiceInstance: serviceInstance,
 		}
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
+		ui := callUpdateUserProvidedService(args, reqFactory, repo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 			{"Updating user provided service", "found-service-name", "my-org", "my-space", "my-user"},
 			{"OK"},
 			{"TIP"},
@@ -103,9 +101,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ServiceInstance: serviceInstance,
 		}
 		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, repo)
+		ui := callUpdateUserProvidedService(args, reqFactory, repo)
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 			{"Updating user provided service"},
 			{"OK"},
 		})
@@ -121,11 +119,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+		ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
 
-		assert.NotEqual(mr.T(), userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
+		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"JSON is invalid"},
 		})
@@ -145,11 +143,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
 
-		ui := callUpdateUserProvidedService(mr.T(), args, reqFactory, userProvidedServiceInstanceRepo)
+		ui := callUpdateUserProvidedService(args, reqFactory, userProvidedServiceInstanceRepo)
 
-		assert.NotEqual(mr.T(), userProvidedServiceInstanceRepo.UpdateServiceInstance, serviceInstance)
+		Expect(userProvidedServiceInstanceRepo.UpdateServiceInstance).NotTo(Equal(serviceInstance))
 
-		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+		testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"Service Instance is not user provided"},
 		})

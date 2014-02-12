@@ -1,6 +1,3 @@
-[submodule "src/github.com/stretchr/testify"]
-	path = src/github.com/stretchr/testify
-	url = https://github.com/stretchr/testify.git
 [submodule "src/github.com/cloudfoundry/loggregatorlib"]
 	path = src/github.com/cloudfoundry/loggregatorlib
 	url = https://github.com/cloudfoundry/loggregatorlib.git
