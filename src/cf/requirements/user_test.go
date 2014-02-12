@@ -11,36 +11,34 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestUserReqExecute", func() {
-			user := models.UserFields{}
-			user.Username = "my-user"
-			user.Guid = "my-user-guid"
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestUserReqExecute", func() {
+		user := models.UserFields{}
+		user.Username = "my-user"
+		user.Guid = "my-user-guid"
 
-			userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: user}
-			ui := new(testterm.FakeUI)
+		userRepo := &testapi.FakeUserRepository{FindByUsernameUserFields: user}
+		ui := new(testterm.FakeUI)
 
-			userReq := NewUserRequirement("foo", ui, userRepo)
-			success := userReq.Execute()
+		userReq := NewUserRequirement("foo", ui, userRepo)
+		success := userReq.Execute()
 
-			assert.True(mr.T(), success)
-			assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "foo")
-			assert.Equal(mr.T(), userReq.GetUser(), user)
+		assert.True(mr.T(), success)
+		assert.Equal(mr.T(), userRepo.FindByUsernameUsername, "foo")
+		assert.Equal(mr.T(), userReq.GetUser(), user)
+	})
+
+	It("TestUserReqWhenUserDoesNotExist", func() {
+		userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
+		ui := new(testterm.FakeUI)
+
+		testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
+			NewUserRequirement("foo", ui, userRepo).Execute()
 		})
 
-		It("TestUserReqWhenUserDoesNotExist", func() {
-			userRepo := &testapi.FakeUserRepository{FindByUsernameNotFound: true}
-			ui := new(testterm.FakeUI)
-
-			testassert.AssertPanic(mr.T(), testterm.FailedWasCalled, func() {
-				NewUserRequirement("foo", ui, userRepo).Execute()
-			})
-
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"User not found"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"FAILED"},
+			{"User not found"},
 		})
 	})
-}
+})

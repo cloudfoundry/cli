@@ -49,34 +49,33 @@ func (r *TestRequirement) Execute() (success bool) {
 
 	return true
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestRun", func() {
 
-			passingReq := TestRequirement{Passes: true}
-			failingReq := TestRequirement{Passes: false}
-			lastReq := TestRequirement{Passes: true}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestRun", func() {
 
-			cmd := TestCommand{
-				Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
-			}
+		passingReq := TestRequirement{Passes: true}
+		failingReq := TestRequirement{Passes: false}
+		lastReq := TestRequirement{Passes: true}
 
-			cmdFactory := &TestCommandFactory{Cmd: &cmd}
-			runner := NewRunner(cmdFactory, nil)
+		cmd := TestCommand{
+			Reqs: []requirements.Requirement{&passingReq, &failingReq, &lastReq},
+		}
 
-			ctxt := testcmd.NewContext("login", []string{})
+		cmdFactory := &TestCommandFactory{Cmd: &cmd}
+		runner := NewRunner(cmdFactory, nil)
 
-			err := runner.RunCmdByName("some-cmd", ctxt)
+		ctxt := testcmd.NewContext("login", []string{})
 
-			assert.Equal(mr.T(), cmdFactory.CmdName, "some-cmd")
+		err := runner.RunCmdByName("some-cmd", ctxt)
 
-			assert.True(mr.T(), passingReq.WasExecuted, ctxt)
-			assert.True(mr.T(), failingReq.WasExecuted, ctxt)
+		assert.Equal(mr.T(), cmdFactory.CmdName, "some-cmd")
 
-			assert.False(mr.T(), lastReq.WasExecuted)
-			assert.Nil(mr.T(), cmd.WasRunWith)
+		assert.True(mr.T(), passingReq.WasExecuted, ctxt)
+		assert.True(mr.T(), failingReq.WasExecuted, ctxt)
 
-			assert.Error(mr.T(), err)
-		})
+		assert.False(mr.T(), lastReq.WasExecuted)
+		assert.Nil(mr.T(), cmd.WasRunWith)
+
+		assert.Error(mr.T(), err)
 	})
-}
+})

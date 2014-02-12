@@ -16,92 +16,90 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestGetDeleteSharedDomainRequirements", func() {
-			deps := getDeleteSharedDomainDeps()
-			deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestGetDeleteSharedDomainRequirements", func() {
+		deps := getDeleteSharedDomainDeps()
+		deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
-			callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
-			callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: false}
+		callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
-			callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestDeleteSharedDomainNotFound", func() {
+		deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedOrgSuccess: true}
+		callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestDeleteSharedDomainNotFound", func() {
 
-			deps := getDeleteSharedDomainDeps()
-			deps.domainRepo.FindByNameInOrgApiResponse = net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com")
-			ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+		deps := getDeleteSharedDomainDeps()
+		deps.domainRepo.FindByNameInOrgApiResponse = net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com")
+		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
-			assert.Equal(mr.T(), deps.domainRepo.DeleteDomainGuid, "")
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Deleting domain", "foo.com"},
-				{"OK"},
-				{"foo.com", "not found"},
-			})
-		})
-		It("TestDeleteSharedDomainFindError", func() {
-
-			deps := getDeleteSharedDomainDeps()
-			deps.domainRepo.FindByNameInOrgApiResponse = net.NewApiResponseWithMessage("couldn't find the droids you're lookin for")
-			ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
-
-			assert.Equal(mr.T(), deps.domainRepo.DeleteDomainGuid, "")
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Deleting domain", "foo.com"},
-				{"FAILED"},
-				{"foo.com"},
-				{"couldn't find the droids you're lookin for"},
-			})
-		})
-		It("TestDeleteSharedDomainDeleteError", func() {
-
-			deps := getDeleteSharedDomainDeps()
-			deps.domainRepo.DeleteSharedApiResponse = net.NewApiResponseWithMessage("failed badly")
-			ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
-
-			assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Deleting domain", "foo.com"},
-				{"FAILED"},
-				{"foo.com"},
-				{"failed badly"},
-			})
-		})
-		It("TestDeleteSharedDomainHasConfirmation", func() {
-
-			deps := getDeleteSharedDomainDeps()
-			ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
-
-			assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
-			testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
-				{"shared", "foo.com"},
-			})
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Deleting domain", "foo.com"},
-				{"OK"},
-			})
-		})
-		It("TestDeleteSharedDomainForceFlagSkipsConfirmation", func() {
-
-			deps := getDeleteSharedDomainDeps()
-			ui := callDeleteSharedDomain([]string{"-f", "foo.com"}, []string{}, deps)
-
-			assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
-			assert.Equal(mr.T(), len(ui.Prompts), 0)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Deleting domain", "foo.com"},
-				{"OK"},
-			})
+		assert.Equal(mr.T(), deps.domainRepo.DeleteDomainGuid, "")
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Deleting domain", "foo.com"},
+			{"OK"},
+			{"foo.com", "not found"},
 		})
 	})
-}
+	It("TestDeleteSharedDomainFindError", func() {
+
+		deps := getDeleteSharedDomainDeps()
+		deps.domainRepo.FindByNameInOrgApiResponse = net.NewApiResponseWithMessage("couldn't find the droids you're lookin for")
+		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+
+		assert.Equal(mr.T(), deps.domainRepo.DeleteDomainGuid, "")
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Deleting domain", "foo.com"},
+			{"FAILED"},
+			{"foo.com"},
+			{"couldn't find the droids you're lookin for"},
+		})
+	})
+	It("TestDeleteSharedDomainDeleteError", func() {
+
+		deps := getDeleteSharedDomainDeps()
+		deps.domainRepo.DeleteSharedApiResponse = net.NewApiResponseWithMessage("failed badly")
+		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+
+		assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Deleting domain", "foo.com"},
+			{"FAILED"},
+			{"foo.com"},
+			{"failed badly"},
+		})
+	})
+	It("TestDeleteSharedDomainHasConfirmation", func() {
+
+		deps := getDeleteSharedDomainDeps()
+		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
+
+		assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
+		testassert.SliceContains(mr.T(), ui.Prompts, testassert.Lines{
+			{"shared", "foo.com"},
+		})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Deleting domain", "foo.com"},
+			{"OK"},
+		})
+	})
+	It("TestDeleteSharedDomainForceFlagSkipsConfirmation", func() {
+
+		deps := getDeleteSharedDomainDeps()
+		ui := callDeleteSharedDomain([]string{"-f", "foo.com"}, []string{}, deps)
+
+		assert.Equal(mr.T(), deps.domainRepo.DeleteSharedDomainGuid, "foo-guid")
+		assert.Equal(mr.T(), len(ui.Prompts), 0)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Deleting domain", "foo.com"},
+			{"OK"},
+		})
+	})
+})
 
 func fakeDomainRepo() *testapi.FakeDomainRepository {
 	domain := models.DomainFields{}

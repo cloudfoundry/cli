@@ -25,49 +25,47 @@ func withConfigFixture(t mr.TestingT, name string, callback func(dirPath string)
 	callback(filepath.Join(cwd, "../../fixtures/config", name, ".cf", "config.json"))
 }
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestLoadingWithNoConfigFile", func() {
-			withFakeHome(mr.T(), func(configPath string) {
-				repo := NewDiskPersistor(configPath)
-				configData, err := repo.Load()
-				assert.NoError(mr.T(), err)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestLoadingWithNoConfigFile", func() {
+		withFakeHome(mr.T(), func(configPath string) {
+			repo := NewDiskPersistor(configPath)
+			configData, err := repo.Load()
+			assert.NoError(mr.T(), err)
 
-				assert.Equal(mr.T(), configData.Target, "")
-				assert.Equal(mr.T(), configData.ApiVersion, "")
-				assert.Equal(mr.T(), configData.AuthorizationEndpoint, "")
-				assert.Equal(mr.T(), configData.AccessToken, "")
-			})
-		})
-
-		It("TestSavingAndLoading", func() {
-			withFakeHome(mr.T(), func(configPath string) {
-				repo := NewDiskPersistor(configPath)
-				configData, err := repo.Load()
-				assert.NoError(mr.T(), err)
-
-				configData.ApiVersion = "3.1.0"
-				configData.Target = "https://api.target.example.com"
-				configData.AuthorizationEndpoint = "https://login.target.example.com"
-				configData.AccessToken = "bearer my_access_token"
-
-				err = repo.Save(configData)
-				assert.NoError(mr.T(), err)
-
-				savedConfig, err := repo.Load()
-				assert.NoError(mr.T(), err)
-				assert.Equal(mr.T(), savedConfig, configData)
-			})
-		})
-
-		It("TestReadingOutdatedConfigReturnsNewConfig", func() {
-			withConfigFixture(mr.T(), "outdated-config", func(configPath string) {
-				repo := NewDiskPersistor(configPath)
-				configData, err := repo.Load()
-
-				assert.NoError(mr.T(), err)
-				assert.Equal(mr.T(), configData.Target, "")
-			})
+			assert.Equal(mr.T(), configData.Target, "")
+			assert.Equal(mr.T(), configData.ApiVersion, "")
+			assert.Equal(mr.T(), configData.AuthorizationEndpoint, "")
+			assert.Equal(mr.T(), configData.AccessToken, "")
 		})
 	})
-}
+
+	It("TestSavingAndLoading", func() {
+		withFakeHome(mr.T(), func(configPath string) {
+			repo := NewDiskPersistor(configPath)
+			configData, err := repo.Load()
+			assert.NoError(mr.T(), err)
+
+			configData.ApiVersion = "3.1.0"
+			configData.Target = "https://api.target.example.com"
+			configData.AuthorizationEndpoint = "https://login.target.example.com"
+			configData.AccessToken = "bearer my_access_token"
+
+			err = repo.Save(configData)
+			assert.NoError(mr.T(), err)
+
+			savedConfig, err := repo.Load()
+			assert.NoError(mr.T(), err)
+			assert.Equal(mr.T(), savedConfig, configData)
+		})
+	})
+
+	It("TestReadingOutdatedConfigReturnsNewConfig", func() {
+		withConfigFixture(mr.T(), "outdated-config", func(configPath string) {
+			repo := NewDiskPersistor(configPath)
+			configData, err := repo.Load()
+
+			assert.NoError(mr.T(), err)
+			assert.Equal(mr.T(), configData.Target, "")
+		})
+	})
+})

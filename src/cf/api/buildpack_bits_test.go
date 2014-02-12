@@ -16,45 +16,43 @@ import (
 	testnet "testhelpers/net"
 )
 
-func init() {
-	Describe("BuildpackBitsRepository", func() {
-		It("TestUploadBuildpackWithInvalidDirectory", func() {
-			config := testconfig.NewRepository()
-			gateway := net.NewCloudControllerGateway()
+var _ = Describe("BuildpackBitsRepository", func() {
+	It("TestUploadBuildpackWithInvalidDirectory", func() {
+		config := testconfig.NewRepository()
+		gateway := net.NewCloudControllerGateway()
 
-			repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
-			buildpack := models.Buildpack{}
+		repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
+		buildpack := models.Buildpack{}
 
-			apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Contains(mr.T(), apiResponse.Message, "Invalid buildpack")
-		})
-		It("TestUploadBuildpack", func() {
-
-			dir, err := os.Getwd()
-			assert.NoError(mr.T(), err)
-			dir = filepath.Join(dir, "../../fixtures/example-buildpack")
-			err = os.Chmod(filepath.Join(dir, "detect"), 0666)
-			assert.NoError(mr.T(), err)
-
-			_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
-				uploadBuildpackRequest(dir),
-			})
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
-		It("TestUploadBuildpackWithAZipFile", func() {
-
-			dir, err := os.Getwd()
-			assert.NoError(mr.T(), err)
-			dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
-
-			_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
-				uploadBuildpackRequest(dir),
-			})
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-		})
+		apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Contains(mr.T(), apiResponse.Message, "Invalid buildpack")
 	})
-}
+	It("TestUploadBuildpack", func() {
+
+		dir, err := os.Getwd()
+		assert.NoError(mr.T(), err)
+		dir = filepath.Join(dir, "../../fixtures/example-buildpack")
+		err = os.Chmod(filepath.Join(dir, "detect"), 0666)
+		assert.NoError(mr.T(), err)
+
+		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
+			uploadBuildpackRequest(dir),
+		})
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+	})
+	It("TestUploadBuildpackWithAZipFile", func() {
+
+		dir, err := os.Getwd()
+		assert.NoError(mr.T(), err)
+		dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
+
+		_, apiResponse := testUploadBuildpack(mr.T(), dir, []testnet.TestRequest{
+			uploadBuildpackRequest(dir),
+		})
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+	})
+})
 
 func uploadBuildpackRequest(filename string) testnet.TestRequest {
 	return testnet.TestRequest{

@@ -31,74 +31,73 @@ func callUnsetSpaceRole(t mr.TestingT, args []string, spaceRepo *testapi.FakeSpa
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestUnsetSpaceRoleFailsWithUsage", func() {
-			reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 
-			ui := callUnsetSpaceRole(mr.T(), []string{}, spaceRepo, userRepo, reqFactory)
-			assert.True(mr.T(), ui.FailedWithUsage)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestUnsetSpaceRoleFailsWithUsage", func() {
+		reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
 
-			ui = callUnsetSpaceRole(mr.T(), []string{"username"}, spaceRepo, userRepo, reqFactory)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui := callUnsetSpaceRole(mr.T(), []string{}, spaceRepo, userRepo, reqFactory)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callUnsetSpaceRole(mr.T(), []string{"username", "org"}, spaceRepo, userRepo, reqFactory)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui = callUnsetSpaceRole(mr.T(), []string{"username"}, spaceRepo, userRepo, reqFactory)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callUnsetSpaceRole(mr.T(), []string{"username", "org", "space"}, spaceRepo, userRepo, reqFactory)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		ui = callUnsetSpaceRole(mr.T(), []string{"username", "org"}, spaceRepo, userRepo, reqFactory)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callUnsetSpaceRole(mr.T(), []string{"username", "org", "space", "role"}, spaceRepo, userRepo, reqFactory)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestUnsetSpaceRoleRequirements", func() {
+		ui = callUnsetSpaceRole(mr.T(), []string{"username", "org", "space"}, spaceRepo, userRepo, reqFactory)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
-			args := []string{"username", "org", "space", "role"}
-
-			reqFactory.LoginSuccess = false
-			callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-
-			reqFactory.LoginSuccess = true
-			callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-
-			assert.Equal(mr.T(), reqFactory.UserUsername, "username")
-			assert.Equal(mr.T(), reqFactory.OrganizationName, "org")
-		})
-
-		It("TestUnsetSpaceRole", func() {
-			user := models.UserFields{}
-			user.Username = "some-user"
-			user.Guid = "some-user-guid"
-			org := models.Organization{}
-			org.Name = "some-org"
-			org.Guid = "some-org-guid"
-
-			reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
-			reqFactory.LoginSuccess = true
-			reqFactory.UserFields = user
-			reqFactory.Organization = org
-			spaceRepo.FindByNameInOrgSpace = models.Space{}
-			spaceRepo.FindByNameInOrgSpace.Name = "some-space"
-			spaceRepo.FindByNameInOrgSpace.Guid = "some-space-guid"
-
-			args := []string{"my-username", "my-org", "my-space", "SpaceManager"}
-
-			ui := callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
-
-			assert.Equal(mr.T(), spaceRepo.FindByNameInOrgName, "my-space")
-			assert.Equal(mr.T(), spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
-
-			println(ui.DumpOutputs())
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
-				{"OK"},
-			})
-			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleRole, models.SPACE_MANAGER)
-			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
-			assert.Equal(mr.T(), userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
-		})
+		ui = callUnsetSpaceRole(mr.T(), []string{"username", "org", "space", "role"}, spaceRepo, userRepo, reqFactory)
+		assert.False(mr.T(), ui.FailedWithUsage)
 	})
-}
+	It("TestUnsetSpaceRoleRequirements", func() {
+
+		reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
+		args := []string{"username", "org", "space", "role"}
+
+		reqFactory.LoginSuccess = false
+		callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+
+		reqFactory.LoginSuccess = true
+		callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+
+		assert.Equal(mr.T(), reqFactory.UserUsername, "username")
+		assert.Equal(mr.T(), reqFactory.OrganizationName, "org")
+	})
+
+	It("TestUnsetSpaceRole", func() {
+		user := models.UserFields{}
+		user.Username = "some-user"
+		user.Guid = "some-user-guid"
+		org := models.Organization{}
+		org.Name = "some-org"
+		org.Guid = "some-org-guid"
+
+		reqFactory, spaceRepo, userRepo := getUnsetSpaceRoleDeps()
+		reqFactory.LoginSuccess = true
+		reqFactory.UserFields = user
+		reqFactory.Organization = org
+		spaceRepo.FindByNameInOrgSpace = models.Space{}
+		spaceRepo.FindByNameInOrgSpace.Name = "some-space"
+		spaceRepo.FindByNameInOrgSpace.Guid = "some-space-guid"
+
+		args := []string{"my-username", "my-org", "my-space", "SpaceManager"}
+
+		ui := callUnsetSpaceRole(mr.T(), args, spaceRepo, userRepo, reqFactory)
+
+		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgName, "my-space")
+		assert.Equal(mr.T(), spaceRepo.FindByNameInOrgOrgGuid, "some-org-guid")
+
+		println(ui.DumpOutputs())
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
+			{"OK"},
+		})
+		assert.Equal(mr.T(), userRepo.UnsetSpaceRoleRole, models.SPACE_MANAGER)
+		assert.Equal(mr.T(), userRepo.UnsetSpaceRoleUserGuid, "some-user-guid")
+		assert.Equal(mr.T(), userRepo.UnsetSpaceRoleSpaceGuid, "some-space-guid")
+	})
+})

@@ -19,82 +19,81 @@ func callShowService(args []string, reqFactory *testreq.FakeReqFactory) (ui *tes
 	testcmd.RunCommand(cmd, ctxt, reqFactory)
 	return
 }
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestShowServiceRequirements", func() {
-			args := []string{"service1"}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-			callShowService(args, reqFactory)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-			callShowService(args, reqFactory)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestShowServiceRequirements", func() {
+		args := []string{"service1"}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		callShowService(args, reqFactory)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-			callShowService(args, reqFactory)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+		callShowService(args, reqFactory)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "service1")
-		})
-		It("TestShowServiceFailsWithUsage", func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+		callShowService(args, reqFactory)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		assert.Equal(mr.T(), reqFactory.ServiceInstanceName, "service1")
+	})
+	It("TestShowServiceFailsWithUsage", func() {
 
-			ui := callShowService([]string{}, reqFactory)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 
-			ui = callShowService([]string{"my-service"}, reqFactory)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestShowServiceOutput", func() {
+		ui := callShowService([]string{}, reqFactory)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			offering := models.ServiceOfferingFields{}
-			offering.Label = "mysql"
-			offering.DocumentationUrl = "http://documentation.url"
-			offering.Description = "the-description"
+		ui = callShowService([]string{"my-service"}, reqFactory)
+		assert.False(mr.T(), ui.FailedWithUsage)
+	})
+	It("TestShowServiceOutput", func() {
 
-			plan := models.ServicePlanFields{}
-			plan.Guid = "plan-guid"
-			plan.Name = "plan-name"
+		offering := models.ServiceOfferingFields{}
+		offering.Label = "mysql"
+		offering.DocumentationUrl = "http://documentation.url"
+		offering.Description = "the-description"
 
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Name = "service1"
-			serviceInstance.Guid = "service1-guid"
-			serviceInstance.ServicePlan = plan
-			serviceInstance.ServiceOffering = offering
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:         true,
-				TargetedSpaceSuccess: true,
-				ServiceInstance:      serviceInstance,
-			}
-			ui := callShowService([]string{"service1"}, reqFactory)
+		plan := models.ServicePlanFields{}
+		plan.Guid = "plan-guid"
+		plan.Name = "plan-name"
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Service instance:", "service1"},
-				{"Service: ", "mysql"},
-				{"Plan: ", "plan-name"},
-				{"Description: ", "the-description"},
-				{"Documentation url: ", "http://documentation.url"},
-			})
-		})
-		It("TestShowUserProvidedServiceOutput", func() {
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Name = "service1"
+		serviceInstance.Guid = "service1-guid"
+		serviceInstance.ServicePlan = plan
+		serviceInstance.ServiceOffering = offering
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:         true,
+			TargetedSpaceSuccess: true,
+			ServiceInstance:      serviceInstance,
+		}
+		ui := callShowService([]string{"service1"}, reqFactory)
 
-			serviceInstance2 := models.ServiceInstance{}
-			serviceInstance2.Name = "service1"
-			serviceInstance2.Guid = "service1-guid"
-			reqFactory := &testreq.FakeReqFactory{
-				LoginSuccess:         true,
-				TargetedSpaceSuccess: true,
-				ServiceInstance:      serviceInstance2,
-			}
-			ui := callShowService([]string{"service1"}, reqFactory)
-
-			assert.Equal(mr.T(), len(ui.Outputs), 3)
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Service instance: ", "service1"},
-				{"Service: ", "user-provided"},
-			})
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Service instance:", "service1"},
+			{"Service: ", "mysql"},
+			{"Plan: ", "plan-name"},
+			{"Description: ", "the-description"},
+			{"Documentation url: ", "http://documentation.url"},
 		})
 	})
-}
+	It("TestShowUserProvidedServiceOutput", func() {
+
+		serviceInstance2 := models.ServiceInstance{}
+		serviceInstance2.Name = "service1"
+		serviceInstance2.Guid = "service1-guid"
+		reqFactory := &testreq.FakeReqFactory{
+			LoginSuccess:         true,
+			TargetedSpaceSuccess: true,
+			ServiceInstance:      serviceInstance2,
+		}
+		ui := callShowService([]string{"service1"}, reqFactory)
+
+		assert.Equal(mr.T(), len(ui.Outputs), 3)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Service instance: ", "service1"},
+			{"Service: ", "user-provided"},
+		})
+	})
+})

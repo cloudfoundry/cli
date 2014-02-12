@@ -14,43 +14,41 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestShareDomainRequirements", func() {
-			domainRepo := &testapi.FakeDomainRepository{}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestShareDomainRequirements", func() {
+		domainRepo := &testapi.FakeDomainRepository{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-			callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestShareDomainFailsWithUsage", func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false}
+		callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestShareDomainFailsWithUsage", func() {
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			domainRepo := &testapi.FakeDomainRepository{}
-			ui := callShareDomain([]string{}, reqFactory, domainRepo)
-			assert.True(mr.T(), ui.FailedWithUsage)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		domainRepo := &testapi.FakeDomainRepository{}
+		ui := callShareDomain([]string{}, reqFactory, domainRepo)
+		assert.True(mr.T(), ui.FailedWithUsage)
 
-			ui = callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
-			assert.False(mr.T(), ui.FailedWithUsage)
-		})
-		It("TestShareDomain", func() {
+		ui = callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		assert.False(mr.T(), ui.FailedWithUsage)
+	})
+	It("TestShareDomain", func() {
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-			domainRepo := &testapi.FakeDomainRepository{}
-			ui := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
+		domainRepo := &testapi.FakeDomainRepository{}
+		ui := callShareDomain([]string{"example.com"}, reqFactory, domainRepo)
 
-			assert.Equal(mr.T(), domainRepo.CreateSharedDomainName, "example.com")
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Creating shared domain", "example.com", "my-user"},
-				{"OK"},
-			})
+		assert.Equal(mr.T(), domainRepo.CreateSharedDomainName, "example.com")
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Creating shared domain", "example.com", "my-user"},
+			{"OK"},
 		})
 	})
-}
+})
 
 func callShareDomain(args []string, reqFactory *testreq.FakeReqFactory, domainRepo *testapi.FakeDomainRepository) (fakeUI *testterm.FakeUI) {
 	fakeUI = new(testterm.FakeUI)

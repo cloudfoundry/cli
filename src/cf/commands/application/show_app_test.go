@@ -18,110 +18,108 @@ import (
 	"time"
 )
 
-func init() {
-	Describe("Testing with ginkgo", func() {
-		It("TestAppRequirements", func() {
-			args := []string{"my-app", "/foo"}
-			appSummaryRepo := &testapi.FakeAppSummaryRepo{}
-			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
+var _ = Describe("Testing with ginkgo", func() {
+	It("TestAppRequirements", func() {
+		args := []string{"my-app", "/foo"}
+		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
+		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
-			callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true, Application: models.Application{}}
+		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
-			callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false, Application: models.Application{}}
+		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
 
-			reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-			callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
-			assert.True(mr.T(), testcmd.CommandDidPassRequirements)
-			assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
-		})
-		It("TestAppFailsWithUsage", func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
+		callApp(args, reqFactory, appSummaryRepo, appInstancesRepo)
+		assert.True(mr.T(), testcmd.CommandDidPassRequirements)
+		assert.Equal(mr.T(), reqFactory.ApplicationName, "my-app")
+	})
+	It("TestAppFailsWithUsage", func() {
 
-			appSummaryRepo := &testapi.FakeAppSummaryRepo{}
-			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
-			ui := callApp([]string{}, reqFactory, appSummaryRepo, appInstancesRepo)
+		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
+		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
+		ui := callApp([]string{}, reqFactory, appSummaryRepo, appInstancesRepo)
 
-			assert.True(mr.T(), ui.FailedWithUsage)
-			assert.False(mr.T(), testcmd.CommandDidPassRequirements)
-		})
-		It("TestDisplayingAppSummary", func() {
+		assert.True(mr.T(), ui.FailedWithUsage)
+		assert.False(mr.T(), testcmd.CommandDidPassRequirements)
+	})
+	It("TestDisplayingAppSummary", func() {
 
-			reqApp := models.Application{}
-			reqApp.Name = "my-app"
-			reqApp.Guid = "my-app-guid"
+		reqApp := models.Application{}
+		reqApp.Name = "my-app"
+		reqApp.Guid = "my-app-guid"
 
-			route1 := models.RouteSummary{}
-			route1.Host = "my-app"
+		route1 := models.RouteSummary{}
+		route1.Host = "my-app"
 
-			domain := models.DomainFields{}
-			domain.Name = "example.com"
-			route1.Domain = domain
+		domain := models.DomainFields{}
+		domain.Name = "example.com"
+		route1.Domain = domain
 
-			route2 := models.RouteSummary{}
-			route2.Host = "foo"
-			domain2 := models.DomainFields{}
-			domain2.Name = "example.com"
-			route2.Domain = domain2
+		route2 := models.RouteSummary{}
+		route2.Host = "foo"
+		domain2 := models.DomainFields{}
+		domain2.Name = "example.com"
+		route2.Domain = domain2
 
-			appSummary := models.AppSummary{}
-			appSummary.State = "started"
-			appSummary.InstanceCount = 2
-			appSummary.RunningInstances = 2
-			appSummary.Memory = 256
-			appSummary.RouteSummaries = []models.RouteSummary{route1, route2}
+		appSummary := models.AppSummary{}
+		appSummary.State = "started"
+		appSummary.InstanceCount = 2
+		appSummary.RunningInstances = 2
+		appSummary.Memory = 256
+		appSummary.RouteSummaries = []models.RouteSummary{route1, route2}
 
-			time1, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012")
-			assert.NoError(mr.T(), err)
+		time1, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012")
+		assert.NoError(mr.T(), err)
 
-			time2, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012")
-			assert.NoError(mr.T(), err)
+		time2, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Apr 1 15:04:05 -0700 MST 2012")
+		assert.NoError(mr.T(), err)
 
-			appInstance := models.AppInstanceFields{}
-			appInstance.State = models.InstanceRunning
-			appInstance.Since = time1
-			appInstance.CpuUsage = 1.0
-			appInstance.DiskQuota = 1 * formatters.GIGABYTE
-			appInstance.DiskUsage = 32 * formatters.MEGABYTE
-			appInstance.MemQuota = 64 * formatters.MEGABYTE
-			appInstance.MemUsage = 13 * formatters.BYTE
+		appInstance := models.AppInstanceFields{}
+		appInstance.State = models.InstanceRunning
+		appInstance.Since = time1
+		appInstance.CpuUsage = 1.0
+		appInstance.DiskQuota = 1 * formatters.GIGABYTE
+		appInstance.DiskUsage = 32 * formatters.MEGABYTE
+		appInstance.MemQuota = 64 * formatters.MEGABYTE
+		appInstance.MemUsage = 13 * formatters.BYTE
 
-			appInstance2 := models.AppInstanceFields{}
-			appInstance2.State = models.InstanceDown
-			appInstance2.Since = time2
+		appInstance2 := models.AppInstanceFields{}
+		appInstance2.State = models.InstanceDown
+		appInstance2.Since = time2
 
-			instances := []models.AppInstanceFields{appInstance, appInstance2}
+		instances := []models.AppInstanceFields{appInstance, appInstance2}
 
-			appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary}
-			appInstancesRepo := &testapi.FakeAppInstancesRepo{GetInstancesResponses: [][]models.AppInstanceFields{instances}}
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
-			ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
+		appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary}
+		appInstancesRepo := &testapi.FakeAppInstancesRepo{GetInstancesResponses: [][]models.AppInstanceFields{instances}}
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
+		ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
 
-			assert.Equal(mr.T(), appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
+		assert.Equal(mr.T(), appSummaryRepo.GetSummaryAppGuid, "my-app-guid")
 
-			testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
-				{"Showing health and status", "my-app"},
-				{"state", "started"},
-				{"instances", "2/2"},
-				{"usage", "256M x 2 instances"},
-				{"urls", "my-app.example.com", "foo.example.com"},
-				{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
-				{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
-			})
-		})
-		It("TestDisplayingStoppedAppSummary", func() {
-
-			testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_STOPPED)
-		})
-		It("TestDisplayingNotStagedAppSummary", func() {
-
-			testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_NOT_STAGED)
+		testassert.SliceContains(mr.T(), ui.Outputs, testassert.Lines{
+			{"Showing health and status", "my-app"},
+			{"state", "started"},
+			{"instances", "2/2"},
+			{"usage", "256M x 2 instances"},
+			{"urls", "my-app.example.com", "foo.example.com"},
+			{"#0", "running", "2012-01-02 03:04:05 PM", "100.0%", "13 of 64M", "32M of 1G"},
+			{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
 		})
 	})
-}
+	It("TestDisplayingStoppedAppSummary", func() {
+
+		testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_STOPPED)
+	})
+	It("TestDisplayingNotStagedAppSummary", func() {
+
+		testDisplayingAppSummaryWithErrorCode(mr.T(), cf.APP_NOT_STAGED)
+	})
+})
 
 func testDisplayingAppSummaryWithErrorCode(t mr.TestingT, errorCode string) {
 	reqApp := models.Application{}

@@ -15,184 +15,182 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func init() {
-	Describe("target command", func() {
-		var (
-			orgRepo    *testapi.FakeOrgRepository
-			spaceRepo  *testapi.FakeSpaceRepository
-			config     configuration.ReadWriter
-			reqFactory *testreq.FakeReqFactory
-		)
+var _ = Describe("target command", func() {
+	var (
+		orgRepo    *testapi.FakeOrgRepository
+		spaceRepo  *testapi.FakeSpaceRepository
+		config     configuration.ReadWriter
+		reqFactory *testreq.FakeReqFactory
+	)
 
+	BeforeEach(func() {
+		orgRepo, spaceRepo, config, reqFactory = getTargetDependencies()
+	})
+
+	It("TestTargetFailsWithUsage", func() {
+		ui := callTarget([]string{"bad-foo"}, reqFactory, config, orgRepo, spaceRepo)
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
+
+	It("fails requirements when targeting a space or org", func() {
+		callTarget([]string{"-o", "some-crazy-org-im-not-in"}, reqFactory, config, orgRepo, spaceRepo)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+
+		callTarget([]string{"-s", "i-love-space"}, reqFactory, config, orgRepo, spaceRepo)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	})
+
+	It("passes requirements when not attempting to target a space or org", func() {
+		callTarget([]string{}, reqFactory, config, orgRepo, spaceRepo)
+		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+	})
+
+	Context("when the user logs in successfully", func() {
 		BeforeEach(func() {
-			orgRepo, spaceRepo, config, reqFactory = getTargetDependencies()
+			reqFactory.LoginSuccess = true
 		})
 
-		It("TestTargetFailsWithUsage", func() {
-			ui := callTarget([]string{"bad-foo"}, reqFactory, config, orgRepo, spaceRepo)
-			Expect(ui.FailedWithUsage).To(BeTrue())
-		})
-
-		It("fails requirements when targeting a space or org", func() {
-			callTarget([]string{"-o", "some-crazy-org-im-not-in"}, reqFactory, config, orgRepo, spaceRepo)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
+		It("passes requirements when targeting a space or org", func() {
 			callTarget([]string{"-s", "i-love-space"}, reqFactory, config, orgRepo, spaceRepo)
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-		})
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 
-		It("passes requirements when not attempting to target a space or org", func() {
-			callTarget([]string{}, reqFactory, config, orgRepo, spaceRepo)
+			callTarget([]string{"-o", "orgs-are-delightful"}, reqFactory, config, orgRepo, spaceRepo)
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		})
 
-		Context("when the user logs in successfully", func() {
-			BeforeEach(func() {
-				reqFactory.LoginSuccess = true
+		It("TestTargetOrganizationWhenUserHasAccess", func() {
+			org := models.Organization{}
+			org.Name = "my-organization"
+			org.Guid = "my-organization-guid"
+
+			orgRepo.Organizations = []models.Organization{org}
+			orgRepo.FindByNameOrganization = org
+
+			ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
+
+			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+
+			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+		})
+
+		It("TestTargetOrganizationWhenUserDoesNotHaveAccess", func() {
+			orgs := []models.Organization{}
+			orgRepo.Organizations = orgs
+			orgRepo.FindByNameErr = true
+
+			ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{{"FAILED"}})
+		})
+
+		It("TestTargetOrganizationWhenOrgNotFound", func() {
+			orgRepo.FindByNameNotFound = true
+
+			ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
+
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"my-organization", "not found"},
+			})
+		})
+
+		It("TestTargetSpaceWhenNoOrganizationIsSelected", func() {
+			config.SetOrganizationFields(models.OrganizationFields{})
+
+			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
+
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"An org must be targeted before targeting a space"},
+			})
+			Expect(config.OrganizationFields().Guid).To(Equal(""))
+		})
+
+		It("TestTargetSpaceWhenUserHasAccess", func() {
+			space := models.Space{}
+			space.Name = "my-space"
+			space.Guid = "my-space-guid"
+
+			spaceRepo.Spaces = []models.Space{space}
+			spaceRepo.FindByNameSpace = space
+
+			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
+
+			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+			Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
+
+		It("TestTargetSpaceWhenUserDoesNotHaveAccess", func() {
+			config.SetSpaceFields(models.SpaceFields{})
+			spaceRepo.FindByNameErr = true
+
+			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
+
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"Unable to access space", "my-space"},
 			})
 
-			It("passes requirements when targeting a space or org", func() {
-				callTarget([]string{"-s", "i-love-space"}, reqFactory, config, orgRepo, spaceRepo)
-				Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(config.SpaceFields().Guid).To(Equal(""))
+			Expect(ui.ShowConfigurationCalled).To(BeFalse())
+		})
 
-				callTarget([]string{"-o", "orgs-are-delightful"}, reqFactory, config, orgRepo, spaceRepo)
-				Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		It("TestTargetSpaceWhenSpaceNotFound", func() {
+			spaceRepo.FindByNameNotFound = true
+
+			ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
+
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"my-space", "not found"},
 			})
+		})
 
-			It("TestTargetOrganizationWhenUserHasAccess", func() {
-				org := models.Organization{}
-				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
+		It("TestTargetOrganizationAndSpace", func() {
+			org := models.Organization{}
+			org.Name = "my-organization"
+			org.Guid = "my-organization-guid"
+			orgRepo.Organizations = []models.Organization{org}
 
-				orgRepo.Organizations = []models.Organization{org}
-				orgRepo.FindByNameOrganization = org
+			space := models.Space{}
+			space.Name = "my-space"
+			space.Guid = "my-space-guid"
+			spaceRepo.Spaces = []models.Space{space}
 
-				ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
+			ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
 
-				Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
+			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+			Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+		})
 
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-			})
+		It("TestTargetOrganizationAndSpaceWhenSpaceFails", func() {
+			config.SetSpaceFields(models.SpaceFields{})
 
-			It("TestTargetOrganizationWhenUserDoesNotHaveAccess", func() {
-				orgs := []models.Organization{}
-				orgRepo.Organizations = orgs
-				orgRepo.FindByNameErr = true
+			org := models.Organization{}
+			org.Name = "my-organization"
+			org.Guid = "my-organization-guid"
+			orgRepo.Organizations = []models.Organization{org}
 
-				ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
-				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{{"FAILED"}})
-			})
+			spaceRepo.FindByNameErr = true
 
-			It("TestTargetOrganizationWhenOrgNotFound", func() {
-				orgRepo.FindByNameNotFound = true
+			ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
 
-				ui := callTarget([]string{"-o", "my-organization"}, reqFactory, config, orgRepo, spaceRepo)
-
-				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"my-organization", "not found"},
-				})
-			})
-
-			It("TestTargetSpaceWhenNoOrganizationIsSelected", func() {
-				config.SetOrganizationFields(models.OrganizationFields{})
-
-				ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
-
-				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"An org must be targeted before targeting a space"},
-				})
-				Expect(config.OrganizationFields().Guid).To(Equal(""))
-			})
-
-			It("TestTargetSpaceWhenUserHasAccess", func() {
-				space := models.Space{}
-				space.Name = "my-space"
-				space.Guid = "my-space-guid"
-
-				spaceRepo.Spaces = []models.Space{space}
-				spaceRepo.FindByNameSpace = space
-
-				ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
-
-				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
-			})
-
-			It("TestTargetSpaceWhenUserDoesNotHaveAccess", func() {
-				config.SetSpaceFields(models.SpaceFields{})
-				spaceRepo.FindByNameErr = true
-
-				ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
-
-				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"Unable to access space", "my-space"},
-				})
-
-				Expect(config.SpaceFields().Guid).To(Equal(""))
-				Expect(ui.ShowConfigurationCalled).To(BeFalse())
-			})
-
-			It("TestTargetSpaceWhenSpaceNotFound", func() {
-				spaceRepo.FindByNameNotFound = true
-
-				ui := callTarget([]string{"-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
-
-				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"my-space", "not found"},
-				})
-			})
-
-			It("TestTargetOrganizationAndSpace", func() {
-				org := models.Organization{}
-				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
-				orgRepo.Organizations = []models.Organization{org}
-
-				space := models.Space{}
-				space.Name = "my-space"
-				space.Guid = "my-space-guid"
-				spaceRepo.Spaces = []models.Space{space}
-
-				ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
-
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
-				Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
-			})
-
-			It("TestTargetOrganizationAndSpaceWhenSpaceFails", func() {
-				config.SetSpaceFields(models.SpaceFields{})
-
-				org := models.Organization{}
-				org.Name = "my-organization"
-				org.Guid = "my-organization-guid"
-				orgRepo.Organizations = []models.Organization{org}
-
-				spaceRepo.FindByNameErr = true
-
-				ui := callTarget([]string{"-o", "my-organization", "-s", "my-space"}, reqFactory, config, orgRepo, spaceRepo)
-
-				Expect(ui.ShowConfigurationCalled).To(BeFalse())
-				Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
-				Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
-				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
-				Expect(config.SpaceFields().Guid).To(Equal(""))
-				testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
-					{"FAILED"},
-					{"Unable to access space", "my-space"},
-				})
+			Expect(ui.ShowConfigurationCalled).To(BeFalse())
+			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
+			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+			Expect(config.SpaceFields().Guid).To(Equal(""))
+			testassert.SliceContains(GinkgoT(), ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"Unable to access space", "my-space"},
 			})
 		})
 	})
-}
+})
 
 func getTargetDependencies() (
 	orgRepo *testapi.FakeOrgRepository,

@@ -178,199 +178,198 @@ func createServiceRepoWithConfig(t mr.TestingT, reqs []testnet.TestRequest, conf
 	return
 }
 
-func init() {
-	Describe("Testing with ginkgo", func() {
+var _ = Describe("Testing with ginkgo", func() {
 
-		It("TestGetServiceOfferingsWhenNotTargetingASpace", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/services?inline-relations-depth=1",
-				Response: multipleOfferingsResponse,
-			})
-
-			config := testconfig.NewRepository()
-			config.SetAccessToken("BEARER my_access_token")
-
-			testGetServiceOfferings(mr.T(), req, config)
+	It("TestGetServiceOfferingsWhenNotTargetingASpace", func() {
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/services?inline-relations-depth=1",
+			Response: multipleOfferingsResponse,
 		})
 
-		It("TestGetServiceOfferingsWhenTargetingASpace", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-				Response: multipleOfferingsResponse,
-			})
+		config := testconfig.NewRepository()
+		config.SetAccessToken("BEARER my_access_token")
 
-			space := models.SpaceFields{}
-			space.Guid = "my-space-guid"
+		testGetServiceOfferings(mr.T(), req, config)
+	})
 
-			config := testconfig.NewRepository()
-			config.SetAccessToken("BEARER my_access_token")
-			config.SetSpaceFields(space)
-
-			testGetServiceOfferings(mr.T(), req, config)
-		})
-		It("TestCreateServiceInstance", func() {
-
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "POST",
-				Path:     "/v2/service_instances",
-				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
-				Response: testnet.TestResponse{Status: http.StatusCreated},
-			})
-
-			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
-			defer ts.Close()
-
-			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsSuccessful())
-			assert.Equal(mr.T(), identicalAlreadyExists, false)
-		})
-		It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
-
-			errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:  "POST",
-				Path:    "/v2/service_instances",
-				Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
-				Response: testnet.TestResponse{
-					Status: http.StatusBadRequest,
-					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-				},
-			})
-
-			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{errorReq, findServiceInstanceReq})
-			defer ts.Close()
-
-			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), identicalAlreadyExists, true)
-		})
-		It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
-
-			errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:  "POST",
-				Path:    "/v2/service_instances",
-				Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
-				Response: testnet.TestResponse{
-					Status: http.StatusBadRequest,
-					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-				},
-			})
-
-			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{errorReq, findServiceInstanceReq})
-			defer ts.Close()
-
-			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), identicalAlreadyExists, false)
-		})
-		It("TestFindInstanceByName", func() {
-
-			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{findServiceInstanceReq})
-			defer ts.Close()
-
-			instance, apiResponse := repo.FindInstanceByName("my-service")
-
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), instance.Name, "my-service")
-			assert.Equal(mr.T(), instance.Guid, "my-service-instance-guid")
-			assert.Equal(mr.T(), instance.ServiceOffering.Label, "mysql")
-			assert.Equal(mr.T(), instance.ServiceOffering.DocumentationUrl, "http://info.example.com")
-			assert.Equal(mr.T(), instance.ServiceOffering.Description, "MySQL database")
-			assert.Equal(mr.T(), instance.ServicePlan.Name, "plan-name")
-			assert.Equal(mr.T(), len(instance.ServiceBindings), 2)
-
-			binding := instance.ServiceBindings[0]
-			assert.Equal(mr.T(), binding.Url, "/v2/service_bindings/service-binding-1-guid")
-			assert.Equal(mr.T(), binding.Guid, "service-binding-1-guid")
-			assert.Equal(mr.T(), binding.AppGuid, "app-1-guid")
-		})
-		It("TestFindInstanceByNameForNonExistentService", func() {
-
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
-			})
-
-			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
-			defer ts.Close()
-
-			_, apiResponse := repo.FindInstanceByName("my-service")
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.True(mr.T(), apiResponse.IsNotFound())
+	It("TestGetServiceOfferingsWhenTargetingASpace", func() {
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+			Response: multipleOfferingsResponse,
 		})
 
-		It("TestDeleteServiceWithoutServiceBindings", func() {
+		space := models.SpaceFields{}
+		space.Guid = "my-space-guid"
 
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "DELETE",
-				Path:     "/v2/service_instances/my-service-instance-guid",
-				Response: testnet.TestResponse{Status: http.StatusOK},
-			})
+		config := testconfig.NewRepository()
+		config.SetAccessToken("BEARER my_access_token")
+		config.SetSpaceFields(space)
 
-			ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
-			defer ts.Close()
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
-			apiResponse := repo.DeleteService(serviceInstance)
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsNotSuccessful())
-		})
-		It("TestDeleteServiceWithServiceBindings", func() {
+		testGetServiceOfferings(mr.T(), req, config)
+	})
+	It("TestCreateServiceInstance", func() {
 
-			_, _, repo := createServiceRepo(mr.T(), []testnet.TestRequest{})
-
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
-
-			binding := models.ServiceBindingFields{}
-			binding.Url = "/v2/service_bindings/service-binding-1-guid"
-			binding.AppGuid = "app-1-guid"
-
-			binding2 := models.ServiceBindingFields{}
-			binding2.Url = "/v2/service_bindings/service-binding-2-guid"
-			binding2.AppGuid = "app-2-guid"
-
-			serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
-
-			apiResponse := repo.DeleteService(serviceInstance)
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), apiResponse.Message, "Cannot delete service instance, apps are still bound to it")
-		})
-		It("TestRenameService", func() {
-			path := "/v2/service_instances/my-service-instance-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
-
-			plan := models.ServicePlanFields{}
-			plan.Guid = "some-plan-guid"
-			serviceInstance.ServicePlan = plan
-
-			testRenameService(mr.T(), path, serviceInstance)
-		})
-		It("TestRenameServiceWhenServiceIsUserProvided", func() {
-			path := "/v2/user_provided_service_instances/my-service-instance-guid"
-			serviceInstance := models.ServiceInstance{}
-			serviceInstance.Guid = "my-service-instance-guid"
-			testRenameService(mr.T(), path, serviceInstance)
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "POST",
+			Path:     "/v2/service_instances",
+			Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+			Response: testnet.TestResponse{Status: http.StatusCreated},
 		})
 
-		It("finds service offerings by label and provider", func() {
-			t := mr.T()
-			_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
-				Method: "GET",
-				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
-				Response: testnet.TestResponse{
-					Status: 200,
-					Body: `{
+		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
+		defer ts.Close()
+
+		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsSuccessful())
+		assert.Equal(mr.T(), identicalAlreadyExists, false)
+	})
+	It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
+
+		errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/service_instances",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+			Response: testnet.TestResponse{
+				Status: http.StatusBadRequest,
+				Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+			},
+		})
+
+		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{errorReq, findServiceInstanceReq})
+		defer ts.Close()
+
+		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), identicalAlreadyExists, true)
+	})
+	It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
+
+		errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "POST",
+			Path:    "/v2/service_instances",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
+			Response: testnet.TestResponse{
+				Status: http.StatusBadRequest,
+				Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+			},
+		})
+
+		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{errorReq, findServiceInstanceReq})
+		defer ts.Close()
+
+		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), identicalAlreadyExists, false)
+	})
+	It("TestFindInstanceByName", func() {
+
+		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{findServiceInstanceReq})
+		defer ts.Close()
+
+		instance, apiResponse := repo.FindInstanceByName("my-service")
+
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), instance.Name, "my-service")
+		assert.Equal(mr.T(), instance.Guid, "my-service-instance-guid")
+		assert.Equal(mr.T(), instance.ServiceOffering.Label, "mysql")
+		assert.Equal(mr.T(), instance.ServiceOffering.DocumentationUrl, "http://info.example.com")
+		assert.Equal(mr.T(), instance.ServiceOffering.Description, "MySQL database")
+		assert.Equal(mr.T(), instance.ServicePlan.Name, "plan-name")
+		assert.Equal(mr.T(), len(instance.ServiceBindings), 2)
+
+		binding := instance.ServiceBindings[0]
+		assert.Equal(mr.T(), binding.Url, "/v2/service_bindings/service-binding-1-guid")
+		assert.Equal(mr.T(), binding.Guid, "service-binding-1-guid")
+		assert.Equal(mr.T(), binding.AppGuid, "app-1-guid")
+	})
+	It("TestFindInstanceByNameForNonExistentService", func() {
+
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "GET",
+			Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+		})
+
+		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
+		defer ts.Close()
+
+		_, apiResponse := repo.FindInstanceByName("my-service")
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsError())
+		assert.True(mr.T(), apiResponse.IsNotFound())
+	})
+
+	It("TestDeleteServiceWithoutServiceBindings", func() {
+
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:   "DELETE",
+			Path:     "/v2/service_instances/my-service-instance-guid",
+			Response: testnet.TestResponse{Status: http.StatusOK},
+		})
+
+		ts, handler, repo := createServiceRepo(mr.T(), []testnet.TestRequest{req})
+		defer ts.Close()
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Guid = "my-service-instance-guid"
+		apiResponse := repo.DeleteService(serviceInstance)
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsNotSuccessful())
+	})
+	It("TestDeleteServiceWithServiceBindings", func() {
+
+		_, _, repo := createServiceRepo(mr.T(), []testnet.TestRequest{})
+
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Guid = "my-service-instance-guid"
+
+		binding := models.ServiceBindingFields{}
+		binding.Url = "/v2/service_bindings/service-binding-1-guid"
+		binding.AppGuid = "app-1-guid"
+
+		binding2 := models.ServiceBindingFields{}
+		binding2.Url = "/v2/service_bindings/service-binding-2-guid"
+		binding2.AppGuid = "app-2-guid"
+
+		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
+
+		apiResponse := repo.DeleteService(serviceInstance)
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), apiResponse.Message, "Cannot delete service instance, apps are still bound to it")
+	})
+	It("TestRenameService", func() {
+		path := "/v2/service_instances/my-service-instance-guid"
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Guid = "my-service-instance-guid"
+
+		plan := models.ServicePlanFields{}
+		plan.Guid = "some-plan-guid"
+		serviceInstance.ServicePlan = plan
+
+		testRenameService(mr.T(), path, serviceInstance)
+	})
+	It("TestRenameServiceWhenServiceIsUserProvided", func() {
+		path := "/v2/user_provided_service_instances/my-service-instance-guid"
+		serviceInstance := models.ServiceInstance{}
+		serviceInstance.Guid = "my-service-instance-guid"
+		testRenameService(mr.T(), path, serviceInstance)
+	})
+
+	It("finds service offerings by label and provider", func() {
+		t := mr.T()
+		_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+			Method: "GET",
+			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+			Response: testnet.TestResponse{
+				Status: 200,
+				Body: `{
 			"next_url": null,
 			"resources": [
 				{
@@ -387,68 +386,67 @@ func init() {
 				}
 			]
 		}`,
-				},
-			}})
+			},
+		}})
 
-			offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-			assert.Equal(t, offering.Guid, "offering-1-guid")
-			assert.True(t, apiResponse.IsSuccessful())
-		})
+		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+		assert.Equal(t, offering.Guid, "offering-1-guid")
+		assert.True(t, apiResponse.IsSuccessful())
+	})
 
-		It("returns an error if the offering cannot be found", func() {
-			t := mr.T()
-			_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
-				Method: "GET",
-				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
-				Response: testnet.TestResponse{
-					Status: 200,
-					Body: `{
+	It("returns an error if the offering cannot be found", func() {
+		t := mr.T()
+		_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+			Method: "GET",
+			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+			Response: testnet.TestResponse{
+				Status: 200,
+				Body: `{
 			"next_url": null,
 			"resources": []
 		}`,
-				},
-			}})
+			},
+		}})
 
-			offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-			assert.True(t, apiResponse.IsNotFound())
-			assert.Equal(t, offering.Guid, "")
-		})
+		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+		assert.True(t, apiResponse.IsNotFound())
+		assert.Equal(t, offering.Guid, "")
+	})
 
-		It("handles api errors when finding service offerings", func() {
-			t := mr.T()
-			_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
-				Method: "GET",
-				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
-				Response: testnet.TestResponse{
-					Status: 400,
-					Body: `{
+	It("handles api errors when finding service offerings", func() {
+		t := mr.T()
+		_, _, repo := createServiceRepo(t, []testnet.TestRequest{{
+			Method: "GET",
+			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+			Response: testnet.TestResponse{
+				Status: 400,
+				Body: `{
 			"code": 10005,
 			"description": "The query parameter is invalid"
 		}`,
-				},
-			}})
+			},
+		}})
 
-			_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-			assert.True(t, apiResponse.IsError())
-			assert.Equal(t, apiResponse.ErrorCode, "10005")
-		})
-
-		It("purges service offerings", func() {
-			t := mr.T()
-			_, handler, repo := createServiceRepo(t, []testnet.TestRequest{{
-				Method: "DELETE",
-				Path:   "/v2/services/the-service-guid?purge=true",
-				Response: testnet.TestResponse{
-					Status: 204,
-				},
-			}})
-
-			offering := maker.NewServiceOffering("the-offering")
-			offering.Guid = "the-service-guid"
-
-			apiResponse := repo.PurgeServiceOffering(offering)
-			assert.True(t, apiResponse.IsSuccessful())
-			assert.True(t, handler.AllRequestsCalled())
-		})
+		_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+		assert.True(t, apiResponse.IsError())
+		assert.Equal(t, apiResponse.ErrorCode, "10005")
 	})
-}
+
+	It("purges service offerings", func() {
+		t := mr.T()
+		_, handler, repo := createServiceRepo(t, []testnet.TestRequest{{
+			Method: "DELETE",
+			Path:   "/v2/services/the-service-guid?purge=true",
+			Response: testnet.TestResponse{
+				Status: 204,
+			},
+		}})
+
+		offering := maker.NewServiceOffering("the-offering")
+		offering.Guid = "the-service-guid"
+
+		apiResponse := repo.PurgeServiceOffering(offering)
+		assert.True(t, apiResponse.IsSuccessful())
+		assert.True(t, handler.AllRequestsCalled())
+	})
+})

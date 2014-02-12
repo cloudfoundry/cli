@@ -14,62 +14,60 @@ import (
 	testnet "testhelpers/net"
 )
 
-func init() {
-	Describe("AuthenticationRepository", func() {
-		It("TestSuccessfullyLoggingIn", func() {
-			deps := setupAuthDependencies(mr.T(), successfulLoginRequest)
-			defer teardownAuthDependencies(deps)
+var _ = Describe("AuthenticationRepository", func() {
+	It("TestSuccessfullyLoggingIn", func() {
+		deps := setupAuthDependencies(mr.T(), successfulLoginRequest)
+		defer teardownAuthDependencies(deps)
 
-			auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-			apiResponse := auth.Authenticate("foo@example.com", "bar")
+		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+		apiResponse := auth.Authenticate("foo@example.com", "bar")
 
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
-			assert.False(mr.T(), apiResponse.IsError())
-			assert.Equal(mr.T(), deps.config.AuthorizationEndpoint(), deps.ts.URL)
-			assert.Equal(mr.T(), deps.config.AccessToken(), "BEARER my_access_token")
-			assert.Equal(mr.T(), deps.config.RefreshToken(), "my_refresh_token")
-		})
-
-		It("TestUnsuccessfullyLoggingIn", func() {
-			deps := setupAuthDependencies(mr.T(), unsuccessfulLoginRequest)
-			defer teardownAuthDependencies(deps)
-
-			auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-			apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
-
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsNotSuccessful())
-			assert.Equal(mr.T(), apiResponse.Message, "Password is incorrect, please try again.")
-			assert.Empty(mr.T(), deps.config.AccessToken())
-		})
-
-		It("TestServerErrorLoggingIn", func() {
-			deps := setupAuthDependencies(mr.T(), errorLoginRequest)
-			defer teardownAuthDependencies(deps)
-
-			auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-			apiResponse := auth.Authenticate("foo@example.com", "bar")
-
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsError())
-			assert.Equal(mr.T(), apiResponse.Message, "Server error, status code: 500, error code: , message: ")
-			assert.Empty(mr.T(), deps.config.AccessToken())
-		})
-
-		It("TestLoggingInWithErrorMaskedAsSuccess", func() {
-			deps := setupAuthDependencies(mr.T(), errorMaskedAsSuccessLoginRequest)
-			defer teardownAuthDependencies(deps)
-
-			auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-			apiResponse := auth.Authenticate("foo@example.com", "bar")
-
-			assert.True(mr.T(), deps.handler.AllRequestsCalled())
-			assert.True(mr.T(), apiResponse.IsError())
-			assert.Equal(mr.T(), apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
-			assert.Empty(mr.T(), deps.config.AccessToken())
-		})
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		assert.False(mr.T(), apiResponse.IsError())
+		assert.Equal(mr.T(), deps.config.AuthorizationEndpoint(), deps.ts.URL)
+		assert.Equal(mr.T(), deps.config.AccessToken(), "BEARER my_access_token")
+		assert.Equal(mr.T(), deps.config.RefreshToken(), "my_refresh_token")
 	})
-}
+
+	It("TestUnsuccessfullyLoggingIn", func() {
+		deps := setupAuthDependencies(mr.T(), unsuccessfulLoginRequest)
+		defer teardownAuthDependencies(deps)
+
+		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+		apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
+
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsNotSuccessful())
+		assert.Equal(mr.T(), apiResponse.Message, "Password is incorrect, please try again.")
+		assert.Empty(mr.T(), deps.config.AccessToken())
+	})
+
+	It("TestServerErrorLoggingIn", func() {
+		deps := setupAuthDependencies(mr.T(), errorLoginRequest)
+		defer teardownAuthDependencies(deps)
+
+		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+		apiResponse := auth.Authenticate("foo@example.com", "bar")
+
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsError())
+		assert.Equal(mr.T(), apiResponse.Message, "Server error, status code: 500, error code: , message: ")
+		assert.Empty(mr.T(), deps.config.AccessToken())
+	})
+
+	It("TestLoggingInWithErrorMaskedAsSuccess", func() {
+		deps := setupAuthDependencies(mr.T(), errorMaskedAsSuccessLoginRequest)
+		defer teardownAuthDependencies(deps)
+
+		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+		apiResponse := auth.Authenticate("foo@example.com", "bar")
+
+		assert.True(mr.T(), deps.handler.AllRequestsCalled())
+		assert.True(mr.T(), apiResponse.IsError())
+		assert.Equal(mr.T(), apiResponse.Message, "Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io")
+		assert.Empty(mr.T(), deps.config.AccessToken())
+	})
+})
 
 var authHeaders = http.Header{
 	"accept":        {"application/json"},

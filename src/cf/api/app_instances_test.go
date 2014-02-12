@@ -15,35 +15,33 @@ import (
 	"time"
 )
 
-func init() {
-	Describe("AppInstancesRepo", func() {
-		It("TestAppInstancesGetInstances", func() {
-			ts, handler, repo := createAppInstancesRepo(mr.T(), []testnet.TestRequest{
-				appInstancesRequest,
-				appStatsRequest,
-			})
-			defer ts.Close()
-			appGuid := "my-cool-app-guid"
-
-			instances, err := repo.GetInstances(appGuid)
-			assert.True(mr.T(), handler.AllRequestsCalled())
-			assert.False(mr.T(), err.IsNotSuccessful())
-
-			assert.Equal(mr.T(), len(instances), 2)
-
-			assert.Equal(mr.T(), instances[0].State, models.InstanceRunning)
-			assert.Equal(mr.T(), instances[1].State, models.InstanceStarting)
-
-			instance0 := instances[0]
-			assert.Equal(mr.T(), instance0.Since, time.Unix(1379522342, 0))
-			assert.Exactly(mr.T(), instance0.DiskQuota, uint64(1073741824))
-			assert.Exactly(mr.T(), instance0.DiskUsage, uint64(56037376))
-			assert.Exactly(mr.T(), instance0.MemQuota, uint64(67108864))
-			assert.Exactly(mr.T(), instance0.MemUsage, uint64(19218432))
-			assert.Equal(mr.T(), instance0.CpuUsage, 3.659571249238058e-05)
+var _ = Describe("AppInstancesRepo", func() {
+	It("TestAppInstancesGetInstances", func() {
+		ts, handler, repo := createAppInstancesRepo(mr.T(), []testnet.TestRequest{
+			appInstancesRequest,
+			appStatsRequest,
 		})
+		defer ts.Close()
+		appGuid := "my-cool-app-guid"
+
+		instances, err := repo.GetInstances(appGuid)
+		assert.True(mr.T(), handler.AllRequestsCalled())
+		assert.False(mr.T(), err.IsNotSuccessful())
+
+		assert.Equal(mr.T(), len(instances), 2)
+
+		assert.Equal(mr.T(), instances[0].State, models.InstanceRunning)
+		assert.Equal(mr.T(), instances[1].State, models.InstanceStarting)
+
+		instance0 := instances[0]
+		assert.Equal(mr.T(), instance0.Since, time.Unix(1379522342, 0))
+		assert.Exactly(mr.T(), instance0.DiskQuota, uint64(1073741824))
+		assert.Exactly(mr.T(), instance0.DiskUsage, uint64(56037376))
+		assert.Exactly(mr.T(), instance0.MemQuota, uint64(67108864))
+		assert.Exactly(mr.T(), instance0.MemUsage, uint64(19218432))
+		assert.Equal(mr.T(), instance0.CpuUsage, 3.659571249238058e-05)
 	})
-}
+})
 
 var appStatsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
