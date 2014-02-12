@@ -3,8 +3,9 @@ package net
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -38,21 +39,21 @@ func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 	return func(t mr.TestingT, request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
-			assert.Fail(t, "Error reading request body: %s", err)
+			Fail(fmt.Sprintf("Error reading request body: %s", err))
 		}
 
 		actualBody, err := bytesToInterface(bodyBytes)
 		if err != nil {
-			assert.Fail(t, "Error unmarshalling request", err.Error())
+			Fail(fmt.Sprintf("Error unmarshalling request", err.Error()))
 		}
 
 		expectedBody, err := bytesToInterface([]byte(expectedBodyString))
 		if err != nil {
-			assert.Fail(t, "Error unmarshalling expected json", err.Error())
+			Fail(fmt.Sprintf("Error unmarshalling expected json", err.Error()))
 		}
 
-		assert.Equal(t, expectedBody, actualBody, "\nEXPECTED: %s\nACTUAL:   %s", expectedBody, actualBody)
-		assert.Equal(t, request.Header.Get("content-type"), "application/json", "Content Type was not application/json.")
+		Expect(expectedBody).To(Equal(actualBody), "\nEXPECTED: %s\nACTUAL: %s", expectedBody, actualBody)
+		Expect(request.Header.Get("content-type")).To(Equal("application/json"), "Content Type was not application/json.")
 	}
 }
 
@@ -60,14 +61,14 @@ func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string)
 	return func(t mr.TestingT, request *http.Request) {
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
-			assert.Fail(t, "Error reading request body: %s", err)
+			Fail(fmt.Sprintf("Error reading request body: %s", err))
 		}
 
 		actualBody := string(bodyBytes)
-		assert.Equal(t, RemoveWhiteSpaceFromBody(actualBody), RemoveWhiteSpaceFromBody(expectedBody), "Body did not match.")
+		Expect(RemoveWhiteSpaceFromBody(actualBody)).To(Equal(RemoveWhiteSpaceFromBody(expectedBody)), "Body did not match.")
 
 		actualContentType := request.Header.Get("content-type")
-		assert.Equal(t, actualContentType, expectedContentType, "Content Type did not match.")
+		Expect(actualContentType).To(Equal(expectedContentType), "Content Type did not match.")
 	}
 }
 

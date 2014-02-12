@@ -125,7 +125,7 @@ var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.y
 var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 	err := request.ParseMultipartForm(4096)
 	if err != nil {
-		assert.Fail(t, "Failed parsing multipart form", err)
+		Fail(fmt.Sprintf("Failed parsing multipart form %v", err))
 		return
 	}
 	defer request.MultipartForm.RemoveAll()
@@ -150,19 +150,19 @@ var uploadBodyMatcher = func(t mr.TestingT, request *http.Request) {
 
 	file, err := applicationFile.Open()
 	if err != nil {
-		assert.Fail(t, "Cannot get multipart file", err.Error())
+		Fail(fmt.Sprintf("Cannot get multipart file %v", err.Error()))
 		return
 	}
 
 	length, err := strconv.ParseInt(applicationFile.Header.Get("content-length"), 10, 64)
 	if err != nil {
-		assert.Fail(t, "Cannot convert content-length to int", err.Error())
+		Fail(fmt.Sprintf("Cannot convert content-length to int %v", err.Error()))
 		return
 	}
 
 	zipReader, err := zip.NewReader(file, length)
 	if err != nil {
-		assert.Fail(t, "Error reading zip content", err.Error())
+		Fail(fmt.Sprintf("Error reading zip content %v", err.Error()))
 		return
 	}
 
@@ -176,7 +176,7 @@ nextFile:
 				continue nextFile
 			}
 		}
-		assert.Fail(t, "Missing file: "+f.Name)
+		Fail("Missing file: " + f.Name)
 	}
 }
 

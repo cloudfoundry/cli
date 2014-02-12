@@ -5,9 +5,9 @@ import (
 	"cf/configuration"
 	"cf/net"
 	"encoding/base64"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -17,7 +17,7 @@ import (
 
 var _ = Describe("AuthenticationRepository", func() {
 	It("TestSuccessfullyLoggingIn", func() {
-		deps := setupAuthDependencies(mr.T(), successfulLoginRequest)
+		deps := setupAuthDependencies(successfulLoginRequest)
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
@@ -31,7 +31,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	It("TestUnsuccessfullyLoggingIn", func() {
-		deps := setupAuthDependencies(mr.T(), unsuccessfulLoginRequest)
+		deps := setupAuthDependencies(unsuccessfulLoginRequest)
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
@@ -44,7 +44,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	It("TestServerErrorLoggingIn", func() {
-		deps := setupAuthDependencies(mr.T(), errorLoginRequest)
+		deps := setupAuthDependencies(errorLoginRequest)
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
@@ -57,7 +57,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	It("TestLoggingInWithErrorMaskedAsSuccess", func() {
-		deps := setupAuthDependencies(mr.T(), errorMaskedAsSuccessLoginRequest)
+		deps := setupAuthDependencies(errorMaskedAsSuccessLoginRequest)
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
@@ -96,7 +96,7 @@ var successfulLoginRequest = testnet.TestRequest{
 var successfulLoginMatcher = func(t mr.TestingT, request *http.Request) {
 	err := request.ParseForm()
 	if err != nil {
-		assert.Fail(t, "Failed to parse form: %s", err)
+		Fail(fmt.Sprintf("Failed to parse form: %s", err))
 		return
 	}
 
@@ -139,8 +139,8 @@ type authDependencies struct {
 	gateway net.Gateway
 }
 
-func setupAuthDependencies(t mr.TestingT, request testnet.TestRequest) (deps authDependencies) {
-	deps.ts, deps.handler = testnet.NewTLSServer(t, []testnet.TestRequest{request})
+func setupAuthDependencies(request testnet.TestRequest) (deps authDependencies) {
+	deps.ts, deps.handler = testnet.NewTLSServer(GinkgoT(), []testnet.TestRequest{request})
 
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAuthorizationEndpoint(deps.ts.URL)

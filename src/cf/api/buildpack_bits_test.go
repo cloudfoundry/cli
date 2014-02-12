@@ -6,6 +6,7 @@ import (
 	. "cf/api"
 	"cf/models"
 	"cf/net"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
@@ -78,7 +79,7 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 	return func(t mr.TestingT, request *http.Request) {
 		err := request.ParseMultipartForm(4096)
 		if err != nil {
-			assert.Fail(t, "Failed parsing multipart form: %s", err)
+			Fail(fmt.Sprintf("Failed parsing multipart form: %s", err))
 			return
 		}
 		defer request.MultipartForm.RemoveAll()
@@ -96,13 +97,13 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 
 		file, err := buildpackFile.Open()
 		if err != nil {
-			assert.Fail(t, "Cannot get multipart file: %s", err.Error())
+			Fail(fmt.Sprintf("Cannot get multipart file: %s", err.Error()))
 			return
 		}
 
 		zipReader, err := zip.NewReader(file, 4096)
 		if err != nil {
-			assert.Fail(t, "Error reading zip content: %s", err.Error())
+			Fail(fmt.Sprintf("Error reading zip content: %s", err.Error()))
 		}
 
 		Expect(len(zipReader.File)).To(Equal(3), "Wrong number of files in zip")
@@ -115,7 +116,7 @@ func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
 					continue nextFile
 				}
 			}
-			assert.Fail(t, "Missing file: "+f.Name)
+			Fail("Missing file: " + f.Name)
 		}
 	}
 }
