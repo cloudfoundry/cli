@@ -8,7 +8,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
 	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
@@ -136,7 +135,7 @@ var _ = Describe("UserRepository", func() {
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, "User my-user not found")
+		Expect(apiResponse.Message).To(ContainSubstring("User my-user not found"))
 	})
 
 	It("TestCreateUser", func() {
@@ -237,7 +236,7 @@ var _ = Describe("UserRepository", func() {
 		apiResponse := repo.SetOrgRole("user-guid", "org-guid", "foo")
 
 		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
+		Expect(apiResponse.Message).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("TestUnsetOrgRoleFromOrgManager", func() {
@@ -257,7 +256,7 @@ var _ = Describe("UserRepository", func() {
 		apiResponse := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
 
 		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
+		Expect(apiResponse.Message).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("TestSetSpaceRoleToSpaceManager", func() {
@@ -277,7 +276,7 @@ var _ = Describe("UserRepository", func() {
 		apiResponse := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
 
 		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		assert.Contains(mr.T(), apiResponse.Message, "Invalid Role")
+		Expect(apiResponse.Message).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("lists all users in the org", func() {

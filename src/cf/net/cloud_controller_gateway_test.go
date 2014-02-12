@@ -5,8 +5,6 @@ import (
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/assert"
-	mr "github.com/tjarratt/mr_t"
 	"net/http"
 	"net/http/httptest"
 )
@@ -36,8 +34,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse = gateway.PerformRequest(request)
 
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, "The host is taken: test1")
-		assert.Contains(mr.T(), apiResponse.ErrorCode, "210003")
+		Expect(apiResponse.Message).To(ContainSubstring("The host is taken: test1"))
+		Expect(apiResponse.ErrorCode).To(ContainSubstring("210003"))
 	})
 	It("TestCloudControllerGatewayInvalidTokenHandling", func() {
 
@@ -52,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse = gateway.PerformRequest(request)
 
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		assert.Contains(mr.T(), apiResponse.Message, "The token is invalid")
-		assert.Contains(mr.T(), apiResponse.ErrorCode, INVALID_TOKEN_CODE)
+		Expect(apiResponse.Message).To(ContainSubstring("The token is invalid"))
+		Expect(apiResponse.ErrorCode).To(ContainSubstring(INVALID_TOKEN_CODE))
 	})
 })

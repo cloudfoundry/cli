@@ -71,7 +71,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		Expect(errs).NotTo(BeEmpty())
-		assert.Contains(mr.T(), errs.Error(), "memory")
+		Expect(errs.Error()).To(ContainSubstring("memory"))
 	})
 
 	It("TestManifestWithTimeoutSetsHealthCheckTimeout", func() {
@@ -101,7 +101,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		Expect(errs).NotTo(BeEmpty())
-		assert.Contains(mr.T(), errs.Error(), "env var 'bar' should not be null")
+		Expect(errs.Error()).To(ContainSubstring("env var 'bar' should not be null"))
 	})
 
 	It("TestManifestWithAbsolutePath", func() {
@@ -172,7 +172,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		Expect(errs).NotTo(BeEmpty())
-		assert.Contains(mr.T(), errs.Error(), "Properties are not supported. Found property '${foo}'")
+		Expect(errs.Error()).To(ContainSubstring("Properties are not supported. Found property '${foo}'"))
 	})
 
 	It("TestParsingManifestWithNullCommand", func() {
