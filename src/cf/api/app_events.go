@@ -37,6 +37,7 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 			return cb(resource.(EventResourceNewV2).ToFields())
 		})
 
+	// FIXME: needs semantic versioning
 	if apiResponse.IsNotFound() {
 		apiResponse = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
@@ -53,6 +54,7 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 
 const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"
 
+// FIXME: needs semantic versioning
 type EventResourceOldV2 struct {
 	Resource
 	Entity struct {
