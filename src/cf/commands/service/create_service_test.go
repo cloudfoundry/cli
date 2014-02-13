@@ -37,8 +37,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering.Plans = []models.ServicePlanFields{plan}
 		offering2 := models.ServiceOffering{}
 		offering2.Label = "postgres"
-		serviceOfferings := []models.ServiceOffering{offering, offering2}
-		serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
+
+		serviceRepo := &testapi.FakeServiceRepo{}
+		serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{
+			offering,
+			offering2,
+		}
+
 		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 			[]string{},
 			serviceRepo,
@@ -51,8 +56,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
 		Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
 	})
-	It("TestCreateServiceWhenServiceAlreadyExists", func() {
 
+	It("TestCreateServiceWhenServiceAlreadyExists", func() {
 		offering := models.ServiceOffering{}
 		offering.Label = "cleardb"
 		plan := models.ServicePlanFields{}
@@ -61,8 +66,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering.Plans = []models.ServicePlanFields{plan}
 		offering2 := models.ServiceOffering{}
 		offering2.Label = "postgres"
-		serviceOfferings := []models.ServiceOffering{offering, offering2}
-		serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings, CreateServiceAlreadyExists: true}
+		serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
+		serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
 		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 			[]string{},
 			serviceRepo,

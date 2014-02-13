@@ -28,16 +28,14 @@ func NewRepositoryWithDefaults() configuration.Repository {
 		Username: "my-user",
 	})
 
-	spaceFields := models.SpaceFields{}
-	spaceFields.Name = "my-space"
-	spaceFields.Guid = "my-space-guid"
-
-	orgFields := models.OrganizationFields{}
-	orgFields.Name = "my-org"
-	orgFields.Guid = "my-org-guid"
-
-	configRepo.SetSpaceFields(spaceFields)
-	configRepo.SetOrganizationFields(orgFields)
+	configRepo.SetSpaceFields(models.SpaceFields{
+		Name: "my-space",
+		Guid: "my-space-guid",
+	})
+	configRepo.SetOrganizationFields(models.OrganizationFields{
+		Name: "my-org",
+		Guid: "my-org-guid",
+	})
 
 	return configRepo
 }

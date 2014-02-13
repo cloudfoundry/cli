@@ -7,7 +7,18 @@ import (
 )
 
 type FakeServiceRepo struct {
-	ServiceOfferings []models.ServiceOffering
+	GetAllServiceOfferingsReturns struct {
+		ServiceOfferings []models.ServiceOffering
+		ApiResponse      net.ApiResponse
+	}
+
+	GetServiceOfferingsForSpaceReturns struct {
+		ServiceOfferings []models.ServiceOffering
+		ApiResponse      net.ApiResponse
+	}
+	GetServiceOfferingsForSpaceArgs struct {
+		SpaceGuid string
+	}
 
 	CreateServiceInstanceName     string
 	CreateServiceInstancePlanGuid string
@@ -36,9 +47,13 @@ type FakeServiceRepo struct {
 	FindServiceOfferingByLabelAndProviderCalled          bool
 }
 
-func (repo *FakeServiceRepo) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
-	offerings = repo.ServiceOfferings
-	return
+func (repo *FakeServiceRepo) GetAllServiceOfferings() (models.ServiceOfferings, net.ApiResponse) {
+	return repo.GetAllServiceOfferingsReturns.ServiceOfferings, repo.GetAllServiceOfferingsReturns.ApiResponse
+}
+
+func (repo *FakeServiceRepo) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, net.ApiResponse) {
+	repo.GetServiceOfferingsForSpaceArgs.SpaceGuid = spaceGuid
+	return repo.GetServiceOfferingsForSpaceReturns.ServiceOfferings, repo.GetServiceOfferingsForSpaceReturns.ApiResponse
 }
 
 func (repo *FakeServiceRepo) PurgeServiceOffering(offering models.ServiceOffering) (apiResponse net.ApiResponse) {

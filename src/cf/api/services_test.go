@@ -17,199 +17,48 @@ import (
 	testnet "testhelpers/net"
 )
 
-var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-  "resources": [
-    {
-      "metadata": {
-        "guid": "offering-1-guid"
-      },
-      "entity": {
-        "label": "Offering 1",
-        "provider": "Offering 1 provider",
-        "description": "Offering 1 description",
-        "version" : "1.0",
-        "service_plans": [
-        	{
-        		"metadata": {"guid": "offering-1-plan-1-guid"},
-        		"entity": {"name": "Offering 1 Plan 1"}
-        	},
-        	{
-        		"metadata": {"guid": "offering-1-plan-2-guid"},
-        		"entity": {"name": "Offering 1 Plan 2"}
-        	}
-        ]
-      }
-    },
-    {
-      "metadata": {
-        "guid": "offering-2-guid"
-      },
-      "entity": {
-        "label": "Offering 2",
-        "provider": "Offering 2 provider",
-        "description": "Offering 2 description",
-        "version" : "1.5",
-        "service_plans": [
-        	{
-        		"metadata": {"guid": "offering-2-plan-1-guid"},
-        		"entity": {"name": "Offering 2 Plan 1"}
-        	}
-        ]
-      }
-    }
-  ]
-}`}
-
-func testGetServiceOfferings(req testnet.TestRequest, config configuration.ReadWriter) {
-	ts, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{req}, config)
-	defer ts.Close()
-
-	offerings, apiResponse := repo.GetServiceOfferings()
-
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
-	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-	Expect(2).To(Equal(len(offerings)))
-
-	firstOffering := offerings[0]
-	Expect(firstOffering.Label).To(Equal("Offering 1"))
-	Expect(firstOffering.Version).To(Equal("1.0"))
-	Expect(firstOffering.Description).To(Equal("Offering 1 description"))
-	Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
-	Expect(firstOffering.Guid).To(Equal("offering-1-guid"))
-	Expect(len(firstOffering.Plans)).To(Equal(2))
-
-	plan := firstOffering.Plans[0]
-	Expect(plan.Name).To(Equal("Offering 1 Plan 1"))
-	Expect(plan.Guid).To(Equal("offering-1-plan-1-guid"))
-
-	secondOffering := offerings[1]
-	Expect(secondOffering.Label).To(Equal("Offering 2"))
-	Expect(secondOffering.Guid).To(Equal("offering-2-guid"))
-	Expect(len(secondOffering.Plans)).To(Equal(1))
-}
-
-var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
-		{
-		  "metadata": {
-			"guid": "my-service-instance-guid"
-		  },
-		  "entity": {
-			"name": "my-service",
-			"service_bindings": [
-			  {
-				"metadata": {
-				  "guid": "service-binding-1-guid",
-				  "url": "/v2/service_bindings/service-binding-1-guid"
-				},
-				"entity": {
-				  "app_guid": "app-1-guid"
-				}
-			  },
-			  {
-				"metadata": {
-				  "guid": "service-binding-2-guid",
-				  "url": "/v2/service_bindings/service-binding-2-guid"
-				},
-				"entity": {
-				  "app_guid": "app-2-guid"
-				}
-			  }
-			],
-			"service_plan": {
-			  "metadata": {
-				"guid": "plan-guid"
-			  },
-			  "entity": {
-				"name": "plan-name",
-				"service": {
-				  "metadata": {
-					"guid": "service-guid"
-				  },
-				  "entity": {
-					"label": "mysql",
-					"description": "MySQL database",
-					"documentation_url": "http://info.example.com"
-				  }
-				}
-			  }
-			}
-		  }
-		}
-  	]}`}})
-
-func testRenameService(endpointPath string, serviceInstance models.ServiceInstance) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     endpointPath,
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated},
-	})
-
-	ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-	defer ts.Close()
-
-	apiResponse := repo.RenameService(serviceInstance, "new-name")
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
-	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-}
-
-func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	space := models.SpaceFields{}
-	space.Guid = "my-space-guid"
-	config := testconfig.NewRepository()
-	config.SetAccessToken("BEARER my_access_token")
-	config.SetSpaceFields(space)
-	return createServiceRepoWithConfig(reqs, config)
-}
-
-func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	if len(reqs) > 0 {
-		ts, handler = testnet.NewTLSServer(reqs)
-		config.SetApiEndpoint(ts.URL)
-	}
-
-	gateway := net.NewCloudControllerGateway()
-	repo = NewCloudControllerServiceRepository(config, gateway)
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-
-	It("TestGetServiceOfferingsWhenNotTargetingASpace", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "GET",
-			Path:     "/v2/services?inline-relations-depth=1",
-			Response: multipleOfferingsResponse,
-		})
-
+var _ = Describe("Services Repo", func() {
+	It("gets all public service offerings", func() {
 		config := testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
 
-		testGetServiceOfferings(req, config)
+		ts, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/services?inline-relations-depth=1",
+				Response: multipleOfferingsResponse,
+			}),
+		}, config)
+		defer ts.Close()
+
+		offerings, apiResponse := repo.GetAllServiceOfferings()
+
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		expectMultipleServiceOfferings(offerings)
 	})
 
-	It("TestGetServiceOfferingsWhenTargetingASpace", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "GET",
-			Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-			Response: multipleOfferingsResponse,
-		})
-
-		space := models.SpaceFields{}
-		space.Guid = "my-space-guid"
-
+	It("gets all service offerings in a given space", func() {
 		config := testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
-		config.SetSpaceFields(space)
 
-		testGetServiceOfferings(req, config)
+		ts, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+				Response: multipleOfferingsResponse,
+			}),
+		}, config)
+		defer ts.Close()
+
+		offerings, apiResponse := repo.GetServiceOfferingsForSpace("my-space-guid")
+
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		expectMultipleServiceOfferings(offerings)
 	})
+
 	It("TestCreateServiceInstance", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "POST",
 			Path:     "/v2/service_instances",
@@ -225,8 +74,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(identicalAlreadyExists).To(Equal(false))
 	})
-	It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
 
+	It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
 		errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/service_instances",
@@ -246,8 +95,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(identicalAlreadyExists).To(Equal(true))
 	})
-	It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
 
+	It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
 		errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/service_instances",
@@ -267,8 +116,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(identicalAlreadyExists).To(Equal(false))
 	})
-	It("TestFindInstanceByName", func() {
 
+	It("TestFindInstanceByName", func() {
 		ts, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq})
 		defer ts.Close()
 
@@ -289,8 +138,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(binding.Guid).To(Equal("service-binding-1-guid"))
 		Expect(binding.AppGuid).To(Equal("app-1-guid"))
 	})
-	It("TestFindInstanceByNameForNonExistentService", func() {
 
+	It("TestFindInstanceByNameForNonExistentService", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "GET",
 			Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
@@ -307,7 +156,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestDeleteServiceWithoutServiceBindings", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "DELETE",
 			Path:     "/v2/service_instances/my-service-instance-guid",
@@ -322,8 +170,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
-	It("TestDeleteServiceWithServiceBindings", func() {
 
+	It("TestDeleteServiceWithServiceBindings", func() {
 		_, _, repo := createServiceRepo([]testnet.TestRequest{})
 
 		serviceInstance := models.ServiceInstance{}
@@ -343,6 +191,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Cannot delete service instance, apps are still bound to it"))
 	})
+
 	It("TestRenameService", func() {
 		path := "/v2/service_instances/my-service-instance-guid"
 		serviceInstance := models.ServiceInstance{}
@@ -354,6 +203,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testRenameService(path, serviceInstance)
 	})
+
 	It("TestRenameServiceWhenServiceIsUserProvided", func() {
 		path := "/v2/user_provided_service_instances/my-service-instance-guid"
 		serviceInstance := models.ServiceInstance{}
@@ -368,22 +218,22 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{
 				Status: 200,
 				Body: `{
-			"next_url": null,
-			"resources": [
-				{
-				  "metadata": {
-					"guid": "offering-1-guid"
-				  },
-				  "entity": {
-					"label": "offering-1",
-					"provider": "provider-1",
-					"description": "offering 1 description",
-					"version" : "1.0",
-					"service_plans": []
-				  }
-				}
-			]
-		}`,
+            "next_url": null,
+            "resources": [
+                {
+                  "metadata": {
+                    "guid": "offering-1-guid"
+                  },
+                  "entity": {
+                    "label": "offering-1",
+                    "provider": "provider-1",
+                    "description": "offering 1 description",
+                    "version" : "1.0",
+                    "service_plans": []
+                  }
+                }
+            ]
+        }`,
 			},
 		}})
 
@@ -399,9 +249,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{
 				Status: 200,
 				Body: `{
-			"next_url": null,
-			"resources": []
-		}`,
+            "next_url": null,
+            "resources": []
+        }`,
 			},
 		}})
 
@@ -417,9 +267,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			Response: testnet.TestResponse{
 				Status: 400,
 				Body: `{
-			"code": 10005,
-			"description": "The query parameter is invalid"
-		}`,
+            "code": 10005,
+            "description": "The query parameter is invalid"
+        }`,
 			},
 		}})
 
@@ -445,3 +295,154 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
 	})
 })
+
+var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+  "resources": [
+    {
+      "metadata": {
+        "guid": "offering-1-guid"
+      },
+      "entity": {
+        "label": "Offering 1",
+        "provider": "Offering 1 provider",
+        "description": "Offering 1 description",
+        "version" : "1.0",
+        "service_plans": [
+            {
+                "metadata": {"guid": "offering-1-plan-1-guid"},
+                "entity": {"name": "Offering 1 Plan 1"}
+            },
+            {
+                "metadata": {"guid": "offering-1-plan-2-guid"},
+                "entity": {"name": "Offering 1 Plan 2"}
+            }
+        ]
+      }
+    },
+    {
+      "metadata": {
+        "guid": "offering-2-guid"
+      },
+      "entity": {
+        "label": "Offering 2",
+        "provider": "Offering 2 provider",
+        "description": "Offering 2 description",
+        "version" : "1.5",
+        "service_plans": [
+            {
+                "metadata": {"guid": "offering-2-plan-1-guid"},
+                "entity": {"name": "Offering 2 Plan 1"}
+            }
+        ]
+      }
+    }
+  ]
+}`}
+
+func expectMultipleServiceOfferings(offerings []models.ServiceOffering) {
+	Expect(len(offerings)).To(Equal(2))
+
+	firstOffering := offerings[0]
+	Expect(firstOffering.Label).To(Equal("Offering 1"))
+	Expect(firstOffering.Version).To(Equal("1.0"))
+	Expect(firstOffering.Description).To(Equal("Offering 1 description"))
+	Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
+	Expect(firstOffering.Guid).To(Equal("offering-1-guid"))
+	Expect(len(firstOffering.Plans)).To(Equal(2))
+
+	plan := firstOffering.Plans[0]
+	Expect(plan.Name).To(Equal("Offering 1 Plan 1"))
+	Expect(plan.Guid).To(Equal("offering-1-plan-1-guid"))
+
+	secondOffering := offerings[1]
+	Expect(secondOffering.Label).To(Equal("Offering 2"))
+	Expect(secondOffering.Guid).To(Equal("offering-2-guid"))
+	Expect(len(secondOffering.Plans)).To(Equal(1))
+}
+
+var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+        {
+          "metadata": {
+            "guid": "my-service-instance-guid"
+          },
+          "entity": {
+            "name": "my-service",
+            "service_bindings": [
+              {
+                "metadata": {
+                  "guid": "service-binding-1-guid",
+                  "url": "/v2/service_bindings/service-binding-1-guid"
+                },
+                "entity": {
+                  "app_guid": "app-1-guid"
+                }
+              },
+              {
+                "metadata": {
+                  "guid": "service-binding-2-guid",
+                  "url": "/v2/service_bindings/service-binding-2-guid"
+                },
+                "entity": {
+                  "app_guid": "app-2-guid"
+                }
+              }
+            ],
+            "service_plan": {
+              "metadata": {
+                "guid": "plan-guid"
+              },
+              "entity": {
+                "name": "plan-name",
+                "service": {
+                  "metadata": {
+                    "guid": "service-guid"
+                  },
+                  "entity": {
+                    "label": "mysql",
+                    "description": "MySQL database",
+                    "documentation_url": "http://info.example.com"
+                  }
+                }
+              }
+            }
+          }
+        }
+    ]}`}})
+
+func testRenameService(endpointPath string, serviceInstance models.ServiceInstance) {
+	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		Method:   "PUT",
+		Path:     endpointPath,
+		Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
+		Response: testnet.TestResponse{Status: http.StatusCreated},
+	})
+
+	ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+	defer ts.Close()
+
+	apiResponse := repo.RenameService(serviceInstance, "new-name")
+	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+}
+
+func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+	config := testconfig.NewRepository()
+	config.SetAccessToken("BEARER my_access_token")
+	config.SetSpaceFields(models.SpaceFields{Guid: "my-space-guid"})
+	return createServiceRepoWithConfig(reqs, config)
+}
+
+func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+	if len(reqs) > 0 {
+		ts, handler = testnet.NewTLSServer(reqs)
+		config.SetApiEndpoint(ts.URL)
+	}
+
+	gateway := net.NewCloudControllerGateway()
+	repo = NewCloudControllerServiceRepository(config, gateway)
+	return
+}
