@@ -20,7 +20,7 @@ type ServiceRepository interface {
 	DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse)
 	FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse)
 	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse)
-	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) net.ApiResponse
+	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceRepository struct {
@@ -163,15 +163,17 @@ func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDe
 	return
 }
 
-func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse) {
 	path := fmt.Sprintf("%s/v2/service_plans/%s/service_instances", repo.config.ApiEndpoint(), v1PlanGuid)
 	body := strings.NewReader(fmt.Sprintf(`{"service_plan_guid":"%s"}`, v2PlanGuid))
-	request, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken(), body)
+	response := new(ServiceMigrateV1ToV2Response)
+
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), body, response)
 	if apiResponse.IsNotSuccessful() {
 		return
 	}
 
-	apiResponse = repo.gateway.PerformRequest(request)
+	changedCount = response.ChangedCount
 	return
 }
 

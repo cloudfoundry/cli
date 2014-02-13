@@ -706,14 +706,15 @@ var _ = Describe("Testing with ginkgo", func() {
 				Method:   "PUT",
 				Path:     "/v2/service_plans/v1-guid/service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"v2-guid"}`),
-				Response: testnet.TestResponse{Status: http.StatusOK},
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"changed_count":3}`},
 			})
 
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			changedCount, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(changedCount).To(Equal(3))
 		})
 
 		It("returns an error when migrating fails", func() {
@@ -727,7 +728,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			_, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
 			Expect(apiResponse.IsSuccessful()).To(BeFalse())
 		})
 	})

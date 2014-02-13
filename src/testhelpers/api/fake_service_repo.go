@@ -46,10 +46,11 @@ type FakeServiceRepo struct {
 	ServiceInstanceCountForServicePlan int
 	ServiceInstanceCountApiResponse    net.ApiResponse
 
-	V1GuidToMigrate                      string
-	V2GuidToMigrate                      string
-	MigrateServicePlanFromV1ToV2Called   bool
-	MigrateServicePlanFromV1ToV2Response net.ApiResponse
+	V1GuidToMigrate                           string
+	V2GuidToMigrate                           string
+	MigrateServicePlanFromV1ToV2Called        bool
+	MigrateServicePlanFromV1ToV2ReturnedCount int
+	MigrateServicePlanFromV1ToV2Response      net.ApiResponse
 }
 
 func (repo *FakeServiceRepo) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
@@ -132,10 +133,11 @@ func (repo *FakeServiceRepo) GetServiceInstanceCountForServicePlan(v1PlanGuid st
 	return
 }
 
-func (repo *FakeServiceRepo) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse) {
 	repo.MigrateServicePlanFromV1ToV2Called = true
 	repo.V1GuidToMigrate = v1PlanGuid
 	repo.V2GuidToMigrate = v2PlanGuid
+	changedCount = repo.MigrateServicePlanFromV1ToV2ReturnedCount
 	apiResponse = repo.MigrateServicePlanFromV1ToV2Response
 	return
 }

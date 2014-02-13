@@ -94,6 +94,7 @@ func init() {
 				Context("when the v1 and v2 service instances exists", func() {
 					BeforeEach(func() {
 						serviceRepo.FindServicePlanByDescriptionResultGuids = []string{"v1-guid", "v2-guid"}
+						serviceRepo.MigrateServicePlanFromV1ToV2ReturnedCount = 1
 					})
 
 					It("makes a request to migrate the v1 service instance", func() {
@@ -125,10 +126,12 @@ func init() {
 					})
 
 					It("notifies the user that the migration was successful", func() {
+						serviceRepo.ServiceInstanceCountForServicePlan = 2
 						testcmd.RunCommand(cmd, context, requirementsFactory)
 
 						testassert.SliceContains(ui.Outputs, testassert.Lines{
-							{"Migrating", "1", "service instance"},
+							{"Attempting to migrate", "2", "service instances"},
+							{"1", "service instance", "migrated"},
 							{"OK"},
 						})
 					})
