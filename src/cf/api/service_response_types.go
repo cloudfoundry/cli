@@ -116,6 +116,10 @@ type ServicePlanDescription struct {
 	ServiceProvider string
 }
 
+type ServiceMigrateV1ToV2Response struct {
+	ChangedCount int `json:"changed_count"`
+}
+
 func (planDesc ServicePlanDescription) String() string {
 	if planDesc.ServiceProvider == "" {
 		return fmt.Sprintf("%s %s", planDesc.ServiceName, planDesc.ServicePlanName) // v2 plan

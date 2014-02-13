@@ -6,6 +6,7 @@ import (
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
+	"fmt"
 	"github.com/codegangsta/cli"
 )
 
@@ -75,24 +76,35 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 		" making the v1 plan private or shutting down the v1 broker to prevent additional instances from" +
 		" being created. Once service instances have been migrated, the v1 services and plans can be" +
 		" removed from Cloud Foundry.\n\n")
-	var serviceInstancesPhrase string
-	if count == 1 {
-		serviceInstancesPhrase = "service instance"
-	} else {
-		serviceInstancesPhrase = "service instances"
-	}
-	response := cmd.ui.Confirm("Really migrate %d %s from plan %s to %s?", count, serviceInstancesPhrase, v1, v2)
+
+	serviceInstancesPhrase := pluralizeServiceInstances(count)
+
+	response := cmd.ui.Confirm("Really migrate %s from plan %s to %s?", serviceInstancesPhrase, v1, v2)
 	if !response {
 		return
 	}
 
-	cmd.ui.Say("Migrating %d %s...", count, serviceInstancesPhrase)
+	cmd.ui.Say("Attempting to migrate %s...", serviceInstancesPhrase)
 
-	apiResponse = cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1Guid, v2Guid)
+	changedCount, apiResponse := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1Guid, v2Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 	}
+
+	cmd.ui.Say("%s migrated.", pluralizeServiceInstances(changedCount))
+
 	cmd.ui.Ok()
 
 	return
+}
+
+func pluralizeServiceInstances(count int) string {
+	var phrase string
+	if count == 1 {
+		phrase = "service instance"
+	} else {
+		phrase = "service instances"
+	}
+
+	return fmt.Sprintf("%d %s", count, phrase)
 }
