@@ -117,7 +117,8 @@ type ServiceBindingEntity struct {
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) net.ApiResponse
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse)
-	GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse)
+	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse)
+	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiResponse net.ApiResponse)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse)
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse)
@@ -135,14 +136,19 @@ func NewCloudControllerServiceRepository(config configuration.Reader, gateway ne
 	return
 }
 
-func (repo CloudControllerServiceRepository) GetServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.ApiEndpoint())
-	spaceGuid := repo.config.SpaceFields().Guid
+func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
+	return repo.getServiceOfferings(
+		fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.ApiEndpoint(), spaceGuid),
+	)
+}
 
-	if spaceGuid != "" {
-		path = fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.ApiEndpoint(), spaceGuid)
-	}
+func (repo CloudControllerServiceRepository) GetAllServiceOfferings() (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
+	return repo.getServiceOfferings(
+		fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.ApiEndpoint()),
+	)
+}
 
+func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (offerings models.ServiceOfferings, apiResponse net.ApiResponse) {
 	resources := new(PaginatedServiceOfferingResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiResponse.IsNotSuccessful() {

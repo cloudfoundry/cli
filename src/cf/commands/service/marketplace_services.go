@@ -3,6 +3,8 @@ package service
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/models"
+	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -28,17 +30,24 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 }
 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
+	var (
+		serviceOfferings models.ServiceOfferings
+		apiResponse      net.ApiResponse
+	)
+
 	if cmd.config.HasSpace() {
 		cmd.ui.Say("Getting services from marketplace in org %s / space %s as %s...",
 			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			terminal.EntityNameColor(cmd.config.Username()),
 		)
+		serviceOfferings, apiResponse = cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
+	} else if !cmd.config.IsLoggedIn() {
+		cmd.ui.Say("Getting all services from marketplace...")
+		serviceOfferings, apiResponse = cmd.serviceRepo.GetAllServiceOfferings()
 	} else {
-		cmd.ui.Say("Getting services from marketplace...")
+		cmd.ui.Failed("Cannot list marketplace services without a targetted space")
 	}
-
-	serviceOfferings, apiResponse := cmd.serviceRepo.GetServiceOfferings()
 
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)

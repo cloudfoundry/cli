@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
@@ -13,54 +14,99 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callMarketplaceServices(config configuration.Reader, serviceRepo *testapi.FakeServiceRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{}
-
-	ctxt := testcmd.NewContext("marketplace", []string{})
-	reqFactory := &testreq.FakeReqFactory{}
-
-	cmd := NewMarketplaceServices(ui, config, serviceRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
 var _ = Describe("Testing Marketplace Services", func() {
-
+	var ui *testterm.FakeUI
+	var reqFactory *testreq.FakeReqFactory
 	var config configuration.ReadWriter
+	var serviceRepo *testapi.FakeServiceRepo
+	var fakeServiceOfferings []models.ServiceOffering
+
+	BeforeEach(func() {
+		serviceRepo = &testapi.FakeServiceRepo{}
+		ui = &testterm.FakeUI{}
+		reqFactory = &testreq.FakeReqFactory{}
+
+		fakeServiceOfferings = []models.ServiceOffering{
+			models.ServiceOffering{
+				Plans: []models.ServicePlanFields{
+					models.ServicePlanFields{Name: "service-plan-a"},
+					models.ServicePlanFields{Name: "service-plan-b"},
+				},
+				ServiceOfferingFields: models.ServiceOfferingFields{
+					Label:       "zzz-my-service-offering",
+					Description: "service offering 1 description",
+				}},
+			models.ServiceOffering{
+				Plans: []models.ServicePlanFields{
+					models.ServicePlanFields{Name: "service-plan-c"},
+					models.ServicePlanFields{Name: "service-plan-d"}},
+				ServiceOfferingFields: models.ServiceOfferingFields{
+					Label:       "aaa-my-service-offering",
+					Description: "service offering 2 description",
+				},
+			}}
+	})
 
 	Context("when the user is logged in", func() {
-
 		BeforeEach(func() {
 			config = testconfig.NewRepositoryWithDefaults()
 		})
 
-		It("lists the correct service offerings", func() {
-			plan := models.ServicePlanFields{}
-			plan.Name = "service-plan-a"
-			plan2 := models.ServicePlanFields{}
-			plan2.Name = "service-plan-b"
-			plan3 := models.ServicePlanFields{}
-			plan3.Name = "service-plan-c"
-			plan4 := models.ServicePlanFields{}
-			plan4.Name = "service-plan-d"
+		Context("when the user has a space targetted", func() {
+			BeforeEach(func() {
+				config.SetSpaceFields(models.SpaceFields{
+					Guid: "the-space-guid",
+					Name: "the-space-name",
+				})
+			})
 
-			offering := models.ServiceOffering{}
-			offering.Label = "zzz-my-service-offering"
-			offering.Description = "service offering 1 description"
-			offering.Plans = []models.ServicePlanFields{plan, plan2}
+			It("lists all of the service offerings for the space", func() {
+				serviceRepo := &testapi.FakeServiceRepo{}
+				serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = fakeServiceOfferings
+				cmd := NewMarketplaceServices(ui, config, serviceRepo)
+				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
 
-			offering2 := models.ServiceOffering{}
-			offering2.Label = "aaa-my-service-offering"
-			offering2.Description = "service offering 2 description"
-			offering2.Plans = []models.ServicePlanFields{plan3, plan4}
+				Expect(serviceRepo.GetServiceOfferingsForSpaceArgs.SpaceGuid).To(Equal("the-space-guid"))
 
-			serviceOfferings := []models.ServiceOffering{offering, offering2}
-			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Getting services from marketplace in org", "my-org", "the-space-name", "my-user"},
+					{"OK"},
+					{"service", "plans", "description"},
+					{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
+					{"zzz-my-service-offering", "service offering 1 description", "service-plan-a", "service-plan-b"},
+				})
+			})
+		})
 
-			ui := callMarketplaceServices(config, serviceRepo)
+		Context("when the user doesn't have a space targetted", func() {
+			BeforeEach(func() {
+				config.SetSpaceFields(models.SpaceFields{})
+			})
+
+			It("tells the user to target a space", func() {
+				cmd := NewMarketplaceServices(ui, config, serviceRepo)
+				testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"without", "space"},
+				})
+			})
+		})
+	})
+
+	Context("when user is not logged in", func() {
+		BeforeEach(func() {
+			config = testconfig.NewRepository()
+		})
+
+		It("lists all public service offerings if any are available", func() {
+			serviceRepo := &testapi.FakeServiceRepo{}
+			serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = fakeServiceOfferings
+
+			cmd := NewMarketplaceServices(ui, config, serviceRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting services from marketplace in org", "my-org", "my-space", "my-user"},
+				{"Getting all services from marketplace"},
 				{"OK"},
 				{"service", "plans", "description"},
 				{"aaa-my-service-offering", "service offering 2 description", "service-plan-c", "service-plan-d"},
@@ -68,29 +114,19 @@ var _ = Describe("Testing Marketplace Services", func() {
 			})
 		})
 
-	})
+		It("does not display a table if no service offerings exist", func() {
+			serviceRepo := &testapi.FakeServiceRepo{}
+			serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{}
 
-	Context("when user is not logged in", func() {
-
-		BeforeEach(func() {
-			config = testconfig.NewRepository()
-		})
-
-		It("fails gracefully when user is not logged in", func() {
-			serviceOfferings := []models.ServiceOffering{}
-			serviceRepo := &testapi.FakeServiceRepo{ServiceOfferings: serviceOfferings}
-
-			ui := callMarketplaceServices(config, serviceRepo)
+			cmd := NewMarketplaceServices(ui, config, serviceRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Getting services from marketplace..."},
-				{"OK"},
 				{"No service offerings found"},
 			})
 			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 				{"service", "plans", "description"},
 			})
 		})
-
 	})
 })

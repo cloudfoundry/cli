@@ -46,7 +46,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	offerings, apiResponse := cmd.serviceRepo.GetServiceOfferings()
+	offerings, apiResponse := cmd.serviceRepo.GetAllServiceOfferings()
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
