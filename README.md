@@ -3,24 +3,36 @@ Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?br
 
 This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release.
 
-Latest Installers (v6.0.0)
-==========================
-- [Mac OS X 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-osx-amd64.pkg)
-- [Windows 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-386.zip)
-- [Windows 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-amd64.zip)
+Stable Release (v6.0.0)
+=======================
+
+Installers
+----------
 - [Debian 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_i386.deb)
 - [Debian 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_amd64.deb)
 - [Redhat 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_i386.rpm)
 - [Redhat 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_amd64.rpm)
+- [Mac OS X 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-osx-amd64.pkg)
+- [Windows 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-386.zip)
+- [Windows 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-amd64.zip)
 
-Downloading edge
-================
+Binaries
+--------
+- [Linux 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-linux-386.tgz)
+- [Linux 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-linux-amd64.tgz)
+- [Mac OS X 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-darwin-amd64.tgz)
+- [Windows 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-windows-386.zip)
+- [Windows 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-windows-amd64.zip)
+
+Edge Releases (master)
+=============
+
 Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI. These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
-- [Mac OS X 64 bit binary](http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz)
 - [Linux 64 bit binary](http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz)
 - [Linux 32 bit binary](http://go-cli.s3.amazonaws.com/cf-linux-386.tgz)
-- [Windows 64 bit executable](http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip)
-- [Windows 32 bit executable](http://go-cli.s3.amazonaws.com/cf-windows-386.zip)
+- [Mac OS X 64 bit binary](http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz)
+- [Windows 64 bit binary](http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip)
+- [Windows 32 bit binary](http://go-cli.s3.amazonaws.com/cf-windows-386.zip)
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
