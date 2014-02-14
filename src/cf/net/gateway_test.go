@@ -94,11 +94,16 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 }
 
 var _ = Describe("Testing with ginkgo", func() {
+	var ccGateway Gateway
+	var uaaGateway Gateway
+
+	BeforeEach(func() {
+		ccGateway = NewCloudControllerGateway()
+		uaaGateway = NewUAAGateway()
+	})
 
 	It("TestNewRequest", func() {
-		gateway := NewCloudControllerGateway()
-
-		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
+		request, apiResponse := ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
@@ -106,29 +111,66 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
 	})
 
-	It("TestNewRequestWithAFileBody", func() {
-		gateway := NewCloudControllerGateway()
+	Describe("when uploading a file", func() {
+		var err error
+		var request *Request
+		var apiResponse ApiResponse
+		var apiServer *httptest.Server
+		var authServer *httptest.Server
+		var fileToUpload *os.File
 
-		body, err := os.Open("../../fixtures/hello_world.txt")
-		Expect(err).NotTo(HaveOccurred())
-		request, apiResponse := gateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", body)
+		BeforeEach(func() {
+			apiServer = httptest.NewTLSServer(refreshTokenApiEndPoint(
+				`{ "code": 1000, "description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusOK},
+			))
 
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(request.HttpReq.ContentLength).To(Equal(int64(12)))
+			authServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				fmt.Fprintln(
+					writer,
+					`{ "access_token": "new-access-token", "token_type": "bearer", "refresh_token": "new-refresh-token"}`)
+			}))
+
+
+			fileToUpload, err = ioutil.TempFile("", "test-gateway")
+			strings.NewReader("expected body").WriteTo(fileToUpload)
+
+			config, auth := createAuthenticationRepository(apiServer, authServer)
+			ccGateway.SetTokenRefresher(auth)
+			request, apiResponse = ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
+		})
+
+		AfterEach(func() {
+			apiServer.Close()
+			authServer.Close()
+			fileToUpload.Close()
+			os.Remove(fileToUpload.Name())
+		})
+
+		It("sets the content length to the size of the file", func() {
+			Expect(err).NotTo(HaveOccurred())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(request.HttpReq.ContentLength).To(Equal(int64(13)))
+		})
+
+		Describe("when the access token expires during the upload", func() {
+			It("successfully re-sends the file on the second request", func() {
+				apiResponse = ccGateway.PerformRequest(request)
+				Expect(apiResponse.Message).To(BeEmpty())
+			})
+		})
 	})
 
 	It("TestRefreshingTheTokenWithUAARequest", func() {
-		gateway := NewUAAGateway()
 		endpoint := refreshTokenApiEndPoint(
 			`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
 			testnet.TestResponse{Status: http.StatusOK},
 		)
 
-		testRefreshTokenWithSuccess(gateway, endpoint)
+		testRefreshTokenWithSuccess(uaaGateway, endpoint)
 	})
 
 	It("TestRefreshingTheTokenWithUAARequestAndReturningError", func() {
-		gateway := NewUAAGateway()
 		endpoint := refreshTokenApiEndPoint(
 			`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
 			testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
@@ -136,21 +178,19 @@ var _ = Describe("Testing with ginkgo", func() {
 		}`},
 		)
 
-		testRefreshTokenWithError(gateway, endpoint)
+		testRefreshTokenWithError(uaaGateway, endpoint)
 	})
 
 	It("TestRefreshingTheTokenWithCloudControllerRequest", func() {
-		gateway := NewCloudControllerGateway()
 		endpoint := refreshTokenApiEndPoint(
 			`{ "code": 1000, "description": "Auth token is invalid" }`,
 			testnet.TestResponse{Status: http.StatusOK},
 		)
 
-		testRefreshTokenWithSuccess(gateway, endpoint)
+		testRefreshTokenWithSuccess(ccGateway, endpoint)
 	})
-	It("TestRefreshingTheTokenWithCloudControllerRequestAndReturningError", func() {
 
-		gateway := NewCloudControllerGateway()
+	It("TestRefreshingTheTokenWithCloudControllerRequestAndReturningError", func() {
 		endpoint := refreshTokenApiEndPoint(
 			`{ "code": 1000, "description": "Auth token is invalid" }`,
 			testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
@@ -158,6 +198,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		}`},
 		)
 
-		testRefreshTokenWithError(gateway, endpoint)
+		testRefreshTokenWithError(ccGateway, endpoint)
 	})
 })
