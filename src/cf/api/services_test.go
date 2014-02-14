@@ -161,7 +161,6 @@ var _ = Describe("Services Repo", func() {
 			Path:     "/v2/service_instances/my-service-instance-guid",
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
-
 		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 		serviceInstance := models.ServiceInstance{}
@@ -293,6 +292,294 @@ var _ = Describe("Services Repo", func() {
 		apiResponse := repo.PurgeServiceOffering(offering)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(handler.AllRequestsCalled()).To(BeTrue())
+	})
+
+	Describe("getting the count of service instances for a service plan", func() {
+		var planGuid = "abc123"
+
+		It("returns the number of service instances", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+                    {
+                      "total_results": 9,
+                      "total_pages": 9,
+                      "prev_url": null,
+                      "next_url": "/v2/service_plans/abc123/service_instances?page=2&results-per-page=1",
+                      "resources": [
+                        {
+                          "metadata": {
+                            "guid": "def456",
+                            "url": "/v2/service_instances/def456",
+                            "created_at": "2013-06-06T02:42:55+00:00",
+                            "updated_at": null
+                          },
+                          "entity": {
+                            "name": "pet-db",
+                            "credentials": { "name": "the_name" },
+                            "service_plan_guid": "abc123",
+                            "space_guid": "ghi789",
+                            "dashboard_url": "https://example.com/dashboard",
+                            "type": "managed_service_instance",
+                            "space_url": "/v2/spaces/ghi789",
+                            "service_plan_url": "/v2/service_plans/abc123",
+                            "service_bindings_url": "/v2/service_instances/def456/service_bindings"
+                          }
+                        }
+                      ]
+                    }
+                `},
+			})
+			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			count, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			Expect(count).To(Equal(9))
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		})
+
+		It("returns the API error when one occurs", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
+				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
+			})
+			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			_, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
+
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+		})
+	})
+
+	Describe("finding a service plan", func() {
+
+		Context("when we find a matching plan", func() {
+			It("returns the plan guid for a v1 plan", func() {
+				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/services?inline-relations-depth=1&q=label:v1-elephantsql;provider:v1-elephantsql",
+					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+                        {
+                          "resources": [
+                            {
+                              "metadata": {
+                                "guid": "offering-1-guid"
+                              },
+                              "entity": {
+                                "label": "v1-elephantsql",
+                                "provider": "v1-elephantsql",
+                                "description": "Offering 1 description",
+                                "version" : "1.0",
+                                "service_plans": [
+                                    {
+                                        "metadata": {"guid": "offering-1-plan-1-guid"},
+                                        "entity": {"name": "not-the-plan-youre-looking-for"}
+                                    },
+                                    {
+                                        "metadata": {"guid": "offering-1-plan-2-guid"},
+                                        "entity": {"name": "v1-panda"}
+                                    }
+                                ]
+                              }
+                            }
+                          ]
+                        }`}})
+
+				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer ts.Close()
+
+				v1 := ServicePlanDescription{
+					ServiceName:     "v1-elephantsql",
+					ServicePlanName: "v1-panda",
+					ServiceProvider: "v1-elephantsql",
+				}
+
+				v1Guid, apiResponse := repo.FindServicePlanByDescription(v1)
+
+				Expect(v1Guid).To(Equal("offering-1-plan-2-guid"))
+				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+
+			It("returns the plan guid for a v2 plan", func() {
+				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/services?inline-relations-depth=1&q=label:v2-elephantsql;provider:",
+					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+                        {
+                          "resources": [
+                            {
+                              "metadata": {
+                                "guid": "offering-1-guid"
+                              },
+                              "entity": {
+                                "label": "v2-elephantsql",
+                                "provider": null,
+                                "description": "Offering 1 description",
+                                "version" : "1.0",
+                                "service_plans": [
+                                    {
+                                        "metadata": {"guid": "offering-1-plan-1-guid"},
+                                        "entity": {"name": "not-the-plan-youre-looking-for"}
+                                    },
+                                    {
+                                        "metadata": {"guid": "offering-1-plan-2-guid"},
+                                        "entity": {"name": "v2-panda"}
+                                    }
+                                ]
+                              }
+                            }
+                          ]
+                        }`}})
+
+				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer ts.Close()
+
+				v2 := ServicePlanDescription{
+					ServiceName:     "v2-elephantsql",
+					ServicePlanName: "v2-panda",
+				}
+
+				v2Guid, apiResponse := repo.FindServicePlanByDescription(v2)
+
+				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(v2Guid).To(Equal("offering-1-plan-2-guid"))
+			})
+		})
+
+		Context("when no service matches the description", func() {
+			It("returns an apiResponse error", func() {
+				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/services?inline-relations-depth=1&q=label:v2-service-label;provider:",
+					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+				})
+
+				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer ts.Close()
+
+				v2 := ServicePlanDescription{
+					ServiceName:     "v2-service-label",
+					ServicePlanName: "v2-plan-name",
+				}
+
+				_, apiResponse := repo.FindServicePlanByDescription(v2)
+
+				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+				Expect(apiResponse.IsNotFound()).To(BeTrue())
+				Expect(apiResponse.Message).To(ContainSubstring("Plan"))
+				Expect(apiResponse.Message).To(ContainSubstring("v2-service-label v2-plan-name"))
+				Expect(apiResponse.Message).To(ContainSubstring("cannot be found"))
+			})
+		})
+
+		Context("when the described service has no matching plan", func() {
+			It("returns apiResponse error", func() {
+				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   "/v2/services?inline-relations-depth=1&q=label:v2-service-label;provider:",
+					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+                        {
+                          "resources": [
+                            {
+                              "metadata": {
+                                "guid": "offering-1-guid"
+                              },
+                              "entity": {
+                                "label": "v2-elephantsql",
+                                "provider": null,
+                                "description": "Offering 1 description",
+                                "version" : "1.0",
+                                "service_plans": [
+                                  {
+                                    "metadata": {"guid": "offering-1-plan-1-guid"},
+                                    "entity": {"name": "not-the-plan-youre-looking-for"}
+                                  },
+                                  {
+                                    "metadata": {"guid": "offering-1-plan-2-guid"},
+                                    "entity": {"name": "also-not-the-plan-youre-looking-for"}
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }`}})
+
+				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer ts.Close()
+
+				v2 := ServicePlanDescription{
+					ServiceName:     "v2-service-label",
+					ServicePlanName: "v2-plan-name",
+				}
+
+				_, apiResponse := repo.FindServicePlanByDescription(v2)
+
+				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+				Expect(apiResponse.IsNotFound()).To(BeTrue())
+				Expect(apiResponse.Message).To(ContainSubstring("Plan"))
+				Expect(apiResponse.Message).To(ContainSubstring("v2-service-label v2-plan-name"))
+				Expect(apiResponse.Message).To(ContainSubstring("cannot be found"))
+			})
+		})
+
+		Context("when we get an HTTP error", func() {
+			It("returns that apiResponse error", func() {
+				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/services?inline-relations-depth=1&q=label:v2-service-label;provider:",
+					Response: testnet.TestResponse{Status: http.StatusInternalServerError}})
+
+				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer ts.Close()
+
+				v2 := ServicePlanDescription{
+					ServiceName:     "v2-service-label",
+					ServicePlanName: "v2-plan-name",
+				}
+
+				_, apiResponse := repo.FindServicePlanByDescription(v2)
+
+				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+				Expect(apiResponse.IsHttpError()).To(BeTrue())
+			})
+		})
+	})
+
+	Describe("migrating service plans", func() {
+
+		It("makes a request to CC to migrate the instances from v1 to v2", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/service_plans/v1-guid/service_instances",
+				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"v2-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"changed_count":3}`},
+			})
+
+			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			changedCount, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(changedCount).To(Equal(3))
+		})
+
+		It("returns an error when migrating fails", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/service_plans/v1-guid/service_instances",
+				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"v2-guid"}`),
+				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
+			})
+
+			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			_, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+		})
 	})
 })
 
