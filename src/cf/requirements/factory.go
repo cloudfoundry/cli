@@ -22,6 +22,7 @@ type Factory interface {
 	NewDomainRequirement(name string) DomainRequirement
 	NewUserRequirement(username string) UserRequirement
 	NewBuildpackRequirement(buildpack string) BuildpackRequirement
+	NewApiEndpointRequirement() Requirement
 }
 
 type apiRequirementFactory struct {
@@ -116,5 +117,12 @@ func (f apiRequirementFactory) NewBuildpackRequirement(buildpack string) Buildpa
 		buildpack,
 		f.ui,
 		f.repoLocator.GetBuildpackRepository(),
+	)
+}
+
+func (f apiRequirementFactory) NewApiEndpointRequirement() Requirement {
+	return NewApiEndpointRequirement(
+		f.ui,
+		f.config,
 	)
 }

@@ -89,6 +89,10 @@ func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.
 	return FakeRequirement{f, f.BuildpackSuccess}
 }
 
+func (f *FakeReqFactory) NewApiEndpointRequirement() requirements.Requirement {
+	return FakeRequirement{f, true}
+}
+
 type FakeRequirement struct {
 	factory *FakeReqFactory
 	success bool
