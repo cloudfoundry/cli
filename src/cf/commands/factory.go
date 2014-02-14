@@ -85,7 +85,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["space"] = space.NewShowSpace(ui, config)
 	factory.cmdsByName["space-users"] = user.NewSpaceUsers(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
 	factory.cmdsByName["spaces"] = space.NewListSpaces(ui, config, repoLocator.GetSpaceRepository())
-	factory.cmdsByName["stacks"] = NewStacks(ui, config, repoLocator.GetStackRepository())
+	factory.cmdsByName["stacks"] = NewListStacks(ui, config, repoLocator.GetStackRepository())
 	factory.cmdsByName["target"] = NewTarget(ui, config, repoLocator.GetOrganizationRepository(), repoLocator.GetSpaceRepository())
 	factory.cmdsByName["unbind-service"] = service.NewUnbindService(ui, config, repoLocator.GetServiceBindingRepository())
 	factory.cmdsByName["unset-env"] = application.NewUnsetEnv(ui, config, repoLocator.GetApplicationRepository())
