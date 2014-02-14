@@ -305,6 +305,10 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string) (apiResponse ApiRe
 func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
 	httpReq := request.HttpReq
 
+	if request.SeekableBody != nil {
+		httpReq.Body = ioutil.NopCloser(request.SeekableBody)
+	}
+
 	// perform request
 	rawResponse, apiResponse = gateway.doRequestAndHandlerError(request)
 	if apiResponse.IsSuccessful() || gateway.authenticator == nil {
