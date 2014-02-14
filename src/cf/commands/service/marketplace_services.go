@@ -26,6 +26,7 @@ func NewMarketplaceServices(ui terminal.UI, config configuration.Reader, service
 }
 
 func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs, reqFactory.NewApiEndpointRequirement())
 	return
 }
 

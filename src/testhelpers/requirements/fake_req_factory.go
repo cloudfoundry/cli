@@ -13,6 +13,7 @@ type FakeReqFactory struct {
 	ServiceInstance     models.ServiceInstance
 
 	LoginSuccess            bool
+	ApiEndpointSuccess      bool
 	ValidAccessTokenSuccess bool
 	TargetedSpaceSuccess    bool
 	TargetedOrgSuccess      bool
@@ -90,7 +91,7 @@ func (f *FakeReqFactory) NewBuildpackRequirement(buildpack string) requirements.
 }
 
 func (f *FakeReqFactory) NewApiEndpointRequirement() requirements.Requirement {
-	return FakeRequirement{f, true}
+	return FakeRequirement{f, f.ApiEndpointSuccess}
 }
 
 type FakeRequirement struct {
