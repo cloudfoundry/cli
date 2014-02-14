@@ -23,6 +23,7 @@ func NewListServiceBrokers(ui terminal.UI, config configuration.Reader, repo api
 }
 
 func (cmd ListServiceBrokers) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs, reqFactory.NewLoginRequirement())
 	return
 }
 
