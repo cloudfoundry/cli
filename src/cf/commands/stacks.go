@@ -14,19 +14,19 @@ type Stacks struct {
 	stacksRepo api.StackRepository
 }
 
-func NewStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.StackRepository) (cmd *Stacks) {
-	cmd = new(Stacks)
+func NewStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.StackRepository) (cmd Stacks) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.stacksRepo = stacksRepo
 	return
 }
 
-func (cmd *Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs, reqFactory.NewLoginRequirement())
 	return
 }
 
-func (cmd *Stacks) Run(c *cli.Context) {
+func (cmd Stacks) Run(c *cli.Context) {
 	cmd.ui.Say("Getting stacks in org %s / space %s as %s...",
 		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
