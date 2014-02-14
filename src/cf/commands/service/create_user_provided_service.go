@@ -31,6 +31,7 @@ func (cmd CreateUserProvidedService) GetRequirements(reqFactory requirements.Fac
 		return
 	}
 
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
 	return
 }
 
