@@ -16,8 +16,7 @@ type ListRoutes struct {
 	config    configuration.Reader
 }
 
-func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd *ListRoutes) {
-	cmd = new(ListRoutes)
+func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.RouteRepository) (cmd ListRoutes) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.routeRepo = routeRepo
@@ -25,6 +24,7 @@ func NewListRoutes(ui terminal.UI, config configuration.Reader, routeRepo api.Ro
 }
 
 func (cmd ListRoutes) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs, reqFactory.NewLoginRequirement())
 	return
 }
 
