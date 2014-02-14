@@ -50,13 +50,21 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 
 	v1Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v1)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+		if apiResponse.IsNotFound() {
+			cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v1.String()))
+		} else {
+			cmd.ui.Failed(apiResponse.Message)
+		}
 		return
 	}
 
 	v2Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v2)
 	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+		if apiResponse.IsNotFound() {
+			cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v2.String()))
+		} else {
+			cmd.ui.Failed(apiResponse.Message)
+		}
 		return
 	}
 
@@ -65,7 +73,7 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	} else if count == 0 {
-		cmd.ui.Failed("Plan %s has no service instances to migrate", v1)
+		cmd.ui.Failed("Plan %s has no service instances to migrate", terminal.EntityNameColor(v1.String()))
 		return
 	}
 
@@ -75,11 +83,15 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 		" implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend" +
 		" making the v1 plan private or shutting down the v1 broker to prevent additional instances from" +
 		" being created. Once service instances have been migrated, the v1 services and plans can be" +
-		" removed from Cloud Foundry.\n\n")
+		" removed from Cloud Foundry.")
 
 	serviceInstancesPhrase := pluralizeServiceInstances(count)
 
-	response := cmd.ui.Confirm("Really migrate %s from plan %s to %s?", serviceInstancesPhrase, v1, v2)
+	response := cmd.ui.Confirm("Really migrate %s from plan %s to %s?>",
+		serviceInstancesPhrase,
+		terminal.EntityNameColor(v1.String()),
+		terminal.EntityNameColor(v2.String()),
+	)
 	if !response {
 		return
 	}
