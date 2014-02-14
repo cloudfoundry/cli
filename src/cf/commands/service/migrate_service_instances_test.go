@@ -138,47 +138,97 @@ func init() {
 				})
 
 				Context("when finding the v1 plan fails", func() {
-					BeforeEach(func() {
-						serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewApiResponseWithMessage("uh oh")}
-					})
+					Context("because the plan does not exist", func() {
+						BeforeEach(func() {
+							serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewNotFoundApiResponse("not used")}
+						})
 
-					It("notifies the user of the failure", func() {
-						testcmd.RunCommand(cmd, context, requirementsFactory)
+						It("notifies the user of the failure", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
 
-						testassert.SliceContains(ui.Outputs, testassert.Lines{
-							{"FAILED"},
-							{"uh oh"},
+							testassert.SliceContains(ui.Outputs, testassert.Lines{
+								{"FAILED"},
+								{"Plan", "v1-service-name", "v1-provider-name", "v1-plan-name", "cannot be found"},
+							})
+						})
+
+						It("does not display the warning", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
+
+							testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+								{"WARNING:", "this operation is to replace a service broker"},
+							})
 						})
 					})
 
-					It("does not display the warning", func() {
-						testcmd.RunCommand(cmd, context, requirementsFactory)
+					Context("because there was an http error", func() {
+						BeforeEach(func() {
+							serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewApiResponseWithMessage("uh oh")}
+						})
 
-						testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-							{"WARNING:", "this operation is to replace a service broker"},
+						It("notifies the user of the failure", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
+
+							testassert.SliceContains(ui.Outputs, testassert.Lines{
+								{"FAILED"},
+								{"uh oh"},
+							})
+						})
+
+						It("does not display the warning", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
+
+							testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+								{"WARNING:", "this operation is to replace a service broker"},
+							})
 						})
 					})
 				})
 
 				Context("when finding the v2 plan fails", func() {
-					BeforeEach(func() {
-						serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewSuccessfulApiResponse(), net.NewApiResponseWithMessage("uh oh")}
-					})
+					Context("because the plan does not exist", func() {
+						BeforeEach(func() {
+							serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewSuccessfulApiResponse(), net.NewNotFoundApiResponse("not used")}
+						})
 
-					It("notifies the user of the failure", func() {
-						testcmd.RunCommand(cmd, context, requirementsFactory)
+						It("notifies the user of the failure", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
 
-						testassert.SliceContains(ui.Outputs, testassert.Lines{
-							{"FAILED"},
-							{"uh oh"},
+							testassert.SliceContains(ui.Outputs, testassert.Lines{
+								{"FAILED"},
+								{"Plan", "v2-service-name", "v2-plan-name", "cannot be found"},
+							})
+						})
+
+						It("does not display the warning", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
+
+							testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+								{"WARNING:", "this operation is to replace a service broker"},
+							})
 						})
 					})
 
-					It("does not display the warning", func() {
-						testcmd.RunCommand(cmd, context, requirementsFactory)
+					Context("because there was an http error", func() {
+						BeforeEach(func() {
+							serviceRepo.FindServicePlanByDescriptionResponses = []net.ApiResponse{net.NewSuccessfulApiResponse(), net.NewApiResponseWithMessage("uh oh")}
+						})
 
-						testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-							{"WARNING:", "this operation is to replace a service broker"},
+						It("notifies the user of the failure", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
+
+							testassert.SliceContains(ui.Outputs, testassert.Lines{
+								{"FAILED"},
+								{"uh oh"},
+							})
+						})
+
+						It("does not display the warning", func() {
+							testcmd.RunCommand(cmd, context, requirementsFactory)
+
+							testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+								{"WARNING:", "this operation is to replace a service broker"},
+							})
 						})
 					})
 				})
