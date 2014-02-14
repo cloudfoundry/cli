@@ -24,7 +24,7 @@ var _ = Describe("Testing Marketplace Services", func() {
 	BeforeEach(func() {
 		serviceRepo = &testapi.FakeServiceRepo{}
 		ui = &testterm.FakeUI{}
-		reqFactory = &testreq.FakeReqFactory{}
+		reqFactory = &testreq.FakeReqFactory{ApiEndpointSuccess: true}
 
 		fakeServiceOfferings = []models.ServiceOffering{
 			models.ServiceOffering{
@@ -45,6 +45,17 @@ var _ = Describe("Testing Marketplace Services", func() {
 					Description: "service offering 2 description",
 				},
 			}}
+	})
+
+	Context("when the an API endpoint is not targeted", func() {
+		It("does not meet its requirements", func() {
+			config := testconfig.NewRepository()
+			cmd := NewMarketplaceServices(ui, config, serviceRepo)
+			reqFactory.ApiEndpointSuccess = false
+
+			testcmd.RunCommand(cmd, testcmd.NewContext("marketplace", []string{}), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
 	Context("when the user is logged in", func() {
