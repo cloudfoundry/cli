@@ -62,7 +62,7 @@ func (repo CloudControllerDomainRepository) ListDomains(cb func(models.DomainFie
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) net.ApiResponse {
 	apiResponse := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
-	if apiResponse.IsNotFound() {
+	if apiResponse.IsNotFound() { // FIXME: needs semantic versioning
 		apiResponse = repo.listDomains("/v2/domains", cb)
 	}
 

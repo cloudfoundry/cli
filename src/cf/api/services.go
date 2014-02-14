@@ -10,110 +10,6 @@ import (
 	"strings"
 )
 
-type PaginatedServiceOfferingResources struct {
-	Resources []ServiceOfferingResource
-}
-
-type ServiceOfferingResource struct {
-	Metadata Metadata
-	Entity   ServiceOfferingEntity
-}
-
-func (resource ServiceOfferingResource) ToFields() (fields models.ServiceOfferingFields) {
-	fields.Label = resource.Entity.Label
-	fields.Version = resource.Entity.Version
-	fields.Provider = resource.Entity.Provider
-	fields.Description = resource.Entity.Description
-	fields.Guid = resource.Metadata.Guid
-	fields.DocumentationUrl = resource.Entity.DocumentationUrl
-	return
-}
-
-func (resource ServiceOfferingResource) ToModel() (offering models.ServiceOffering) {
-	offering.ServiceOfferingFields = resource.ToFields()
-	for _, p := range resource.Entity.ServicePlans {
-		servicePlan := models.ServicePlanFields{}
-		servicePlan.Name = p.Entity.Name
-		servicePlan.Guid = p.Metadata.Guid
-		offering.Plans = append(offering.Plans, servicePlan)
-	}
-	return offering
-}
-
-type ServiceOfferingEntity struct {
-	Label            string
-	Version          string
-	Description      string
-	DocumentationUrl string `json:"documentation_url"`
-	Provider         string
-	ServicePlans     []ServicePlanResource `json:"service_plans"`
-}
-
-type ServicePlanResource struct {
-	Metadata Metadata
-	Entity   ServicePlanEntity
-}
-
-func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.Name = resource.Entity.Name
-	return
-}
-
-type ServicePlanEntity struct {
-	Name            string
-	ServiceOffering ServiceOfferingResource `json:"service"`
-}
-
-type PaginatedServiceInstanceResources struct {
-	Resources []ServiceInstanceResource
-}
-
-type ServiceInstanceResource struct {
-	Metadata Metadata
-	Entity   ServiceInstanceEntity
-}
-
-func (resource ServiceInstanceResource) ToFields() (fields models.ServiceInstanceFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.Name = resource.Entity.Name
-	return
-}
-
-func (resource ServiceInstanceResource) ToModel() (instance models.ServiceInstance) {
-	instance.ServiceInstanceFields = resource.ToFields()
-	instance.ServicePlan = resource.Entity.ServicePlan.ToFields()
-	instance.ServiceOffering = resource.Entity.ServicePlan.Entity.ServiceOffering.ToFields()
-
-	instance.ServiceBindings = []models.ServiceBindingFields{}
-	for _, bindingResource := range resource.Entity.ServiceBindings {
-		instance.ServiceBindings = append(instance.ServiceBindings, bindingResource.ToFields())
-	}
-	return
-}
-
-type ServiceInstanceEntity struct {
-	Name            string
-	ServiceBindings []ServiceBindingResource `json:"service_bindings"`
-	ServicePlan     ServicePlanResource      `json:"service_plan"`
-}
-
-type ServiceBindingResource struct {
-	Metadata Metadata
-	Entity   ServiceBindingEntity
-}
-
-func (resource ServiceBindingResource) ToFields() (fields models.ServiceBindingFields) {
-	fields.Url = resource.Metadata.Url
-	fields.Guid = resource.Metadata.Guid
-	fields.AppGuid = resource.Entity.AppGuid
-	return
-}
-
-type ServiceBindingEntity struct {
-	AppGuid string `json:"app_guid"`
-}
-
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) net.ApiResponse
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse)
@@ -123,6 +19,9 @@ type ServiceRepository interface {
 	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse)
 	RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse)
 	DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse)
+	FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse)
+	GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse)
+	MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse)
 }
 
 type CloudControllerServiceRepository struct {
@@ -241,5 +140,53 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 		offering = resources.Resources[0].ToModel()
 	}
 
+	return
+}
+
+func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1&q=label:%s;provider:%s",
+		repo.config.ApiEndpoint(),
+		planDescription.ServiceName,
+		planDescription.ServiceProvider)
+
+	response := new(PaginatedServiceOfferingResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	for _, serviceOfferingResource := range response.Resources {
+		for _, servicePlanResource := range serviceOfferingResource.Entity.ServicePlans {
+			if servicePlanResource.Entity.Name == planDescription.ServicePlanName {
+				planGuid = servicePlanResource.Metadata.Guid
+				return
+			}
+		}
+	}
+
+	apiResponse = net.NewNotFoundApiResponse("Plan %s cannot be found", planDescription)
+
+	return
+}
+
+func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_plans/%s/service_instances", repo.config.ApiEndpoint(), v1PlanGuid)
+	body := strings.NewReader(fmt.Sprintf(`{"service_plan_guid":"%s"}`, v2PlanGuid))
+	response := new(ServiceMigrateV1ToV2Response)
+
+	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), body, response)
+	if apiResponse.IsNotSuccessful() {
+		return
+	}
+
+	changedCount = response.ChangedCount
+	return
+}
+
+func (repo CloudControllerServiceRepository) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse) {
+	path := fmt.Sprintf("%s/v2/service_plans/%s/service_instances?results-per-page=1", repo.config.ApiEndpoint(), v1PlanGuid)
+	response := new(PaginatedServiceInstanceResources)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
+	count = response.TotalResults
 	return
 }

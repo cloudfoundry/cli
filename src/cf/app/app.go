@@ -627,6 +627,25 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "migrate-service-instances",
+			Description: "Migrate service instances from one service plan to another",
+			Usage: fmt.Sprintf(
+				"%s migrate-service-instances v1_SERVICE v1_PROVIDER v1_PLAN v2_SERVICE v2_PLAN\n\n"+
+					"WARNING: This operation is internal to Cloud Foundry; service brokers will not be contacted and"+
+					" resources for service instances will not be altered. The primary use case for this operation is"+
+					" to replace a service broker which implements the v1 Service Broker API with a broker which"+
+					" implements the v2 API by remapping service instances from v1 plans to v2 plans.  We recommend"+
+					" making the v1 plan private or shutting down the v1 broker to prevent additional instances from"+
+					" being created. Once service instances have been migrated, the v1 services and plans can be"+
+					" removed from Cloud Foundry.",
+				cf.Name(),
+			),
+
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("migrate-service-instances", c)
+			},
+		},
+		{
 			Name:        "set-env",
 			ShortName:   "se",
 			Description: "Set an env variable for an app",

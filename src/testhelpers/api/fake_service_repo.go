@@ -1,6 +1,7 @@
 package api
 
 import (
+	realApi "cf/api"
 	"cf/models"
 	"cf/net"
 	"generic"
@@ -45,6 +46,22 @@ type FakeServiceRepo struct {
 	FindServiceOfferingByLabelAndProviderServiceOffering models.ServiceOffering
 	FindServiceOfferingByLabelAndProviderApiResponse     net.ApiResponse
 	FindServiceOfferingByLabelAndProviderCalled          bool
+
+	V1ServicePlanDescription realApi.ServicePlanDescription
+	V2ServicePlanDescription realApi.ServicePlanDescription
+	FindServicePlanByDescriptionArguments   []realApi.ServicePlanDescription
+	FindServicePlanByDescriptionResultGuids []string
+	FindServicePlanByDescriptionResponses   []net.ApiResponse
+	findServicePlanByDescriptionCallCount   int
+
+	ServiceInstanceCountForServicePlan int
+	ServiceInstanceCountApiResponse    net.ApiResponse
+
+	V1GuidToMigrate                           string
+	V2GuidToMigrate                           string
+	MigrateServicePlanFromV1ToV2Called        bool
+	MigrateServicePlanFromV1ToV2ReturnedCount int
+	MigrateServicePlanFromV1ToV2Response      net.ApiResponse
 }
 
 func (repo *FakeServiceRepo) GetAllServiceOfferings() (models.ServiceOfferings, net.ApiResponse) {
@@ -107,5 +124,35 @@ func (repo *FakeServiceRepo) DeleteService(instance models.ServiceInstance) (api
 func (repo *FakeServiceRepo) RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
 	repo.RenameServiceServiceInstance = instance
 	repo.RenameServiceNewName = newName
+	return
+}
+
+func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription realApi.ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse) {
+
+	repo.FindServicePlanByDescriptionArguments =
+		append(repo.FindServicePlanByDescriptionArguments, planDescription)
+
+	if len(repo.FindServicePlanByDescriptionResultGuids) > repo.findServicePlanByDescriptionCallCount {
+		planGuid = repo.FindServicePlanByDescriptionResultGuids[repo.findServicePlanByDescriptionCallCount]
+	}
+	if len(repo.FindServicePlanByDescriptionResponses) > repo.findServicePlanByDescriptionCallCount {
+		apiResponse = repo.FindServicePlanByDescriptionResponses[repo.findServicePlanByDescriptionCallCount]
+	}
+	repo.findServicePlanByDescriptionCallCount += 1
+	return
+}
+
+func (repo *FakeServiceRepo) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse) {
+	count = repo.ServiceInstanceCountForServicePlan
+	apiResponse = repo.ServiceInstanceCountApiResponse
+	return
+}
+
+func (repo *FakeServiceRepo) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse) {
+	repo.MigrateServicePlanFromV1ToV2Called = true
+	repo.V1GuidToMigrate = v1PlanGuid
+	repo.V2GuidToMigrate = v2PlanGuid
+	changedCount = repo.MigrateServicePlanFromV1ToV2ReturnedCount
+	apiResponse = repo.MigrateServicePlanFromV1ToV2Response
 	return
 }
