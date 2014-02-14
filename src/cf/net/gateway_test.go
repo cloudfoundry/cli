@@ -131,7 +131,6 @@ var _ = Describe("Testing with ginkgo", func() {
 					`{ "access_token": "new-access-token", "token_type": "bearer", "refresh_token": "new-refresh-token"}`)
 			}))
 
-
 			fileToUpload, err = ioutil.TempFile("", "test-gateway")
 			strings.NewReader("expected body").WriteTo(fileToUpload)
 
