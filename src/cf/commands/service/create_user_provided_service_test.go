@@ -1,8 +1,8 @@
 package service_test
 
 import (
-	"cf/api"
 	. "cf/commands/service"
+	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -13,25 +13,46 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callCreateUserProvidedService(args []string, inputs []string, userProvidedServiceInstanceRepo api.UserProvidedServiceInstanceRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{Inputs: inputs}
-	ctxt := testcmd.NewContext("create-user-provided-service", args)
-	reqFactory := &testreq.FakeReqFactory{}
+var _ = Describe("create-user-provided-service command", func() {
+	var (
+		ui         *testterm.FakeUI
+		config     configuration.ReadWriter
+		repo       *testapi.FakeUserProvidedServiceInstanceRepo
+		reqFactory *testreq.FakeReqFactory
+		cmd        CreateUserProvidedService
+	)
 
-	config := testconfig.NewRepositoryWithDefaults()
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		config = testconfig.NewRepositoryWithDefaults()
+		repo = &testapi.FakeUserProvidedServiceInstanceRepo{}
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		cmd = NewCreateUserProvidedService(ui, config, repo)
+	})
 
-	cmd := NewCreateUserProvidedService(fakeUI, config, userProvidedServiceInstanceRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
+	Describe("login requirements", func() {
+		It("fails if the user is not logged in", func() {
+			reqFactory.LoginSuccess = false
+			ctxt := testcmd.NewContext("create-user-provided-service", []string{"my-service"})
+			testcmd.RunCommand(cmd, ctxt, reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+	})
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestCreateUserProvidedServiceWithParameterList", func() {
-		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callCreateUserProvidedService([]string{"-p", `"foo, bar, baz"`, "my-custom-service"},
-			[]string{"foo value", "bar value", "baz value"},
-			repo,
-		)
+	It("creates a new user provided service given just a name", func() {
+		args := []string{"my-custom-service"}
+		ctxt := testcmd.NewContext("create-user-provided-service", args)
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
+			{"Creating user provided service"},
+			{"OK"},
+		})
+	})
+
+	It("accepts service parameters interactively", func() {
+		ui.Inputs = []string{"foo value", "bar value", "baz value"}
+		ctxt := testcmd.NewContext("create-user-provided-service", []string{"-p", `"foo, bar, baz"`, "my-custom-service"})
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 		testassert.SliceContains(ui.Prompts, testassert.Lines{
 			{"foo"},
@@ -52,15 +73,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 	})
 
-	It("TestCreateUserProvidedServiceWithJson", func() {
-		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callCreateUserProvidedService([]string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
-			[]string{},
-			repo,
-		)
+	It("accepts service parameters as JSON without prompting", func() {
+		args := []string{"-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
+		ctxt := testcmd.NewContext("create-user-provided-service", args)
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
 		Expect(ui.Prompts).To(BeEmpty())
-
 		Expect(repo.CreateName).To(Equal("my-custom-service"))
 		Expect(repo.CreateParams).To(Equal(map[string]string{
 			"foo": "foo value",
@@ -73,27 +91,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"OK"},
 		})
 	})
-	It("TestCreateUserProvidedServiceWithNoSecondArgument", func() {
 
-		userProvidedServiceInstanceRepo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-		ui := callCreateUserProvidedService([]string{"my-custom-service"},
-			[]string{},
-			userProvidedServiceInstanceRepo,
-		)
+	It("creates a user provided service with a syslog drain url", func() {
+		args := []string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"}
+		ctxt := testcmd.NewContext("create-user-provided-service", args)
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user provided service"},
-			{"OK"},
-		})
-	})
-	It("TestCreateUserProvidedServiceWithSyslogDrain", func() {
-
-		repo := &testapi.FakeUserProvidedServiceInstanceRepo{}
-
-		ui := callCreateUserProvidedService([]string{"-l", "syslog://example.com", "-p", `{"foo": "foo value", "bar": "bar value", "baz": "baz value"}`, "my-custom-service"},
-			[]string{},
-			repo,
-		)
 		Expect(repo.CreateDrainUrl).To(Equal("syslog://example.com"))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user provided service"},
