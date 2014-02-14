@@ -8,25 +8,25 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type Stacks struct {
+type ListStacks struct {
 	ui         terminal.UI
 	config     configuration.Reader
 	stacksRepo api.StackRepository
 }
 
-func NewStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.StackRepository) (cmd Stacks) {
+func NewListStacks(ui terminal.UI, config configuration.Reader, stacksRepo api.StackRepository) (cmd ListStacks) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.stacksRepo = stacksRepo
 	return
 }
 
-func (cmd Stacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd ListStacks) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	reqs = append(reqs, reqFactory.NewLoginRequirement())
 	return
 }
 
-func (cmd Stacks) Run(c *cli.Context) {
+func (cmd ListStacks) Run(c *cli.Context) {
 	cmd.ui.Say("Getting stacks in org %s / space %s as %s...",
 		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields().Name),

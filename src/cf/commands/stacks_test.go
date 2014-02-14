@@ -6,17 +6,17 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
-	testreq "testhelpers/requirements"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
 
 var _ = Describe("stacks command", func() {
 	var (
 		ui         *testterm.FakeUI
-		cmd        Stacks
+		cmd        ListStacks
 		repo       *testapi.FakeStackRepository
 		reqFactory *testreq.FakeReqFactory
 	)
@@ -26,7 +26,7 @@ var _ = Describe("stacks command", func() {
 		config := testconfig.NewRepositoryWithDefaults()
 		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 		repo = &testapi.FakeStackRepository{}
-		cmd = NewStacks(ui, config, repo)
+		cmd = NewListStacks(ui, config, repo)
 	})
 
 	Describe("login requirements", func() {
@@ -40,11 +40,11 @@ var _ = Describe("stacks command", func() {
 
 	It("lists the stacks", func() {
 		stack1 := models.Stack{
-			Name: "Stack-1",
+			Name:        "Stack-1",
 			Description: "Stack 1 Description",
 		}
 		stack2 := models.Stack{
-			Name: "Stack-2",
+			Name:        "Stack-2",
 			Description: "Stack 2 Description",
 		}
 
