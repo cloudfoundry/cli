@@ -16,6 +16,7 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type AppFileResource struct {
@@ -114,7 +115,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 		request.HttpReq.Header.Set("Content-Type", contentType)
 
 		response := &Resource{}
-		_, apiResponse = repo.gateway.PerformPollingRequestForJSONResponse(request, response)
+		_, apiResponse = repo.gateway.PerformPollingRequestForJSONResponse(request, response, 5*time.Minute)
 		if apiResponse.IsNotSuccessful() {
 			return
 		}

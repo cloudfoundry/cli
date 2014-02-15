@@ -16,6 +16,7 @@ import (
 	"strings"
 	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
+	"time"
 )
 
 func testRefreshTokenWithSuccess(gateway Gateway, endpoint http.HandlerFunc) {
@@ -96,6 +97,8 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 var _ = Describe("Testing with ginkgo", func() {
 	var ccGateway Gateway
 	var uaaGateway Gateway
+	var config configuration.ReadWriter
+	var authRepo api.AuthenticationRepository
 
 	BeforeEach(func() {
 		ccGateway = NewCloudControllerGateway()
@@ -109,6 +112,57 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
 		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
+	})
+
+	Describe("making an async request", func() {
+		var jobStatus string
+		var apiServer *httptest.Server
+		var authServer *httptest.Server
+
+		BeforeEach(func() {
+			jobStatus = "queued"
+
+			apiServer = httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				switch request.URL.Path {
+				case "/v2/foo":
+					fmt.Fprintln(writer, `{ "metadata": { "url": "/v2/jobs/the-job-guid" } }`)
+				case "/v2/jobs/the-job-guid":
+					fmt.Fprintf(writer, `{ "entity": { "status": "%s" } }`, jobStatus)
+				default:
+					writer.WriteHeader(http.StatusInternalServerError)
+					fmt.Fprintf(writer, `"Unexpected request path '%s'"`, request.URL.Path)
+				}
+			}))
+
+			authServer, _ = testnet.NewTLSServer([]testnet.TestRequest{})
+
+			config, authRepo = createAuthenticationRepository(apiServer, authServer)
+			ccGateway.SetTokenRefresher(authRepo)
+			ccGateway.PollingThrottle = 3 * time.Millisecond
+		})
+
+		AfterEach(func() {
+			apiServer.Close()
+			authServer.Close()
+		})
+
+		It("returns the last response if the job completes before the timeout", func() {
+			go func() {
+				time.Sleep(15 * time.Millisecond)
+				jobStatus = "finished"
+			}()
+
+			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
+			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 20*time.Millisecond)
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		})
+
+		It("returns an error if jobs takes longer than the timeout", func() {
+			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
+			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 5*time.Millisecond)
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			Expect(apiResponse.Message).To(ContainSubstring("timed out"))
+		})
 	})
 
 	Describe("when uploading a file", func() {
