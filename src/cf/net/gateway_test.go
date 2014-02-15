@@ -148,18 +148,18 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		It("returns the last response if the job completes before the timeout", func() {
 			go func() {
-				time.Sleep(15 * time.Millisecond)
+				time.Sleep(25 * time.Millisecond)
 				jobStatus = "finished"
 			}()
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 20*time.Millisecond)
+			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 100*time.Millisecond)
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
 
 		It("returns an error if jobs takes longer than the timeout", func() {
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 5*time.Millisecond)
+			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 10*time.Millisecond)
 			Expect(apiResponse.IsSuccessful()).To(BeFalse())
 			Expect(apiResponse.Message).To(ContainSubstring("timed out"))
 		})
