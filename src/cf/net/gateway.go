@@ -18,6 +18,7 @@ const (
 	JOB_FINISHED             = "finished"
 	JOB_FAILED               = "failed"
 	DEFAULT_POLLING_THROTTLE = 5 * time.Second
+	ASYNC_REQUEST_TIMEOUT    = 20 * time.Second
 )
 
 type JobEntity struct {
@@ -143,13 +144,12 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken strin
 	}
 
 	if gateway.PollingEnabled {
-		_, apiResponse = gateway.PerformPollingRequestForJSONResponse(request, resource)
+		_, apiResponse = gateway.PerformPollingRequestForJSONResponse(request, resource, ASYNC_REQUEST_TIMEOUT)
 		return
 	} else {
 		_, apiResponse = gateway.PerformRequestForJSONResponse(request, resource)
 		return
 	}
-
 }
 
 func (gateway Gateway) NewRequest(method, path, accessToken string, body io.ReadSeeker) (req *Request, apiResponse ApiResponse) {
@@ -233,7 +233,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 	return
 }
 
-func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiResponse ApiResponse) {
+func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, response interface{}, timeout time.Duration) (headers http.Header, apiResponse ApiResponse) {
 	query := request.HttpReq.URL.Query()
 	query.Add("async", "true")
 	request.HttpReq.URL.RawQuery = query.Encode()
@@ -271,13 +271,19 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 	}
 
 	jobUrl = fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResponse.Metadata.Url)
-	apiResponse = gateway.waitForJob(jobUrl, request.HttpReq.Header.Get("Authorization"))
+	apiResponse = gateway.waitForJob(jobUrl, request.HttpReq.Header.Get("Authorization"), timeout)
 
 	return
 }
 
-func (gateway Gateway) waitForJob(jobUrl, accessToken string) (apiResponse ApiResponse) {
+func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (apiResponse ApiResponse) {
+	startTime := time.Now()
 	for true {
+		if time.Since(startTime) > timeout {
+			apiResponse = NewApiResponseWithMessage("Error: timed out waiting for async job '%s' to finish", jobUrl)
+			return
+		}
+
 		var request *Request
 		request, apiResponse = gateway.NewRequest("GET", jobUrl, accessToken, nil)
 		response := &JobResponse{}
