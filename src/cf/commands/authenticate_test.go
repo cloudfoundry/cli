@@ -1,7 +1,6 @@
 package commands_test
 
 import (
-	"cf/api"
 	. "cf/commands"
 	"cf/configuration"
 	. "github.com/onsi/ginkgo"
@@ -14,81 +13,76 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestAuthenticateFailsWithUsage", func() {
-		config := testconfig.NewRepository()
+var _ = Describe("auth command", func() {
+	var (
+		ui         *testterm.FakeUI
+		cmd        Authenticate
+		config     configuration.ReadWriter
+		repo       *testapi.FakeAuthenticationRepository
+		reqFactory *testreq.FakeReqFactory
+	)
 
-		auth := &testapi.FakeAuthenticationRepository{
-			AccessToken:  "my_access_token",
-			RefreshToken: "my_refresh_token",
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		config = testconfig.NewRepositoryWithDefaults()
+		reqFactory = &testreq.FakeReqFactory{}
+		repo = &testapi.FakeAuthenticationRepository{
 			Config:       config,
+			AccessToken:  "my-access-token",
+			RefreshToken: "my-refresh-token",
 		}
-
-		ui := callAuthenticate([]string{}, config, auth)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callAuthenticate([]string{"my-username"}, config, auth)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callAuthenticate([]string{"my-username", "my-password"}, config, auth)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+		cmd = NewAuthenticate(ui, config, repo)
 	})
 
-	It("TestSuccessfullyAuthenticatingWithUsernameAndPasswordAsArguments", func() {
-		testSuccessfulAuthenticate([]string{"user@example.com", "password"})
+	Describe("requirements", func() {
+		It("fails with usage when given too few arguments", func() {
+			context := testcmd.NewContext("auth", []string{})
+			testcmd.RunCommand(cmd, context, reqFactory)
+
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
+
+		It("fails if the user has not set an api endpoint", func() {
+			context := testcmd.NewContext("auth", []string{"username", "password"})
+			testcmd.RunCommand(cmd, context, reqFactory)
+
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
-	It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
-		config := testconfig.NewRepository()
+	Context("when an api endpoint is targeted", func() {
+		BeforeEach(func() {
+			reqFactory.ApiEndpointSuccess = true
+			config.SetApiEndpoint("foo.example.org/authenticate")
+		})
 
-		ui := callAuthenticate(
-			[]string{
-				"foo@example.com",
-				"bar",
-			},
-			config,
-			&testapi.FakeAuthenticationRepository{AuthError: true, Config: config},
-		)
+		It("authenticates successfully", func() {
+			reqFactory.ApiEndpointSuccess = true
+			context := testcmd.NewContext("auth", []string{"foo@example.com", "password"})
+			testcmd.RunCommand(cmd, context, reqFactory)
 
-		Expect(len(ui.Outputs)).To(Equal(4))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{config.ApiEndpoint()},
-			{"Authenticating..."},
-			{"FAILED"},
-			{"Error authenticating"},
+			Expect(ui.FailedWithUsage).To(BeFalse())
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"foo.example.org/authenticate"},
+				{"OK"},
+			})
+
+			Expect(repo.Email).To(Equal("foo@example.com"))
+			Expect(repo.Password).To(Equal("password"))
+		})
+
+		It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
+			repo.AuthError = true
+			context := testcmd.NewContext("auth", []string{"username", "password"})
+			testcmd.RunCommand(cmd, context, reqFactory)
+
+			println(ui.DumpOutputs())
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{config.ApiEndpoint()},
+				{"Authenticating..."},
+				{"FAILED"},
+				{"Error authenticating"},
+			})
 		})
 	})
 })
-
-func testSuccessfulAuthenticate(args []string) (ui *testterm.FakeUI) {
-	config := testconfig.NewRepository()
-	config.SetApiEndpoint("foo.example.org/authenticate")
-
-	auth := &testapi.FakeAuthenticationRepository{
-		AccessToken:  "my_access_token",
-		RefreshToken: "my_refresh_token",
-		Config:       config,
-	}
-
-	ui = callAuthenticate(args, config, auth)
-
-	testassert.SliceContains(ui.Outputs, testassert.Lines{
-		{"foo.example.org/authenticate"},
-		{"OK"},
-	})
-
-	Expect(config.AccessToken()).To(Equal("my_access_token"))
-	Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
-	Expect(auth.Email).To(Equal("user@example.com"))
-	Expect(auth.Password).To(Equal("password"))
-
-	return
-}
-
-func callAuthenticate(args []string, config configuration.Reader, auth api.AuthenticationRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("auth", args)
-	cmd := NewAuthenticate(ui, config, auth)
-	testcmd.RunCommand(cmd, ctxt, &testreq.FakeReqFactory{})
-	return
-}
