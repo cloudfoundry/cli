@@ -251,8 +251,9 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "update-service-broker"),
 					newCmdPresenter(app, maxNameLen, "delete-service-broker"),
 					newCmdPresenter(app, maxNameLen, "rename-service-broker"),
-					newCmdPresenter(app, maxNameLen, "purge-service-offering"),
+				}, {
 					newCmdPresenter(app, maxNameLen, "migrate-service-instances"),
+					newCmdPresenter(app, maxNameLen, "purge-service-offering"),
 				},
 			},
 		}, {
