@@ -4,7 +4,6 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -25,11 +24,13 @@ func NewAuthenticate(ui terminal.UI, config configuration.Reader, authenticator 
 }
 
 func (cmd Authenticate) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	if len(c.Args()) < 2 {
+	if len(c.Args()) != 2 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "auth")
 		return
 	}
+
+	reqs = append(reqs, reqFactory.NewApiEndpointRequirement())
 	return
 }
 
@@ -40,21 +41,14 @@ func (cmd Authenticate) Run(c *cli.Context) {
 	password := c.Args()[1]
 
 	cmd.ui.Say("Authenticating...")
-
-	apiResponse := cmd.doLogin(username, password)
+	apiResponse := cmd.authenticator.Authenticate(username, password)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	return
-}
+	cmd.ui.Ok()
+	cmd.ui.Say("Use '%s' to view or set your target org and space", terminal.CommandColor(cf.Name()+" target"))
 
-func (cmd Authenticate) doLogin(username, password string) (apiResponse net.ApiResponse) {
-	apiResponse = cmd.authenticator.Authenticate(username, password)
-	if apiResponse.IsSuccessful() {
-		cmd.ui.Ok()
-		cmd.ui.Say("Use '%s' to view or set your target org and space", terminal.CommandColor(cf.Name()+" target"))
-	}
 	return
 }
