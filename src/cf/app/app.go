@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/commands"
 	"cf/terminal"
+	"cf/trace"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -25,6 +26,8 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 	}
 	cli.HelpPrinter = showAppHelp
 	cli.AppHelpTemplate = appHelpTemplate
+
+	trace.Logger.Printf("\n%s\n%s\n\n", terminal.HeaderColor("VERSION:"), cf.Version)
 
 	app = cli.NewApp()
 	app.Usage = cf.Usage
