@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 	"regexp"
 	"strings"
+	"time"
 )
 
 const (
@@ -79,7 +80,7 @@ func dumpRequest(req *http.Request) {
 	if err != nil {
 		trace.Logger.Printf("Error dumping request\n%s\n", err)
 	} else {
-		trace.Logger.Printf("\n%s\n%s\n", terminal.HeaderColor("REQUEST:"), Sanitize(string(dumpedRequest)))
+		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor("REQUEST:"), time.Now().Format(time.RFC3339), Sanitize(string(dumpedRequest)))
 		if !shouldDisplayBody {
 			trace.Logger.Println("[MULTIPART/FORM-DATA CONTENT HIDDEN]")
 		}
@@ -91,6 +92,6 @@ func dumpResponse(res *http.Response) {
 	if err != nil {
 		trace.Logger.Printf("Error dumping response\n%s\n", err)
 	} else {
-		trace.Logger.Printf("\n%s\n%s\n", terminal.HeaderColor("RESPONSE:"), Sanitize(string(dumpedResponse)))
+		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor("RESPONSE:"), time.Now().Format(time.RFC3339), Sanitize(string(dumpedResponse)))
 	}
 }
