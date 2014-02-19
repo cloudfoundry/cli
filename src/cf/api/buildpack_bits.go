@@ -5,12 +5,16 @@ import (
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
+	"crypto/tls"
 	"fileutils"
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 )
 
 type BuildpackBitsRepository interface {
@@ -31,34 +35,64 @@ func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gate
 }
 
 func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) (apiResponse net.ApiResponse) {
-	fileutils.TempFile("buildpack", func(zipFile *os.File, err error) {
+	if strings.HasPrefix(dir, "http://") || strings.HasPrefix(dir, "https://") {
+		client := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				Proxy:           http.ProxyFromEnvironment,
+			},
+		}
+		response, err := client.Get(dir)
 		if err != nil {
-			apiResponse = net.NewApiResponseWithMessage(err.Error())
-			return
+			apiResponse = net.NewApiResponseWithError("Could not download buildpack", err)
+		} else {
+			apiResponse = repo.uploadBits(buildpack, response.Body, path.Base(dir))
 		}
-		err = repo.zipper.Zip(dir, zipFile)
-		if err != nil {
-			apiResponse = net.NewApiResponseWithError("Invalid buildpack", err)
-			return
-		}
-		apiResponse = repo.uploadBits(buildpack, zipFile, dir)
-		if apiResponse.IsNotSuccessful() {
-			return
-		}
-	})
+	} else {
+		fileutils.TempFile("buildpack", func(zipFile *os.File, err error) {
+			if err != nil {
+				apiResponse = net.NewApiResponseWithMessage(err.Error())
+				return
+			}
+
+			err = repo.zipper.Zip(dir, zipFile)
+			if err != nil {
+				apiResponse = net.NewApiResponseWithError("Invalid buildpack", err)
+				return
+			}
+			apiResponse = repo.uploadBits(buildpack, zipFile, filepath.Base(dir))
+		})
+	}
+
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, zipFile *os.File, filename string) (apiResponse net.ApiResponse) {
-	url := fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid)
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) net.ApiResponse {
+	return repo.performMultiPartUpload(
+		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid),
+		"buildpack",
+		buildpackName,
+		body)
+}
 
+func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) (apiResponse net.ApiResponse) {
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
 			apiResponse = net.NewApiResponseWithMessage(err.Error())
 			return
 		}
 
-		boundary, err := repo.writeUploadBody(zipFile, requestFile, filename)
+		writer := multipart.NewWriter(requestFile)
+		part, err := writer.CreateFormFile(fieldName, fileName)
+
+		if err != nil {
+			writer.Close()
+			return
+		}
+
+		_, err = io.Copy(part, body)
+		writer.Close()
+
 		if err != nil {
 			apiResponse = net.NewApiResponseWithError("Error creating upload", err)
 			return
@@ -66,7 +100,7 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.B
 
 		var request *net.Request
 		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
-		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
+		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
 		request.HttpReq.Header.Set("Content-Type", contentType)
 		if apiResponse.IsNotSuccessful() {
 			return
@@ -75,29 +109,5 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.B
 		apiResponse = repo.gateway.PerformRequest(request)
 	})
 
-	return
-}
-
-func (repo CloudControllerBuildpackBitsRepository) writeUploadBody(zipFile *os.File, body *os.File, filename string) (boundary string, err error) {
-	writer := multipart.NewWriter(body)
-	defer writer.Close()
-
-	boundary = writer.Boundary()
-
-	zipStats, err := zipFile.Stat()
-	if err != nil {
-		return
-	}
-
-	if zipStats.Size() == 0 {
-		return
-	}
-
-	part, err := writer.CreateFormFile("buildpack", filepath.Base(filename))
-	if err != nil {
-		return
-	}
-
-	_, err = io.Copy(part, zipFile)
 	return
 }
