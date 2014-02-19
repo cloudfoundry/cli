@@ -14,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing Marketplace Services", func() {
+var _ = Describe("Marketplace Services", func() {
 	var ui *testterm.FakeUI
 	var reqFactory *testreq.FakeReqFactory
 	var config configuration.ReadWriter
