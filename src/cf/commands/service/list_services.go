@@ -23,6 +23,10 @@ func NewListServices(ui terminal.UI, config configuration.Reader, serviceSummary
 }
 
 func (cmd ListServices) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+	reqs = append(reqs,
+		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedSpaceRequirement(),
+	)
 	return
 }
 

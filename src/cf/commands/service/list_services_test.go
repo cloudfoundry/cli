@@ -2,34 +2,83 @@ package service_test
 
 import (
 	. "cf/commands/service"
+	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
+	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestServices", func() {
+var _ = Describe("services", func() {
+	var (
+		ui         *testterm.FakeUI
+		configRepo configuration.Repository
+		reqFactory *testreq.FakeReqFactory
+	)
 
-		plan := models.ServicePlanFields{}
-		plan.Guid = "spark-guid"
-		plan.Name = "spark"
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		reqFactory = &testreq.FakeReqFactory{
+			LoginSuccess: true,
+			TargetedSpaceSuccess: true,
+			TargetedOrgSuccess: true,
+		}
+	})
 
-		offering := models.ServiceOfferingFields{}
-		offering.Label = "cleardb"
+	Describe("services requirements", func() {
+		var cmd ListServices
+
+		BeforeEach(func() {
+			cmd = NewListServices(ui, configRepo, &testapi.FakeServiceSummaryRepo{})
+		})
+
+		Context("when not logged in", func() {
+			BeforeEach(func() {
+				reqFactory.LoginSuccess = false
+			})
+
+			It("fails requirements", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
+				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			})
+		})
+		
+		Context("when no space is targeted", func() {
+			BeforeEach(func() {
+				reqFactory.TargetedSpaceSuccess = false
+			})
+				
+			It("fails requirements", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
+				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			})
+		})
+	})
+
+	It("lists available services", func() {
+		plan := models.ServicePlanFields{
+			Guid: "spark-guid",
+			Name: "spark",
+		}
+
+		plan2 := models.ServicePlanFields{
+			Guid: "spark-guid-2",
+			Name: "spark-2",
+		}
+
+		offering := models.ServiceOfferingFields{Label: "cleardb"}
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Name = "my-service-1"
 		serviceInstance.ServicePlan = plan
 		serviceInstance.ApplicationNames = []string{"cli1", "cli2"}
 		serviceInstance.ServiceOffering = offering
-
-		plan2 := models.ServicePlanFields{}
-		plan2.Guid = "spark-guid-2"
-		plan2.Name = "spark-2"
 
 		serviceInstance2 := models.ServiceInstance{}
 		serviceInstance2.Name = "my-service-2"
@@ -44,11 +93,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
 			GetSummariesInCurrentSpaceInstances: serviceInstances,
 		}
-		ui := &testterm.FakeUI{}
-		configRepo := testconfig.NewRepositoryWithDefaults()
 
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		cmd.Run(testcmd.NewContext("services", []string{}))
+		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting services in org", "my-org", "my-space", "my-user"},
@@ -58,17 +105,15 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"my-service-provided-by-user", "user-provided"},
 		})
 	})
-	It("TestEmptyServicesList", func() {
 
+	It("lists no services when none are found", func() {
 		serviceInstances := []models.ServiceInstance{}
 		serviceSummaryRepo := &testapi.FakeServiceSummaryRepo{
 			GetSummariesInCurrentSpaceInstances: serviceInstances,
 		}
-		ui := &testterm.FakeUI{}
-		configRepo := testconfig.NewRepositoryWithDefaults()
 
 		cmd := NewListServices(ui, configRepo, serviceSummaryRepo)
-		cmd.Run(testcmd.NewContext("services", []string{}))
+		testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting services in org", "my-org", "my-space", "my-user"},
