@@ -21,16 +21,17 @@ import (
 
 var _ = Describe("BuildpackBitsRepository", func() {
 	var (
-		workingDirectory string
-		configRepo       configuration.Repository
-		repo             CloudControllerBuildpackBitsRepository
-		buildpack        models.Buildpack
+		buildpacksDir string
+		configRepo    configuration.Repository
+		repo          CloudControllerBuildpackBitsRepository
+		buildpack     models.Buildpack
 	)
 
 	BeforeEach(func() {
 		gateway := net.NewCloudControllerGateway()
+		pwd, _ := os.Getwd()
 
-		workingDirectory, _ = os.Getwd()
+		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, cf.ApplicationZipper{})
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
@@ -44,7 +45,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		})
 
 		It("uploads a valid buildpack directory", func() {
-			buildpackPath := filepath.Join(workingDirectory, "../../fixtures/example-buildpack")
+			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack")
 
 			err := os.Chmod(filepath.Join(buildpackPath, "detect"), 0666)
 			Expect(err).NotTo(HaveOccurred())
@@ -61,7 +62,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		})
 
 		It("uploads a valid zipped buildpack", func() {
-			buildpackPath := filepath.Join(workingDirectory, "../../fixtures/example-buildpack.zip")
+			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack.zip")
 
 			ts, handler := testnet.NewTLSServer([]testnet.TestRequest{
 				uploadBuildpackRequest(buildpackPath),
@@ -81,7 +82,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			var apiServer *httptest.Server
 
 			BeforeEach(func() {
-				buildpackPath = filepath.Join(workingDirectory, "../../fixtures/example-buildpack.zip")
+				buildpackPath = filepath.Join(buildpacksDir, "example-buildpack.zip")
 				apiServer, handler = testnet.NewTLSServer([]testnet.TestRequest{
 					uploadBuildpackRequest(buildpackPath),
 				})
