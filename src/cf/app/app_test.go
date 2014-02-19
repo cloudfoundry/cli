@@ -1,10 +1,13 @@
 package app_test
 
 import (
+	"bytes"
+	"cf"
 	"cf/api"
 	. "cf/app"
 	"cf/commands"
 	"cf/net"
+	"cf/trace"
 	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -28,8 +31,8 @@ var expectedCommandNames = []string{
 	"update-buildpack", "update-service-broker", "update-service-auth-token", "update-user-provided-service",
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestCommands", func() {
+var _ = Describe("App", func() {
+	It("#NewApp", func() {
 		ui := &testterm.FakeUI{}
 		config := testconfig.NewRepository()
 		manifestRepo := &testmanifest.FakeManifestRepository{}
@@ -44,8 +47,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		cmdRunner := &FakeRunner{cmdFactory: cmdFactory}
 
 		for _, cmdName := range expectedCommandNames {
+			output := bytes.NewBuffer(make([]byte, 1024))
+			trace.SetStdout(output)
+			trace.EnableTrace()
+
 			app, err := NewApp(cmdRunner)
 			Expect(err).NotTo(HaveOccurred())
+
+			Expect(output.String()).To(ContainSubstring("VERSION:\n" + cf.Version))
 
 			app.Run([]string{"", cmdName})
 			Expect(cmdRunner.cmdName).To(Equal(cmdName))
