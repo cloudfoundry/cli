@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -47,7 +48,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		It("uploads a valid buildpack directory", func() {
 			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack")
 
-			err := os.Chmod(filepath.Join(buildpackPath, "detect"), 0666)
+			err := os.Chmod(filepath.Join(buildpackPath, "bin/detect"), 0666)
 			Expect(err).NotTo(HaveOccurred())
 
 			ts, handler := testnet.NewTLSServer([]testnet.TestRequest{
@@ -156,15 +157,30 @@ func uploadBuildpackRequest(filename string) testnet.TestRequest {
 			zipReader, err := zip.NewReader(file, 4096)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0666)))
-
-			actualFilenames := []string{}
+			actualFileNames := []string{}
+			actualFileContents := []string{}
 			for _, f := range zipReader.File {
-				actualFilenames = append(actualFilenames, f.Name)
+				actualFileNames = append(actualFileNames, f.Name)
+				c, _ := f.Open()
+				content, _ := ioutil.ReadAll(c)
+				actualFileContents = append(actualFileContents, string(content))
 			}
-			sort.Strings(actualFilenames)
+			sort.Strings(actualFileNames)
 
-			Expect(actualFilenames).To(Equal([]string{"compile", "detect", "package"}))
+			Expect(actualFileNames).To(Equal([]string{
+				"bin/compile",
+				"bin/detect",
+				"bin/release",
+				"lib/helper",
+			}))
+			Expect(actualFileContents).To(Equal([]string{
+				"the-compile-script\n",
+				"the-detect-script\n",
+				"the-release-script\n",
+				"the-helper-script\n",
+			}))
+
+			Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0666)))
 		},
 	}
 }
