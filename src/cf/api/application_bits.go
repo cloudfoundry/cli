@@ -202,6 +202,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(r *zip.ReadClose
 
 	return
 }
+
 func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiResponse net.ApiResponse) {
 	appFilesRequest := []AppFileResource{}
 	for _, file := range allAppFiles {

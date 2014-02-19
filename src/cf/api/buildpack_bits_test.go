@@ -4,132 +4,166 @@ import (
 	"archive/zip"
 	"cf"
 	. "cf/api"
+	"cf/configuration"
 	"cf/models"
 	"cf/net"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"io"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sort"
 	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 )
 
 var _ = Describe("BuildpackBitsRepository", func() {
-	It("TestUploadBuildpackWithInvalidDirectory", func() {
-		config := testconfig.NewRepository()
+	var (
+		workingDirectory string
+		configRepo       configuration.Repository
+		repo             CloudControllerBuildpackBitsRepository
+		buildpack        models.Buildpack
+	)
+
+	BeforeEach(func() {
 		gateway := net.NewCloudControllerGateway()
 
-		repo := NewCloudControllerBuildpackBitsRepository(config, gateway, cf.ApplicationZipper{})
-		buildpack := models.Buildpack{}
-
-		apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring("Invalid buildpack"))
+		workingDirectory, _ = os.Getwd()
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, cf.ApplicationZipper{})
+		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 	})
 
-	It("TestUploadBuildpack", func() {
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		dir = filepath.Join(dir, "../../fixtures/example-buildpack")
-		err = os.Chmod(filepath.Join(dir, "detect"), 0666)
-		Expect(err).NotTo(HaveOccurred())
-
-		_, apiResponse := testUploadBuildpack(dir, []testnet.TestRequest{
-			uploadBuildpackRequest(dir),
+	Describe("#UploadBuildpack", func() {
+		It("fails to upload a buildpack with an invalid directory", func() {
+			apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
+			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+			Expect(apiResponse.Message).To(ContainSubstring("Invalid buildpack"))
 		})
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-	})
 
-	It("TestUploadBuildpackWithAZipFile", func() {
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		dir = filepath.Join(dir, "../../fixtures/example-buildpack.zip")
+		It("uploads a valid buildpack directory", func() {
+			buildpackPath := filepath.Join(workingDirectory, "../../fixtures/example-buildpack")
 
-		_, apiResponse := testUploadBuildpack(dir, []testnet.TestRequest{
-			uploadBuildpackRequest(dir),
+			err := os.Chmod(filepath.Join(buildpackPath, "detect"), 0666)
+			Expect(err).NotTo(HaveOccurred())
+
+			ts, handler := testnet.NewTLSServer([]testnet.TestRequest{
+				uploadBuildpackRequest(buildpackPath),
+			})
+			defer ts.Close()
+			configRepo.SetApiEndpoint(ts.URL)
+
+			apiResponse := repo.UploadBuildpack(buildpack, buildpackPath)
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+
+		It("uploads a valid zipped buildpack", func() {
+			buildpackPath := filepath.Join(workingDirectory, "../../fixtures/example-buildpack.zip")
+
+			ts, handler := testnet.NewTLSServer([]testnet.TestRequest{
+				uploadBuildpackRequest(buildpackPath),
+			})
+			defer ts.Close()
+
+			configRepo.SetApiEndpoint(ts.URL)
+
+			apiResponse := repo.UploadBuildpack(buildpack, buildpackPath)
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		})
+
+		Describe("when given the URL of a buildpack", func() {
+			var buildpackPath string
+			var handler *testnet.TestHandler
+			var apiServer *httptest.Server
+
+			BeforeEach(func() {
+				buildpackPath = filepath.Join(workingDirectory, "../../fixtures/example-buildpack.zip")
+				apiServer, handler = testnet.NewTLSServer([]testnet.TestRequest{
+					uploadBuildpackRequest(buildpackPath),
+				})
+				configRepo.SetApiEndpoint(apiServer.URL)
+			})
+
+			AfterEach(func() {
+				apiServer.Close()
+			})
+
+			var buildpackFileServerHandler = http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+				Expect(request.URL.Path).To(Equal("/place/example-buildpack.zip"))
+				f, err := os.Open(buildpackPath)
+				Expect(err).NotTo(HaveOccurred())
+				io.Copy(writer, f)
+			})
+
+			It("uploads the file over HTTP", func() {
+				fileServer := httptest.NewServer(buildpackFileServerHandler)
+				defer fileServer.Close()
+
+				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+				Expect(handler.AllRequestsCalled()).To(BeTrue())
+				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+
+			It("returns an unsuccessful response when the server cannot be reached", func() {
+				apiResponse := repo.UploadBuildpack(buildpack, "https://domain.bad-domain:223453/no-place/example-buildpack.zip")
+				Expect(handler.AllRequestsCalled()).To(BeFalse())
+				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			})
+
+			It("uploads the file over HTTPS", func() {
+				fileServer := httptest.NewTLSServer(buildpackFileServerHandler)
+				defer fileServer.Close()
+
+				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+				Expect(handler.AllRequestsCalled()).To(BeTrue())
+				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+		})
 	})
 })
 
 func uploadBuildpackRequest(filename string) testnet.TestRequest {
 	return testnet.TestRequest{
-		Method:  "PUT",
-		Path:    "/v2/buildpacks/my-cool-buildpack-guid/bits",
-		Matcher: uploadBuildpackBodyMatcher(filename),
+		Method: "PUT",
+		Path:   "/v2/buildpacks/my-cool-buildpack-guid/bits",
 		Response: testnet.TestResponse{
 			Status: http.StatusCreated,
-			Body: `
-{
-	"metadata":{
-		"guid": "my-job-guid"
-	}
-}
-	`},
-	}
-}
+			Body:   `{ "metadata":{ "guid": "my-job-guid" } }`,
+		},
+		Matcher: func(request *http.Request) {
+			err := request.ParseMultipartForm(4096)
+			defer request.MultipartForm.RemoveAll()
+			Expect(err).NotTo(HaveOccurred())
 
-var expectedBuildpackContent = []string{"detect", "compile", "package"}
+			Expect(len(request.MultipartForm.Value)).To(Equal(0))
+			Expect(len(request.MultipartForm.File)).To(Equal(1))
 
-func uploadBuildpackBodyMatcher(pathToFile string) testnet.RequestMatcher {
-	return func(request *http.Request) {
-		err := request.ParseMultipartForm(4096)
-		if err != nil {
-			Fail(fmt.Sprintf("Failed parsing multipart form: %s", err))
-			return
-		}
-		defer request.MultipartForm.RemoveAll()
+			files, ok := request.MultipartForm.File["buildpack"]
+			Expect(ok).To(BeTrue(), "Buildpack file part not present")
+			Expect(len(files)).To(Equal(1), "Wrong number of files")
 
-		Expect(len(request.MultipartForm.Value)).To(Equal(0), "Should have 0 values")
-		Expect(len(request.MultipartForm.File)).To(Equal(1), "Wrong number of files")
+			buildpackFile := files[0]
+			Expect(buildpackFile.Filename).To(Equal(filepath.Base(filename)), "Wrong file name")
 
-		files, ok := request.MultipartForm.File["buildpack"]
+			file, err := buildpackFile.Open()
+			Expect(err).NotTo(HaveOccurred())
 
-		Expect(ok).To(BeTrue(), "Buildpack file part not present")
-		Expect(len(files)).To(Equal(1), "Wrong number of files")
+			zipReader, err := zip.NewReader(file, 4096)
+			Expect(err).NotTo(HaveOccurred())
 
-		buildpackFile := files[0]
-		Expect(buildpackFile.Filename).To(Equal(filepath.Base(pathToFile)), "Wrong file name")
+			Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0666)))
 
-		file, err := buildpackFile.Open()
-		if err != nil {
-			Fail(fmt.Sprintf("Cannot get multipart file: %s", err.Error()))
-			return
-		}
-
-		zipReader, err := zip.NewReader(file, 4096)
-		if err != nil {
-			Fail(fmt.Sprintf("Error reading zip content: %s", err.Error()))
-		}
-
-		Expect(len(zipReader.File)).To(Equal(3), "Wrong number of files in zip")
-		Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0666)))
-
-	nextFile:
-		for _, f := range zipReader.File {
-			for _, expected := range expectedBuildpackContent {
-				if f.Name == expected {
-					continue nextFile
-				}
+			actualFilenames := []string{}
+			for _, f := range zipReader.File {
+				actualFilenames = append(actualFilenames, f.Name)
 			}
-			Fail("Missing file: " + f.Name)
-		}
+			sort.Strings(actualFilenames)
+
+			Expect(actualFilenames).To(Equal([]string{"compile", "detect", "package"}))
+		},
 	}
-}
-
-func testUploadBuildpack(dir string, requests []testnet.TestRequest) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewTLSServer(requests)
-	defer ts.Close()
-
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
-	repo := NewCloudControllerBuildpackBitsRepository(configRepo, gateway, cf.ApplicationZipper{})
-	buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
-
-	apiResponse = repo.UploadBuildpack(buildpack, dir)
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
-	return
 }
