@@ -45,7 +45,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			Expect(apiResponse.Message).To(ContainSubstring("Error opening buildpack file"))
 		})
 
-		FIt("uploads a valid buildpack directory", func() {
+		It("uploads a valid buildpack directory", func() {
 			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack")
 
 			os.Chmod(filepath.Join(buildpackPath, "bin/compile"), 0755)
@@ -79,7 +79,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
 
-		FDescribe("when the buildpack is wrapped in an extra top-level directory", func() {
+		Describe("when the buildpack is wrapped in an extra top-level directory", func() {
 			It("uploads a zip file containing only the actual buildpack", func() {
 				buildpackPath := filepath.Join(buildpacksDir, "example-buildpack-in-dir.zip")
 
