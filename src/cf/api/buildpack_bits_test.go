@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"runtime"
 	"path/filepath"
 	"sort"
 	testconfig "testhelpers/configuration"
@@ -210,9 +211,11 @@ func uploadBuildpackRequest(filename string) testnet.TestRequest {
 				"the-helper-script\n",
 			}))
 
-			Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0755)))
-			Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(0755)))
-			Expect(zipReader.File[2].Mode()).To(Equal(os.FileMode(0755)))
+			if runtime.GOOS != "windows" {
+				Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(0755)))
+				Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0755)))
+				Expect(zipReader.File[2].Mode()).To(Equal(os.FileMode(0755)))
+			}
 		},
 	}
 }
