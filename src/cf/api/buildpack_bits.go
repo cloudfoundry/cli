@@ -52,13 +52,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 					return
 				}
 
-				var stats os.FileInfo
-				stats, err = downloadFile.Stat()
-				if err != nil {
-					return
-				}
-
-				err = normalizeBuildpackArchive(downloadFile, stats.Size(), zipFileToUpload)
+				err = normalizeBuildpackArchive(downloadFile, zipFileToUpload)
 			})
 		} else {
 			buildpackFileName = filepath.Base(buildpackLocation)
@@ -77,7 +71,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 					apiResponse = net.NewApiResponseWithError("Couldn't open buildpack file", err)
 					return
 				}
-				err = normalizeBuildpackArchive(specifiedFile, stats.Size(), zipFileToUpload)
+				err = normalizeBuildpackArchive(specifiedFile, zipFileToUpload)
 			}
 		}
 
@@ -92,8 +86,13 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 	return
 }
 
-func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.File) (err error) {
-	reader, _ := zip.NewReader(inputFile, size)
+func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) (err error) {
+	stats, err := inputFile.Stat()
+	if err != nil {
+		return
+	}
+
+	reader, _ := zip.NewReader(inputFile, stats.Size())
 	contents := reader.File
 
 	parentPath, hasBuildpack := findBuildpackPath(contents)
@@ -106,7 +105,7 @@ func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.Fi
 
 	for _, file := range contents {
 		name := file.Name
-		if strings.HasPrefix(name, parentPath) {
+		if parentPath == "." || strings.HasPrefix(name, parentPath) {
 			var (
 				r      io.ReadCloser
 				w      io.Writer
@@ -115,7 +114,7 @@ func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.Fi
 
 			fileInfo := file.FileInfo()
 			header, err = zip.FileInfoHeader(fileInfo)
-			header.Name = filepath.ToSlash(strings.Replace(name, parentPath, "", 1))
+			header.Name = strings.Replace(name, parentPath+"/", "", 1)
 
 			r, err = file.Open()
 			if err != nil {
@@ -141,12 +140,12 @@ func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.Fi
 }
 
 func findBuildpackPath(zipFiles []*zip.File) (parentPath string, foundBuildpack bool) {
-	needle := filepath.Join("bin", "compile")
+	needle := "bin/compile"
 
 	for _, file := range zipFiles {
 		if strings.HasSuffix(file.Name, needle) {
 			foundBuildpack = true
-			parentPath = path.Join(file.Name, "..", "..") + "/"
+			parentPath = path.Join(file.Name, "..", "..")
 			return
 		}
 	}
