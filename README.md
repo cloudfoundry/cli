@@ -36,6 +36,27 @@ Edge binaries are published to our Amazon S3 bucket with each new commit that pa
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
+Filing Bugs
+===========
+
+##### For simple bugs (eg: text formatting, help messages, etc), please provide
+
+- the command you ran
+- what occurred
+- what you expected to occur
+
+##### For bugs related to HTTP requests or strange behavior, please run the command with env var `CF_TRACE=true` and provide
+
+- the command you ran
+- the trace output
+- a high-level description of the bug
+
+##### For panics and other crashes, please provide
+
+- the command you ran
+- the stack trace generated (if any)
+- any other relevant information
+
 Cloning the repository
 ======================
 
