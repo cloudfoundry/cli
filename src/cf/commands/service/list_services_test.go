@@ -25,9 +25,9 @@ var _ = Describe("services", func() {
 		ui = &testterm.FakeUI{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		reqFactory = &testreq.FakeReqFactory{
-			LoginSuccess: true,
+			LoginSuccess:         true,
 			TargetedSpaceSuccess: true,
-			TargetedOrgSuccess: true,
+			TargetedOrgSuccess:   true,
 		}
 	})
 
@@ -48,12 +48,12 @@ var _ = Describe("services", func() {
 				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 			})
 		})
-		
+
 		Context("when no space is targeted", func() {
 			BeforeEach(func() {
 				reqFactory.TargetedSpaceSuccess = false
 			})
-				
+
 			It("fails requirements", func() {
 				testcmd.RunCommand(cmd, testcmd.NewContext("services", []string{}), reqFactory)
 				Expect(testcmd.CommandDidPassRequirements).To(BeFalse())

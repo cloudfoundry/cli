@@ -45,10 +45,12 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			Expect(apiResponse.Message).To(ContainSubstring("Error opening buildpack file"))
 		})
 
-		It("uploads a valid buildpack directory", func() {
+		FIt("uploads a valid buildpack directory", func() {
 			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack")
 
-			err := os.Chmod(filepath.Join(buildpackPath, "bin/detect"), 0666)
+			os.Chmod(filepath.Join(buildpackPath, "bin/compile"), 0755)
+			os.Chmod(filepath.Join(buildpackPath, "bin/detect"), 0755)
+			err := os.Chmod(filepath.Join(buildpackPath, "bin/release"), 0755)
 			Expect(err).NotTo(HaveOccurred())
 
 			ts, handler := testnet.NewTLSServer([]testnet.TestRequest{
@@ -208,7 +210,9 @@ func uploadBuildpackRequest(filename string) testnet.TestRequest {
 				"the-helper-script\n",
 			}))
 
-			Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0666)))
+			Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0755)))
+			Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(0755)))
+			Expect(zipReader.File[2].Mode()).To(Equal(os.FileMode(0755)))
 		},
 	}
 }
