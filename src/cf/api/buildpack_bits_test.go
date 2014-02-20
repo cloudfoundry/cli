@@ -42,7 +42,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		It("fails to upload a buildpack with an invalid directory", func() {
 			apiResponse := repo.UploadBuildpack(buildpack, "/foo/bar")
 			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-			Expect(apiResponse.Message).To(ContainSubstring("Invalid buildpack"))
+			Expect(apiResponse.Message).To(ContainSubstring("Error opening buildpack file"))
 		})
 
 		It("uploads a valid buildpack directory", func() {
@@ -77,15 +77,30 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
 
+		FDescribe("when the buildpack is wrapped in an extra top-level directory", func() {
+			It("uploads a zip file containing only the actual buildpack", func() {
+				buildpackPath := filepath.Join(buildpacksDir, "example-buildpack-in-dir.zip")
+
+				ts, handler := testnet.NewTLSServer([]testnet.TestRequest{
+					uploadBuildpackRequest(buildpackPath),
+				})
+				defer ts.Close()
+
+				configRepo.SetApiEndpoint(ts.URL)
+
+				apiResponse := repo.UploadBuildpack(buildpack, buildpackPath)
+				Expect(handler.AllRequestsCalled()).To(BeTrue())
+				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+		})
+
 		Describe("when given the URL of a buildpack", func() {
-			var buildpackPath string
 			var handler *testnet.TestHandler
 			var apiServer *httptest.Server
 
 			BeforeEach(func() {
-				buildpackPath = filepath.Join(buildpacksDir, "example-buildpack.zip")
 				apiServer, handler = testnet.NewTLSServer([]testnet.TestRequest{
-					uploadBuildpackRequest(buildpackPath),
+					uploadBuildpackRequest("example-buildpack.zip"),
 				})
 				configRepo.SetApiEndpoint(apiServer.URL)
 			})
@@ -94,35 +109,48 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				apiServer.Close()
 			})
 
-			var buildpackFileServerHandler = http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-				Expect(request.URL.Path).To(Equal("/place/example-buildpack.zip"))
-				f, err := os.Open(buildpackPath)
-				Expect(err).NotTo(HaveOccurred())
-				io.Copy(writer, f)
-			})
+			var buildpackFileServerHandler = func(buildpackName string) http.HandlerFunc {
+				return func(writer http.ResponseWriter, request *http.Request) {
+					Expect(request.URL.Path).To(Equal("/place/example-buildpack.zip"))
+					f, err := os.Open(filepath.Join(buildpacksDir, buildpackName))
+					Expect(err).NotTo(HaveOccurred())
+					io.Copy(writer, f)
+				}
+			}
 
 			It("uploads the file over HTTP", func() {
-				fileServer := httptest.NewServer(buildpackFileServerHandler)
+				fileServer := httptest.NewServer(buildpackFileServerHandler("example-buildpack.zip"))
 				defer fileServer.Close()
 
 				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
 				Expect(handler.AllRequestsCalled()).To(BeTrue())
 				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+
+			It("uploads the file over HTTPS", func() {
+				fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack.zip"))
+				defer fileServer.Close()
+
+				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+				Expect(handler.AllRequestsCalled()).To(BeTrue())
+				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+
+			Describe("when the buildpack is wrapped in an extra top-level directory", func() {
+				It("uploads a zip file containing only the actual buildpack", func() {
+					fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack-in-dir.zip"))
+					defer fileServer.Close()
+
+					apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+					Expect(handler.AllRequestsCalled()).To(BeTrue())
+					Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				})
 			})
 
 			It("returns an unsuccessful response when the server cannot be reached", func() {
 				apiResponse := repo.UploadBuildpack(buildpack, "https://domain.bad-domain:223453/no-place/example-buildpack.zip")
 				Expect(handler.AllRequestsCalled()).To(BeFalse())
 				Expect(apiResponse.IsSuccessful()).To(BeFalse())
-			})
-
-			It("uploads the file over HTTPS", func() {
-				fileServer := httptest.NewTLSServer(buildpackFileServerHandler)
-				defer fileServer.Close()
-
-				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
-				Expect(handler.AllRequestsCalled()).To(BeTrue())
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			})
 		})
 	})
