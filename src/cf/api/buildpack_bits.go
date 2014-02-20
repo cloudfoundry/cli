@@ -86,7 +86,6 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 }
 
 func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.File) (err error) {
-	fmt.Printf("\nSIZE %d", size)
 	reader, _ := zip.NewReader(inputFile, size)
 	contents := reader.File
 
@@ -104,14 +103,19 @@ func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.Fi
 			var (
 				r io.ReadCloser
 				w io.Writer
+				header *zip.FileHeader
 			)
+
+			fileInfo := file.FileInfo()
+			header, err = zip.FileInfoHeader(fileInfo)
+			header.Name = filepath.ToSlash(strings.Replace(name, parentPath, "", 1))
 
 			r, err = file.Open()
 			if err != nil {
 				return
 			}
 
-			w, err = writer.Create(strings.Replace(name, parentPath, "", 1))
+			w, err = writer.CreateHeader(header)
 			if err != nil {
 				return
 			}
