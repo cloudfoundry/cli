@@ -109,7 +109,7 @@ func (repo RemoteEndpointRepository) GetUAAEndpoint() (endpoint string, apiRespo
 	return
 }
 
-// TODO - remove
+// FIXME: needs semantic versioning
 func defaultLoggregatorEndpoint(apiEndpoint string) string {
 	url := endpointDomainRegex.ReplaceAllString(apiEndpoint, "ws${1}://loggregator.${2}")
 	if url[0:3] == "wss" {
