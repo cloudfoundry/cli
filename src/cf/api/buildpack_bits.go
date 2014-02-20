@@ -108,8 +108,8 @@ func normalizeBuildpackArchive(inputFile *os.File, size int64, outputFile *os.Fi
 		name := file.Name
 		if strings.HasPrefix(name, parentPath) {
 			var (
-				r io.ReadCloser
-				w io.Writer
+				r      io.ReadCloser
+				w      io.Writer
 				header *zip.FileHeader
 			)
 
