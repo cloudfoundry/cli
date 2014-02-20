@@ -46,12 +46,19 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 		var buildpackFileName string
 		if isWebURL(buildpackLocation) {
 			buildpackFileName = path.Base(buildpackLocation)
-			downloadBuildpack(buildpackLocation, func(downloadFile *os.File, downloadSize int64, downloadErr error) {
+			downloadBuildpack(buildpackLocation, func(downloadFile *os.File, downloadErr error) {
 				if downloadErr != nil {
 					err = downloadErr
-				} else {
-					err = normalizeBuildpackArchive(downloadFile, downloadSize, zipFileToUpload)
+					return
 				}
+
+				var stats os.FileInfo
+				stats, err = downloadFile.Stat()
+				if err != nil {
+					return
+				}
+
+				err = normalizeBuildpackArchive(downloadFile, stats.Size(), zipFileToUpload)
 			})
 		} else {
 			buildpackFileName = filepath.Base(buildpackLocation)
@@ -150,10 +157,10 @@ func isWebURL(path string) bool {
 	return strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://")
 }
 
-func downloadBuildpack(url string, cb func(*os.File, int64, error)) {
+func downloadBuildpack(url string, cb func(*os.File, error)) {
 	fileutils.TempFile("buildpack-download", func(tempfile *os.File, err error) {
 		if err != nil {
-			cb(nil, 0, err)
+			cb(nil, err)
 			return
 		}
 
@@ -165,13 +172,13 @@ func downloadBuildpack(url string, cb func(*os.File, int64, error)) {
 		}
 		response, err := client.Get(url)
 		if err != nil {
-			cb(nil, 0, err)
+			cb(nil, err)
 			return
 		}
 
 		io.Copy(tempfile, response.Body)
 		tempfile.Seek(0, 0)
-		cb(tempfile, response.ContentLength, nil)
+		cb(tempfile, nil)
 	})
 }
 
