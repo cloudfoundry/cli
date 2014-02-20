@@ -33,6 +33,8 @@ func (cmd Api) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 func (cmd Api) Run(c *cli.Context) {
 	if len(c.Args()) == 0 {
 		cmd.ui.Say(
+			// TODO: should prompt to use api or login if no api is targeted
+			// consider calling ui.ShowConfiguration
 			"API endpoint: %s (API version: %s)",
 			terminal.EntityNameColor(cmd.config.ApiEndpoint()),
 			terminal.EntityNameColor(cmd.config.ApiVersion()),

@@ -109,12 +109,14 @@ func (c terminalUI) ConfigFailure(err error) {
 }
 
 func (ui terminalUI) ShowConfiguration(config configuration.Reader) {
+	// TODO: should prompt to use api or login if no api is targeted
 	ui.Say("API endpoint: %s (API version: %s)",
 		EntityNameColor(config.ApiEndpoint()),
 		EntityNameColor(config.ApiVersion()))
 
 	if !config.IsLoggedIn() {
 		ui.Say(NotLoggedInText())
+		return
 	} else {
 		ui.Say("User:         %s", EntityNameColor(config.UserEmail()))
 	}
