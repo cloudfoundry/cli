@@ -16,6 +16,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
+	"github.com/nu7hatch/gouuid"
 )
 
 type cliDependencies struct {
@@ -26,7 +27,11 @@ type cliDependencies struct {
 }
 
 func setupDependencies() (deps *cliDependencies) {
-	fileutils.SetTmpPathPrefix("cf")
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		deps.termUI.Failed(fmt.Sprintf("Failed to create uuid: %s", err))
+	}
+	fileutils.SetTmpPathPrefix(uuid.String())
 
 	if os.Getenv("CF_COLOR") == "" {
 		os.Setenv("CF_COLOR", "true")
