@@ -139,15 +139,13 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 	} else {
 		offering = resources.Resources[0].ToModel()
 	}
-
 	return
 }
 
 func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1&q=label:%s;provider:%s",
+	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1&q=%s",
 		repo.config.ApiEndpoint(),
-		planDescription.ServiceName,
-		planDescription.ServiceProvider)
+		url.QueryEscape("label:"+planDescription.ServiceName+";provider:"+planDescription.ServiceProvider))
 
 	response := new(PaginatedServiceOfferingResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), response)
