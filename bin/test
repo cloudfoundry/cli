@@ -19,12 +19,10 @@ echo -e "\n Installing package dependencies..."
 $(dirname $0)/go test -i cf/... generic/...
 
 echo -e "\n Testing packages:"
-$(dirname $0)/go test cf/... generic/... -parallel 4$@
+$(dirname $0)/go test cf/... fileutils/... -parallel 4$@
 
 echo -e "\n Vetting packages for potential issues..."
 $(dirname $0)/go tool vet src/cf/.
 
 echo -e "\n Running build script to confirm everything compiles..."
 $(dirname $0)/build
-
-
