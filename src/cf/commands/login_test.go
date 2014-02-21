@@ -61,8 +61,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.orgRepo.FindByNameName).To(Equal("my-org"))
 		Expect(c.spaceRepo.FindByNameName).To(Equal("my-space"))
@@ -112,8 +114,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.orgRepo.FindByNameName).To(Equal("my-org"))
 		Expect(c.spaceRepo.FindByNameName).To(Equal("my-space"))
@@ -169,8 +173,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
@@ -191,8 +197,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
@@ -219,8 +227,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
@@ -252,8 +262,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
@@ -279,8 +291,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})
@@ -305,8 +319,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.Email).To(Equal("user@example.com"))
-		Expect(c.authRepo.Password).To(Equal("password"))
+		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"username": "user@example.com",
+			"password": "password",
+		}))
 
 		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
 	})

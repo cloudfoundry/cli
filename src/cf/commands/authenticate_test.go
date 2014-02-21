@@ -67,8 +67,10 @@ var _ = Describe("auth command", func() {
 				{"OK"},
 			})
 
-			Expect(repo.Email).To(Equal("foo@example.com"))
-			Expect(repo.Password).To(Equal("password"))
+			Expect(repo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "foo@example.com",
+				"password": "password",
+			}))
 		})
 
 		It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
@@ -76,7 +78,6 @@ var _ = Describe("auth command", func() {
 			context := testcmd.NewContext("auth", []string{"username", "password"})
 			testcmd.RunCommand(cmd, context, reqFactory)
 
-			println(ui.DumpOutputs())
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{config.ApiEndpoint()},
 				{"Authenticating..."},

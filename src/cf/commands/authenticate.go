@@ -37,11 +37,11 @@ func (cmd Authenticate) GetRequirements(reqFactory requirements.Factory, c *cli.
 func (cmd Authenticate) Run(c *cli.Context) {
 	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.ApiEndpoint()))
 
-	username := c.Args()[0]
-	password := c.Args()[1]
-
 	cmd.ui.Say("Authenticating...")
-	apiResponse := cmd.authenticator.Authenticate(username, password)
+	apiResponse := cmd.authenticator.Authenticate(map[string]string{
+		"username": c.Args()[0],
+		"password": c.Args()[1],
+	})
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return

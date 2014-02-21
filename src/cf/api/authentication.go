@@ -12,7 +12,7 @@ import (
 )
 
 type AuthenticationRepository interface {
-	Authenticate(email string, password string) (apiResponse net.ApiResponse)
+	Authenticate(credentials map[string]string) (apiResponse net.ApiResponse)
 	RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse)
 }
 
@@ -27,12 +27,13 @@ func NewUAAAuthenticationRepository(gateway net.Gateway, config configuration.Re
 	return
 }
 
-func (uaa UAAAuthenticationRepository) Authenticate(email string, password string) (apiResponse net.ApiResponse) {
+func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse net.ApiResponse) {
 	data := url.Values{
-		"username":   {email},
-		"password":   {password},
 		"grant_type": {"password"},
 		"scope":      {""},
+	}
+	for key, val := range credentials {
+		data[key] = []string{val}
 	}
 
 	apiResponse = uaa.getAuthToken(data)

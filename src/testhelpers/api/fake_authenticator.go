@@ -7,17 +7,17 @@ import (
 
 type FakeAuthenticationRepository struct {
 	Config   configuration.ReadWriter
-	Email    string
-	Password string
+	AuthenticateArgs struct {
+		Credentials map[string]string
+	}
 
 	AuthError    bool
 	AccessToken  string
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticationRepository) Authenticate(email string, password string) (apiResponse net.ApiResponse) {
-	auth.Email = email
-	auth.Password = password
+func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse net.ApiResponse) {
+	auth.AuthenticateArgs.Credentials = credentials
 
 	if auth.AuthError {
 		apiResponse = net.NewApiResponseWithMessage("Error authenticating.")
