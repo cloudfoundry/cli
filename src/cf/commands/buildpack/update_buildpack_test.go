@@ -21,6 +21,10 @@ func callUpdateBuildpack(args []string, reqFactory *testreq.FakeReqFactory, fake
 	return
 }
 
+func getRepositories() (*testapi.FakeBuildpackRepository, *testapi.FakeBuildpackBitsRepository) {
+	return &testapi.FakeBuildpackRepository{}, &testapi.FakeBuildpackBitsRepository{}
+}
+
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestUpdateBuildpackRequirements", func() {
 		repo, bitsRepo := getRepositories()
