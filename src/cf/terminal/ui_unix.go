@@ -52,7 +52,7 @@ func (ui terminalUI) AskForPassword(prompt string, args ...interface{}) (passwd 
 
 	passwd = readPassword(pid)
 
-	// Carraige return after the user input.
+	// Carriage return after the user input.
 	fmt.Println("")
 
 	return
