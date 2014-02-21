@@ -2,7 +2,6 @@ package buildpack_test
 
 import (
 	. "cf/commands/buildpack"
-	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -12,38 +11,44 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func getRepositories() (*testapi.FakeBuildpackRepository, *testapi.FakeBuildpackBitsRepository) {
-	return &testapi.FakeBuildpackRepository{}, &testapi.FakeBuildpackBitsRepository{}
-}
+var _ = Describe("create-buildpack command", func() {
+	var (
+		reqFactory *testreq.FakeReqFactory
+		repo       *testapi.FakeBuildpackRepository
+		bitsRepo   *testapi.FakeBuildpackBitsRepository
+		ui         *testterm.FakeUI
+		cmd        CreateBuildpack
+	)
 
-func callCreateBuildpack(args []string, reqFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository,
-	fakeBitsRepo *testapi.FakeBuildpackBitsRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-buildpack", args)
+	BeforeEach(func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		repo = &testapi.FakeBuildpackRepository{}
+		bitsRepo = &testapi.FakeBuildpackBitsRepository{}
+		ui = &testterm.FakeUI{}
+		cmd = NewCreateBuildpack(ui, repo, bitsRepo)
+	})
 
-	cmd := NewCreateBuildpack(ui, fakeRepo, fakeBitsRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestCreateBuildpackRequirements", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		repo.FindByNameBuildpack = models.Buildpack{}
-		callCreateBuildpack([]string{"my-buildpack", "my-dir", "0"}, reqFactory, repo, bitsRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
+	It("fails requirements when the user is not logged in", func() {
 		reqFactory.LoginSuccess = false
-		callCreateBuildpack([]string{"my-buildpack", "my-dir", "0"}, reqFactory, repo, bitsRepo)
+		context := testcmd.NewContext("create-buildpack", []string{"my-buildpack", "my-dir", "0"})
+		testcmd.RunCommand(cmd, context, reqFactory)
+
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestCreateBuildpack", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-		ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	It("fails with usage when given fewer than three arguments", func() {
+		context := testcmd.NewContext("create-buildpack", []string{})
+		testcmd.RunCommand(cmd, context, reqFactory)
+
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
+
+	It("creates and uploads buildpacks", func() {
+		context := testcmd.NewContext("create-buildpack", []string{"my-buildpack", "my.war", "5"})
+		testcmd.RunCommand(cmd, context, reqFactory)
+
+		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
+		Expect(ui.FailedWithUsage).To(BeFalse())
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
@@ -55,13 +60,11 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"FAILED"},
 		})
 	})
-	It("TestCreateBuildpackWhenItAlreadyExists", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-
+	It("warns the user when the buildpack already exists", func() {
 		repo.CreateBuildpackExists = true
-		ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+		context := testcmd.NewContext("create-buildpack", []string{"my-buildpack", "my.war", "5"})
+		testcmd.RunCommand(cmd, context, reqFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
@@ -73,65 +76,24 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"FAILED"},
 		})
 	})
-	It("TestCreateBuildpackWithPosition", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-		ui := callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
+	It("enables the buildpack when given the --enabled flag", func() {
+		context := testcmd.NewContext("create-buildpack", []string{"--enable", "my-buildpack", "my.war", "5"})
+		testcmd.RunCommand(cmd, context, reqFactory)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating buildpack", "my-buildpack"},
-			{"OK"},
-			{"Uploading buildpack", "my-buildpack"},
-			{"OK"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-		})
-	})
-	It("TestCreateBuildpackEnabled", func() {
-
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-		ui := callCreateBuildpack([]string{"--enable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
-
-		Expect(repo.CreateBuildpack.Enabled).NotTo(BeNil())
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(true))
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"creating buildpack", "my-buildpack"},
-			{"OK"},
-			{"uploading buildpack", "my-buildpack"},
-			{"OK"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-		})
 	})
-	It("TestCreateBuildpackNoEnableFlag", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-		callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
-
-		Expect(repo.CreateBuildpack.Enabled).To(BeNil())
-	})
-	It("TestCreateBuildpackDisabled", func() {
-
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-		callCreateBuildpack([]string{"--disable", "my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
-
-		Expect(repo.CreateBuildpack.Enabled).NotTo(BeNil())
+	It("disables the buildpack when given the --disable flag", func() {
+		context := testcmd.NewContext("create-buildpack", []string{"--disable", "my-buildpack", "my.war", "5"})
+		testcmd.RunCommand(cmd, context, reqFactory)
 		Expect(*repo.CreateBuildpack.Enabled).To(Equal(false))
 	})
-	It("TestCreateBuildpackWithInvalidPath", func() {
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-
+	It("alerts the user when uploading the buildpack bits fails", func() {
 		bitsRepo.UploadBuildpackErr = true
-		ui := callCreateBuildpack([]string{"my-buildpack", "bogus/path", "5"}, reqFactory, repo, bitsRepo)
+		context := testcmd.NewContext("create-buildpack", []string{"my-buildpack", "bogus/path", "5"})
+		testcmd.RunCommand(cmd, context, reqFactory)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating buildpack", "my-buildpack"},
@@ -139,16 +101,5 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"Uploading buildpack"},
 			{"FAILED"},
 		})
-	})
-	It("TestCreateBuildpackFailsWithUsage", func() {
-
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		repo, bitsRepo := getRepositories()
-
-		ui := callCreateBuildpack([]string{}, reqFactory, repo, bitsRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callCreateBuildpack([]string{"my-buildpack", "my.war", "5"}, reqFactory, repo, bitsRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
 })
