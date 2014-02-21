@@ -153,7 +153,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			}()
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
-			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 100*time.Millisecond)
+			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 500*time.Millisecond)
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
 
