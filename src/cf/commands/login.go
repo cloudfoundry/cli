@@ -122,7 +122,11 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 
 		cmd.ui.Say("Authenticating...")
 
-		apiResponse = cmd.authenticator.Authenticate(username, password)
+		apiResponse = cmd.authenticator.Authenticate(map[string]string{
+			"username": username,
+			"password": password,
+		})
+
 		if apiResponse.IsSuccessful() {
 			cmd.ui.Ok()
 			cmd.ui.Say("")

@@ -20,7 +20,10 @@ var _ = Describe("AuthenticationRepository", func() {
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-		apiResponse := auth.Authenticate("foo@example.com", "bar")
+		apiResponse := auth.Authenticate(map[string]string{
+			"username": "foo@example.com",
+			"password": "bar",
+		})
 
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeFalse())
@@ -34,7 +37,10 @@ var _ = Describe("AuthenticationRepository", func() {
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-		apiResponse := auth.Authenticate("foo@example.com", "oops wrong pass")
+		apiResponse := auth.Authenticate(map[string]string{
+			"username": "foo@example.com",
+			"password": "bar",
+		})
 
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
@@ -47,7 +53,10 @@ var _ = Describe("AuthenticationRepository", func() {
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-		apiResponse := auth.Authenticate("foo@example.com", "bar")
+		apiResponse := auth.Authenticate(map[string]string{
+			"username": "foo@example.com",
+			"password": "bar",
+		})
 
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeTrue())
@@ -60,7 +69,10 @@ var _ = Describe("AuthenticationRepository", func() {
 		defer teardownAuthDependencies(deps)
 
 		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-		apiResponse := auth.Authenticate("foo@example.com", "bar")
+		apiResponse := auth.Authenticate(map[string]string{
+			"username": "foo@example.com",
+			"password": "bar",
+		})
 
 		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeTrue())
