@@ -12,500 +12,355 @@ import (
 	testassert "testhelpers/assert"
 	testcmd "testhelpers/commands"
 	testconfig "testhelpers/configuration"
-	"testhelpers/maker"
 	testterm "testhelpers/terminal"
 )
 
 var _ = Describe("Testing with ginkgo", func() {
-	It("TestSuccessfullyLoggingInWithNumericalPrompts", func() {
-		c := setUpLoginTestContext()
+	var (
+		Flags        []string
+		Config       configuration.ReadWriter
+		ui           *testterm.FakeUI
+		authRepo     *testapi.FakeAuthenticationRepository
+		endpointRepo *testapi.FakeEndpointRepo
+		orgRepo      *testapi.FakeOrgRepository
+		spaceRepo    *testapi.FakeSpaceRepository
+	)
 
-		OUT_OF_RANGE_CHOICE := "3"
-
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
-
-		org1 := models.Organization{}
-		org1.Guid = "some-org-guid"
-		org1.Name = "some-org"
-
-		org2 := models.Organization{}
-		org2.Guid = "my-org-guid"
-		org2.Name = "my-org"
-
-		space1 := models.Space{}
-		space1.Guid = "my-space-guid"
-		space1.Name = "my-space"
-
-		space2 := models.Space{}
-		space2.Guid = "some-space-guid"
-		space2.Name = "some-space"
-
-		c.orgRepo.Organizations = []models.Organization{org1, org2}
-		c.spaceRepo.Spaces = []models.Space{space1, space2}
-
-		callLogin(c)
-
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
-			{"Select an org"},
-			{"1. some-org"},
-			{"2. my-org"},
-			{"Select a space"},
-			{"1. my-space"},
-			{"2. some-space"},
-		})
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
-
-		Expect(c.orgRepo.FindByNameName).To(Equal("my-org"))
-		Expect(c.spaceRepo.FindByNameName).To(Equal("my-space"))
-
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
-	})
-
-	It("TestSuccessfullyLoggingInWithStringPrompts", func() {
-		c := setUpLoginTestContext()
-
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"}
-
-		org1 := models.Organization{}
-		org1.Guid = "some-org-guid"
-		org1.Name = "some-org"
-
-		org2 := models.Organization{}
-		org2.Guid = "my-org-guid"
-		org2.Name = "my-org"
-
-		space1 := models.Space{}
-		space1.Guid = "my-space-guid"
-		space1.Name = "my-space"
-
-		space2 := models.Space{}
-		space2.Guid = "some-space-guid"
-		space2.Name = "some-space"
-
-		c.orgRepo.Organizations = []models.Organization{org1, org2}
-		c.spaceRepo.Spaces = []models.Space{space1, space2}
-
-		callLogin(c)
-
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
-			{"Select an org"},
-			{"1. some-org"},
-			{"2. my-org"},
-			{"Select a space"},
-			{"1. my-space"},
-			{"2. some-space"},
-		})
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
-
-		Expect(c.orgRepo.FindByNameName).To(Equal("my-org"))
-		Expect(c.spaceRepo.FindByNameName).To(Equal("my-space"))
-
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
-	})
-
-	It("TestLoggingInWithTooManyOrgsDoesNotShowOrgList", func() {
-		c := setUpLoginTestContext()
-
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
-
-		for i := 0; i < 60; i++ {
-			id := strconv.Itoa(i)
-			org := models.Organization{}
-			org.Guid = "my-org-guid-" + id
-			org.Name = "my-org-" + id
-			c.orgRepo.Organizations = append(c.orgRepo.Organizations, org)
+	BeforeEach(func() {
+		Flags = []string{}
+		Config = testconfig.NewRepository()
+		ui = &testterm.FakeUI{}
+		authRepo = &testapi.FakeAuthenticationRepository{
+			AccessToken:  "my_access_token",
+			RefreshToken: "my_refresh_token",
+			Config:       Config,
 		}
+		endpointRepo = &testapi.FakeEndpointRepo{Config: Config}
+		orgRepo = &testapi.FakeOrgRepository{}
+		spaceRepo = &testapi.FakeSpaceRepository{}
+	})
 
-		c.orgRepo.FindByNameOrganization = c.orgRepo.Organizations[1]
+	Describe("when there are a small number of organizations and spaces", func() {
+		var org2 models.Organization
+		var space2 models.Space
 
-		space1 := models.Space{}
-		space1.Guid = "my-space-guid"
-		space1.Name = "my-space"
+		BeforeEach(func() {
+			org1 := models.Organization{}
+			org1.Guid = "some-org-guid"
+			org1.Name = "some-org"
 
-		space2 := models.Space{}
-		space2.Guid = "some-space-guid"
-		space2.Name = "some-space"
+			org2 = models.Organization{}
+			org2.Guid = "my-org-guid"
+			org2.Name = "my-org"
 
-		c.spaceRepo.Spaces = []models.Space{space1, space2}
+			space1 := models.Space{}
+			space1.Guid = "my-space-guid"
+			space1.Name = "my-space"
 
-		callLogin(c)
+			space2 = models.Space{}
+			space2.Guid = "some-space-guid"
+			space2.Name = "some-space"
 
-		testassert.SliceDoesNotContain(c.ui.Outputs, testassert.Lines{
-			{"my-org-2"},
+			orgRepo.Organizations = []models.Organization{org1, org2}
+			spaceRepo.Spaces = []models.Space{space1, space2}
 		})
-		Expect(c.orgRepo.FindByNameName).To(Equal("my-org-1"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid-1"))
+
+		It("lets the user select an org and space by number", func() {
+			OUT_OF_RANGE_CHOICE := "3"
+
+			ui.Inputs = []string{"api.example.com", "user@example.com", "password", OUT_OF_RANGE_CHOICE, "2", OUT_OF_RANGE_CHOICE, "1"}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Select an org"},
+				{"1. some-org"},
+				{"2. my-org"},
+				{"Select a space"},
+				{"1. my-space"},
+				{"2. some-space"},
+			})
+
+			Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+
+			Expect(orgRepo.FindByNameName).To(Equal("my-org"))
+			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
+
+		It("lets the user select an org and space by name", func() {
+			ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Select an org"},
+				{"1. some-org"},
+				{"2. my-org"},
+				{"Select a space"},
+				{"1. my-space"},
+				{"2. some-space"},
+			})
+
+			Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+
+			Expect(orgRepo.FindByNameName).To(Equal("my-org"))
+			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
+
+		It("doesn't ask the user to select an org if they have one in their config", func() {
+			Config.SetOrganizationFields(org2.OrganizationFields)
+
+			Flags = []string{"-s", "my-space"}
+			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+
+			orgRepo.FindByNameOrganization = models.Organization{}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
+
+		It("lets the user specify an org and space using flags", func() {
+			Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
+
+		It("doesn't ask the user for the API url if they have it in their config", func() {
+			Config.SetApiEndpoint("http://api.example.com")
+
+			Flags = []string{"-o", "my-org", "-s", "my-space"}
+			ui.Inputs = []string{"user@example.com", "password"}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
+
+		It("uses the org and space from the config file if they are present", func() {
+			Config.SetOrganizationFields(org2.OrganizationFields)
+			Config.SetSpaceFields(space2.SpaceFields)
+
+			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+
+			orgRepo.FindByNameOrganization = models.Organization{}
+			spaceRepo.FindByNameInOrgSpace = models.Space{}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("some-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
 	})
 
-	It("TestSuccessfullyLoggingInWithFlags", func() {
-		c := setUpLoginTestContext()
+	Describe("when there are too many orgs to show", func() {
+		BeforeEach(func() {
+			for i := 0; i < 60; i++ {
+				id := strconv.Itoa(i)
+				org := models.Organization{}
+				org.Guid = "my-org-guid-" + id
+				org.Name = "my-org-" + id
+				orgRepo.Organizations = append(orgRepo.Organizations, org)
+			}
 
-		c.Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"}
+			orgRepo.FindByNameOrganization = orgRepo.Organizations[1]
 
-		callLogin(c)
+			space1 := models.Space{}
+			space1.Guid = "my-space-guid"
+			space1.Name = "my-space"
 
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
+			space2 := models.Space{}
+			space2.Guid = "some-space-guid"
+			space2.Name = "some-space"
 
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
+			spaceRepo.Spaces = []models.Space{space1, space2}
+		})
 
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
+		It("doesn't display a list of orgs (the user must type the name)", func() {
+			ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org-1", "my-space"}
+
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"my-org-2"},
+			})
+			Expect(orgRepo.FindByNameName).To(Equal("my-org-1"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid-1"))
+		})
 	})
 
-	It("TestSuccessfullyLoggingInWithEndpointSetInConfig", func() {
-		c := setUpLoginTestContext()
+	Describe("when there is only a single org and space", func() {
+		BeforeEach(func() {
+			org := models.Organization{}
+			org.Name = "my-org"
+			org.Guid = "my-org-guid"
 
-		c.Flags = []string{"-o", "my-org", "-s", "my-space"}
-		c.ui.Inputs = []string{"user@example.com", "password"}
-		c.Config.SetApiEndpoint("http://api.example.com")
+			orgRepo.FindByNameOrganization = models.Organization{}
+			orgRepo.Organizations = []models.Organization{org}
 
-		callLogin(c)
+			space := models.Space{}
+			space.Guid = "my-space-guid"
+			space.Name = "my-space"
+			spaceRepo.Spaces = []models.Space{space}
+		})
 
-		Expect(c.Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
+		It("does not ask the user to select an org/space", func() {
+			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
+			Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
+			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
+			Expect(Config.AccessToken()).To(Equal("my_access_token"))
+			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
+			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+				"username": "user@example.com",
+				"password": "password",
+			}))
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
+		})
 	})
 
-	It("TestSuccessfullyLoggingInWithOrgSetInConfig", func() {
-		c := setUpLoginTestContext()
+	It("fails when the user enters invalid credentials", func() {
+		authRepo.AuthError = true
 
-		org := models.OrganizationFields{}
-		org.Name = "my-org"
-		org.Guid = "my-org-guid"
-		c.Config.SetOrganizationFields(org)
+		Flags = []string{"-u", "user@example.com"}
+		ui.Inputs = []string{"api.example.com", "password", "password2", "password3"}
 
-		c.Flags = []string{"-s", "my-space"}
-		c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
+		l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+		testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-		c.orgRepo.FindByNameOrganization = models.Organization{}
+		Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+		Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+		Expect(Config.SpaceFields().Guid).To(BeEmpty())
+		Expect(Config.AccessToken()).To(BeEmpty())
+		Expect(Config.RefreshToken()).To(BeEmpty())
 
-		callLogin(c)
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
-
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
-	})
-
-	It("TestSuccessfullyLoggingInWithOrgAndSpaceSetInConfig", func() {
-		c := setUpLoginTestContext()
-
-		org := models.OrganizationFields{}
-		org.Name = "my-org"
-		org.Guid = "my-org-guid"
-		c.Config.SetOrganizationFields(org)
-
-		space := models.SpaceFields{}
-		space.Guid = "my-space-guid"
-		space.Name = "my-space"
-		c.Config.SetSpaceFields(space)
-
-		c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-
-		c.orgRepo.FindByNameOrganization = models.Organization{}
-		c.spaceRepo.FindByNameInOrgSpace = models.Space{}
-
-		callLogin(c)
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
-
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
-	})
-
-	It("TestSuccessfullyLoggingInWithOnlyOneOrg", func() {
-		c := setUpLoginTestContext()
-
-		org := models.Organization{}
-		org.Name = "my-org"
-		org.Guid = "my-org-guid"
-
-		c.Flags = []string{"-s", "my-space"}
-		c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-		c.orgRepo.FindByNameOrganization = models.Organization{}
-		c.orgRepo.Organizations = []models.Organization{org}
-
-		callLogin(c)
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
-
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
-	})
-
-	It("TestSuccessfullyLoggingInWithOnlyOneSpace", func() {
-		c := setUpLoginTestContext()
-
-		space := models.Space{}
-		space.Guid = "my-space-guid"
-		space.Name = "my-space"
-
-		c.Flags = []string{"-o", "my-org"}
-		c.ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-		c.spaceRepo.Spaces = []models.Space{space}
-
-		callLogin(c)
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		Expect(c.endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-		Expect(c.authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-			"username": "user@example.com",
-			"password": "password",
-		}))
-
-		Expect(c.ui.ShowConfigurationCalled).To(BeTrue())
-	})
-
-	It("TestUnsuccessfullyLoggingInWithAuthError", func() {
-		c := setUpLoginTestContext()
-
-		c.Flags = []string{"-u", "user@example.com"}
-		c.ui.Inputs = []string{"api.example.com", "password", "password2", "password3"}
-		c.authRepo.AuthError = true
-
-		callLogin(c)
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(BeEmpty())
-		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
-		Expect(c.Config.AccessToken()).To(BeEmpty())
-		Expect(c.Config.RefreshToken()).To(BeEmpty())
-
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 	})
 
-	It("TestUnsuccessfullyLoggingInWithUpdateEndpointError", func() {
-		c := setUpLoginTestContext()
+	It("fails when the /v2/info API returns an error", func() {
+		endpointRepo.UpdateEndpointError = net.NewApiResponseWithMessage("Server error")
 
-		c.ui.Inputs = []string{"api.example.com"}
-		c.endpointRepo.UpdateEndpointError = net.NewApiResponseWithMessage("Server error")
+		ui.Inputs = []string{"api.example.com"}
 
-		callLogin(c)
+		l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+		testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-		Expect(c.Config.ApiEndpoint()).To(BeEmpty())
-		Expect(c.Config.OrganizationFields().Guid).To(BeEmpty())
-		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
-		Expect(c.Config.AccessToken()).To(BeEmpty())
-		Expect(c.Config.RefreshToken()).To(BeEmpty())
+		Expect(Config.ApiEndpoint()).To(BeEmpty())
+		Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+		Expect(Config.SpaceFields().Guid).To(BeEmpty())
+		Expect(Config.AccessToken()).To(BeEmpty())
+		Expect(Config.RefreshToken()).To(BeEmpty())
 
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
 	})
 
-	It("TestUnsuccessfullyLoggingInWithOrgFindByNameErr", func() {
-		c := setUpLoginTestContext()
+	It("fails when there is an error fetching the organization", func() {
+		orgRepo.FindByNameErr = true
 
-		c.Flags = []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"}
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
-		c.orgRepo.FindByNameErr = true
+		Flags = []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"}
+		ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
 
-		callLogin(c)
+		l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+		testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(BeEmpty())
-		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
+		Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+		Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+		Expect(Config.SpaceFields().Guid).To(BeEmpty())
+		Expect(Config.AccessToken()).To(Equal("my_access_token"))
+		Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
+		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Failed"},
 		})
-	})
-
-	It("TestUnsuccessfullyLoggingInWithSpaceFindByNameErr", func() {
-		c := setUpLoginTestContext()
-
-		c.Flags = []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"}
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
-		c.spaceRepo.FindByNameErr = true
-
-		callLogin(c)
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(BeEmpty())
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
-			{"Failed"},
-		})
-	})
-
-	It("TestSuccessfullyLoggingInWithoutTargetOrg", func() {
-		c := setUpLoginTestContext()
-
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", ""}
-
-		org1 := maker.NewOrg(maker.Overrides{"name": "org1"})
-		org2 := maker.NewOrg(maker.Overrides{"name": "org2"})
-		c.orgRepo.Organizations = []models.Organization{org1, org2}
-
-		callLogin(c)
-
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
-			{"Select an org (or press enter to skip):"},
-		})
-		testassert.SliceDoesNotContain(c.ui.Outputs, testassert.Lines{
-			{"Select a space", "or press enter to skip"},
-		})
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal(""))
-		Expect(c.Config.SpaceFields().Guid).To(Equal(""))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
-	})
-
-	It("TestSuccessfullyLoggingInWithoutTargetSpace", func() {
-		c := setUpLoginTestContext()
-
-		c.ui.Inputs = []string{"api.example.com", "user@example.com", "password", ""}
-
-		org := models.Organization{}
-		org.Guid = "some-org-guid"
-		org.Name = "some-org"
-
-		space1 := maker.NewSpace(maker.Overrides{"name": "some-space", "guid": "some-space-guid"})
-		space2 := maker.NewSpace(maker.Overrides{"name": "other-space", "guid": "other-space-guid"})
-
-		c.orgRepo.Organizations = []models.Organization{org}
-		c.spaceRepo.Spaces = []models.Space{space1, space2}
-
-		callLogin(c)
-
-		testassert.SliceContains(c.ui.Outputs, testassert.Lines{
-			{"Select a space (or press enter to skip):"},
-		})
-		testassert.SliceDoesNotContain(c.ui.Outputs, testassert.Lines{
-			{"FAILED"},
-		})
-
-		Expect(c.Config.ApiEndpoint()).To(Equal("api.example.com"))
-		Expect(c.Config.OrganizationFields().Guid).To(Equal("some-org-guid"))
-		Expect(c.Config.SpaceFields().Guid).To(Equal(""))
-		Expect(c.Config.AccessToken()).To(Equal("my_access_token"))
-		Expect(c.Config.RefreshToken()).To(Equal("my_refresh_token"))
 	})
 })
-
-type LoginTestContext struct {
-	Flags  []string
-	Config configuration.ReadWriter
-
-	ui           *testterm.FakeUI
-	authRepo     *testapi.FakeAuthenticationRepository
-	endpointRepo *testapi.FakeEndpointRepo
-	orgRepo      *testapi.FakeOrgRepository
-	spaceRepo    *testapi.FakeSpaceRepository
-}
-
-func setUpLoginTestContext() (c *LoginTestContext) {
-	c = new(LoginTestContext)
-	c.Config = testconfig.NewRepository()
-
-	c.ui = &testterm.FakeUI{}
-
-	c.authRepo = &testapi.FakeAuthenticationRepository{
-		AccessToken:  "my_access_token",
-		RefreshToken: "my_refresh_token",
-		Config:       c.Config,
-	}
-	c.endpointRepo = &testapi.FakeEndpointRepo{Config: c.Config}
-
-	org := models.Organization{}
-	org.Name = "my-org"
-	org.Guid = "my-org-guid"
-
-	c.orgRepo = &testapi.FakeOrgRepository{
-		Organizations: []models.Organization{org},
-	}
-
-	space := models.Space{}
-	space.Name = "my-space"
-	space.Guid = "my-space-guid"
-
-	c.spaceRepo = &testapi.FakeSpaceRepository{
-		Spaces: []models.Space{space},
-	}
-
-	return
-}
-
-func callLogin(c *LoginTestContext) {
-	l := NewLogin(c.ui, c.Config, c.authRepo, c.endpointRepo, c.orgRepo, c.spaceRepo)
-	testcmd.RunCommand(l, testcmd.NewContext("login", c.Flags), nil)
-}
