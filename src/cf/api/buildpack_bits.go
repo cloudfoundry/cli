@@ -92,7 +92,11 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) (err err
 		return
 	}
 
-	reader, _ := zip.NewReader(inputFile, stats.Size())
+	reader, err := zip.NewReader(inputFile, stats.Size())
+	if err != nil {
+		return
+	}
+
 	contents := reader.File
 
 	parentPath, hasBuildpack := findBuildpackPath(contents)
