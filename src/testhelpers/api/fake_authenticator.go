@@ -10,6 +10,10 @@ type FakeAuthenticationRepository struct {
 	AuthenticateArgs struct {
 		Credentials map[string]string
 	}
+	GetLoginPromptsReturns struct {
+		ApiResponse net.ApiResponse
+		Prompts map[string]configuration.AuthPrompt
+	}
 
 	AuthError    bool
 	AccessToken  string
@@ -35,5 +39,11 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 }
 
 func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse) {
+	return
+}
+
+func (auth *FakeAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse net.ApiResponse) {
+	prompts = auth.GetLoginPromptsReturns.Prompts
+	apiResponse = auth.GetLoginPromptsReturns.ApiResponse
 	return
 }

@@ -108,24 +108,32 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
 }
 
 func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
-	username := c.String("u")
-	if username == "" {
-		username = cmd.ui.Ask("Username%s", terminal.PromptColor(">"))
+	prompts, apiResponse := cmd.authenticator.GetLoginPrompts()
+
+	var passwordKey string
+	credentials := make(map[string]string)
+	for key, prompt := range prompts {
+		if prompt.Type == configuration.AuthPromptTypePassword {
+			passwordKey = key
+		} else if key == "username" && c.String("u") != "" {
+			credentials[key] = c.String("u")
+		} else {
+			credentials[key] = cmd.ui.Ask("%s%s", prompt.DisplayName, terminal.PromptColor(">"))
+		}
 	}
 
 	password := c.String("p")
+	passwordPrompt := prompts[passwordKey]
 
 	for i := 0; i < maxLoginTries; i++ {
 		if password == "" || i > 0 {
-			password = cmd.ui.AskForPassword("Password%s", terminal.PromptColor(">"))
+			password = cmd.ui.AskForPassword("%s%s", passwordPrompt.DisplayName, terminal.PromptColor(">"))
 		}
 
 		cmd.ui.Say("Authenticating...")
 
-		apiResponse = cmd.authenticator.Authenticate(map[string]string{
-			"username": username,
-			"password": password,
-		})
+		credentials[passwordKey] = password
+		apiResponse = cmd.authenticator.Authenticate(credentials)
 
 		if apiResponse.IsSuccessful() {
 			cmd.ui.Ok()

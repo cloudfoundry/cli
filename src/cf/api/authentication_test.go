@@ -15,69 +15,108 @@ import (
 )
 
 var _ = Describe("AuthenticationRepository", func() {
-	It("TestSuccessfullyLoggingIn", func() {
-		deps := setupAuthDependencies(successfulLoginRequest)
-		defer teardownAuthDependencies(deps)
+	var (
+		gateway net.Gateway
+		ts      *httptest.Server
+		handler *testnet.TestHandler
+		config  configuration.ReadWriter
+	)
 
-		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
-		apiResponse := auth.Authenticate(map[string]string{
-			"username": "foo@example.com",
-			"password": "bar",
-		})
-
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
-		Expect(apiResponse.IsError()).To(BeFalse())
-		Expect(deps.config.AuthorizationEndpoint()).To(Equal(deps.ts.URL))
-		Expect(deps.config.AccessToken()).To(Equal("BEARER my_access_token"))
-		Expect(deps.config.RefreshToken()).To(Equal("my_refresh_token"))
+	BeforeEach(func() {
+		gateway = net.NewUAAGateway()
 	})
 
-	It("TestUnsuccessfullyLoggingIn", func() {
-		deps := setupAuthDependencies(unsuccessfulLoginRequest)
-		defer teardownAuthDependencies(deps)
+	AfterEach(func() {
+		ts.Close()
+	})
 
-		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+	It("logs in", func() {
+		ts, handler, config = setupAuthDependencies(successfulLoginRequest)
+
+		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiResponse := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(config.AuthorizationEndpoint()).To(Equal(ts.URL))
+		Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
+		Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
+	})
+
+	It("returns a failure response when login fails", func() {
+		ts, handler, config = setupAuthDependencies(unsuccessfulLoginRequest)
+
+		auth := NewUAAAuthenticationRepository(gateway, config)
+		apiResponse := auth.Authenticate(map[string]string{
+			"username": "foo@example.com",
+			"password": "bar",
+		})
+
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Password is incorrect, please try again."))
-		Expect(deps.config.AccessToken()).To(BeEmpty())
+		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
-	It("TestServerErrorLoggingIn", func() {
-		deps := setupAuthDependencies(errorLoginRequest)
-		defer teardownAuthDependencies(deps)
+	It("returns a failure response when an error occurs during login", func() {
+		ts, handler, config = setupAuthDependencies(errorLoginRequest)
 
-		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiResponse := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Server error, status code: 500, error code: , message: "))
-		Expect(deps.config.AccessToken()).To(BeEmpty())
+		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
-	It("TestLoggingInWithErrorMaskedAsSuccess", func() {
-		deps := setupAuthDependencies(errorMaskedAsSuccessLoginRequest)
-		defer teardownAuthDependencies(deps)
+	It("returns an error response when the UAA has an error but still returns a 200", func() {
+		ts, handler, config = setupAuthDependencies(errorMaskedAsSuccessLoginRequest)
 
-		auth := NewUAAAuthenticationRepository(deps.gateway, deps.config)
+		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiResponse := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
-		Expect(deps.config.AccessToken()).To(BeEmpty())
+		Expect(config.AccessToken()).To(BeEmpty())
+	})
+
+	It("gets the login prompts", func() {
+		ts, handler, config = setupAuthDependencies(loginInfoRequest)
+		auth := NewUAAAuthenticationRepository(gateway, config)
+
+		prompts, apiResponse := auth.GetLoginPrompts()
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(prompts).To(Equal(map[string]configuration.AuthPrompt{
+			"username": configuration.AuthPrompt{
+				DisplayName: "Email",
+				Type:        configuration.AuthPromptTypeText,
+			},
+			"pin": configuration.AuthPrompt{
+				DisplayName: "PIN Number",
+				Type:        configuration.AuthPromptTypePassword,
+			},
+		}))
+	})
+
+	It("returns a failure response when the login info API fails", func() {
+		ts, handler, config = setupAuthDependencies(loginInfoFailureRequest)
+		auth := NewUAAAuthenticationRepository(gateway, config)
+
+		prompts, apiResponse := auth.GetLoginPrompts()
+		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(apiResponse.IsError()).To(BeTrue())
+		Expect(prompts).To(BeEmpty())
 	})
 })
 
@@ -111,10 +150,10 @@ var successfulLoginMatcher = func(request *http.Request) {
 		return
 	}
 
-	Expect(request.Form.Get("username")).To(Equal("foo@example.com"), "Username did not match.")
-	Expect(request.Form.Get("password")).To(Equal("bar"), "Password did not match.")
-	Expect(request.Form.Get("grant_type")).To(Equal("password"), "Grant type did not match.")
-	Expect(request.Form.Get("scope")).To(Equal(""), "Scope did not mathc.")
+	Expect(request.Form.Get("username")).To(Equal("foo@example.com"))
+	Expect(request.Form.Get("password")).To(Equal("bar"))
+	Expect(request.Form.Get("grant_type")).To(Equal("password"))
+	Expect(request.Form.Get("scope")).To(Equal(""))
 }
 
 var unsuccessfulLoginRequest = testnet.TestRequest{
@@ -139,27 +178,50 @@ var errorMaskedAsSuccessLoginRequest = testnet.TestRequest{
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
-{"error":{"error":"rest_client_error","error_description":"I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"}}
+{
+	"error": {
+		"error": "rest_client_error",
+		"error_description": "I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"
+	}
+}
 `},
 }
 
-type authDependencies struct {
-	ts      *httptest.Server
-	handler *testnet.TestHandler
-	config  configuration.ReadWriter
-	gateway net.Gateway
+var loginInfoRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/login",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+	"timestamp":"2013-12-18T11:26:53-0700",
+	"app":{
+		"artifact":"cloudfoundry-identity-uaa",
+		"description":"User Account and Authentication Service",
+		"name":"UAA",
+		"version":"1.4.7"
+	},
+	"commit_id":"2701cc8",
+	"prompts":{
+		"username": ["text","Email"],
+		"pin": ["password", "PIN Number"]
+	}
+}`,
+	},
 }
 
-func setupAuthDependencies(request testnet.TestRequest) (deps authDependencies) {
-	deps.ts, deps.handler = testnet.NewTLSServer([]testnet.TestRequest{request})
-
-	deps.config = testconfig.NewRepository()
-	deps.config.SetAuthorizationEndpoint(deps.ts.URL)
-
-	deps.gateway = net.NewUAAGateway()
-	return
+var loginInfoFailureRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/login",
+	Response: testnet.TestResponse{
+		Status: http.StatusInternalServerError,
+	},
 }
 
-func teardownAuthDependencies(deps authDependencies) {
-	deps.ts.Close()
+func setupAuthDependencies(request testnet.TestRequest) (*httptest.Server, *testnet.TestHandler, configuration.ReadWriter) {
+	ts, handler := testnet.NewTLSServer([]testnet.TestRequest{request})
+	config := testconfig.NewRepository()
+	config.SetAuthorizationEndpoint(ts.URL)
+
+	return ts, handler, config
 }

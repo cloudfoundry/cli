@@ -45,6 +45,10 @@ func (ui *FakeUI) Warn(message string, args ...interface{}) {
 
 func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
+	if (len(ui.Inputs) == 0) {
+		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+	}
+
 	answer = ui.Inputs[0]
 	ui.Inputs = ui.Inputs[1:]
 	return
@@ -61,6 +65,10 @@ func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 
 func (ui *FakeUI) AskForPassword(prompt string, args ...interface{}) (answer string) {
 	ui.PasswordPrompts = append(ui.PasswordPrompts, fmt.Sprintf(prompt, args...))
+	if len(ui.Inputs) == 0 {
+		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
+	}
+
 	answer = ui.Inputs[0]
 	ui.Inputs = ui.Inputs[1:]
 	return

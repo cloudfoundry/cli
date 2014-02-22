@@ -4,6 +4,18 @@ import (
 	"cf/models"
 )
 
+type AuthPromptType string
+
+const (
+	AuthPromptTypeText     AuthPromptType = "TEXT"
+	AuthPromptTypePassword AuthPromptType = "PASSWORD"
+)
+
+type AuthPrompt struct {
+	Type        AuthPromptType
+	DisplayName string
+}
+
 type Data struct {
 	ConfigVersion         int
 	Target                string
@@ -14,6 +26,7 @@ type Data struct {
 	RefreshToken          string
 	OrganizationFields    models.OrganizationFields
 	SpaceFields           models.SpaceFields
+	AuthenticationPrompts map[string]AuthPrompt
 }
 
 func NewData() (data *Data) {
