@@ -360,7 +360,7 @@ var _ = Describe("Services Repo", func() {
 			It("returns the plan guid for a v1 plan", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/services?inline-relations-depth=1&q=label:v1-elephantsql;provider:v1-elephantsql",
+					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v1-elephantsql;provider:v1-elephantsql")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
                         {
                           "resources": [
@@ -406,7 +406,7 @@ var _ = Describe("Services Repo", func() {
 			It("returns the plan guid for a v2 plan", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/services?inline-relations-depth=1&q=label:v2-elephantsql;provider:",
+					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-elephantsql;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
                         {
                           "resources": [
@@ -453,7 +453,7 @@ var _ = Describe("Services Repo", func() {
 			It("returns an apiResponse error", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
-					Path:     "/v2/services?inline-relations-depth=1&q=label:v2-service-label;provider:",
+					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
 				})
 
@@ -479,7 +479,7 @@ var _ = Describe("Services Repo", func() {
 			It("returns apiResponse error", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
-					Path:   "/v2/services?inline-relations-depth=1&q=label:v2-service-label;provider:",
+					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
                         {
                           "resources": [
@@ -529,7 +529,7 @@ var _ = Describe("Services Repo", func() {
 			It("returns that apiResponse error", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
-					Path:     "/v2/services?inline-relations-depth=1&q=label:v2-service-label;provider:",
+					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusInternalServerError}})
 
 				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
