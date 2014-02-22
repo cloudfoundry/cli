@@ -141,10 +141,8 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
-			{"OK"},
-			{"Service offering", "does not exist"},
-		})
+		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{{"Service offering", "does not exist"}})
+		testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{{"Ok"}})
 
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
