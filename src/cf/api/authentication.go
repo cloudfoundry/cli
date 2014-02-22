@@ -14,6 +14,7 @@ import (
 type AuthenticationRepository interface {
 	Authenticate(credentials map[string]string) (apiResponse net.ApiResponse)
 	RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse)
+	GetLoginPrompts() (map[string]configuration.AuthPrompt, net.ApiResponse)
 }
 
 type UAAAuthenticationRepository struct {
@@ -40,6 +41,34 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	if apiResponse.IsNotSuccessful() && apiResponse.StatusCode == 401 {
 		apiResponse.Message = "Password is incorrect, please try again."
 	}
+	return
+}
+
+type LoginResource struct {
+	Prompts map[string][]string
+}
+
+var knownAuthPromptTypes = map[string]configuration.AuthPromptType{
+	"text":     configuration.AuthPromptTypeText,
+	"password": configuration.AuthPromptTypePassword,
+}
+
+func (r *LoginResource) ToModel() (prompts map[string]configuration.AuthPrompt) {
+	prompts = make(map[string]configuration.AuthPrompt)
+	for key, val := range r.Prompts {
+		prompts[key] = configuration.AuthPrompt{
+			Type:        knownAuthPromptTypes[val[0]],
+			DisplayName: val[1],
+		}
+	}
+	return
+}
+
+func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse net.ApiResponse) {
+	url := fmt.Sprintf("%s/login", uaa.config.AuthorizationEndpoint())
+	resource := &LoginResource{}
+	apiResponse = uaa.gateway.GetResource(url, "", resource)
+	prompts = resource.ToModel()
 	return
 }
 

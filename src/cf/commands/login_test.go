@@ -36,8 +36,34 @@ var _ = Describe("Testing with ginkgo", func() {
 			Config:       Config,
 		}
 		endpointRepo = &testapi.FakeEndpointRepo{Config: Config}
-		orgRepo = &testapi.FakeOrgRepository{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
+
+		org := models.Organization{}
+		org.Name = "my-org"
+		org.Guid = "my-org-guid"
+
+		orgRepo = &testapi.FakeOrgRepository{
+			Organizations:          []models.Organization{org},
+			FindByNameOrganization: models.Organization{},
+		}
+
+		space := models.Space{}
+		space.Guid = "my-space-guid"
+		space.Name = "my-space"
+
+		spaceRepo = &testapi.FakeSpaceRepository{
+			Spaces: []models.Space{space},
+		}
+
+		authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
+			"username": configuration.AuthPrompt{
+				DisplayName: "Username",
+				Type:        configuration.AuthPromptTypeText,
+			},
+			"password": configuration.AuthPrompt{
+				DisplayName: "Password",
+				Type:        configuration.AuthPromptTypePassword,
+			},
+		}
 	})
 
 	Describe("when there are a small number of organizations and spaces", func() {
@@ -270,20 +296,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	Describe("when there is only a single org and space", func() {
-		BeforeEach(func() {
-			org := models.Organization{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
-
-			orgRepo.FindByNameOrganization = models.Organization{}
-			orgRepo.Organizations = []models.Organization{org}
-
-			space := models.Space{}
-			space.Guid = "my-space-guid"
-			space.Name = "my-space"
-			spaceRepo.Spaces = []models.Space{space}
-		})
-
 		It("does not ask the user to select an org/space", func() {
 			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
 
@@ -303,6 +315,42 @@ var _ = Describe("Testing with ginkgo", func() {
 			}))
 			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 		})
+	})
+
+	It("asks the user for fields given by the login info API", func() {
+		authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
+			"pin": configuration.AuthPrompt{
+				DisplayName: "PIN Number",
+				Type:        configuration.AuthPromptTypePassword,
+			},
+			"account_number": configuration.AuthPrompt{
+				DisplayName: "Account Number",
+				Type:        configuration.AuthPromptTypeText,
+			},
+			"department_number": configuration.AuthPrompt{
+				DisplayName: "Dept Number",
+				Type:        configuration.AuthPromptTypeText,
+			},
+		}
+
+		ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin"}
+
+		l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+		testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+		testassert.SliceContains(ui.Prompts, testassert.Lines{
+			{"Account Number>"},
+			{"Dept Number>"},
+		})
+		testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
+			{"PIN Number>"},
+		})
+
+		Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
+			"account_number":    "the-account-number",
+			"department_number": "the-department-number",
+			"pin":               "the-pin",
+		}))
 	})
 
 	It("fails when the user enters invalid credentials", func() {
