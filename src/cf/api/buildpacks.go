@@ -45,7 +45,7 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 	apiResponse = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
-		fmt.Sprintf("%s?q=name%%3A%s", buildpacks_path, url.QueryEscape(name)),
+		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:" + name)),
 		BuildpackResource{},
 		func(resource interface{}) bool {
 			buildpack = resource.(BuildpackResource).ToFields()
