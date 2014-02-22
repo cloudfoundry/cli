@@ -6,6 +6,7 @@ import (
 	"cf/net"
 	"fmt"
 	"strings"
+	"net/url"
 )
 
 type PaginatedAuthTokenResources struct {
@@ -47,7 +48,7 @@ func (repo CloudControllerServiceAuthTokenRepository) FindAll() (authTokens []mo
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) FindByLabelAndProvider(label, provider string) (authToken models.ServiceAuthTokenFields, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/service_auth_tokens?q=label:%s;provider:%s", repo.config.ApiEndpoint(), label, provider)
+	path := fmt.Sprintf("%s/v2/service_auth_tokens?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("label:" + label + ";provider:" + provider))
 	authTokens, apiResponse := repo.findAllWithPath(path)
 	if apiResponse.IsNotSuccessful() {
 		return

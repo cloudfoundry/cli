@@ -83,7 +83,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/service_auth_tokens?q=label:a-label;provider:a-provider",
+			Path:   "/v2/service_auth_tokens?q=label%3Aa-label%3Bprovider%3Aa-provider",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
 				Body: `{"resources": [{
@@ -112,7 +112,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
-			Path:   "/v2/service_auth_tokens?q=label:a-label;provider:a-provider",
+			Path:   "/v2/service_auth_tokens?q=label%3Aa-label%3Bprovider%3Aa-provider",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
 				Body:   `{"resources": []}`},
