@@ -6,7 +6,6 @@ import (
 	. "cf/api"
 	"cf/models"
 	"cf/net"
-	"fileutils"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -49,28 +48,6 @@ var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
         "size": 111
     }
 ]`)
-
-var permissionsToSet os.FileMode
-var expectedPermissionBits os.FileMode
-
-func init() {
-	permissionsToSet = 0467
-	fileutils.TempFile("permissionedFile", func(file *os.File, err error) {
-		if err != nil {
-			panic("could not create tmp file")
-		}
-
-		fileInfo, err := file.Stat()
-		if err != nil {
-			panic("could not stat tmp file")
-		}
-
-		expectedPermissionBits = fileInfo.Mode()
-		if runtime.GOOS != "windows" {
-			expectedPermissionBits |= permissionsToSet & 0111
-		}
-	})
-}
 
 var matchedResources = testnet.RemoveWhiteSpaceFromBody(`[
 	{
@@ -165,6 +142,14 @@ var uploadBodyMatcher = func(request *http.Request) {
 	}
 
 	Expect(len(zipReader.File)).To(Equal(3), "Wrong number of files in zip")
+
+	var expectedPermissionBits os.FileMode
+	if runtime.GOOS == "windows" {
+		expectedPermissionBits = 0666
+	} else {
+		expectedPermissionBits = 0645
+	}
+
 	Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(expectedPermissionBits)))
 
 nextFile:
@@ -225,7 +210,7 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 	It("TestUploadWithInvalidDirectory", func() {
 		config := testconfig.NewRepository()
 		gateway := net.NewCloudControllerGateway()
@@ -242,7 +227,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
 		dir = filepath.Join(dir, "../../fixtures/example-app")
-		err = os.Chmod(filepath.Join(dir, "Gemfile"), permissionsToSet)
+		err = os.Chmod(filepath.Join(dir, "Gemfile"), 0467)
 
 		Expect(err).NotTo(HaveOccurred())
 
