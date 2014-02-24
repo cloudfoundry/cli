@@ -10,7 +10,6 @@ import (
 	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
-	"fileutils"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
@@ -26,8 +25,6 @@ type cliDependencies struct {
 }
 
 func setupDependencies() (deps *cliDependencies) {
-	fileutils.SetTmpPathPrefix("cf")
-
 	if os.Getenv("CF_COLOR") == "" {
 		os.Setenv("CF_COLOR", "true")
 	}
