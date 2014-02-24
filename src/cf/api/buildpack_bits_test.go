@@ -197,9 +197,9 @@ func uploadBuildpackRequest() testnet.TestRequest {
 			}))
 
 			if runtime.GOOS != "windows" {
-				Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(0755)))
-				Expect(zipReader.File[1].Mode()).To(Equal(os.FileMode(0755)))
-				Expect(zipReader.File[2].Mode()).To(Equal(os.FileMode(0755)))
+				for i := 0; i < 3; i++ {
+					Expect(zipReader.File[i].Mode()).To(Equal(os.FileMode(0755)))
+				}
 			}
 		},
 	}
