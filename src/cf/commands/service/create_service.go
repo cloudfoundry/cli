@@ -46,19 +46,19 @@ func (cmd CreateService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	offerings, apiResponse := cmd.serviceRepo.GetAllServiceOfferings()
+	offerings, apiResponse := cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
 	if apiResponse.IsNotSuccessful() {
 		cmd.ui.Failed(apiResponse.Message)
 		return
 	}
 
-	offering, err := findOffering(offerings, offeringName)
+	offerings, err := findOfferings(offerings, offeringName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
 	}
 
-	plan, err := findPlan(offering.Plans, planName)
+	plan, err := findPlanFromOfferings(offerings, planName)
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 		return
@@ -78,21 +78,25 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 }
 
-func findOffering(offerings []models.ServiceOffering, name string) (offering models.ServiceOffering, err error) {
+func findOfferings(offerings []models.ServiceOffering, name string) (matchingOfferings models.ServiceOfferings, err error) {
 	for _, offering := range offerings {
 		if name == offering.Label {
-			return offering, nil
+			matchingOfferings = append(matchingOfferings, offering)
 		}
 	}
 
-	err = errors.New(fmt.Sprintf("Could not find offering with name %s", name))
+	if len(matchingOfferings) == 0 {
+		err = errors.New(fmt.Sprintf("Could not find any offerings with name %s", name))
+	}
 	return
 }
 
-func findPlan(plans []models.ServicePlanFields, name string) (plan models.ServicePlanFields, err error) {
-	for _, plan := range plans {
-		if name == plan.Name {
-			return plan, nil
+func findPlanFromOfferings(offerings models.ServiceOfferings, name string) (plan models.ServicePlanFields, err error) {
+	for _, offering := range offerings {
+		for _, plan := range offering.Plans {
+			if name == plan.Name {
+				return plan, nil
+			}
 		}
 	}
 

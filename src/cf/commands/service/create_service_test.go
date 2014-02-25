@@ -39,7 +39,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering2.Label = "postgres"
 
 		serviceRepo := &testapi.FakeServiceRepo{}
-		serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{
+		serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = []models.ServiceOffering{
 			offering,
 			offering2,
 		}
@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering2 := models.ServiceOffering{}
 		offering2.Label = "postgres"
 		serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
-		serviceRepo.GetAllServiceOfferingsReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
+		serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
 		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 			[]string{},
 			serviceRepo,
@@ -80,5 +80,34 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 		Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
 		Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
+	})
+
+	Context("When there are multiple services with the same label", func() {
+		It("finds the plan even if it has to search multiple services", func() {
+			offering := models.ServiceOffering{}
+			offering.Label = "cleardb"
+
+			offering2 := models.ServiceOffering{}
+			offering2.Label = "cleardb"
+
+			plan := models.ServicePlanFields{}
+			plan.Name = "spark"
+			plan.Guid = "cleardb-spark-guid"
+			offering2.Plans = []models.ServicePlanFields{plan}
+
+			serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
+			serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
+			ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
+				[]string{},
+				serviceRepo,
+			)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
+				{"OK"},
+			})
+			Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
+			Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
+		})
 	})
 })
