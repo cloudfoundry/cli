@@ -90,7 +90,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(spaceRepo.FindByNameInOrgName).To(Equal("my-space"))
 		Expect(spaceRepo.FindByNameInOrgOrgGuid).To(Equal("some-org-guid"))
 
-		println(ui.DumpOutputs())
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Removing role", "SpaceManager", "some-user", "some-org", "some-space", "my-user"},
 			{"OK"},
