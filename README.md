@@ -75,6 +75,8 @@ Optionally, you can use `bin/run` to compile and run the executable in one step.
 Developing
 ==========
 
+1. Install [Mercurial](http://mercurial.selenic.com/)
+1. Run `go get code.google.com/p/go.tools/cmd/vet`
 1. Write a Ginkgo test.
 1. Run `bin/test` and watch the test fail.
 1. Make the test pass.
