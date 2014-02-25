@@ -147,10 +147,11 @@ var uploadBodyMatcher = func(request *http.Request) {
 	if runtime.GOOS == "windows" {
 		expectedPermissionBits = 0666
 	} else {
-		expectedPermissionBits = 0645
+		expectedPermissionBits = 0467
 	}
 
-	Expect(zipReader.File[0].Mode()).To(Equal(os.FileMode(expectedPermissionBits)))
+	Expect(zipReader.File[0].Name).To(Equal("Gemfile"))
+	Expect(executableBits(zipReader.File[0].Mode())).To(Equal(executableBits(expectedPermissionBits)))
 
 nextFile:
 	for _, f := range zipReader.File {
@@ -161,6 +162,10 @@ nextFile:
 		}
 		Fail("Missing file: " + f.Name)
 	}
+}
+
+func executableBits(mode os.FileMode) os.FileMode {
+	return mode & 0111
 }
 
 func createProgressEndpoint(status string) (req testnet.TestRequest) {
@@ -211,6 +216,14 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 }
 
 var _ = Describe("CloudControllerApplicationBitsRepository", func() {
+	var fixturesDir string
+
+	BeforeEach(func() {
+		cwd, err := os.Getwd()
+		Expect(err).NotTo(HaveOccurred())
+		fixturesDir = filepath.Join(cwd, "../../fixtures/applications")
+	})
+
 	It("TestUploadWithInvalidDirectory", func() {
 		config := testconfig.NewRepository()
 		gateway := net.NewCloudControllerGateway()
@@ -223,48 +236,43 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 		Expect(apiResponse.Message).To(ContainSubstring(filepath.Join("foo", "bar")))
 	})
 
-	It("TestUploadApp", func() {
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		dir = filepath.Join(dir, "../../fixtures/example-app")
-		err = os.Chmod(filepath.Join(dir, "Gemfile"), 0467)
+	Context("uploading a directory", func() {
+		var appPath string
+		BeforeEach(func() {
+			appPath = filepath.Join(fixturesDir, "example-app")
+			// the executable bit is the only bit we care about here
+			err := os.Chmod(filepath.Join(appPath, "Gemfile"), 0467)
+			Expect(err).NotTo(HaveOccurred())
+		})
 
-		Expect(err).NotTo(HaveOccurred())
+		AfterEach(func() {
+			os.Chmod(filepath.Join(appPath, "Gemfile"), 0666)
+		})
 
-		_, apiResponse := testUploadApp(dir, defaultRequests)
+		It("preserves the executable bits when uploading app files", func() {
+			_, apiResponse := testUploadApp(appPath, defaultRequests)
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		})
+
+		It("returns a failure when uploading bits fails", func() {
+			requests := []testnet.TestRequest{
+				matchResourceRequest,
+				uploadApplicationRequest,
+				createProgressEndpoint("running"),
+				createProgressEndpoint("failed"),
+			}
+			_, apiResponse := testUploadApp(appPath, requests)
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+		})
+	})
+
+	It("uploads zip files", func() {
+		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.zip"), defaultRequests)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
-	It("TestCreateUploadDirWithAZipFile", func() {
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		dir = filepath.Join(dir, "../../fixtures/example-app.zip")
-
-		_, apiResponse := testUploadApp(dir, defaultRequests)
+	It("uploads zip files with non-standard names", func() {
+		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.azip"), defaultRequests)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-	})
-
-	It("TestCreateUploadDirWithAZipLikeFile", func() {
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		dir = filepath.Join(dir, "../../fixtures/example-app.azip")
-
-		_, apiResponse := testUploadApp(dir, defaultRequests)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-	})
-
-	It("TestUploadAppFailsWhilePushingBits", func() {
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		dir = filepath.Join(dir, "../../fixtures/example-app")
-
-		requests := []testnet.TestRequest{
-			matchResourceRequest,
-			uploadApplicationRequest,
-			createProgressEndpoint("running"),
-			createProgressEndpoint("failed"),
-		}
-		_, apiResponse := testUploadApp(dir, requests)
-		Expect(apiResponse.IsSuccessful()).To(BeFalse())
 	})
 })

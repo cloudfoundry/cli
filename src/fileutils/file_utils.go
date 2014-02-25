@@ -88,12 +88,7 @@ func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
 }
 
 func SetExecutableBits(dest string, fileInfoToCopy os.FileInfo) (err error) {
-	destFileInfo, err := os.Stat(dest)
-	if err != nil {
-		return
-	}
-
-	err = os.Chmod(dest, destFileInfo.Mode()|(fileInfoToCopy.Mode()&0111))
+	err = os.Chmod(dest, fileInfoToCopy.Mode())
 	return
 }
 
