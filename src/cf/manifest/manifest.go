@@ -193,10 +193,12 @@ func intVal(yamlMap generic.Map, key string, errs *ManifestErrors) *int {
 		intVal, err = strconv.Atoi(val)
 	case int:
 		intVal = val
+	case int64:
+		intVal = int(val)
 	case nil:
 		return nil
 	default:
-		err = errors.New(fmt.Sprintf("Expected %s to be a number.", key))
+		err = errors.New(fmt.Sprintf("Expected %s to be a number, but it was a %T.", key, val))
 	}
 
 	if err != nil {
@@ -265,6 +267,9 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]str
 	case map[string]interface{}:
 		yamlMap.Set(key, generic.NewMap(yamlMap.Get(key)))
 		return envVarOrEmptyMap(yamlMap, errs)
+	case map[interface{}]interface{}:
+		yamlMap.Set(key, generic.NewMap(yamlMap.Get(key)))
+		return envVarOrEmptyMap(yamlMap, errs)
 	case generic.Map:
 		merrs := validateEnvVars(envVars)
 		if merrs != nil {
@@ -278,7 +283,7 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]str
 		})
 		return &result
 	default:
-		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value.", key)))
+		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value, but it was a %T.", key, envVars)))
 		return nil
 	}
 }
