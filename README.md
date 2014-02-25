@@ -1,28 +1,28 @@
 Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 =================
 
-This is the official command line client for Cloud Foundry. [cf v6.0.0](https://github.com/cloudfoundry/cli/releases/tag/v6.0.0) is the current supported release.
+This is the official command line client for Cloud Foundry. [cf v6.0.1](https://github.com/cloudfoundry/cli/releases/tag/v6.0.1) is the current supported release.
 
-Stable Release (v6.0.0)
+Stable Release (v6.0.1)
 =======================
 
 Installers
 ----------
-- [Debian 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_i386.deb)
-- [Debian 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_amd64.deb)
-- [Redhat 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_i386.rpm)
-- [Redhat 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-cli_amd64.rpm)
-- [Mac OS X 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-osx-amd64.pkg)
-- [Windows 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-386.zip)
-- [Windows 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/installer-windows-amd64.zip)
+- [Debian 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-cli_i386.deb)
+- [Debian 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-cli_amd64.deb)
+- [Redhat 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-cli_i386.rpm)
+- [Redhat 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-cli_amd64.rpm)
+- [Mac OS X 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/installer-osx-amd64.pkg)
+- [Windows 32 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/installer-windows-386.zip)
+- [Windows 64 bit](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/installer-windows-amd64.zip)
 
 Binaries
 --------
-- [Linux 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-linux-386.tgz)
-- [Linux 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-linux-amd64.tgz)
-- [Mac OS X 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-darwin-amd64.tgz)
-- [Windows 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-windows-386.zip)
-- [Windows 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.0/cf-windows-amd64.zip)
+- [Linux 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-linux-386.tgz)
+- [Linux 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-linux-amd64.tgz)
+- [Mac OS X 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-darwin-amd64.tgz)
+- [Windows 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-windows-386.zip)
+- [Windows 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.1/cf-windows-amd64.zip)
 
 Edge Releases (master)
 =============
