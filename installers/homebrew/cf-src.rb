@@ -2,7 +2,7 @@ require 'formula'
 
 class CfSrc < Formula
   homepage 'https://github.com/cloudfoundry/cli'
-  url 'https://github.com/cloudfoundry/cli.git', :tag => 'v6.0.0'
+  url 'https://github.com/cloudfoundry/cli.git', :tag => 'v6.0.1'
 
   head 'https://github.com/cloudfoundry/cli.git', :branch => 'master'
 
@@ -10,6 +10,7 @@ class CfSrc < Formula
 
   def install
     inreplace 'src/cf/app_constants.go', 'SHA', 'homebrew'
+    inreplace 'src/cf/app_constants.go', 'BUILT_FROM_SOURCE', 'homebrew'
     system 'bin/build'
     bin.install 'out/cf'
     doc.install 'LICENSE'

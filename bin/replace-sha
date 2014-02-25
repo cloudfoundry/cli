@@ -3,7 +3,7 @@
 CURRENT_SHA=$(git rev-parse --short HEAD)
 
 if [ $(uname) == darwin ]; then
-    sed -i "" -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
+    sed -i "" -e "s/BUILT_FROM_SOURCE/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
 else
-    sed -i -e "s/SHA/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
+    sed -i -e "s/BUILT_FROM_SOURCE/$CURRENT_SHA/g" $(dirname $0)/../src/cf/app_constants.go
 fi
