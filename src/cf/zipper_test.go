@@ -8,20 +8,19 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
-func fileToString(file *os.File) string {
-	bytesBuf := &bytes.Buffer{}
-	_, err := io.Copy(bytesBuf, file)
+func readFile(file *os.File) []byte {
+	bytes, err := ioutil.ReadAll(file)
 	Expect(err).NotTo(HaveOccurred())
-
-	return string(bytesBuf.Bytes())
+	return bytes
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestZipWithDirectory", func() {
+var _ = Describe("Zipper", func() {
+	It("zips directories", func() {
 		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 			workingDir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
@@ -72,46 +71,23 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 	})
 
-	It("TestZipWithZipFile", func() {
+	It("is a no-op for a zipfile", func() {
 		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 			dir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 
 			zipper := ApplicationZipper{}
-			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.zip"), zipFile)
+			fixture := filepath.Join(dir, "../fixtures/applications/example-app.zip")
+			err = zipper.Zip(fixture, zipFile)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(fileToString(zipFile)).To(Equal("This is an application zip file\n"))
+			zippedFile, err := os.Open(fixture)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(readFile(zipFile)).To(Equal(readFile(zippedFile)))
 		})
 	})
 
-	It("TestZipWithWarFile", func() {
-		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
-			dir, err := os.Getwd()
-			Expect(err).NotTo(HaveOccurred())
-
-			zipper := ApplicationZipper{}
-			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.war"), zipFile)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(fileToString(zipFile)).To(Equal("This is an application war file\n"))
-		})
-	})
-
-	It("TestZipWithJarFile", func() {
-		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
-			dir, err := os.Getwd()
-			Expect(err).NotTo(HaveOccurred())
-
-			zipper := ApplicationZipper{}
-			err = zipper.Zip(filepath.Join(dir, "../fixtures/application.jar"), zipFile)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(fileToString(zipFile)).To(Equal("This is an application jar file\n"))
-		})
-	})
-
-	It("TestZipWithInvalidFile", func() {
+	It("returns an error when zipping fails", func() {
 		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 			zipper := ApplicationZipper{}
 			err = zipper.Zip("/a/bogus/directory", zipFile)
@@ -120,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 	})
 
-	It("TestZipWithEmptyDir", func() {
+	It("returns an error when the directory is empty", func() {
 		fileutils.TempFile("zip_test", func(zipFile *os.File, err error) {
 			fileutils.TempDir("zip_test", func(emptyDir string, err error) {
 				zipper := ApplicationZipper{}

@@ -126,22 +126,14 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 
 func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb func(sourceDir string, err error)) {
 	// If appDir is a zip, first extract it to a temporary directory
-	zipReader, err := zip.OpenReader(appDir)
-	if err != nil {
+	if repo.zipper.IsZipFile(appDir) {
+		fileutils.TempDir("unzipped-app", func(tmpDir string, err error) {
+			err = repo.extractZip(appDir, tmpDir)
+			cb(tmpDir, err)
+		})
+	} else {
 		cb(appDir, nil)
-		return
 	}
-
-	fileutils.TempDir("unzipped-app", func(tmpDir string, err error) {
-		if err != nil {
-			cb("", err)
-			return
-		}
-
-		err = repo.extractZip(zipReader, tmpDir)
-		zipReader.Close()
-		cb(tmpDir, err)
-	})
 }
 
 func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir string, uploadDir string) (presentResourcesJson []byte, err error) {
@@ -166,15 +158,17 @@ func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) extractZip(r *zip.ReadCloser, destDir string) (err error) {
+func (repo CloudControllerApplicationBitsRepository) extractZip(appDir, destDir string) (err error) {
+	r, err := zip.OpenReader(appDir)
+	if err != nil {
+		return
+	}
+	defer r.Close()
+
 	for _, f := range r.File {
 		func() {
 			// Don't try to extract directories
 			if f.FileInfo().IsDir() {
-				return
-			}
-
-			if err != nil {
 				return
 			}
 
@@ -184,6 +178,8 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(r *zip.ReadClose
 				return
 			}
 
+			// functional scope from above is important
+			// otherwise this only closes the last file handle
 			defer rc.Close()
 
 			destFilePath := filepath.Join(destDir, f.Name)

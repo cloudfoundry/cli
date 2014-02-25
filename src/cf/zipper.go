@@ -10,14 +10,13 @@ import (
 
 type Zipper interface {
 	Zip(dirToZip string, targetFile *os.File) (err error)
+	IsZipFile(path string) bool
 }
 
 type ApplicationZipper struct{}
 
-var doNotZipExtensions = []string{".zip", ".war", ".jar"}
-
 func (zipper ApplicationZipper) Zip(dirOrZipFile string, targetFile *os.File) (err error) {
-	if shouldNotZip(filepath.Ext(dirOrZipFile)) {
+	if zipper.IsZipFile(dirOrZipFile) {
 		err = fileutils.CopyPathToWriter(dirOrZipFile, targetFile)
 	} else {
 		err = writeZipFile(dirOrZipFile, targetFile)
@@ -26,13 +25,9 @@ func (zipper ApplicationZipper) Zip(dirOrZipFile string, targetFile *os.File) (e
 	return
 }
 
-func shouldNotZip(extension string) (result bool) {
-	for _, ext := range doNotZipExtensions {
-		if ext == extension {
-			return true
-		}
-	}
-	return
+func (zipper ApplicationZipper) IsZipFile(file string) (result bool) {
+	_, err := zip.OpenReader(file)
+	return err == nil
 }
 
 func writeZipFile(dir string, targetFile *os.File) (err error) {
