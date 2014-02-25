@@ -3,9 +3,8 @@ package manifest
 import (
 	"errors"
 	"generic"
-	"github.com/cloudfoundry/gamble"
+	"github.com/fraenkel/candiedyaml"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -82,22 +81,18 @@ func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap gene
 }
 
 func parseManifest(file io.Reader) (yamlMap generic.Map, err error) {
-	yamlBytes, err := ioutil.ReadAll(file)
+	decoder := candiedyaml.NewDecoder(file)
+	yamlMap = generic.NewMap()
+	err = decoder.Decode(yamlMap)
 	if err != nil {
 		return
 	}
 
-	document, err := gamble.Parse(string(yamlBytes))
-	if err != nil {
-		return
-	}
-
-	if !generic.IsMappable(document) {
+	if !generic.IsMappable(yamlMap) {
 		err = errors.New("Invalid manifest. Expected a map")
 		return
 	}
 
-	yamlMap = generic.NewMap(document)
 	return
 }
 

@@ -2,93 +2,7 @@ package generic
 
 import "fmt"
 
-func Merge(collection, otherCollection Map) Map {
-	mergedMap := NewMap()
-
-	iterator := func(key, value interface{}) {
-		mergedMap.Set(key, value)
-	}
-
-	Each(collection, iterator)
-	Each(otherCollection, iterator)
-
-	return mergedMap
-}
-
-func DeepMerge(maps ...Map) Map {
-	mergedMap := NewMap()
-	return Reduce(maps, mergedMap, mergeReducer)
-}
-
-func mergeReducer(key, val interface{}, reduced Map) Map {
-	switch {
-	case reduced.Has(key) == false:
-		reduced.Set(key, val)
-		return reduced
-
-	case IsMappable(val):
-		maps := []Map{NewMap(reduced.Get(key)), NewMap(val)}
-		mergedMap := Reduce(maps, NewMap(), mergeReducer)
-		reduced.Set(key, mergedMap)
-		return reduced
-
-	case IsSliceable(val):
-		reduced.Set(key, append(reduced.Get(key).([]interface{}), val.([]interface{})...))
-		return reduced
-
-	default:
-		reduced.Set(key, val)
-		return reduced
-	}
-}
-
-func Reduce(collections []Map, resultVal Map, cb Reducer) Map {
-	for _, collection := range collections {
-		for _, key := range collection.Keys() {
-			resultVal = cb(key, collection.Get(key), resultVal)
-		}
-	}
-	return resultVal
-}
-
-func Each(collection Map, cb Iterator) {
-	for _, key := range collection.Keys() {
-		cb(key, collection.Get(key))
-	}
-}
-
-func Contains(collection, item interface{}) bool {
-	switch collection := collection.(type) {
-	case Map:
-		return collection.Has(item)
-	case []interface{}:
-		for _, val := range collection {
-			if val == item {
-				return true
-			}
-		}
-		return false
-	}
-
-	panic("unexpected type passed to Contains")
-}
-
-func IsMappable(value interface{}) bool {
-	switch value.(type) {
-	case Map:
-		return true
-	case map[string]interface{}:
-		return true
-	case map[interface{}]interface{}:
-		return true
-	default:
-		return false
-	}
-}
-
-type Iterator func(key, val interface{})
-type Reducer func(key, val interface{}, reducedVal Map) Map
-
+// interface declaration
 type Map interface {
 	IsEmpty() bool
 	Count() int
@@ -100,8 +14,14 @@ type Map interface {
 	Get(key interface{}) interface{}
 	Set(key interface{}, value interface{})
 	Delete(key interface{})
+	String() string
 }
 
+// concrete map type
+type ConcreteMap map[interface{}]interface{}
+
+
+// constructors
 func newEmptyMap() Map {
 	return &ConcreteMap{}
 }
@@ -137,12 +57,7 @@ func NewMap(data ...interface{}) Map {
 	panic("NewMap called with unexpected argument")
 }
 
-type ConcreteMap map[interface{}]interface{}
-
-func (data *ConcreteMap) String() string {
-	return fmt.Sprintf("% v", *data)
-}
-
+// implementing interface methods
 func (data *ConcreteMap) IsEmpty() bool {
 	return data.Count() == 0
 }
@@ -195,4 +110,45 @@ func (data *ConcreteMap) Set(key, value interface{}) {
 
 func (data *ConcreteMap) Delete(key interface{}) {
 	delete(*data, key)
+}
+
+func (data *ConcreteMap) String() string {
+	return fmt.Sprintf("% v", *data)
+}
+
+// helper functions
+func IsMappable(value interface{}) bool {
+	switch value.(type) {
+	case Map:
+		return true
+	case map[string]interface{}:
+		return true
+	case map[interface{}]interface{}:
+		return true
+	default:
+		return false
+	}
+}
+
+type Iterator func(key, val interface{})
+func Each(collection Map, cb Iterator) {
+	for _, key := range collection.Keys() {
+		cb(key, collection.Get(key))
+	}
+}
+
+func Contains(collection, item interface{}) bool {
+	switch collection := collection.(type) {
+	case Map:
+		return collection.Has(item)
+	case []interface{}:
+	for _, val := range collection {
+		if val == item {
+			return true
+		}
+	}
+		return false
+	}
+
+	panic("unexpected type passed to Contains")
 }

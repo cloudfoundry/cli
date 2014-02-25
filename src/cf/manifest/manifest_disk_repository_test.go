@@ -18,6 +18,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 	Describe("given a directory containing a file called 'manifest.yml", func() {
 		It("reads that file", func() {
 			m, path, errs := repo.ReadManifest("../../fixtures/manifests")
+			println(errs.Error())
 
 			Expect(errs).To(BeEmpty())
 			Expect(path).To(Equal(filepath.Clean("../../fixtures/manifests/manifest.yml")))
