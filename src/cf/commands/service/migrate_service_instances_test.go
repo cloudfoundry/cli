@@ -300,6 +300,18 @@ func init() {
 					Expect(serviceRepo.MigrateServicePlanFromV1ToV2Called).To(BeFalse())
 				})
 			})
+
+			Context("when the user ignores confirmation using the force flag", func() {
+				It("does not prompt the user for confirmation", func() {
+					args = []string{"-f", "v1-service-name", "v1-provider-name", "v1-plan-name", "v2-service-name", "v2-plan-name"}
+					context = testcmd.NewContext("migrate-service-instances", args)
+
+					testcmd.RunCommand(cmd, context, requirementsFactory)
+
+					testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{{"Really migrate"}})
+					Expect(serviceRepo.MigrateServicePlanFromV1ToV2Called).To(BeTrue())
+				})
+			})
 		})
 	})
 }
