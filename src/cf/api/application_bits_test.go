@@ -21,6 +21,68 @@ import (
 	"time"
 )
 
+var _ = Describe("CloudControllerApplicationBitsRepository", func() {
+	var fixturesDir string
+
+	BeforeEach(func() {
+		cwd, err := os.Getwd()
+		Expect(err).NotTo(HaveOccurred())
+		fixturesDir = filepath.Join(cwd, "../../fixtures/applications")
+	})
+
+	It("TestUploadWithInvalidDirectory", func() {
+		config := testconfig.NewRepository()
+		gateway := net.NewCloudControllerGateway()
+		zipper := &cf.ApplicationZipper{}
+
+		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
+
+		apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
+		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+		Expect(apiResponse.Message).To(ContainSubstring(filepath.Join("foo", "bar")))
+	})
+
+	Context("uploading a directory", func() {
+		var appPath string
+		BeforeEach(func() {
+			appPath = filepath.Join(fixturesDir, "example-app")
+			// the executable bit is the only bit we care about here
+			err := os.Chmod(filepath.Join(appPath, "Gemfile"), 0467)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			os.Chmod(filepath.Join(appPath, "Gemfile"), 0666)
+		})
+
+		It("preserves the executable bits when uploading app files", func() {
+			_, apiResponse := testUploadApp(appPath, defaultRequests)
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		})
+
+		It("returns a failure when uploading bits fails", func() {
+			requests := []testnet.TestRequest{
+				matchResourceRequest,
+				uploadApplicationRequest,
+				createProgressEndpoint("running"),
+				createProgressEndpoint("failed"),
+			}
+			_, apiResponse := testUploadApp(appPath, requests)
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+		})
+	})
+
+	It("uploads zip files", func() {
+		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.zip"), defaultRequests)
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+	})
+
+	It("uploads zip files with non-standard names", func() {
+		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.azip"), defaultRequests)
+		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+	})
+})
+
 var expectedResources = testnet.RemoveWhiteSpaceFromBody(`[
     {
         "fn": "Gemfile",
@@ -214,65 +276,3 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 
 	return
 }
-
-var _ = Describe("CloudControllerApplicationBitsRepository", func() {
-	var fixturesDir string
-
-	BeforeEach(func() {
-		cwd, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		fixturesDir = filepath.Join(cwd, "../../fixtures/applications")
-	})
-
-	It("TestUploadWithInvalidDirectory", func() {
-		config := testconfig.NewRepository()
-		gateway := net.NewCloudControllerGateway()
-		zipper := &cf.ApplicationZipper{}
-
-		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
-
-		apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring(filepath.Join("foo", "bar")))
-	})
-
-	Context("uploading a directory", func() {
-		var appPath string
-		BeforeEach(func() {
-			appPath = filepath.Join(fixturesDir, "example-app")
-			// the executable bit is the only bit we care about here
-			err := os.Chmod(filepath.Join(appPath, "Gemfile"), 0467)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			os.Chmod(filepath.Join(appPath, "Gemfile"), 0666)
-		})
-
-		It("preserves the executable bits when uploading app files", func() {
-			_, apiResponse := testUploadApp(appPath, defaultRequests)
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		})
-
-		It("returns a failure when uploading bits fails", func() {
-			requests := []testnet.TestRequest{
-				matchResourceRequest,
-				uploadApplicationRequest,
-				createProgressEndpoint("running"),
-				createProgressEndpoint("failed"),
-			}
-			_, apiResponse := testUploadApp(appPath, requests)
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		})
-	})
-
-	It("uploads zip files", func() {
-		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.zip"), defaultRequests)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-	})
-
-	It("uploads zip files with non-standard names", func() {
-		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.azip"), defaultRequests)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-	})
-})
