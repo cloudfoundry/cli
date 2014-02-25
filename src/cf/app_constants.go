@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	Version = "6.0.1-SHA"
+	Version = "6.0.1-BUILT_FROM_SOURCE"
 	Usage   = "A command line tool to interact with Cloud Foundry"
 )
 
