@@ -56,8 +56,9 @@ func (resource ServicePlanResource) ToFields() (fields models.ServicePlanFields)
 }
 
 type ServicePlanEntity struct {
-	Name            string
-	ServiceOffering ServiceOfferingResource `json:"service"`
+	Name                string
+	ServiceOfferingGuid string                  `json:"service_guid"`
+	ServiceOffering     ServiceOfferingResource `json:"service"`
 }
 
 type PaginatedServiceInstanceResources struct {
@@ -79,7 +80,6 @@ func (resource ServiceInstanceResource) ToFields() (fields models.ServiceInstanc
 func (resource ServiceInstanceResource) ToModel() (instance models.ServiceInstance) {
 	instance.ServiceInstanceFields = resource.ToFields()
 	instance.ServicePlan = resource.Entity.ServicePlan.ToFields()
-	instance.ServiceOffering = resource.Entity.ServicePlan.Entity.ServiceOffering.ToFields()
 
 	instance.ServiceBindings = []models.ServiceBindingFields{}
 	for _, bindingResource := range resource.Entity.ServiceBindings {

@@ -62,7 +62,7 @@ func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (o
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse) {
-	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=%s&inline-relations-depth=2", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("%s/v2/spaces/%s/service_instances?return_user_provided_service_instances=true&q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
 
 	resources := new(PaginatedServiceInstanceResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
@@ -75,8 +75,14 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 		return
 	}
 
-	resource := resources.Resources[0]
-	instance = resource.ToModel()
+	instanceResource := resources.Resources[0]
+	instance = instanceResource.ToModel()
+
+	resource := &ServiceOfferingResource{}
+	path = fmt.Sprintf("%s/v2/services/%s", repo.config.ApiEndpoint(), instanceResource.Entity.ServicePlan.Entity.ServiceOfferingGuid)
+	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
+
+	instance.ServiceOffering = resource.ToFields()
 	return
 }
 
@@ -90,11 +96,9 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken(), strings.NewReader(data))
 
 	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode == cf.SERVICE_INSTANCE_NAME_TAKEN {
-
 		serviceInstance, findInstanceApiResponse := repo.FindInstanceByName(name)
 
-		if !findInstanceApiResponse.IsNotSuccessful() &&
-			serviceInstance.ServicePlan.Guid == planGuid {
+		if findInstanceApiResponse.IsSuccessful() && serviceInstance.ServicePlan.Guid == planGuid {
 			apiResponse = net.ApiResponse{}
 			identicalAlreadyExists = true
 			return

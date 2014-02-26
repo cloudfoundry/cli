@@ -58,101 +58,103 @@ var _ = Describe("Services Repo", func() {
 		expectMultipleServiceOfferings(offerings)
 	})
 
-	It("TestCreateServiceInstance", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "POST",
-			Path:     "/v2/service_instances",
-			Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
-			Response: testnet.TestResponse{Status: http.StatusCreated},
+	Describe("creating a service instance", func() {
+		It("makes the right request", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "POST",
+				Path:     "/v2/service_instances",
+				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+
+			ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
+
+			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(identicalAlreadyExists).To(Equal(false))
 		})
 
-		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-		defer ts.Close()
+		It("returns a successful response when an identical service instance already exists", func() {
+			errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/service_instances",
+				Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+				Response: testnet.TestResponse{
+					Status: http.StatusBadRequest,
+					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+				}})
 
-		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(identicalAlreadyExists).To(Equal(false))
-	})
+			ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
+			defer ts.Close()
 
-	It("TestCreateServiceInstanceWhenIdenticalServiceAlreadyExists", func() {
-		errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:  "POST",
-			Path:    "/v2/service_instances",
-			Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
-			Response: testnet.TestResponse{
-				Status: http.StatusBadRequest,
-				Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-			},
+			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
+
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(identicalAlreadyExists).To(Equal(true))
 		})
 
-		ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq})
-		defer ts.Close()
+		It("fails when a different service instance with the same name already exists", func() {
+			errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:  "POST",
+				Path:    "/v2/service_instances",
+				Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
+				Response: testnet.TestResponse{
+					Status: http.StatusBadRequest,
+					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+				}})
 
-		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
+			ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
+			defer ts.Close()
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-		Expect(identicalAlreadyExists).To(Equal(true))
+			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
+
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+			Expect(identicalAlreadyExists).To(Equal(false))
+		})
 	})
 
-	It("TestCreateServiceInstanceWhenDifferentServiceAlreadyExists", func() {
-		errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:  "POST",
-			Path:    "/v2/service_instances",
-			Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
-			Response: testnet.TestResponse{
-				Status: http.StatusBadRequest,
-				Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-			},
+	Describe("finding service instances by name", func() {
+		It("returns the service instance", func() {
+			ts, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq, serviceOfferingReq})
+			defer ts.Close()
+
+			instance, apiResponse := repo.FindInstanceByName("my-service")
+
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(instance.Name).To(Equal("my-service"))
+			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
+			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
+			Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
+			Expect(instance.ServiceOffering.Description).To(Equal("MySQL database"))
+			Expect(instance.ServicePlan.Name).To(Equal("plan-name"))
+			Expect(len(instance.ServiceBindings)).To(Equal(2))
+
+			binding := instance.ServiceBindings[0]
+			Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
+			Expect(binding.Guid).To(Equal("service-binding-1-guid"))
+			Expect(binding.AppGuid).To(Equal("app-1-guid"))
 		})
 
-		ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq})
-		defer ts.Close()
+		It("it returns a failure response when the instance doesn't exist", func() {
+			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+			})
 
-		identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
+			ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer ts.Close()
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(identicalAlreadyExists).To(Equal(false))
-	})
-
-	It("TestFindInstanceByName", func() {
-		ts, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq})
-		defer ts.Close()
-
-		instance, apiResponse := repo.FindInstanceByName("my-service")
-
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-		Expect(instance.Name).To(Equal("my-service"))
-		Expect(instance.Guid).To(Equal("my-service-instance-guid"))
-		Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
-		Expect(instance.ServiceOffering.DocumentationUrl).To(Equal("http://info.example.com"))
-		Expect(instance.ServiceOffering.Description).To(Equal("MySQL database"))
-		Expect(instance.ServicePlan.Name).To(Equal("plan-name"))
-		Expect(len(instance.ServiceBindings)).To(Equal(2))
-
-		binding := instance.ServiceBindings[0]
-		Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
-		Expect(binding.Guid).To(Equal("service-binding-1-guid"))
-		Expect(binding.AppGuid).To(Equal("app-1-guid"))
-	})
-
-	It("TestFindInstanceByNameForNonExistentService", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "GET",
-			Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-			Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+			_, apiResponse := repo.FindInstanceByName("my-service")
+			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(apiResponse.IsError()).To(BeFalse())
+			Expect(apiResponse.IsNotFound()).To(BeTrue())
 		})
-
-		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-		defer ts.Close()
-
-		_, apiResponse := repo.FindInstanceByName("my-service")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
-		Expect(apiResponse.IsError()).To(BeFalse())
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
 	It("TestDeleteServiceWithoutServiceBindings", func() {
@@ -355,7 +357,6 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	Describe("finding a service plan", func() {
-
 		Context("when we find a matching plan", func() {
 			It("returns the plan guid for a v1 plan", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -549,7 +550,6 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	Describe("migrating service plans", func() {
-
 		It("makes a request to CC to migrate the instances from v1 to v2", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
@@ -648,10 +648,28 @@ func expectMultipleServiceOfferings(offerings []models.ServiceOffering) {
 	Expect(len(secondOffering.Plans)).To(Equal(1))
 }
 
+var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/services/the-service-guid",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+		{
+		  "metadata": {
+			"guid": "15790581-a293-489b-9efc-847ecf1b1339"
+		  },
+		  "entity": {
+			"label": "mysql",
+			"provider": "mysql",
+			"documentation_url": "http://info.example.com",
+			"description": "MySQL database"
+		  }
+		}`,
+	}})
+
 var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"resources": [
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+	{"resources": [
         {
           "metadata": {
             "guid": "my-service-instance-guid"
@@ -684,16 +702,7 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
               },
               "entity": {
                 "name": "plan-name",
-                "service": {
-                  "metadata": {
-                    "guid": "service-guid"
-                  },
-                  "entity": {
-                    "label": "mysql",
-                    "description": "MySQL database",
-                    "documentation_url": "http://info.example.com"
-                  }
-                }
+                "service_guid": "the-service-guid"
               }
             }
           }
