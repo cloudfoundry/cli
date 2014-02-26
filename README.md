@@ -36,6 +36,18 @@ Edge binaries are published to our Amazon S3 bucket with each new commit that pa
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
+Troubleshooting / FAQs
+======================
+
+Linux
+-----
+* "bash: .cf: No such file or directory". Ensure that you're using the correct binary or installer for your architecture. See http://askubuntu.com/questions/133389/no-such-file-or-directory-but-the-file-exists
+
+Mac OS X
+--------
+* "Illegal instruction: 4" - This is a known defect with some versions of OS X. Please file an issue. As a workaround, you can build from source or use homebrew.
+
+
 Filing Bugs
 ===========
 
