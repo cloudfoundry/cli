@@ -29,14 +29,13 @@ func NewScale(ui terminal.UI, config configuration.Reader, restarter Application
 }
 
 func (cmd *Scale) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "scale")
 		return
 	}
 
-	if c.Int("i") == -1 && c.String("m") == "" {
+	if c.Int("i") == -1 && c.String("m") == "" && c.String("k") == "" {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "scale")
 		return
@@ -72,6 +71,17 @@ func (cmd *Scale) Run(c *cli.Context) {
 			return
 		}
 		params.Memory = &memory
+		shouldRestart = true
+	}
+
+	if c.String("k") != "" {
+		diskQuota, err := formatters.ToMegabytes(c.String("k"))
+		if err != nil {
+			cmd.ui.Say("Invalid value for disk")
+			cmd.ui.FailWithUsage(c, "scale")
+			return
+		}
+		params.DiskQuota = &diskQuota
 		shouldRestart = true
 	}
 

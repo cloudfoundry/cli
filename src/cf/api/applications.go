@@ -40,6 +40,7 @@ type ApplicationEntity struct {
 	SpaceGuid          *string             `json:"space_guid,omitempty"`
 	Instances          *int                `json:"instances,omitempty"`
 	Memory             *uint64             `json:"memory,omitempty"`
+	DiskQuota          *uint64             `json:"disk_quota,omitempty"`
 	StackGuid          *string             `json:"stack_guid,omitempty"`
 	Stack              *StackResource      `json:"stack,omitempty"`
 	Routes             *[]AppRouteResource `json:"routes,omitempty"`
@@ -60,6 +61,7 @@ func NewApplicationEntityFromAppParams(app models.AppParams) ApplicationEntity {
 		SpaceGuid:          app.SpaceGuid,
 		Instances:          app.InstanceCount,
 		Memory:             app.Memory,
+		DiskQuota:          app.DiskQuota,
 		StackGuid:          app.StackGuid,
 		Command:            app.Command,
 		HealthCheckTimeout: app.HealthCheckTimeout,
@@ -82,7 +84,10 @@ func (resource ApplicationResource) ToFields() (app models.ApplicationFields) {
 		app.Name = *entity.Name
 	}
 	if entity.Memory != nil {
-		app.Memory = uint64(*entity.Memory)
+		app.Memory = *entity.Memory
+	}
+	if entity.DiskQuota != nil {
+		app.DiskQuota = *entity.DiskQuota
 	}
 	if entity.Instances != nil {
 		app.InstanceCount = *entity.Instances
