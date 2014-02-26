@@ -39,8 +39,9 @@ func walkManifestLookingForProperties(data generic.Map) (errs ManifestErrors) {
 	return
 }
 
+var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
+
 func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
-	propertyRegex := regexp.MustCompile(`\${\w+}`)
 	switch value := value.(type) {
 	case string:
 		match := propertyRegex.FindString(value)
@@ -52,12 +53,11 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 		for _, item := range value {
 			errs = append(errs, walkMapLookingForProperties(item)...)
 		}
-	case map[string]interface{}:
+	case map[interface{}]interface{}:
 		for _, item := range value {
 			errs = append(errs, walkMapLookingForProperties(item)...)
 		}
 	}
-
 	return
 }
 
