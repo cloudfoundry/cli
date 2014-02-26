@@ -2,6 +2,7 @@ package application_test
 
 import (
 	. "cf/commands/application"
+	"cf/configuration"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -14,116 +15,105 @@ import (
 )
 
 var _ = Describe("Testing with ginkgo", func() {
-	It("TestScaleRequirements", func() {
-		args := []string{"-m", "1G", "my-app"}
-		deps := getScaleDependencies()
+	var (
+		reqFactory *testreq.FakeReqFactory
+		restarter  *testcmd.FakeAppRestarter
+		appRepo    *testapi.FakeApplicationRepository
+		ui         *testterm.FakeUI
+		configRepo configuration.Repository
+		cmd        *Scale
+	)
 
-		deps.reqFactory.LoginSuccess = false
-		deps.reqFactory.TargetedSpaceSuccess = true
-		callScale(args, deps)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		deps.reqFactory.LoginSuccess = true
-		deps.reqFactory.TargetedSpaceSuccess = false
-		callScale(args, deps)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-		deps.reqFactory.LoginSuccess = true
-		deps.reqFactory.TargetedSpaceSuccess = true
-		callScale(args, deps)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(deps.reqFactory.ApplicationName).To(Equal("my-app"))
+	BeforeEach(func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		restarter = &testcmd.FakeAppRestarter{}
+		appRepo = &testapi.FakeApplicationRepository{}
+		ui = new(testterm.FakeUI)
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		cmd = NewScale(ui, configRepo, restarter, appRepo)
 	})
-	It("TestScaleFailsWithUsage", func() {
 
-		deps := getScaleDependencies()
+	Describe("requirements", func() {
+		It("requires the user to be logged in with a targed space", func() {
+			args := []string{"-m", "1G", "my-app"}
 
-		ui := callScale([]string{}, deps)
+			reqFactory.LoginSuccess = false
+			reqFactory.TargetedSpaceSuccess = true
 
-		Expect(ui.FailedWithUsage).To(BeTrue())
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-	})
-	It("TestScaleFailsWithoutFlags", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", args), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		args := []string{"my-app"}
-		deps := getScaleDependencies()
-		deps.reqFactory.LoginSuccess = true
-		deps.reqFactory.TargetedSpaceSuccess = true
+			reqFactory.LoginSuccess = true
+			reqFactory.TargetedSpaceSuccess = false
 
-		callScale(args, deps)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-	})
-	It("TestScaleAll", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", args), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 
-		app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-		deps := getScaleDependencies()
-		deps.reqFactory.Application = app
-		deps.appRepo.UpdateAppResult = app
+			reqFactory.LoginSuccess = true
+			reqFactory.TargetedSpaceSuccess = true
 
-		ui := callScale([]string{"-i", "5", "-m", "512M", "my-app"}, deps)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Scaling", "my-app", "my-org", "my-space", "my-user"},
-			{"OK"},
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", args), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		})
 
-		Expect(deps.restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
-		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-		Expect(*deps.appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
-		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(5))
+		It("requires an app to be specified", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-m", "1G"}), reqFactory)
+
+			Expect(ui.FailedWithUsage).To(BeTrue())
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+
+		It("requires at least one flag", func() {
+			reqFactory.LoginSuccess = true
+			reqFactory.TargetedSpaceSuccess = true
+
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"my-app"}), reqFactory)
+
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
-	It("TestScaleOnlyInstances", func() {
 
-		app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-		deps := getScaleDependencies()
-		deps.reqFactory.Application = app
-		deps.appRepo.UpdateAppResult = app
+	Describe("scaling an app", func() {
+		BeforeEach(func() {
+			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
+			reqFactory.Application = app
+			appRepo.UpdateAppResult = app
+		})
 
-		callScale([]string{"-i", "5", "my-app"}, deps)
+		It("can set an app's instance count, memory limit and disk limit", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}), reqFactory)
 
-		Expect(deps.restarter.AppToRestart.Guid).To(Equal(""))
-		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(5))
-		Expect(deps.appRepo.UpdateParams.DiskQuota).To(BeNil())
-		Expect(deps.appRepo.UpdateParams.Memory).To(BeNil())
-	})
-	It("TestScaleOnlyMemory", func() {
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Scaling", "my-app", "my-org", "my-space", "my-user"},
+				{"OK"},
+			})
 
-		app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
-		deps := getScaleDependencies()
-		deps.reqFactory.Application = app
-		deps.appRepo.UpdateAppResult = app
+			Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+			Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
+			Expect(*appRepo.UpdateParams.DiskQuota).To(Equal(uint64(2048)))
+		})
 
-		callScale([]string{"-m", "512M", "my-app"}, deps)
+		It("does not scale the memory and disk limits if they are not specified", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "my-app"}), reqFactory)
 
-		Expect(deps.restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
-		Expect(deps.appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-		Expect(*deps.appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
-		Expect(deps.appRepo.UpdateParams.DiskQuota).To(BeNil())
-		Expect(deps.appRepo.UpdateParams.InstanceCount).To(BeNil())
+			Expect(restarter.AppToRestart.Guid).To(Equal(""))
+			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
+			Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
+			Expect(appRepo.UpdateParams.Memory).To(BeNil())
+		})
+
+		It("does not scale the app's instance count if it is not specified", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-m", "512M", "my-app"}), reqFactory)
+
+			Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+			Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
+			Expect(appRepo.UpdateParams.InstanceCount).To(BeNil())
+		})
 	})
 })
-
-type scaleDependencies struct {
-	reqFactory *testreq.FakeReqFactory
-	restarter  *testcmd.FakeAppRestarter
-	appRepo    *testapi.FakeApplicationRepository
-}
-
-func getScaleDependencies() (deps scaleDependencies) {
-	deps = scaleDependencies{
-		reqFactory: &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true},
-		restarter:  &testcmd.FakeAppRestarter{},
-		appRepo:    &testapi.FakeApplicationRepository{},
-	}
-	return
-}
-
-func callScale(args []string, deps scaleDependencies) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("scale", args)
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	cmd := NewScale(ui, configRepo, deps.restarter, deps.appRepo)
-	testcmd.RunCommand(cmd, ctxt, deps.reqFactory)
-	return
-}
