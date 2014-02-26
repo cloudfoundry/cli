@@ -11,9 +11,9 @@ import (
 )
 
 func testManifestWithAbsolutePathOnPosix() {
-	m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+	m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 		"applications": []interface{}{
-			map[string]interface{}{
+			map[interface{}]interface{}{
 				"path": "/another/path-segment",
 			},
 		},
@@ -24,9 +24,9 @@ func testManifestWithAbsolutePathOnPosix() {
 }
 
 func testManifestWithAbsolutePathOnWindows() {
-	m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[string]interface{}{
+	m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[interface{}]interface{}{
 		"applications": []interface{}{
-			map[string]interface{}{
+			map[interface{}]interface{}{
 				"path": `C:\another\path`,
 			},
 		},
@@ -38,11 +38,11 @@ func testManifestWithAbsolutePathOnWindows() {
 
 var _ = Describe("Testing with ginkgo", func() {
 	It("TestManifestWithGlobalAndAppSpecificProperties", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
 			"memory":    "512M",
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"name":     "bitcoin-miner",
 					"no-route": true,
 				},
@@ -58,11 +58,11 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestManifestWithInvalidMemory", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
 			"memory":    "512",
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"name": "bitcoin-miner",
 				},
 			},
@@ -73,9 +73,9 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestManifestWithTimeoutSetsHealthCheckTimeout", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"name":    "bitcoin-miner",
 					"timeout": "360",
 				},
@@ -87,12 +87,12 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestManifestWithEmptyEnvVarIsInvalid", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
-			"env": generic.NewMap(map[string]interface{}{
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+			"env": generic.NewMap(map[interface{}]interface{}{
 				"bar": nil,
 			}),
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"name": "bad app",
 				},
 			},
@@ -103,9 +103,9 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("returns an empty map when no env was present in the manifest", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{"name": "no-env-vars"},
+				map[interface{}]interface{}{"name": "no-env-vars"},
 			},
 		}))
 		Expect(errs).To(BeEmpty())
@@ -121,9 +121,9 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestManifestWithRelativePath", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"path": "../another/path-segment",
 				},
 			},
@@ -138,9 +138,9 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestParsingManifestWithNulls", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"buildpack":  nil,
 					"disk_quota": nil,
 					"domain":     nil,
@@ -168,25 +168,25 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 	})
 
-	It("TestParsingManifestWithPropertiesReturnsErrors", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+	It("returns an error when the manifest contains old-style property syntax", func() {
+		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{
-					"env": map[string]interface{}{
-						"bar": "many-${foo}-are-cool",
+				map[interface{}]interface{}{
+					"env": map[interface{}]interface{}{
+						"bar": "many-${some_property-name}-are-cool",
 					},
 				},
 			},
 		}))
 
 		Expect(errs).NotTo(BeEmpty())
-		Expect(errs.Error()).To(ContainSubstring("Properties are not supported. Found property '${foo}'"))
+		Expect(errs.Error()).To(ContainSubstring("Properties are not supported. Found property '${some_property-name}'"))
 	})
 
 	It("TestParsingManifestWithNullCommand", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{
+				map[interface{}]interface{}{
 					"command": nil,
 				},
 			},
@@ -197,9 +197,9 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestParsingEmptyManifestDoesNotSetCommand", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[string]interface{}{
+		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[string]interface{}{},
+				map[interface{}]interface{}{},
 			},
 		}))
 
