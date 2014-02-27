@@ -30,7 +30,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			"user":     "me",
 			"password": "secret",
 		})
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestCreateUserProvidedServiceInstanceWithSyslogDrain", func() {
@@ -50,7 +50,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			"user":     "me",
 			"password": "secret",
 		})
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceInstance", func() {
@@ -76,7 +76,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.SysLogDrainUrl = "syslog://example.com"
 
 		apiResponse := repo.Update(serviceInstance)
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceInstanceWithOnlyParams", func() {
@@ -100,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "my-instance-guid"
 		serviceInstance.Params = params
 		apiResponse := repo.Update(serviceInstance)
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 	It("TestUpdateUserProvidedServiceInstanceWithOnlySysLogDrainUrl", func() {
@@ -118,7 +118,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Guid = "my-instance-guid"
 		serviceInstance.SysLogDrainUrl = "syslog://example.com"
 		apiResponse := repo.Update(serviceInstance)
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })

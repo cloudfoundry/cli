@@ -2,10 +2,10 @@ package net
 
 import (
 	"fmt"
+	"github.com/onsi/ginkgo"
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"github.com/onsi/ginkgo"
 )
 
 type TestRequest struct {
@@ -30,15 +30,7 @@ type TestHandler struct {
 }
 
 func (h *TestHandler) AllRequestsCalled() bool {
-	if h.CallCount == len(h.Requests) {
-		return true
-	}
-	fmt.Print("Failed to call requests:\n")
-	for i := h.CallCount; i < len(h.Requests); i++ {
-		fmt.Printf("%#v\n", h.Requests[i])
-	}
-	fmt.Print("\n\n")
-	return false
+	return h.CallCount == len(h.Requests)
 }
 
 func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -39,7 +39,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			"password": "bar",
 		})
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(config.AuthorizationEndpoint()).To(Equal(ts.URL))
 		Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
@@ -55,7 +55,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			"password": "bar",
 		})
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Password is incorrect, please try again."))
 		Expect(config.AccessToken()).To(BeEmpty())
@@ -70,7 +70,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			"password": "bar",
 		})
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Server error, status code: 500, error code: , message: "))
 		Expect(config.AccessToken()).To(BeEmpty())
@@ -85,7 +85,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			"password": "bar",
 		})
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 		Expect(config.AccessToken()).To(BeEmpty())
@@ -114,7 +114,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		auth := NewUAAAuthenticationRepository(gateway, config)
 
 		prompts, apiResponse := auth.GetLoginPrompts()
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeTrue())
 		Expect(prompts).To(BeEmpty())
 	})

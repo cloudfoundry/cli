@@ -68,7 +68,7 @@ var _ = Describe("Space Repository", func() {
 		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
 		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	Describe("finding spaces by name", func() {
@@ -125,7 +125,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		space, apiResponse := repo.Create("space-name", "my-org-guid")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(space.Guid).To(Equal("space-guid"))
 	})
@@ -142,7 +142,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Rename("my-space-guid", "new-space-name")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -157,7 +157,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-space-guid")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })
@@ -235,7 +235,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	defer ts.Close()
 
 	space, apiResponse := findByName(repo, "Space1")
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	Expect(space.Name).To(Equal("Space1"))
 	Expect(space.Guid).To(Equal("space1-guid"))
@@ -270,7 +270,7 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 	defer ts.Close()
 
 	_, apiResponse := findByName(repo, "Space1")
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiResponse.IsError()).To(BeFalse())
 	Expect(apiResponse.IsNotFound()).To(BeTrue())
 }

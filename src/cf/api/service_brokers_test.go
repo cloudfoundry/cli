@@ -75,7 +75,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		Expect(len(serviceBrokers)).To(Equal(2))
 		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
 		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -113,7 +113,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		expectedBroker.Password = "found-password"
 		expectedBroker.Guid = "found-guid"
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(foundBroker).To(Equal(expectedBroker))
 	})
@@ -130,7 +130,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		_, apiResponse := repo.FindByName("my-broker")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 		Expect(apiResponse.Message).To(Equal("Service Broker 'my-broker' not found"))
 	})
@@ -150,7 +150,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Create("foobroker", "http://example.com", "foouser", "password")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -175,7 +175,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Update(serviceBroker)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -192,7 +192,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Rename("my-guid", "update-foobroker")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -208,7 +208,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		apiResponse := repo.Delete("my-guid")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 })

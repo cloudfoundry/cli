@@ -38,7 +38,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
@@ -59,7 +59,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.ErrorCode).To(Equal("90003"))
 	})
@@ -82,7 +82,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		Expect(found).To(BeTrue())
 	})
