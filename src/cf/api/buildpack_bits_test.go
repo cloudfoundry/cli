@@ -113,6 +113,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				defer fileServer.Close()
 
 				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+
 				Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			})
@@ -121,9 +122,21 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack.zip"))
 				defer fileServer.Close()
 
+				repo.TrustedCerts = fileServer.TLS.Certificates
 				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+
 				Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			})
+
+			It("fails when the server's SSL cert cannot be verified", func() {
+				fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack.zip"))
+				defer fileServer.Close()
+
+				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
+
+				Expect(testServerHandler).NotTo(testnet.HaveAllRequestsCalled())
+				Expect(apiResponse.IsSuccessful()).To(BeFalse())
 			})
 
 			Describe("when the buildpack is wrapped in an extra top-level directory", func() {
@@ -131,7 +144,9 @@ var _ = Describe("BuildpackBitsRepository", func() {
 					fileServer := httptest.NewTLSServer(buildpackFileServerHandler("example-buildpack-in-dir.zip"))
 					defer fileServer.Close()
 
+					repo.TrustedCerts = fileServer.TLS.Certificates
 					apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack-in-dir.zip")
+
 					Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 					Expect(apiResponse.IsSuccessful()).To(BeTrue())
 				})

@@ -7,6 +7,7 @@ import (
 	"cf/models"
 	"cf/net"
 	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fileutils"
 	"fmt"
@@ -24,9 +25,10 @@ type BuildpackBitsRepository interface {
 }
 
 type CloudControllerBuildpackBitsRepository struct {
-	config  configuration.Reader
-	gateway net.Gateway
-	zipper  cf.Zipper
+	config       configuration.Reader
+	gateway      net.Gateway
+	zipper       cf.Zipper
+	TrustedCerts []tls.Certificate
 }
 
 func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerBuildpackBitsRepository) {
@@ -46,7 +48,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 		var buildpackFileName string
 		if isWebURL(buildpackLocation) {
 			buildpackFileName = path.Base(buildpackLocation)
-			downloadBuildpack(buildpackLocation, func(downloadFile *os.File, downloadErr error) {
+			repo.downloadBuildpack(buildpackLocation, func(downloadFile *os.File, downloadErr error) {
 				if downloadErr != nil {
 					err = downloadErr
 					return
@@ -160,19 +162,29 @@ func isWebURL(path string) bool {
 	return strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://")
 }
 
-func downloadBuildpack(url string, cb func(*os.File, error)) {
+func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string, cb func(*os.File, error)) {
 	fileutils.TempFile("buildpack-download", func(tempfile *os.File, err error) {
 		if err != nil {
 			cb(nil, err)
 			return
 		}
 
+		var certPool *x509.CertPool
+		if len(repo.TrustedCerts) > 0 {
+			certPool = x509.NewCertPool()
+			for _, tlsCert := range repo.TrustedCerts {
+				cert, _ := x509.ParseCertificate(tlsCert.Certificate[0])
+				certPool.AddCert(cert)
+			}
+		}
+
 		client := &http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				TLSClientConfig: &tls.Config{RootCAs: certPool},
 				Proxy:           http.ProxyFromEnvironment,
 			},
 		}
+
 		response, err := client.Get(url)
 		if err != nil {
 			cb(nil, err)
