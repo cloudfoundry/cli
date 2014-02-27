@@ -10,8 +10,8 @@ type FakeManifestRepository struct {
 	}
 	ReadManifestReturns struct {
 		Manifest *manifest.Manifest
-		Path string
-		Errors manifest.ManifestErrors
+		Path     string
+		Errors   manifest.ManifestErrors
 	}
 }
 

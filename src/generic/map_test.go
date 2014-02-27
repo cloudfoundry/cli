@@ -1,9 +1,9 @@
 package generic_test
 
 import (
-	. "github.com/onsi/gomega"
 	. "generic"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func init() {

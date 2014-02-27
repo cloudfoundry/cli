@@ -6,13 +6,13 @@ import (
 )
 
 type FakeAuthenticationRepository struct {
-	Config   configuration.ReadWriter
+	Config           configuration.ReadWriter
 	AuthenticateArgs struct {
 		Credentials map[string]string
 	}
 	GetLoginPromptsReturns struct {
 		ApiResponse net.ApiResponse
-		Prompts map[string]configuration.AuthPrompt
+		Prompts     map[string]configuration.AuthPrompt
 	}
 
 	AuthError    bool

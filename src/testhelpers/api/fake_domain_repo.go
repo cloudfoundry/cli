@@ -16,8 +16,8 @@ type FakeDomainRepository struct {
 	ListDomainsDomains     []models.DomainFields
 	ListDomainsApiResponse net.ApiResponse
 
-	FindByNameInOrgName      string
-	FindByNameInOrgGuid      string
+	FindByNameInOrgName        string
+	FindByNameInOrgGuid        string
 	FindByNameInOrgDomain      models.DomainFields
 	FindByNameInOrgApiResponse net.ApiResponse
 

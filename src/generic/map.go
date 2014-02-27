@@ -20,7 +20,6 @@ type Map interface {
 // concrete map type
 type ConcreteMap map[interface{}]interface{}
 
-
 // constructors
 func newEmptyMap() Map {
 	return &ConcreteMap{}
@@ -131,6 +130,7 @@ func IsMappable(value interface{}) bool {
 }
 
 type Iterator func(key, val interface{})
+
 func Each(collection Map, cb Iterator) {
 	for _, key := range collection.Keys() {
 		cb(key, collection.Get(key))
@@ -142,11 +142,11 @@ func Contains(collection, item interface{}) bool {
 	case Map:
 		return collection.Has(item)
 	case []interface{}:
-	for _, val := range collection {
-		if val == item {
-			return true
+		for _, val := range collection {
+			if val == item {
+				return true
+			}
 		}
-	}
 		return false
 	}
 
