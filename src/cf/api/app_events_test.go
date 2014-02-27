@@ -138,7 +138,7 @@ var _ = Describe("App Events Repo", func() {
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(list).To(Equal(expectedEvents))
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	It("TestListEventsUsingNewEndpoint", func() {
@@ -213,7 +213,7 @@ var _ = Describe("App Events Repo", func() {
 		})
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 
 		Expect(len(events)).To(Equal(2))
 		Expect(events[0].Guid).To(Equal("event-1-guid"))
@@ -251,7 +251,7 @@ var _ = Describe("App Events Repo", func() {
 
 		Expect(list).To(Equal(expectedEvents))
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(deps.handler.AllRequestsCalled()).To(BeTrue())
+		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	It("TestUnmarshalNewCrashEvent", func() {

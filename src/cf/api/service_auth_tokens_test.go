@@ -30,7 +30,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken.Token = "a token"
 		apiResponse := repo.Create(authToken)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 	It("TestServiceAuthFindAll", func() {
@@ -66,7 +66,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		authTokens, apiResponse := repo.FindAll()
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(len(authTokens)).To(Equal(2))
@@ -100,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		serviceAuthToken, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		authToken2 := models.ServiceAuthTokenFields{}
 		authToken2.Guid = "mysql-core-guid"
@@ -123,7 +123,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
@@ -143,7 +143,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken3.Token = "a value"
 		apiResponse := repo.Update(authToken3)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 	It("TestServiceAuthDelete", func() {
@@ -160,7 +160,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken4.Guid = "mysql-core-guid"
 		apiResponse := repo.Delete(authToken4)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 })

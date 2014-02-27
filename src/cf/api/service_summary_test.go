@@ -63,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		serviceInstances, apiResponse := repo.GetSummariesInCurrentSpace()
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(1).To(Equal(len(serviceInstances)))

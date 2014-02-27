@@ -65,7 +65,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			apiResponse := repo.UploadBuildpack(buildpack, buildpackPath)
-			Expect(testServerHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
 
@@ -73,7 +73,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 			buildpackPath := filepath.Join(buildpacksDir, "example-buildpack.zip")
 
 			apiResponse := repo.UploadBuildpack(buildpack, buildpackPath)
-			Expect(testServerHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		})
 
@@ -82,7 +82,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				buildpackPath := filepath.Join(buildpacksDir, "example-buildpack-in-dir.zip")
 
 				apiResponse := repo.UploadBuildpack(buildpack, buildpackPath)
-				Expect(testServerHandler.AllRequestsCalled()).To(BeTrue())
+				Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			})
 		})
@@ -103,7 +103,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 					defer fileServer.Close()
 
 					apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/bad-buildpack.zip")
-					Expect(testServerHandler.AllRequestsCalled()).To(BeFalse())
+					Expect(testServerHandler).NotTo(testnet.HaveAllRequestsCalled())
 					Expect(apiResponse.IsSuccessful()).To(BeFalse())
 				})
 			})
@@ -113,7 +113,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				defer fileServer.Close()
 
 				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
-				Expect(testServerHandler.AllRequestsCalled()).To(BeTrue())
+				Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			})
 
@@ -122,7 +122,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 				defer fileServer.Close()
 
 				apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack.zip")
-				Expect(testServerHandler.AllRequestsCalled()).To(BeTrue())
+				Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			})
 
@@ -132,14 +132,14 @@ var _ = Describe("BuildpackBitsRepository", func() {
 					defer fileServer.Close()
 
 					apiResponse := repo.UploadBuildpack(buildpack, fileServer.URL+"/place/example-buildpack-in-dir.zip")
-					Expect(testServerHandler.AllRequestsCalled()).To(BeTrue())
+					Expect(testServerHandler).To(testnet.HaveAllRequestsCalled())
 					Expect(apiResponse.IsSuccessful()).To(BeTrue())
 				})
 			})
 
 			It("returns an unsuccessful response when the server cannot be reached", func() {
 				apiResponse := repo.UploadBuildpack(buildpack, "https://domain.bad-domain:223453/no-place/example-buildpack.zip")
-				Expect(testServerHandler.AllRequestsCalled()).To(BeFalse())
+				Expect(testServerHandler).NotTo(testnet.HaveAllRequestsCalled())
 				Expect(apiResponse.IsSuccessful()).To(BeFalse())
 			})
 		})

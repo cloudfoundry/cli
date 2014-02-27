@@ -27,8 +27,8 @@ var _ = Describe("UserRepository", func() {
 
 			users, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
-			Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
-			Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 			Expect(len(users)).To(Equal(3))
@@ -47,8 +47,8 @@ var _ = Describe("UserRepository", func() {
 
 			users, apiResponse := repo.ListUsersInSpaceForRole("my-space-guid", models.SPACE_MANAGER)
 
-			Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
-			Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 			Expect(len(users)).To(Equal(3))
@@ -74,7 +74,7 @@ var _ = Describe("UserRepository", func() {
 
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
-			Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
+			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.StatusCode).To(Equal(http.StatusGatewayTimeout))
 		})
 
@@ -111,7 +111,7 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		expectedUserFields := models.UserFields{}
@@ -131,7 +131,7 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		_, apiResponse := repo.FindByUsername("my-user")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 		Expect(apiResponse.Message).To(ContainSubstring("User my-user not found"))
@@ -167,8 +167,8 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		apiResponse := repo.Create("my-user", "my-password")
-		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
-		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
+		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
@@ -190,8 +190,8 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		apiResponse := repo.Delete("my-user-guid")
-		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
-		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
+		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -213,8 +213,8 @@ var _ = Describe("UserRepository", func() {
 		defer uaa.Close()
 
 		apiResponse := repo.Delete("my-user-guid")
-		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
-		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
+		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -287,8 +287,8 @@ var _ = Describe("UserRepository", func() {
 
 		users, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_USER)
 
-		Expect(ccHandler.AllRequestsCalled()).To(BeTrue())
-		Expect(uaaHandler.AllRequestsCalled()).To(BeTrue())
+		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
+		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(len(users)).To(Equal(3))
@@ -370,7 +370,7 @@ func testSetOrgRoleWithValidRole(role string, path string) {
 
 	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
 
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
@@ -386,7 +386,7 @@ func testUnsetOrgRoleWithValidRole(role string, path string) {
 
 	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
 
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 
@@ -408,7 +408,7 @@ func testSetSpaceRoleWithValidRole(role string, path string) {
 
 	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
 
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiResponse.IsSuccessful()).To(BeTrue())
 }
 

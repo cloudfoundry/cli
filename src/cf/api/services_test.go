@@ -33,7 +33,7 @@ var _ = Describe("Services Repo", func() {
 
 		offerings, apiResponse := repo.GetAllServiceOfferings()
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		expectMultipleServiceOfferings(offerings)
 	})
@@ -53,7 +53,7 @@ var _ = Describe("Services Repo", func() {
 
 		offerings, apiResponse := repo.GetServiceOfferingsForSpace("my-space-guid")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		expectMultipleServiceOfferings(offerings)
 	})
@@ -71,7 +71,7 @@ var _ = Describe("Services Repo", func() {
 			defer ts.Close()
 
 			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			Expect(identicalAlreadyExists).To(Equal(false))
 		})
@@ -91,7 +91,7 @@ var _ = Describe("Services Repo", func() {
 
 			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
 
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsSuccessful()).To(BeTrue())
 			Expect(identicalAlreadyExists).To(Equal(true))
 		})
@@ -111,7 +111,7 @@ var _ = Describe("Services Repo", func() {
 
 			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 			Expect(identicalAlreadyExists).To(Equal(false))
 		})
@@ -124,7 +124,7 @@ var _ = Describe("Services Repo", func() {
 
 			instance, apiResponse := repo.FindInstanceByName("my-service")
 
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
@@ -151,7 +151,7 @@ var _ = Describe("Services Repo", func() {
 			defer ts.Close()
 
 			_, apiResponse := repo.FindInstanceByName("my-service")
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsError()).To(BeFalse())
 			Expect(apiResponse.IsNotFound()).To(BeTrue())
 		})
@@ -168,7 +168,7 @@ var _ = Describe("Services Repo", func() {
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
 		apiResponse := repo.DeleteService(serviceInstance)
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
@@ -293,7 +293,7 @@ var _ = Describe("Services Repo", func() {
 
 		apiResponse := repo.PurgeServiceOffering(offering)
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	Describe("getting the count of service instances for a service plan", func() {
@@ -721,7 +721,7 @@ func testRenameService(endpointPath string, serviceInstance models.ServiceInstan
 	defer ts.Close()
 
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 }
 

@@ -57,7 +57,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(orgs[1].Guid).To(Equal("org2-guid"))
 		Expect(orgs[2].Guid).To(Equal("org3-guid"))
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	It("TestOrganizationsListOrgsWithNoOrgs", func() {
@@ -78,7 +78,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(wasCalled).To(BeFalse())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	It("TestOrganizationsFindByName", func() {
@@ -114,7 +114,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		existingOrg.Name = "Org1"
 
 		org, apiResponse := repo.FindByName("Org1")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 		Expect(org.Name).To(Equal(existingOrg.Name))
@@ -140,7 +140,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		_, apiResponse := repo.FindByName("org1")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
@@ -157,7 +157,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Create("my-org")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
@@ -173,7 +173,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Rename("my-org-guid", "my-new-org")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
@@ -189,7 +189,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		apiResponse := repo.Delete("my-org-guid")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 })

@@ -52,7 +52,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		headers, body, apiResponse := repo.Request("GET", "/v2/endpoint", "", "")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(headers).To(ContainSubstring("200"))
 		Expect(headers).To(ContainSubstring("Content-Type"))
 		Expect(headers).To(ContainSubstring("text/plain"))
@@ -79,7 +79,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -127,7 +127,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
 		println(apiResponse.Message)
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 

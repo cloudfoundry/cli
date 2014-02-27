@@ -83,7 +83,7 @@ var _ = Describe("Buildpacks repo", func() {
 		})
 
 		Expect(buildpacks).To(Equal(expectedBuildpacks))
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 	})
 
@@ -98,7 +98,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		buildpack, apiResponse := repo.FindByName("Buildpack1")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(buildpack.Name).To(Equal(existingBuildpack.Name))
@@ -114,7 +114,7 @@ var _ = Describe("Buildpacks repo", func() {
 		defer ts.Close()
 
 		_, apiResponse := repo.FindByName("Buildpack1")
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsError()).To(BeFalse())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
@@ -166,7 +166,7 @@ var _ = Describe("Buildpacks repo", func() {
 		position := 999
 		created, apiResponse := repo.Create("my-cool-buildpack", &position, nil, nil)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(created.Guid).NotTo(BeNil())
@@ -200,7 +200,7 @@ var _ = Describe("Buildpacks repo", func() {
 		enabled := true
 		created, apiResponse := repo.Create("my-cool-buildpack", &position, &enabled, nil)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 
 		Expect(created.Guid).NotTo(BeNil())
@@ -221,7 +221,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		apiResponse := repo.Delete("my-cool-buildpack-guid")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
 
@@ -256,7 +256,7 @@ var _ = Describe("Buildpacks repo", func() {
 		buildpack.Enabled = &enabled
 		updated, apiResponse := repo.Update(buildpack)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 		Expect(buildpack).To(Equal(updated))
@@ -301,7 +301,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		updated, apiResponse := repo.Update(buildpack)
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 
 		Expect(expectedBuildpack).To(Equal(updated))

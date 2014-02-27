@@ -33,7 +33,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			defer ts.Close()
 
 			quota, apiResponse := repo.FindByName("my-quota")
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 			expectedQuota := models.QuotaFields{}
 			expectedQuota.Guid = "my-quota-guid"
@@ -57,7 +57,7 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 			defer ts.Close()
 
 			apiResponse := repo.Update("my-org-guid", "my-quota-guid")
-			Expect(handler.AllRequestsCalled()).To(BeTrue())
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 		})
 

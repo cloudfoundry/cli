@@ -58,7 +58,7 @@ var _ = Describe("AppFilesRepository", func() {
 		repo := NewCloudControllerAppFilesRepository(configRepo, gateway)
 		list, err := repo.ListFiles("my-app-guid", "some/path")
 
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(err.IsNotSuccessful()).To(BeFalse())
 		Expect(list).To(Equal(expectedResponse))
 	})

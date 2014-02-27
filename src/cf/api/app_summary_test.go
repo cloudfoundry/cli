@@ -24,7 +24,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		defer ts.Close()
 
 		apps, apiResponse := repo.GetSummariesInCurrentSpace()
-		Expect(handler.AllRequestsCalled()).To(BeTrue())
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
 		Expect(apiResponse.IsSuccessful()).To(BeTrue())
 		Expect(2).To(Equal(len(apps)))

@@ -272,7 +272,7 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 	Expect(reportedPath).To(Equal(dir))
 	Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
 	Expect(reportedUploadSize).To(Equal(uint64(759)))
-	Expect(handler.AllRequestsCalled()).To(BeTrue())
+	Expect(handler).To(testnet.HaveAllRequestsCalled())
 
 	return
 }
