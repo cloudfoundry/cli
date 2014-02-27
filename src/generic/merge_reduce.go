@@ -41,6 +41,7 @@ func mergeReducer(key, val interface{}, reduced Map) Map {
 }
 
 type Reducer func(key, val interface{}, reducedVal Map) Map
+
 func Reduce(collections []Map, resultVal Map, cb Reducer) Map {
 	for _, collection := range collections {
 		for _, key := range collection.Keys() {

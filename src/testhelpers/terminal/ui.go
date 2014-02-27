@@ -45,7 +45,7 @@ func (ui *FakeUI) Warn(message string, args ...interface{}) {
 
 func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	ui.Prompts = append(ui.Prompts, fmt.Sprintf(prompt, args...))
-	if (len(ui.Inputs) == 0) {
+	if len(ui.Inputs) == 0 {
 		panic("No input provided to Fake UI for prompt: " + fmt.Sprintf(prompt, args...))
 	}
 

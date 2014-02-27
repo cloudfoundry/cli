@@ -47,8 +47,8 @@ type FakeServiceRepo struct {
 	FindServiceOfferingByLabelAndProviderApiResponse     net.ApiResponse
 	FindServiceOfferingByLabelAndProviderCalled          bool
 
-	V1ServicePlanDescription realApi.ServicePlanDescription
-	V2ServicePlanDescription realApi.ServicePlanDescription
+	V1ServicePlanDescription                realApi.ServicePlanDescription
+	V2ServicePlanDescription                realApi.ServicePlanDescription
 	FindServicePlanByDescriptionArguments   []realApi.ServicePlanDescription
 	FindServicePlanByDescriptionResultGuids []string
 	FindServicePlanByDescriptionResponses   []net.ApiResponse
