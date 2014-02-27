@@ -19,14 +19,14 @@ func (matcher allRequestsCalledMatcher) Match(actual interface{}) (bool, string,
 	}
 
 	if testHandler.AllRequestsCalled() {
+		message := "Expected all requests to not be called, but they were all called"
+		return true, message, nil
+	} else {
 		message := fmt.Sprint("Failed to call requests:\n")
 		for i := testHandler.CallCount; i < len(testHandler.Requests); i++ {
 			message += fmt.Sprintf("%#v\n", testHandler.Requests[i])
 		}
 		message += "\n"
-		return true, message, nil
-	} else {
-		message := "Expected all requests to not be called, but they were all called"
 		return false, message, nil
 	}
 }
