@@ -25,16 +25,6 @@ func (cmd PurgeServiceOffering) GetRequirements(reqFactory requirements.Factory,
 func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 
-	confirmed := c.Bool("f")
-	if !confirmed {
-		cmd.ui.Warn(`Warning: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.`)
-		confirmed = cmd.ui.Confirm("Really purge service offering %s from Cloud Foundry?", serviceName)
-	}
-
-	if !confirmed {
-		return
-	}
-
 	offering, apiResponse := cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
 	if apiResponse != nil {
 		if apiResponse.IsNotFound() {
@@ -43,10 +33,19 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 			cmd.ui.Failed(apiResponse.Error())
 		}
 	} else {
+		confirmed := c.Bool("f")
+		if !confirmed {
+			cmd.ui.Warn(`Warning: This operation assumes that the service broker responsible for this service offering is no longer available, and all service instances have been deleted, leaving orphan records in Cloud Foundry's database. All knowledge of the service will be removed from Cloud Foundry, including service instances and service bindings. No attempt will be made to contact the service broker; running this command without destroying the service broker will cause orphan service instances. After running this command you may want to run either delete-service-auth-token or delete-service-broker to complete the cleanup.`)
+			confirmed = cmd.ui.Confirm("Really purge service offering %s from Cloud Foundry?", serviceName)
+		}
+
+		if !confirmed {
+			return
+		}
+		cmd.ui.Say("Purging service %s...", serviceName)
 		cmd.serviceRepo.PurgeServiceOffering(offering)
 		cmd.ui.Ok()
 	}
-
 	return
 }
 
