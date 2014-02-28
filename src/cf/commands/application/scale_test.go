@@ -81,6 +81,18 @@ var _ = Describe("Testing with ginkgo", func() {
 			appRepo.UpdateAppResult = app
 		})
 
+		Context("when no flags are specified", func() {
+			It("prints a description of the app's limits", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"my-app"}), reqFactory)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"memory", "256M"},
+					{"disk", "1G"},
+					{"instances", "42"},
+				})
+			})
+		})
+
 		It("can set an app's instance count, memory limit and disk limit", func() {
 			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}), reqFactory)
 
