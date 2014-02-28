@@ -644,7 +644,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 					" removed from Cloud Foundry.",
 				cf.Name(),
 			),
-
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force migration without confirmation"},
+			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("migrate-service-instances", c)
 			},

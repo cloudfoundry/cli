@@ -47,6 +47,7 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 		ServiceName:     c.Args()[3],
 		ServicePlanName: c.Args()[4],
 	}
+	force := c.Bool("f")
 
 	v1Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v1)
 	if apiResponse.IsNotSuccessful() {
@@ -87,13 +88,15 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 
 	serviceInstancesPhrase := pluralizeServiceInstances(count)
 
-	response := cmd.ui.Confirm("Really migrate %s from plan %s to %s?>",
-		serviceInstancesPhrase,
-		terminal.EntityNameColor(v1.String()),
-		terminal.EntityNameColor(v2.String()),
-	)
-	if !response {
-		return
+	if !force {
+		response := cmd.ui.Confirm("Really migrate %s from plan %s to %s?>",
+			serviceInstancesPhrase,
+			terminal.EntityNameColor(v1.String()),
+			terminal.EntityNameColor(v2.String()),
+		)
+		if !response {
+			return
+		}
 	}
 
 	cmd.ui.Say("Attempting to migrate %s...", serviceInstancesPhrase)
