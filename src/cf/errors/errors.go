@@ -88,6 +88,8 @@ func NewErrorWithError(message string, err error) Error {
 func NewHTTPErrorWithError(message string, err error) HttpError {
 	return &concreteError{
 		Message: fmt.Sprintf("%s: %s", message, err.Error()),
+		isHttpResponse: true,
+		statusCode:
 	}
 }
 

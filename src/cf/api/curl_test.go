@@ -34,7 +34,7 @@ func newCurlDependencies() (deps curlDependencies) {
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("curl command", func() {
 	It("TestCurlGetRequest", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
@@ -127,7 +127,6 @@ var _ = Describe("Testing with ginkgo", func() {
 		headers := "content-type: ascii/cats\nx-something-else:5"
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
-		println(apiResponse.Error())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse).NotTo(HaveOccurred())
 	})
