@@ -50,6 +50,9 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd Login) Run(c *cli.Context) {
+
+	cmd.config.ClearSession()
+
 	oldUserName := cmd.config.Username()
 
 	apiResponse := cmd.setApi(c)

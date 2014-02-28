@@ -15,7 +15,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("Login Command", func() {
 	var (
 		Flags        []string
 		Config       configuration.ReadWriter
@@ -64,6 +64,63 @@ var _ = Describe("Testing with ginkgo", func() {
 				Type:        configuration.AuthPromptTypePassword,
 			},
 		}
+	})
+
+	Describe("when the user is already logged in", func() {
+		BeforeEach(func() {
+			Config = testconfig.NewRepositoryWithDefaults()
+			Config.SetApiEndpoint("api.example.com")
+			Config.SetAccessToken("my_access_token")
+			Config.SetRefreshToken("my_refesh_token")
+			authRepo.Config = Config
+		})
+
+		Describe("and a new login fails", func() {
+			BeforeEach(func() {
+				authRepo.AuthError = true
+
+				Flags = []string{"-u", "user@example.com"}
+				ui.Inputs = []string{"password", "password2", "password3"}
+
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+			})
+
+			It("does not clear ApiEndpoint in the config", func() {
+					Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			})
+
+			It("clears Access Token, Refresh Token, Org, and Space from the config ", func() {
+				Expect(Config.AccessToken()).To(BeEmpty())
+				Expect(Config.RefreshToken()).To(BeEmpty())
+				Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+				Expect(Config.SpaceFields().Guid).To(BeEmpty())
+			})
+		})
+
+		Describe("and a new login succeeds", func() {
+			BeforeEach(func() {
+				orgRepo.Organizations[0].Name = "new-org"
+				orgRepo.Organizations[0].Guid = "new-org-guid"
+				spaceRepo.Spaces[0].Name = "new-space"
+				spaceRepo.Spaces[0].Guid = "new-space-guid"
+				authRepo.AccessToken = "new_access_token"
+				authRepo.RefreshToken = "new_refresh_token"
+
+				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "new-org", "-s", "new-space"}
+
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+			})
+
+			It("updates Access Token, Refresh Token, Org, and Space in the config", func() {
+				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+				Expect(Config.AccessToken()).To(Equal("new_access_token"))
+        Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
+				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
+				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
+			})
+		})
 	})
 
 	Describe("when there are a small number of organizations and spaces", func() {
@@ -159,32 +216,6 @@ var _ = Describe("Testing with ginkgo", func() {
 			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 		})
 
-		It("doesn't ask the user to select an org if they have one in their config", func() {
-			Config.SetOrganizationFields(org2.OrganizationFields)
-
-			Flags = []string{"-s", "my-space"}
-			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-
-			orgRepo.FindByNameOrganization = models.Organization{}
-
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-			Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
-			Expect(Config.AccessToken()).To(Equal("my_access_token"))
-			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-				"username": "user@example.com",
-				"password": "password",
-			}))
-
-			Expect(ui.ShowConfigurationCalled).To(BeTrue())
-		})
-
 		It("lets the user specify an org and space using flags", func() {
 			Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"}
 
@@ -230,32 +261,6 @@ var _ = Describe("Testing with ginkgo", func() {
 			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 		})
 
-		It("uses the org and space from the config file if they are present", func() {
-			Config.SetOrganizationFields(org2.OrganizationFields)
-			Config.SetSpaceFields(space2.SpaceFields)
-
-			ui.Inputs = []string{"http://api.example.com", "user@example.com", "password"}
-
-			orgRepo.FindByNameOrganization = models.Organization{}
-			spaceRepo.FindByNameInOrgSpace = models.Space{}
-
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-			Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
-			Expect(Config.SpaceFields().Guid).To(Equal("some-space-guid"))
-			Expect(Config.AccessToken()).To(Equal("my_access_token"))
-			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-				"username": "user@example.com",
-				"password": "password",
-			}))
-
-			Expect(ui.ShowConfigurationCalled).To(BeTrue())
-		})
 	})
 
 	Describe("when there are too many orgs to show", func() {
