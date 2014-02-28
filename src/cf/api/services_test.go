@@ -140,6 +140,26 @@ var _ = Describe("Services Repo", func() {
 			Expect(binding.AppGuid).To(Equal("app-1-guid"))
 		})
 
+		It("returns user provided services", func() {
+			ts, handler, repo := createServiceRepo([]testnet.TestRequest{findUserProvidedServiceInstanceReq})
+			defer ts.Close()
+
+			instance, apiResponse := repo.FindInstanceByName("my-service")
+
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(instance.Name).To(Equal("my-service"))
+			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
+			Expect(instance.ServiceOffering.Label).To(Equal(""))
+			Expect(instance.ServicePlan.Name).To(Equal(""))
+			Expect(len(instance.ServiceBindings)).To(Equal(2))
+
+			binding := instance.ServiceBindings[0]
+			Expect(binding.Url).To(Equal("/v2/service_bindings/service-binding-1-guid"))
+			Expect(binding.Guid).To(Equal("service-binding-1-guid"))
+			Expect(binding.AppGuid).To(Equal("app-1-guid"))
+		})
+
 		It("it returns a failure response when the instance doesn't exist", func() {
 			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
@@ -705,6 +725,42 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
                 "service_guid": "the-service-guid"
               }
             }
+          }
+        }
+    ]}`}})
+
+var findUserProvidedServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+	{"resources": [
+        {
+          "metadata": {
+            "guid": "my-service-instance-guid"
+          },
+          "entity": {
+            "name": "my-service",
+            "service_bindings": [
+              {
+                "metadata": {
+                  "guid": "service-binding-1-guid",
+                  "url": "/v2/service_bindings/service-binding-1-guid"
+                },
+                "entity": {
+                  "app_guid": "app-1-guid"
+                }
+              },
+              {
+                "metadata": {
+                  "guid": "service-binding-2-guid",
+                  "url": "/v2/service_bindings/service-binding-2-guid"
+                },
+                "entity": {
+                  "app_guid": "app-2-guid"
+                }
+              }
+            ],
+            "service_plan_guid": null
           }
         }
     ]}`}})
