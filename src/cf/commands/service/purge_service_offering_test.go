@@ -70,6 +70,9 @@ var _ = Describe("Purging services", func() {
 		testassert.SliceContains(deps.ui.Prompts, testassert.Lines{
 			{"Really purge service", "the-service-name"},
 		})
+		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{
+			{"Purging service the-service-name..."},
+		})
 
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderName).To(Equal("the-service-name"))
 		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderProvider).To(Equal(""))
@@ -91,7 +94,7 @@ var _ = Describe("Purging services", func() {
 			deps.reqFactory,
 		)
 
-		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderCalled).To(Equal(false))
+		Expect(deps.serviceRepo.FindServiceOfferingByLabelAndProviderCalled).To(Equal(true))
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
 	})
 
@@ -135,13 +138,16 @@ var _ = Describe("Purging services", func() {
 
 		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = net.NewNotFoundApiResponse("uh oh cant find it")
 
+		deps.ui.Inputs = []string{"yes"}
+
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{"-f", "-p", "the-provider", "the-service-name"}),
+			testcmd.NewContext("purge-service-offering", []string{"-p", "the-provider", "the-service-name"}),
 			deps.reqFactory,
 		)
 
 		testassert.SliceContains(deps.ui.Outputs, testassert.Lines{{"Service offering", "does not exist"}})
+		testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{{"Warning"}})
 		testassert.SliceDoesNotContain(deps.ui.Outputs, testassert.Lines{{"Ok"}})
 
 		Expect(deps.serviceRepo.PurgeServiceOfferingCalled).To(Equal(false))
