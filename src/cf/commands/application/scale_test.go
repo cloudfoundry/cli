@@ -77,6 +77,10 @@ var _ = Describe("Testing with ginkgo", func() {
 	Describe("scaling an app", func() {
 		BeforeEach(func() {
 			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})
+			app.InstanceCount = 42
+			app.DiskQuota = 1024
+			app.Memory = 256
+
 			reqFactory.Application = app
 			appRepo.UpdateAppResult = app
 		})
@@ -86,9 +90,15 @@ var _ = Describe("Testing with ginkgo", func() {
 				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"my-app"}), reqFactory)
 
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Showing limits", "my-app", "my-org", "my-space", "my-user"},
+					{"OK"},
 					{"memory", "256M"},
 					{"disk", "1G"},
 					{"instances", "42"},
+				})
+
+				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+					{"Scaling"},
 				})
 			})
 		})

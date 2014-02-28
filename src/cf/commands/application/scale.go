@@ -45,12 +45,25 @@ func (cmd *Scale) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 	return
 }
 
+var bytesInAMegabyte uint64 = 1024 * 1024
+
 func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()
 	if !anyFlagsSet(c) {
-		cmd.ui.Say("memory: %s", formatters.ByteSize(currentApp.Memory))
-		cmd.ui.Say("disk: %s", formatters.ByteSize(currentApp.DiskQuota))
-		cmd.ui.Say("instances: %d", currentApp.InstanceCount)
+		cmd.ui.Say("Showing limits for %s in org %s / space %s as %s...",
+			terminal.EntityNameColor(currentApp.Name),
+			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+			terminal.EntityNameColor(cmd.config.Username()),
+		)
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+
+		cmd.ui.Say("%s %s", terminal.HeaderColor("memory:"), formatters.ByteSize(currentApp.Memory*bytesInAMegabyte))
+		cmd.ui.Say("%s %s", terminal.HeaderColor("disk:"), formatters.ByteSize(currentApp.DiskQuota*bytesInAMegabyte))
+		cmd.ui.Say("%s %d", terminal.HeaderColor("instances:"), currentApp.InstanceCount)
+
+		return
 	}
 
 	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
@@ -105,5 +118,5 @@ func (cmd *Scale) Run(c *cli.Context) {
 }
 
 func anyFlagsSet(context *cli.Context) bool {
-	return context.String("m") != "" && context.String("k") != "" && context.Int("i") != -1
+	return context.String("m") != "" || context.String("k") != "" || context.Int("i") != -1
 }
