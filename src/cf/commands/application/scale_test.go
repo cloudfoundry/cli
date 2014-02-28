@@ -64,13 +64,13 @@ var _ = Describe("Testing with ginkgo", func() {
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
-		It("requires at least one flag", func() {
+		It("does not require any flags", func() {
 			reqFactory.LoginSuccess = true
 			reqFactory.TargetedSpaceSuccess = true
 
 			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"my-app"}), reqFactory)
 
-			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		})
 	})
 
