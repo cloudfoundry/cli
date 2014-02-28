@@ -67,7 +67,7 @@ func init() {
 		Describe("migrating service instances", func() {
 			BeforeEach(func() {
 				requirementsFactory.LoginSuccess = true
-				args = []string{"v1-service-name", "v1-provider-name", "v1-plan-name", "v2-service-name", "v2-plan-name"}
+				args = []string{"v1-service-label", "v1-provider-name", "v1-plan-name", "v2-service-label", "v2-plan-name"}
 				context = testcmd.NewContext("migrate-service-instances", args)
 				serviceRepo.ServiceInstanceCountForServicePlan = 1
 			})
@@ -81,8 +81,8 @@ func init() {
 				})
 				testassert.SliceContains(ui.Prompts, testassert.Lines{
 					{"Really migrate", "1 service instance",
-						"from plan", "v1-service-name", "v1-provider-name", "v1-plan-name",
-						"to", "v2-service-name", "v2-plan-name"},
+						"from plan", "v1-service-label", "v1-provider-name", "v1-plan-name",
+						"to", "v2-service-label", "v2-plan-name"},
 				})
 			})
 
@@ -110,7 +110,7 @@ func init() {
 						expectedV1 := api.ServicePlanDescription{
 							ServicePlanName: "v1-plan-name",
 							ServiceProvider: "v1-provider-name",
-							ServiceName:     "v1-service-name",
+							ServiceLabel:    "v1-service-label",
 						}
 						Expect(serviceRepo.FindServicePlanByDescriptionArguments[0]).To(Equal(expectedV1))
 					})
@@ -120,7 +120,7 @@ func init() {
 
 						expectedV2 := api.ServicePlanDescription{
 							ServicePlanName: "v2-plan-name",
-							ServiceName:     "v2-service-name",
+							ServiceLabel:    "v2-service-label",
 						}
 						Expect(serviceRepo.FindServicePlanByDescriptionArguments[1]).To(Equal(expectedV2))
 					})
@@ -148,7 +148,7 @@ func init() {
 
 							testassert.SliceContains(ui.Outputs, testassert.Lines{
 								{"FAILED"},
-								{"Plan", "v1-service-name", "v1-provider-name", "v1-plan-name", "cannot be found"},
+								{"Plan", "v1-service-label", "v1-provider-name", "v1-plan-name", "cannot be found"},
 							})
 						})
 
@@ -196,7 +196,7 @@ func init() {
 
 							testassert.SliceContains(ui.Outputs, testassert.Lines{
 								{"FAILED"},
-								{"Plan", "v2-service-name", "v2-plan-name", "cannot be found"},
+								{"Plan", "v2-service-label", "v2-plan-name", "cannot be found"},
 							})
 						})
 
@@ -303,7 +303,7 @@ func init() {
 
 			Context("when the user ignores confirmation using the force flag", func() {
 				It("does not prompt the user for confirmation", func() {
-					args = []string{"-f", "v1-service-name", "v1-provider-name", "v1-plan-name", "v2-service-name", "v2-plan-name"}
+					args = []string{"-f", "v1-service-label", "v1-provider-name", "v1-plan-name", "v2-service-label", "v2-plan-name"}
 					context = testcmd.NewContext("migrate-service-instances", args)
 
 					testcmd.RunCommand(cmd, context, requirementsFactory)
