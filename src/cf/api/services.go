@@ -78,11 +78,13 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	instanceResource := resources.Resources[0]
 	instance = instanceResource.ToModel()
 
-	resource := &ServiceOfferingResource{}
-	path = fmt.Sprintf("%s/v2/services/%s", repo.config.ApiEndpoint(), instanceResource.Entity.ServicePlan.Entity.ServiceOfferingGuid)
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
+	if instanceResource.Entity.ServicePlan.Metadata.Guid != "" {
+		resource := &ServiceOfferingResource{}
+		path = fmt.Sprintf("%s/v2/services/%s", repo.config.ApiEndpoint(), instanceResource.Entity.ServicePlan.Entity.ServiceOfferingGuid)
+		apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
+		instance.ServiceOffering = resource.ToFields()
+	}
 
-	instance.ServiceOffering = resource.ToFields()
 	return
 }
 
