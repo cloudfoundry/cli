@@ -31,8 +31,8 @@ func (cmd ListServiceAuthTokens) GetRequirements(reqFactory requirements.Factory
 func (cmd ListServiceAuthTokens) Run(c *cli.Context) {
 	cmd.ui.Say("Getting service auth tokens as %s...", terminal.EntityNameColor(cmd.config.Username()))
 	authTokens, apiResponse := cmd.authTokenRepo.FindAll()
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 	cmd.ui.Ok()

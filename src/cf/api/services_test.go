@@ -34,7 +34,7 @@ var _ = Describe("Services Repo", func() {
 		offerings, apiResponse := repo.GetAllServiceOfferings()
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		expectMultipleServiceOfferings(offerings)
 	})
 
@@ -54,7 +54,7 @@ var _ = Describe("Services Repo", func() {
 		offerings, apiResponse := repo.GetServiceOfferingsForSpace("my-space-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		expectMultipleServiceOfferings(offerings)
 	})
 
@@ -72,7 +72,7 @@ var _ = Describe("Services Repo", func() {
 
 			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(identicalAlreadyExists).To(Equal(false))
 		})
 
@@ -92,7 +92,7 @@ var _ = Describe("Services Repo", func() {
 			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(identicalAlreadyExists).To(Equal(true))
 		})
 
@@ -112,7 +112,7 @@ var _ = Describe("Services Repo", func() {
 			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(BeNil())
 			Expect(identicalAlreadyExists).To(Equal(false))
 		})
 	})
@@ -125,7 +125,7 @@ var _ = Describe("Services Repo", func() {
 			instance, apiResponse := repo.FindInstanceByName("my-service")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
@@ -147,7 +147,7 @@ var _ = Describe("Services Repo", func() {
 			instance, apiResponse := repo.FindInstanceByName("my-service")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal(""))
@@ -172,7 +172,7 @@ var _ = Describe("Services Repo", func() {
 
 			_, apiResponse := repo.FindInstanceByName("my-service")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsError()).To(BeFalse())
+
 			Expect(apiResponse.IsNotFound()).To(BeTrue())
 		})
 	})
@@ -189,7 +189,7 @@ var _ = Describe("Services Repo", func() {
 		serviceInstance.Guid = "my-service-instance-guid"
 		apiResponse := repo.DeleteService(serviceInstance)
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteServiceWithServiceBindings", func() {
@@ -209,8 +209,8 @@ var _ = Describe("Services Repo", func() {
 		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 
 		apiResponse := repo.DeleteService(serviceInstance)
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(Equal("Cannot delete service instance, apps are still bound to it"))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.Error()).To(Equal("Cannot delete service instance, apps are still bound to it"))
 	})
 
 	It("TestRenameService", func() {
@@ -260,7 +260,7 @@ var _ = Describe("Services Repo", func() {
 
 		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(offering.Guid).To(Equal("offering-1-guid"))
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("returns an error if the offering cannot be found", func() {
@@ -295,8 +295,8 @@ var _ = Describe("Services Repo", func() {
 		}})
 
 		_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(apiResponse.IsError()).To(BeTrue())
-		Expect(apiResponse.ErrorCode).To(Equal("10005"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.ErrorCode()).To(Equal("10005"))
 	})
 
 	It("purges service offerings", func() {
@@ -312,7 +312,7 @@ var _ = Describe("Services Repo", func() {
 		offering.Guid = "the-service-guid"
 
 		apiResponse := repo.PurgeServiceOffering(offering)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -358,7 +358,7 @@ var _ = Describe("Services Repo", func() {
 
 			count, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
 			Expect(count).To(Equal(9))
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 		})
 
 		It("returns the API error when one occurs", func() {
@@ -372,7 +372,7 @@ var _ = Describe("Services Repo", func() {
 
 			_, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
 
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			Expect(apiResponse).To(HaveOccurred())
 		})
 	})
 
@@ -421,7 +421,7 @@ var _ = Describe("Services Repo", func() {
 				v1Guid, apiResponse := repo.FindServicePlanByDescription(v1)
 
 				Expect(v1Guid).To(Equal("offering-1-plan-2-guid"))
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(apiResponse).NotTo(HaveOccurred())
 			})
 
 			It("returns the plan guid for a v2 plan", func() {
@@ -465,7 +465,7 @@ var _ = Describe("Services Repo", func() {
 
 				v2Guid, apiResponse := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(apiResponse).NotTo(HaveOccurred())
 				Expect(v2Guid).To(Equal("offering-1-plan-2-guid"))
 			})
 		})
@@ -488,11 +488,11 @@ var _ = Describe("Services Repo", func() {
 
 				_, apiResponse := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+				Expect(apiResponse).To(HaveOccurred())
 				Expect(apiResponse.IsNotFound()).To(BeTrue())
-				Expect(apiResponse.Message).To(ContainSubstring("Plan"))
-				Expect(apiResponse.Message).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiResponse.Message).To(ContainSubstring("cannot be found"))
+				Expect(apiResponse.Error()).To(ContainSubstring("Plan"))
+				Expect(apiResponse.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
+				Expect(apiResponse.Error()).To(ContainSubstring("cannot be found"))
 			})
 		})
 
@@ -538,11 +538,11 @@ var _ = Describe("Services Repo", func() {
 
 				_, apiResponse := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+				Expect(apiResponse).To(HaveOccurred())
 				Expect(apiResponse.IsNotFound()).To(BeTrue())
-				Expect(apiResponse.Message).To(ContainSubstring("Plan"))
-				Expect(apiResponse.Message).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiResponse.Message).To(ContainSubstring("cannot be found"))
+				Expect(apiResponse.Error()).To(ContainSubstring("Plan"))
+				Expect(apiResponse.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
+				Expect(apiResponse.Error()).To(ContainSubstring("cannot be found"))
 			})
 		})
 
@@ -563,7 +563,7 @@ var _ = Describe("Services Repo", func() {
 
 				_, apiResponse := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse.IsSuccessful()).To(BeFalse())
+				Expect(apiResponse).To(HaveOccurred())
 				Expect(apiResponse.IsHttpError()).To(BeTrue())
 			})
 		})
@@ -582,7 +582,7 @@ var _ = Describe("Services Repo", func() {
 			defer ts.Close()
 
 			changedCount, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(changedCount).To(Equal(3))
 		})
 
@@ -598,7 +598,7 @@ var _ = Describe("Services Repo", func() {
 			defer ts.Close()
 
 			_, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			Expect(apiResponse).To(HaveOccurred())
 		})
 	})
 })
@@ -778,7 +778,7 @@ func testRenameService(endpointPath string, serviceInstance models.ServiceInstan
 
 	apiResponse := repo.RenameService(serviceInstance, "new-name")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+	Expect(apiResponse).NotTo(HaveOccurred())
 }
 
 func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {

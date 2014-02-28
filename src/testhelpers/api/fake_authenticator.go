@@ -2,7 +2,7 @@ package api
 
 import (
 	"cf/configuration"
-	"cf/net"
+	"cf/errors"
 )
 
 type FakeAuthenticationRepository struct {
@@ -11,7 +11,7 @@ type FakeAuthenticationRepository struct {
 		Credentials map[string]string
 	}
 	GetLoginPromptsReturns struct {
-		ApiResponse net.ApiResponse
+		ApiResponse errors.Error
 		Prompts     map[string]configuration.AuthPrompt
 	}
 
@@ -20,11 +20,11 @@ type FakeAuthenticationRepository struct {
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse net.ApiResponse) {
+func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse errors.Error) {
 	auth.AuthenticateArgs.Credentials = credentials
 
 	if auth.AuthError {
-		apiResponse = net.NewApiResponseWithMessage("Error authenticating.")
+		apiResponse = errors.NewErrorWithMessage("Error authenticating.")
 		return
 	}
 
@@ -38,11 +38,11 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 	return
 }
 
-func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse) {
+func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.HttpError) {
 	return
 }
 
-func (auth *FakeAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse net.ApiResponse) {
+func (auth *FakeAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse errors.Error) {
 	prompts = auth.GetLoginPromptsReturns.Prompts
 	apiResponse = auth.GetLoginPromptsReturns.ApiResponse
 	return

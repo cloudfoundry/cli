@@ -31,7 +31,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse := repo.Create(authToken)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 	It("TestServiceAuthFindAll", func() {
 
@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		authTokens, apiResponse := repo.FindAll()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(len(authTokens)).To(Equal(2))
 
@@ -101,7 +101,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceAuthToken, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		authToken2 := models.ServiceAuthTokenFields{}
 		authToken2.Guid = "mysql-core-guid"
 		authToken2.Label = "mysql"
@@ -124,7 +124,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		_, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeFalse())
+
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 	It("TestServiceAuthUpdate", func() {
@@ -144,7 +144,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse := repo.Update(authToken3)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 	It("TestServiceAuthDelete", func() {
 
@@ -161,7 +161,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse := repo.Delete(authToken4)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 

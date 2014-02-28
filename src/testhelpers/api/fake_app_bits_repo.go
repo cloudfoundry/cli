@@ -1,7 +1,7 @@
 package api
 
 import (
-	"cf/net"
+	"cf/errors"
 )
 
 type FakeApplicationBitsRepository struct {
@@ -14,12 +14,12 @@ type FakeApplicationBitsRepository struct {
 	CallbackFileCount uint64
 }
 
-func (repo *FakeApplicationBitsRepository) UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiResponse net.ApiResponse) {
+func (repo *FakeApplicationBitsRepository) UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiResponse errors.Error) {
 	repo.UploadedDir = dir
 	repo.UploadedAppGuid = appGuid
 
 	if repo.UploadAppErr {
-		apiResponse = net.NewApiResponseWithMessage("Error uploading app")
+		apiResponse = errors.NewErrorWithMessage("Error uploading app")
 		return
 	}
 

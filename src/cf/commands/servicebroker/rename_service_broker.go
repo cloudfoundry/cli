@@ -36,8 +36,8 @@ func (cmd RenameServiceBroker) GetRequirements(reqFactory requirements.Factory, 
 
 func (cmd RenameServiceBroker) Run(c *cli.Context) {
 	serviceBroker, apiResponse := cmd.repo.FindByName(c.Args()[0])
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -51,8 +51,8 @@ func (cmd RenameServiceBroker) Run(c *cli.Context) {
 
 	apiResponse = cmd.repo.Rename(serviceBroker.Guid, newName)
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

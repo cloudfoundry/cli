@@ -52,16 +52,16 @@ func (cmd *DeleteSharedDomain) Run(c *cli.Context) {
 	)
 
 	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
-	if apiResponse.IsError() {
-		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Message)
-		return
-	}
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		cmd.ui.Ok()
-		cmd.ui.Warn(apiResponse.Message)
+		cmd.ui.Warn(apiResponse.Error())
 		return
 	}
 
+	if apiResponse != nil {
+		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Error())
+		return
+	}
 	if !force {
 		answer := cmd.ui.Confirm(
 			`This domain is shared across all orgs.
@@ -74,8 +74,8 @@ Are you sure you want to delete the domain %s? `, domainName)
 	}
 
 	apiResponse = cmd.domainRepo.DeleteSharedDomain(domain.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiResponse.Error())
 		return
 	}
 

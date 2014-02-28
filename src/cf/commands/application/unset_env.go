@@ -65,8 +65,8 @@ func (cmd *UnsetEnv) Run(c *cli.Context) {
 	delete(envParams, varName)
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

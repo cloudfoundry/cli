@@ -2,20 +2,20 @@ package api
 
 import (
 	realApi "cf/api"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	"generic"
 )
 
 type FakeServiceRepo struct {
 	GetAllServiceOfferingsReturns struct {
 		ServiceOfferings []models.ServiceOffering
-		ApiResponse      net.ApiResponse
+		ApiResponse      errors.Error
 	}
 
 	GetServiceOfferingsForSpaceReturns struct {
 		ServiceOfferings []models.ServiceOffering
-		ApiResponse      net.ApiResponse
+		ApiResponse      errors.Error
 	}
 	GetServiceOfferingsForSpaceArgs struct {
 		SpaceGuid string
@@ -39,47 +39,47 @@ type FakeServiceRepo struct {
 
 	PurgedServiceOffering           models.ServiceOffering
 	PurgeServiceOfferingCalled      bool
-	PurgeServiceOfferingApiResponse net.ApiResponse
+	PurgeServiceOfferingApiResponse errors.Error
 
 	FindServiceOfferingByLabelAndProviderName            string
 	FindServiceOfferingByLabelAndProviderProvider        string
 	FindServiceOfferingByLabelAndProviderServiceOffering models.ServiceOffering
-	FindServiceOfferingByLabelAndProviderApiResponse     net.ApiResponse
+	FindServiceOfferingByLabelAndProviderApiResponse     errors.Error
 	FindServiceOfferingByLabelAndProviderCalled          bool
 
 	V1ServicePlanDescription                realApi.ServicePlanDescription
 	V2ServicePlanDescription                realApi.ServicePlanDescription
 	FindServicePlanByDescriptionArguments   []realApi.ServicePlanDescription
 	FindServicePlanByDescriptionResultGuids []string
-	FindServicePlanByDescriptionResponses   []net.ApiResponse
+	FindServicePlanByDescriptionResponses   []errors.Error
 	findServicePlanByDescriptionCallCount   int
 
 	ServiceInstanceCountForServicePlan int
-	ServiceInstanceCountApiResponse    net.ApiResponse
+	ServiceInstanceCountApiResponse    errors.Error
 
 	V1GuidToMigrate                           string
 	V2GuidToMigrate                           string
 	MigrateServicePlanFromV1ToV2Called        bool
 	MigrateServicePlanFromV1ToV2ReturnedCount int
-	MigrateServicePlanFromV1ToV2Response      net.ApiResponse
+	MigrateServicePlanFromV1ToV2Response      errors.Error
 }
 
-func (repo *FakeServiceRepo) GetAllServiceOfferings() (models.ServiceOfferings, net.ApiResponse) {
+func (repo *FakeServiceRepo) GetAllServiceOfferings() (models.ServiceOfferings, errors.Error) {
 	return repo.GetAllServiceOfferingsReturns.ServiceOfferings, repo.GetAllServiceOfferingsReturns.ApiResponse
 }
 
-func (repo *FakeServiceRepo) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, net.ApiResponse) {
+func (repo *FakeServiceRepo) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, errors.Error) {
 	repo.GetServiceOfferingsForSpaceArgs.SpaceGuid = spaceGuid
 	return repo.GetServiceOfferingsForSpaceReturns.ServiceOfferings, repo.GetServiceOfferingsForSpaceReturns.ApiResponse
 }
 
-func (repo *FakeServiceRepo) PurgeServiceOffering(offering models.ServiceOffering) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) PurgeServiceOffering(offering models.ServiceOffering) (apiResponse errors.Error) {
 	repo.PurgedServiceOffering = offering
 	repo.PurgeServiceOfferingCalled = true
 	return
 }
 
-func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiResponse errors.Error) {
 	repo.FindServiceOfferingByLabelAndProviderCalled = true
 	repo.FindServiceOfferingByLabelAndProviderName = name
 	repo.FindServiceOfferingByLabelAndProviderProvider = provider
@@ -88,7 +88,7 @@ func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provide
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiResponse errors.Error) {
 	repo.CreateServiceInstanceName = name
 	repo.CreateServiceInstancePlanGuid = planGuid
 	identicalAlreadyExists = repo.CreateServiceAlreadyExists
@@ -96,7 +96,7 @@ func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (ident
 	return
 }
 
-func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.ServiceInstance, apiResponse errors.Error) {
 	repo.FindInstanceByNameName = name
 
 	if repo.FindInstanceByNameMap != nil && repo.FindInstanceByNameMap.Has(name) {
@@ -106,28 +106,28 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.Se
 	}
 
 	if repo.FindInstanceByNameErr {
-		apiResponse = net.NewApiResponseWithMessage("Error finding instance")
+		apiResponse = errors.NewErrorWithMessage("Error finding instance")
 	}
 
 	if repo.FindInstanceByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service instance", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "Service instance", name)
 	}
 
 	return
 }
 
-func (repo *FakeServiceRepo) DeleteService(instance models.ServiceInstance) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) DeleteService(instance models.ServiceInstance) (apiResponse errors.Error) {
 	repo.DeleteServiceServiceInstance = instance
 	return
 }
 
-func (repo *FakeServiceRepo) RenameService(instance models.ServiceInstance, newName string) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) RenameService(instance models.ServiceInstance, newName string) (apiResponse errors.Error) {
 	repo.RenameServiceServiceInstance = instance
 	repo.RenameServiceNewName = newName
 	return
 }
 
-func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription realApi.ServicePlanDescription) (planGuid string, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription realApi.ServicePlanDescription) (planGuid string, apiResponse errors.Error) {
 
 	repo.FindServicePlanByDescriptionArguments =
 		append(repo.FindServicePlanByDescriptionArguments, planDescription)
@@ -142,13 +142,13 @@ func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription realAp
 	return
 }
 
-func (repo *FakeServiceRepo) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) GetServiceInstanceCountForServicePlan(v1PlanGuid string) (count int, apiResponse errors.Error) {
 	count = repo.ServiceInstanceCountForServicePlan
 	apiResponse = repo.ServiceInstanceCountApiResponse
 	return
 }
 
-func (repo *FakeServiceRepo) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse net.ApiResponse) {
+func (repo *FakeServiceRepo) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiResponse errors.Error) {
 	repo.MigrateServicePlanFromV1ToV2Called = true
 	repo.V1GuidToMigrate = v1PlanGuid
 	repo.V2GuidToMigrate = v2PlanGuid

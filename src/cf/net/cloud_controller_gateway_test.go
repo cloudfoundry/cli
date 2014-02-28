@@ -36,9 +36,9 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
 		apiResponse = gateway.PerformRequest(request)
 
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring("The host is taken: test1"))
-		Expect(apiResponse.ErrorCode).To(ContainSubstring("210003"))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.Error()).To(ContainSubstring("The host is taken: test1"))
+		Expect(apiResponse.ErrorCode()).To(ContainSubstring("210003"))
 	})
 
 	It("parses invalid token responses", func() {
@@ -49,8 +49,8 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
 		apiResponse = gateway.PerformRequest(request)
 
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring("The token is invalid"))
-		Expect(apiResponse.ErrorCode).To(ContainSubstring(INVALID_TOKEN_CODE))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.Error()).To(ContainSubstring("The token is invalid"))
+		Expect(apiResponse.ErrorCode()).To(ContainSubstring(INVALID_TOKEN_CODE))
 	})
 })

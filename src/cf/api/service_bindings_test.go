@@ -39,7 +39,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestCreateServiceBindingIfError", func() {
@@ -60,8 +60,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.ErrorCode).To(Equal("90003"))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.ErrorCode()).To(Equal("90003"))
 	})
 
 	It("TestDeleteServiceBinding", func() {
@@ -83,7 +83,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(found).To(BeTrue())
 	})
 
@@ -98,7 +98,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler.CallCount).To(Equal(0))
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(found).To(BeFalse())
 	})
 })

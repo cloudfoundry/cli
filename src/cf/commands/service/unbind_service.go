@@ -55,8 +55,8 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 	)
 
 	found, apiResponse := cmd.serviceBindingRepo.Delete(instance, app.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

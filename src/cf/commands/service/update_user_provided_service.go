@@ -75,8 +75,8 @@ func (cmd *UpdateUserProvidedService) Run(c *cli.Context) {
 	serviceInstance.SysLogDrainUrl = drainUrl
 
 	apiResponse := cmd.userProvidedServiceInstanceRepo.Update(serviceInstance.ServiceInstanceFields)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

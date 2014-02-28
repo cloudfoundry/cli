@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -33,7 +34,7 @@ var _ = Describe("Gateway", func() {
 	It("TestNewRequest", func() {
 		request, apiResponse := ccGateway.NewRequest("GET", "https://example.com/v2/apps", "BEARER my-access-token", nil)
 
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(request.HttpReq.Header.Get("Authorization")).To(Equal("BEARER my-access-token"))
 		Expect(request.HttpReq.Header.Get("accept")).To(Equal("application/json"))
 		Expect(request.HttpReq.Header.Get("User-Agent")).To(Equal("go-cli " + cf.Version + " / " + runtime.GOOS))
@@ -81,21 +82,21 @@ var _ = Describe("Gateway", func() {
 
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
 			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 500*time.Millisecond)
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 		})
 
 		It("returns an error if jobs takes longer than the timeout", func() {
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
 			_, apiResponse := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 10*time.Millisecond)
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
-			Expect(apiResponse.Message).To(ContainSubstring("timed out"))
+			Expect(apiResponse).To(HaveOccurred())
+			Expect(apiResponse.Error()).To(ContainSubstring("timed out"))
 		})
 	})
 
 	Describe("when uploading a file", func() {
 		var err error
 		var request *Request
-		var apiResponse ApiResponse
+		var apiResponse errors.Error
 		var apiServer *httptest.Server
 		var authServer *httptest.Server
 		var fileToUpload *os.File
@@ -131,14 +132,14 @@ var _ = Describe("Gateway", func() {
 
 		It("sets the content length to the size of the file", func() {
 			Expect(err).NotTo(HaveOccurred())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(request.HttpReq.ContentLength).To(Equal(int64(13)))
 		})
 
 		Describe("when the access token expires during the upload", func() {
 			It("successfully re-sends the file on the second request", func() {
 				apiResponse = ccGateway.PerformRequest(request)
-				Expect(apiResponse.Message).To(BeEmpty())
+				Expect(apiResponse.Error()).To(BeEmpty())
 			})
 		})
 	})
@@ -175,7 +176,7 @@ var _ = Describe("Gateway", func() {
 			request, apiResponse := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			apiResponse = uaaGateway.PerformRequest(request)
 
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
 			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
 		})
@@ -192,7 +193,7 @@ var _ = Describe("Gateway", func() {
 			request, apiResponse := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			apiResponse = ccGateway.PerformRequest(request)
 
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
 			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
 		})
@@ -211,8 +212,8 @@ var _ = Describe("Gateway", func() {
 			request, apiResponse := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			apiResponse = uaaGateway.PerformRequest(request)
 
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
-			Expect(apiResponse.ErrorCode).To(Equal("333"))
+			Expect(apiResponse).To(HaveOccurred())
+			Expect(apiResponse.ErrorCode()).To(Equal("333"))
 		})
 
 		It("returns a failure response when token refresh fails after a CC request", func() {
@@ -229,8 +230,8 @@ var _ = Describe("Gateway", func() {
 			request, apiResponse := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
 			apiResponse = ccGateway.PerformRequest(request)
 
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
-			Expect(apiResponse.ErrorCode).To(Equal("333"))
+			Expect(apiResponse).To(HaveOccurred())
+			Expect(apiResponse.ErrorCode()).To(Equal("333"))
 		})
 	})
 
@@ -243,8 +244,8 @@ var _ = Describe("Gateway", func() {
 		request, apiResponse := ccGateway.NewRequest("POST", apiServer.URL+"/v2/foo", "the-access-token", nil)
 		apiResponse = ccGateway.PerformRequest(request)
 
-		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		Expect(apiResponse.Message).To(ContainSubstring("certificate"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(ContainSubstring("certificate"))
 	})
 })
 

@@ -2,8 +2,8 @@ package buildpack_test
 
 import (
 	. "cf/commands/buildpack"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -13,7 +13,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("delete-buildpack command", func() {
 	It("TestDeleteBuildpackGetRequirements", func() {
 
 		ui := &testterm.FakeUI{Inputs: []string{"y"}}
@@ -114,7 +114,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		buildpack.Guid = "my-buildpack-guid"
 		buildpackRepo := &testapi.FakeBuildpackRepository{
 			FindByNameBuildpack: buildpack,
-			DeleteApiResponse:   net.NewApiResponseWithMessage("failed badly"),
+			DeleteApiResponse:   errors.NewErrorWithMessage("failed badly"),
 		}
 
 		cmd := NewDeleteBuildpack(ui, buildpackRepo)

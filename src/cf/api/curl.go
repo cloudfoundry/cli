@@ -3,6 +3,7 @@ package api
 import (
 	"bufio"
 	"cf/configuration"
+	"cf/errors"
 	"cf/net"
 	"fmt"
 	"io/ioutil"
@@ -13,7 +14,7 @@ import (
 )
 
 type CurlRepository interface {
-	Request(method, path, header, body string) (resHeaders, resBody string, apiResponse net.ApiResponse)
+	Request(method, path, header, body string) (resHeaders, resBody string, apiResponse errors.Error)
 }
 
 type CloudControllerCurlRepository struct {
@@ -27,31 +28,30 @@ func NewCloudControllerCurlRepository(config configuration.Reader, gateway net.G
 	return
 }
 
-func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, apiResponse net.ApiResponse) {
+func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, apiResponse errors.Error) {
 	url := fmt.Sprintf("%s/%s", repo.config.ApiEndpoint(), strings.TrimLeft(path, "/"))
 
 	req, apiResponse := repo.gateway.NewRequest(method, url, repo.config.AccessToken(), strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	err := mergeHeaders(req.HttpReq.Header, headerString)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error parsing headers", err)
+		apiResponse = errors.NewErrorWithError("Error parsing headers", err)
 		return
 	}
 
 	res, apiResponse := repo.gateway.PerformRequestForResponse(req)
 
-	if apiResponse.IsNotSuccessful() {
-		if apiResponse.IsHttpError() {
-			resHeaders = apiResponse.ErrorHeader
-			resBody = apiResponse.ErrorBody
-			apiResponse = net.NewSuccessfulApiResponse()
-			return
-		} else {
-			return
+	if apiResponse != nil {
+		if httpErr, ok := apiResponse.(errors.HttpError); ok {
+			resHeaders = httpErr.Headers()
+			resBody = httpErr.Body()
+			apiResponse = nil
 		}
+
+		return
 	}
 
 	headerBytes, _ := httputil.DumpResponse(res, false)
@@ -59,7 +59,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	bytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error reading response", err)
+		apiResponse = errors.NewErrorWithError("Error reading response", err)
 	}
 	resBody = string(bytes)
 

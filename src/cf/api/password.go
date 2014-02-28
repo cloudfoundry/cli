@@ -2,13 +2,14 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/net"
 	"fmt"
 	"strings"
 )
 
 type PasswordRepository interface {
-	UpdatePassword(old string, new string) net.ApiResponse
+	UpdatePassword(old string, new string) errors.Error
 }
 
 type CloudControllerPasswordRepository struct {
@@ -24,9 +25,9 @@ func NewCloudControllerPasswordRepository(config configuration.Reader, gateway n
 	return
 }
 
-func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiResponse errors.Error) {
 	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 

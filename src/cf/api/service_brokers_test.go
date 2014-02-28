@@ -76,7 +76,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
 		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestFindServiceBrokerByName", func() {
@@ -114,7 +114,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		expectedBroker.Guid = "found-guid"
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(foundBroker).To(Equal(expectedBroker))
 	})
 
@@ -132,7 +132,7 @@ var _ = Describe("Service Brokers Repo", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
-		Expect(apiResponse.Message).To(Equal("Service Broker 'my-broker' not found"))
+		Expect(apiResponse.Error()).To(Equal("Service Broker 'my-broker' not found"))
 	})
 
 	It("TestCreateServiceBroker", func() {
@@ -151,7 +151,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		apiResponse := repo.Create("foobroker", "http://example.com", "foouser", "password")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateServiceBroker", func() {
@@ -176,7 +176,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		apiResponse := repo.Update(serviceBroker)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestRenameServiceBroker", func() {
@@ -193,7 +193,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		apiResponse := repo.Rename("my-guid", "update-foobroker")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteServiceBroker", func() {
@@ -209,7 +209,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		apiResponse := repo.Delete("my-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 

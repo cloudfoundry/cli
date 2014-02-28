@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	cferrors "cf/errors"
 	"cf/models"
 	"cf/net"
 	"errors"
@@ -29,7 +30,7 @@ var _ = Describe("UserRepository", func() {
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 
 			Expect(len(users)).To(Equal(3))
 			Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -49,7 +50,7 @@ var _ = Describe("UserRepository", func() {
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 
 			Expect(len(users)).To(Equal(3))
 			Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -75,7 +76,7 @@ var _ = Describe("UserRepository", func() {
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.StatusCode).To(Equal(http.StatusGatewayTimeout))
+			Expect(apiResponse.StatusCode()).To(Equal(http.StatusGatewayTimeout))
 		})
 
 		It("returns an error when the UAA endpoint cannot be determined", func() {
@@ -89,7 +90,7 @@ var _ = Describe("UserRepository", func() {
 			ccGateway := net.NewCloudControllerGateway()
 			uaaGateway := net.NewUAAGateway()
 			endpointRepo := &testapi.FakeEndpointRepo{}
-			endpointRepo.UAAEndpointReturns.ApiResponse = net.NewApiResponseWithError("Failed to get endpoint!", errors.New("Failed!"))
+			endpointRepo.UAAEndpointReturns.ApiResponse = cferrors.NewErrorWithError("Failed to get endpoint!", errors.New("Failed!"))
 
 			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
 
@@ -112,7 +113,7 @@ var _ = Describe("UserRepository", func() {
 
 		user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		expectedUserFields := models.UserFields{}
 		expectedUserFields.Username = "my-full-username"
@@ -132,9 +133,9 @@ var _ = Describe("UserRepository", func() {
 
 		_, apiResponse := repo.FindByUsername("my-user")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeFalse())
+
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring("User my-user not found"))
+		Expect(apiResponse.Error()).To(ContainSubstring("User my-user not found"))
 	})
 
 	It("TestCreateUser", func() {
@@ -169,7 +170,7 @@ var _ = Describe("UserRepository", func() {
 		apiResponse := repo.Create("my-user", "my-password")
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteUser", func() {
@@ -192,7 +193,7 @@ var _ = Describe("UserRepository", func() {
 		apiResponse := repo.Delete("my-user-guid")
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteUserWhenNotFoundOnTheCloudController", func() {
@@ -215,7 +216,7 @@ var _ = Describe("UserRepository", func() {
 		apiResponse := repo.Delete("my-user-guid")
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestSetOrgRoleToOrgManager", func() {
@@ -234,8 +235,8 @@ var _ = Describe("UserRepository", func() {
 		repo := createUsersRepoWithoutEndpoints()
 		apiResponse := repo.SetOrgRole("user-guid", "org-guid", "foo")
 
-		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		Expect(apiResponse.Message).To(ContainSubstring("Invalid Role"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("TestUnsetOrgRoleFromOrgManager", func() {
@@ -254,8 +255,8 @@ var _ = Describe("UserRepository", func() {
 		repo := createUsersRepoWithoutEndpoints()
 		apiResponse := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
 
-		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		Expect(apiResponse.Message).To(ContainSubstring("Invalid Role"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("TestSetSpaceRoleToSpaceManager", func() {
@@ -274,8 +275,8 @@ var _ = Describe("UserRepository", func() {
 		repo := createUsersRepoWithoutEndpoints()
 		apiResponse := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
 
-		Expect(apiResponse.IsSuccessful()).To(BeFalse())
-		Expect(apiResponse.Message).To(ContainSubstring("Invalid Role"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("lists all users in the org", func() {
@@ -289,7 +290,7 @@ var _ = Describe("UserRepository", func() {
 
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(len(users)).To(Equal(3))
 		Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -371,7 +372,7 @@ func testSetOrgRoleWithValidRole(role string, path string) {
 	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
 
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse.IsSuccessful()).To(BeTrue())
+	Expect(apiResponse).NotTo(HaveOccurred())
 }
 
 func testUnsetOrgRoleWithValidRole(role string, path string) {
@@ -387,7 +388,7 @@ func testUnsetOrgRoleWithValidRole(role string, path string) {
 	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
 
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse.IsSuccessful()).To(BeTrue())
+	Expect(apiResponse).NotTo(HaveOccurred())
 }
 
 func testSetSpaceRoleWithValidRole(role string, path string) {
@@ -409,7 +410,7 @@ func testSetSpaceRoleWithValidRole(role string, path string) {
 	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
 
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse.IsSuccessful()).To(BeTrue())
+	Expect(apiResponse).NotTo(HaveOccurred())
 }
 
 func createUsersRepoWithoutEndpoints() (repo UserRepository) {

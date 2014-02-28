@@ -3,8 +3,8 @@ package commands_test
 import (
 	. "cf/commands"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"strconv"
@@ -374,7 +374,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("fails when the /v2/info API returns an error", func() {
-		endpointRepo.UpdateEndpointError = net.NewApiResponseWithMessage("Server error")
+		endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("Server error")
 
 		ui.Inputs = []string{"api.example.com"}
 

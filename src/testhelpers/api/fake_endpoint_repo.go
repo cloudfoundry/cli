@@ -2,31 +2,31 @@ package api
 
 import (
 	"cf/configuration"
-	"cf/net"
+	"cf/errors"
 )
 
 type FakeEndpointRepo struct {
 	Config configuration.ReadWriter
 
 	UpdateEndpointReceived string
-	UpdateEndpointError    net.ApiResponse
+	UpdateEndpointError    errors.Error
 
 	LoggregatorEndpointReturns struct {
 		Endpoint    string
-		ApiResponse net.ApiResponse
+		ApiResponse errors.Error
 	}
 
 	UAAEndpointReturns struct {
 		Endpoint    string
-		ApiResponse net.ApiResponse
+		ApiResponse errors.Error
 	}
 }
 
-func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse) {
+func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse errors.Error) {
 	repo.UpdateEndpointReceived = endpoint
 	apiResponse = repo.UpdateEndpointError
 
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -35,17 +35,17 @@ func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint str
 	return
 }
 
-func (repo *FakeEndpointRepo) GetLoggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo *FakeEndpointRepo) GetLoggregatorEndpoint() (endpoint string, apiResponse errors.Error) {
 	endpoint = repo.LoggregatorEndpointReturns.Endpoint
 	apiResponse = repo.LoggregatorEndpointReturns.ApiResponse
 	return
 }
 
-func (repo *FakeEndpointRepo) GetCloudControllerEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo *FakeEndpointRepo) GetCloudControllerEndpoint() (endpoint string, apiResponse errors.Error) {
 	return
 }
 
-func (repo *FakeEndpointRepo) GetUAAEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo *FakeEndpointRepo) GetUAAEndpoint() (endpoint string, apiResponse errors.Error) {
 	endpoint = repo.UAAEndpointReturns.Endpoint
 	apiResponse = repo.UAAEndpointReturns.ApiResponse
 	return

@@ -13,7 +13,7 @@ import (
 	testnet "testhelpers/net"
 )
 
-var jsonResponse = `
+var expectedJSONResponse = `
 	{"resources": [
 		{
 		  "metadata": { "guid": "my-quota-guid" },
@@ -41,7 +41,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Path:   "/v2/endpoint",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
-				Body:   jsonResponse},
+				Body:   expectedJSONResponse},
 		})
 		ts, handler := testnet.NewServer([]testnet.TestRequest{req})
 		defer ts.Close()
@@ -56,8 +56,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(headers).To(ContainSubstring("200"))
 		Expect(headers).To(ContainSubstring("Content-Type"))
 		Expect(headers).To(ContainSubstring("text/plain"))
-		testassert.JSONStringEquals(body, jsonResponse)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		testassert.JSONStringEquals(body, expectedJSONResponse)
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestCurlPostRequest", func() {
@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
-				Body:   jsonResponse},
+				Body:   expectedJSONResponse},
 		})
 
 		ts, handler := testnet.NewServer([]testnet.TestRequest{req})
@@ -80,7 +80,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestCurlFailingRequest", func() {
@@ -90,7 +90,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			Matcher: testnet.RequestBodyMatcher(`{"key":"val"}`),
 			Response: testnet.TestResponse{
 				Status: http.StatusBadRequest,
-				Body:   jsonResponse},
+				Body:   expectedJSONResponse},
 		})
 
 		ts, _ := testnet.NewServer([]testnet.TestRequest{req})
@@ -100,9 +100,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		deps.config.SetApiEndpoint(ts.URL)
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, body, _ := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+		_, body, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
-		testassert.JSONStringEquals(body, jsonResponse)
+		Expect(apiResponse).NotTo(HaveOccurred())
+		testassert.JSONStringEquals(body, expectedJSONResponse)
 	})
 
 	It("TestCurlWithCustomHeaders", func() {
@@ -115,7 +116,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			},
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
-				Body:   jsonResponse},
+				Body:   expectedJSONResponse},
 		})
 		ts, handler := testnet.NewServer([]testnet.TestRequest{req})
 		defer ts.Close()
@@ -126,16 +127,16 @@ var _ = Describe("Testing with ginkgo", func() {
 		headers := "content-type: ascii/cats\nx-something-else:5"
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
-		println(apiResponse.Message)
+		println(apiResponse.Error())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestCurlWithInvalidHeaders", func() {
 		deps := newCurlDependencies()
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
 		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
-		Expect(apiResponse.IsError()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring("headers"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(ContainSubstring("headers"))
 	})
 })

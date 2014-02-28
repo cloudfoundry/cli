@@ -54,8 +54,8 @@ func (cmd *MapRoute) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 
 	route, apiResponse := cmd.routeCreator.CreateRoute(hostName, domain, cmd.config.SpaceFields())
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error resolving route:\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Error resolving route:\n%s", apiResponse.Error())
 	}
 	cmd.ui.Say("Adding route %s to app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(route.URL()),
@@ -66,8 +66,8 @@ func (cmd *MapRoute) Run(c *cli.Context) {
 	)
 
 	apiResponse = cmd.routeRepo.Bind(route.Guid, app.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

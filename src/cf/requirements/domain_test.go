@@ -2,8 +2,8 @@ package requirements_test
 
 import (
 	"cf/configuration"
+	cferrors "cf/errors"
 	"cf/models"
-	"cf/net"
 	. "cf/requirements"
 	"errors"
 	. "github.com/onsi/ginkgo"
@@ -37,7 +37,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("fails when the domain is not found", func() {
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("")}
+		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: cferrors.NewNotFoundError("")}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
 		testassert.AssertPanic(testterm.FailedWasCalled, func() {
@@ -46,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("fails when an error occurs fetching the domain", func() {
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: net.NewApiResponseWithError("", errors.New(""))}
+		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: cferrors.NewErrorWithError("", errors.New(""))}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
 		testassert.AssertPanic(testterm.FailedWasCalled, func() {

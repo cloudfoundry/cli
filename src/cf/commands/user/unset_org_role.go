@@ -60,8 +60,8 @@ func (cmd *UnsetOrgRole) Run(c *cli.Context) {
 
 	apiResponse := cmd.userRepo.UnsetOrgRole(user.Guid, org.Guid, role)
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

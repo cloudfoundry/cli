@@ -4,11 +4,11 @@ import (
 	"archive/zip"
 	"cf"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
 	"fileutils"
 	"fmt"
 	"io"
@@ -21,7 +21,7 @@ import (
 )
 
 type BuildpackBitsRepository interface {
-	UploadBuildpack(buildpack models.Buildpack, dir string) (apiResponse net.ApiResponse)
+	UploadBuildpack(buildpack models.Buildpack, dir string) (apiResponse errors.Error)
 }
 
 type CloudControllerBuildpackBitsRepository struct {
@@ -38,10 +38,10 @@ func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gate
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiResponse errors.Error) {
 	fileutils.TempFile("buildpack-upload", func(zipFileToUpload *os.File, err error) {
 		if err != nil {
-			apiResponse = net.NewApiResponseWithError("Couldn't create temp file for upload", err)
+			apiResponse = errors.NewErrorWithError("Couldn't create temp file for upload", err)
 			return
 		}
 
@@ -61,7 +61,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 
 			stats, err := os.Stat(buildpackLocation)
 			if err != nil {
-				apiResponse = net.NewApiResponseWithError("Error opening buildpack file", err)
+				apiResponse = errors.NewErrorWithError("Error opening buildpack file", err)
 				return
 			}
 
@@ -70,7 +70,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 			} else {
 				specifiedFile, err := os.Open(buildpackLocation)
 				if err != nil {
-					apiResponse = net.NewApiResponseWithError("Couldn't open buildpack file", err)
+					apiResponse = errors.NewErrorWithError("Couldn't open buildpack file", err)
 					return
 				}
 				err = normalizeBuildpackArchive(specifiedFile, zipFileToUpload)
@@ -78,7 +78,7 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 		}
 
 		if err != nil {
-			apiResponse = net.NewApiResponseWithError("Couldn't write zip file", err)
+			apiResponse = errors.NewErrorWithError("Couldn't write zip file", err)
 			return
 		}
 
@@ -197,7 +197,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 	})
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) net.ApiResponse {
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) errors.Error {
 	return repo.performMultiPartUpload(
 		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid),
 		"buildpack",
@@ -205,10 +205,10 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.B
 		body)
 }
 
-func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) (apiResponse net.ApiResponse) {
+func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) (apiResponse errors.Error) {
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
-			apiResponse = net.NewApiResponseWithMessage(err.Error())
+			apiResponse = errors.NewErrorWithMessage(err.Error())
 			return
 		}
 
@@ -224,7 +224,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		writer.Close()
 
 		if err != nil {
-			apiResponse = net.NewApiResponseWithError("Error creating upload", err)
+			apiResponse = errors.NewErrorWithError("Error creating upload", err)
 			return
 		}
 
@@ -232,7 +232,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", writer.Boundary())
 		request.HttpReq.Header.Set("Content-Type", contentType)
-		if apiResponse.IsNotSuccessful() {
+		if apiResponse != nil {
 			return
 		}
 

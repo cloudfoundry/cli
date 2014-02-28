@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/net"
 	"cf/terminal"
 	"encoding/base64"
@@ -12,9 +13,9 @@ import (
 )
 
 type AuthenticationRepository interface {
-	Authenticate(credentials map[string]string) (apiResponse net.ApiResponse)
-	RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse)
-	GetLoginPrompts() (map[string]configuration.AuthPrompt, net.ApiResponse)
+	Authenticate(credentials map[string]string) (apiResponse errors.Error)
+	RefreshAuthToken() (updatedToken string, apiResponse errors.HttpError)
+	GetLoginPrompts() (map[string]configuration.AuthPrompt, errors.Error)
 }
 
 type UAAAuthenticationRepository struct {
@@ -28,7 +29,7 @@ func NewUAAAuthenticationRepository(gateway net.Gateway, config configuration.Re
 	return
 }
 
-func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse net.ApiResponse) {
+func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse errors.Error) {
 	data := url.Values{
 		"grant_type": {"password"},
 		"scope":      {""},
@@ -38,8 +39,8 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	}
 
 	apiResponse = uaa.getAuthToken(data)
-	if apiResponse.IsNotSuccessful() && apiResponse.StatusCode == 401 {
-		apiResponse.Message = "Password is incorrect, please try again."
+	if apiResponse != nil && apiResponse.StatusCode() == 401 {
+		apiResponse = errors.NewErrorWithMessage("Password is incorrect, please try again.")
 	}
 	return
 }
@@ -64,7 +65,7 @@ func (r *LoginResource) ToModel() (prompts map[string]configuration.AuthPrompt) 
 	return
 }
 
-func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse net.ApiResponse) {
+func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse errors.Error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthorizationEndpoint())
 	resource := &LoginResource{}
 	apiResponse = uaa.gateway.GetResource(url, "", resource)
@@ -72,7 +73,7 @@ func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]con
 	return
 }
 
-func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse net.ApiResponse) {
+func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.HttpError) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
@@ -82,7 +83,7 @@ func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, 
 	apiResponse = uaa.getAuthToken(data)
 	updatedToken = uaa.config.AccessToken()
 
-	if apiResponse.IsError() {
+	if apiResponse != nil {
 		fmt.Printf("%s\n\n", terminal.NotLoggedInText())
 		os.Exit(1)
 	}
@@ -90,7 +91,7 @@ func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, 
 	return
 }
 
-func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiResponse net.ApiResponse) {
+func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (httpError errors.HttpError) {
 	type uaaErrorResponse struct {
 		Code        string `json:"error"`
 		Description string `json:"error_description"`
@@ -105,7 +106,8 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint())
 	request, apiResponse := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
+		httpError = errors.NewHTTPErrorWithError("Failed to start oauth request", apiResponse)
 		return
 	}
 	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -113,12 +115,13 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (apiRespons
 	response := new(AuthenticationResponse)
 	_, apiResponse = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
+		httpError = errors.NewHTTPErrorWithError("auth request failed", apiResponse)
 		return
 	}
 
 	if response.Error.Code != "" {
-		apiResponse = net.NewApiResponseWithMessage("Authentication Server error: %s", response.Error.Description)
+		apiResponse = errors.NewErrorWithMessage("Authentication Server error: %s", response.Error.Description)
 		return
 	}
 
