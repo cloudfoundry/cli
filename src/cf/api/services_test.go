@@ -459,7 +459,7 @@ var _ = Describe("Services Repo", func() {
 				defer ts.Close()
 
 				v2 := ServicePlanDescription{
-				  ServiceLabel:    "v2-elephantsql",
+					ServiceLabel:    "v2-elephantsql",
 					ServicePlanName: "v2-panda",
 				}
 

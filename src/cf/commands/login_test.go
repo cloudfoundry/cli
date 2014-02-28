@@ -87,7 +87,7 @@ var _ = Describe("Login Command", func() {
 			})
 
 			It("does not clear ApiEndpoint in the config", func() {
-					Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
 			})
 
 			It("clears Access Token, Refresh Token, Org, and Space from the config ", func() {
@@ -116,7 +116,7 @@ var _ = Describe("Login Command", func() {
 			It("updates Access Token, Refresh Token, Org, and Space in the config", func() {
 				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
 				Expect(Config.AccessToken()).To(Equal("new_access_token"))
-        Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
+				Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
 			})
