@@ -413,7 +413,7 @@ var _ = Describe("Services Repo", func() {
 				defer ts.Close()
 
 				v1 := ServicePlanDescription{
-					ServiceName:     "v1-elephantsql",
+					ServiceLabel:    "v1-elephantsql",
 					ServicePlanName: "v1-panda",
 					ServiceProvider: "v1-elephantsql",
 				}
@@ -459,7 +459,7 @@ var _ = Describe("Services Repo", func() {
 				defer ts.Close()
 
 				v2 := ServicePlanDescription{
-					ServiceName:     "v2-elephantsql",
+				  ServiceLabel:    "v2-elephantsql",
 					ServicePlanName: "v2-panda",
 				}
 
@@ -482,7 +482,7 @@ var _ = Describe("Services Repo", func() {
 				defer ts.Close()
 
 				v2 := ServicePlanDescription{
-					ServiceName:     "v2-service-label",
+					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
 
@@ -532,7 +532,7 @@ var _ = Describe("Services Repo", func() {
 				defer ts.Close()
 
 				v2 := ServicePlanDescription{
-					ServiceName:     "v2-service-label",
+					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
 
@@ -557,7 +557,7 @@ var _ = Describe("Services Repo", func() {
 				defer ts.Close()
 
 				v2 := ServicePlanDescription{
-					ServiceName:     "v2-service-label",
+					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
 
