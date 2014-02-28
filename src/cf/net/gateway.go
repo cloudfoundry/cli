@@ -241,12 +241,12 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 	query.Add("async", "true")
 	request.HttpReq.URL.RawQuery = query.Encode()
 
-	bytes, headers, _, apiResponse := gateway.PerformRequestForResponseBytes(request)
+	bytes, headers, rawResponse, apiResponse := gateway.PerformRequestForResponseBytes(request)
 	if apiResponse != nil {
 		return
 	}
 
-	if apiResponse.StatusCode() > 203 || strings.TrimSpace(string(bytes)) == "" {
+	if rawResponse.StatusCode > 203 || strings.TrimSpace(string(bytes)) == "" {
 		return
 	}
 

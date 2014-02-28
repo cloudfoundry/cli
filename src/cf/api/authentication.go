@@ -41,6 +41,10 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	apiResponse = uaa.getAuthToken(data)
 	if apiResponse != nil && apiResponse.StatusCode() == 401 {
 		apiResponse = errors.NewErrorWithMessage("Password is incorrect, please try again.")
+	} else if apiResponse == nil {
+		println("NIL")
+	} else {
+		println("status code", apiResponse.StatusCode())
 	}
 	return
 }
