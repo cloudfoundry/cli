@@ -104,7 +104,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createServiceBindingRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceBindingRepository) {
-	ts, handler = testnet.NewTLSServer(requests)
+	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

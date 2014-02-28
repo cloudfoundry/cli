@@ -546,7 +546,7 @@ func deleteSharedDomainReq(statusCode int) testnet.TestRequest {
 }
 
 func createDomainRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo DomainRepository) {
-	ts, handler = testnet.NewTLSServer(reqs)
+	ts, handler = testnet.NewServer(reqs)
 	config := testconfig.NewRepositoryWithDefaults()
 	config.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

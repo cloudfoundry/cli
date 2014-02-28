@@ -81,7 +81,7 @@ var _ = Describe("UserRepository", func() {
 		It("returns an error when the UAA endpoint cannot be determined", func() {
 			ccReqs, _ := createUsersByRoleEndpoints("/v2/organizations/my-org-guid/managers")
 
-			ts, _ := testnet.NewTLSServer(ccReqs)
+			ts, _ := testnet.NewServer(ccReqs)
 			defer ts.Close()
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(ts.URL)
@@ -434,11 +434,11 @@ func createUsersRepo(ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest
 	uaaTarget := ""
 
 	if len(ccReqs) > 0 {
-		cc, ccHandler = testnet.NewTLSServer(ccReqs)
+		cc, ccHandler = testnet.NewServer(ccReqs)
 		ccTarget = cc.URL
 	}
 	if len(uaaReqs) > 0 {
-		uaa, uaaHandler = testnet.NewTLSServer(uaaReqs)
+		uaa, uaaHandler = testnet.NewServer(uaaReqs)
 		uaaTarget = uaa.URL
 	}
 

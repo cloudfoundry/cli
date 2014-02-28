@@ -330,7 +330,7 @@ var findBuildpackRequest = testnet.TestRequest{
 }
 
 func createBuildpackRepo(requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo BuildpackRepository) {
-	ts, handler = testnet.NewTLSServer(requests)
+	ts, handler = testnet.NewServer(requests)
 	config := testconfig.NewRepositoryWithDefaults()
 	config.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

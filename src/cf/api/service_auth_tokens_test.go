@@ -166,7 +166,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createServiceAuthTokenRepo(request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceAuthTokenRepository) {
-	ts, handler = testnet.NewTLSServer([]testnet.TestRequest{request})
+	ts, handler = testnet.NewServer([]testnet.TestRequest{request})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

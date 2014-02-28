@@ -2,6 +2,7 @@ package net
 
 import (
 	"cf"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -60,6 +61,7 @@ type Gateway struct {
 	errHandler      errorHandler
 	PollingEnabled  bool
 	PollingThrottle time.Duration
+	trustedCerts    []tls.Certificate
 }
 
 func newGateway(errHandler errorHandler) (gateway Gateway) {
@@ -344,7 +346,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 }
 
 func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiResponse ApiResponse) {
-	rawResponse, err := doRequest(request.HttpReq)
+	rawResponse, err := gateway.doRequest(request.HttpReq)
 	if err != nil {
 		apiResponse = NewApiResponseWithError("Error performing request", err)
 		return
@@ -363,4 +365,22 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 		apiResponse = NewApiResponseWithStatusCode(rawResponse.StatusCode)
 	}
 	return
+}
+
+func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
+	httpClient := newHttpClient(gateway.trustedCerts)
+
+	dumpRequest(request)
+
+	response, err = httpClient.Do(request)
+	if err != nil {
+		return
+	}
+
+	dumpResponse(response)
+	return
+}
+
+func (gateway *Gateway) AddTrustedCerts(certificates []tls.Certificate) {
+	gateway.trustedCerts = append(gateway.trustedCerts, certificates...)
 }

@@ -274,7 +274,7 @@ var updateApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 })
 
 func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ApplicationRepository) {
-	ts, handler = testnet.NewTLSServer(requests)
+	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

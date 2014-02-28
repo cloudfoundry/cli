@@ -41,7 +41,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, cf.ApplicationZipper{})
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 
-		testServer, testServerHandler = testnet.NewTLSServer([]testnet.TestRequest{uploadBuildpackRequest()})
+		testServer, testServerHandler = testnet.NewServer([]testnet.TestRequest{uploadBuildpackRequest()})
 		configRepo.SetApiEndpoint(testServer.URL)
 	})
 

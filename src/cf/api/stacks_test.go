@@ -69,7 +69,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestStacksFindByNameNotFound", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "GET",
 			Path:     "/v2/stacks?q=name%3Alinux",
@@ -84,7 +83,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestStacksFindAll", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "GET",
 			Path:     "/v2/stacks",
@@ -104,7 +102,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createStackRepo(req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo StackRepository) {
-	ts, handler = testnet.NewTLSServer([]testnet.TestRequest{req})
+	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)

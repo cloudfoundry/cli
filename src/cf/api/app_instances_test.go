@@ -87,7 +87,7 @@ var appInstancesRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequ
 }`}})
 
 func createAppInstancesRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo AppInstancesRepository) {
-	ts, handler = testnet.NewTLSServer(requests)
+	ts, handler = testnet.NewServer(requests)
 	space := models.SpaceFields{}
 	space.Guid = "my-space-guid"
 	configRepo := testconfig.NewRepositoryWithDefaults()

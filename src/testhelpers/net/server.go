@@ -91,12 +91,14 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, tester.Response.Body)
 }
 
-func NewTLSServer(requests []TestRequest) (s *httptest.Server, h *TestHandler) {
-	h = &TestHandler{
-		Requests: requests,
-	}
-	s = httptest.NewTLSServer(h)
-	return
+func NewTLSServer(requests []TestRequest) (*httptest.Server, *TestHandler) {
+	handler := &TestHandler{Requests: requests}
+	return httptest.NewTLSServer(handler), handler
+}
+
+func NewServer(requests []TestRequest) (*httptest.Server, *TestHandler) {
+	handler := &TestHandler{Requests: requests}
+	return httptest.NewServer(handler), handler
 }
 
 func (h *TestHandler) logError(msg string, args ...interface{}) {

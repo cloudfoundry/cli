@@ -178,7 +178,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestDeleteOrganization", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "DELETE",
 			Path:     "/v2/organizations/my-org-guid?recursive=true",
@@ -195,7 +194,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createOrganizationRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo OrganizationRepository) {
-	ts, handler = testnet.NewTLSServer(reqs)
+	ts, handler = testnet.NewServer(reqs)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)

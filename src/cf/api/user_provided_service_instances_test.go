@@ -33,8 +33,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
-	It("TestCreateUserProvidedServiceInstanceWithSyslogDrain", func() {
 
+	It("TestCreateUserProvidedServiceInstanceWithSyslogDrain", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "POST",
 			Path:     "/v2/user_provided_service_instances",
@@ -53,8 +53,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
-	It("TestUpdateUserProvidedServiceInstance", func() {
 
+	It("TestUpdateUserProvidedServiceInstance", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/user_provided_service_instances/my-instance-guid",
@@ -79,8 +79,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
-	It("TestUpdateUserProvidedServiceInstanceWithOnlyParams", func() {
 
+	It("TestUpdateUserProvidedServiceInstanceWithOnlyParams", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/user_provided_service_instances/my-instance-guid",
@@ -103,8 +103,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
 	})
-	It("TestUpdateUserProvidedServiceInstanceWithOnlySysLogDrainUrl", func() {
 
+	It("TestUpdateUserProvidedServiceInstanceWithOnlySysLogDrainUrl", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/v2/user_provided_service_instances/my-instance-guid",
@@ -124,7 +124,7 @@ var _ = Describe("Testing with ginkgo", func() {
 })
 
 func createUserProvidedServiceInstanceRepo(req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo UserProvidedServiceInstanceRepository) {
-	ts, handler = testnet.NewTLSServer([]testnet.TestRequest{req})
+	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway()

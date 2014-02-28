@@ -15,7 +15,6 @@ import (
 
 var _ = Describe("AppFilesRepository", func() {
 	It("lists files", func() {
-
 		expectedResponse := "file 1\n file 2\n file 3"
 
 		listFilesEndpoint := func(writer http.ResponseWriter, request *http.Request) {
@@ -34,7 +33,7 @@ var _ = Describe("AppFilesRepository", func() {
 			fmt.Fprint(writer, expectedResponse)
 		}
 
-		listFilesServer := httptest.NewTLSServer(http.HandlerFunc(listFilesEndpoint))
+		listFilesServer := httptest.NewServer(http.HandlerFunc(listFilesEndpoint))
 		defer listFilesServer.Close()
 
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -48,7 +47,7 @@ var _ = Describe("AppFilesRepository", func() {
 			},
 		})
 
-		listFilesRedirectServer, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
+		listFilesRedirectServer, handler := testnet.NewServer([]testnet.TestRequest{req})
 		defer listFilesRedirectServer.Close()
 
 		configRepo := testconfig.NewRepositoryWithDefaults()

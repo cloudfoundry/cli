@@ -15,17 +15,19 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestUAAGatewayErrorHandling", func() {
+var _ = Describe("UAA Gateway", func() {
+	var gateway Gateway
 
-		gateway := NewUAAGateway()
+	BeforeEach(func() {
+		gateway = NewUAAGateway()
+	})
 
+	It("parses error responses", func() {
 		ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
 		defer ts.Close()
+		gateway.AddTrustedCerts(ts.TLS.Certificates)
 
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-
 		apiResponse = gateway.PerformRequest(request)
 
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())

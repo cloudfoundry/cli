@@ -90,7 +90,7 @@ type eventTestDependencies struct {
 }
 
 func setupEventTest(requests []testnet.TestRequest) (deps eventTestDependencies) {
-	deps.server, deps.handler = testnet.NewTLSServer(requests)
+	deps.server, deps.handler = testnet.NewServer(requests)
 
 	configRepo := testconfig.NewRepository()
 	configRepo.SetApiEndpoint(deps.server.URL)
