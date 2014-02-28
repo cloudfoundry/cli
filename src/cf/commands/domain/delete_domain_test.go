@@ -3,8 +3,8 @@ package domain_test
 import (
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -15,7 +15,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("delete-domain command", func() {
 	It("TestGetRequirements", func() {
 		domainRepo := &testapi.FakeDomainRepository{}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
@@ -80,7 +80,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteDomainNotFound", func() {
 
 		domainRepo := &testapi.FakeDomainRepository{
-			FindByNameInOrgApiResponse: net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com"),
+			FindByNameInOrgApiResponse: errors.NewNotFoundError("%s %s not found", "Domain", "foo.com"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
@@ -97,7 +97,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteDomainFindError", func() {
 
 		domainRepo := &testapi.FakeDomainRepository{
-			FindByNameInOrgApiResponse: net.NewApiResponseWithMessage("failed badly"),
+			FindByNameInOrgApiResponse: errors.NewErrorWithMessage("failed badly"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
@@ -119,7 +119,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domain.Guid = "foo-guid"
 		domainRepo := &testapi.FakeDomainRepository{
 			FindByNameInOrgDomain: domain,
-			DeleteApiResponse:     net.NewApiResponseWithMessage("failed badly"),
+			DeleteApiResponse:     errors.NewErrorWithMessage("failed badly"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 

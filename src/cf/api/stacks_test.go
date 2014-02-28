@@ -63,7 +63,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		stack, apiResponse := repo.FindByName("linux")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(stack.Name).To(Equal("custom-linux"))
 		Expect(stack.Guid).To(Equal("custom-linux-guid"))
 	})
@@ -79,7 +79,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.FindByName("linux")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(BeNil())
 	})
 
 	It("TestStacksFindAll", func() {
@@ -94,7 +94,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		stacks, apiResponse := repo.FindAll()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(len(stacks)).To(Equal(2))
 		Expect(stacks[0].Name).To(Equal("lucid64"))
 		Expect(stacks[0].Guid).To(Equal("50688ae5-9bfc-4bf6-a4bf-caadb21a32c6"))

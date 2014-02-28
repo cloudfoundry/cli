@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -13,7 +14,7 @@ import (
 )
 
 type AppEventsRepository interface {
-	ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse
+	ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -27,7 +28,7 @@ func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse {
+func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error {
 	apiResponse := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -38,7 +39,7 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 		})
 
 	// FIXME: needs semantic versioning
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		apiResponse = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
 			repo.config.AccessToken(),

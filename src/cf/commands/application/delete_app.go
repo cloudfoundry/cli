@@ -58,20 +58,20 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	app, apiResponse := cmd.appRepo.Read(appName)
 
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return
 	}
 
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
+		return
+	}
+
 	apiResponse = cmd.appRepo.Delete(app.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

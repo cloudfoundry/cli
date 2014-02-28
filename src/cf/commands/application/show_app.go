@@ -67,19 +67,19 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	)
 
 	appSummary, apiResponse := cmd.appSummaryRepo.GetSummary(app.Guid)
-	appIsStopped := apiResponse.ErrorCode == cf.APP_STOPPED ||
-		apiResponse.ErrorCode == cf.APP_NOT_STAGED ||
+	appIsStopped := apiResponse.ErrorCode() == cf.APP_STOPPED ||
+		apiResponse.ErrorCode() == cf.APP_NOT_STAGED ||
 		appSummary.State == "stopped"
 
-	if apiResponse.IsNotSuccessful() && !appIsStopped {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil && !appIsStopped {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
 	var instances []models.AppInstanceFields
 	instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
-	if apiResponse.IsNotSuccessful() && !appIsStopped {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil && !appIsStopped {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

@@ -41,11 +41,11 @@ func (cmd Password) Run(c *cli.Context) {
 	cmd.ui.Say("Changing password...")
 	apiResponse := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
-	if apiResponse.IsNotSuccessful() {
-		if apiResponse.StatusCode == 401 {
+	if apiResponse != nil {
+		if apiResponse.StatusCode() == 401 {
 			cmd.ui.Failed("Current password did not match")
 		} else {
-			cmd.ui.Failed(apiResponse.Message)
+			cmd.ui.Failed(apiResponse.Error())
 		}
 		return
 	}

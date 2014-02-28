@@ -2,8 +2,8 @@ package requirements
 
 import (
 	"cf/api"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/terminal"
 )
 
@@ -28,11 +28,11 @@ func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRe
 }
 
 func (req *applicationApiRequirement) Execute() (success bool) {
-	var apiResponse net.ApiResponse
+	var apiResponse errors.Error
 	req.application, apiResponse = req.appRepo.Read(req.name)
 
-	if apiResponse.IsNotSuccessful() {
-		req.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		req.ui.Failed(apiResponse.Error())
 		return false
 	}
 

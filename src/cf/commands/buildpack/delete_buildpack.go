@@ -58,14 +58,14 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 		return
 	}
 
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
 	apiResponse = cmd.buildpackRepo.Delete(buildpack.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error deleting buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Error deleting buildpack %s\n%s", terminal.EntityNameColor(buildpack.Name), apiResponse.Error())
 		return
 	}
 

@@ -45,8 +45,8 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 	quotaName := c.Args()[1]
 	quota, apiResponse := cmd.quotaRepo.FindByName(quotaName)
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -57,8 +57,8 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 	)
 
 	apiResponse = cmd.quotaRepo.Update(org.Guid, quota.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

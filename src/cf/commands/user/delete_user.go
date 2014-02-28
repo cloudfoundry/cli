@@ -51,19 +51,20 @@ func (cmd DeleteUserFields) Run(c *cli.Context) {
 	)
 
 	user, apiResponse := cmd.userRepo.FindByUsername(username)
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("User %s does not exist.", username)
 		return
 	}
 
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
+		return
+	}
+
 	apiResponse = cmd.userRepo.Delete(user.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

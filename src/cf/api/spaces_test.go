@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -67,14 +68,14 @@ var _ = Describe("Space Repository", func() {
 		Expect(len(spaces)).To(Equal(2))
 		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
 		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
 	Describe("finding spaces by name", func() {
 		It("returns the space", func() {
 			testSpacesFindByNameWithOrg("my-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
 					return repo.FindByName(spaceName)
 				},
 			)
@@ -82,7 +83,7 @@ var _ = Describe("Space Repository", func() {
 
 		It("can find spaces in a particular org", func() {
 			testSpacesFindByNameWithOrg("another-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
 					return repo.FindByNameInOrg(spaceName, "another-org-guid")
 				},
 			)
@@ -90,7 +91,7 @@ var _ = Describe("Space Repository", func() {
 
 		It("returns a 'not found' response when the space doesn't exist", func() {
 			testSpacesDidNotFindByNameWithOrg("my-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
 					return repo.FindByName(spaceName)
 				},
 			)
@@ -98,7 +99,7 @@ var _ = Describe("Space Repository", func() {
 
 		It("returns a 'not found' response when the space doesn't exist in the given org", func() {
 			testSpacesDidNotFindByNameWithOrg("another-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, net.ApiResponse) {
+				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
 					return repo.FindByNameInOrg(spaceName, "another-org-guid")
 				},
 			)
@@ -126,7 +127,7 @@ var _ = Describe("Space Repository", func() {
 
 		space, apiResponse := repo.Create("space-name", "my-org-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(space.Guid).To(Equal("space-guid"))
 	})
 
@@ -143,7 +144,7 @@ var _ = Describe("Space Repository", func() {
 
 		apiResponse := repo.Rename("my-space-guid", "new-space-name")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("deletes spaces", func() {
@@ -158,11 +159,11 @@ var _ = Describe("Space Repository", func() {
 
 		apiResponse := repo.Delete("my-space-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 
-func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
+func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, errors.Error)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -236,7 +237,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 
 	space, apiResponse := findByName(repo, "Space1")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+	Expect(apiResponse).NotTo(HaveOccurred())
 	Expect(space.Name).To(Equal("Space1"))
 	Expect(space.Guid).To(Equal("space1-guid"))
 
@@ -252,11 +253,11 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	Expect(len(space.ServiceInstances)).To(Equal(1))
 	Expect(space.ServiceInstances[0].Guid).To(Equal("service1-guid"))
 
-	Expect(apiResponse.IsSuccessful()).To(BeTrue())
+	Expect(apiResponse).NotTo(HaveOccurred())
 	return
 }
 
-func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, net.ApiResponse)) {
+func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, errors.Error)) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),
@@ -271,7 +272,7 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 
 	_, apiResponse := findByName(repo, "Space1")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse.IsError()).To(BeFalse())
+
 	Expect(apiResponse.IsNotFound()).To(BeTrue())
 }
 

@@ -3,8 +3,8 @@ package domain_test
 import (
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -15,7 +15,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("delete-shared-domain command", func() {
 	It("TestGetDeleteSharedDomainRequirements", func() {
 		deps := getDeleteSharedDomainDeps()
 		deps.requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
@@ -34,7 +34,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteSharedDomainNotFound", func() {
 
 		deps := getDeleteSharedDomainDeps()
-		deps.domainRepo.FindByNameInOrgApiResponse = net.NewNotFoundApiResponse("%s %s not found", "Domain", "foo.com")
+		deps.domainRepo.FindByNameInOrgApiResponse = errors.NewNotFoundError("%s %s not found", "Domain", "foo.com")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
@@ -47,7 +47,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteSharedDomainFindError", func() {
 
 		deps := getDeleteSharedDomainDeps()
-		deps.domainRepo.FindByNameInOrgApiResponse = net.NewApiResponseWithMessage("couldn't find the droids you're lookin for")
+		deps.domainRepo.FindByNameInOrgApiResponse = errors.NewErrorWithMessage("couldn't find the droids you're lookin for")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
@@ -61,7 +61,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteSharedDomainDeleteError", func() {
 
 		deps := getDeleteSharedDomainDeps()
-		deps.domainRepo.DeleteSharedApiResponse = net.NewApiResponseWithMessage("failed badly")
+		deps.domainRepo.DeleteSharedApiResponse = errors.NewErrorWithMessage("failed badly")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))

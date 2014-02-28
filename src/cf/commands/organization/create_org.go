@@ -44,14 +44,14 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 	apiResponse := cmd.orgRepo.Create(name)
-	if apiResponse.IsNotSuccessful() {
-		if apiResponse.ErrorCode == cf.ORG_EXISTS {
+	if apiResponse != nil {
+		if apiResponse.ErrorCode() == cf.ORG_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Org %s already exists", name)
 			return
 		}
 
-		cmd.ui.Failed(apiResponse.Message)
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

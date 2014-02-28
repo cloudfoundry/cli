@@ -84,7 +84,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		Expect(buildpacks).To(Equal(expectedBuildpacks))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestBuildpacksFindByName", func() {
@@ -99,7 +99,7 @@ var _ = Describe("Buildpacks repo", func() {
 		buildpack, apiResponse := repo.FindByName("Buildpack1")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(buildpack.Name).To(Equal(existingBuildpack.Name))
 		Expect(buildpack.Guid).To(Equal(existingBuildpack.Guid))
@@ -115,7 +115,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		_, apiResponse := repo.FindByName("Buildpack1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeFalse())
+
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
@@ -136,10 +136,10 @@ var _ = Describe("Buildpacks repo", func() {
 		defer ts.Close()
 		one := 1
 		createdBuildpack, apiResponse := repo.Create("name with space", &one, nil, nil)
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+		Expect(apiResponse).To(HaveOccurred())
 		Expect(createdBuildpack).To(Equal(models.Buildpack{}))
-		Expect(apiResponse.ErrorCode).To(Equal("290003"))
-		Expect(apiResponse.Message).To(ContainSubstring("Buildpack is invalid"))
+		Expect(apiResponse.ErrorCode()).To(Equal("290003"))
+		Expect(apiResponse.Error()).To(ContainSubstring("Buildpack is invalid"))
 	})
 
 	It("TestCreateBuildpackWithPosition", func() {
@@ -167,7 +167,7 @@ var _ = Describe("Buildpacks repo", func() {
 		created, apiResponse := repo.Create("my-cool-buildpack", &position, nil, nil)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(created.Guid).NotTo(BeNil())
 		Expect("my-cool-buildpack").To(Equal(created.Name))
@@ -201,7 +201,7 @@ var _ = Describe("Buildpacks repo", func() {
 		created, apiResponse := repo.Create("my-cool-buildpack", &position, &enabled, nil)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(created.Guid).NotTo(BeNil())
 		Expect("my-cool-buildpack").To(Equal(created.Name))
@@ -222,7 +222,7 @@ var _ = Describe("Buildpacks repo", func() {
 		apiResponse := repo.Delete("my-cool-buildpack-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateBuildpack", func() {
@@ -257,7 +257,7 @@ var _ = Describe("Buildpacks repo", func() {
 		updated, apiResponse := repo.Update(buildpack)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(buildpack).To(Equal(updated))
 	})
@@ -302,7 +302,7 @@ var _ = Describe("Buildpacks repo", func() {
 		updated, apiResponse := repo.Update(buildpack)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(expectedBuildpack).To(Equal(updated))
 	})

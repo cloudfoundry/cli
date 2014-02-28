@@ -2,8 +2,8 @@ package serviceauthtoken_test
 
 import (
 	. "cf/commands/serviceauthtoken"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -140,7 +140,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteServiceAuthTokenWhenTokenDoesNotExist", func() {
 
 		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderApiResponse: net.NewNotFoundApiResponse("not found"),
+			FindByLabelAndProviderApiResponse: errors.NewNotFoundError("not found"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}
@@ -155,7 +155,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteServiceAuthTokenFailsWithError", func() {
 
 		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderApiResponse: net.NewApiResponseWithMessage("OH NOES"),
+			FindByLabelAndProviderApiResponse: errors.NewErrorWithMessage("OH NOES"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}

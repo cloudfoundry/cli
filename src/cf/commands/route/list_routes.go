@@ -51,8 +51,8 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 		return true
 	})
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching routes.\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Failed fetching routes.\n%s", apiResponse.Error())
 		return
 	}
 

@@ -50,8 +50,8 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 	)
 
 	apiResponse := cmd.spaceRepo.Rename(space.Guid, newName)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

@@ -52,13 +52,15 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 	)
 
 	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
-	if apiResponse.IsError() {
-		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Message)
+
+	if apiResponse != nil && apiResponse.IsNotFound() {
+		cmd.ui.Ok()
+		cmd.ui.Warn(apiResponse.Error())
 		return
 	}
-	if apiResponse.IsNotFound() {
-		cmd.ui.Ok()
-		cmd.ui.Warn(apiResponse.Message)
+
+	if apiResponse != nil {
+		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Error())
 		return
 	}
 
@@ -71,8 +73,8 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 	}
 
 	apiResponse = cmd.domainRepo.Delete(domain.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiResponse.Error())
 		return
 	}
 

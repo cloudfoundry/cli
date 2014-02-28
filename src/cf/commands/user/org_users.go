@@ -74,8 +74,8 @@ func (cmd *OrgUsers) Run(c *cli.Context) {
 			cmd.ui.Say("  %s", user.Username)
 		}
 
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Failed fetching org-users for role %s.\n%s", apiResponse.Message, displayName)
+		if apiResponse != nil {
+			cmd.ui.Failed("Failed fetching org-users for role %s.\n%s", apiResponse.Error(), displayName)
 			return
 		}
 	}

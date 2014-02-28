@@ -46,8 +46,8 @@ func (cmd CreateServiceAuthTokenFields) Run(c *cli.Context) {
 	}
 
 	apiResponse := cmd.authTokenRepo.Create(serviceAuthTokenRepo)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

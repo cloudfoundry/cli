@@ -54,8 +54,8 @@ func (cmd *RenameApp) Run(c *cli.Context) {
 	params := models.AppParams{Name: &newName}
 
 	_, apiResponse := cmd.appRepo.Update(app.Guid, params)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 	cmd.ui.Ok()

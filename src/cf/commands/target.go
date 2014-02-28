@@ -85,8 +85,8 @@ func (cmd Target) setOrganization(orgName string) (err error) {
 	}
 
 	org, apiResponse := cmd.orgRepo.FindByName(orgName)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Could not target org.\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Could not target org.\n%s", apiResponse.Error())
 		return
 	}
 
@@ -107,8 +107,8 @@ func (cmd Target) setSpace(spaceName string) (err error) {
 
 	space, apiResponse := cmd.spaceRepo.FindByName(spaceName)
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Unable to access space %s.\n%s", spaceName, apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Unable to access space %s.\n%s", spaceName, apiResponse.Error())
 		return
 	}
 

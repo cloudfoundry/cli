@@ -56,8 +56,8 @@ func (cmd CreateUserProvidedService) Run(c *cli.Context) {
 	)
 
 	apiResponse := cmd.userProvidedServiceInstanceRepo.Create(name, drainUrl, paramsMap)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

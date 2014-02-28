@@ -4,10 +4,10 @@ import (
 	"cf/api"
 	"cf/commands/service"
 	"cf/configuration"
+	cferrors "cf/errors"
 	"cf/formatters"
 	"cf/manifest"
 	"cf/models"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -77,8 +77,8 @@ func (cmd *Push) Run(c *cli.Context) {
 		cmd.ui.Say("Uploading %s...", terminal.EntityNameColor(app.Name))
 
 		apiResponse := cmd.appBitsRepo.UploadApp(app.Guid, *appParams.Path, cmd.describeUploadOperation)
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(fmt.Sprintf("Error uploading application.\n%s", apiResponse.Message))
+		if apiResponse != nil {
+			cmd.ui.Failed(fmt.Sprintf("Error uploading application.\n%s", apiResponse.Error()))
 			return
 		}
 		cmd.ui.Ok()
@@ -93,21 +93,22 @@ func (cmd *Push) Run(c *cli.Context) {
 
 func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 	for _, serviceName := range services {
-		serviceInstance, response := cmd.serviceRepo.FindInstanceByName(serviceName)
+		serviceInstance, apiResponse := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-		if response.IsNotSuccessful() {
+		if apiResponse != nil {
 			cmd.ui.Failed("Could not find service %s to bind to %s", serviceName, app.Name)
 			return
 		}
 
 		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, cmd.config.Username())
-		bindResponse := cmd.binder.BindApplication(app, serviceInstance)
-		cmd.ui.Ok()
+		apiResponse = cmd.binder.BindApplication(app, serviceInstance)
 
-		if bindResponse.IsNotSuccessful() && bindResponse.ErrorCode != service.AppAlreadyBoundErrorCode {
-			cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, bindResponse.Message)
+		if apiResponse != nil && apiResponse.ErrorCode() != service.AppAlreadyBoundErrorCode {
+			cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, apiResponse)
 			return
 		}
+
+		cmd.ui.Ok()
 	}
 }
 
@@ -125,8 +126,8 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 	cmd.ui.Say("Using stack %s...", terminal.EntityNameColor(stackName))
 
 	stack, apiResponse := cmd.stackRepo.FindByName(stackName)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -176,8 +177,8 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
 
 	apiResponse := cmd.routeRepo.Bind(route.Guid, app.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -216,12 +217,12 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 
 func (cmd *Push) route(hostName string, domain models.DomainFields) (route models.Route) {
 	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
 
 		route, apiResponse = cmd.routeRepo.Create(hostName, domain.Guid)
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
+		if apiResponse != nil {
+			cmd.ui.Failed(apiResponse.Error())
 			return
 		}
 
@@ -235,12 +236,12 @@ func (cmd *Push) route(hostName string, domain models.DomainFields) (route model
 }
 
 func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.DomainFields) {
-	var apiResponse net.ApiResponse
+	var apiResponse cferrors.Error
 
 	if domainName != "" {
 		domain, apiResponse = cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields().Guid)
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
+		if apiResponse != nil {
+			cmd.ui.Failed(apiResponse.Error())
 		}
 		return
 	}
@@ -273,8 +274,8 @@ func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 		apiResponse = cmd.domainRepo.ListDomains(listDomainsCallback)
 	}
 
-	if apiResponse.IsNotSuccessful() {
-		err = errors.New(apiResponse.Message)
+	if apiResponse != nil {
+		err = errors.New(apiResponse.Error())
 	}
 
 	if !foundIt {
@@ -305,16 +306,16 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	}
 
 	app, apiResponse := cmd.appRepo.Read(*appParams.Name)
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
 	var didCreate bool = false
 	if apiResponse.IsNotFound() {
 		app, apiResponse = cmd.createApp(appParams)
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed(apiResponse.Message)
+		if apiResponse != nil {
+			cmd.ui.Failed(apiResponse.Error())
 			return
 		}
 		didCreate = true
@@ -327,7 +328,7 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	return
 }
 
-func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiResponse net.ApiResponse) {
+func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiResponse cferrors.Error) {
 	spaceGuid := cmd.config.SpaceFields().Guid
 	appParams.SpaceGuid = &spaceGuid
 
@@ -339,8 +340,8 @@ func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, 
 	)
 
 	app, apiResponse = cmd.appRepo.Create(appParams)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -366,10 +367,10 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 		}
 	}
 
-	var apiResponse net.ApiResponse
+	var apiResponse cferrors.Error
 	updatedApp, apiResponse = cmd.appRepo.Update(app.Guid, appParams)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

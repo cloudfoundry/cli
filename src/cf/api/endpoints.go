@@ -2,16 +2,17 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/net"
 	"regexp"
 	"strings"
 )
 
 type EndpointRepository interface {
-	UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse)
-	GetLoggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse)
-	GetUAAEndpoint() (endpoint string, apiResponse net.ApiResponse)
-	GetCloudControllerEndpoint() (endpoint string, apiResponse net.ApiResponse)
+	UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse errors.Error)
+	GetLoggregatorEndpoint() (endpoint string, apiResponse errors.Error)
+	GetUAAEndpoint() (endpoint string, apiResponse errors.Error)
+	GetCloudControllerEndpoint() (endpoint string, apiResponse errors.Error)
 }
 
 type RemoteEndpointRepository struct {
@@ -25,14 +26,14 @@ func NewEndpointRepository(config configuration.ReadWriter, gateway net.Gateway)
 	return
 }
 
-func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse errors.Error) {
 	endpointMissingScheme := !strings.HasPrefix(endpoint, "https://") && !strings.HasPrefix(endpoint, "http://")
 
 	if endpointMissingScheme {
 		finalEndpoint = "https://" + endpoint
 		apiResponse = repo.attemptUpdate(finalEndpoint)
 
-		if apiResponse.IsNotSuccessful() {
+		if apiResponse != nil {
 			finalEndpoint = "http://" + endpoint
 			apiResponse = repo.attemptUpdate(finalEndpoint)
 		}
@@ -46,9 +47,9 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 	return
 }
 
-func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse errors.Error) {
 	request, apiResponse := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -58,7 +59,7 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse
 		LoggregatorEndpoint   string `json:"logging_endpoint"`
 	})
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &serverResponse)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -74,10 +75,10 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) (apiResponse
 	return
 }
 
-func (repo RemoteEndpointRepository) GetLoggregatorEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) GetLoggregatorEndpoint() (endpoint string, apiResponse errors.Error) {
 	if repo.config.LoggregatorEndpoint() == "" {
 		if repo.config.ApiEndpoint() == "" {
-			apiResponse = net.NewApiResponseWithMessage("Loggregator endpoint missing from config file")
+			apiResponse = errors.NewErrorWithMessage("Loggregator endpoint missing from config file")
 		} else {
 			endpoint = defaultLoggregatorEndpoint(repo.config.ApiEndpoint())
 		}
@@ -88,9 +89,9 @@ func (repo RemoteEndpointRepository) GetLoggregatorEndpoint() (endpoint string, 
 	return
 }
 
-func (repo RemoteEndpointRepository) GetCloudControllerEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) GetCloudControllerEndpoint() (endpoint string, apiResponse errors.Error) {
 	if repo.config.ApiEndpoint() == "" {
-		apiResponse = net.NewApiResponseWithMessage("Target endpoint missing from config file")
+		apiResponse = errors.NewErrorWithMessage("Target endpoint missing from config file")
 		return
 	}
 
@@ -98,9 +99,9 @@ func (repo RemoteEndpointRepository) GetCloudControllerEndpoint() (endpoint stri
 	return
 }
 
-func (repo RemoteEndpointRepository) GetUAAEndpoint() (endpoint string, apiResponse net.ApiResponse) {
+func (repo RemoteEndpointRepository) GetUAAEndpoint() (endpoint string, apiResponse errors.Error) {
 	if repo.config.AuthorizationEndpoint() == "" {
-		apiResponse = net.NewApiResponseWithMessage("UAA endpoint missing from config file")
+		apiResponse = errors.NewErrorWithMessage("UAA endpoint missing from config file")
 		return
 	}
 

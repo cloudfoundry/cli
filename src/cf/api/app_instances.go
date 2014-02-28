@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -32,7 +33,7 @@ type InstanceStatsApiResponse struct {
 }
 
 type AppInstancesRepository interface {
-	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse net.ApiResponse)
+	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse errors.Error)
 }
 
 type CloudControllerAppInstancesRepository struct {
@@ -46,17 +47,17 @@ func NewCloudControllerAppInstancesRepository(config configuration.Reader, gatew
 	return
 }
 
-func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid)
 	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken(), nil)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	instancesResponse := InstancesApiResponse{}
 
 	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &instancesResponse)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -76,11 +77,11 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 	return repo.updateInstancesWithStats(appGuid, instances)
 }
 
-func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.ApiEndpoint(), guid)
 	statsResponse := StatsApiResponse{}
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), &statsResponse)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 

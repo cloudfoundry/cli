@@ -39,16 +39,16 @@ func (cmd UpdateServiceAuthTokenFields) Run(c *cli.Context) {
 	cmd.ui.Say("Updating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
 	serviceAuthToken, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
 	serviceAuthToken.Token = c.Args()[2]
 
 	apiResponse = cmd.authTokenRepo.Update(serviceAuthToken)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

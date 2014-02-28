@@ -1,6 +1,6 @@
 package api
 
-import "cf/net"
+import "cf/errors"
 
 type FakeCurlRepository struct {
 	Method         string
@@ -9,10 +9,10 @@ type FakeCurlRepository struct {
 	Body           string
 	ResponseHeader string
 	ResponseBody   string
-	ApiResponse    net.ApiResponse
+	ApiResponse    errors.Error
 }
 
-func (repo *FakeCurlRepository) Request(method, path, header, body string) (resHeaders, resBody string, apiResponse net.ApiResponse) {
+func (repo *FakeCurlRepository) Request(method, path, header, body string) (resHeaders, resBody string, apiResponse errors.Error) {
 	repo.Method = method
 	repo.Path = path
 	repo.Header = header

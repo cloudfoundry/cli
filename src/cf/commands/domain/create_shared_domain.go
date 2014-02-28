@@ -46,8 +46,8 @@ func (cmd *CreateSharedDomain) Run(c *cli.Context) {
 	)
 
 	apiResponse := cmd.domainRepo.CreateSharedDomain(domainName)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

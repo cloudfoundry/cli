@@ -3,7 +3,7 @@ package service_test
 import (
 	. "cf/commands/service"
 	"cf/configuration"
-	"cf/net"
+	cferrors "cf/errors"
 	"errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -114,7 +114,7 @@ var _ = Describe("Purging services", func() {
 	It("fails with an error message when the request fails", func() {
 		deps := setupDependencies()
 
-		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = net.NewApiResponseWithError("oh no!", errors.New("!"))
+		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewErrorWithError("oh no!", errors.New("!"))
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
@@ -133,7 +133,7 @@ var _ = Describe("Purging services", func() {
 	It("indicates when a service doesn't exist", func() {
 		deps := setupDependencies()
 
-		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = net.NewNotFoundApiResponse("uh oh cant find it")
+		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewNotFoundError("uh oh cant find it")
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),

@@ -136,7 +136,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 			_, apiResponse := repo.UpdateEndpoint(testServer.URL)
 
-			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(BeNil())
 		})
 
 		It("returns a failure response when the API returns invalid JSON", func() {
@@ -144,7 +144,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 			_, apiResponse := repo.UpdateEndpoint(testServer.URL)
 
-			Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(BeNil())
 		})
 
 		Describe("when the specified API url doesn't have a scheme", func() {
@@ -155,7 +155,7 @@ var _ = Describe("Endpoints Repository", func() {
 				endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
 				Expect(endpoint).To(Equal("https://" + schemelessURL))
 
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(apiResponse).NotTo(HaveOccurred())
 
 				Expect(config.AccessToken()).To(Equal(""))
 				Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
@@ -171,7 +171,7 @@ var _ = Describe("Endpoints Repository", func() {
 				endpoint, apiResponse := repo.UpdateEndpoint(schemelessURL)
 
 				Expect(endpoint).To(Equal("http://" + schemelessURL))
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(apiResponse).NotTo(HaveOccurred())
 
 				Expect(config.AccessToken()).To(Equal(""))
 				Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
@@ -189,7 +189,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 			endpoint, apiResponse := repo.GetCloudControllerEndpoint()
 
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(endpoint).To(Equal("http://api.example.com"))
 		})
 
@@ -200,7 +200,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 			endpoint, apiResponse := repo.GetLoggregatorEndpoint()
 
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(endpoint).To(Equal("wss://loggregator.example.com:4443"))
 		})
 
@@ -215,7 +215,7 @@ var _ = Describe("Endpoints Repository", func() {
 				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 				endpoint, apiResponse := repo.GetLoggregatorEndpoint()
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(apiResponse).NotTo(HaveOccurred())
 				Expect(endpoint).To(Equal("wss://loggregator.run.pivotal.io:4443"))
 			})
 
@@ -225,7 +225,7 @@ var _ = Describe("Endpoints Repository", func() {
 				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
 				endpoint, apiResponse := repo.GetLoggregatorEndpoint()
-				Expect(apiResponse.IsSuccessful()).To(BeTrue())
+				Expect(apiResponse).NotTo(HaveOccurred())
 				Expect(endpoint).To(Equal("ws://loggregator.run.pivotal.io:80"))
 			})
 		})
@@ -238,7 +238,7 @@ var _ = Describe("Endpoints Repository", func() {
 
 			endpoint, apiResponse := repo.GetUAAEndpoint()
 
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(endpoint).To(Equal("https://uaa.example.com"))
 		})
 
@@ -246,14 +246,14 @@ var _ = Describe("Endpoints Repository", func() {
 			config := testconfig.NewRepository()
 			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
 
-			_, response := repo.GetLoggregatorEndpoint()
-			Expect(response.IsNotSuccessful()).To(BeTrue())
+			_, apiResponse := repo.GetLoggregatorEndpoint()
+			Expect(apiResponse).To(HaveOccurred())
 
-			_, response = repo.GetCloudControllerEndpoint()
-			Expect(response.IsNotSuccessful()).To(BeTrue())
+			_, apiResponse = repo.GetCloudControllerEndpoint()
+			Expect(apiResponse).To(HaveOccurred())
 
-			_, response = repo.GetUAAEndpoint()
-			Expect(response.IsNotSuccessful()).To(BeTrue())
+			_, apiResponse = repo.GetUAAEndpoint()
+			Expect(apiResponse).To(HaveOccurred())
 		})
 	})
 })
