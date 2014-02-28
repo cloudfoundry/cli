@@ -43,7 +43,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Status: http.StatusOK,
 				Body:   jsonResponse},
 		})
-		ts, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
+		ts, handler := testnet.NewServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()
@@ -70,7 +70,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Body:   jsonResponse},
 		})
 
-		ts, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
+		ts, handler := testnet.NewServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()
@@ -93,7 +93,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Body:   jsonResponse},
 		})
 
-		ts, _ := testnet.NewTLSServer([]testnet.TestRequest{req})
+		ts, _ := testnet.NewServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()
@@ -117,7 +117,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				Status: http.StatusOK,
 				Body:   jsonResponse},
 		})
-		ts, handler := testnet.NewTLSServer([]testnet.TestRequest{req})
+		ts, handler := testnet.NewServer([]testnet.TestRequest{req})
 		defer ts.Close()
 
 		deps := newCurlDependencies()

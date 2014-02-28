@@ -249,7 +249,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 }
 
 func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiResponse net.ApiResponse) {
-	ts, handler := testnet.NewTLSServer(requests)
+	ts, handler := testnet.NewServer(requests)
 	defer ts.Close()
 
 	configRepo := testconfig.NewRepositoryWithDefaults()

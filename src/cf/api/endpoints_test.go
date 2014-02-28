@@ -58,6 +58,7 @@ var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request
 var _ = Describe("Endpoints Repository", func() {
 	var (
 		config       configuration.ReadWriter
+		gateway      net.Gateway
 		testServer   *httptest.Server
 		repo         EndpointRepository
 		testServerFn func(w http.ResponseWriter, r *http.Request)
@@ -68,7 +69,9 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		repo = NewEndpointRepository(config, net.NewCloudControllerGateway())
+		gateway = net.NewCloudControllerGateway()
+		gateway.AddTrustedCerts(testServer.TLS.Certificates)
+		repo = NewEndpointRepository(config, gateway)
 	})
 
 	AfterEach(func() {

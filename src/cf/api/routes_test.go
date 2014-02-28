@@ -319,7 +319,7 @@ var findRouteByHostResponse = testnet.TestResponse{Status: http.StatusCreated, B
 ]}`}
 
 func createRoutesRepo(requests ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo CloudControllerRouteRepository, domainRepo *testapi.FakeDomainRepository) {
-	ts, handler = testnet.NewTLSServer(requests)
+	ts, handler = testnet.NewServer(requests)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)

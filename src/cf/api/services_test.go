@@ -790,7 +790,7 @@ func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler
 
 func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
 	if len(reqs) > 0 {
-		ts, handler = testnet.NewTLSServer(reqs)
+		ts, handler = testnet.NewServer(reqs)
 		config.SetApiEndpoint(ts.URL)
 	}
 

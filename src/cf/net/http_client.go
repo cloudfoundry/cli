@@ -4,6 +4,7 @@ import (
 	"cf/terminal"
 	"cf/trace"
 	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"net/http"
@@ -17,9 +18,18 @@ const (
 	PRIVATE_DATA_PLACEHOLDER = "[PRIVATE DATA HIDDEN]"
 )
 
-func newHttpClient() *http.Client {
+func newHttpClient(trustedCerts []tls.Certificate) *http.Client {
+	var certPool *x509.CertPool
+	if len(trustedCerts) > 0 {
+		certPool = x509.NewCertPool()
+		for _, tlsCert := range trustedCerts {
+			cert, _ := x509.ParseCertificate(tlsCert.Certificate[0])
+			certPool.AddCert(cert)
+		}
+	}
+
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{RootCAs: certPool},
 		Proxy:           http.ProxyFromEnvironment,
 	}
 	return &http.Client{
@@ -34,9 +44,7 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 	}
 
 	prevReq := via[len(via)-1]
-
 	req.Header.Set("Authorization", prevReq.Header.Get("Authorization"))
-
 	dumpRequest(req)
 
 	return nil
@@ -57,20 +65,6 @@ func Sanitize(input string) (sanitized string) {
 	sanitized = sanitizeJson("refresh_token", sanitized)
 	sanitized = sanitizeJson("token", sanitized)
 
-	return
-}
-
-func doRequest(request *http.Request) (response *http.Response, err error) {
-	httpClient := newHttpClient()
-
-	dumpRequest(request)
-
-	response, err = httpClient.Do(request)
-	if err != nil {
-		return
-	}
-
-	dumpResponse(response)
 	return
 }
 

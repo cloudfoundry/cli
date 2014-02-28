@@ -19,82 +19,7 @@ import (
 	"time"
 )
 
-func testRefreshTokenWithSuccess(gateway Gateway, endpoint http.HandlerFunc) {
-	config, apiResponse := testRefreshToken(gateway, endpoint)
-	Expect(apiResponse.IsSuccessful()).To(BeTrue())
-	Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
-	Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
-}
-
-func testRefreshTokenWithError(gateway Gateway, endpoint http.HandlerFunc) {
-	_, apiResponse := testRefreshToken(gateway, endpoint)
-	Expect(apiResponse.IsSuccessful()).To(BeFalse())
-	Expect(apiResponse.ErrorCode).To(Equal("333"))
-}
-
-var refreshTokenApiEndPoint = func(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		var jsonResponse string
-
-		bodyBytes, err := ioutil.ReadAll(request.Body)
-		if err != nil || string(bodyBytes) != "expected body" {
-			writer.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		switch request.Header.Get("Authorization") {
-		case "bearer initial-access-token":
-			writer.WriteHeader(http.StatusUnauthorized)
-			jsonResponse = unauthorizedBody
-		case "bearer new-access-token":
-			writer.WriteHeader(secondReqResp.Status)
-			jsonResponse = secondReqResp.Body
-		default:
-			writer.WriteHeader(http.StatusInternalServerError)
-		}
-
-		fmt.Fprintln(writer, jsonResponse)
-	}
-}
-
-func testRefreshToken(gateway Gateway, endpoint http.HandlerFunc) (config configuration.Reader, apiResponse ApiResponse) {
-	authEndpoint := func(writer http.ResponseWriter, request *http.Request) {
-		fmt.Fprintln(
-			writer,
-			`{ "access_token": "new-access-token", "token_type": "bearer", "refresh_token": "new-refresh-token"}`,
-		)
-	}
-
-	apiServer := httptest.NewTLSServer(endpoint)
-	defer apiServer.Close()
-
-	authServer := httptest.NewTLSServer(http.HandlerFunc(authEndpoint))
-	defer authServer.Close()
-
-	config, auth := createAuthenticationRepository(apiServer, authServer)
-	gateway.SetTokenRefresher(auth)
-
-	request, apiResponse := gateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-	Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-
-	apiResponse = gateway.PerformRequest(request)
-	return
-}
-
-func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
-	config := testconfig.NewRepository()
-	config.SetAuthorizationEndpoint(authServer.URL)
-	config.SetApiEndpoint(apiServer.URL)
-	config.SetAccessToken("bearer initial-access-token")
-	config.SetRefreshToken("initial-refresh-token")
-
-	authGateway := NewUAAGateway()
-	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)
-
-	return config, authenticator
-}
-
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("Gateway", func() {
 	var ccGateway Gateway
 	var uaaGateway Gateway
 	var config configuration.ReadWriter
@@ -139,6 +64,8 @@ var _ = Describe("Testing with ginkgo", func() {
 			config, authRepo = createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(authRepo)
 			ccGateway.PollingThrottle = 3 * time.Millisecond
+
+			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
 		})
 
 		AfterEach(func() {
@@ -190,6 +117,8 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
+			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+
 			request, apiResponse = ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
 		})
 
@@ -214,43 +143,147 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 	})
 
-	It("TestRefreshingTheTokenWithUAARequest", func() {
-		endpoint := refreshTokenApiEndPoint(
-			`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-			testnet.TestResponse{Status: http.StatusOK},
-		)
+	Describe("refreshing the auth token", func() {
+		var authServer *httptest.Server
 
-		testRefreshTokenWithSuccess(uaaGateway, endpoint)
+		BeforeEach(func() {
+			authServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, `{
+				 	"access_token": "new-access-token",
+				 	"token_type": "bearer",
+					"refresh_token": "new-refresh-token"
+				}`)
+			}))
+
+			uaaGateway.AddTrustedCerts(authServer.TLS.Certificates)
+		})
+
+		AfterEach(func() {
+			authServer.Close()
+		})
+
+		It("refreshes the token when UAA requests fail", func() {
+			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusOK},
+			))
+			defer apiServer.Close()
+			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+
+			config, auth := createAuthenticationRepository(apiServer, authServer)
+			uaaGateway.SetTokenRefresher(auth)
+			request, apiResponse := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			apiResponse = uaaGateway.PerformRequest(request)
+
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
+			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
+		})
+
+		It("refreshes the token when CC requests fail", func() {
+			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+				`{ "code": 1000, "description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusOK}))
+			defer apiServer.Close()
+			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+
+			config, auth := createAuthenticationRepository(apiServer, authServer)
+			ccGateway.SetTokenRefresher(auth)
+			request, apiResponse := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			apiResponse = ccGateway.PerformRequest(request)
+
+			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
+			Expect(config.RefreshToken()).To(Equal("new-refresh-token"))
+		})
+
+		It("returns a failure response when token refresh fails after a UAA request", func() {
+			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+				`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
+					"error": "333", "error_description": "bad request"
+				}`}))
+			defer apiServer.Close()
+			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+
+			config, auth := createAuthenticationRepository(apiServer, authServer)
+			uaaGateway.SetTokenRefresher(auth)
+			request, apiResponse := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			apiResponse = uaaGateway.PerformRequest(request)
+
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			Expect(apiResponse.ErrorCode).To(Equal("333"))
+		})
+
+		It("returns a failure response when token refresh fails after a CC request", func() {
+			apiServer := httptest.NewTLSServer(refreshTokenApiEndPoint(
+				`{ "code": 1000, "description": "Auth token is invalid" }`,
+				testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
+					"code": 333, "description": "bad request"
+				}`}))
+			defer apiServer.Close()
+			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+
+			config, auth := createAuthenticationRepository(apiServer, authServer)
+			ccGateway.SetTokenRefresher(auth)
+			request, apiResponse := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
+			apiResponse = ccGateway.PerformRequest(request)
+
+			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			Expect(apiResponse.ErrorCode).To(Equal("333"))
+		})
 	})
 
-	It("TestRefreshingTheTokenWithUAARequestAndReturningError", func() {
-		endpoint := refreshTokenApiEndPoint(
-			`{ "error": "invalid_token", "error_description": "Auth token is invalid" }`,
-			testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
-			"error": "333", "error_description": "bad request"
-		}`},
-		)
+	It("validates the server's SSL certificates", func() {
+		apiServer := httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			fmt.Fprintln(writer, `{}`)
+		}))
+		defer apiServer.Close()
 
-		testRefreshTokenWithError(uaaGateway, endpoint)
-	})
+		request, apiResponse := ccGateway.NewRequest("POST", apiServer.URL+"/v2/foo", "the-access-token", nil)
+		apiResponse = ccGateway.PerformRequest(request)
 
-	It("TestRefreshingTheTokenWithCloudControllerRequest", func() {
-		endpoint := refreshTokenApiEndPoint(
-			`{ "code": 1000, "description": "Auth token is invalid" }`,
-			testnet.TestResponse{Status: http.StatusOK},
-		)
-
-		testRefreshTokenWithSuccess(ccGateway, endpoint)
-	})
-
-	It("TestRefreshingTheTokenWithCloudControllerRequestAndReturningError", func() {
-		endpoint := refreshTokenApiEndPoint(
-			`{ "code": 1000, "description": "Auth token is invalid" }`,
-			testnet.TestResponse{Status: http.StatusBadRequest, Body: `{
-			"code": 333, "description": "bad request"
-		}`},
-		)
-
-		testRefreshTokenWithError(ccGateway, endpoint)
+		Expect(apiResponse.IsSuccessful()).To(BeFalse())
+		Expect(apiResponse.Message).To(ContainSubstring("certificate"))
 	})
 })
+
+func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		var jsonResponse string
+
+		bodyBytes, err := ioutil.ReadAll(request.Body)
+		if err != nil || string(bodyBytes) != "expected body" {
+			writer.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		switch request.Header.Get("Authorization") {
+		case "bearer initial-access-token":
+			writer.WriteHeader(http.StatusUnauthorized)
+			jsonResponse = unauthorizedBody
+		case "bearer new-access-token":
+			writer.WriteHeader(secondReqResp.Status)
+			jsonResponse = secondReqResp.Body
+		default:
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
+
+		fmt.Fprintln(writer, jsonResponse)
+	}
+}
+
+func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
+	config := testconfig.NewRepository()
+	config.SetAuthorizationEndpoint(authServer.URL)
+	config.SetApiEndpoint(apiServer.URL)
+	config.SetAccessToken("bearer initial-access-token")
+	config.SetRefreshToken("initial-refresh-token")
+
+	authGateway := NewUAAGateway()
+	authGateway.AddTrustedCerts(authServer.TLS.Certificates)
+
+	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)
+
+	return config, authenticator
+}

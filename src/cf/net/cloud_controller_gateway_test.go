@@ -21,32 +21,32 @@ var invalidTokenCloudControllerRequest = func(writer http.ResponseWriter, reques
 	fmt.Fprintln(writer, jsonResponse)
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestCloudControllerGatewayErrorHandling", func() {
-		gateway := NewCloudControllerGateway()
+var _ = Describe("Cloud Controller Gateway", func() {
+	var gateway Gateway
 
+	BeforeEach(func() {
+		gateway = NewCloudControllerGateway()
+	})
+
+	It("parses error responses", func() {
 		ts := httptest.NewTLSServer(http.HandlerFunc(failingCloudControllerRequest))
 		defer ts.Close()
+		gateway.AddTrustedCerts(ts.TLS.Certificates)
 
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-
 		apiResponse = gateway.PerformRequest(request)
 
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
 		Expect(apiResponse.Message).To(ContainSubstring("The host is taken: test1"))
 		Expect(apiResponse.ErrorCode).To(ContainSubstring("210003"))
 	})
-	It("TestCloudControllerGatewayInvalidTokenHandling", func() {
 
-		gateway := NewCloudControllerGateway()
-
+	It("parses invalid token responses", func() {
 		ts := httptest.NewTLSServer(http.HandlerFunc(invalidTokenCloudControllerRequest))
 		defer ts.Close()
+		gateway.AddTrustedCerts(ts.TLS.Certificates)
 
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
-
 		apiResponse = gateway.PerformRequest(request)
 
 		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())

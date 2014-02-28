@@ -219,7 +219,7 @@ var loginInfoFailureRequest = testnet.TestRequest{
 }
 
 func setupAuthDependencies(request testnet.TestRequest) (*httptest.Server, *testnet.TestHandler, configuration.ReadWriter) {
-	ts, handler := testnet.NewTLSServer([]testnet.TestRequest{request})
+	ts, handler := testnet.NewServer([]testnet.TestRequest{request})
 	config := testconfig.NewRepository()
 	config.SetAuthorizationEndpoint(ts.URL)
 
