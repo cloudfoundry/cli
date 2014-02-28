@@ -12,6 +12,9 @@ func NewAppFields(overrides Overrides) (app models.ApplicationFields) {
 	app.Name = "app-name"
 	app.Guid = appGuid()
 	app.State = "started"
+	app.InstanceCount = 42
+	app.DiskQuota = 1073741824
+	app.Memory = 268435456
 
 	if overrides.Has("guid") {
 		app.Guid = overrides.Get("guid").(string)
