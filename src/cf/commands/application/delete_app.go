@@ -56,22 +56,22 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	app, apiResponse := cmd.appRepo.Read(appName)
+	app, apiErr := cmd.appRepo.Read(appName)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.appRepo.Delete(app.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.appRepo.Delete(app.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

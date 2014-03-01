@@ -23,10 +23,10 @@ var _ = Describe("AppSummaryRepository", func() {
 		ts, handler, repo := createAppSummaryRepo([]testnet.TestRequest{getAppSummariesRequest})
 		defer ts.Close()
 
-		apps, apiResponse := repo.GetSummariesInCurrentSpace()
+		apps, apiErr := repo.GetSummariesInCurrentSpace()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(2).To(Equal(len(apps)))
 
 		app1 := apps[0]

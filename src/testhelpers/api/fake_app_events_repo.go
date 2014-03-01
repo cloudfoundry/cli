@@ -6,9 +6,9 @@ import (
 )
 
 type FakeAppEventsRepo struct {
-	AppGuid     string
-	Events      []models.EventFields
-	ApiResponse errors.Error
+	AppGuid string
+	Events  []models.EventFields
+	Error   errors.Error
 }
 
 func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error {
@@ -16,5 +16,5 @@ func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func(models.EventFie
 	for _, e := range repo.Events {
 		cb(e)
 	}
-	return repo.ApiResponse
+	return repo.Error
 }

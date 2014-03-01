@@ -62,26 +62,26 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 	)
 
 	if orgGuid == "" {
-		org, apiResponse := cmd.orgRepo.FindByName(orgName)
-		if apiResponse != nil && apiResponse.IsNotFound() {
+		org, apiErr := cmd.orgRepo.FindByName(orgName)
+		if apiErr != nil && apiErr.IsNotFound() {
 			cmd.ui.Failed("Org %s does not exist or is not accessible", orgName)
 			return
 		}
-		if apiResponse != nil {
-			cmd.ui.Failed("Error finding org %s\n%s", orgName, apiResponse.Error())
+		if apiErr != nil {
+			cmd.ui.Failed("Error finding org %s\n%s", orgName, apiErr.Error())
 			return
 		}
 		orgGuid = org.Guid
 	}
 
-	space, apiResponse := cmd.spaceRepo.Create(spaceName, orgGuid)
-	if apiResponse != nil {
-		if apiResponse.ErrorCode() == cf.SPACE_EXISTS {
+	space, apiErr := cmd.spaceRepo.Create(spaceName, orgGuid)
+	if apiErr != nil {
+		if apiErr.ErrorCode() == cf.SPACE_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Space %s already exists", spaceName)
 			return
 		}
-		cmd.ui.Failed(apiResponse.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 	cmd.ui.Ok()

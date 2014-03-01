@@ -50,14 +50,14 @@ var _ = Describe("curl command", func() {
 		deps.config.SetApiEndpoint(ts.URL)
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		headers, body, apiResponse := repo.Request("GET", "/v2/endpoint", "", "")
+		headers, body, apiErr := repo.Request("GET", "/v2/endpoint", "", "")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(headers).To(ContainSubstring("200"))
 		Expect(headers).To(ContainSubstring("Content-Type"))
 		Expect(headers).To(ContainSubstring("text/plain"))
 		testassert.JSONStringEquals(body, expectedJSONResponse)
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestCurlPostRequest", func() {
@@ -77,10 +77,10 @@ var _ = Describe("curl command", func() {
 		deps.config.SetApiEndpoint(ts.URL)
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+		_, _, apiErr := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestCurlFailingRequest", func() {
@@ -100,9 +100,9 @@ var _ = Describe("curl command", func() {
 		deps.config.SetApiEndpoint(ts.URL)
 
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, body, apiResponse := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
+		_, body, apiErr := repo.Request("POST", "/v2/endpoint", "", `{"key":"val"}`)
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		testassert.JSONStringEquals(body, expectedJSONResponse)
 	})
 
@@ -126,16 +126,16 @@ var _ = Describe("curl command", func() {
 
 		headers := "content-type: ascii/cats\nx-something-else:5"
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", headers, "")
+		_, _, apiErr := repo.Request("POST", "/v2/endpoint", headers, "")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestCurlWithInvalidHeaders", func() {
 		deps := newCurlDependencies()
 		repo := NewCloudControllerCurlRepository(deps.config, deps.gateway)
-		_, _, apiResponse := repo.Request("POST", "/v2/endpoint", "not-valid", "")
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.Error()).To(ContainSubstring("headers"))
+		_, _, apiErr := repo.Request("POST", "/v2/endpoint", "not-valid", "")
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.Error()).To(ContainSubstring("headers"))
 	})
 })

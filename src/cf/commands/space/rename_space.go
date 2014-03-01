@@ -49,9 +49,9 @@ func (cmd *RenameSpace) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.spaceRepo.Rename(space.Guid, newName)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr := cmd.spaceRepo.Rename(space.Guid, newName)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

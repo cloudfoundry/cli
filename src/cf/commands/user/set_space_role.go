@@ -56,9 +56,9 @@ func (cmd *SetSpaceRole) Run(c *cli.Context) {
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
 
-	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	space, apiErr := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -78,9 +78,9 @@ func (cmd *SetSpaceRole) SetSpaceRole(space models.Space, role, userGuid, userNa
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userRepo.SetSpaceRole(userGuid, space.Guid, space.Organization.Guid, role)
-	if apiResponse != nil {
-		err = errors.New(apiResponse.Error())
+	apiErr := cmd.userRepo.SetSpaceRole(userGuid, space.Guid, space.Organization.Guid, role)
+	if apiErr != nil {
+		err = errors.New(apiErr.Error())
 		return
 	}
 

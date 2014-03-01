@@ -61,9 +61,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createStackRepo(req)
 		defer ts.Close()
 
-		stack, apiResponse := repo.FindByName("linux")
+		stack, apiErr := repo.FindByName("linux")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(stack.Name).To(Equal("custom-linux"))
 		Expect(stack.Guid).To(Equal("custom-linux-guid"))
 	})
@@ -77,9 +77,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createStackRepo(req)
 		defer ts.Close()
 
-		_, apiResponse := repo.FindByName("linux")
+		_, apiErr := repo.FindByName("linux")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiErr).NotTo(BeNil())
 	})
 
 	It("TestStacksFindAll", func() {
@@ -92,9 +92,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createStackRepo(req)
 		defer ts.Close()
 
-		stacks, apiResponse := repo.FindAll()
+		stacks, apiErr := repo.FindAll()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(len(stacks)).To(Equal(2))
 		Expect(stacks[0].Name).To(Equal("lucid64"))
 		Expect(stacks[0].Guid).To(Equal("50688ae5-9bfc-4bf6-a4bf-caadb21a32c6"))

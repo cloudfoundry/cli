@@ -38,10 +38,10 @@ func (cmd ListApps) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apps, apiResponse := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
+	apps, apiErr := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

@@ -13,17 +13,17 @@ type FakeAppSummaryRepo struct {
 	GetSummarySummary   models.AppSummary
 }
 
-func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse errors.Error) {
+func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr errors.Error) {
 	apps = repo.GetSummariesInCurrentSpaceApps
 	return
 }
 
-func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.AppSummary, apiResponse errors.Error) {
+func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.AppSummary, apiErr errors.Error) {
 	repo.GetSummaryAppGuid = appGuid
 	summary = repo.GetSummarySummary
 
 	if repo.GetSummaryErrorCode != "" {
-		apiResponse = errors.NewError("Error", repo.GetSummaryErrorCode)
+		apiErr = errors.NewError("Error", repo.GetSummaryErrorCode)
 	}
 
 	return

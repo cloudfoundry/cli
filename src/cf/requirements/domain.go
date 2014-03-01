@@ -31,11 +31,11 @@ func NewDomainRequirement(name string, ui terminal.UI, config configuration.Read
 }
 
 func (req *domainApiRequirement) Execute() bool {
-	var apiResponse errors.Error
-	req.domain, apiResponse = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields().Guid)
+	var apiErr errors.Error
+	req.domain, apiErr = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields().Guid)
 
-	if apiResponse != nil {
-		req.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 

@@ -103,9 +103,9 @@ func (cmd *Scale) Run(c *cli.Context) {
 		params.InstanceCount = &instances
 	}
 
-	updatedApp, apiResponse := cmd.appRepo.Update(currentApp.Guid, params)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	updatedApp, apiErr := cmd.appRepo.Update(currentApp.Guid, params)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

@@ -75,7 +75,7 @@ type ServiceOfferingSummary struct {
 }
 
 type ServiceSummaryRepository interface {
-	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse errors.Error)
+	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr errors.Error)
 }
 
 type CloudControllerServiceSummaryRepository struct {
@@ -89,12 +89,12 @@ func NewCloudControllerServiceSummaryRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse errors.Error) {
+func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
 	resource := new(ServiceInstancesSummaries)
 
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
-	if apiResponse != nil {
+	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
+	if apiErr != nil {
 		return
 	}
 

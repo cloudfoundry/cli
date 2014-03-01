@@ -28,10 +28,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken.Label = "a label"
 		authToken.Provider = "a provider"
 		authToken.Token = "a token"
-		apiResponse := repo.Create(authToken)
+		apiErr := repo.Create(authToken)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 	It("TestServiceAuthFindAll", func() {
 
@@ -65,9 +65,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createServiceAuthTokenRepo(req)
 		defer ts.Close()
 
-		authTokens, apiResponse := repo.FindAll()
+		authTokens, apiErr := repo.FindAll()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(len(authTokens)).To(Equal(2))
 
@@ -98,10 +98,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createServiceAuthTokenRepo(req)
 		defer ts.Close()
 
-		serviceAuthToken, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
+		serviceAuthToken, apiErr := repo.FindByLabelAndProvider("a-label", "a-provider")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		authToken2 := models.ServiceAuthTokenFields{}
 		authToken2.Guid = "mysql-core-guid"
 		authToken2.Label = "mysql"
@@ -121,11 +121,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createServiceAuthTokenRepo(req)
 		defer ts.Close()
 
-		_, apiResponse := repo.FindByLabelAndProvider("a-label", "a-provider")
+		_, apiErr := repo.FindByLabelAndProvider("a-label", "a-provider")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
+		Expect(apiErr.IsNotFound()).To(BeTrue())
 	})
 	It("TestServiceAuthUpdate", func() {
 
@@ -141,10 +141,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		authToken3 := models.ServiceAuthTokenFields{}
 		authToken3.Guid = "mysql-core-guid"
 		authToken3.Token = "a value"
-		apiResponse := repo.Update(authToken3)
+		apiErr := repo.Update(authToken3)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 	It("TestServiceAuthDelete", func() {
 
@@ -158,10 +158,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 		authToken4 := models.ServiceAuthTokenFields{}
 		authToken4.Guid = "mysql-core-guid"
-		apiResponse := repo.Delete(authToken4)
+		apiErr := repo.Delete(authToken4)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

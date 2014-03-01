@@ -24,12 +24,12 @@ type FakeServiceBrokerRepo struct {
 	ListErr        bool
 }
 
-func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse errors.Error) {
+func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiErr errors.Error) {
 	repo.FindByNameName = name
 	serviceBroker = repo.FindByNameServiceBroker
 
 	if repo.FindByNameNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "Service Broker", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "Service Broker", name)
 	}
 
 	return
@@ -49,7 +49,7 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker model
 	}
 }
 
-func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiResponse errors.Error) {
+func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiErr errors.Error) {
 	repo.CreateName = name
 	repo.CreateUrl = url
 	repo.CreateUsername = username
@@ -57,18 +57,18 @@ func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) 
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiResponse errors.Error) {
+func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiErr errors.Error) {
 	repo.UpdatedServiceBroker = serviceBroker
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiResponse errors.Error) {
+func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiErr errors.Error) {
 	repo.RenamedServiceBrokerGuid = guid
 	repo.RenamedServiceBrokerName = name
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiResponse errors.Error) {
+func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiErr errors.Error) {
 	repo.DeletedServiceBrokerGuid = guid
 	return
 }

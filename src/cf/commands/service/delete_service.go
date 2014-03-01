@@ -58,22 +58,22 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	instance, apiResponse := cmd.serviceRepo.FindInstanceByName(serviceName)
+	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service %s does not exist.", serviceName)
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.serviceRepo.DeleteService(instance)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.serviceRepo.DeleteService(instance)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

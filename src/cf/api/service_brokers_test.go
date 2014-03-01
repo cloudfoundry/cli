@@ -67,7 +67,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		defer ts.Close()
 
 		serviceBrokers := []models.ServiceBroker{}
-		apiResponse := repo.ListServiceBrokers(func(broker models.ServiceBroker) bool {
+		apiErr := repo.ListServiceBrokers(func(broker models.ServiceBroker) bool {
 			serviceBrokers = append(serviceBrokers, broker)
 			return true
 		})
@@ -76,7 +76,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		Expect(serviceBrokers[0].Guid).To(Equal("found-guid-1"))
 		Expect(serviceBrokers[1].Guid).To(Equal("found-guid-2"))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestFindServiceBrokerByName", func() {
@@ -105,7 +105,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
-		foundBroker, apiResponse := repo.FindByName("my-broker")
+		foundBroker, apiErr := repo.FindByName("my-broker")
 		expectedBroker := models.ServiceBroker{}
 		expectedBroker.Name = "found-name"
 		expectedBroker.Url = "http://found.example.com"
@@ -114,7 +114,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		expectedBroker.Guid = "found-guid"
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(foundBroker).To(Equal(expectedBroker))
 	})
 
@@ -128,11 +128,11 @@ var _ = Describe("Service Brokers Repo", func() {
 		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
-		_, apiResponse := repo.FindByName("my-broker")
+		_, apiErr := repo.FindByName("my-broker")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
-		Expect(apiResponse.Error()).To(Equal("Service Broker 'my-broker' not found"))
+		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.Error()).To(Equal("Service Broker 'my-broker' not found"))
 	})
 
 	It("TestCreateServiceBroker", func() {
@@ -148,10 +148,10 @@ var _ = Describe("Service Brokers Repo", func() {
 		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Create("foobroker", "http://example.com", "foouser", "password")
+		apiErr := repo.Create("foobroker", "http://example.com", "foouser", "password")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateServiceBroker", func() {
@@ -173,10 +173,10 @@ var _ = Describe("Service Brokers Repo", func() {
 		serviceBroker.Username = "update-foouser"
 		serviceBroker.Password = "update-password"
 
-		apiResponse := repo.Update(serviceBroker)
+		apiErr := repo.Update(serviceBroker)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestRenameServiceBroker", func() {
@@ -190,10 +190,10 @@ var _ = Describe("Service Brokers Repo", func() {
 		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Rename("my-guid", "update-foobroker")
+		apiErr := repo.Rename("my-guid", "update-foobroker")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteServiceBroker", func() {
@@ -206,10 +206,10 @@ var _ = Describe("Service Brokers Repo", func() {
 		ts, handler, repo := createServiceBrokerRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-guid")
+		apiErr := repo.Delete("my-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

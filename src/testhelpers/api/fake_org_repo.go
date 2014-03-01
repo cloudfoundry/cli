@@ -23,7 +23,7 @@ type FakeOrgRepository struct {
 	DeletedOrganizationGuid string
 }
 
-func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiResponse errors.Error) {
+func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiErr errors.Error) {
 	for _, org := range repo.Organizations {
 		if !cb(org) {
 			break
@@ -32,7 +32,7 @@ func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiRe
 	return
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization, apiResponse errors.Error) {
+func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization, apiErr errors.Error) {
 	repo.FindByNameName = name
 
 	var foundOrg bool = false
@@ -45,32 +45,32 @@ func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization,
 	}
 
 	if repo.FindByNameErr || !foundOrg {
-		apiResponse = errors.NewErrorWithMessage("Error finding organization by name.")
+		apiErr = errors.NewErrorWithMessage("Error finding organization by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "Org", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "Org", name)
 	}
 
 	return
 }
 
-func (repo *FakeOrgRepository) Create(name string) (apiResponse errors.Error) {
+func (repo *FakeOrgRepository) Create(name string) (apiErr errors.Error) {
 	if repo.CreateOrgExists {
-		apiResponse = errors.NewError("Space already exists", cf.ORG_EXISTS)
+		apiErr = errors.NewError("Space already exists", cf.ORG_EXISTS)
 		return
 	}
 	repo.CreateName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Rename(orgGuid string, name string) (apiResponse errors.Error) {
+func (repo *FakeOrgRepository) Rename(orgGuid string, name string) (apiErr errors.Error) {
 	repo.RenameOrganizationGuid = orgGuid
 	repo.RenameNewName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Delete(orgGuid string) (apiResponse errors.Error) {
+func (repo *FakeOrgRepository) Delete(orgGuid string) (apiErr errors.Error) {
 	repo.DeletedOrganizationGuid = orgGuid
 	return
 }

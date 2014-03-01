@@ -38,9 +38,9 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
-		apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.Error()).To(ContainSubstring(filepath.Join("foo", "bar")))
+		apiErr := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.Error()).To(ContainSubstring(filepath.Join("foo", "bar")))
 	})
 
 	Context("uploading a directory", func() {
@@ -57,8 +57,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 		})
 
 		It("preserves the executable bits when uploading app files", func() {
-			_, apiResponse := testUploadApp(appPath, defaultRequests)
-			Expect(apiResponse).NotTo(HaveOccurred())
+			_, apiErr := testUploadApp(appPath, defaultRequests)
+			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
 		It("returns a failure when uploading bits fails", func() {
@@ -68,19 +68,19 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 				createProgressEndpoint("running"),
 				createProgressEndpoint("failed"),
 			}
-			_, apiResponse := testUploadApp(appPath, requests)
-			Expect(apiResponse).To(HaveOccurred())
+			_, apiErr := testUploadApp(appPath, requests)
+			Expect(apiErr).To(HaveOccurred())
 		})
 	})
 
 	It("uploads zip files", func() {
-		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.zip"), defaultRequests)
-		Expect(apiResponse).NotTo(HaveOccurred())
+		_, apiErr := testUploadApp(filepath.Join(fixturesDir, "example-app.zip"), defaultRequests)
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("uploads zip files with non-standard names", func() {
-		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.azip"), defaultRequests)
-		Expect(apiResponse).NotTo(HaveOccurred())
+		_, apiErr := testUploadApp(filepath.Join(fixturesDir, "example-app.azip"), defaultRequests)
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 
@@ -249,7 +249,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	return
 }
 
-func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiResponse errors.Error) {
+func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiErr errors.Error) {
 	ts, handler := testnet.NewServer(requests)
 	defer ts.Close()
 
@@ -264,7 +264,7 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 		reportedPath                          string
 		reportedFileCount, reportedUploadSize uint64
 	)
-	apiResponse = repo.UploadApp("my-cool-app-guid", dir, func(path string, uploadSize, fileCount uint64) {
+	apiErr = repo.UploadApp("my-cool-app-guid", dir, func(path string, uploadSize, fileCount uint64) {
 		reportedPath = path
 		reportedUploadSize = uploadSize
 		reportedFileCount = fileCount

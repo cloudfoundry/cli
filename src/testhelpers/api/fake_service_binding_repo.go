@@ -15,18 +15,18 @@ type FakeServiceBindingRepo struct {
 	DeleteBindingNotFound bool
 }
 
-func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiResponse errors.Error) {
+func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiErr errors.Error) {
 	repo.CreateServiceInstanceGuid = instanceGuid
 	repo.CreateApplicationGuid = appGuid
 
 	if repo.CreateErrorCode != "" {
-		apiResponse = errors.NewError("Error binding service", repo.CreateErrorCode)
+		apiErr = errors.NewError("Error binding service", repo.CreateErrorCode)
 	}
 
 	return
 }
 
-func (repo *FakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiResponse errors.Error) {
+func (repo *FakeServiceBindingRepo) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr errors.Error) {
 	repo.DeleteServiceInstance = instance
 	repo.DeleteApplicationGuid = appGuid
 	found = !repo.DeleteBindingNotFound

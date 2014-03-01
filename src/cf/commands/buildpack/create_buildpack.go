@@ -41,14 +41,14 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating buildpack %s...", terminal.EntityNameColor(buildpackName))
 
-	buildpack, apiResponse := cmd.createBuildpack(buildpackName, c)
-	if apiResponse != nil {
-		if apiResponse.ErrorCode() == cf.BUILDPACK_EXISTS {
+	buildpack, apiErr := cmd.createBuildpack(buildpackName, c)
+	if apiErr != nil {
+		if apiErr.ErrorCode() == cf.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
 			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" update-buildpack"))
 		} else {
-			cmd.ui.Failed(apiResponse.Error())
+			cmd.ui.Failed(apiErr.Error())
 		}
 		return
 	}
@@ -59,26 +59,26 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	dir := c.Args()[1]
 
-	apiResponse = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	cmd.ui.Ok()
 }
 
-func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiResponse errors.Error) {
+func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr errors.Error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiResponse = errors.NewErrorWithMessage("Invalid position. %s", err.Error())
+		apiErr = errors.NewErrorWithMessage("Invalid position. %s", err.Error())
 		return
 	}
 
 	enabled := c.Bool("enable")
 	disabled := c.Bool("disable")
 	if enabled && disabled {
-		apiResponse = errors.NewErrorWithMessage("Cannot specify both enabled and disabled.")
+		apiErr = errors.NewErrorWithMessage("Cannot specify both enabled and disabled.")
 		return
 	}
 
@@ -91,7 +91,7 @@ func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context)
 		enableOption = &disabled
 	}
 
-	buildpack, apiResponse = cmd.buildpackRepo.Create(buildpackName, &position, enableOption, nil)
+	buildpack, apiErr = cmd.buildpackRepo.Create(buildpackName, &position, enableOption, nil)
 
 	return
 }

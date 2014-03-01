@@ -53,9 +53,9 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 	spaceName := c.Args()[1]
 	org := cmd.orgReq.GetOrganization()
 
-	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	space, apiErr := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 	}
 
 	cmd.ui.Say("Getting users in org %s / space %s as %s",
@@ -67,7 +67,7 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 	for _, role := range spaceRoles {
 		displayName := spaceRoleToDisplayName[role]
 
-		users, apiResponse := cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
+		users, apiErr := cmd.userRepo.ListUsersInSpaceForRole(space.Guid, role)
 
 		cmd.ui.Say("")
 		cmd.ui.Say("%s", terminal.HeaderColor(displayName))
@@ -76,8 +76,8 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 			cmd.ui.Say("  %s", user.Username)
 		}
 
-		if apiResponse != nil {
-			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiResponse.Error(), displayName)
+		if apiErr != nil {
+			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiErr.Error(), displayName)
 			return
 		}
 	}

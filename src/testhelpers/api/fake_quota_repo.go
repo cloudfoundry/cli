@@ -17,27 +17,27 @@ type FakeQuotaRepository struct {
 	UpdateQuotaGuid string
 }
 
-func (repo *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse errors.Error) {
+func (repo *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiErr errors.Error) {
 	quotas = repo.FindAllQuotas
 
 	return
 }
 
-func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse errors.Error) {
+func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiErr errors.Error) {
 	repo.FindByNameName = name
 	quota = repo.FindByNameQuota
 
 	if repo.FindByNameNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "Org", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "Org", name)
 	}
 	if repo.FindByNameErr {
-		apiResponse = errors.NewErrorWithMessage("Error finding quota")
+		apiErr = errors.NewErrorWithMessage("Error finding quota")
 	}
 
 	return
 }
 
-func (repo *FakeQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse errors.Error) {
+func (repo *FakeQuotaRepository) Update(orgGuid, quotaGuid string) (apiErr errors.Error) {
 	repo.UpdateOrgGuid = orgGuid
 	repo.UpdateQuotaGuid = quotaGuid
 	return

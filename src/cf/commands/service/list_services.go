@@ -37,10 +37,10 @@ func (cmd ListServices) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	serviceInstances, apiResponse := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
+	serviceInstances, apiErr := cmd.serviceSummaryRepo.GetSummariesInCurrentSpace()
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

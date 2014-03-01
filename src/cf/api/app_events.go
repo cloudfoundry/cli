@@ -29,7 +29,7 @@ func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway 
 }
 
 func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error {
-	apiResponse := repo.gateway.ListPaginatedResources(
+	apiErr := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid))),
@@ -39,8 +39,8 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 		})
 
 	// FIXME: needs semantic versioning
-	if apiResponse != nil && apiResponse.IsNotFound() {
-		apiResponse = repo.gateway.ListPaginatedResources(
+	if apiErr != nil && apiErr.IsNotFound() {
+		apiErr = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
 			repo.config.AccessToken(),
 			fmt.Sprintf("/v2/apps/%s/events", appGuid),
@@ -50,7 +50,7 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 			})
 	}
 
-	return apiResponse
+	return apiErr
 }
 
 const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"

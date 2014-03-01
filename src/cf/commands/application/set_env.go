@@ -62,10 +62,10 @@ func (cmd *SetEnv) Run(c *cli.Context) {
 	envParams := app.EnvironmentVars
 	envParams[varName] = varValue
 
-	_, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
+	_, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{EnvironmentVars: &envParams})
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

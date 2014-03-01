@@ -54,9 +54,9 @@ func (cmd *UnbindService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	found, apiResponse := cmd.serviceBindingRepo.Delete(instance, app.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	found, apiErr := cmd.serviceBindingRepo.Delete(instance, app.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

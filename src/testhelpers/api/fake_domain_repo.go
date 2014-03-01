@@ -60,47 +60,47 @@ func (repo *FakeDomainRepository) ListDomains(cb func(models.DomainFields) bool)
 	return repo.ListDomainsApiResponse
 }
 
-func (repo *FakeDomainRepository) FindByName(name string) (domain models.DomainFields, apiResponse errors.Error) {
+func (repo *FakeDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr errors.Error) {
 	repo.FindByNameName = name
 	domain = repo.FindByNameDomain
 
 	if repo.FindByNameNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "Domain", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "Domain", name)
 	}
 	if repo.FindByNameErr {
-		apiResponse = errors.NewErrorWithMessage("Error finding domain")
+		apiErr = errors.NewErrorWithMessage("Error finding domain")
 	}
 
 	return
 }
 
-func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiResponse errors.Error) {
+func (repo *FakeDomainRepository) FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr errors.Error) {
 	repo.FindByNameInOrgName = name
 	repo.FindByNameInOrgGuid = owningOrgGuid
 	domain = repo.FindByNameInOrgDomain
-	apiResponse = repo.FindByNameInOrgApiResponse
+	apiErr = repo.FindByNameInOrgApiResponse
 	return
 }
 
-func (repo *FakeDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiResponse errors.Error) {
+func (repo *FakeDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr errors.Error) {
 	repo.CreateDomainName = domainName
 	repo.CreateDomainOwningOrgGuid = owningOrgGuid
 	return
 }
 
-func (repo *FakeDomainRepository) CreateSharedDomain(domainName string) (apiResponse errors.Error) {
+func (repo *FakeDomainRepository) CreateSharedDomain(domainName string) (apiErr errors.Error) {
 	repo.CreateSharedDomainName = domainName
 	return
 }
 
-func (repo *FakeDomainRepository) Delete(domainGuid string) (apiResponse errors.Error) {
+func (repo *FakeDomainRepository) Delete(domainGuid string) (apiErr errors.Error) {
 	repo.DeleteDomainGuid = domainGuid
-	apiResponse = repo.DeleteApiResponse
+	apiErr = repo.DeleteApiResponse
 	return
 }
 
-func (repo *FakeDomainRepository) DeleteSharedDomain(domainGuid string) (apiResponse errors.Error) {
+func (repo *FakeDomainRepository) DeleteSharedDomain(domainGuid string) (apiErr errors.Error) {
 	repo.DeleteSharedDomainGuid = domainGuid
-	apiResponse = repo.DeleteSharedApiResponse
+	apiErr = repo.DeleteSharedApiResponse
 	return
 }

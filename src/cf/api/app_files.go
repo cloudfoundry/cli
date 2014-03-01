@@ -8,7 +8,7 @@ import (
 )
 
 type AppFilesRepository interface {
-	ListFiles(appGuid, path string) (files string, apiResponse errors.Error)
+	ListFiles(appGuid, path string) (files string, apiErr errors.Error)
 }
 
 type CloudControllerAppFilesRepository struct {
@@ -22,13 +22,13 @@ func NewCloudControllerAppFilesRepository(config configuration.Reader, gateway n
 	return
 }
 
-func (repo CloudControllerAppFilesRepository) ListFiles(appGuid, path string) (files string, apiResponse errors.Error) {
+func (repo CloudControllerAppFilesRepository) ListFiles(appGuid, path string) (files string, apiErr errors.Error) {
 	url := fmt.Sprintf("%s/v2/apps/%s/instances/0/files/%s", repo.config.ApiEndpoint(), appGuid, path)
-	request, apiResponse := repo.gateway.NewRequest("GET", url, repo.config.AccessToken(), nil)
-	if apiResponse != nil {
+	request, apiErr := repo.gateway.NewRequest("GET", url, repo.config.AccessToken(), nil)
+	if apiErr != nil {
 		return
 	}
 
-	files, _, apiResponse = repo.gateway.PerformRequestForTextResponse(request)
+	files, _, apiErr = repo.gateway.PerformRequestForTextResponse(request)
 	return
 }

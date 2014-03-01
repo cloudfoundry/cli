@@ -28,11 +28,11 @@ func NewApplicationRequirement(name string, ui terminal.UI, aR api.ApplicationRe
 }
 
 func (req *applicationApiRequirement) Execute() (success bool) {
-	var apiResponse errors.Error
-	req.application, apiResponse = req.appRepo.Read(req.name)
+	var apiErr errors.Error
+	req.application, apiErr = req.appRepo.Read(req.name)
 
-	if apiResponse != nil {
-		req.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 

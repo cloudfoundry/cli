@@ -51,9 +51,9 @@ func (cmd *Curl) Run(c *cli.Context) {
 		trace.EnableTrace()
 	}
 
-	respHeader, respBody, apiResponse := cmd.curlRepo.Request(method, path, reqHeader, body)
-	if apiResponse != nil {
-		cmd.ui.Failed("Error creating request:\n%s", apiResponse.Error())
+	respHeader, respBody, apiErr := cmd.curlRepo.Request(method, path, reqHeader, body)
+	if apiErr != nil {
+		cmd.ui.Failed("Error creating request:\n%s", apiErr.Error())
 		return
 	}
 

@@ -10,7 +10,7 @@ type FakeAppFilesRepo struct {
 	FileList string
 }
 
-func (repo *FakeAppFilesRepo) ListFiles(appGuid, path string) (files string, apiResponse errors.Error) {
+func (repo *FakeAppFilesRepo) ListFiles(appGuid, path string) (files string, apiErr errors.Error) {
 	repo.AppGuid = appGuid
 	repo.Path = path
 

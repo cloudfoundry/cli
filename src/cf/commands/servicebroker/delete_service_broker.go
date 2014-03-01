@@ -53,22 +53,22 @@ func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	broker, apiResponse := cmd.repo.FindByName(brokerName)
+	broker, apiErr := cmd.repo.FindByName(brokerName)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Broker %s does not exist.", brokerName)
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.repo.Delete(broker.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.repo.Delete(broker.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

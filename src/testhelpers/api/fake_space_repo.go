@@ -46,7 +46,7 @@ func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) err
 	return nil
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiResponse errors.Error) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiErr errors.Error) {
 	repo.FindByNameName = name
 
 	var foundSpace bool = false
@@ -59,31 +59,31 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, ap
 	}
 
 	if repo.FindByNameErr || !foundSpace {
-		apiResponse = errors.NewErrorWithMessage("Error finding space by name.")
+		apiErr = errors.NewErrorWithMessage("Error finding space by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "Space", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "Space", name)
 	}
 
 	return
 }
 
-func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse errors.Error) {
+func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr errors.Error) {
 	repo.FindByNameInOrgName = name
 	repo.FindByNameInOrgOrgGuid = orgGuid
 	space = repo.FindByNameInOrgSpace
 	return
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiResponse errors.Error) {
+func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiErr errors.Error) {
 	space = repo.SummarySpace
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse errors.Error) {
+func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr errors.Error) {
 	if repo.CreateSpaceExists {
-		apiResponse = errors.NewError("Space already exists", cf.SPACE_EXISTS)
+		apiErr = errors.NewError("Space already exists", cf.SPACE_EXISTS)
 		return
 	}
 	repo.CreateSpaceName = name
@@ -92,13 +92,13 @@ func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space mode
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiResponse errors.Error) {
+func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiErr errors.Error) {
 	repo.RenameSpaceGuid = spaceGuid
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiResponse errors.Error) {
+func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiErr errors.Error) {
 	repo.DeletedSpaceGuid = spaceGuid
 	return
 }

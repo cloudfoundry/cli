@@ -25,12 +25,12 @@ func (cmd PurgeServiceOffering) GetRequirements(reqFactory requirements.Factory,
 func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 	serviceName := c.Args()[0]
 
-	offering, apiResponse := cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
-	if apiResponse != nil {
-		if apiResponse.IsNotFound() {
+	offering, apiErr := cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
+	if apiErr != nil {
+		if apiErr.IsNotFound() {
 			cmd.ui.Warn("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.")
 		} else {
-			cmd.ui.Failed(apiResponse.Error())
+			cmd.ui.Failed(apiErr.Error())
 		}
 	} else {
 		confirmed := c.Bool("f")

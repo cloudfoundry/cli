@@ -114,14 +114,10 @@ typically declared as an interface type, and not a concrete type. (see `src/cf/c
 
 Some dependencies are managed by a repository locator in `src/cf/api/repository_locator.go`.
 
-Repositories communicate with the api endpoints through a Gateway (see `src/cf/net`). Repositories return
-a Model and an ApiResponse object by convention. Consumers are expected to check the ApiResponse for
-success or failure, much like an `error`.
+Repositories communicate with the api endpoints through a Gateway (see `src/cf/net`).
 
 Models are data structures related to Cloud Foundry (see `src/cf/models`). For example, some models are
 apps, buildpacks, domains, etc.
-
-ApiResponse objects convey a variety of important error conditions (see `src/cf/net/api_response.go`).
 
 
 Managing dependencies
@@ -156,6 +152,5 @@ Creating Repositories
 Although not ideal, we use the name "Repository" for API related operations as opposed to "Service". Repository was chosen
 to avoid confusion with Service model objects (i.e. creating Services and Service Instances within Cloud Foundry).
 
-By convention, Repository methods return a model object and an ApiResponse. Models are used in both Commands and Repositories
-to model Cloud Foundry data.  ApiResponse objects are used to communicate application errors, runtime errors,
-whether the resource was found, etc. This convention provides a consistent method signature across repositories.
+By convention, Repository methods return a model object and an error. Models are used in both Commands and Repositories
+to model Cloud Foundry data. This convention provides a consistent method signature across repositories.

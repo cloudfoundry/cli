@@ -12,7 +12,7 @@ import (
 )
 
 type RouteCreator interface {
-	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse cferrors.Error)
+	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr cferrors.Error)
 }
 
 type CreateRoute struct {
@@ -59,14 +59,14 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 	space := cmd.spaceReq.GetSpace()
 	domain := cmd.domainReq.GetDomain()
 
-	_, apiResponse := cmd.CreateRoute(hostName, domain, space.SpaceFields)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	_, apiErr := cmd.CreateRoute(hostName, domain, space.SpaceFields)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse cferrors.Error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr cferrors.Error) {
 	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
 		terminal.EntityNameColor(domain.UrlForHost(hostName)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -74,8 +74,8 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields,
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	route, apiResponse = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
-	if apiResponse != nil {
+	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
+	if apiErr != nil {
 		var findApiResponse cferrors.Error
 		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 
@@ -85,7 +85,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields,
 			return
 		}
 
-		apiResponse = nil
+		apiErr = nil
 		cmd.ui.Ok()
 		cmd.ui.Warn("Route %s already exists", route.URL())
 		return

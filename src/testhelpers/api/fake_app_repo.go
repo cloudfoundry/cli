@@ -24,18 +24,18 @@ type FakeApplicationRepository struct {
 	DeletedAppGuid string
 }
 
-func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiResponse errors.Error) {
+func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr errors.Error) {
 	repo.ReadName = name
 	app = repo.ReadApp
 
 	if repo.ReadErr {
-		apiResponse = errors.NewErrorWithMessage("Error finding app by name.")
+		apiErr = errors.NewErrorWithMessage("Error finding app by name.")
 	}
 	if repo.ReadAuthErr {
-		apiResponse = errors.NewHttpError(401, "", "", "1000", "Authentication failed.")
+		apiErr = errors.NewHttpError(401, "", "", "1000", "Authentication failed.")
 	}
 	if repo.ReadNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "App", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "App", name)
 	}
 
 	return
@@ -48,7 +48,7 @@ func (repo *FakeApplicationRepository) CreatedAppParams() (params models.AppPara
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiResponse errors.Error) {
+func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiErr errors.Error) {
 	if repo.CreateAppParams == nil {
 		repo.CreateAppParams = []models.AppParams{}
 	}
@@ -85,17 +85,17 @@ func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultAp
 	return
 }
 
-func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse errors.Error) {
+func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr errors.Error) {
 	repo.UpdateAppGuid = appGuid
 	repo.UpdateParams = params
 	updatedApp = repo.UpdateAppResult
 	if repo.UpdateErr {
-		apiResponse = errors.NewErrorWithMessage("Error updating app.")
+		apiErr = errors.NewErrorWithMessage("Error updating app.")
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) Delete(appGuid string) (apiResponse errors.Error) {
+func (repo *FakeApplicationRepository) Delete(appGuid string) (apiErr errors.Error) {
 	repo.DeletedAppGuid = appGuid
 	return
 }

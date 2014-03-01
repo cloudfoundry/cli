@@ -58,10 +58,10 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 	)
 
 	state := "STOPPED"
-	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
-	if apiResponse != nil {
-		err = errors.New(apiResponse.Error())
-		cmd.ui.Failed(apiResponse.Error())
+	updatedApp, apiErr := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
+	if apiErr != nil {
+		err = errors.New(apiErr.Error())
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

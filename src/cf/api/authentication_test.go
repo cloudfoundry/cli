@@ -34,13 +34,13 @@ var _ = Describe("AuthenticationRepository", func() {
 		ts, handler, config = setupAuthDependencies(successfulLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
-		apiResponse := auth.Authenticate(map[string]string{
+		apiErr := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(config.AuthorizationEndpoint()).To(Equal(ts.URL))
 		Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
 		Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -50,14 +50,14 @@ var _ = Describe("AuthenticationRepository", func() {
 		ts, handler, config = setupAuthDependencies(unsuccessfulLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
-		apiResponse := auth.Authenticate(map[string]string{
+		apiErr := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.Error()).To(Equal("Password is incorrect, please try again."))
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.Error()).To(Equal("Password is incorrect, please try again."))
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
@@ -65,14 +65,14 @@ var _ = Describe("AuthenticationRepository", func() {
 		ts, handler, config = setupAuthDependencies(errorLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
-		apiResponse := auth.Authenticate(map[string]string{
+		apiErr := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.Error()).To(Equal("Server error, status code: 500, error code: , message: "))
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.Error()).To(Equal("Server error, status code: 500, error code: , message: "))
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
@@ -80,14 +80,14 @@ var _ = Describe("AuthenticationRepository", func() {
 		ts, handler, config = setupAuthDependencies(errorMaskedAsSuccessLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
-		apiResponse := auth.Authenticate(map[string]string{
+		apiErr := auth.Authenticate(map[string]string{
 			"username": "foo@example.com",
 			"password": "bar",
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.Error()).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.Error()).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
@@ -95,8 +95,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		ts, handler, config = setupAuthDependencies(loginInfoRequest)
 		auth := NewUAAAuthenticationRepository(gateway, config)
 
-		prompts, apiResponse := auth.GetLoginPrompts()
-		Expect(apiResponse).NotTo(HaveOccurred())
+		prompts, apiErr := auth.GetLoginPrompts()
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(prompts).To(Equal(map[string]configuration.AuthPrompt{
 			"username": configuration.AuthPrompt{
 				DisplayName: "Email",
@@ -113,9 +113,9 @@ var _ = Describe("AuthenticationRepository", func() {
 		ts, handler, config = setupAuthDependencies(loginInfoFailureRequest)
 		auth := NewUAAAuthenticationRepository(gateway, config)
 
-		prompts, apiResponse := auth.GetLoginPrompts()
+		prompts, apiErr := auth.GetLoginPrompts()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiErr).To(HaveOccurred())
 		Expect(prompts).To(BeEmpty())
 	})
 })

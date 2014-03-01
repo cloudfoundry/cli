@@ -13,14 +13,14 @@ type FakeUserProvidedServiceInstanceRepo struct {
 	UpdateServiceInstance models.ServiceInstanceFields
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]string) (apiResponse errors.Error) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]string) (apiErr errors.Error) {
 	repo.CreateName = name
 	repo.CreateDrainUrl = drainUrl
 	repo.CreateParams = params
 	return
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance models.ServiceInstanceFields) (apiResponse errors.Error) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance models.ServiceInstanceFields) (apiErr errors.Error) {
 	repo.UpdateServiceInstance = serviceInstance
 	return
 }

@@ -49,11 +49,11 @@ func (resource OrganizationResource) ToModel() (org models.Organization) {
 }
 
 type OrganizationRepository interface {
-	ListOrgs(func(models.Organization) bool) (apiResponse errors.Error)
-	FindByName(name string) (org models.Organization, apiResponse errors.Error)
-	Create(name string) (apiResponse errors.Error)
-	Rename(orgGuid string, name string) (apiResponse errors.Error)
-	Delete(orgGuid string) (apiResponse errors.Error)
+	ListOrgs(func(models.Organization) bool) (apiErr errors.Error)
+	FindByName(name string) (org models.Organization, apiErr errors.Error)
+	Create(name string) (apiErr errors.Error)
+	Rename(orgGuid string, name string) (apiErr errors.Error)
+	Delete(orgGuid string) (apiErr errors.Error)
 }
 
 type CloudControllerOrganizationRepository struct {
@@ -67,7 +67,7 @@ func NewCloudControllerOrganizationRepository(config configuration.Reader, gatew
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organization) bool) (apiResponse errors.Error) {
+func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organization) bool) (apiErr errors.Error) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -78,9 +78,9 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organi
 		})
 }
 
-func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiResponse errors.Error) {
+func (repo CloudControllerOrganizationRepository) FindByName(name string) (org models.Organization, apiErr errors.Error) {
 	found := false
-	apiResponse = repo.gateway.ListPaginatedResources(
+	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name))),
@@ -92,25 +92,25 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 		})
 
 	if !found {
-		apiResponse = errors.NewNotFoundError("Organization %s not found", name)
+		apiErr = errors.NewNotFoundError("Organization %s not found", name)
 	}
 
 	return
 }
 
-func (repo CloudControllerOrganizationRepository) Create(name string) (apiResponse errors.Error) {
+func (repo CloudControllerOrganizationRepository) Create(name string) (apiErr errors.Error) {
 	url := repo.config.ApiEndpoint() + "/v2/organizations"
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
 	return repo.gateway.CreateResource(url, repo.config.AccessToken(), strings.NewReader(data))
 }
 
-func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiResponse errors.Error) {
+func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiErr errors.Error) {
 	url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
 	return repo.gateway.UpdateResource(url, repo.config.AccessToken(), strings.NewReader(data))
 }
 
-func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiResponse errors.Error) {
+func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr errors.Error) {
 	url := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.ApiEndpoint(), orgGuid)
 	return repo.gateway.DeleteResource(url, repo.config.AccessToken())
 }

@@ -37,9 +37,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
-		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
+		apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestCreateServiceBindingIfError", func() {
@@ -56,11 +56,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
-		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
+		apiErr := repo.Create("my-service-instance-guid", "my-app-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.ErrorCode()).To(Equal("90003"))
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.ErrorCode()).To(Equal("90003"))
 	})
 
 	It("TestDeleteServiceBinding", func() {
@@ -78,10 +78,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		binding2.AppGuid = "app-2-guid"
 		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 
-		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
+		found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(found).To(BeTrue())
 	})
 
@@ -92,10 +92,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
 
-		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
+		found, apiErr := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler.CallCount).To(Equal(0))
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(found).To(BeFalse())
 	})
 })

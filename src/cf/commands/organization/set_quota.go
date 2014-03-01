@@ -43,10 +43,10 @@ func (cmd *SetQuota) GetRequirements(reqFactory requirements.Factory, c *cli.Con
 func (cmd *SetQuota) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 	quotaName := c.Args()[1]
-	quota, apiResponse := cmd.quotaRepo.FindByName(quotaName)
+	quota, apiErr := cmd.quotaRepo.FindByName(quotaName)
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -56,9 +56,9 @@ func (cmd *SetQuota) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse = cmd.quotaRepo.Update(org.Guid, quota.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.quotaRepo.Update(org.Guid, quota.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

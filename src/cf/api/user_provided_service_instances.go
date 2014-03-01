@@ -11,8 +11,8 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainUrl string, params map[string]string) (apiResponse errors.Error)
-	Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse errors.Error)
+	Create(name, drainUrl string, params map[string]string) (apiErr errors.Error)
+	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr errors.Error)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -26,7 +26,7 @@ func NewCCUserProvidedServiceInstanceRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiResponse errors.Error) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
 
 	type RequestBody struct {
@@ -44,14 +44,14 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	})
 
 	if err != nil {
-		apiResponse = errors.NewErrorWithError("Error parsing response", err)
+		apiErr = errors.NewErrorWithError("Error parsing response", err)
 		return
 	}
 
 	return repo.gateway.CreateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse errors.Error) {
+func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), serviceInstanceFields.Guid)
 
 	type RequestBody struct {
@@ -62,7 +62,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	reqBody := RequestBody{serviceInstanceFields.Params, serviceInstanceFields.SysLogDrainUrl}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		apiResponse = errors.NewErrorWithError("Error parsing response", err)
+		apiErr = errors.NewErrorWithError("Error parsing response", err)
 		return
 	}
 

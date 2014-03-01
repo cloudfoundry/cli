@@ -19,12 +19,12 @@ var _ = Describe("DomainRepository", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListSharedDomains(func(d models.DomainFields) bool {
+		apiErr := repo.ListSharedDomains(func(d models.DomainFields) bool {
 			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(len(receivedDomains)).To(Equal(2))
 		Expect(receivedDomains[0].Guid).To(Equal("shared-domain1-guid"))
 		Expect(receivedDomains[1].Guid).To(Equal("shared-domain2-guid"))
@@ -36,12 +36,12 @@ var _ = Describe("DomainRepository", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+		apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
 			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(len(receivedDomains)).To(Equal(1))
 		Expect(receivedDomains[0].Guid).To(Equal("domain-guid"))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -52,12 +52,12 @@ var _ = Describe("DomainRepository", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+		apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
 			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(len(receivedDomains)).To(Equal(3))
 		Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
 		Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
@@ -69,12 +69,12 @@ var _ = Describe("DomainRepository", func() {
 		defer ts.Close()
 
 		wasCalled := false
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+		apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
 			wasCalled = true
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(wasCalled).To(BeFalse())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
@@ -90,12 +90,12 @@ var _ = Describe("DomainRepository", func() {
 		defer ts.Close()
 
 		receivedDomains := []models.DomainFields{}
-		apiResponse := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+		apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
 			receivedDomains = append(receivedDomains, d)
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -114,9 +114,9 @@ var _ = Describe("DomainRepository", func() {
 		ts, handler, repo := createDomainRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
-		domain, apiResponse := repo.FindByName("domain2.cf-app.com")
+		domain, apiErr := repo.FindByName("domain2.cf-app.com")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(domain.Name).To(Equal("domain2.cf-app.com"))
 		Expect(domain.Guid).To(Equal("domain2-guid"))
@@ -144,9 +144,9 @@ var _ = Describe("DomainRepository", func() {
 			ts, handler, repo := createDomainRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
+			domain, apiErr := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(domain.Name).To(Equal("my-example.com"))
 			Expect(domain.Guid).To(Equal("my-domain-guid"))
@@ -180,9 +180,9 @@ var _ = Describe("DomainRepository", func() {
 			ts, handler, repo := createDomainRepo([]testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 			defer ts.Close()
 
-			domain, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
+			domain, apiErr := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(domain.Name).To(Equal("shared-example.com"))
 			Expect(domain.Guid).To(Equal("shared-domain-guid"))
@@ -205,10 +205,10 @@ var _ = Describe("DomainRepository", func() {
 			ts, handler, repo := createDomainRepo([]testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 			defer ts.Close()
 
-			_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
+			_, apiErr := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-			Expect(apiResponse.IsNotFound()).To(BeTrue())
+			Expect(apiErr.IsNotFound()).To(BeTrue())
 		})
 
 		It("returns not found when the global endpoint returns a non-shared domain", func() {
@@ -238,10 +238,10 @@ var _ = Describe("DomainRepository", func() {
 			ts, handler, repo := createDomainRepo([]testnet.TestRequest{orgDomainsReq, sharedDomainsReq})
 			defer ts.Close()
 
-			_, apiResponse := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
+			_, apiErr := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-			Expect(apiResponse.IsNotFound()).To(BeTrue())
+			Expect(apiErr.IsNotFound()).To(BeTrue())
 		})
 	})
 
@@ -265,10 +265,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		createdDomain, apiResponse := repo.Create("example.com", "org-guid")
+		createdDomain, apiErr := repo.Create("example.com", "org-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(createdDomain.Guid).To(Equal("abc-123"))
 	})
 
@@ -286,10 +286,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		createdDomain, apiResponse := repo.Create("example.com", "org-guid")
+		createdDomain, apiErr := repo.Create("example.com", "org-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(createdDomain.Guid).To(Equal("abc-123"))
 	})
 
@@ -308,10 +308,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		apiResponse := repo.CreateSharedDomain("example.com")
+		apiErr := repo.CreateSharedDomain("example.com")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestCreateSharedDomainsWithOldEndpoint", func() {
@@ -335,10 +335,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		apiResponse := repo.CreateSharedDomain("example.com")
+		apiErr := repo.CreateSharedDomain("example.com")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteDomainWithNewEndpoint", func() {
@@ -347,10 +347,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-domain-guid")
+		apiErr := repo.Delete("my-domain-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteDomainWithOldEndpoint", func() {
@@ -364,10 +364,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-domain-guid")
+		apiErr := repo.Delete("my-domain-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteSharedDomainWithNewEndpoint", func() {
@@ -376,10 +376,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		apiResponse := repo.DeleteSharedDomain("my-domain-guid")
+		apiErr := repo.DeleteSharedDomain("my-domain-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteSharedDomainWithOldEndpoint", func() {
@@ -393,10 +393,10 @@ var _ = Describe("DomainRepository", func() {
 		})
 		defer ts.Close()
 
-		apiResponse := repo.DeleteSharedDomain("my-domain-guid")
+		apiErr := repo.DeleteSharedDomain("my-domain-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteDomainFailure", func() {
@@ -405,10 +405,10 @@ var _ = Describe("DomainRepository", func() {
 		ts, handler, repo := createDomainRepo([]testnet.TestRequest{req})
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-domain-guid")
+		apiErr := repo.Delete("my-domain-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiErr).NotTo(BeNil())
 	})
 })
 

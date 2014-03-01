@@ -62,10 +62,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createServiceSummaryRepo(req)
 		defer ts.Close()
 
-		serviceInstances, apiResponse := repo.GetSummariesInCurrentSpace()
+		serviceInstances, apiErr := repo.GetSummariesInCurrentSpace()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(1).To(Equal(len(serviceInstances)))
 
 		instance1 := serviceInstances[0]

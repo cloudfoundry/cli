@@ -46,9 +46,9 @@ func (cmd CreateService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	offerings, apiResponse := cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	offerings, apiErr := cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -65,9 +65,9 @@ func (cmd CreateService) Run(c *cli.Context) {
 	}
 
 	var identicalAlreadyExists bool
-	identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	identicalAlreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
