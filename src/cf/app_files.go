@@ -46,7 +46,7 @@ func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 		sha1 := fmt.Sprintf("%x", sha1Bytes)
 
 		appFiles = append(appFiles, models.AppFileFields{
-			Path: fileName,
+			Path: filepath.ToSlash(fileName),
 			Sha1: sha1,
 			Size: size,
 		})
