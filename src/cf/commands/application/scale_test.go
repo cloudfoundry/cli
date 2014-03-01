@@ -48,13 +48,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			testcmd.RunCommand(cmd, testcmd.NewContext("scale", args), reqFactory)
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
-			reqFactory.LoginSuccess = true
-			reqFactory.TargetedSpaceSuccess = true
-
-			testcmd.RunCommand(cmd, testcmd.NewContext("scale", args), reqFactory)
-			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-			Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 		})
 
 		It("requires an app to be specified", func() {
@@ -98,44 +91,62 @@ var _ = Describe("Testing with ginkgo", func() {
 				})
 
 				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-					{"Scaling"},
+					{"Scaling", "my-app", "my-org", "my-space", "my-user"},
 				})
 			})
 		})
 
-		It("can set an app's instance count, memory limit and disk limit", func() {
-			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}), reqFactory)
+		Context("when the user does not confirm 'yes'", func() {
+			It("does not restart the app", func() {
+				ui.Inputs = []string{"whatever"}
+				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}), reqFactory)
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Scaling", "my-app", "my-org", "my-space", "my-user"},
-				{"OK"},
+				Expect(restarter.AppToRestart.Guid).To(Equal(""))
+			})
+		})
+
+		Context("when the user confirms they want to restart", func() {
+			BeforeEach(func() {
+				ui.Inputs = []string{"yes"}
 			})
 
-			Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-			Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
-			Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
-			Expect(*appRepo.UpdateParams.DiskQuota).To(Equal(uint64(2048)))
-		})
+			It("can set an app's instance count, memory limit and disk limit", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "-m", "512M", "-k", "2G", "my-app"}), reqFactory)
 
-		It("does not scale the memory and disk limits if they are not specified", func() {
-			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "my-app"}), reqFactory)
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Scaling", "my-app", "my-org", "my-space", "my-user"},
+					{"OK"},
+				})
 
-			Expect(restarter.AppToRestart.Guid).To(Equal(""))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-			Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
-			Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
-			Expect(appRepo.UpdateParams.Memory).To(BeNil())
-		})
+				testassert.SliceContains(ui.Prompts, testassert.Lines{
+					{"Are you sure", "my-app"},
+				})
+				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+				Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+				Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
+				Expect(*appRepo.UpdateParams.DiskQuota).To(Equal(uint64(2048)))
+			})
 
-		It("does not scale the app's instance count if it is not specified", func() {
-			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-m", "512M", "my-app"}), reqFactory)
+			It("does not scale the memory and disk limits if they are not specified", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "5", "my-app"}), reqFactory)
 
-			Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
-			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-			Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
-			Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
-			Expect(appRepo.UpdateParams.InstanceCount).To(BeNil())
+				Expect(restarter.AppToRestart.Guid).To(Equal(""))
+				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+				Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(5))
+				Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
+				Expect(appRepo.UpdateParams.Memory).To(BeNil())
+			})
+
+			It("does not scale the app's instance count if it is not specified", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-m", "512M", "my-app"}), reqFactory)
+
+				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+				Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(512)))
+				Expect(appRepo.UpdateParams.DiskQuota).To(BeNil())
+				Expect(appRepo.UpdateParams.InstanceCount).To(BeNil())
+			})
 		})
 	})
 })
