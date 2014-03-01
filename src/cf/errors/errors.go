@@ -7,69 +7,24 @@ import (
 
 type Error interface {
 	error
-	IsHttpError() bool
 	IsNotFound() bool
-	StatusCode() int
 	ErrorCode() string
 }
 
-type HttpError interface {
-	Error
-	Headers() string
-	Body() string
-}
-
 type concreteError struct {
-	Message   string
-	errorCode string
-
-	statusCode  int
-	errorHeader string
-	errorBody   string
-
-	isHttpResponse bool
-	isNotFound     bool
+	Message    string
+	errorCode  string
+	isNotFound bool
 }
 
 func New(message string) error {
 	return original.New(message)
 }
 
-func NewError(message string, errorCode string, statusCode int) Error {
+func NewError(message string, errorCode string) Error {
 	return &concreteError{
-		Message:        message,
-		errorCode:      errorCode,
-		statusCode:     statusCode,
-		isHttpResponse: true,
-	}
-}
-
-func NewErrorWithHttpError(message string, errorCode string, statusCode int, errorHeader string, errorBody string) Error {
-	return &concreteError{
-		Message:        message,
-		errorCode:      errorCode,
-		statusCode:     statusCode,
-		isHttpResponse: true,
-		errorHeader:    errorHeader,
-		errorBody:      errorBody,
-	}
-}
-
-func NewHttpErrorWithHttpError(message string, errorCode string, statusCode int, errorHeader string, errorBody string) HttpError {
-	return &concreteError{
-		Message:        message,
-		errorCode:      errorCode,
-		statusCode:     statusCode,
-		isHttpResponse: true,
-		errorHeader:    errorHeader,
-		errorBody:      errorBody,
-	}
-}
-
-func NewErrorWithStatusCode(statusCode int) Error {
-	return &concreteError{
-		statusCode:     statusCode,
-		isHttpResponse: true,
+		Message:   message,
+		errorCode: errorCode,
 	}
 }
 
@@ -85,14 +40,6 @@ func NewErrorWithError(message string, err error) Error {
 	}
 }
 
-func NewHTTPErrorWithError(message string, err error) HttpError {
-	return &concreteError{
-		Message: fmt.Sprintf("%s: %s", message, err.Error()),
-		isHttpResponse: true,
-		statusCode:
-	}
-}
-
 func NewNotFoundError(message string, a ...interface{}) Error {
 	return &concreteError{
 		Message:    fmt.Sprintf(message, a...),
@@ -100,33 +47,68 @@ func NewNotFoundError(message string, a ...interface{}) Error {
 	}
 }
 
-func NewSuccessfulError() (error Error) {
-	return &concreteError{}
-}
-
-func (err *concreteError) IsHttpError() bool {
-	return err.isHttpResponse
-}
-
 func (err *concreteError) IsNotFound() bool {
-	return err.isNotFound || (err.isHttpResponse && err.statusCode == 404)
+	return err.isNotFound
 }
 
 func (err *concreteError) Error() string {
 	return err.Message
 }
 
-func (err *concreteError) StatusCode() int {
-	return err.statusCode
-}
 func (err *concreteError) ErrorCode() string {
 	return err.errorCode
 }
 
-func (err *concreteError) Headers() string {
-	return err.errorHeader
+type HttpError interface {
+	Error
+	StatusCode() int
+	Headers() string
+	Body() string
 }
 
-func (err *concreteError) Body() string {
-	return err.errorBody
+type httpError struct {
+	statusCode  int
+	headers     string
+	body        string
+	code        string
+	description string
+}
+
+func NewHttpError(statusCode int, header string, body string, code string, description string) HttpError {
+	return &httpError{
+		statusCode:  statusCode,
+		headers:     header,
+		body:        body,
+		code:        code,
+		description: description,
+	}
+}
+
+func (err *httpError) StatusCode() int {
+	return err.statusCode
+}
+
+func (err *httpError) Headers() string {
+	return err.headers
+}
+
+func (err *httpError) Body() string {
+	return err.body
+}
+
+func (err *httpError) Error() string {
+	return fmt.Sprintf(
+		"Server error, status code: %d, error code: %s, message: %s",
+		err.statusCode,
+		err.code,
+		err.description,
+	)
+}
+
+func (err *httpError) ErrorCode() string {
+	return err.code
+}
+
+func (err *httpError) IsNotFound() bool {
+	return err.statusCode == 404
 }

@@ -270,7 +270,7 @@ func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 	}
 
 	apiResponse := cmd.domainRepo.ListSharedDomains(listDomainsCallback)
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		apiResponse = cmd.domainRepo.ListDomains(listDomainsCallback)
 	}
 
@@ -306,19 +306,20 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	}
 
 	app, apiResponse := cmd.appRepo.Read(*appParams.Name)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
-		return
-	}
-
 	var didCreate bool = false
-	if apiResponse.IsNotFound() {
-		app, apiResponse = cmd.createApp(appParams)
-		if apiResponse != nil {
+
+	if apiResponse != nil {
+		if apiResponse.IsNotFound() {
+			app, apiResponse = cmd.createApp(appParams)
+			if apiResponse != nil {
+				cmd.ui.Failed(apiResponse.Error())
+				return
+			}
+			didCreate = true
+		} else {
 			cmd.ui.Failed(apiResponse.Error())
 			return
 		}
-		didCreate = true
 	}
 
 	if !didCreate {

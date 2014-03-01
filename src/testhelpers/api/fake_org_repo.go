@@ -57,7 +57,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization,
 
 func (repo *FakeOrgRepository) Create(name string) (apiResponse errors.Error) {
 	if repo.CreateOrgExists {
-		apiResponse = errors.NewError("Space already exists", cf.ORG_EXISTS, 400)
+		apiResponse = errors.NewError("Space already exists", cf.ORG_EXISTS)
 		return
 	}
 	repo.CreateName = name

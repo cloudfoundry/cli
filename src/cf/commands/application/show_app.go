@@ -67,8 +67,8 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	)
 
 	appSummary, apiResponse := cmd.appSummaryRepo.GetSummary(app.Guid)
-	appIsStopped := apiResponse.ErrorCode() == cf.APP_STOPPED ||
-		apiResponse.ErrorCode() == cf.APP_NOT_STAGED ||
+	appIsStopped := (apiResponse != nil && (apiResponse.ErrorCode() == cf.APP_STOPPED ||
+		apiResponse.ErrorCode() == cf.APP_NOT_STAGED)) ||
 		appSummary.State == "stopped"
 
 	if apiResponse != nil && !appIsStopped {

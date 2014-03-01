@@ -3,7 +3,6 @@ package api
 import (
 	"cf/errors"
 	"cf/models"
-	"net/http"
 )
 
 type FakeServiceBindingRepo struct {
@@ -21,7 +20,7 @@ func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiRes
 	repo.CreateApplicationGuid = appGuid
 
 	if repo.CreateErrorCode != "" {
-		apiResponse = errors.NewError("Error binding service", repo.CreateErrorCode, http.StatusBadRequest)
+		apiResponse = errors.NewError("Error binding service", repo.CreateErrorCode)
 	}
 
 	return

@@ -3,6 +3,7 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -564,7 +565,8 @@ var _ = Describe("Services Repo", func() {
 				_, apiResponse := repo.FindServicePlanByDescription(v2)
 
 				Expect(apiResponse).To(HaveOccurred())
-				Expect(apiResponse.IsHttpError()).To(BeTrue())
+				_, ok := apiResponse.(errors.HttpError)
+				Expect(ok).To(BeTrue())
 			})
 		})
 	})

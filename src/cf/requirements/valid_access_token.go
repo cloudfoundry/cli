@@ -2,6 +2,7 @@ package requirements
 
 import (
 	"cf/api"
+	"cf/errors"
 	"cf/terminal"
 )
 
@@ -17,9 +18,11 @@ func NewValidAccessTokenRequirement(ui terminal.UI, appRepo api.ApplicationRepos
 func (req ValidAccessTokenRequirement) Execute() (success bool) {
 	_, apiResponse := req.appRepo.Read("checking_for_valid_access_token")
 
-	if apiResponse != nil && apiResponse.StatusCode() == 401 {
-		req.ui.Say(terminal.NotLoggedInText())
-		return false
+	if httpResp, ok := apiResponse.(errors.HttpError); ok {
+		if httpResp.StatusCode() == 401 {
+			req.ui.Say(terminal.NotLoggedInText())
+			return false
+		}
 	}
 
 	return true

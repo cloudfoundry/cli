@@ -38,7 +38,7 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 	return
 }
 
-func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.HttpError) {
+func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.Error) {
 	return
 }
 

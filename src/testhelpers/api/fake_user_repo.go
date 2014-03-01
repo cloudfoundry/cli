@@ -52,12 +52,12 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 
 func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, errors.Error) {
 	repo.ListUsersOrganizationGuid = orgGuid
-	return repo.ListUsersByRole[roleName], errors.NewErrorWithStatusCode(200)
+	return repo.ListUsersByRole[roleName], nil
 }
 
 func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) ([]models.UserFields, errors.Error) {
 	repo.ListUsersSpaceGuid = spaceGuid
-	return repo.ListUsersByRole[roleName], errors.NewErrorWithStatusCode(200)
+	return repo.ListUsersByRole[roleName], nil
 }
 
 func (repo *FakeUserRepository) Create(username, password string) (apiResponse errors.Error) {
@@ -65,7 +65,7 @@ func (repo *FakeUserRepository) Create(username, password string) (apiResponse e
 	repo.CreateUserPassword = password
 
 	if repo.CreateUserExists {
-		apiResponse = errors.NewError("User already exists", cf.USER_EXISTS, 400)
+		apiResponse = errors.NewError("User already exists", cf.USER_EXISTS)
 	}
 
 	return

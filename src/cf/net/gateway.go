@@ -49,7 +49,7 @@ type errorResponse struct {
 type errorHandler func(*http.Response) errorResponse
 
 type tokenRefresher interface {
-	RefreshAuthToken() (string, errors.HttpError)
+	RefreshAuthToken() (string, errors.Error)
 }
 
 type Request struct {
@@ -194,7 +194,7 @@ func (gateway Gateway) PerformRequest(request *Request) (apiResponse errors.Erro
 	return
 }
 
-func (gateway Gateway) PerformRequestForResponse(request *Request) (rawResponse *http.Response, apiResponse errors.HttpError) {
+func (gateway Gateway) PerformRequestForResponse(request *Request) (rawResponse *http.Response, apiResponse errors.Error) {
 	return gateway.doRequestHandlingAuth(request)
 }
 
@@ -300,7 +300,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 		case JOB_FINISHED:
 			return
 		case JOB_FAILED:
-			apiResponse = errors.NewError("Internal Server Error", "", 500)
+			apiResponse = errors.NewError("Job failed", JOB_FAILED)
 			return
 		}
 
@@ -311,7 +311,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 	return
 }
 
-func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, apiResponse errors.HttpError) {
+func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, apiResponse errors.Error) {
 	httpReq := request.HttpReq
 
 	if request.SeekableBody != nil {
@@ -346,23 +346,18 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 	return
 }
 
-func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiResponse errors.HttpError) {
+func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiResponse errors.Error) {
 	rawResponse, err := gateway.doRequest(request.HttpReq)
 	if err != nil {
-		apiResponse = errors.NewHTTPErrorWithError("Error performing request", err)
+		apiResponse = errors.NewErrorWithError("Error performing request", err)
 		return
 	}
 
 	if rawResponse.StatusCode > 299 {
 		errorResponse := gateway.errHandler(rawResponse)
-		message := fmt.Sprintf(
-			"Server error, status code: %d, error code: %s, message: %s",
-			rawResponse.StatusCode,
-			errorResponse.Code,
-			errorResponse.Description,
-		)
-		apiResponse = errors.NewHttpErrorWithHttpError(message, errorResponse.Code, rawResponse.StatusCode, errorResponse.ResponseHeader, errorResponse.ResponseBody)
+		apiResponse = errors.NewHttpError(rawResponse.StatusCode, errorResponse.ResponseHeader, errorResponse.ResponseBody, errorResponse.Code, errorResponse.Description)
 	}
+
 	return
 }
 

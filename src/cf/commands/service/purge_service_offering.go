@@ -36,10 +36,12 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 	}
 
 	offering, apiResponse := cmd.serviceRepo.FindServiceOfferingByLabelAndProvider(serviceName, c.String("p"))
-	if apiResponse.IsNotFound() {
-		cmd.ui.Warn("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.")
-	} else if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiResponse != nil {
+		if apiResponse.IsNotFound() {
+			cmd.ui.Warn("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.")
+		} else {
+			cmd.ui.Failed(apiResponse.Error())
+		}
 	} else {
 		cmd.serviceRepo.PurgeServiceOffering(offering)
 		cmd.ui.Ok()

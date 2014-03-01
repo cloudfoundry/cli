@@ -43,7 +43,7 @@ func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) err
 			break
 		}
 	}
-	return errors.NewErrorWithStatusCode(200)
+	return nil
 }
 
 func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiResponse errors.Error) {
@@ -83,7 +83,7 @@ func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiResponse e
 
 func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse errors.Error) {
 	if repo.CreateSpaceExists {
-		apiResponse = errors.NewError("Space already exists", cf.SPACE_EXISTS, 400)
+		apiResponse = errors.NewError("Space already exists", cf.SPACE_EXISTS)
 		return
 	}
 	repo.CreateSpaceName = name

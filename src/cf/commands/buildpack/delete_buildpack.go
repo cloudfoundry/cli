@@ -52,7 +52,7 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 
 	buildpack, apiResponse := cmd.buildpackRepo.FindByName(buildpackName)
 
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Buildpack %s does not exist.", buildpackName)
 		return
