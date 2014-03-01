@@ -140,6 +140,8 @@ var _ = Describe("Purging services", func() {
 
 		deps.ui.Inputs = []string{"yes"}
 
+		deps.ui.Inputs = []string{"yes"}
+
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
 			testcmd.NewContext("purge-service-offering", []string{"-p", "the-provider", "the-service-name"}),
