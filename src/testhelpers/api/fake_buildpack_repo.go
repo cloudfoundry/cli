@@ -2,8 +2,8 @@ package api
 
 import (
 	"cf"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeBuildpackRepository struct {
@@ -12,52 +12,52 @@ type FakeBuildpackRepository struct {
 	FindByNameNotFound    bool
 	FindByNameName        string
 	FindByNameBuildpack   models.Buildpack
-	FindByNameApiResponse net.ApiResponse
+	FindByNameApiResponse errors.Error
 
 	CreateBuildpackExists bool
 	CreateBuildpack       models.Buildpack
-	CreateApiResponse     net.ApiResponse
+	CreateApiResponse     errors.Error
 
 	DeleteBuildpackGuid string
-	DeleteApiResponse   net.ApiResponse
+	DeleteApiResponse   errors.Error
 
 	UpdateBuildpack models.Buildpack
 }
 
-func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) net.ApiResponse {
+func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) errors.Error {
 	for _, b := range repo.Buildpacks {
 		cb(b)
 	}
-	return net.NewApiResponseWithStatusCode(200)
+	return nil
 }
 
-func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse errors.Error) {
 	repo.FindByNameName = name
 	buildpack = repo.FindByNameBuildpack
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("Buildpack %s not found", name)
+		apiResponse = errors.NewNotFoundError("Buildpack %s not found", name)
 	}
 
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse errors.Error) {
 	if repo.CreateBuildpackExists {
-		return repo.CreateBuildpack, net.NewApiResponse("Buildpack already exists", cf.BUILDPACK_EXISTS, 400)
+		return repo.CreateBuildpack, errors.NewError("Buildpack already exists", cf.BUILDPACK_EXISTS)
 	}
 
 	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
-func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiResponse errors.Error) {
 	repo.DeleteBuildpackGuid = buildpackGuid
 	apiResponse = repo.DeleteApiResponse
 	return
 }
 
-func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse net.ApiResponse) {
+func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse errors.Error) {
 	repo.UpdateBuildpack = buildpack
 	return
 }

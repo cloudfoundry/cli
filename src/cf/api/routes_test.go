@@ -40,7 +40,7 @@ var _ = Describe("route repository", func() {
 		Expect(routes[0].Guid).To(Equal("route-1-guid"))
 		Expect(routes[1].Guid).To(Equal("route-2-guid"))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("finds routes by host", func() {
@@ -56,7 +56,7 @@ var _ = Describe("route repository", func() {
 		route, apiResponse := repo.FindByHost("my-cool-app")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(route.Host).To(Equal("my-cool-app"))
 		Expect(route.Guid).To(Equal("my-route-guid"))
 	})
@@ -74,7 +74,7 @@ var _ = Describe("route repository", func() {
 		_, apiResponse := repo.FindByHost("my-cool-app")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(BeNil())
 	})
 
 	It("finds a route by host and domain", func() {
@@ -93,7 +93,7 @@ var _ = Describe("route repository", func() {
 
 		route, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(domainRepo.FindByNameName).To(Equal("my-domain.com"))
 		Expect(route.Host).To(Equal("my-cool-app"))
@@ -118,7 +118,7 @@ var _ = Describe("route repository", func() {
 		_, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeFalse())
+
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
@@ -140,7 +140,7 @@ var _ = Describe("route repository", func() {
 		createdRoute, apiResponse := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 	})
 
@@ -161,7 +161,7 @@ var _ = Describe("route repository", func() {
 
 		createdRoute, apiResponse := repo.Create("my-cool-app", "my-domain-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 	})
@@ -178,7 +178,7 @@ var _ = Describe("route repository", func() {
 
 		apiResponse := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("unbinds routes", func() {
@@ -193,7 +193,7 @@ var _ = Describe("route repository", func() {
 
 		apiResponse := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("deletes routes", func() {
@@ -208,7 +208,7 @@ var _ = Describe("route repository", func() {
 
 		apiResponse := repo.Delete("my-cool-route-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 

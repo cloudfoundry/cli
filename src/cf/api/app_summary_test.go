@@ -26,7 +26,7 @@ var _ = Describe("AppSummaryRepository", func() {
 		apps, apiResponse := repo.GetSummariesInCurrentSpace()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(2).To(Equal(len(apps)))
 
 		app1 := apps[0]

@@ -1,9 +1,8 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
-	"net/http"
 )
 
 type FakeAppSummaryRepo struct {
@@ -14,17 +13,17 @@ type FakeAppSummaryRepo struct {
 	GetSummarySummary   models.AppSummary
 }
 
-func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse net.ApiResponse) {
+func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiResponse errors.Error) {
 	apps = repo.GetSummariesInCurrentSpaceApps
 	return
 }
 
-func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.AppSummary, apiResponse net.ApiResponse) {
+func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.AppSummary, apiResponse errors.Error) {
 	repo.GetSummaryAppGuid = appGuid
 	summary = repo.GetSummarySummary
 
 	if repo.GetSummaryErrorCode != "" {
-		apiResponse = net.NewApiResponse("Error", repo.GetSummaryErrorCode, http.StatusBadRequest)
+		apiResponse = errors.NewError("Error", repo.GetSummaryErrorCode)
 	}
 
 	return

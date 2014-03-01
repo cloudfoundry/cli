@@ -17,8 +17,8 @@ import (
 	"time"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestAppRequirements", func() {
+var _ = Describe("Show App Command", func() {
+	It("requires the user to be logged in and have a targetted space", func() {
 		args := []string{"my-app", "/foo"}
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
@@ -36,8 +36,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
 	})
-	It("TestAppFailsWithUsage", func() {
 
+	It("requires an app name", func() {
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: models.Application{}}
@@ -46,8 +46,8 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(ui.FailedWithUsage).To(BeTrue())
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestDisplayingAppSummary", func() {
 
+	It("displays a summary of the app", func() {
 		reqApp := models.Application{}
 		reqApp.Name = "my-app"
 		reqApp.Guid = "my-app-guid"
@@ -110,12 +110,12 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"#1", "down", "2012-04-01 03:04:05 PM", "0%", "0 of 0", "0 of 0"},
 		})
 	})
-	It("TestDisplayingStoppedAppSummary", func() {
 
+	It("TestDisplayingStoppedAppSummary", func() {
 		testDisplayingAppSummaryWithErrorCode(cf.APP_STOPPED)
 	})
-	It("TestDisplayingNotStagedAppSummary", func() {
 
+	It("TestDisplayingNotStagedAppSummary", func() {
 		testDisplayingAppSummaryWithErrorCode(cf.APP_NOT_STAGED)
 	})
 })

@@ -2,8 +2,8 @@ package api
 
 import (
 	"cf"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeOrgRepository struct {
@@ -23,7 +23,7 @@ type FakeOrgRepository struct {
 	DeletedOrganizationGuid string
 }
 
-func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiResponse net.ApiResponse) {
+func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiResponse errors.Error) {
 	for _, org := range repo.Organizations {
 		if !cb(org) {
 			break
@@ -32,7 +32,7 @@ func (repo FakeOrgRepository) ListOrgs(cb func(models.Organization) bool) (apiRe
 	return
 }
 
-func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization, apiResponse net.ApiResponse) {
+func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization, apiResponse errors.Error) {
 	repo.FindByNameName = name
 
 	var foundOrg bool = false
@@ -45,32 +45,32 @@ func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization,
 	}
 
 	if repo.FindByNameErr || !foundOrg {
-		apiResponse = net.NewApiResponseWithMessage("Error finding organization by name.")
+		apiResponse = errors.NewErrorWithMessage("Error finding organization by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "Org", name)
 	}
 
 	return
 }
 
-func (repo *FakeOrgRepository) Create(name string) (apiResponse net.ApiResponse) {
+func (repo *FakeOrgRepository) Create(name string) (apiResponse errors.Error) {
 	if repo.CreateOrgExists {
-		apiResponse = net.NewApiResponse("Space already exists", cf.ORG_EXISTS, 400)
+		apiResponse = errors.NewError("Space already exists", cf.ORG_EXISTS)
 		return
 	}
 	repo.CreateName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Rename(orgGuid string, name string) (apiResponse net.ApiResponse) {
+func (repo *FakeOrgRepository) Rename(orgGuid string, name string) (apiResponse errors.Error) {
 	repo.RenameOrganizationGuid = orgGuid
 	repo.RenameNewName = name
 	return
 }
 
-func (repo *FakeOrgRepository) Delete(orgGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeOrgRepository) Delete(orgGuid string) (apiResponse errors.Error) {
 	repo.DeletedOrganizationGuid = orgGuid
 	return
 }

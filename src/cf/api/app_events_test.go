@@ -136,7 +136,7 @@ var _ = Describe("App Events Repo", func() {
 			return true
 		})
 
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(list).To(Equal(expectedEvents))
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
@@ -212,7 +212,7 @@ var _ = Describe("App Events Repo", func() {
 			return true
 		})
 
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 
 		Expect(len(events)).To(Equal(2))
@@ -250,7 +250,7 @@ var _ = Describe("App Events Repo", func() {
 		}
 
 		Expect(list).To(Equal(expectedEvents))
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(BeNil())
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
 

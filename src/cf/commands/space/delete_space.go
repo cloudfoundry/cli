@@ -66,8 +66,8 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	}
 
 	apiResponse := cmd.spaceRepo.Delete(space.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

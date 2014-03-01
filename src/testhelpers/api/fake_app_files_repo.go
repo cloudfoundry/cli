@@ -1,7 +1,7 @@
 package api
 
 import (
-	"cf/net"
+	"cf/errors"
 )
 
 type FakeAppFilesRepo struct {
@@ -10,7 +10,7 @@ type FakeAppFilesRepo struct {
 	FileList string
 }
 
-func (repo *FakeAppFilesRepo) ListFiles(appGuid, path string) (files string, apiResponse net.ApiResponse) {
+func (repo *FakeAppFilesRepo) ListFiles(appGuid, path string) (files string, apiResponse errors.Error) {
 	repo.AppGuid = appGuid
 	repo.Path = path
 

@@ -2,8 +2,8 @@ package api
 
 import (
 	"cf"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeSpaceRepository struct {
@@ -37,16 +37,16 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space models.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) net.ApiResponse {
+func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) errors.Error {
 	for _, space := range repo.Spaces {
 		if !callback(space) {
 			break
 		}
 	}
-	return net.NewApiResponseWithStatusCode(200)
+	return nil
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiResponse errors.Error) {
 	repo.FindByNameName = name
 
 	var foundSpace bool = false
@@ -59,31 +59,31 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, ap
 	}
 
 	if repo.FindByNameErr || !foundSpace {
-		apiResponse = net.NewApiResponseWithMessage("Error finding space by name.")
+		apiResponse = errors.NewErrorWithMessage("Error finding space by name.")
 	}
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Space", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "Space", name)
 	}
 
 	return
 }
 
-func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse errors.Error) {
 	repo.FindByNameInOrgName = name
 	repo.FindByNameInOrgOrgGuid = orgGuid
 	space = repo.FindByNameInOrgSpace
 	return
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiResponse errors.Error) {
 	space = repo.SummarySpace
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse errors.Error) {
 	if repo.CreateSpaceExists {
-		apiResponse = net.NewApiResponse("Space already exists", cf.SPACE_EXISTS, 400)
+		apiResponse = errors.NewError("Space already exists", cf.SPACE_EXISTS)
 		return
 	}
 	repo.CreateSpaceName = name
@@ -92,13 +92,13 @@ func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space mode
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiResponse errors.Error) {
 	repo.RenameSpaceGuid = spaceGuid
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiResponse errors.Error) {
 	repo.DeletedSpaceGuid = spaceGuid
 	return
 }

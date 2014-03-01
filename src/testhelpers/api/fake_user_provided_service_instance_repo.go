@@ -1,8 +1,8 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeUserProvidedServiceInstanceRepo struct {
@@ -13,14 +13,14 @@ type FakeUserProvidedServiceInstanceRepo struct {
 	UpdateServiceInstance models.ServiceInstanceFields
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Create(name, drainUrl string, params map[string]string) (apiResponse errors.Error) {
 	repo.CreateName = name
 	repo.CreateDrainUrl = drainUrl
 	repo.CreateParams = params
 	return
 }
 
-func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance models.ServiceInstanceFields) (apiResponse net.ApiResponse) {
+func (repo *FakeUserProvidedServiceInstanceRepo) Update(serviceInstance models.ServiceInstanceFields) (apiResponse errors.Error) {
 	repo.UpdateServiceInstance = serviceInstance
 	return
 }

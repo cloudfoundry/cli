@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"encoding/json"
@@ -10,8 +11,8 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse)
-	Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse net.ApiResponse)
+	Create(name, drainUrl string, params map[string]string) (apiResponse errors.Error)
+	Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse errors.Error)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -25,7 +26,7 @@ func NewCCUserProvidedServiceInstanceRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiResponse net.ApiResponse) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
 
 	type RequestBody struct {
@@ -43,14 +44,14 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	})
 
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
+		apiResponse = errors.NewErrorWithError("Error parsing response", err)
 		return
 	}
 
 	return repo.gateway.CreateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse net.ApiResponse) {
+func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), serviceInstanceFields.Guid)
 
 	type RequestBody struct {
@@ -61,7 +62,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	reqBody := RequestBody{serviceInstanceFields.Params, serviceInstanceFields.SysLogDrainUrl}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Error parsing response", err)
+		apiResponse = errors.NewErrorWithError("Error parsing response", err)
 		return
 	}
 

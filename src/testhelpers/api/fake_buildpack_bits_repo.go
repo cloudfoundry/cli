@@ -1,19 +1,19 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeBuildpackBitsRepository struct {
 	UploadBuildpackErr         bool
-	UploadBuildpackApiResponse net.ApiResponse
+	UploadBuildpackApiResponse errors.Error
 	UploadBuildpackPath        string
 }
 
-func (repo *FakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) net.ApiResponse {
+func (repo *FakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) errors.Error {
 	if repo.UploadBuildpackErr {
-		return net.NewApiResponseWithMessage("Invalid buildpack")
+		return errors.NewErrorWithMessage("Invalid buildpack")
 	}
 
 	repo.UploadBuildpackPath = dir

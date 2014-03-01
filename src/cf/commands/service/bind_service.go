@@ -4,8 +4,8 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	cferrors "cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -23,7 +23,7 @@ type BindService struct {
 }
 
 type ServiceBinder interface {
-	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse net.ApiResponse)
+	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse cferrors.Error)
 }
 
 func NewBindService(ui terminal.UI, config configuration.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
@@ -64,21 +64,21 @@ func (cmd *BindService) Run(c *cli.Context) {
 	)
 
 	apiResponse := cmd.BindApplication(app, serviceInstance)
-	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != AppAlreadyBoundErrorCode {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		if apiResponse.ErrorCode() == AppAlreadyBoundErrorCode {
+			cmd.ui.Ok()
+			cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
+			return
+		} else {
+			cmd.ui.Failed(apiResponse.Error())
+		}
 	}
 
 	cmd.ui.Ok()
-
-	if apiResponse.ErrorCode == AppAlreadyBoundErrorCode {
-		cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
-		return
-	}
-
 	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
 }
 
-func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse net.ApiResponse) {
+func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiResponse cferrors.Error) {
 	apiResponse = cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid)
 	return
 }

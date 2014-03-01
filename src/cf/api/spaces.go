@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -47,12 +48,12 @@ type SpaceEntity struct {
 }
 
 type SpaceRepository interface {
-	ListSpaces(func(models.Space) bool) net.ApiResponse
-	FindByName(name string) (space models.Space, apiResponse net.ApiResponse)
-	FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse)
-	Create(name string, orgGuid string) (space models.Space, apiResponse net.ApiResponse)
-	Rename(spaceGuid, newName string) (apiResponse net.ApiResponse)
-	Delete(spaceGuid string) (apiResponse net.ApiResponse)
+	ListSpaces(func(models.Space) bool) errors.Error
+	FindByName(name string) (space models.Space, apiResponse errors.Error)
+	FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse errors.Error)
+	Create(name string, orgGuid string) (space models.Space, apiResponse errors.Error)
+	Rename(spaceGuid, newName string) (apiResponse errors.Error)
+	Delete(spaceGuid string) (apiResponse errors.Error)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -66,7 +67,7 @@ func NewCloudControllerSpaceRepository(config configuration.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) net.ApiResponse {
+func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) errors.Error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -77,11 +78,11 @@ func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space
 		})
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiResponse errors.Error) {
 	return repo.FindByNameInOrg(name, repo.config.OrganizationFields().Guid)
 }
 
-func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiResponse errors.Error) {
 	foundSpace := false
 	apiResponse = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
@@ -95,31 +96,31 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 		})
 
 	if !foundSpace {
-		apiResponse = net.NewNotFoundApiResponse("Space %s not found.", name)
+		apiResponse = errors.NewNotFoundError("Space %s not found.", name)
 	}
 
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.ApiEndpoint())
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(SpaceResource)
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(body), resource)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 	space = resource.ToModel()
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.ApiEndpoint(), spaceGuid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
 }
 
-func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.ApiEndpoint(), spaceGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -31,9 +32,9 @@ type QuotaEntity struct {
 }
 
 type QuotaRepository interface {
-	FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse)
-	FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse)
-	Update(orgGuid, quotaGuid string) (apiResponse net.ApiResponse)
+	FindAll() (quotas []models.QuotaFields, apiResponse errors.Error)
+	FindByName(name string) (quota models.QuotaFields, apiResponse errors.Error)
+	Update(orgGuid, quotaGuid string) (apiResponse errors.Error)
 }
 
 type CloudControllerQuotaRepository struct {
@@ -47,11 +48,11 @@ func NewCloudControllerQuotaRepository(config configuration.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiResponse errors.Error) {
 	resources := new(PaginatedQuotaResources)
 
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -62,20 +63,20 @@ func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas 
 	return
 }
 
-func (repo CloudControllerQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.ApiEndpoint())
 	return repo.findAllWithPath(path)
 }
 
-func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/quota_definitions?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
 	quotas, apiResponse := repo.findAllWithPath(path)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	if len(quotas) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("Quota '%s' not found", name)
+		apiResponse = errors.NewNotFoundError("Quota '%s' not found", name)
 		return
 	}
 
@@ -83,7 +84,7 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 	return
 }
 
-func (repo CloudControllerQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(data))

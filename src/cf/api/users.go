@@ -3,6 +3,7 @@ package api
 import (
 	"cf"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -48,15 +49,15 @@ var spaceRoleToPathMap = map[string]string{
 }
 
 type UserRepository interface {
-	FindByUsername(username string) (user models.UserFields, apiResponse net.ApiResponse)
-	ListUsersInOrgForRole(orgGuid string, role string) ([]models.UserFields, net.ApiResponse)
-	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, net.ApiResponse)
-	Create(username, password string) (apiResponse net.ApiResponse)
-	Delete(userGuid string) (apiResponse net.ApiResponse)
-	SetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse)
-	UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse)
-	SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse net.ApiResponse)
-	UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse net.ApiResponse)
+	FindByUsername(username string) (user models.UserFields, apiResponse errors.Error)
+	ListUsersInOrgForRole(orgGuid string, role string) ([]models.UserFields, errors.Error)
+	ListUsersInSpaceForRole(spaceGuid string, role string) ([]models.UserFields, errors.Error)
+	Create(username, password string) (apiResponse errors.Error)
+	Delete(userGuid string) (apiResponse errors.Error)
+	SetOrgRole(userGuid, orgGuid, role string) (apiResponse errors.Error)
+	UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse errors.Error)
+	SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse errors.Error)
+	UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse errors.Error)
 }
 
 type CloudControllerUserRepository struct {
@@ -74,9 +75,9 @@ func NewCloudControllerUserRepository(config configuration.Reader, uaaGateway ne
 	return
 }
 
-func (repo CloudControllerUserRepository) FindByUsername(username string) (user models.UserFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) FindByUsername(username string) (user models.UserFields, apiResponse errors.Error) {
 	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -85,7 +86,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 
 	users, apiResponse := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
 	if len(users) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("User %s not found", username)
+		apiResponse = errors.NewNotFoundError("User %s not found", username)
 		return
 	}
 
@@ -93,15 +94,15 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 	return
 }
 
-func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) (users []models.UserFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) (users []models.UserFields, apiResponse errors.Error) {
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/organizations/%s/%s", orgGuid, orgRoleToPathMap[roleName]))
 }
 
-func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) (users []models.UserFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) (users []models.UserFields, apiResponse errors.Error) {
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, spaceRoleToPathMap[roleName]))
 }
 
-func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users []models.UserFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users []models.UserFields, apiResponse errors.Error) {
 	guidFilters := []string{}
 
 	apiResponse = repo.ccGateway.ListPaginatedResources(
@@ -115,12 +116,12 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 			guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, user.Guid))
 			return true
 		})
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -130,10 +131,10 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 	return
 }
 
-func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers []models.UserFields, path string) (updatedUsers []models.UserFields, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers []models.UserFields, path string) (updatedUsers []models.UserFields, apiResponse errors.Error) {
 	uaaResponse := new(UAAUserResources)
 	apiResponse = repo.uaaGateway.GetResource(path, repo.config.AccessToken(), uaaResponse)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -156,9 +157,9 @@ func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers [
 	return
 }
 
-func (repo CloudControllerUserRepository) Create(username, password string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) Create(username, password string) (apiResponse errors.Error) {
 	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -176,7 +177,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (api
 		username,
 	)
 	request, apiResponse := repo.uaaGateway.NewRequest("POST", path, repo.config.AccessToken(), strings.NewReader(body))
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -186,7 +187,7 @@ func (repo CloudControllerUserRepository) Create(username, password string) (api
 	createUserResponse := &uaaUserFields{}
 
 	_, apiResponse = repo.uaaGateway.PerformRequestForJSONResponse(request, createUserResponse)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -195,16 +196,16 @@ func (repo CloudControllerUserRepository) Create(username, password string) (api
 	return repo.ccGateway.CreateResource(path, repo.config.AccessToken(), strings.NewReader(body))
 }
 
-func (repo CloudControllerUserRepository) Delete(userGuid string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) Delete(userGuid string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/users/%s", repo.config.ApiEndpoint(), userGuid)
 
 	apiResponse = repo.ccGateway.DeleteResource(path, repo.config.AccessToken())
-	if apiResponse.IsNotSuccessful() && apiResponse.ErrorCode != cf.USER_NOT_FOUND {
+	if apiResponse != nil && apiResponse.ErrorCode() != cf.USER_NOT_FOUND {
 		return
 	}
 
 	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -212,74 +213,74 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiResponse n
 	return repo.uaaGateway.DeleteResource(path, repo.config.AccessToken())
 }
 
-func (repo CloudControllerUserRepository) SetOrgRole(userGuid string, orgGuid string, role string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) SetOrgRole(userGuid string, orgGuid string, role string) (apiResponse errors.Error) {
 	apiResponse = repo.setOrUnsetOrgRole("PUT", userGuid, orgGuid, role)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 	return repo.addOrgUserRole(userGuid, orgGuid)
 }
 
-func (repo CloudControllerUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse errors.Error) {
 	return repo.setOrUnsetOrgRole("DELETE", userGuid, orgGuid, role)
 }
 
-func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb, userGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb, userGuid, orgGuid, role string) (apiResponse errors.Error) {
 	rolePath, found := orgRoleToPathMap[role]
 
 	if !found {
-		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
+		apiResponse = errors.NewErrorWithMessage("Invalid Role %s", role)
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/organizations/%s/%s/%s", repo.config.ApiEndpoint(), orgGuid, rolePath, userGuid)
 
 	request, apiResponse := repo.ccGateway.NewRequest(verb, path, repo.config.AccessToken(), nil)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	apiResponse = repo.ccGateway.PerformRequest(request)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 	return
 }
 
-func (repo CloudControllerUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse errors.Error) {
 	rolePath, apiResponse := repo.checkSpaceRole(userGuid, spaceGuid, role)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	apiResponse = repo.addOrgUserRole(userGuid, orgGuid)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	return repo.ccGateway.UpdateResource(rolePath, repo.config.AccessToken(), nil)
 }
 
-func (repo CloudControllerUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse errors.Error) {
 	rolePath, apiResponse := repo.checkSpaceRole(userGuid, spaceGuid, role)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 	return repo.ccGateway.DeleteResource(rolePath, repo.config.AccessToken())
 }
 
-func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, role string) (fullPath string, apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) checkSpaceRole(userGuid, spaceGuid, role string) (fullPath string, apiResponse errors.Error) {
 	rolePath, found := spaceRoleToPathMap[role]
 
 	if !found {
-		apiResponse = net.NewApiResponseWithMessage("Invalid Role %s", role)
+		apiResponse = errors.NewErrorWithMessage("Invalid Role %s", role)
 	}
 
 	fullPath = fmt.Sprintf("%s/v2/spaces/%s/%s/%s", repo.config.ApiEndpoint(), spaceGuid, rolePath, userGuid)
 	return
 }
 
-func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s/users/%s", repo.config.ApiEndpoint(), orgGuid, userGuid)
 	return repo.ccGateway.UpdateResource(path, repo.config.AccessToken(), nil)
 }

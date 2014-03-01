@@ -3,8 +3,8 @@ package service
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -33,7 +33,7 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	var (
 		serviceOfferings models.ServiceOfferings
-		apiResponse      net.ApiResponse
+		apiResponse      errors.Error
 	)
 
 	if cmd.config.HasSpace() {
@@ -50,8 +50,8 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 		cmd.ui.Failed("Cannot list marketplace services without a targetted space")
 	}
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

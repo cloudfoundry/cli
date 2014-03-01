@@ -35,14 +35,14 @@ func (cmd ListOrgs) Run(c *cli.Context) {
 	noOrgs := true
 	table := cmd.ui.Table([]string{"name"})
 
-	apiStatus := cmd.orgRepo.ListOrgs(func(org models.Organization) bool {
+	apiResponse := cmd.orgRepo.ListOrgs(func(org models.Organization) bool {
 		table.Print([][]string{{org.Name}})
 		noOrgs = false
 		return true
 	})
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching orgs.\n%s", apiStatus.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Failed fetching orgs.\n%s", apiResponse)
 		return
 	}
 

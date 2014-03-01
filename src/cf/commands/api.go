@@ -53,8 +53,8 @@ func (cmd Api) SetApiEndpoint(endpoint string) {
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
 	endpoint, apiResponse := cmd.endpointRepo.UpdateEndpoint(endpoint)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

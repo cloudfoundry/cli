@@ -3,8 +3,8 @@ package buildpack
 import (
 	"cf"
 	"cf/api"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -42,13 +42,13 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	cmd.ui.Say("Creating buildpack %s...", terminal.EntityNameColor(buildpackName))
 
 	buildpack, apiResponse := cmd.createBuildpack(buildpackName, c)
-	if apiResponse.IsNotSuccessful() {
-		if apiResponse.ErrorCode == cf.BUILDPACK_EXISTS {
+	if apiResponse != nil {
+		if apiResponse.ErrorCode() == cf.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
 			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" update-buildpack"))
 		} else {
-			cmd.ui.Failed(apiResponse.Message)
+			cmd.ui.Failed(apiResponse.Error())
 		}
 		return
 	}
@@ -60,25 +60,25 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	dir := c.Args()[1]
 
 	apiResponse = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
 	cmd.ui.Ok()
 }
 
-func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiResponse net.ApiResponse) {
+func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiResponse errors.Error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiResponse = net.NewApiResponseWithMessage("Invalid position. %s", err.Error())
+		apiResponse = errors.NewErrorWithMessage("Invalid position. %s", err.Error())
 		return
 	}
 
 	enabled := c.Bool("enable")
 	disabled := c.Bool("disable")
 	if enabled && disabled {
-		apiResponse = net.NewApiResponseWithMessage("Cannot specify both enabled and disabled.")
+		apiResponse = errors.NewErrorWithMessage("Cannot specify both enabled and disabled.")
 		return
 	}
 

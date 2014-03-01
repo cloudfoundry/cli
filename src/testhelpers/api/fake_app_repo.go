@@ -1,8 +1,8 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeApplicationRepository struct {
@@ -24,18 +24,18 @@ type FakeApplicationRepository struct {
 	DeletedAppGuid string
 }
 
-func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiResponse errors.Error) {
 	repo.ReadName = name
 	app = repo.ReadApp
 
 	if repo.ReadErr {
-		apiResponse = net.NewApiResponseWithMessage("Error finding app by name.")
+		apiResponse = errors.NewErrorWithMessage("Error finding app by name.")
 	}
 	if repo.ReadAuthErr {
-		apiResponse = net.NewApiResponse("Authentication failed.", "1000", 401)
+		apiResponse = errors.NewHttpError(401, "", "", "1000", "Authentication failed.")
 	}
 	if repo.ReadNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "App", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "App", name)
 	}
 
 	return
@@ -48,7 +48,7 @@ func (repo *FakeApplicationRepository) CreatedAppParams() (params models.AppPara
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiResponse errors.Error) {
 	if repo.CreateAppParams == nil {
 		repo.CreateAppParams = []models.AppParams{}
 	}
@@ -85,17 +85,17 @@ func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultAp
 	return
 }
 
-func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse errors.Error) {
 	repo.UpdateAppGuid = appGuid
 	repo.UpdateParams = params
 	updatedApp = repo.UpdateAppResult
 	if repo.UpdateErr {
-		apiResponse = net.NewApiResponseWithMessage("Error updating app.")
+		apiResponse = errors.NewErrorWithMessage("Error updating app.")
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) Delete(appGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeApplicationRepository) Delete(appGuid string) (apiResponse errors.Error) {
 	repo.DeletedAppGuid = appGuid
 	return
 }

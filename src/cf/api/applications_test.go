@@ -21,7 +21,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			app, apiResponse := repo.Read("My App")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(app.Name).To(Equal("My App"))
 			Expect(app.Guid).To(Equal("app1-guid"))
 			Expect(app.Memory).To(Equal(uint64(128)))
@@ -42,7 +42,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			_, apiResponse := repo.Read("My App")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsError()).To(BeFalse())
 			Expect(apiResponse.IsNotFound()).To(BeTrue())
 		})
 	})
@@ -56,7 +55,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			createdApp, apiResponse := repo.Create(params)
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 
 			app := models.Application{}
 			app.Name = "my-cool-app"
@@ -82,7 +81,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			_, apiResponse := repo.Create(params)
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(apiResponse).NotTo(HaveOccurred())
 		})
 	})
 
@@ -106,7 +105,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			updatedApp, apiResponse := repo.Update(app.Guid, app.ToParams())
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
 			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
 		})
@@ -128,7 +127,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			_, apiResponse := repo.Update("app1-guid", params)
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+			Expect(apiResponse).NotTo(HaveOccurred())
 		})
 	})
 
@@ -144,7 +143,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Delete("my-cool-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 

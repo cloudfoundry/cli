@@ -55,20 +55,20 @@ func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 
 	broker, apiResponse := cmd.repo.FindByName(brokerName)
 
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Broker %s does not exist.", brokerName)
 		return
 	}
 
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
+		return
+	}
+
 	apiResponse = cmd.repo.Delete(broker.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

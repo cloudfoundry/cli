@@ -35,8 +35,8 @@ func (cmd *ListQuotas) Run(c *cli.Context) {
 
 	quotas, apiResponse := cmd.quotaRepo.FindAll()
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 	cmd.ui.Ok()
