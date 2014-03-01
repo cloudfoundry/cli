@@ -43,7 +43,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestCreateServiceBindingIfError", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/service_bindings",
@@ -65,7 +64,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestDeleteServiceBinding", func() {
-
 		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{deleteBindingReq})
 		defer ts.Close()
 
@@ -88,7 +86,6 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestDeleteServiceBindingWhenBindingDoesNotExist", func() {
-
 		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{})
 		defer ts.Close()
 

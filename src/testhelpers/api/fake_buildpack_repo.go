@@ -28,7 +28,7 @@ func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bo
 	for _, b := range repo.Buildpacks {
 		cb(b)
 	}
-	return errors.NewErrorWithStatusCode(200)
+	return nil
 }
 
 func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse errors.Error) {
@@ -44,7 +44,7 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.B
 
 func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse errors.Error) {
 	if repo.CreateBuildpackExists {
-		return repo.CreateBuildpack, errors.NewError("Buildpack already exists", cf.BUILDPACK_EXISTS, 400)
+		return repo.CreateBuildpack, errors.NewError("Buildpack already exists", cf.BUILDPACK_EXISTS)
 	}
 
 	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}

@@ -3,7 +3,6 @@ package api
 import (
 	"cf/errors"
 	"cf/models"
-	"net/http"
 	"time"
 )
 
@@ -26,7 +25,7 @@ func (repo *FakeAppInstancesRepo) GetInstances(appGuid string) (instances []mode
 		errorCode := repo.GetInstancesErrorCodes[0]
 		repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
 		if errorCode != "" {
-			apiResponse = errors.NewError("Error staging app", errorCode, http.StatusBadRequest)
+			apiResponse = errors.NewError("Error staging app", errorCode)
 		}
 	}
 

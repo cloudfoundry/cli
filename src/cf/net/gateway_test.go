@@ -21,10 +21,12 @@ import (
 )
 
 var _ = Describe("Gateway", func() {
-	var ccGateway Gateway
-	var uaaGateway Gateway
-	var config configuration.ReadWriter
-	var authRepo api.AuthenticationRepository
+	var (
+		ccGateway  Gateway
+		uaaGateway Gateway
+		config     configuration.ReadWriter
+		authRepo   api.AuthenticationRepository
+	)
 
 	BeforeEach(func() {
 		ccGateway = NewCloudControllerGateway()
@@ -94,12 +96,14 @@ var _ = Describe("Gateway", func() {
 	})
 
 	Describe("when uploading a file", func() {
-		var err error
-		var request *Request
-		var apiResponse errors.Error
-		var apiServer *httptest.Server
-		var authServer *httptest.Server
-		var fileToUpload *os.File
+		var (
+			err          error
+			request      *Request
+			apiResponse  errors.Error
+			apiServer    *httptest.Server
+			authServer   *httptest.Server
+			fileToUpload *os.File
+		)
 
 		BeforeEach(func() {
 			apiServer = httptest.NewTLSServer(refreshTokenApiEndPoint(
@@ -139,7 +143,7 @@ var _ = Describe("Gateway", func() {
 		Describe("when the access token expires during the upload", func() {
 			It("successfully re-sends the file on the second request", func() {
 				apiResponse = ccGateway.PerformRequest(request)
-				Expect(apiResponse.Error()).To(BeEmpty())
+				Expect(apiResponse).NotTo(HaveOccurred())
 			})
 		})
 	})

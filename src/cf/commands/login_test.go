@@ -15,7 +15,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("Login Command", func() {
 	var (
 		Flags        []string
 		Config       configuration.ReadWriter

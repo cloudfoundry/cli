@@ -2,10 +2,9 @@ package api_test
 
 import (
 	. "cf/api"
-	cferrors "cf/errors"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
-	"errors"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -76,7 +75,9 @@ var _ = Describe("UserRepository", func() {
 			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.StatusCode()).To(Equal(http.StatusGatewayTimeout))
+			httpErr, ok := apiResponse.(errors.HttpError)
+			Expect(ok).To(BeTrue())
+			Expect(httpErr.StatusCode()).To(Equal(http.StatusGatewayTimeout))
 		})
 
 		It("returns an error when the UAA endpoint cannot be determined", func() {
@@ -90,7 +91,7 @@ var _ = Describe("UserRepository", func() {
 			ccGateway := net.NewCloudControllerGateway()
 			uaaGateway := net.NewUAAGateway()
 			endpointRepo := &testapi.FakeEndpointRepo{}
-			endpointRepo.UAAEndpointReturns.ApiResponse = cferrors.NewErrorWithError("Failed to get endpoint!", errors.New("Failed!"))
+			endpointRepo.UAAEndpointReturns.ApiResponse = errors.NewErrorWithError("Failed to get endpoint!", errors.New("Failed!"))
 
 			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
 

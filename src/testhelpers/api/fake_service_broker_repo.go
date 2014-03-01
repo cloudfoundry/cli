@@ -45,7 +45,7 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker model
 	if repo.ListErr {
 		return errors.NewErrorWithMessage("Error finding service brokers")
 	} else {
-		return errors.NewErrorWithStatusCode(200)
+		return nil
 	}
 }
 

@@ -64,17 +64,17 @@ func (cmd *BindService) Run(c *cli.Context) {
 	)
 
 	apiResponse := cmd.BindApplication(app, serviceInstance)
-	if apiResponse != nil && apiResponse.ErrorCode() != AppAlreadyBoundErrorCode {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiResponse != nil {
+		if apiResponse.ErrorCode() == AppAlreadyBoundErrorCode {
+			cmd.ui.Ok()
+			cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
+			return
+		} else {
+			cmd.ui.Failed(apiResponse.Error())
+		}
 	}
 
 	cmd.ui.Ok()
-
-	if apiResponse.ErrorCode() == AppAlreadyBoundErrorCode {
-		cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
-		return
-	}
-
 	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
 }
 

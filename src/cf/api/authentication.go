@@ -14,7 +14,7 @@ import (
 
 type AuthenticationRepository interface {
 	Authenticate(credentials map[string]string) (apiResponse errors.Error)
-	RefreshAuthToken() (updatedToken string, apiResponse errors.HttpError)
+	RefreshAuthToken() (updatedToken string, apiResponse errors.Error)
 	GetLoginPrompts() (map[string]configuration.AuthPrompt, errors.Error)
 }
 
@@ -39,13 +39,13 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	}
 
 	apiResponse = uaa.getAuthToken(data)
-	if apiResponse != nil && apiResponse.StatusCode() == 401 {
-		apiResponse = errors.NewErrorWithMessage("Password is incorrect, please try again.")
-	} else if apiResponse == nil {
-		println("NIL")
-	} else {
-		println("status code", apiResponse.StatusCode())
+	switch response := apiResponse.(type) {
+	case errors.HttpError:
+		if response.StatusCode() == 401 {
+			apiResponse = errors.NewErrorWithMessage("Password is incorrect, please try again.")
+		}
 	}
+
 	return
 }
 
@@ -77,7 +77,7 @@ func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]con
 	return
 }
 
-func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.HttpError) {
+func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.Error) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
@@ -95,7 +95,7 @@ func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, 
 	return
 }
 
-func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (httpError errors.HttpError) {
+func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) errors.Error {
 	type uaaErrorResponse struct {
 		Code        string `json:"error"`
 		Description string `json:"error_description"`
@@ -109,28 +109,29 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) (httpError 
 	}
 
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint())
-	request, apiResponse := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
-	if apiResponse != nil {
-		httpError = errors.NewHTTPErrorWithError("Failed to start oauth request", apiResponse)
-		return
+	request, err := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
+	if err != nil {
+		return errors.NewErrorWithError("Failed to start oauth request", err)
 	}
 	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := new(AuthenticationResponse)
-	_, apiResponse = uaa.gateway.PerformRequestForJSONResponse(request, &response)
+	_, err = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
-	if apiResponse != nil {
-		httpError = errors.NewHTTPErrorWithError("auth request failed", apiResponse)
-		return
+	switch typedErr := err.(type) {
+	case nil:
+	case errors.HttpError:
+		return typedErr
+	default:
+		return errors.NewErrorWithError("auth request failed", typedErr)
 	}
 
 	if response.Error.Code != "" {
-		apiResponse = errors.NewErrorWithMessage("Authentication Server error: %s", response.Error.Description)
-		return
+		return errors.NewError("Authentication Server error: "+response.Error.Description, response.Error.Code)
 	}
 
 	uaa.config.SetAccessToken(fmt.Sprintf("%s %s", response.TokenType, response.AccessToken))
 	uaa.config.SetRefreshToken(response.RefreshToken)
 
-	return
+	return nil
 }
