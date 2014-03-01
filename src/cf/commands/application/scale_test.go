@@ -105,6 +105,13 @@ var _ = Describe("Testing with ginkgo", func() {
 			})
 		})
 
+		Context("when the user provides the -f flag", func() {
+			It("does not prompt the user", func() {
+				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-f", "-i", "5", "-m", "512M", "-k", "2G", "my-app"}), reqFactory)
+				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
+			})
+		})
+
 		Context("when the user confirms they want to restart", func() {
 			BeforeEach(func() {
 				ui.Inputs = []string{"yes"}

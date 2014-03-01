@@ -592,6 +592,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewIntFlagWithValue("i", "Number of instances", -1),
 				NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
+				cli.BoolFlag{Name: "f", Usage: ""},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("scale", c)
