@@ -54,8 +54,8 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 	org := cmd.orgReq.GetOrganization()
 
 	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 	}
 
 	cmd.ui.Say("Getting users in org %s / space %s as %s",
@@ -76,8 +76,8 @@ func (cmd *SpaceUsers) Run(c *cli.Context) {
 			cmd.ui.Say("  %s", user.Username)
 		}
 
-		if apiResponse.IsNotSuccessful() {
-			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiResponse.Message, displayName)
+		if apiResponse != nil {
+			cmd.ui.Failed("Failed fetching space-users for role %s.\n%s", apiResponse.Error(), displayName)
 			return
 		}
 	}

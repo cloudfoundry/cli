@@ -52,8 +52,8 @@ func (cmd *Curl) Run(c *cli.Context) {
 	}
 
 	respHeader, respBody, apiResponse := cmd.curlRepo.Request(method, path, reqHeader, body)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Error creating request:\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Error creating request:\n%s", apiResponse.Error())
 		return
 	}
 

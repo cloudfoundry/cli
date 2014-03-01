@@ -32,14 +32,14 @@ func (cmd ListServiceBrokers) Run(c *cli.Context) {
 
 	table := cmd.ui.Table([]string{"name", "url"})
 	foundBrokers := false
-	apiStatus := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
+	apiResponse := cmd.repo.ListServiceBrokers(func(serviceBroker models.ServiceBroker) bool {
 		table.Print([][]string{{serviceBroker.Name, serviceBroker.Url}})
 		foundBrokers = true
 		return true
 	})
 
-	if apiStatus.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching service brokers.\n%s", apiStatus.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Failed fetching service brokers.\n%s", apiResponse)
 		return
 	}
 

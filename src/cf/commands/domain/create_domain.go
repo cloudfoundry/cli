@@ -50,8 +50,8 @@ func (cmd *CreateDomain) Run(c *cli.Context) {
 	)
 
 	_, apiResponse := cmd.domainRepo.Create(domainName, owningOrg.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

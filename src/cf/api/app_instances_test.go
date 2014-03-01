@@ -15,7 +15,7 @@ import (
 )
 
 var _ = Describe("AppInstancesRepo", func() {
-	It("TestAppInstancesGetInstances", func() {
+	It("returns instances of the app, given a guid", func() {
 		ts, handler, repo := createAppInstancesRepo([]testnet.TestRequest{
 			appInstancesRequest,
 			appStatsRequest,
@@ -24,8 +24,8 @@ var _ = Describe("AppInstancesRepo", func() {
 		appGuid := "my-cool-app-guid"
 
 		instances, err := repo.GetInstances(appGuid)
+		Expect(err).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(err.IsNotSuccessful()).To(BeFalse())
 
 		Expect(len(instances)).To(Equal(2))
 

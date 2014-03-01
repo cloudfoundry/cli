@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -74,7 +75,7 @@ type ServiceOfferingSummary struct {
 }
 
 type ServiceSummaryRepository interface {
-	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse net.ApiResponse)
+	GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse errors.Error)
 }
 
 type CloudControllerServiceSummaryRepository struct {
@@ -88,12 +89,12 @@ func NewCloudControllerServiceSummaryRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse net.ApiResponse) {
+func (repo CloudControllerServiceSummaryRepository) GetSummariesInCurrentSpace() (instances []models.ServiceInstance, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
 	resource := new(ServiceInstancesSummaries)
 
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resource)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 

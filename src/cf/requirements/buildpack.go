@@ -2,8 +2,8 @@ package requirements
 
 import (
 	"cf/api"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/terminal"
 )
 
@@ -28,11 +28,11 @@ func NewBuildpackRequirement(name string, ui terminal.UI, bR api.BuildpackReposi
 }
 
 func (req *buildpackApiRequirement) Execute() (success bool) {
-	var apiResponse net.ApiResponse
+	var apiResponse errors.Error
 	req.buildpack, apiResponse = req.buildpackRepo.FindByName(req.name)
 
-	if apiResponse.IsNotSuccessful() {
-		req.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		req.ui.Failed(apiResponse.Error())
 		return false
 	}
 

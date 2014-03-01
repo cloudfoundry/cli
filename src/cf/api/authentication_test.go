@@ -40,7 +40,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(config.AuthorizationEndpoint()).To(Equal(ts.URL))
 		Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
 		Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -56,8 +56,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(Equal("Password is incorrect, please try again."))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.Error()).To(Equal("Password is incorrect, please try again."))
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
@@ -71,8 +71,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeTrue())
-		Expect(apiResponse.Message).To(Equal("Server error, status code: 500, error code: , message: "))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(Equal("Server error, status code: 500, error code: , message: "))
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
@@ -86,8 +86,8 @@ var _ = Describe("AuthenticationRepository", func() {
 		})
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeTrue())
-		Expect(apiResponse.Message).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
+		Expect(apiResponse).To(HaveOccurred())
+		Expect(apiResponse.Error()).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
@@ -96,7 +96,7 @@ var _ = Describe("AuthenticationRepository", func() {
 		auth := NewUAAAuthenticationRepository(gateway, config)
 
 		prompts, apiResponse := auth.GetLoginPrompts()
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(prompts).To(Equal(map[string]configuration.AuthPrompt{
 			"username": configuration.AuthPrompt{
 				DisplayName: "Email",
@@ -115,7 +115,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		prompts, apiResponse := auth.GetLoginPrompts()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeTrue())
+		Expect(apiResponse).To(HaveOccurred())
 		Expect(prompts).To(BeEmpty())
 	})
 })

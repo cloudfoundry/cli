@@ -56,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(orgs[0].Guid).To(Equal("org1-guid"))
 		Expect(orgs[1].Guid).To(Equal("org2-guid"))
 		Expect(orgs[2].Guid).To(Equal("org3-guid"))
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -77,7 +77,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		Expect(wasCalled).To(BeFalse())
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -115,7 +115,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		org, apiResponse := repo.FindByName("Org1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		Expect(org.Name).To(Equal(existingOrg.Name))
 		Expect(org.Guid).To(Equal(existingOrg.Guid))
@@ -141,7 +141,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		_, apiResponse := repo.FindByName("org1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsError()).To(BeFalse())
+
 		Expect(apiResponse.IsNotFound()).To(BeTrue())
 	})
 
@@ -158,7 +158,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Create("my-org")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestRenameOrganization", func() {
@@ -174,7 +174,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Rename("my-org-guid", "my-new-org")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteOrganization", func() {
@@ -189,7 +189,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Delete("my-org-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 

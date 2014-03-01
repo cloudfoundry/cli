@@ -1,8 +1,8 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeServiceBrokerRepo struct {
@@ -24,18 +24,18 @@ type FakeServiceBrokerRepo struct {
 	ListErr        bool
 }
 
-func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiResponse errors.Error) {
 	repo.FindByNameName = name
 	serviceBroker = repo.FindByNameServiceBroker
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Service Broker", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "Service Broker", name)
 	}
 
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker models.ServiceBroker) bool) net.ApiResponse {
+func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker models.ServiceBroker) bool) errors.Error {
 	for _, broker := range repo.ServiceBrokers {
 		if !callback(broker) {
 			break
@@ -43,13 +43,13 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker model
 	}
 
 	if repo.ListErr {
-		return net.NewApiResponseWithMessage("Error finding service brokers")
+		return errors.NewErrorWithMessage("Error finding service brokers")
 	} else {
-		return net.NewApiResponseWithStatusCode(200)
+		return nil
 	}
 }
 
-func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiResponse errors.Error) {
 	repo.CreateName = name
 	repo.CreateUrl = url
 	repo.CreateUsername = username
@@ -57,18 +57,18 @@ func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) 
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiResponse errors.Error) {
 	repo.UpdatedServiceBroker = serviceBroker
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiResponse errors.Error) {
 	repo.RenamedServiceBrokerGuid = guid
 	repo.RenamedServiceBrokerName = name
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiResponse net.ApiResponse) {
+func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiResponse errors.Error) {
 	repo.DeletedServiceBrokerGuid = guid
 	return
 }

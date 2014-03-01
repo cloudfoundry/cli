@@ -49,8 +49,8 @@ func (cmd *RenameOrg) Run(c *cli.Context) {
 	)
 
 	apiResponse := cmd.orgRepo.Rename(org.Guid, newName)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 	cmd.ui.Ok()

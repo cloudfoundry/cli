@@ -3,6 +3,7 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
 	"github.com/codegangsta/cli"
@@ -41,17 +42,19 @@ func (cmd Password) Run(c *cli.Context) {
 	cmd.ui.Say("Changing password...")
 	apiResponse := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
-	if apiResponse.IsNotSuccessful() {
-		if apiResponse.StatusCode == 401 {
+	switch typedErr := apiResponse.(type) {
+	case nil:
+	case errors.HttpError:
+		if typedErr.StatusCode() == 401 {
 			cmd.ui.Failed("Current password did not match")
 		} else {
-			cmd.ui.Failed(apiResponse.Message)
+			cmd.ui.Failed(apiResponse.Error())
 		}
-		return
+	default:
+		cmd.ui.Failed(apiResponse.Error())
 	}
 
 	cmd.ui.Ok()
-
 	cmd.config.ClearSession()
 	cmd.ui.Say("Please log in again")
 }

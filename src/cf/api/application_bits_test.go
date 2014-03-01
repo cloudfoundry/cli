@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"cf"
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -38,8 +39,8 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
 		apiResponse := repo.UploadApp("app-guid", "/foo/bar", func(path string, uploadSize, fileCount uint64) {})
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring(filepath.Join("foo", "bar")))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.Error()).To(ContainSubstring(filepath.Join("foo", "bar")))
 	})
 
 	Context("uploading a directory", func() {
@@ -57,7 +58,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 		It("preserves the executable bits when uploading app files", func() {
 			_, apiResponse := testUploadApp(appPath, defaultRequests)
-			Expect(apiResponse.IsSuccessful()).To(BeTrue())
+			Expect(apiResponse).NotTo(HaveOccurred())
 		})
 
 		It("returns a failure when uploading bits fails", func() {
@@ -68,18 +69,18 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 				createProgressEndpoint("failed"),
 			}
 			_, apiResponse := testUploadApp(appPath, requests)
-			Expect(apiResponse.IsSuccessful()).To(BeFalse())
+			Expect(apiResponse).To(HaveOccurred())
 		})
 	})
 
 	It("uploads zip files", func() {
 		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.zip"), defaultRequests)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("uploads zip files with non-standard names", func() {
 		_, apiResponse := testUploadApp(filepath.Join(fixturesDir, "example-app.azip"), defaultRequests)
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 })
 
@@ -248,7 +249,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	return
 }
 
-func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiResponse net.ApiResponse) {
+func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiResponse errors.Error) {
 	ts, handler := testnet.NewServer(requests)
 	defer ts.Close()
 

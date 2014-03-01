@@ -2,8 +2,8 @@ package api
 
 import (
 	"cf"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeUserRepository struct {
@@ -39,58 +39,58 @@ type FakeUserRepository struct {
 	UnsetSpaceRoleRole      string
 }
 
-func (repo *FakeUserRepository) FindByUsername(username string) (user models.UserFields, apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) FindByUsername(username string) (user models.UserFields, apiResponse errors.Error) {
 	repo.FindByUsernameUsername = username
 	user = repo.FindByUsernameUserFields
 
 	if repo.FindByUsernameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("User not found")
+		apiResponse = errors.NewNotFoundError("User not found")
 	}
 
 	return
 }
 
-func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, net.ApiResponse) {
+func (repo *FakeUserRepository) ListUsersInOrgForRole(orgGuid string, roleName string) ([]models.UserFields, errors.Error) {
 	repo.ListUsersOrganizationGuid = orgGuid
-	return repo.ListUsersByRole[roleName], net.NewApiResponseWithStatusCode(200)
+	return repo.ListUsersByRole[roleName], nil
 }
 
-func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) ([]models.UserFields, net.ApiResponse) {
+func (repo *FakeUserRepository) ListUsersInSpaceForRole(spaceGuid string, roleName string) ([]models.UserFields, errors.Error) {
 	repo.ListUsersSpaceGuid = spaceGuid
-	return repo.ListUsersByRole[roleName], net.NewApiResponseWithStatusCode(200)
+	return repo.ListUsersByRole[roleName], nil
 }
 
-func (repo *FakeUserRepository) Create(username, password string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) Create(username, password string) (apiResponse errors.Error) {
 	repo.CreateUserUsername = username
 	repo.CreateUserPassword = password
 
 	if repo.CreateUserExists {
-		apiResponse = net.NewApiResponse("User already exists", cf.USER_EXISTS, 400)
+		apiResponse = errors.NewError("User already exists", cf.USER_EXISTS)
 	}
 
 	return
 }
 
-func (repo *FakeUserRepository) Delete(userGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) Delete(userGuid string) (apiResponse errors.Error) {
 	repo.DeleteUserGuid = userGuid
 	return
 }
 
-func (repo *FakeUserRepository) SetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) SetOrgRole(userGuid, orgGuid, role string) (apiResponse errors.Error) {
 	repo.SetOrgRoleUserGuid = userGuid
 	repo.SetOrgRoleOrganizationGuid = orgGuid
 	repo.SetOrgRoleRole = role
 	return
 }
 
-func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) UnsetOrgRole(userGuid, orgGuid, role string) (apiResponse errors.Error) {
 	repo.UnsetOrgRoleUserGuid = userGuid
 	repo.UnsetOrgRoleOrganizationGuid = orgGuid
 	repo.UnsetOrgRoleRole = role
 	return
 }
 
-func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role string) (apiResponse errors.Error) {
 	repo.SetSpaceRoleUserGuid = userGuid
 	repo.SetSpaceRoleOrgGuid = orgGuid
 	repo.SetSpaceRoleSpaceGuid = spaceGuid
@@ -98,7 +98,7 @@ func (repo *FakeUserRepository) SetSpaceRole(userGuid, spaceGuid, orgGuid, role 
 	return
 }
 
-func (repo *FakeUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse net.ApiResponse) {
+func (repo *FakeUserRepository) UnsetSpaceRole(userGuid, spaceGuid, role string) (apiResponse errors.Error) {
 	repo.UnsetSpaceRoleUserGuid = userGuid
 	repo.UnsetSpaceRoleSpaceGuid = spaceGuid
 	repo.UnsetSpaceRoleRole = role

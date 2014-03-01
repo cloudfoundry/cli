@@ -39,11 +39,10 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 	})
 
 	It("TestCreateServiceBindingIfError", func() {
-
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "POST",
 			Path:    "/v2/service_bindings",
@@ -60,12 +59,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		apiResponse := repo.Create("my-service-instance-guid", "my-app-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.ErrorCode).To(Equal("90003"))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.ErrorCode()).To(Equal("90003"))
 	})
 
 	It("TestDeleteServiceBinding", func() {
-
 		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{deleteBindingReq})
 		defer ts.Close()
 
@@ -83,12 +81,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(found).To(BeTrue())
 	})
 
 	It("TestDeleteServiceBindingWhenBindingDoesNotExist", func() {
-
 		ts, handler, repo := createServiceBindingRepo([]testnet.TestRequest{})
 		defer ts.Close()
 
@@ -98,7 +95,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		found, apiResponse := repo.Delete(serviceInstance, "app-2-guid")
 
 		Expect(handler.CallCount).To(Equal(0))
-		Expect(apiResponse.IsNotSuccessful()).To(BeFalse())
+		Expect(apiResponse).NotTo(HaveOccurred())
 		Expect(found).To(BeFalse())
 	})
 })

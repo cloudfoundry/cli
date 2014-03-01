@@ -1,8 +1,8 @@
 package commands
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeRouteCreator struct {
@@ -12,7 +12,7 @@ type FakeRouteCreator struct {
 	ReservedRoute           models.Route
 }
 
-func (cmd *FakeRouteCreator) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (reservedRoute models.Route, apiResponse net.ApiResponse) {
+func (cmd *FakeRouteCreator) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (reservedRoute models.Route, apiResponse errors.Error) {
 	cmd.CreateRouteHostname = hostName
 	cmd.CreateRouteDomainFields = domain
 	cmd.CreateRouteSpaceFields = space

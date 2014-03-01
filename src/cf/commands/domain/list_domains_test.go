@@ -3,8 +3,8 @@ package domain_test
 import (
 	"cf/commands/domain"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -15,7 +15,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("domains command", func() {
 	It("TestListDomainsRequirements", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
@@ -100,7 +100,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: net.NewApiResponseWithMessage("borked!"),
+			ListSharedDomainsApiResponse: errors.NewErrorWithMessage("borked!"),
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
@@ -123,7 +123,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		domain.Name = "ze-domain"
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: net.NewNotFoundApiResponse("whoops! misplaced yr domainz"),
+			ListSharedDomainsApiResponse: errors.NewNotFoundError("whoops! misplaced yr domainz"),
 			ListDomainsForOrgDomains:     []models.DomainFields{domain},
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
@@ -142,7 +142,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListDomainsForOrgApiResponse: net.NewApiResponseWithMessage("borked!"),
+			ListDomainsForOrgApiResponse: errors.NewErrorWithMessage("borked!"),
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 

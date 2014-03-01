@@ -3,8 +3,8 @@ package route
 import (
 	"cf/api"
 	"cf/configuration"
+	cferrors "cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -12,7 +12,7 @@ import (
 )
 
 type RouteCreator interface {
-	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse net.ApiResponse)
+	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse cferrors.Error)
 }
 
 type CreateRoute struct {
@@ -60,13 +60,13 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 
 	_, apiResponse := cmd.CreateRoute(hostName, domain, space.SpaceFields)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse net.ApiResponse) {
+func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiResponse cferrors.Error) {
 	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
 		terminal.EntityNameColor(domain.UrlForHost(hostName)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -75,17 +75,17 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields,
 	)
 
 	route, apiResponse = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
-	if apiResponse.IsNotSuccessful() {
-		var findApiResponse net.ApiResponse
+	if apiResponse != nil {
+		var findApiResponse cferrors.Error
 		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 
-		if findApiResponse.IsNotSuccessful() ||
+		if findApiResponse != nil ||
 			route.Space.Guid != space.Guid ||
 			route.Domain.Guid != domain.Guid {
 			return
 		}
 
-		apiResponse = net.NewSuccessfulApiResponse()
+		apiResponse = nil
 		cmd.ui.Ok()
 		cmd.ui.Warn("Route %s already exists", route.URL())
 		return

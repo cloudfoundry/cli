@@ -1,8 +1,8 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeQuotaRepository struct {
@@ -17,27 +17,27 @@ type FakeQuotaRepository struct {
 	UpdateQuotaGuid string
 }
 
-func (repo *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse net.ApiResponse) {
+func (repo *FakeQuotaRepository) FindAll() (quotas []models.QuotaFields, apiResponse errors.Error) {
 	quotas = repo.FindAllQuotas
 
 	return
 }
 
-func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse net.ApiResponse) {
+func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiResponse errors.Error) {
 	repo.FindByNameName = name
 	quota = repo.FindByNameQuota
 
 	if repo.FindByNameNotFound {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "Org", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "Org", name)
 	}
 	if repo.FindByNameErr {
-		apiResponse = net.NewApiResponseWithMessage("Error finding quota")
+		apiResponse = errors.NewErrorWithMessage("Error finding quota")
 	}
 
 	return
 }
 
-func (repo *FakeQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse net.ApiResponse) {
+func (repo *FakeQuotaRepository) Update(orgGuid, quotaGuid string) (apiResponse errors.Error) {
 	repo.UpdateOrgGuid = orgGuid
 	repo.UpdateQuotaGuid = quotaGuid
 	return

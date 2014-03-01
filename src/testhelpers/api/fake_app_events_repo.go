@@ -1,17 +1,17 @@
 package api
 
 import (
+	"cf/errors"
 	"cf/models"
-	"cf/net"
 )
 
 type FakeAppEventsRepo struct {
 	AppGuid     string
 	Events      []models.EventFields
-	ApiResponse net.ApiResponse
+	ApiResponse errors.Error
 }
 
-func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func(models.EventFields) bool) net.ApiResponse {
+func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error {
 	repo.AppGuid = appGuid
 	for _, e := range repo.Events {
 		cb(e)

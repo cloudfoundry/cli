@@ -1,6 +1,6 @@
 package api
 
-import "cf/net"
+import "cf/errors"
 
 type FakePasswordRepo struct {
 	Score          string
@@ -11,12 +11,12 @@ type FakePasswordRepo struct {
 	UpdateOldPassword  string
 }
 
-func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiResponse net.ApiResponse) {
+func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiResponse errors.Error) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
 
 	if repo.UpdateUnauthorized {
-		apiResponse = net.NewApiResponse("Authorization Failed", "unauthorized", 401)
+		apiResponse = errors.NewHttpError(401, "", "", "unauthorized", "Authorization Failed")
 	}
 
 	return

@@ -3,8 +3,8 @@ package commands
 import (
 	"cf/api"
 	"cf/configuration"
+	cferrors "cf/errors"
 	"cf/models"
-	"cf/net"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -56,13 +56,13 @@ func (cmd Login) Run(c *cli.Context) {
 	oldUserName := cmd.config.Username()
 
 	apiResponse := cmd.setApi(c)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Invalid API endpoint.\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Invalid API endpoint.\n%s", apiResponse.Error())
 		return
 	}
 
 	apiResponse = cmd.authenticate(c)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		cmd.ui.Failed("Unable to authenticate.")
 		return
 	}
@@ -89,7 +89,7 @@ func (cmd Login) Run(c *cli.Context) {
 	return
 }
 
-func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
+func (cmd Login) setApi(c *cli.Context) (apiResponse cferrors.Error) {
 	api := c.String("a")
 	if api == "" {
 		api = cmd.config.ApiEndpoint()
@@ -110,7 +110,7 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse net.ApiResponse) {
 	return
 }
 
-func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
+func (cmd Login) authenticate(c *cli.Context) (apiResponse cferrors.Error) {
 	prompts, apiResponse := cmd.authenticator.GetLoginPrompts()
 
 	var passwordKey string
@@ -138,13 +138,13 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse net.ApiResponse) {
 		credentials[passwordKey] = password
 		apiResponse = cmd.authenticator.Authenticate(credentials)
 
-		if apiResponse.IsSuccessful() {
+		if apiResponse == nil {
 			cmd.ui.Ok()
 			cmd.ui.Say("")
 			break
 		}
 
-		cmd.ui.Say(apiResponse.Message)
+		cmd.ui.Say(apiResponse.Error())
 	}
 	return
 }
@@ -169,8 +169,8 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 			return len(availableOrgs) < maxChoices
 		})
 
-		if apiResponse.IsNotSuccessful() {
-			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiResponse.Message))
+		if apiResponse != nil {
+			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiResponse.Error()))
 			return
 		}
 
@@ -188,10 +188,10 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 	}
 
 	var org models.Organization
-	var apiResponse net.ApiResponse
+	var apiResponse cferrors.Error
 	org, apiResponse = cmd.orgRepo.FindByName(orgName)
-	if apiResponse.IsNotSuccessful() {
-		err = errors.New(apiResponse.Message)
+	if apiResponse != nil {
+		err = errors.New(apiResponse.Error())
 		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err)
 		return
 	}
@@ -233,8 +233,8 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 			return (len(availableSpaces) < maxChoices)
 		})
 
-		if apiResponse.IsNotSuccessful() {
-			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiResponse.Message))
+		if apiResponse != nil {
+			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiResponse.Error()))
 			cmd.ui.Failed(err.Error())
 			return
 		}
@@ -254,10 +254,10 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 	}
 
 	var space models.Space
-	var apiResponse net.ApiResponse
+	var apiResponse cferrors.Error
 	space, apiResponse = cmd.spaceRepo.FindByName(spaceName)
-	if apiResponse.IsNotSuccessful() {
-		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiResponse.Message))
+	if apiResponse != nil {
+		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiResponse.Error()))
 		cmd.ui.Failed(err.Error())
 		return
 	}

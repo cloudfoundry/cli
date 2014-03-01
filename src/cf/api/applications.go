@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"encoding/json"
@@ -126,10 +127,10 @@ type PaginatedApplicationResources struct {
 }
 
 type ApplicationRepository interface {
-	Create(params models.AppParams) (createdApp models.Application, apiResponse net.ApiResponse)
-	Read(name string) (app models.Application, apiResponse net.ApiResponse)
-	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse net.ApiResponse)
-	Delete(appGuid string) (apiResponse net.ApiResponse)
+	Create(params models.AppParams) (createdApp models.Application, apiResponse errors.Error)
+	Read(name string) (app models.Application, apiResponse errors.Error)
+	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse errors.Error)
+	Delete(appGuid string) (apiResponse errors.Error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -143,17 +144,17 @@ func NewCloudControllerApplicationRepository(config configuration.Reader, gatewa
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiResponse errors.Error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Failed to marshal JSON", err)
+		apiResponse = errors.NewErrorWithError("Failed to marshal JSON", err)
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/apps", repo.config.ApiEndpoint())
 	resource := new(ApplicationResource)
 	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -161,16 +162,16 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
 	appResources := new(PaginatedApplicationResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), appResources)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	if len(appResources.Resources) == 0 {
-		apiResponse = net.NewNotFoundApiResponse("%s %s not found", "App", name)
+		apiResponse = errors.NewNotFoundError("%s %s not found", "App", name)
 		return
 	}
 
@@ -179,17 +180,17 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app models.A
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiResponse errors.Error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
-		apiResponse = net.NewApiResponseWithError("Failed to marshal JSON", err)
+		apiResponse = errors.NewErrorWithError("Failed to marshal JSON", err)
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.ApiEndpoint(), appGuid)
 	resource := new(ApplicationResource)
 	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
@@ -204,7 +205,7 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppP
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiResponse net.ApiResponse) {
+func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.ApiEndpoint(), appGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
 }

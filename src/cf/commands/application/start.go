@@ -119,8 +119,8 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 
 	state := "STARTED"
 	updatedApp, apiResponse := cmd.appRepo.Update(app.Guid, models.AppParams{State: &state})
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -175,11 +175,11 @@ func (cmd Start) waitForInstancesToStage(app models.Application) {
 	stagingStartTime := time.Now()
 	_, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
 
-	for apiResponse.IsNotSuccessful() && time.Since(stagingStartTime) < cmd.StagingTimeout {
-		if apiResponse.ErrorCode != cf.APP_NOT_STAGED {
+	for apiResponse != nil && time.Since(stagingStartTime) < cmd.StagingTimeout {
+		if apiResponse.ErrorCode() != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(fmt.Sprintf("%s\n\nTIP: use '%s' for more information",
-				apiResponse.Message,
+				apiResponse.Error(),
 				terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
 			return
 		}
@@ -200,7 +200,7 @@ func (cmd Start) waitForOneRunningInstance(app models.Application) {
 		}
 
 		instances, apiResponse := cmd.appInstancesRepo.GetInstances(app.Guid)
-		if apiResponse.IsNotSuccessful() {
+		if apiResponse != nil {
 			cmd.ui.Wait(cmd.PingerThrottle)
 			continue
 		}

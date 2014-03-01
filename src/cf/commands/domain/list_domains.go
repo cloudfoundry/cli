@@ -52,14 +52,14 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"name                              ", "status"})
 	apiResponse := cmd.domainRepo.ListSharedDomains(domainsCallback(table, &noDomains))
 
-	if apiResponse.IsNotSuccessful() && !apiResponse.IsNotFound() {
-		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiResponse.Message)
+	if apiResponse != nil && !apiResponse.IsNotFound() {
+		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiResponse.Error())
 		return
 	}
 
 	apiResponse = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching private domains.\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Failed fetching private domains.\n%s", apiResponse.Error())
 		return
 	}
 

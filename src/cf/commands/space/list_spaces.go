@@ -43,8 +43,8 @@ func (cmd ListSpaces) Run(c *cli.Context) {
 		return true
 	})
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed("Failed fetching spaces.\n%s", apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed("Failed fetching spaces.\n%s", apiResponse.Error())
 		return
 	}
 

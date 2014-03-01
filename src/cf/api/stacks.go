@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -30,8 +31,8 @@ type StackEntity struct {
 }
 
 type StackRepository interface {
-	FindByName(name string) (stack models.Stack, apiResponse net.ApiResponse)
-	FindAll() (stacks []models.Stack, apiResponse net.ApiResponse)
+	FindByName(name string) (stack models.Stack, apiResponse errors.Error)
+	FindAll() (stacks []models.Stack, apiResponse errors.Error)
 }
 
 type CloudControllerStackRepository struct {
@@ -45,15 +46,15 @@ func NewCloudControllerStackRepository(config configuration.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiResponse net.ApiResponse) {
+func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
 	stacks, apiResponse := repo.findAllWithPath(path)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 
 	if len(stacks) == 0 {
-		apiResponse = net.NewApiResponseWithMessage("Stack '%s' not found", name)
+		apiResponse = errors.NewErrorWithMessage("Stack '%s' not found", name)
 		return
 	}
 
@@ -61,15 +62,15 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack models
 	return
 }
 
-func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiResponse net.ApiResponse) {
+func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiResponse errors.Error) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.ApiEndpoint())
 	return repo.findAllWithPath(path)
 }
 
-func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiResponse net.ApiResponse) {
+func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiResponse errors.Error) {
 	resources := new(PaginatedStackResources)
 	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
-	if apiResponse.IsNotSuccessful() {
+	if apiResponse != nil {
 		return
 	}
 

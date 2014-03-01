@@ -4,7 +4,7 @@ import (
 	"bytes"
 	. "cf/commands"
 	"cf/configuration"
-	"cf/net"
+	"cf/errors"
 	"cf/trace"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,7 +16,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("curl command", func() {
 	var deps curlDependencies
 
 	BeforeEach(func() {
@@ -122,7 +122,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 
 		It("prints a failure message when the response is not success", func() {
-			deps.curlRepo.ApiResponse = net.NewApiResponseWithMessage("ooops")
+			deps.curlRepo.ApiResponse = errors.NewErrorWithMessage("ooops")
 			runCurlWithInputs(deps, []string{"/foo"})
 
 			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{

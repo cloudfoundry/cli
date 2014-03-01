@@ -42,8 +42,8 @@ func (cmd Authenticate) Run(c *cli.Context) {
 		"username": c.Args()[0],
 		"password": c.Args()[1],
 	})
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

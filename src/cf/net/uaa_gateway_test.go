@@ -30,8 +30,8 @@ var _ = Describe("UAA Gateway", func() {
 		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
 		apiResponse = gateway.PerformRequest(request)
 
-		Expect(apiResponse.IsNotSuccessful()).To(BeTrue())
-		Expect(apiResponse.Message).To(ContainSubstring("The foo is wrong"))
-		Expect(apiResponse.ErrorCode).To(ContainSubstring("foo"))
+		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiResponse.Error()).To(ContainSubstring("The foo is wrong"))
+		Expect(apiResponse.ErrorCode()).To(ContainSubstring("foo"))
 	})
 })

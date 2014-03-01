@@ -58,7 +58,7 @@ var _ = Describe("AppFilesRepository", func() {
 		list, err := repo.ListFiles("my-app-guid", "some/path")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(err.IsNotSuccessful()).To(BeFalse())
+		Expect(err).ToNot(HaveOccurred())
 		Expect(list).To(Equal(expectedResponse))
 	})
 })

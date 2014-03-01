@@ -59,20 +59,20 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 
 	org, apiResponse := cmd.orgRepo.FindByName(orgName)
 
-	if apiResponse.IsError() {
-		cmd.ui.Failed(apiResponse.Message)
-		return
-	}
-
-	if apiResponse.IsNotFound() {
+	if apiResponse != nil && apiResponse.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Org %s does not exist.", orgName)
 		return
 	}
 
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
+		return
+	}
+
 	apiResponse = cmd.orgRepo.Delete(org.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

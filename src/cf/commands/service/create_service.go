@@ -47,8 +47,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 	)
 
 	offerings, apiResponse := cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
@@ -66,8 +66,8 @@ func (cmd CreateService) Run(c *cli.Context) {
 
 	var identicalAlreadyExists bool
 	identicalAlreadyExists, apiResponse = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 

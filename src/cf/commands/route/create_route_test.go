@@ -150,7 +150,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(route.Guid).To(Equal(createdRoute.Guid))
 
-		Expect(apiResponse.IsSuccessful()).To(BeTrue())
+		Expect(apiResponse).NotTo(HaveOccurred())
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},

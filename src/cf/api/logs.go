@@ -32,8 +32,8 @@ func NewLoggregatorLogsRepository(config configuration.Reader, endpointRepo Endp
 
 func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
 	host, apiResponse := repo.endpointRepo.GetLoggregatorEndpoint()
-	if apiResponse.IsNotSuccessful() {
-		err = errors.New(apiResponse.Message)
+	if apiResponse != nil {
+		err = errors.New(apiResponse.Error())
 		return
 	}
 
@@ -46,8 +46,8 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect fu
 
 func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) error {
 	host, apiResponse := repo.endpointRepo.GetLoggregatorEndpoint()
-	if apiResponse.IsNotSuccessful() {
-		return errors.New(apiResponse.Message)
+	if apiResponse != nil {
+		return errors.New(apiResponse.Error())
 	}
 	location := host + fmt.Sprintf("/tail/?app=%s", appGuid)
 	return repo.connectToWebsocket(location, onConnect, logChan, stopLoggingChan, printTimeBuffer)

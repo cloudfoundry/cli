@@ -40,8 +40,8 @@ func (cmd ListApps) Run(c *cli.Context) {
 
 	apps, apiResponse := cmd.appSummaryRepo.GetSummariesInCurrentSpace()
 
-	if apiResponse.IsNotSuccessful() {
-		cmd.ui.Failed(apiResponse.Message)
+	if apiResponse != nil {
+		cmd.ui.Failed(apiResponse.Error())
 		return
 	}
 
