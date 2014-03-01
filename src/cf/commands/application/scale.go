@@ -113,7 +113,11 @@ func (cmd *Scale) Run(c *cli.Context) {
 	cmd.ui.Say("")
 
 	if shouldRestart {
-		cmd.restarter.ApplicationRestart(updatedApp)
+		userConfirm := cmd.ui.Confirm("Are you sure you want to scale app %s? This will cause the app to restage.", terminal.EntityNameColor(updatedApp.Name))
+
+		if userConfirm {
+			cmd.restarter.ApplicationRestart(updatedApp)
+		}
 	}
 }
 
