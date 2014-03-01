@@ -77,14 +77,14 @@ var _ = Describe("Buildpacks repo", func() {
 		}
 
 		buildpacks := []models.Buildpack{}
-		apiResponse := repo.ListBuildpacks(func(b models.Buildpack) bool {
+		apiErr := repo.ListBuildpacks(func(b models.Buildpack) bool {
 			buildpacks = append(buildpacks, b)
 			return true
 		})
 
 		Expect(buildpacks).To(Equal(expectedBuildpacks))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestBuildpacksFindByName", func() {
@@ -96,10 +96,10 @@ var _ = Describe("Buildpacks repo", func() {
 		existingBuildpack.Guid = "buildpack1-guid"
 		existingBuildpack.Name = "Buildpack1"
 
-		buildpack, apiResponse := repo.FindByName("Buildpack1")
+		buildpack, apiErr := repo.FindByName("Buildpack1")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(buildpack.Name).To(Equal(existingBuildpack.Name))
 		Expect(buildpack.Guid).To(Equal(existingBuildpack.Guid))
@@ -113,10 +113,10 @@ var _ = Describe("Buildpacks repo", func() {
 		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
-		_, apiResponse := repo.FindByName("Buildpack1")
+		_, apiErr := repo.FindByName("Buildpack1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
+		Expect(apiErr.IsNotFound()).To(BeTrue())
 	})
 
 	It("TestBuildpackCreateRejectsImproperNames", func() {
@@ -135,11 +135,11 @@ var _ = Describe("Buildpacks repo", func() {
 		ts, _, repo := createBuildpackRepo(badRequest)
 		defer ts.Close()
 		one := 1
-		createdBuildpack, apiResponse := repo.Create("name with space", &one, nil, nil)
-		Expect(apiResponse).To(HaveOccurred())
+		createdBuildpack, apiErr := repo.Create("name with space", &one, nil, nil)
+		Expect(apiErr).To(HaveOccurred())
 		Expect(createdBuildpack).To(Equal(models.Buildpack{}))
-		Expect(apiResponse.ErrorCode()).To(Equal("290003"))
-		Expect(apiResponse.Error()).To(ContainSubstring("Buildpack is invalid"))
+		Expect(apiErr.ErrorCode()).To(Equal("290003"))
+		Expect(apiErr.Error()).To(ContainSubstring("Buildpack is invalid"))
 	})
 
 	It("TestCreateBuildpackWithPosition", func() {
@@ -164,10 +164,10 @@ var _ = Describe("Buildpacks repo", func() {
 		defer ts.Close()
 
 		position := 999
-		created, apiResponse := repo.Create("my-cool-buildpack", &position, nil, nil)
+		created, apiErr := repo.Create("my-cool-buildpack", &position, nil, nil)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(created.Guid).NotTo(BeNil())
 		Expect("my-cool-buildpack").To(Equal(created.Name))
@@ -198,10 +198,10 @@ var _ = Describe("Buildpacks repo", func() {
 
 		position := 999
 		enabled := true
-		created, apiResponse := repo.Create("my-cool-buildpack", &position, &enabled, nil)
+		created, apiErr := repo.Create("my-cool-buildpack", &position, &enabled, nil)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(created.Guid).NotTo(BeNil())
 		Expect("my-cool-buildpack").To(Equal(created.Name))
@@ -219,10 +219,10 @@ var _ = Describe("Buildpacks repo", func() {
 		ts, handler, repo := createBuildpackRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-cool-buildpack-guid")
+		apiErr := repo.Delete("my-cool-buildpack-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateBuildpack", func() {
@@ -254,10 +254,10 @@ var _ = Describe("Buildpacks repo", func() {
 		buildpack.Guid = "my-cool-buildpack-guid"
 		buildpack.Position = &position
 		buildpack.Enabled = &enabled
-		updated, apiResponse := repo.Update(buildpack)
+		updated, apiErr := repo.Update(buildpack)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(buildpack).To(Equal(updated))
 	})
@@ -299,10 +299,10 @@ var _ = Describe("Buildpacks repo", func() {
 		expectedBuildpack.Position = &position
 		expectedBuildpack.Locked = &locked
 
-		updated, apiResponse := repo.Update(buildpack)
+		updated, apiErr := repo.Update(buildpack)
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(expectedBuildpack).To(Equal(updated))
 	})

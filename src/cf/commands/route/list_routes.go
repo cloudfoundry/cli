@@ -36,7 +36,7 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"host", "domain", "apps"})
 
 	noRoutes := true
-	apiResponse := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
+	apiErr := cmd.routeRepo.ListRoutes(func(route models.Route) bool {
 		appNames := ""
 		for _, app := range route.Apps {
 			appNames = appNames + ", " + app.Name
@@ -51,8 +51,8 @@ func (cmd ListRoutes) Run(c *cli.Context) {
 		return true
 	})
 
-	if apiResponse != nil {
-		cmd.ui.Failed("Failed fetching routes.\n%s", apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed("Failed fetching routes.\n%s", apiErr.Error())
 		return
 	}
 

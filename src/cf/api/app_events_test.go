@@ -131,12 +131,12 @@ var _ = Describe("App Events Repo", func() {
 		}
 
 		list := []models.EventFields{}
-		apiResponse := repo.ListEvents("my-app-guid", func(event models.EventFields) bool {
+		apiErr := repo.ListEvents("my-app-guid", func(event models.EventFields) bool {
 			list = append(list, event)
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(list).To(Equal(expectedEvents))
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
@@ -207,12 +207,12 @@ var _ = Describe("App Events Repo", func() {
 		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
 		events := []models.EventFields{}
-		apiResponse := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
+		apiErr := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
 			events = append(events, e)
 			return true
 		})
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 
 		Expect(len(events)).To(Equal(2))
@@ -233,7 +233,7 @@ var _ = Describe("App Events Repo", func() {
 		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
 
 		list := []models.EventFields{}
-		apiResponse := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
+		apiErr := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
 			list = append(list, e)
 			return true
 		})
@@ -250,7 +250,7 @@ var _ = Describe("App Events Repo", func() {
 		}
 
 		Expect(list).To(Equal(expectedEvents))
-		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiErr).NotTo(BeNil())
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
 

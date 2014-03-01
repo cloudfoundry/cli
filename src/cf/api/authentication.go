@@ -13,8 +13,8 @@ import (
 )
 
 type AuthenticationRepository interface {
-	Authenticate(credentials map[string]string) (apiResponse errors.Error)
-	RefreshAuthToken() (updatedToken string, apiResponse errors.Error)
+	Authenticate(credentials map[string]string) (apiErr errors.Error)
+	RefreshAuthToken() (updatedToken string, apiErr errors.Error)
 	GetLoginPrompts() (map[string]configuration.AuthPrompt, errors.Error)
 }
 
@@ -29,7 +29,7 @@ func NewUAAAuthenticationRepository(gateway net.Gateway, config configuration.Re
 	return
 }
 
-func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse errors.Error) {
+func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr errors.Error) {
 	data := url.Values{
 		"grant_type": {"password"},
 		"scope":      {""},
@@ -38,11 +38,11 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 		data[key] = []string{val}
 	}
 
-	apiResponse = uaa.getAuthToken(data)
-	switch response := apiResponse.(type) {
+	apiErr = uaa.getAuthToken(data)
+	switch response := apiErr.(type) {
 	case errors.HttpError:
 		if response.StatusCode() == 401 {
-			apiResponse = errors.NewErrorWithMessage("Password is incorrect, please try again.")
+			apiErr = errors.NewErrorWithMessage("Password is incorrect, please try again.")
 		}
 	}
 
@@ -69,25 +69,25 @@ func (r *LoginResource) ToModel() (prompts map[string]configuration.AuthPrompt) 
 	return
 }
 
-func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse errors.Error) {
+func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthorizationEndpoint())
 	resource := &LoginResource{}
-	apiResponse = uaa.gateway.GetResource(url, "", resource)
+	apiErr = uaa.gateway.GetResource(url, "", resource)
 	prompts = resource.ToModel()
 	return
 }
 
-func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.Error) {
+func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr errors.Error) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
 		"scope":         {""},
 	}
 
-	apiResponse = uaa.getAuthToken(data)
+	apiErr = uaa.getAuthToken(data)
 	updatedToken = uaa.config.AccessToken()
 
-	if apiResponse != nil {
+	if apiErr != nil {
 		fmt.Printf("%s\n\n", terminal.NotLoggedInText())
 		os.Exit(1)
 	}

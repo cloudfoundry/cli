@@ -33,10 +33,10 @@ func (cmd *ListQuotas) GetRequirements(reqFactory requirements.Factory, c *cli.C
 func (cmd *ListQuotas) Run(c *cli.Context) {
 	cmd.ui.Say("Getting quotas as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
-	quotas, apiResponse := cmd.quotaRepo.FindAll()
+	quotas, apiErr := cmd.quotaRepo.FindAll()
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 	cmd.ui.Ok()

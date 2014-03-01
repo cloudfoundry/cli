@@ -54,13 +54,13 @@ func (cmd *RenameService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
-	apiResponse := cmd.serviceRepo.RenameService(serviceInstance, newName)
+	apiErr := cmd.serviceRepo.RenameService(serviceInstance, newName)
 
-	if apiResponse != nil {
-		if apiResponse.ErrorCode() == cf.SERVICE_INSTANCE_NAME_TAKEN {
-			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiResponse.Error(), cf.Name())
+	if apiErr != nil {
+		if apiErr.ErrorCode() == cf.SERVICE_INSTANCE_NAME_TAKEN {
+			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiErr.Error(), cf.Name())
 		} else {
-			cmd.ui.Failed(apiResponse.Error())
+			cmd.ui.Failed(apiErr.Error())
 		}
 		return
 	}

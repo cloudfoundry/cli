@@ -60,21 +60,21 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting route %s...", terminal.EntityNameColor(url))
 
-	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(host, domainName)
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	route, apiErr := cmd.routeRepo.FindByHostAndDomain(host, domainName)
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Route %s does not exist.", url)
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.routeRepo.Delete(route.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.routeRepo.Delete(route.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

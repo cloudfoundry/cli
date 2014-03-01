@@ -66,20 +66,20 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	appSummary, apiResponse := cmd.appSummaryRepo.GetSummary(app.Guid)
-	appIsStopped := (apiResponse != nil && (apiResponse.ErrorCode() == cf.APP_STOPPED ||
-		apiResponse.ErrorCode() == cf.APP_NOT_STAGED)) ||
+	appSummary, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
+	appIsStopped := (apiErr != nil && (apiErr.ErrorCode() == cf.APP_STOPPED ||
+		apiErr.ErrorCode() == cf.APP_NOT_STAGED)) ||
 		appSummary.State == "stopped"
 
-	if apiResponse != nil && !appIsStopped {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil && !appIsStopped {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	var instances []models.AppInstanceFields
-	instances, apiResponse = cmd.appInstancesRepo.GetInstances(app.Guid)
-	if apiResponse != nil && !appIsStopped {
-		cmd.ui.Failed(apiResponse.Error())
+	instances, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+	if apiErr != nil && !appIsStopped {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

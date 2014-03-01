@@ -28,11 +28,11 @@ func NewBuildpackRequirement(name string, ui terminal.UI, bR api.BuildpackReposi
 }
 
 func (req *buildpackApiRequirement) Execute() (success bool) {
-	var apiResponse errors.Error
-	req.buildpack, apiResponse = req.buildpackRepo.FindByName(req.name)
+	var apiErr errors.Error
+	req.buildpack, apiErr = req.buildpackRepo.FindByName(req.name)
 
-	if apiResponse != nil {
-		req.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 

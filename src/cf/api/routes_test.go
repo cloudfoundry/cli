@@ -31,7 +31,7 @@ var _ = Describe("route repository", func() {
 		defer ts.Close()
 
 		routes := []models.Route{}
-		apiResponse := repo.ListRoutes(func(route models.Route) bool {
+		apiErr := repo.ListRoutes(func(route models.Route) bool {
 			routes = append(routes, route)
 			return true
 		})
@@ -40,7 +40,7 @@ var _ = Describe("route repository", func() {
 		Expect(routes[0].Guid).To(Equal("route-1-guid"))
 		Expect(routes[1].Guid).To(Equal("route-2-guid"))
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("finds routes by host", func() {
@@ -53,10 +53,10 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		route, apiResponse := repo.FindByHost("my-cool-app")
+		route, apiErr := repo.FindByHost("my-cool-app")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(route.Host).To(Equal("my-cool-app"))
 		Expect(route.Guid).To(Equal("my-route-guid"))
 	})
@@ -71,10 +71,10 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		_, apiResponse := repo.FindByHost("my-cool-app")
+		_, apiErr := repo.FindByHost("my-cool-app")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(BeNil())
+		Expect(apiErr).NotTo(BeNil())
 	})
 
 	It("finds a route by host and domain", func() {
@@ -91,9 +91,9 @@ var _ = Describe("route repository", func() {
 		domain.Guid = "my-domain-guid"
 		domainRepo.FindByNameDomain = domain
 
-		route, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+		route, apiErr := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(domainRepo.FindByNameName).To(Equal("my-domain.com"))
 		Expect(route.Host).To(Equal("my-cool-app"))
@@ -115,11 +115,11 @@ var _ = Describe("route repository", func() {
 		domain.Guid = "my-domain-guid"
 		domainRepo.FindByNameDomain = domain
 
-		_, apiResponse := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
+		_, apiErr := repo.FindByHostAndDomain("my-cool-app", "my-domain.com")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
+		Expect(apiErr.IsNotFound()).To(BeTrue())
 	})
 
 	It("creates routes in a given space", func() {
@@ -137,10 +137,10 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		createdRoute, apiResponse := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
+		createdRoute, apiErr := repo.CreateInSpace("my-cool-app", "my-domain-guid", "my-space-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 	})
 
@@ -159,9 +159,9 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		createdRoute, apiResponse := repo.Create("my-cool-app", "my-domain-guid")
+		createdRoute, apiErr := repo.Create("my-cool-app", "my-domain-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(createdRoute.Guid).To(Equal("my-route-guid"))
 	})
@@ -176,9 +176,9 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		apiResponse := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
+		apiErr := repo.Bind("my-cool-route-guid", "my-cool-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("unbinds routes", func() {
@@ -191,9 +191,9 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		apiResponse := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
+		apiErr := repo.Unbind("my-cool-route-guid", "my-cool-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("deletes routes", func() {
@@ -206,9 +206,9 @@ var _ = Describe("route repository", func() {
 		ts, handler, repo, _ := createRoutesRepo(request)
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-cool-route-guid")
+		apiErr := repo.Delete("my-cool-route-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

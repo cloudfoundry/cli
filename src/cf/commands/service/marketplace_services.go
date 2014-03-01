@@ -33,7 +33,7 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	var (
 		serviceOfferings models.ServiceOfferings
-		apiResponse      errors.Error
+		apiErr           errors.Error
 	)
 
 	if cmd.config.HasSpace() {
@@ -42,16 +42,16 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 			terminal.EntityNameColor(cmd.config.Username()),
 		)
-		serviceOfferings, apiResponse = cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
+		serviceOfferings, apiErr = cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
 	} else if !cmd.config.IsLoggedIn() {
 		cmd.ui.Say("Getting all services from marketplace...")
-		serviceOfferings, apiResponse = cmd.serviceRepo.GetAllServiceOfferings()
+		serviceOfferings, apiErr = cmd.serviceRepo.GetAllServiceOfferings()
 	} else {
 		cmd.ui.Failed("Cannot list marketplace services without a targetted space")
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

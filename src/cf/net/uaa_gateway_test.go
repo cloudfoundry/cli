@@ -27,11 +27,11 @@ var _ = Describe("UAA Gateway", func() {
 		defer ts.Close()
 		gateway.AddTrustedCerts(ts.TLS.Certificates)
 
-		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		apiResponse = gateway.PerformRequest(request)
+		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+		apiErr = gateway.PerformRequest(request)
 
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.Error()).To(ContainSubstring("The foo is wrong"))
-		Expect(apiResponse.ErrorCode()).To(ContainSubstring("foo"))
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.Error()).To(ContainSubstring("The foo is wrong"))
+		Expect(apiErr.ErrorCode()).To(ContainSubstring("foo"))
 	})
 })

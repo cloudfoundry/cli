@@ -50,21 +50,21 @@ func (cmd DeleteUserFields) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	user, apiResponse := cmd.userRepo.FindByUsername(username)
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	user, apiErr := cmd.userRepo.FindByUsername(username)
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("User %s does not exist.", username)
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.userRepo.Delete(user.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.userRepo.Delete(user.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

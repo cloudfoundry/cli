@@ -12,21 +12,21 @@ type FakeEndpointRepo struct {
 	UpdateEndpointError    errors.Error
 
 	LoggregatorEndpointReturns struct {
-		Endpoint    string
-		ApiResponse errors.Error
+		Endpoint string
+		Error    errors.Error
 	}
 
 	UAAEndpointReturns struct {
-		Endpoint    string
-		ApiResponse errors.Error
+		Endpoint string
+		Error    errors.Error
 	}
 }
 
-func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint string, apiResponse errors.Error) {
+func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr errors.Error) {
 	repo.UpdateEndpointReceived = endpoint
-	apiResponse = repo.UpdateEndpointError
+	apiErr = repo.UpdateEndpointError
 
-	if apiResponse != nil {
+	if apiErr != nil {
 		return
 	}
 
@@ -35,18 +35,18 @@ func (repo *FakeEndpointRepo) UpdateEndpoint(endpoint string) (finalEndpoint str
 	return
 }
 
-func (repo *FakeEndpointRepo) GetLoggregatorEndpoint() (endpoint string, apiResponse errors.Error) {
+func (repo *FakeEndpointRepo) GetLoggregatorEndpoint() (endpoint string, apiErr errors.Error) {
 	endpoint = repo.LoggregatorEndpointReturns.Endpoint
-	apiResponse = repo.LoggregatorEndpointReturns.ApiResponse
+	apiErr = repo.LoggregatorEndpointReturns.Error
 	return
 }
 
-func (repo *FakeEndpointRepo) GetCloudControllerEndpoint() (endpoint string, apiResponse errors.Error) {
+func (repo *FakeEndpointRepo) GetCloudControllerEndpoint() (endpoint string, apiErr errors.Error) {
 	return
 }
 
-func (repo *FakeEndpointRepo) GetUAAEndpoint() (endpoint string, apiResponse errors.Error) {
+func (repo *FakeEndpointRepo) GetUAAEndpoint() (endpoint string, apiErr errors.Error) {
 	endpoint = repo.UAAEndpointReturns.Endpoint
-	apiResponse = repo.UAAEndpointReturns.ApiResponse
+	apiErr = repo.UAAEndpointReturns.Error
 	return
 }

@@ -25,11 +25,11 @@ var _ = Describe("UserRepository", func() {
 			defer cc.Close()
 			defer uaa.Close()
 
-			users, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
+			users, apiErr := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(len(users)).To(Equal(3))
 			Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -45,11 +45,11 @@ var _ = Describe("UserRepository", func() {
 			defer cc.Close()
 			defer uaa.Close()
 
-			users, apiResponse := repo.ListUsersInSpaceForRole("my-space-guid", models.SPACE_MANAGER)
+			users, apiErr := repo.ListUsersInSpaceForRole("my-space-guid", models.SPACE_MANAGER)
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 
 			Expect(len(users)).To(Equal(3))
 			Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -72,10 +72,10 @@ var _ = Describe("UserRepository", func() {
 			cc, ccHandler, _, _, repo := createUsersRepo(ccReqs, []testnet.TestRequest{})
 			defer cc.Close()
 
-			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
+			_, apiErr := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
 			Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
-			httpErr, ok := apiResponse.(errors.HttpError)
+			httpErr, ok := apiErr.(errors.HttpError)
 			Expect(ok).To(BeTrue())
 			Expect(httpErr.StatusCode()).To(Equal(http.StatusGatewayTimeout))
 		})
@@ -91,13 +91,13 @@ var _ = Describe("UserRepository", func() {
 			ccGateway := net.NewCloudControllerGateway()
 			uaaGateway := net.NewUAAGateway()
 			endpointRepo := &testapi.FakeEndpointRepo{}
-			endpointRepo.UAAEndpointReturns.ApiResponse = errors.NewErrorWithError("Failed to get endpoint!", errors.New("Failed!"))
+			endpointRepo.UAAEndpointReturns.Error = errors.NewErrorWithError("Failed to get endpoint!", errors.New("Failed!"))
 
 			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
 
-			_, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
+			_, apiErr := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
 
-			Expect(apiResponse).To(Equal(endpointRepo.UAAEndpointReturns.ApiResponse))
+			Expect(apiErr).To(Equal(endpointRepo.UAAEndpointReturns.Error))
 		})
 	})
 
@@ -112,9 +112,9 @@ var _ = Describe("UserRepository", func() {
 		uaa, handler, repo := createUsersRepoWithoutCCEndpoints([]testnet.TestRequest{uaaReq})
 		defer uaa.Close()
 
-		user, apiResponse := repo.FindByUsername("damien+user1@pivotallabs.com")
+		user, apiErr := repo.FindByUsername("damien+user1@pivotallabs.com")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		expectedUserFields := models.UserFields{}
 		expectedUserFields.Username = "my-full-username"
@@ -132,11 +132,11 @@ var _ = Describe("UserRepository", func() {
 		uaa, handler, repo := createUsersRepoWithoutCCEndpoints([]testnet.TestRequest{uaaReq})
 		defer uaa.Close()
 
-		_, apiResponse := repo.FindByUsername("my-user")
+		_, apiErr := repo.FindByUsername("my-user")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
-		Expect(apiResponse.Error()).To(ContainSubstring("User my-user not found"))
+		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.Error()).To(ContainSubstring("User my-user not found"))
 	})
 
 	It("TestCreateUser", func() {
@@ -168,10 +168,10 @@ var _ = Describe("UserRepository", func() {
 		defer cc.Close()
 		defer uaa.Close()
 
-		apiResponse := repo.Create("my-user", "my-password")
+		apiErr := repo.Create("my-user", "my-password")
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteUser", func() {
@@ -191,10 +191,10 @@ var _ = Describe("UserRepository", func() {
 		defer cc.Close()
 		defer uaa.Close()
 
-		apiResponse := repo.Delete("my-user-guid")
+		apiErr := repo.Delete("my-user-guid")
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteUserWhenNotFoundOnTheCloudController", func() {
@@ -214,10 +214,10 @@ var _ = Describe("UserRepository", func() {
 		defer cc.Close()
 		defer uaa.Close()
 
-		apiResponse := repo.Delete("my-user-guid")
+		apiErr := repo.Delete("my-user-guid")
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestSetOrgRoleToOrgManager", func() {
@@ -234,10 +234,10 @@ var _ = Describe("UserRepository", func() {
 
 	It("TestSetOrgRoleWithInvalidRole", func() {
 		repo := createUsersRepoWithoutEndpoints()
-		apiResponse := repo.SetOrgRole("user-guid", "org-guid", "foo")
+		apiErr := repo.SetOrgRole("user-guid", "org-guid", "foo")
 
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.Error()).To(ContainSubstring("Invalid Role"))
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.Error()).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("TestUnsetOrgRoleFromOrgManager", func() {
@@ -254,10 +254,10 @@ var _ = Describe("UserRepository", func() {
 
 	It("TestUnsetOrgRoleWithInvalidRole", func() {
 		repo := createUsersRepoWithoutEndpoints()
-		apiResponse := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
+		apiErr := repo.UnsetOrgRole("user-guid", "org-guid", "foo")
 
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.Error()).To(ContainSubstring("Invalid Role"))
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.Error()).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("TestSetSpaceRoleToSpaceManager", func() {
@@ -274,10 +274,10 @@ var _ = Describe("UserRepository", func() {
 
 	It("TestSetSpaceRoleWithInvalidRole", func() {
 		repo := createUsersRepoWithoutEndpoints()
-		apiResponse := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
+		apiErr := repo.SetSpaceRole("user-guid", "space-guid", "org-guid", "foo")
 
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.Error()).To(ContainSubstring("Invalid Role"))
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.Error()).To(ContainSubstring("Invalid Role"))
 	})
 
 	It("lists all users in the org", func() {
@@ -287,11 +287,11 @@ var _ = Describe("UserRepository", func() {
 		defer cc.Close()
 		defer uaa.Close()
 
-		users, apiResponse := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_USER)
+		users, apiErr := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_USER)
 
 		Expect(ccHandler).To(testnet.HaveAllRequestsCalled())
 		Expect(uaaHandler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(len(users)).To(Equal(3))
 		Expect(users[0].Guid).To(Equal("user-1-guid"))
@@ -370,10 +370,10 @@ func testSetOrgRoleWithValidRole(role string, path string) {
 	cc, handler, repo := createUsersRepoWithoutUAAEndpoints([]testnet.TestRequest{req, userReq})
 	defer cc.Close()
 
-	apiResponse := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
+	apiErr := repo.SetOrgRole("my-user-guid", "my-org-guid", role)
 
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse).NotTo(HaveOccurred())
+	Expect(apiErr).NotTo(HaveOccurred())
 }
 
 func testUnsetOrgRoleWithValidRole(role string, path string) {
@@ -386,10 +386,10 @@ func testUnsetOrgRoleWithValidRole(role string, path string) {
 	cc, handler, repo := createUsersRepoWithoutUAAEndpoints([]testnet.TestRequest{req})
 	defer cc.Close()
 
-	apiResponse := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
+	apiErr := repo.UnsetOrgRole("my-user-guid", "my-org-guid", role)
 
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse).NotTo(HaveOccurred())
+	Expect(apiErr).NotTo(HaveOccurred())
 }
 
 func testSetSpaceRoleWithValidRole(role string, path string) {
@@ -408,10 +408,10 @@ func testSetSpaceRoleWithValidRole(role string, path string) {
 	cc, handler, repo := createUsersRepoWithoutUAAEndpoints([]testnet.TestRequest{addToOrgReq, setRoleReq})
 	defer cc.Close()
 
-	apiResponse := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
+	apiErr := repo.SetSpaceRole("my-user-guid", "my-space-guid", "my-org-guid", role)
 
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse).NotTo(HaveOccurred())
+	Expect(apiErr).NotTo(HaveOccurred())
 }
 
 func createUsersRepoWithoutEndpoints() (repo UserRepository) {

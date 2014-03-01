@@ -60,7 +60,7 @@ var _ = Describe("Space Repository", func() {
 		defer ts.Close()
 
 		spaces := []models.Space{}
-		apiResponse := repo.ListSpaces(func(space models.Space) bool {
+		apiErr := repo.ListSpaces(func(space models.Space) bool {
 			spaces = append(spaces, space)
 			return true
 		})
@@ -68,7 +68,7 @@ var _ = Describe("Space Repository", func() {
 		Expect(len(spaces)).To(Equal(2))
 		Expect(spaces[0].Guid).To(Equal("acceptance-space-guid"))
 		Expect(spaces[1].Guid).To(Equal("staging-space-guid"))
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -125,9 +125,9 @@ var _ = Describe("Space Repository", func() {
 		ts, handler, repo := createSpacesRepo(request)
 		defer ts.Close()
 
-		space, apiResponse := repo.Create("space-name", "my-org-guid")
+		space, apiErr := repo.Create("space-name", "my-org-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(space.Guid).To(Equal("space-guid"))
 	})
 
@@ -142,9 +142,9 @@ var _ = Describe("Space Repository", func() {
 		ts, handler, repo := createSpacesRepo(request)
 		defer ts.Close()
 
-		apiResponse := repo.Rename("my-space-guid", "new-space-name")
+		apiErr := repo.Rename("my-space-guid", "new-space-name")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("deletes spaces", func() {
@@ -157,9 +157,9 @@ var _ = Describe("Space Repository", func() {
 		ts, handler, repo := createSpacesRepo(request)
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-space-guid")
+		apiErr := repo.Delete("my-space-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 
@@ -235,9 +235,9 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	ts, handler, repo := createSpacesRepo(request)
 	defer ts.Close()
 
-	space, apiResponse := findByName(repo, "Space1")
+	space, apiErr := findByName(repo, "Space1")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse).NotTo(HaveOccurred())
+	Expect(apiErr).NotTo(HaveOccurred())
 	Expect(space.Name).To(Equal("Space1"))
 	Expect(space.Guid).To(Equal("space1-guid"))
 
@@ -253,7 +253,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	Expect(len(space.ServiceInstances)).To(Equal(1))
 	Expect(space.ServiceInstances[0].Guid).To(Equal("service1-guid"))
 
-	Expect(apiResponse).NotTo(HaveOccurred())
+	Expect(apiErr).NotTo(HaveOccurred())
 	return
 }
 
@@ -270,10 +270,10 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 	ts, handler, repo := createSpacesRepo(request)
 	defer ts.Close()
 
-	_, apiResponse := findByName(repo, "Space1")
+	_, apiErr := findByName(repo, "Space1")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-	Expect(apiResponse.IsNotFound()).To(BeTrue())
+	Expect(apiErr.IsNotFound()).To(BeTrue())
 }
 
 func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {

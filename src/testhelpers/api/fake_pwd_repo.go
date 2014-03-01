@@ -11,12 +11,12 @@ type FakePasswordRepo struct {
 	UpdateOldPassword  string
 }
 
-func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiResponse errors.Error) {
+func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr errors.Error) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
 
 	if repo.UpdateUnauthorized {
-		apiResponse = errors.NewHttpError(401, "", "", "unauthorized", "Authorization Failed")
+		apiErr = errors.NewHttpError(401, "", "", "unauthorized", "Authorization Failed")
 	}
 
 	return

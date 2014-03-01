@@ -46,9 +46,9 @@ func (cmd CreateServiceBroker) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.serviceBrokerRepo.Create(name, url, username, password)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr := cmd.serviceBrokerRepo.Create(name, url, username, password)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

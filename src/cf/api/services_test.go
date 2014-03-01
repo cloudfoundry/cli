@@ -32,10 +32,10 @@ var _ = Describe("Services Repo", func() {
 		}, config)
 		defer ts.Close()
 
-		offerings, apiResponse := repo.GetAllServiceOfferings()
+		offerings, apiErr := repo.GetAllServiceOfferings()
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		expectMultipleServiceOfferings(offerings)
 	})
 
@@ -52,10 +52,10 @@ var _ = Describe("Services Repo", func() {
 		}, config)
 		defer ts.Close()
 
-		offerings, apiResponse := repo.GetServiceOfferingsForSpace("my-space-guid")
+		offerings, apiErr := repo.GetServiceOfferingsForSpace("my-space-guid")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		expectMultipleServiceOfferings(offerings)
 	})
 
@@ -71,9 +71,9 @@ var _ = Describe("Services Repo", func() {
 			ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("instance-name", "plan-guid")
+			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("instance-name", "plan-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(identicalAlreadyExists).To(Equal(false))
 		})
 
@@ -90,10 +90,10 @@ var _ = Describe("Services Repo", func() {
 			ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
 			defer ts.Close()
 
-			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "plan-guid")
+			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("my-service", "plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(identicalAlreadyExists).To(Equal(true))
 		})
 
@@ -110,10 +110,10 @@ var _ = Describe("Services Repo", func() {
 			ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
 			defer ts.Close()
 
-			identicalAlreadyExists, apiResponse := repo.CreateServiceInstance("my-service", "different-plan-guid")
+			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(BeNil())
+			Expect(apiErr).NotTo(BeNil())
 			Expect(identicalAlreadyExists).To(Equal(false))
 		})
 	})
@@ -123,10 +123,10 @@ var _ = Describe("Services Repo", func() {
 			ts, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq, serviceOfferingReq})
 			defer ts.Close()
 
-			instance, apiResponse := repo.FindInstanceByName("my-service")
+			instance, apiErr := repo.FindInstanceByName("my-service")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
@@ -145,10 +145,10 @@ var _ = Describe("Services Repo", func() {
 			ts, handler, repo := createServiceRepo([]testnet.TestRequest{findUserProvidedServiceInstanceReq})
 			defer ts.Close()
 
-			instance, apiResponse := repo.FindInstanceByName("my-service")
+			instance, apiErr := repo.FindInstanceByName("my-service")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal(""))
@@ -171,10 +171,10 @@ var _ = Describe("Services Repo", func() {
 			ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			_, apiResponse := repo.FindInstanceByName("my-service")
+			_, apiErr := repo.FindInstanceByName("my-service")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-			Expect(apiResponse.IsNotFound()).To(BeTrue())
+			Expect(apiErr.IsNotFound()).To(BeTrue())
 		})
 	})
 
@@ -188,9 +188,9 @@ var _ = Describe("Services Repo", func() {
 		defer ts.Close()
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
-		apiResponse := repo.DeleteService(serviceInstance)
+		apiErr := repo.DeleteService(serviceInstance)
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteServiceWithServiceBindings", func() {
@@ -209,9 +209,9 @@ var _ = Describe("Services Repo", func() {
 
 		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
 
-		apiResponse := repo.DeleteService(serviceInstance)
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.Error()).To(Equal("Cannot delete service instance, apps are still bound to it"))
+		apiErr := repo.DeleteService(serviceInstance)
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.Error()).To(Equal("Cannot delete service instance, apps are still bound to it"))
 	})
 
 	It("TestRenameService", func() {
@@ -259,9 +259,9 @@ var _ = Describe("Services Repo", func() {
 			},
 		}})
 
-		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(offering.Guid).To(Equal("offering-1-guid"))
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("returns an error if the offering cannot be found", func() {
@@ -277,8 +277,8 @@ var _ = Describe("Services Repo", func() {
 			},
 		}})
 
-		offering, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
+		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+		Expect(apiErr.IsNotFound()).To(BeTrue())
 		Expect(offering.Guid).To(Equal(""))
 	})
 
@@ -295,9 +295,9 @@ var _ = Describe("Services Repo", func() {
 			},
 		}})
 
-		_, apiResponse := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(apiResponse).To(HaveOccurred())
-		Expect(apiResponse.ErrorCode()).To(Equal("10005"))
+		_, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+		Expect(apiErr).To(HaveOccurred())
+		Expect(apiErr.ErrorCode()).To(Equal("10005"))
 	})
 
 	It("purges service offerings", func() {
@@ -312,8 +312,8 @@ var _ = Describe("Services Repo", func() {
 		offering := maker.NewServiceOffering("the-offering")
 		offering.Guid = "the-service-guid"
 
-		apiResponse := repo.PurgeServiceOffering(offering)
-		Expect(apiResponse).NotTo(HaveOccurred())
+		apiErr := repo.PurgeServiceOffering(offering)
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -357,9 +357,9 @@ var _ = Describe("Services Repo", func() {
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			count, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			count, apiErr := repo.GetServiceInstanceCountForServicePlan(planGuid)
 			Expect(count).To(Equal(9))
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 		})
 
 		It("returns the API error when one occurs", func() {
@@ -371,9 +371,9 @@ var _ = Describe("Services Repo", func() {
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			_, apiResponse := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			_, apiErr := repo.GetServiceInstanceCountForServicePlan(planGuid)
 
-			Expect(apiResponse).To(HaveOccurred())
+			Expect(apiErr).To(HaveOccurred())
 		})
 	})
 
@@ -419,10 +419,10 @@ var _ = Describe("Services Repo", func() {
 					ServiceProvider: "v1-elephantsql",
 				}
 
-				v1Guid, apiResponse := repo.FindServicePlanByDescription(v1)
+				v1Guid, apiErr := repo.FindServicePlanByDescription(v1)
 
 				Expect(v1Guid).To(Equal("offering-1-plan-2-guid"))
-				Expect(apiResponse).NotTo(HaveOccurred())
+				Expect(apiErr).NotTo(HaveOccurred())
 			})
 
 			It("returns the plan guid for a v2 plan", func() {
@@ -464,15 +464,15 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-panda",
 				}
 
-				v2Guid, apiResponse := repo.FindServicePlanByDescription(v2)
+				v2Guid, apiErr := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse).NotTo(HaveOccurred())
+				Expect(apiErr).NotTo(HaveOccurred())
 				Expect(v2Guid).To(Equal("offering-1-plan-2-guid"))
 			})
 		})
 
 		Context("when no service matches the description", func() {
-			It("returns an apiResponse error", func() {
+			It("returns an apiErr error", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
@@ -487,18 +487,18 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-plan-name",
 				}
 
-				_, apiResponse := repo.FindServicePlanByDescription(v2)
+				_, apiErr := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse).To(HaveOccurred())
-				Expect(apiResponse.IsNotFound()).To(BeTrue())
-				Expect(apiResponse.Error()).To(ContainSubstring("Plan"))
-				Expect(apiResponse.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiResponse.Error()).To(ContainSubstring("cannot be found"))
+				Expect(apiErr).To(HaveOccurred())
+				Expect(apiErr.IsNotFound()).To(BeTrue())
+				Expect(apiErr.Error()).To(ContainSubstring("Plan"))
+				Expect(apiErr.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
+				Expect(apiErr.Error()).To(ContainSubstring("cannot be found"))
 			})
 		})
 
 		Context("when the described service has no matching plan", func() {
-			It("returns apiResponse error", func() {
+			It("returns apiErr error", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
@@ -537,18 +537,18 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-plan-name",
 				}
 
-				_, apiResponse := repo.FindServicePlanByDescription(v2)
+				_, apiErr := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse).To(HaveOccurred())
-				Expect(apiResponse.IsNotFound()).To(BeTrue())
-				Expect(apiResponse.Error()).To(ContainSubstring("Plan"))
-				Expect(apiResponse.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiResponse.Error()).To(ContainSubstring("cannot be found"))
+				Expect(apiErr).To(HaveOccurred())
+				Expect(apiErr.IsNotFound()).To(BeTrue())
+				Expect(apiErr.Error()).To(ContainSubstring("Plan"))
+				Expect(apiErr.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
+				Expect(apiErr.Error()).To(ContainSubstring("cannot be found"))
 			})
 		})
 
 		Context("when we get an HTTP error", func() {
-			It("returns that apiResponse error", func() {
+			It("returns that apiErr error", func() {
 				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
 					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
@@ -562,10 +562,10 @@ var _ = Describe("Services Repo", func() {
 					ServicePlanName: "v2-plan-name",
 				}
 
-				_, apiResponse := repo.FindServicePlanByDescription(v2)
+				_, apiErr := repo.FindServicePlanByDescription(v2)
 
-				Expect(apiResponse).To(HaveOccurred())
-				_, ok := apiResponse.(errors.HttpError)
+				Expect(apiErr).To(HaveOccurred())
+				_, ok := apiErr.(errors.HttpError)
 				Expect(ok).To(BeTrue())
 			})
 		})
@@ -583,8 +583,8 @@ var _ = Describe("Services Repo", func() {
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			changedCount, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
-			Expect(apiResponse).NotTo(HaveOccurred())
+			changedCount, apiErr := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(changedCount).To(Equal(3))
 		})
 
@@ -599,8 +599,8 @@ var _ = Describe("Services Repo", func() {
 			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer ts.Close()
 
-			_, apiResponse := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
-			Expect(apiResponse).To(HaveOccurred())
+			_, apiErr := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			Expect(apiErr).To(HaveOccurred())
 		})
 	})
 })
@@ -778,9 +778,9 @@ func testRenameService(endpointPath string, serviceInstance models.ServiceInstan
 	ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 	defer ts.Close()
 
-	apiResponse := repo.RenameService(serviceInstance, "new-name")
+	apiErr := repo.RenameService(serviceInstance, "new-name")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiResponse).NotTo(HaveOccurred())
+	Expect(apiErr).NotTo(HaveOccurred())
 }
 
 func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {

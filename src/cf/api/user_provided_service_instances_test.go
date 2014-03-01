@@ -25,13 +25,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createUserProvidedServiceInstanceRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Create("my-custom-service", "", map[string]string{
+		apiErr := repo.Create("my-custom-service", "", map[string]string{
 			"host":     "example.com",
 			"user":     "me",
 			"password": "secret",
 		})
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestCreateUserProvidedServiceInstanceWithSyslogDrain", func() {
@@ -45,13 +45,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createUserProvidedServiceInstanceRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Create("my-custom-service", "syslog://example.com", map[string]string{
+		apiErr := repo.Create("my-custom-service", "syslog://example.com", map[string]string{
 			"host":     "example.com",
 			"user":     "me",
 			"password": "secret",
 		})
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateUserProvidedServiceInstance", func() {
@@ -75,9 +75,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance.Params = params
 		serviceInstance.SysLogDrainUrl = "syslog://example.com"
 
-		apiResponse := repo.Update(serviceInstance)
+		apiErr := repo.Update(serviceInstance)
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateUserProvidedServiceInstanceWithOnlyParams", func() {
@@ -99,9 +99,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance := models.ServiceInstanceFields{}
 		serviceInstance.Guid = "my-instance-guid"
 		serviceInstance.Params = params
-		apiResponse := repo.Update(serviceInstance)
+		apiErr := repo.Update(serviceInstance)
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestUpdateUserProvidedServiceInstanceWithOnlySysLogDrainUrl", func() {
@@ -117,9 +117,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		serviceInstance := models.ServiceInstanceFields{}
 		serviceInstance.Guid = "my-instance-guid"
 		serviceInstance.SysLogDrainUrl = "syslog://example.com"
-		apiResponse := repo.Update(serviceInstance)
+		apiErr := repo.Update(serviceInstance)
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

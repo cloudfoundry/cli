@@ -57,22 +57,22 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	org, apiResponse := cmd.orgRepo.FindByName(orgName)
+	org, apiErr := cmd.orgRepo.FindByName(orgName)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Org %s does not exist.", orgName)
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.orgRepo.Delete(org.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.orgRepo.Delete(org.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

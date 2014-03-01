@@ -51,16 +51,16 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	domain, apiResponse := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
+	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
-		cmd.ui.Warn(apiResponse.Error())
+		cmd.ui.Warn(apiErr.Error())
 		return
 	}
 
-	if apiResponse != nil {
-		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiErr.Error())
 		return
 	}
 
@@ -72,9 +72,9 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 		}
 	}
 
-	apiResponse = cmd.domainRepo.Delete(domain.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiResponse.Error())
+	apiErr = cmd.domainRepo.Delete(domain.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed("Error deleting domain %s\n%s", domainName, apiErr.Error())
 		return
 	}
 

@@ -55,14 +55,14 @@ func (cmd Login) Run(c *cli.Context) {
 
 	oldUserName := cmd.config.Username()
 
-	apiResponse := cmd.setApi(c)
-	if apiResponse != nil {
-		cmd.ui.Failed("Invalid API endpoint.\n%s", apiResponse.Error())
+	apiErr := cmd.setApi(c)
+	if apiErr != nil {
+		cmd.ui.Failed("Invalid API endpoint.\n%s", apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.authenticate(c)
-	if apiResponse != nil {
+	apiErr = cmd.authenticate(c)
+	if apiErr != nil {
 		cmd.ui.Failed("Unable to authenticate.")
 		return
 	}
@@ -89,7 +89,7 @@ func (cmd Login) Run(c *cli.Context) {
 	return
 }
 
-func (cmd Login) setApi(c *cli.Context) (apiResponse cferrors.Error) {
+func (cmd Login) setApi(c *cli.Context) (apiErr cferrors.Error) {
 	api := c.String("a")
 	if api == "" {
 		api = cmd.config.ApiEndpoint()
@@ -101,7 +101,7 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse cferrors.Error) {
 		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(api))
 	}
 
-	endpoint, apiResponse := cmd.endpointRepo.UpdateEndpoint(api)
+	endpoint, apiErr := cmd.endpointRepo.UpdateEndpoint(api)
 
 	if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
@@ -110,8 +110,8 @@ func (cmd Login) setApi(c *cli.Context) (apiResponse cferrors.Error) {
 	return
 }
 
-func (cmd Login) authenticate(c *cli.Context) (apiResponse cferrors.Error) {
-	prompts, apiResponse := cmd.authenticator.GetLoginPrompts()
+func (cmd Login) authenticate(c *cli.Context) (apiErr cferrors.Error) {
+	prompts, apiErr := cmd.authenticator.GetLoginPrompts()
 
 	var passwordKey string
 	credentials := make(map[string]string)
@@ -136,15 +136,15 @@ func (cmd Login) authenticate(c *cli.Context) (apiResponse cferrors.Error) {
 		cmd.ui.Say("Authenticating...")
 
 		credentials[passwordKey] = password
-		apiResponse = cmd.authenticator.Authenticate(credentials)
+		apiErr = cmd.authenticator.Authenticate(credentials)
 
-		if apiResponse == nil {
+		if apiErr == nil {
 			cmd.ui.Ok()
 			cmd.ui.Say("")
 			break
 		}
 
-		cmd.ui.Say(apiResponse.Error())
+		cmd.ui.Say(apiErr.Error())
 	}
 	return
 }
@@ -164,13 +164,13 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 		}
 
 		availableOrgs := []models.Organization{}
-		apiResponse := cmd.orgRepo.ListOrgs(func(o models.Organization) bool {
+		apiErr := cmd.orgRepo.ListOrgs(func(o models.Organization) bool {
 			availableOrgs = append(availableOrgs, o)
 			return len(availableOrgs) < maxChoices
 		})
 
-		if apiResponse != nil {
-			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiResponse.Error()))
+		if apiErr != nil {
+			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiErr.Error()))
 			return
 		}
 
@@ -188,10 +188,10 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 	}
 
 	var org models.Organization
-	var apiResponse cferrors.Error
-	org, apiResponse = cmd.orgRepo.FindByName(orgName)
-	if apiResponse != nil {
-		err = errors.New(apiResponse.Error())
+	var apiErr cferrors.Error
+	org, apiErr = cmd.orgRepo.FindByName(orgName)
+	if apiErr != nil {
+		err = errors.New(apiErr.Error())
 		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err)
 		return
 	}
@@ -228,13 +228,13 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 		}
 
 		var availableSpaces []models.Space
-		apiResponse := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
+		apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
 			availableSpaces = append(availableSpaces, space)
 			return (len(availableSpaces) < maxChoices)
 		})
 
-		if apiResponse != nil {
-			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiResponse.Error()))
+		if apiErr != nil {
+			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiErr.Error()))
 			cmd.ui.Failed(err.Error())
 			return
 		}
@@ -254,10 +254,10 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 	}
 
 	var space models.Space
-	var apiResponse cferrors.Error
-	space, apiResponse = cmd.spaceRepo.FindByName(spaceName)
-	if apiResponse != nil {
-		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiResponse.Error()))
+	var apiErr cferrors.Error
+	space, apiErr = cmd.spaceRepo.FindByName(spaceName)
+	if apiErr != nil {
+		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiErr.Error()))
 		cmd.ui.Failed(err.Error())
 		return
 	}

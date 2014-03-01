@@ -33,9 +33,9 @@ func (cmd ListStacks) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	stacks, apiResponse := cmd.stacksRepo.FindAll()
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	stacks, apiErr := cmd.stacksRepo.FindAll()
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

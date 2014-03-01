@@ -40,18 +40,18 @@ func (cmd Password) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("Changing password...")
-	apiResponse := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
+	apiErr := cmd.pwdRepo.UpdatePassword(oldPassword, newPassword)
 
-	switch typedErr := apiResponse.(type) {
+	switch typedErr := apiErr.(type) {
 	case nil:
 	case errors.HttpError:
 		if typedErr.StatusCode() == 401 {
 			cmd.ui.Failed("Current password did not match")
 		} else {
-			cmd.ui.Failed(apiResponse.Error())
+			cmd.ui.Failed(apiErr.Error())
 		}
 	default:
-		cmd.ui.Failed(apiResponse.Error())
+		cmd.ui.Failed(apiErr.Error())
 	}
 
 	cmd.ui.Ok()

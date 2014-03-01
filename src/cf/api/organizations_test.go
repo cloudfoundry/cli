@@ -47,7 +47,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		orgs := []models.Organization{}
-		apiResponse := repo.ListOrgs(func(o models.Organization) bool {
+		apiErr := repo.ListOrgs(func(o models.Organization) bool {
 			orgs = append(orgs, o)
 			return true
 		})
@@ -56,7 +56,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(orgs[0].Guid).To(Equal("org1-guid"))
 		Expect(orgs[1].Guid).To(Equal("org2-guid"))
 		Expect(orgs[2].Guid).To(Equal("org3-guid"))
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -71,13 +71,13 @@ var _ = Describe("Testing with ginkgo", func() {
 		defer ts.Close()
 
 		wasCalled := false
-		apiResponse := repo.ListOrgs(func(o models.Organization) bool {
+		apiErr := repo.ListOrgs(func(o models.Organization) bool {
 			wasCalled = true
 			return false
 		})
 
 		Expect(wasCalled).To(BeFalse())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 	})
 
@@ -113,9 +113,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		existingOrg.Guid = "org1-guid"
 		existingOrg.Name = "Org1"
 
-		org, apiResponse := repo.FindByName("Org1")
+		org, apiErr := repo.FindByName("Org1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		Expect(org.Name).To(Equal(existingOrg.Name))
 		Expect(org.Guid).To(Equal(existingOrg.Guid))
@@ -139,10 +139,10 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
-		_, apiResponse := repo.FindByName("org1")
+		_, apiErr := repo.FindByName("org1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiResponse.IsNotFound()).To(BeTrue())
+		Expect(apiErr.IsNotFound()).To(BeTrue())
 	})
 
 	It("TestCreateOrganization", func() {
@@ -156,9 +156,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Create("my-org")
+		apiErr := repo.Create("my-org")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestRenameOrganization", func() {
@@ -172,9 +172,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Rename("my-org-guid", "my-new-org")
+		apiErr := repo.Rename("my-org-guid", "my-new-org")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 
 	It("TestDeleteOrganization", func() {
@@ -187,9 +187,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createOrganizationRepo(req)
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-org-guid")
+		apiErr := repo.Delete("my-org-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

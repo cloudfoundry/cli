@@ -33,12 +33,12 @@ type DomainEntity struct {
 type DomainRepository interface {
 	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) errors.Error
 	ListSharedDomains(cb func(models.DomainFields) bool) errors.Error
-	FindByName(name string) (domain models.DomainFields, apiResponse errors.Error)
-	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiResponse errors.Error)
-	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiResponse errors.Error)
-	CreateSharedDomain(domainName string) (apiResponse errors.Error)
-	Delete(domainGuid string) (apiResponse errors.Error)
-	DeleteSharedDomain(domainGuid string) (apiResponse errors.Error)
+	FindByName(name string) (domain models.DomainFields, apiErr errors.Error)
+	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr errors.Error)
+	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr errors.Error)
+	CreateSharedDomain(domainName string) (apiErr errors.Error)
+	Delete(domainGuid string) (apiErr errors.Error)
+	DeleteSharedDomain(domainGuid string) (apiErr errors.Error)
 	ListDomains(cb func(models.DomainFields) bool) errors.Error
 }
 
@@ -62,15 +62,15 @@ func (repo CloudControllerDomainRepository) ListDomains(cb func(models.DomainFie
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) errors.Error {
-	apiResponse := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
-	if apiResponse != nil && apiResponse.IsNotFound() { // FIXME: needs semantic versioning
-		apiResponse = repo.listDomains("/v2/domains", cb)
+	apiErr := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
+	if apiErr != nil && apiErr.IsNotFound() { // FIXME: needs semantic versioning
+		apiErr = repo.listDomains("/v2/domains", cb)
 	}
 
-	return apiResponse
+	return apiErr
 }
 
-func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr errors.Error) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -85,92 +85,92 @@ func (repo CloudControllerDomainRepository) isOrgDomain(orgGuid string, domain m
 	return orgGuid == domain.OwningOrganizationGuid || domain.Shared
 }
 
-func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr errors.Error) {
 	return repo.findOneWithPath(
 		fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name)),
 		name)
 }
 
-func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiResponse errors.Error) {
-	domain, apiResponse = repo.findOneWithPath(
+func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiErr errors.Error) {
+	domain, apiErr = repo.findOneWithPath(
 		fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=%s", orgGuid, url.QueryEscape("name:"+name)),
 		name)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
-		domain, apiResponse = repo.FindByName(name)
+	if apiErr != nil && apiErr.IsNotFound() {
+		domain, apiErr = repo.FindByName(name)
 		if !domain.Shared {
-			apiResponse = errors.NewNotFoundError("Domain %s not found", name)
+			apiErr = errors.NewNotFoundError("Domain %s not found", name)
 		}
 	}
 
 	return
 }
 
-func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiErr errors.Error) {
 	foundDomain := false
-	apiResponse = repo.listDomains(path, func(result models.DomainFields) bool {
+	apiErr = repo.listDomains(path, func(result models.DomainFields) bool {
 		domain = result
 		foundDomain = true
 		return false
 	})
 
-	if apiResponse == nil && !foundDomain {
-		apiResponse = errors.NewNotFoundError("Domain %s not found", name)
+	if apiErr == nil && !foundDomain {
+		apiErr = errors.NewNotFoundError("Domain %s not found", name)
 	}
 
 	return
 }
 
-func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr errors.Error) {
 	data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid)
 	resource := new(DomainResource)
 
 	path := repo.config.ApiEndpoint() + "/v2/private_domains"
-	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		path := repo.config.ApiEndpoint() + "/v2/domains"
 		data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s", "wildcard": true}`, domainName, owningOrgGuid)
-		apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
+		apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 	}
 
-	if apiResponse == nil {
+	if apiErr == nil {
 		createdDomain = resource.ToFields()
 	}
 	return
 }
 
-func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiErr errors.Error) {
 	path := repo.config.ApiEndpoint() + "/v2/shared_domains"
 	data := strings.NewReader(fmt.Sprintf(`{"name":"%s"}`, domainName))
-	apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
+	apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		path := repo.config.ApiEndpoint() + "/v2/domains"
 		data := strings.NewReader(fmt.Sprintf(`{"name":"%s", "wildcard": true}`, domainName))
-		apiResponse = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
+		apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
 	}
 	return
 }
 
-func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+		apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	}
 	return
 }
 
-func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiResponse errors.Error) {
+func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/shared_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	if apiErr != nil && apiErr.IsNotFound() {
 		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-		apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+		apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	}
 	return
 }

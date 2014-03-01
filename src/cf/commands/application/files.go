@@ -56,9 +56,9 @@ func (cmd *Files) Run(c *cli.Context) {
 		path = c.Args()[1]
 	}
 
-	list, apiResponse := cmd.appFilesRepo.ListFiles(app.Guid, path)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	list, apiErr := cmd.appFilesRepo.ListFiles(app.Guid, path)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

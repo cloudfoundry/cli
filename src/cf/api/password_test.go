@@ -24,9 +24,9 @@ var _ = Describe("CloudControllerPasswordRepository", func() {
 		passwordUpdateServer, handler, repo := createPasswordRepo(req)
 		defer passwordUpdateServer.Close()
 
-		apiResponse := repo.UpdatePassword("old-password", "new-password")
+		apiErr := repo.UpdatePassword("old-password", "new-password")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

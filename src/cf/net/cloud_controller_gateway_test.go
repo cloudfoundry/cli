@@ -33,12 +33,12 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		defer ts.Close()
 		gateway.AddTrustedCerts(ts.TLS.Certificates)
 
-		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		apiResponse = gateway.PerformRequest(request)
+		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+		apiErr = gateway.PerformRequest(request)
 
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.Error()).To(ContainSubstring("The host is taken: test1"))
-		Expect(apiResponse.ErrorCode()).To(ContainSubstring("210003"))
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.Error()).To(ContainSubstring("The host is taken: test1"))
+		Expect(apiErr.ErrorCode()).To(ContainSubstring("210003"))
 	})
 
 	It("parses invalid token responses", func() {
@@ -46,11 +46,11 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		defer ts.Close()
 		gateway.AddTrustedCerts(ts.TLS.Certificates)
 
-		request, apiResponse := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		apiResponse = gateway.PerformRequest(request)
+		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
+		apiErr = gateway.PerformRequest(request)
 
-		Expect(apiResponse).NotTo(BeNil())
-		Expect(apiResponse.Error()).To(ContainSubstring("The token is invalid"))
-		Expect(apiResponse.ErrorCode()).To(ContainSubstring(INVALID_TOKEN_CODE))
+		Expect(apiErr).NotTo(BeNil())
+		Expect(apiErr.Error()).To(ContainSubstring("The token is invalid"))
+		Expect(apiErr.ErrorCode()).To(ContainSubstring(INVALID_TOKEN_CODE))
 	})
 })

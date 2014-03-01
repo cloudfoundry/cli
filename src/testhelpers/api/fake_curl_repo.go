@@ -9,10 +9,10 @@ type FakeCurlRepository struct {
 	Body           string
 	ResponseHeader string
 	ResponseBody   string
-	ApiResponse    errors.Error
+	Error          errors.Error
 }
 
-func (repo *FakeCurlRepository) Request(method, path, header, body string) (resHeaders, resBody string, apiResponse errors.Error) {
+func (repo *FakeCurlRepository) Request(method, path, header, body string) (resHeaders, resBody string, apiErr errors.Error) {
 	repo.Method = method
 	repo.Path = path
 	repo.Header = header
@@ -20,6 +20,6 @@ func (repo *FakeCurlRepository) Request(method, path, header, body string) (resH
 
 	resHeaders = repo.ResponseHeader
 	resBody = repo.ResponseBody
-	apiResponse = repo.ApiResponse
+	apiErr = repo.Error
 	return
 }

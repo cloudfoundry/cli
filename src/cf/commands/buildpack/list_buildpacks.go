@@ -33,7 +33,7 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 	table := cmd.ui.Table([]string{"buildpack", "position", "enabled", "locked", "filename"})
 	noBuildpacks := true
 
-	apiResponse := cmd.buildpackRepo.ListBuildpacks(func(buildpack models.Buildpack) bool {
+	apiErr := cmd.buildpackRepo.ListBuildpacks(func(buildpack models.Buildpack) bool {
 		position := ""
 		if buildpack.Position != nil {
 			position = strconv.Itoa(*buildpack.Position)
@@ -57,8 +57,8 @@ func (cmd ListBuildpacks) Run(c *cli.Context) {
 		return true
 	})
 
-	if apiResponse != nil {
-		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed("Failed fetching buildpacks.\n%s", apiErr.Error())
 		return
 	}
 

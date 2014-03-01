@@ -52,9 +52,9 @@ func (cmd Api) SetApiEndpoint(endpoint string) {
 
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
 
-	endpoint, apiResponse := cmd.endpointRepo.UpdateEndpoint(endpoint)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	endpoint, apiErr := cmd.endpointRepo.UpdateEndpoint(endpoint)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

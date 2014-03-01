@@ -12,11 +12,11 @@ import (
 )
 
 type BuildpackRepository interface {
-	FindByName(name string) (buildpack models.Buildpack, apiResponse errors.Error)
+	FindByName(name string) (buildpack models.Buildpack, apiErr errors.Error)
 	ListBuildpacks(func(models.Buildpack) bool) errors.Error
-	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse errors.Error)
-	Delete(buildpackGuid string) (apiResponse errors.Error)
-	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse errors.Error)
+	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr errors.Error)
+	Delete(buildpackGuid string) (apiErr errors.Error)
+	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr errors.Error)
 }
 
 type CloudControllerBuildpackRepository struct {
@@ -41,9 +41,9 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 		})
 }
 
-func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse errors.Error) {
+func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr errors.Error) {
 	foundIt := false
-	apiResponse = repo.gateway.ListPaginatedResources(
+	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:"+name)),
@@ -55,23 +55,23 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 		})
 
 	if !foundIt {
-		apiResponse = errors.NewNotFoundError("%s %s not found", "Buildpack", name)
+		apiErr = errors.NewNotFoundError("%s %s not found", "Buildpack", name)
 	}
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse errors.Error) {
+func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr errors.Error) {
 	path := repo.config.ApiEndpoint() + buildpacks_path
 	entity := BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
 	if err != nil {
-		apiResponse = errors.NewErrorWithError("Could not serialize information", err)
+		apiErr = errors.NewErrorWithError("Could not serialize information", err)
 		return
 	}
 
 	resource := new(BuildpackResource)
-	apiResponse = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
-	if apiResponse != nil {
+	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
+	if apiErr != nil {
 		return
 	}
 
@@ -79,26 +79,26 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiResponse errors.Error) {
+func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr errors.Error) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpackGuid)
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse errors.Error) {
+func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr errors.Error) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
 
 	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled, "", "", buildpack.Locked}
 
 	body, err := json.Marshal(entity)
 	if err != nil {
-		apiResponse = errors.NewErrorWithError("Could not serialize updates.", err)
+		apiErr = errors.NewErrorWithError("Could not serialize updates.", err)
 		return
 	}
 
 	resource := new(BuildpackResource)
-	apiResponse = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
-	if apiResponse != nil {
+	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
+	if apiErr != nil {
 		return
 	}
 

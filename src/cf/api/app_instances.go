@@ -33,7 +33,7 @@ type InstanceStatsApiResponse struct {
 }
 
 type AppInstancesRepository interface {
-	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse errors.Error)
+	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr errors.Error)
 }
 
 type CloudControllerAppInstancesRepository struct {
@@ -47,17 +47,17 @@ func NewCloudControllerAppInstancesRepository(config configuration.Reader, gatew
 	return
 }
 
-func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiResponse errors.Error) {
+func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid)
-	request, apiResponse := repo.gateway.NewRequest("GET", path, repo.config.AccessToken(), nil)
-	if apiResponse != nil {
+	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken(), nil)
+	if apiErr != nil {
 		return
 	}
 
 	instancesResponse := InstancesApiResponse{}
 
-	_, apiResponse = repo.gateway.PerformRequestForJSONResponse(request, &instancesResponse)
-	if apiResponse != nil {
+	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &instancesResponse)
+	if apiErr != nil {
 		return
 	}
 
@@ -77,11 +77,11 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 	return repo.updateInstancesWithStats(appGuid, instances)
 }
 
-func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiResponse errors.Error) {
+func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.ApiEndpoint(), guid)
 	statsResponse := StatsApiResponse{}
-	apiResponse = repo.gateway.GetResource(path, repo.config.AccessToken(), &statsResponse)
-	if apiResponse != nil {
+	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), &statsResponse)
+	if apiErr != nil {
 		return
 	}
 

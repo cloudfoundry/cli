@@ -10,8 +10,8 @@ import (
 )
 
 type ServiceBindingRepository interface {
-	Create(instanceGuid, appGuid string) (apiResponse errors.Error)
-	Delete(instance models.ServiceInstance, appGuid string) (found bool, apiResponse errors.Error)
+	Create(instanceGuid, appGuid string) (apiErr errors.Error)
+	Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr errors.Error)
 }
 
 type CloudControllerServiceBindingRepository struct {
@@ -25,7 +25,7 @@ func NewCloudControllerServiceBindingRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string) (apiResponse errors.Error) {
+func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid string) (apiErr errors.Error) {
 	path := fmt.Sprintf("%s/v2/service_bindings", repo.config.ApiEndpoint())
 	body := fmt.Sprintf(
 		`{"app_guid":"%s","service_instance_guid":"%s","async":true}`,
@@ -34,7 +34,7 @@ func (repo CloudControllerServiceBindingRepository) Create(instanceGuid, appGuid
 	return repo.gateway.CreateResource(path, repo.config.AccessToken(), strings.NewReader(body))
 }
 
-func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiResponse errors.Error) {
+func (repo CloudControllerServiceBindingRepository) Delete(instance models.ServiceInstance, appGuid string) (found bool, apiErr errors.Error) {
 	var path string
 
 	for _, binding := range instance.ServiceBindings {
@@ -50,6 +50,6 @@ func (repo CloudControllerServiceBindingRepository) Delete(instance models.Servi
 		found = true
 	}
 
-	apiResponse = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	return
 }

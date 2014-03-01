@@ -31,18 +31,18 @@ func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bo
 	return nil
 }
 
-func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiResponse errors.Error) {
+func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr errors.Error) {
 	repo.FindByNameName = name
 	buildpack = repo.FindByNameBuildpack
 
 	if repo.FindByNameNotFound {
-		apiResponse = errors.NewNotFoundError("Buildpack %s not found", name)
+		apiErr = errors.NewNotFoundError("Buildpack %s not found", name)
 	}
 
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiResponse errors.Error) {
+func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr errors.Error) {
 	if repo.CreateBuildpackExists {
 		return repo.CreateBuildpack, errors.NewError("Buildpack already exists", cf.BUILDPACK_EXISTS)
 	}
@@ -51,13 +51,13 @@ func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled 
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
-func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiResponse errors.Error) {
+func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiErr errors.Error) {
 	repo.DeleteBuildpackGuid = buildpackGuid
-	apiResponse = repo.DeleteApiResponse
+	apiErr = repo.DeleteApiResponse
 	return
 }
 
-func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiResponse errors.Error) {
+func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr errors.Error) {
 	repo.UpdateBuildpack = buildpack
 	return
 }

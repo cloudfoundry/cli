@@ -45,9 +45,9 @@ func (cmd *CreateSharedDomain) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.domainRepo.CreateSharedDomain(domainName)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr := cmd.domainRepo.CreateSharedDomain(domainName)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

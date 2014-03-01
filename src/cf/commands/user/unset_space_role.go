@@ -53,9 +53,9 @@ func (cmd *UnsetSpaceRole) Run(c *cli.Context) {
 
 	user := cmd.userReq.GetUser()
 	org := cmd.orgReq.GetOrganization()
-	space, apiResponse := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	space, apiErr := cmd.spaceRepo.FindByNameInOrg(spaceName, org.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -67,10 +67,10 @@ func (cmd *UnsetSpaceRole) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse = cmd.userRepo.UnsetSpaceRole(user.Guid, space.Guid, role)
+	apiErr = cmd.userRepo.UnsetSpaceRole(user.Guid, space.Guid, role)
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

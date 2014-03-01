@@ -49,29 +49,29 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 	}
 	force := c.Bool("f")
 
-	v1Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v1)
-	if apiResponse != nil {
-		if apiResponse.IsNotFound() {
+	v1Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v1)
+	if apiErr != nil {
+		if apiErr.IsNotFound() {
 			cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v1.String()))
 		} else {
-			cmd.ui.Failed(apiResponse.Error())
+			cmd.ui.Failed(apiErr.Error())
 		}
 		return
 	}
 
-	v2Guid, apiResponse := cmd.serviceRepo.FindServicePlanByDescription(v2)
-	if apiResponse != nil {
-		if apiResponse.IsNotFound() {
+	v2Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v2)
+	if apiErr != nil {
+		if apiErr.IsNotFound() {
 			cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v2.String()))
 		} else {
-			cmd.ui.Failed(apiResponse.Error())
+			cmd.ui.Failed(apiErr.Error())
 		}
 		return
 	}
 
-	count, apiResponse := cmd.serviceRepo.GetServiceInstanceCountForServicePlan(v1Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	count, apiErr := cmd.serviceRepo.GetServiceInstanceCountForServicePlan(v1Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	} else if count == 0 {
 		cmd.ui.Failed("Plan %s has no service instances to migrate", terminal.EntityNameColor(v1.String()))
@@ -101,9 +101,9 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 
 	cmd.ui.Say("Attempting to migrate %s...", serviceInstancesPhrase)
 
-	changedCount, apiResponse := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1Guid, v2Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	changedCount, apiErr := cmd.serviceRepo.MigrateServicePlanFromV1ToV2(v1Guid, v2Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 	}
 
 	cmd.ui.Say("%s migrated.", pluralizeServiceInstances(changedCount))

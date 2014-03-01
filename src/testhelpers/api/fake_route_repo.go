@@ -37,7 +37,7 @@ type FakeRouteRepository struct {
 	DeleteRouteGuid string
 }
 
-func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiResponse errors.Error) {
+func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr errors.Error) {
 	if repo.ListErr {
 		return errors.NewErrorWithMessage("WHOOPSIE")
 	}
@@ -50,34 +50,34 @@ func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiResp
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHost(host string) (route models.Route, apiResponse errors.Error) {
+func (repo *FakeRouteRepository) FindByHost(host string) (route models.Route, apiErr errors.Error) {
 	repo.FindByHostHost = host
 
 	if repo.FindByHostErr {
-		apiResponse = errors.NewErrorWithMessage("Route not found")
+		apiErr = errors.NewErrorWithMessage("Route not found")
 	}
 
 	route = repo.FindByHostRoute
 	return
 }
 
-func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route models.Route, apiResponse errors.Error) {
+func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route models.Route, apiErr errors.Error) {
 	repo.FindByHostAndDomainHost = host
 	repo.FindByHostAndDomainDomain = domain
 
 	if repo.FindByHostAndDomainErr {
-		apiResponse = errors.NewErrorWithMessage("Error finding Route")
+		apiErr = errors.NewErrorWithMessage("Error finding Route")
 	}
 
 	if repo.FindByHostAndDomainNotFound {
-		apiResponse = errors.NewNotFoundError("%s %s.%s not found", "Org", host, domain)
+		apiErr = errors.NewNotFoundError("%s %s.%s not found", "Org", host, domain)
 	}
 
 	route = repo.FindByHostAndDomainRoute
 	return
 }
 
-func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute models.Route, apiResponse errors.Error) {
+func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute models.Route, apiErr errors.Error) {
 	repo.CreatedHost = host
 	repo.CreatedDomainGuid = domainGuid
 
@@ -86,13 +86,13 @@ func (repo *FakeRouteRepository) Create(host, domainGuid string) (createdRoute m
 	return
 }
 
-func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiResponse errors.Error) {
+func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr errors.Error) {
 	repo.CreateInSpaceHost = host
 	repo.CreateInSpaceDomainGuid = domainGuid
 	repo.CreateInSpaceSpaceGuid = spaceGuid
 
 	if repo.CreateInSpaceErr {
-		apiResponse = errors.NewErrorWithMessage("Error")
+		apiErr = errors.NewErrorWithMessage("Error")
 	} else {
 		createdRoute = repo.CreateInSpaceCreatedRoute
 	}
@@ -100,19 +100,19 @@ func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid strin
 	return
 }
 
-func (repo *FakeRouteRepository) Bind(routeGuid, appGuid string) (apiResponse errors.Error) {
+func (repo *FakeRouteRepository) Bind(routeGuid, appGuid string) (apiErr errors.Error) {
 	repo.BoundRouteGuid = routeGuid
 	repo.BoundAppGuid = appGuid
 	return
 }
 
-func (repo *FakeRouteRepository) Unbind(routeGuid, appGuid string) (apiResponse errors.Error) {
+func (repo *FakeRouteRepository) Unbind(routeGuid, appGuid string) (apiErr errors.Error) {
 	repo.UnboundRouteGuid = routeGuid
 	repo.UnboundAppGuid = appGuid
 	return
 }
 
-func (repo *FakeRouteRepository) Delete(routeGuid string) (apiResponse errors.Error) {
+func (repo *FakeRouteRepository) Delete(routeGuid string) (apiErr errors.Error) {
 	repo.DeleteRouteGuid = routeGuid
 	return
 }

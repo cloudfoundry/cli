@@ -51,9 +51,9 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 	domain := cmd.domainReq.GetDomain()
 	app := cmd.appReq.GetApplication()
 
-	route, apiResponse := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 	}
 	cmd.ui.Say("Removing route %s from app %s in org %s / space %s as %s...",
 		terminal.EntityNameColor(route.URL()),
@@ -63,9 +63,9 @@ func (cmd *UnmapRoute) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse = cmd.routeRepo.Unbind(route.Guid, app.Guid)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.routeRepo.Unbind(route.Guid, app.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

@@ -11,8 +11,8 @@ type FakeAuthenticationRepository struct {
 		Credentials map[string]string
 	}
 	GetLoginPromptsReturns struct {
-		ApiResponse errors.Error
-		Prompts     map[string]configuration.AuthPrompt
+		Error   errors.Error
+		Prompts map[string]configuration.AuthPrompt
 	}
 
 	AuthError    bool
@@ -20,11 +20,11 @@ type FakeAuthenticationRepository struct {
 	RefreshToken string
 }
 
-func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiResponse errors.Error) {
+func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr errors.Error) {
 	auth.AuthenticateArgs.Credentials = credentials
 
 	if auth.AuthError {
-		apiResponse = errors.NewErrorWithMessage("Error authenticating.")
+		apiErr = errors.NewErrorWithMessage("Error authenticating.")
 		return
 	}
 
@@ -38,12 +38,12 @@ func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]st
 	return
 }
 
-func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiResponse errors.Error) {
+func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr errors.Error) {
 	return
 }
 
-func (auth *FakeAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiResponse errors.Error) {
+func (auth *FakeAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
 	prompts = auth.GetLoginPromptsReturns.Prompts
-	apiResponse = auth.GetLoginPromptsReturns.ApiResponse
+	apiErr = auth.GetLoginPromptsReturns.Error
 	return
 }

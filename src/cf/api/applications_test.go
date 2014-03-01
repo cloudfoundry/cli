@@ -19,9 +19,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{findAppRequest})
 			defer ts.Close()
 
-			app, apiResponse := repo.Read("My App")
+			app, apiErr := repo.Read("My App")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(app.Name).To(Equal("My App"))
 			Expect(app.Guid).To(Equal("app1-guid"))
 			Expect(app.Memory).To(Equal(uint64(128)))
@@ -40,9 +40,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
 			defer ts.Close()
 
-			_, apiResponse := repo.Read("My App")
+			_, apiErr := repo.Read("My App")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse.IsNotFound()).To(BeTrue())
+			Expect(apiErr.IsNotFound()).To(BeTrue())
 		})
 	})
 
@@ -52,10 +52,10 @@ var _ = Describe("Testing with ginkgo", func() {
 			defer ts.Close()
 
 			params := defaultAppParams()
-			createdApp, apiResponse := repo.Create(params)
+			createdApp, apiErr := repo.Create(params)
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 
 			app := models.Application{}
 			app.Name = "my-cool-app"
@@ -79,9 +79,9 @@ var _ = Describe("Testing with ginkgo", func() {
 			params.StackGuid = nil
 			params.Command = nil
 
-			_, apiResponse := repo.Create(params)
+			_, apiErr := repo.Create(params)
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
 
@@ -102,10 +102,10 @@ var _ = Describe("Testing with ginkgo", func() {
 			app.State = "started"
 			app.DiskQuota = 512
 
-			updatedApp, apiResponse := repo.Update(app.Guid, app.ToParams())
+			updatedApp, apiErr := repo.Update(app.Guid, app.ToParams())
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(updatedApp.Name).To(Equal("my-cool-app"))
 			Expect(updatedApp.Guid).To(Equal("my-cool-app-guid"))
 		})
@@ -124,10 +124,10 @@ var _ = Describe("Testing with ginkgo", func() {
 			envParams := map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
 			params := models.AppParams{EnvironmentVars: &envParams}
 
-			_, apiResponse := repo.Update("app1-guid", params)
+			_, apiErr := repo.Update("app1-guid", params)
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiResponse).NotTo(HaveOccurred())
+			Expect(apiErr).NotTo(HaveOccurred())
 		})
 	})
 
@@ -141,9 +141,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		ts, handler, repo := createAppRepo([]testnet.TestRequest{deleteApplicationRequest})
 		defer ts.Close()
 
-		apiResponse := repo.Delete("my-cool-app-guid")
+		apiErr := repo.Delete("my-cool-app-guid")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 	})
 })
 

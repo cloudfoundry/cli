@@ -146,11 +146,11 @@ var _ = Describe("Testing with ginkgo", func() {
 		configRepo.SetOrganizationFields(orgFields)
 
 		cmd := NewCreateRoute(ui, configRepo, routeRepo)
-		route, apiResponse := cmd.CreateRoute("my-host", domain, space)
+		route, apiErr := cmd.CreateRoute("my-host", domain, space)
 
 		Expect(route.Guid).To(Equal(createdRoute.Guid))
 
-		Expect(apiResponse).NotTo(HaveOccurred())
+		Expect(apiErr).NotTo(HaveOccurred())
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "my-host.example.com", "my-org", "my-space", "my-user"},

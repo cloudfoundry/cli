@@ -58,10 +58,10 @@ func (cmd *UnsetOrgRole) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userRepo.UnsetOrgRole(user.Guid, org.Guid, role)
+	apiErr := cmd.userRepo.UnsetOrgRole(user.Guid, org.Guid, role)
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

@@ -25,9 +25,9 @@ func NewCloudControllerPasswordRepository(config configuration.Reader, gateway n
 	return
 }
 
-func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiResponse errors.Error) {
-	uaaEndpoint, apiResponse := repo.endpointRepo.GetUAAEndpoint()
-	if apiResponse != nil {
+func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiErr errors.Error) {
+	uaaEndpoint, apiErr := repo.endpointRepo.GetUAAEndpoint()
+	if apiErr != nil {
 		return
 	}
 

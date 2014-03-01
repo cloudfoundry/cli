@@ -26,7 +26,7 @@ type AppFileResource struct {
 }
 
 type ApplicationBitsRepository interface {
-	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiResponse errors.Error)
+	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr errors.Error)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -42,10 +42,10 @@ func NewCloudControllerApplicationBitsRepository(config configuration.Reader, ga
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, cb func(path string, zipSize, fileCount uint64)) (apiResponse errors.Error) {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, cb func(path string, zipSize, fileCount uint64)) (apiErr errors.Error) {
 	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
-			apiResponse = errors.NewErrorWithMessage(err.Error())
+			apiErr = errors.NewErrorWithMessage(err.Error())
 			return
 		}
 
@@ -59,31 +59,31 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 		})
 
 		if err != nil {
-			apiResponse = errors.NewErrorWithMessage("%s", err)
+			apiErr = errors.NewErrorWithMessage("%s", err)
 			return
 		}
 
 		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
 			if err != nil {
-				apiResponse = errors.NewErrorWithMessage("%s", err.Error())
+				apiErr = errors.NewErrorWithMessage("%s", err.Error())
 				return
 			}
 
 			err = repo.zipper.Zip(uploadDir, zipFile)
 			if err != nil {
-				apiResponse = errors.NewErrorWithError("Error zipping application", err)
+				apiErr = errors.NewErrorWithError("Error zipping application", err)
 				return
 			}
 
 			stat, err := zipFile.Stat()
 			if err != nil {
-				apiResponse = errors.NewErrorWithError("Error zipping application", err)
+				apiErr = errors.NewErrorWithError("Error zipping application", err)
 				return
 			}
 			cb(appDir, uint64(stat.Size()), cf.CountFiles(uploadDir))
 
-			apiResponse = repo.uploadBits(appGuid, zipFile, presentResourcesJson)
-			if apiResponse != nil {
+			apiErr = repo.uploadBits(appGuid, zipFile, presentResourcesJson)
+			if apiErr != nil {
 				return
 			}
 		})
@@ -91,23 +91,23 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiResponse errors.Error) {
+func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiErr errors.Error) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.ApiEndpoint(), appGuid)
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
-			apiResponse = errors.NewErrorWithError("Error creating tmp file: %s", err)
+			apiErr = errors.NewErrorWithError("Error creating tmp file: %s", err)
 			return
 		}
 
 		boundary, err := repo.writeUploadBody(zipFile, requestFile, presentResourcesJson)
 		if err != nil {
-			apiResponse = errors.NewErrorWithError("Error writing to tmp file: %s", err)
+			apiErr = errors.NewErrorWithError("Error writing to tmp file: %s", err)
 			return
 		}
 
 		var request *net.Request
-		request, apiResponse = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
-		if apiResponse != nil {
+		request, apiErr = repo.gateway.NewRequest("PUT", url, repo.config.AccessToken(), requestFile)
+		if apiErr != nil {
 			return
 		}
 
@@ -115,8 +115,8 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 		request.HttpReq.Header.Set("Content-Type", contentType)
 
 		response := &Resource{}
-		_, apiResponse = repo.gateway.PerformPollingRequestForJSONResponse(request, response, 5*time.Minute)
-		if apiResponse != nil {
+		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(request, response, 5*time.Minute)
+		if apiErr != nil {
 			return
 		}
 	})
@@ -143,9 +143,9 @@ func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir 
 		return
 	}
 
-	appFilesToUpload, presentResourcesJson, apiResponse := repo.getFilesToUpload(allAppFiles)
-	if apiResponse != nil {
-		err = errors.New(apiResponse.Error())
+	appFilesToUpload, presentResourcesJson, apiErr := repo.getFilesToUpload(allAppFiles)
+	if apiErr != nil {
+		err = errors.New(apiErr.Error())
 		return
 	}
 
@@ -199,7 +199,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(appDir, destDir 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiResponse errors.Error) {
+func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiErr errors.Error) {
 	appFilesRequest := []AppFileResource{}
 	for _, file := range allAppFiles {
 		appFilesRequest = append(appFilesRequest, AppFileResource{
@@ -211,23 +211,23 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 
 	allAppFilesJson, err := json.Marshal(appFilesRequest)
 	if err != nil {
-		apiResponse = errors.NewErrorWithError("Failed to create json for resource_match request", err)
+		apiErr = errors.NewErrorWithError("Failed to create json for resource_match request", err)
 		return
 	}
 
 	path := fmt.Sprintf("%s/v2/resource_match", repo.config.ApiEndpoint())
-	req, apiResponse := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken(), bytes.NewReader(allAppFilesJson))
-	if apiResponse != nil {
+	req, apiErr := repo.gateway.NewRequest("PUT", path, repo.config.AccessToken(), bytes.NewReader(allAppFilesJson))
+	if apiErr != nil {
 		return
 	}
 
-	presentResourcesJson, _, _, apiResponse = repo.gateway.PerformRequestForResponseBytes(req)
+	presentResourcesJson, _, _, apiErr = repo.gateway.PerformRequestForResponseBytes(req)
 
 	fileResource := []AppFileResource{}
 	err = json.Unmarshal(presentResourcesJson, &fileResource)
 
 	if err != nil {
-		apiResponse = errors.NewErrorWithError("Failed to unmarshal json response from resource_match request", err)
+		apiErr = errors.NewErrorWithError("Failed to unmarshal json response from resource_match request", err)
 		return
 	}
 

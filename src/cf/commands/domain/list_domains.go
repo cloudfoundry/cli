@@ -50,16 +50,16 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 
 	noDomains := true
 	table := cmd.ui.Table([]string{"name                              ", "status"})
-	apiResponse := cmd.domainRepo.ListSharedDomains(domainsCallback(table, &noDomains))
+	apiErr := cmd.domainRepo.ListSharedDomains(domainsCallback(table, &noDomains))
 
-	if apiResponse != nil && !apiResponse.IsNotFound() {
-		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiResponse.Error())
+	if apiErr != nil && !apiErr.IsNotFound() {
+		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
-	if apiResponse != nil {
-		cmd.ui.Failed("Failed fetching private domains.\n%s", apiResponse.Error())
+	apiErr = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
+	if apiErr != nil {
+		cmd.ui.Failed("Failed fetching private domains.\n%s", apiErr.Error())
 		return
 	}
 

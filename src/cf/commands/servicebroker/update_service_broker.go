@@ -35,9 +35,9 @@ func (cmd UpdateServiceBroker) GetRequirements(reqFactory requirements.Factory, 
 }
 
 func (cmd UpdateServiceBroker) Run(c *cli.Context) {
-	serviceBroker, apiResponse := cmd.repo.FindByName(c.Args()[0])
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	serviceBroker, apiErr := cmd.repo.FindByName(c.Args()[0])
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -50,10 +50,10 @@ func (cmd UpdateServiceBroker) Run(c *cli.Context) {
 	serviceBroker.Password = c.Args()[2]
 	serviceBroker.Url = c.Args()[3]
 
-	apiResponse = cmd.repo.Update(serviceBroker)
+	apiErr = cmd.repo.Update(serviceBroker)
 
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

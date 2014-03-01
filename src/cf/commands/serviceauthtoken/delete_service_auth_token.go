@@ -50,20 +50,20 @@ func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("Deleting service auth token as %s", terminal.EntityNameColor(cmd.config.Username()))
-	token, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
-	if apiResponse != nil && apiResponse.IsNotFound() {
+	token, apiErr := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
+	if apiErr != nil && apiErr.IsNotFound() {
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Auth Token %s %s does not exist.", tokenLabel, tokenProvider)
 		return
 	}
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
-	apiResponse = cmd.authTokenRepo.Delete(token)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.authTokenRepo.Delete(token)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

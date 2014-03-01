@@ -38,12 +38,12 @@ func (cmd Authenticate) Run(c *cli.Context) {
 	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.ApiEndpoint()))
 
 	cmd.ui.Say("Authenticating...")
-	apiResponse := cmd.authenticator.Authenticate(map[string]string{
+	apiErr := cmd.authenticator.Authenticate(map[string]string{
 		"username": c.Args()[0],
 		"password": c.Args()[1],
 	})
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

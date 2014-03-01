@@ -28,11 +28,11 @@ func NewOrganizationRequirement(name string, ui terminal.UI, sR api.Organization
 }
 
 func (req *organizationApiRequirement) Execute() (success bool) {
-	var apiResponse errors.Error
-	req.org, apiResponse = req.orgRepo.FindByName(req.name)
+	var apiErr errors.Error
+	req.org, apiErr = req.orgRepo.FindByName(req.name)
 
-	if apiResponse != nil {
-		req.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 

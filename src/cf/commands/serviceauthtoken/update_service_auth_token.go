@@ -38,17 +38,17 @@ func (cmd UpdateServiceAuthTokenFields) GetRequirements(reqFactory requirements.
 func (cmd UpdateServiceAuthTokenFields) Run(c *cli.Context) {
 	cmd.ui.Say("Updating service auth token as %s...", terminal.EntityNameColor(cmd.config.Username()))
 
-	serviceAuthToken, apiResponse := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	serviceAuthToken, apiErr := cmd.authTokenRepo.FindByLabelAndProvider(c.Args()[0], c.Args()[1])
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	serviceAuthToken.Token = c.Args()[2]
 
-	apiResponse = cmd.authTokenRepo.Update(serviceAuthToken)
-	if apiResponse != nil {
-		cmd.ui.Failed(apiResponse.Error())
+	apiErr = cmd.authTokenRepo.Update(serviceAuthToken)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 

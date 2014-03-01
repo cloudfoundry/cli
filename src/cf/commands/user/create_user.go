@@ -43,9 +43,9 @@ func (cmd CreateUserFields) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiResponse := cmd.userRepo.Create(username, password)
-	if apiResponse != nil {
-		cmd.ui.Failed("Error creating user %s.\n%s", terminal.EntityNameColor(username), apiResponse.Error())
+	apiErr := cmd.userRepo.Create(username, password)
+	if apiErr != nil {
+		cmd.ui.Failed("Error creating user %s.\n%s", terminal.EntityNameColor(username), apiErr.Error())
 		return
 	}
 

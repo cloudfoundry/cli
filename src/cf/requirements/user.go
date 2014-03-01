@@ -28,11 +28,11 @@ func NewUserRequirement(username string, ui terminal.UI, userRepo api.UserReposi
 }
 
 func (req *userApiRequirement) Execute() (success bool) {
-	var apiResponse errors.Error
-	req.user, apiResponse = req.userRepo.FindByUsername(req.username)
+	var apiErr errors.Error
+	req.user, apiErr = req.userRepo.FindByUsername(req.username)
 
-	if apiResponse != nil {
-		req.ui.Failed(apiResponse.Error())
+	if apiErr != nil {
+		req.ui.Failed(apiErr.Error())
 		return false
 	}
 
