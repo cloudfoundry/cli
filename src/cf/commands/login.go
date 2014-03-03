@@ -108,8 +108,8 @@ func (cmd Login) setApi(c *cli.Context) (apiErr cferrors.Error) {
 	if apiErr != nil {
 		cmd.config.SetApiEndpoint("")
 	} else if !strings.HasPrefix(endpoint, "https://") {
-			cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
-  }
+		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
+	}
 
 	return
 }
