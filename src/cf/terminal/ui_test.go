@@ -133,6 +133,14 @@ var _ = Describe("UI", func() {
 			})
 		})
 	})
+
+	Describe("failing", func() {
+		It("panics with a specific string", func() {
+			testassert.AssertPanic(FailedWasCalled, func() {
+				NewUI(os.Stdin).Failed("uh oh")
+			})
+		})
+	})
 })
 
 func simulateStdin(input string, block func(r io.Reader)) {
