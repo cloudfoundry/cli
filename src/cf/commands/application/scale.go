@@ -96,8 +96,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 		params.InstanceCount = &instances
 	}
 
-
-	if shouldRestart && ! cmd.confirmRestart(c, currentApp.Name) {
+	if shouldRestart && !cmd.confirmRestart(c, currentApp.Name) {
 		return
 	}
 
