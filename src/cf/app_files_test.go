@@ -12,7 +12,7 @@ var _ = Describe("AppFiles", func() {
 
 	Context("AppFilesInDir", func() {
 		FIt("all files have '/' path separators", func() {
-			files, err := AppFilesInDir(filepath.Join("..", "fixtures", "applications"))
+			files, err := AppFilesInDir(filepath.Join("..", "fixtures"))
 			Ω(err).ShouldNot(HaveOccurred())
 
 			for _, afile := range files {
