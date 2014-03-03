@@ -50,8 +50,11 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 }
 
 func (cmd Login) Run(c *cli.Context) {
-
 	cmd.config.ClearSession()
+	defer func() {
+		cmd.ui.Say("")
+		cmd.ui.ShowConfiguration(cmd.config)
+	}()
 
 	oldUserName := cmd.config.Username()
 
@@ -85,7 +88,6 @@ func (cmd Login) Run(c *cli.Context) {
 		}
 	}
 
-	cmd.ui.ShowConfiguration(cmd.config)
 	return
 }
 
@@ -103,9 +105,11 @@ func (cmd Login) setApi(c *cli.Context) (apiErr cferrors.Error) {
 
 	endpoint, apiErr := cmd.endpointRepo.UpdateEndpoint(api)
 
-	if !strings.HasPrefix(endpoint, "https://") {
-		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
-	}
+	if apiErr != nil {
+		cmd.config.SetApiEndpoint("")
+	} else if !strings.HasPrefix(endpoint, "https://") {
+			cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
+  }
 
 	return
 }
