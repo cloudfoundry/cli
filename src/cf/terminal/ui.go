@@ -86,6 +86,8 @@ func (c terminalUI) Ok() {
 	c.Say(SuccessColor("OK"))
 }
 
+const FailedWasCalled = "FailedWasCalled"
+
 func (c terminalUI) Failed(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	c.Say(FailureColor("FAILED"))
@@ -93,7 +95,7 @@ func (c terminalUI) Failed(message string, args ...interface{}) {
 
 	trace.Logger.Print("FAILED")
 	trace.Logger.Print(message)
-	os.Exit(1)
+	panic(FailedWasCalled)
 }
 
 func (c terminalUI) FailWithUsage(ctxt *cli.Context, cmdName string) {

@@ -116,7 +116,7 @@ OPTIONS:
 
 func handlePanics() {
 	err := recover()
-	if err != nil {
+	if err != nil && err != terminal.FailedWasCalled {
 		switch err := err.(type) {
 		case error:
 			displayCrashDialog(err.Error())
@@ -126,6 +126,8 @@ func handlePanics() {
 			displayCrashDialog("An unexpected type of error")
 		}
 	}
+
+	os.Exit(1)
 }
 
 func displayCrashDialog(errorMessage string) {
@@ -150,5 +152,4 @@ and this stack trace:
 
 	stackTrace := "\t" + strings.Replace(string(debug.Stack()), "\n", "\n\t", -1)
 	println(fmt.Sprintf(formattedString, cf.Name(), strings.Join(os.Args, " "), errorMessage, stackTrace))
-	os.Exit(1)
 }
