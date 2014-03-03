@@ -14,7 +14,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("scale command", func() {
 	var (
 		reqFactory *testreq.FakeReqFactory
 		restarter  *testcmd.FakeAppRestarter
@@ -126,7 +126,7 @@ var _ = Describe("Testing with ginkgo", func() {
 				})
 
 				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"Are you sure", "my-app"},
+					{"This will cause the app to restage", "Are you sure", "my-app"},
 				})
 				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
 				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))

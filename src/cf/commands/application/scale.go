@@ -66,13 +66,6 @@ func (cmd *Scale) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(currentApp.Name),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
-
 	params := models.AppParams{}
 	shouldRestart := false
 
@@ -103,6 +96,18 @@ func (cmd *Scale) Run(c *cli.Context) {
 		params.InstanceCount = &instances
 	}
 
+
+	if shouldRestart && ! cmd.confirmRestart(c, currentApp.Name) {
+		return
+	}
+
+	cmd.ui.Say("Scaling app %s in org %s / space %s as %s...",
+		terminal.EntityNameColor(currentApp.Name),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
+
 	updatedApp, apiErr := cmd.appRepo.Update(currentApp.Guid, params)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
@@ -110,18 +115,19 @@ func (cmd *Scale) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("")
 
 	if shouldRestart {
-		if c.Bool("f") {
-			cmd.restarter.ApplicationRestart(updatedApp)
-		} else {
-			userConfirm := cmd.ui.Confirm("Are you sure you want to scale app %s? This will cause the app to restage.", terminal.EntityNameColor(updatedApp.Name))
+		cmd.restarter.ApplicationRestart(updatedApp)
+	}
+}
 
-			if userConfirm {
-				cmd.restarter.ApplicationRestart(updatedApp)
-			}
-		}
+func (cmd *Scale) confirmRestart(context *cli.Context, appName string) bool {
+	if context.Bool("f") {
+		return true
+	} else {
+		result := cmd.ui.Confirm("This will cause the app to restage. Are you sure you want to scale %s?", terminal.EntityNameColor(appName))
+		cmd.ui.Say("")
+		return result
 	}
 }
 
