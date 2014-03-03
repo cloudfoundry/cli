@@ -83,7 +83,7 @@ var _ = Describe("scale command", func() {
 				testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"my-app"}), reqFactory)
 
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Showing limits", "my-app", "my-org", "my-space", "my-user"},
+					{"Showing", "my-app", "my-org", "my-space", "my-user"},
 					{"OK"},
 					{"memory", "256M"},
 					{"disk", "1G"},

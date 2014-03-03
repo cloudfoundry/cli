@@ -50,7 +50,7 @@ var bytesInAMegabyte uint64 = 1024 * 1024
 func (cmd *Scale) Run(c *cli.Context) {
 	currentApp := cmd.appReq.GetApplication()
 	if !anyFlagsSet(c) {
-		cmd.ui.Say("Showing limits for %s in org %s / space %s as %s...",
+		cmd.ui.Say("Showing current scale of app %s in org %s / space %s as %s...",
 			terminal.EntityNameColor(currentApp.Name),
 			terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 			terminal.EntityNameColor(cmd.config.SpaceFields().Name),
