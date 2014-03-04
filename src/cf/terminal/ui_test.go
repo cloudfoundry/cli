@@ -76,6 +76,10 @@ var _ = Describe("UI", func() {
 				ui.ShowConfiguration(config)
 			})
 
+			testassert.SliceDoesNotContain(output, testassert.Lines{
+				{"API endpoint:"},
+			})
+
 			testassert.SliceContains(output, testassert.Lines{
 				{"Not logged in", "Use", "log in"},
 			})
@@ -87,9 +91,73 @@ var _ = Describe("UI", func() {
 		var config configuration.ReadWriter
 
 		BeforeEach(func() {
-			config = testconfig.NewRepository()
+			accessToken := configuration.TokenInfo{
+				UserGuid: "my-user-guid",
+				Username: "my-user",
+				Email:    "my-user-email",
+			}
+			config = testconfig.NewRepositoryWithAccessToken(accessToken)
 			config.SetApiEndpoint("https://test.example.org")
-			config.SetAccessToken("some-access-token")
+			config.SetApiVersion("☃☃☃")
+		})
+
+		Describe("tells the user what is set in the config", func() {
+			var output []string
+
+			JustBeforeEach(func() {
+				output = captureOutput(func() {
+					ui := NewUI(os.Stdin)
+					ui.ShowConfiguration(config)
+				})
+			})
+
+			It("tells the user which api endpoint is set", func() {
+				testassert.SliceContains(output, testassert.Lines{
+					{"API endpoint:", "https://test.example.org"},
+				})
+			})
+
+			It("tells the user the api version", func() {
+				testassert.SliceContains(output, testassert.Lines{
+					{"API version:", "☃☃☃"},
+				})
+			})
+
+			It("tells the user which user is logged in", func() {
+				testassert.SliceContains(output, testassert.Lines{
+					{"User:", "my-user-email"},
+				})
+			})
+
+			Context("when an org is targeted", func() {
+				BeforeEach(func() {
+					config.SetOrganizationFields(models.OrganizationFields{
+						Name: "org-name",
+						Guid: "org-guid",
+					})
+				})
+
+				It("tells the user which org is targeted", func() {
+					testassert.SliceContains(output, testassert.Lines{
+						{"Org:", "org-name"},
+					})
+				})
+			})
+
+			Context("when a space is targeted", func() {
+				BeforeEach(func() {
+					config.SetSpaceFields(models.SpaceFields{
+						Name: "my-space",
+						Guid: "space-guid",
+					})
+				})
+
+				It("tells the user which space is targeted", func() {
+					testassert.SliceContains(output, testassert.Lines{
+						{"Space:", "my-space"},
+					})
+				})
+			})
 		})
 
 		It("prompts the user to target an org and space when no org or space is targeted", func() {
@@ -136,8 +204,10 @@ var _ = Describe("UI", func() {
 
 	Describe("failing", func() {
 		It("panics with a specific string", func() {
-			testassert.AssertPanic(FailedWasCalled, func() {
-				NewUI(os.Stdin).Failed("uh oh")
+			captureOutput(func() {
+				testassert.AssertPanic(FailedWasCalled, func() {
+					NewUI(os.Stdin).Failed("uh oh")
+				})
 			})
 		})
 	})
