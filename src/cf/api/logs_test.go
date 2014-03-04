@@ -4,6 +4,7 @@ import (
 	. "cf/api"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
+	"crypto/tls"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,7 +16,6 @@ import (
 )
 
 var _ = Describe("loggregator logs repository", func() {
-
 	var (
 		logChan        chan *logmessage.Message
 		testServer     *httptest.Server
@@ -33,6 +33,8 @@ var _ = Describe("loggregator logs repository", func() {
 		}
 		logChan = make(chan *logmessage.Message, 1000)
 		testServer, requestHandler, logsRepo = setupTestServerAndLogsRepo(messagesToSend...)
+
+		logsRepo.TrustedCerts = testServer.TLS.Certificates
 	})
 
 	AfterEach(func() {
@@ -40,7 +42,6 @@ var _ = Describe("loggregator logs repository", func() {
 	})
 
 	Describe("RecentLogsFor", func() {
-
 		BeforeEach(func() {
 			err := logsRepo.RecentLogsFor("my-app-guid", func() {}, logChan)
 			Expect(err).NotTo(HaveOccurred())
@@ -65,24 +66,31 @@ var _ = Describe("loggregator logs repository", func() {
 	})
 
 	Describe("TailLogsFor", func() {
-
-		BeforeEach(func() {
+		It("connects to the tailing endpoint", func() {
 			err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
 			Expect(err).NotTo(HaveOccurred())
 			close(logChan)
-		})
 
-		It("connects to the tailing endpoint", func() {
 			Expect(requestHandler.lastPath).To(Equal("/tail/"))
 		})
 
 		It("writes log messages on the channel in the correct order", func() {
+			err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
+			Expect(err).NotTo(HaveOccurred())
+			close(logChan)
+
 			var messages []string
 			for msg := range logChan {
 				messages = append(messages, string(msg.GetLogMessage().Message))
 			}
 
 			Expect(messages).To(Equal([]string{"My message 1", "My message 2", "My message 3"}))
+		})
+
+		It("fails when the server's SSL cert cannot be verified", func() {
+			logsRepo.TrustedCerts = []tls.Certificate{}
+			err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
+			Expect(err).To(HaveOccurred())
 		})
 	})
 })

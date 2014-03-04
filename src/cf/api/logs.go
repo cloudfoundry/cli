@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/configuration"
+	"cf/net"
 	"cf/terminal"
 	"cf/trace"
 	"code.google.com/p/go.net/websocket"
@@ -22,12 +23,14 @@ type LogsRepository interface {
 type LoggregatorLogsRepository struct {
 	config       configuration.Reader
 	endpointRepo EndpointRepository
+	TrustedCerts []tls.Certificate
 }
 
-func NewLoggregatorLogsRepository(config configuration.Reader, endpointRepo EndpointRepository) (repo LoggregatorLogsRepository) {
-	repo.config = config
-	repo.endpointRepo = endpointRepo
-	return
+func NewLoggregatorLogsRepository(config configuration.Reader, endpointRepo EndpointRepository) LoggregatorLogsRepository {
+	return LoggregatorLogsRepository{
+		config:       config,
+		endpointRepo: endpointRepo,
+	}
 }
 
 func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
@@ -65,7 +68,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 	}
 
 	wsConfig.Header.Add("Authorization", repo.config.AccessToken())
-	wsConfig.TlsConfig = &tls.Config{InsecureSkipVerify: true}
+	wsConfig.TlsConfig = net.TLSConfigWithTrustedCerts(repo.TrustedCerts)
 
 	ws, err := websocket.DialConfig(wsConfig)
 	if err != nil {

@@ -4,13 +4,11 @@ import (
 	"cf"
 	"cf/errors"
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"runtime"
 	"strings"
@@ -379,19 +377,4 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 
 func (gateway *Gateway) AddTrustedCerts(certificates []tls.Certificate) {
 	gateway.trustedCerts = append(gateway.trustedCerts, certificates...)
-}
-
-func wrapSSLErrors(host string, err error) errors.Error {
-	urlError, ok := err.(*url.Error)
-	if ok {
-		switch urlError.Err.(type) {
-		case x509.UnknownAuthorityError:
-			return errors.NewInvalidSSLCert(host, "unknown authority")
-		case x509.HostnameError:
-			return errors.NewInvalidSSLCert(host, "not valid for the requested host")
-		case x509.CertificateInvalidError:
-			return errors.NewInvalidSSLCert(host, "")
-		}
-	}
-	return errors.NewErrorWithError("Error performing request", err)
 }

@@ -4,7 +4,6 @@ import (
 	"cf/terminal"
 	"cf/trace"
 	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"fmt"
 	"net/http"
@@ -19,17 +18,8 @@ const (
 )
 
 func newHttpClient(trustedCerts []tls.Certificate) *http.Client {
-	var certPool *x509.CertPool
-	if len(trustedCerts) > 0 {
-		certPool = x509.NewCertPool()
-		for _, tlsCert := range trustedCerts {
-			cert, _ := x509.ParseCertificate(tlsCert.Certificate[0])
-			certPool.AddCert(cert)
-		}
-	}
-
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{RootCAs: certPool},
+		TLSClientConfig: TLSConfigWithTrustedCerts(trustedCerts),
 		Proxy:           http.ProxyFromEnvironment,
 	}
 	return &http.Client{
