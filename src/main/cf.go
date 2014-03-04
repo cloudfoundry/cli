@@ -125,9 +125,9 @@ func handlePanics() {
 		default:
 			displayCrashDialog("An unexpected type of error")
 		}
-	}
 
-	os.Exit(1)
+		os.Exit(1)
+	}
 }
 
 func displayCrashDialog(errorMessage string) {
