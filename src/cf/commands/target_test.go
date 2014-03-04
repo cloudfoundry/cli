@@ -27,7 +27,7 @@ var _ = Describe("target command", func() {
 		orgRepo, spaceRepo, config, reqFactory = getTargetDependencies()
 	})
 
-	It("TestTargetFailsWithUsage", func() {
+	It("fails with usage when called without -o or -s", func() {
 		ui := callTarget([]string{"bad-foo"}, reqFactory, config, orgRepo, spaceRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
