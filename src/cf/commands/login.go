@@ -56,8 +56,6 @@ func (cmd Login) Run(c *cli.Context) {
 		cmd.ui.ShowConfiguration(cmd.config)
 	}()
 
-	oldUserName := cmd.config.Username()
-
 	apiErr := cmd.setApi(c)
 	if apiErr != nil {
 		cmd.ui.Failed("Invalid API endpoint.\n%s", apiErr.Error())
@@ -70,9 +68,7 @@ func (cmd Login) Run(c *cli.Context) {
 		return
 	}
 
-	userChanged := (cmd.config.Username() != oldUserName && oldUserName != "")
-
-	err := cmd.setOrganization(c, userChanged)
+	err := cmd.setOrganization(c)
 	shouldSkipSpace := err != nil && err.Error() == userSkippedInput
 
 	if err != nil && !shouldSkipSpace {
@@ -81,7 +77,7 @@ func (cmd Login) Run(c *cli.Context) {
 	}
 
 	if !shouldSkipSpace {
-		err = cmd.setSpace(c, userChanged)
+		err = cmd.setSpace(c)
 		if err != nil && err.Error() != userSkippedInput {
 			cmd.ui.Failed(err.Error())
 			return
@@ -153,20 +149,10 @@ func (cmd Login) authenticate(c *cli.Context) (apiErr cferrors.Error) {
 	return
 }
 
-func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
+func (cmd Login) setOrganization(c *cli.Context) (err error) {
 	orgName := c.String("o")
 
 	if orgName == "" {
-		// If the user is changing, clear out the org
-		if userChanged {
-			cmd.config.SetOrganizationFields(models.OrganizationFields{})
-		}
-
-		// Reuse org in config
-		if cmd.config.HasOrganization() && !userChanged {
-			return
-		}
-
 		availableOrgs := []models.Organization{}
 		apiErr := cmd.orgRepo.ListOrgs(func(o models.Organization) bool {
 			availableOrgs = append(availableOrgs, o)
@@ -183,17 +169,14 @@ func (cmd Login) setOrganization(c *cli.Context, userChanged bool) (err error) {
 		}
 
 		orgName = cmd.promptForOrgName(availableOrgs)
+		if orgName == "" {
+			cmd.ui.Say("")
+			err = errors.New(userSkippedInput)
+			return
+		}
 	}
 
-	if orgName == "" {
-		cmd.ui.Say("")
-		err = errors.New(userSkippedInput)
-		return
-	}
-
-	var org models.Organization
-	var apiErr cferrors.Error
-	org, apiErr = cmd.orgRepo.FindByName(orgName)
+	org, apiErr := cmd.orgRepo.FindByName(orgName)
 	if apiErr != nil {
 		err = errors.New(apiErr.Error())
 		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err)
@@ -218,19 +201,10 @@ func (cmd Login) targetOrganization(org models.Organization) (err error) {
 	return
 }
 
-func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
+func (cmd Login) setSpace(c *cli.Context) (err error) {
 	spaceName := c.String("s")
 
 	if spaceName == "" {
-		// If user is changing, clear the space
-		if userChanged {
-			cmd.config.SetSpaceFields(models.SpaceFields{})
-		}
-		// Reuse space in config
-		if cmd.config.HasSpace() && !userChanged {
-			return
-		}
-
 		var availableSpaces []models.Space
 		apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
 			availableSpaces = append(availableSpaces, space)
@@ -249,17 +223,14 @@ func (cmd Login) setSpace(c *cli.Context, userChanged bool) (err error) {
 		}
 
 		spaceName = cmd.promptForSpaceName(availableSpaces)
+		if spaceName == "" {
+			cmd.ui.Say("")
+			err = errors.New(userSkippedInput)
+			return
+		}
 	}
 
-	if spaceName == "" {
-		cmd.ui.Say("")
-		err = errors.New(userSkippedInput)
-		return
-	}
-
-	var space models.Space
-	var apiErr cferrors.Error
-	space, apiErr = cmd.spaceRepo.FindByName(spaceName)
+	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 	if apiErr != nil {
 		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiErr.Error()))
 		cmd.ui.Failed(err.Error())
