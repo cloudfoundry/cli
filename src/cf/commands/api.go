@@ -1,10 +1,12 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/requirements"
 	"cf/terminal"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
 )
@@ -32,13 +34,15 @@ func (cmd Api) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 
 func (cmd Api) Run(c *cli.Context) {
 	if len(c.Args()) == 0 {
-		cmd.ui.Say(
-			// TODO: should prompt to use api or login if no api is targeted
-			// consider calling ui.ShowConfiguration
-			"API endpoint: %s (API version: %s)",
-			terminal.EntityNameColor(cmd.config.ApiEndpoint()),
-			terminal.EntityNameColor(cmd.config.ApiVersion()),
-		)
+		if cmd.config.ApiEndpoint() == "" {
+			cmd.ui.Say(fmt.Sprintf("No api endpoint set. Use '%s' to set an endpoint", terminal.CommandColor(cf.Name()+" api")))
+		} else {
+			cmd.ui.Say(
+				"API endpoint: %s (API version: %s)",
+				terminal.EntityNameColor(cmd.config.ApiEndpoint()),
+				terminal.EntityNameColor(cmd.config.ApiVersion()),
+			)
+		}
 		return
 	}
 

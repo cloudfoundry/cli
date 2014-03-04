@@ -1,8 +1,10 @@
 package commands_test
 
 import (
+	"cf"
 	. "cf/commands"
 	"cf/configuration"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -23,46 +25,73 @@ func callApi(args []string, config configuration.Reader, endpointRepo *testapi.F
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestApiWithoutArgument", func() {
-		config := testconfig.NewRepository()
-		config.SetApiEndpoint("https://api.run.pivotal.io")
-		config.SetApiVersion("2.0")
+var _ = Describe("api command", func() {
+	var (
+		config       configuration.ReadWriter
+		endpointRepo *testapi.FakeEndpointRepo
+	)
 
-		endpointRepo := &testapi.FakeEndpointRepo{Config: config}
+	BeforeEach(func() {
+		config = testconfig.NewRepository()
+		endpointRepo = &testapi.FakeEndpointRepo{Config: config}
+	})
 
-		ui := callApi([]string{}, config, endpointRepo)
+	Context("when the user does not provide an endpoint", func() {
+		Context("when the endpoint is set", func() {
+			It("prints out the api endpoint", func() {
+				config.SetApiEndpoint("https://api.run.pivotal.io")
+				config.SetApiVersion("2.0")
 
-		Expect(len(ui.Outputs)).To(Equal(1))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"https://api.run.pivotal.io", "2.0"},
+				ui := callApi([]string{}, config, endpointRepo)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"https://api.run.pivotal.io", "2.0"},
+				})
+			})
+		})
+		Context("when the user has not set an endpoint", func() {
+			It("prompts the user to set an endpoint", func() {
+				ui := callApi([]string{}, config, endpointRepo)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"No api endpoint set", fmt.Sprintf("use '%s api' to set an endpoint", cf.Name())},
+				})
+			})
 		})
 	})
 
-	It("TestApiWhenChangingTheEndpoint", func() {
-		config := testconfig.NewRepository()
-		endpointRepo := &testapi.FakeEndpointRepo{Config: config}
+	Context("the user provides an api endpoint", func() {
+		var (
+			ui *testterm.FakeUI
+		)
 
-		ui := callApi([]string{"http://example.com"}, config, endpointRepo)
+		BeforeEach(func() {
+			ui = callApi([]string{"https://example.com"}, config, endpointRepo)
+		})
 
-		Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://example.com"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Setting api endpoint to", "example.com"},
-			{"OK"},
+		It("updates the api endpoint with the given url", func() {
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Setting api endpoint to", "example.com"},
+				{"OK"},
+			})
+		})
+
+		It("trims trailing slashes from the api endpoint", func() {
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Setting api endpoint to", "example.com"},
+				{"OK"},
+			})
+		})
+
+		Describe("unencrypted http endpoints", func() {
+			It("warns the user", func() {
+				ui = callApi([]string{"http://example.com"}, config, endpointRepo)
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Warning"},
+				})
+			})
 		})
 	})
-
-	It("TestApiWithTrailingSlash", func() {
-		config := testconfig.NewRepository()
-		endpointRepo := &testapi.FakeEndpointRepo{Config: config}
-
-		ui := callApi([]string{"https://example.com/"}, config, endpointRepo)
-
-		Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Setting api endpoint to", "example.com"},
-			{"OK"},
-		})
-	})
-
 })
