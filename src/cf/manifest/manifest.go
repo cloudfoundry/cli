@@ -46,7 +46,7 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 	case string:
 		match := propertyRegex.FindString(value)
 		if match != "" {
-			err := errors.New(fmt.Sprintf("Properties are not supported. Found property '%s' in manifest", match))
+			err := errors.New(fmt.Sprintf("Property '%s' found in manifest. This feature is no longer supported. Please remove it and try again.", match))
 			errs = append(errs, err)
 		}
 	case []interface{}:
