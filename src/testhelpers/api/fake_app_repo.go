@@ -35,7 +35,7 @@ func (repo *FakeApplicationRepository) Read(name string) (app models.Application
 		apiErr = errors.NewHttpError(401, "", "", "1000", "Authentication failed.")
 	}
 	if repo.ReadNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "App", name)
+		apiErr = errors.NewModelNotFoundError("App", name)
 	}
 
 	return

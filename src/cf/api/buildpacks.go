@@ -55,7 +55,7 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 		})
 
 	if !foundIt {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Buildpack", name)
+		apiErr = errors.NewModelNotFoundError("Buildpack", name)
 	}
 	return
 }

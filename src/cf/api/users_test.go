@@ -135,7 +135,7 @@ var _ = Describe("UserRepository", func() {
 		_, apiErr := repo.FindByUsername("my-user")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("User my-user not found"))
 	})
 

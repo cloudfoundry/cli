@@ -92,7 +92,7 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 		})
 
 	if !found {
-		apiErr = errors.NewNotFoundError("Organization %s not found", name)
+		apiErr = errors.NewModelNotFoundError("Organization", name)
 	}
 
 	return

@@ -70,7 +70,7 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	}
 
 	if repo.FindByHostAndDomainNotFound {
-		apiErr = errors.NewNotFoundError("%s %s.%s not found", "Org", host, domain)
+		apiErr = errors.NewModelNotFoundError("Org", host+"."+domain)
 	}
 
 	route = repo.FindByHostAndDomainRoute

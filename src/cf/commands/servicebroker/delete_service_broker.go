@@ -3,9 +3,9 @@ package servicebroker
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -55,13 +55,13 @@ func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 
 	broker, apiErr := cmd.repo.FindByName(brokerName)
 
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Broker %s does not exist.", brokerName)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}

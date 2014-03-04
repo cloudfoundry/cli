@@ -37,7 +37,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
-			{"User not found"},
+			{"not found"},
 		})
 	})
 })

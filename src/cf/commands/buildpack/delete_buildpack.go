@@ -2,9 +2,9 @@ package buildpack
 
 import (
 	"cf/api"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -52,15 +52,16 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 
 	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
 
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil: //do nothing
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Buildpack %s does not exist.", buildpackName)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
+
 	}
 
 	apiErr = cmd.buildpackRepo.Delete(buildpack.Guid)

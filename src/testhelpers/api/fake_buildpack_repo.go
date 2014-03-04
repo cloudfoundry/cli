@@ -36,7 +36,7 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.B
 	buildpack = repo.FindByNameBuildpack
 
 	if repo.FindByNameNotFound {
-		apiErr = errors.NewNotFoundError("Buildpack %s not found", name)
+		apiErr = errors.NewModelNotFoundError("Buildpack", name)
 	}
 
 	return

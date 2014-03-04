@@ -3,9 +3,9 @@ package application
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -58,13 +58,13 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	app, apiErr := cmd.appRepo.Read(appName)
 
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil: // no error
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}

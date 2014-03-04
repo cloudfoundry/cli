@@ -72,7 +72,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	}
 
 	if len(resources.Resources) == 0 {
-		apiErr = errors.NewNotFoundError("Service instance '%s' not found", name)
+		apiErr = errors.NewModelNotFoundError("Service instance", name)
 		return
 	}
 
@@ -142,7 +142,7 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 	if apiErr != nil {
 		return
 	} else if len(resources.Resources) == 0 {
-		apiErr = errors.NewNotFoundError("Service offering not found")
+		apiErr = errors.NewModelNotFoundError("Service offering", label+" "+provider)
 	} else {
 		offering = resources.Resources[0].ToModel()
 	}
@@ -169,7 +169,7 @@ func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDe
 		}
 	}
 
-	apiErr = errors.NewNotFoundError("Plan %s cannot be found", planDescription)
+	apiErr = errors.NewModelNotFoundError("Plan", planDescription.String())
 
 	return
 }

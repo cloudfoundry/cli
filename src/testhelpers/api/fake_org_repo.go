@@ -49,7 +49,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization,
 	}
 
 	if repo.FindByNameNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Org", name)
+		apiErr = errors.NewModelNotFoundError("Org", name)
 	}
 
 	return

@@ -136,7 +136,7 @@ var _ = Describe("Purging services", func() {
 	It("indicates when a service doesn't exist", func() {
 		deps := setupDependencies()
 
-		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewNotFoundError("uh oh cant find it")
+		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewModelNotFoundError("Service Offering", "")
 
 		deps.ui.Inputs = []string{"yes"}
 

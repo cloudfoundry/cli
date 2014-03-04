@@ -3,10 +3,10 @@ package domain
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -50,9 +50,13 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 
 	noDomains := true
 	table := cmd.ui.Table([]string{"name                              ", "status"})
+
 	apiErr := cmd.domainRepo.ListSharedDomains(domainsCallback(table, &noDomains))
 
-	if apiErr != nil && !apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil:
+	case errors.HttpNotFoundError:
+	default:
 		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiErr.Error())
 		return
 	}

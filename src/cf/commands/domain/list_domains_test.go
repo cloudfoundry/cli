@@ -31,16 +31,16 @@ var _ = Describe("domains command", func() {
 		callListDomains([]string{}, reqFactory, domainRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestListDomainsFailsWithUsage", func() {
 
+	It("TestListDomainsFailsWithUsage", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 		domainRepo := &testapi.FakeDomainRepository{}
 
 		ui := callListDomains([]string{"foo"}, reqFactory, domainRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
-	It("TestListDomains", func() {
 
+	It("TestListDomains", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
@@ -75,8 +75,8 @@ var _ = Describe("domains command", func() {
 			{"Domain3", "owned"},
 		})
 	})
-	It("TestListDomainsWhenThereAreNone", func() {
 
+	It("TestListDomainsWhenThereAreNone", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
@@ -91,8 +91,8 @@ var _ = Describe("domains command", func() {
 			{"No domains found"},
 		})
 	})
-	It("TestListDomainsSharedDomainsFails", func() {
 
+	It("TestListDomainsSharedDomainsFails", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
@@ -111,20 +111,20 @@ var _ = Describe("domains command", func() {
 			{"borked!"},
 		})
 	})
-	It("TestListDomainsSharedDomainsTriesOldEndpointOn404", func() {
 
-		orgFields := models.OrganizationFields{}
-		orgFields.Name = "my-org"
-		orgFields.Guid = "my-org-guid"
+	It("lists only the domains for the org if the new shared_domains endpoint returns a 404", func() {
+		orgFields := models.OrganizationFields{
+			Name: "my-org",
+			Guid: "my-org-guid",
+		}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
-		domain := models.DomainFields{}
-		domain.Name = "ze-domain"
-
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: errors.NewNotFoundError("whoops! misplaced yr domainz"),
-			ListDomainsForOrgDomains:     []models.DomainFields{domain},
+			ListSharedDomainsApiResponse: errors.NewHttpError(404, "", "", "", ""),
+			ListDomainsForOrgDomains: []models.DomainFields{
+				models.DomainFields{Name: "ze-domain"},
+			},
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
@@ -133,8 +133,8 @@ var _ = Describe("domains command", func() {
 			{"ze-domain"},
 		})
 	})
-	It("TestListDomainsOrgDomainsFails", func() {
 
+	It("TestListDomainsOrgDomainsFails", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"

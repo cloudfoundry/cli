@@ -3,9 +3,9 @@ package user
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -51,13 +51,13 @@ func (cmd DeleteUserFields) Run(c *cli.Context) {
 	)
 
 	user, apiErr := cmd.userRepo.FindByUsername(username)
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("User %s does not exist.", username)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}

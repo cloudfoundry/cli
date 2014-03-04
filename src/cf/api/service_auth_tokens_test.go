@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -125,7 +126,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 	})
 	It("TestServiceAuthUpdate", func() {
 

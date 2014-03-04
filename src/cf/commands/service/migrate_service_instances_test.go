@@ -140,7 +140,7 @@ func init() {
 				Context("when finding the v1 plan fails", func() {
 					Context("because the plan does not exist", func() {
 						BeforeEach(func() {
-							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{errors.NewNotFoundError("not used")}
+							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{errors.NewModelNotFoundError("Service Plan", "")}
 						})
 
 						It("notifies the user of the failure", func() {
@@ -188,7 +188,7 @@ func init() {
 				Context("when finding the v2 plan fails", func() {
 					Context("because the plan does not exist", func() {
 						BeforeEach(func() {
-							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{nil, errors.NewNotFoundError("not used")}
+							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{nil, errors.NewModelNotFoundError("Service Plan", "")}
 						})
 
 						It("notifies the user of the failure", func() {

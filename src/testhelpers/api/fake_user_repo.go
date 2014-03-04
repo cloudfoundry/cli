@@ -44,7 +44,7 @@ func (repo *FakeUserRepository) FindByUsername(username string) (user models.Use
 	user = repo.FindByUsernameUserFields
 
 	if repo.FindByUsernameNotFound {
-		apiErr = errors.NewNotFoundError("User not found")
+		apiErr = errors.NewModelNotFoundError("User", "")
 	}
 
 	return

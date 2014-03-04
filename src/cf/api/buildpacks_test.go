@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -115,8 +116,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		_, apiErr := repo.FindByName("Buildpack1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-
-		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 	})
 
 	It("TestBuildpackCreateRejectsImproperNames", func() {

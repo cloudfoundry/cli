@@ -78,7 +78,7 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 		})
 
 	if !foundBroker {
-		apiErr = errors.NewNotFoundError("Service Broker '%s' not found", name)
+		apiErr = errors.NewModelNotFoundError("Service Broker", name)
 	}
 
 	return

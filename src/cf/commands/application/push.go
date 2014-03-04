@@ -4,13 +4,12 @@ import (
 	"cf/api"
 	"cf/commands/service"
 	"cf/configuration"
-	cferrors "cf/errors"
+	"cf/errors"
 	"cf/formatters"
 	"cf/manifest"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
@@ -236,7 +235,7 @@ func (cmd *Push) route(hostName string, domain models.DomainFields) (route model
 }
 
 func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.DomainFields) {
-	var apiErr cferrors.Error
+	var apiErr errors.Error
 
 	if domainName != "" {
 		domain, apiErr = cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields().Guid)
@@ -270,12 +269,11 @@ func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 	}
 
 	apiErr := cmd.domainRepo.ListSharedDomains(listDomainsCallback)
-	if apiErr != nil && apiErr.IsNotFound() {
-		apiErr = cmd.domainRepo.ListDomains(listDomainsCallback)
-	}
 
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
+	// FIXME: needs semantic API version
+	switch apiErr.(type) {
+	case errors.HttpNotFoundError:
+		apiErr = cmd.domainRepo.ListDomains(listDomainsCallback)
 	}
 
 	if !foundIt {
@@ -306,30 +304,25 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	}
 
 	app, apiErr := cmd.appRepo.Read(*appParams.Name)
-	var didCreate bool = false
 
-	if apiErr != nil {
-		if apiErr.IsNotFound() {
-			app, apiErr = cmd.createApp(appParams)
-			if apiErr != nil {
-				cmd.ui.Failed(apiErr.Error())
-				return
-			}
-			didCreate = true
-		} else {
+	switch apiErr.(type) {
+	case nil:
+		app = cmd.updateApp(app, appParams)
+	case errors.ModelNotFoundError:
+		app, apiErr = cmd.createApp(appParams)
+		if apiErr != nil {
 			cmd.ui.Failed(apiErr.Error())
 			return
 		}
-	}
-
-	if !didCreate {
-		app = cmd.updateApp(app, appParams)
+	default:
+		cmd.ui.Failed(apiErr.Error())
+		return
 	}
 
 	return
 }
 
-func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiErr cferrors.Error) {
+func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiErr errors.Error) {
 	spaceGuid := cmd.config.SpaceFields().Guid
 	appParams.SpaceGuid = &spaceGuid
 
@@ -368,7 +361,7 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 		}
 	}
 
-	var apiErr cferrors.Error
+	var apiErr errors.Error
 	updatedApp, apiErr = cmd.appRepo.Update(app.Guid, appParams)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

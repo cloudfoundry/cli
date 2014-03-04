@@ -5,10 +5,10 @@ import (
 	"cf/api"
 	"cf/commands/user"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -63,14 +63,16 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 
 	if orgGuid == "" {
 		org, apiErr := cmd.orgRepo.FindByName(orgName)
-		if apiErr != nil && apiErr.IsNotFound() {
+		switch apiErr.(type) {
+		case nil:
+		case errors.ModelNotFoundError:
 			cmd.ui.Failed("Org %s does not exist or is not accessible", orgName)
 			return
-		}
-		if apiErr != nil {
+		default:
 			cmd.ui.Failed("Error finding org %s\n%s", orgName, apiErr.Error())
 			return
 		}
+
 		orgGuid = org.Guid
 	}
 

@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -142,7 +143,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		_, apiErr := repo.FindByName("org1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 	})
 
 	It("TestCreateOrganization", func() {

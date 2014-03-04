@@ -38,8 +38,9 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 			return cb(resource.(EventResourceNewV2).ToFields())
 		})
 
-	// FIXME: needs semantic versioning
-	if apiErr != nil && apiErr.IsNotFound() {
+	// FIXME: needs semantic API version
+	switch apiErr.(type) {
+	case errors.HttpNotFoundError:
 		apiErr = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
 			repo.config.AccessToken(),

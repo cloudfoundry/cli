@@ -2,10 +2,9 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	cferrors "cf/errors"
+	"cf/errors"
 	"cf/manifest"
 	"cf/models"
-	"errors"
 	"generic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -69,7 +68,7 @@ var _ = Describe("Push Command", func() {
 		sharedDomain.Shared = true
 		sharedDomain.Guid = "shared-domain-guid"
 
-		deps.domainRepo.ListSharedDomainsApiResponse = cferrors.NewNotFoundError("whoopsie")
+		deps.domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "", "", "", "")
 		deps.domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
 		deps.routeRepo.FindByHostAndDomainErr = true
 		deps.appRepo.ReadNotFound = true

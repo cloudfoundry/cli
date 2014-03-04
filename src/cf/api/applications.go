@@ -171,7 +171,7 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app models.A
 	}
 
 	if len(appResources.Resources) == 0 {
-		apiErr = errors.NewNotFoundError("%s %s not found", "App", name)
+		apiErr = errors.NewModelNotFoundError("App", name)
 		return
 	}
 

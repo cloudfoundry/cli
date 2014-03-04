@@ -86,7 +86,7 @@ func (repo CloudControllerUserRepository) FindByUsername(username string) (user 
 
 	users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
 	if len(users) == 0 {
-		apiErr = errors.NewNotFoundError("User %s not found", username)
+		apiErr = errors.NewModelNotFoundError("User", username)
 		return
 	}
 

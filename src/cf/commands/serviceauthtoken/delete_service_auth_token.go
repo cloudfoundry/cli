@@ -3,9 +3,9 @@ package serviceauthtoken
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -51,14 +51,15 @@ func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
 
 	cmd.ui.Say("Deleting service auth token as %s", terminal.EntityNameColor(cmd.config.Username()))
 	token, apiErr := cmd.authTokenRepo.FindByLabelAndProvider(tokenLabel, tokenProvider)
-	if apiErr != nil && apiErr.IsNotFound() {
+
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Auth Token %s %s does not exist.", tokenLabel, tokenProvider)
 		return
-	}
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	apiErr = cmd.authTokenRepo.Delete(token)

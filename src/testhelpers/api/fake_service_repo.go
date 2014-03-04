@@ -110,7 +110,7 @@ func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.Se
 	}
 
 	if repo.FindInstanceByNameNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Service instance", name)
+		apiErr = errors.NewModelNotFoundError("Service instance", name)
 	}
 
 	return

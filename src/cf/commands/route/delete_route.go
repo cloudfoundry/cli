@@ -3,9 +3,9 @@ package route
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -61,13 +61,14 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 	cmd.ui.Say("Deleting route %s...", terminal.EntityNameColor(url))
 
 	route, apiErr := cmd.routeRepo.FindByHostAndDomain(host, domainName)
-	if apiErr != nil && apiErr.IsNotFound() {
+
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Route %s does not exist.", url)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}
