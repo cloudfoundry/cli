@@ -112,3 +112,31 @@ func (err *httpError) ErrorCode() string {
 func (err *httpError) IsNotFound() bool {
 	return err.statusCode == 404
 }
+
+type InvalidSSLCert struct {
+	URL    string
+	Reason string
+}
+
+func NewInvalidSSLCert(url, reason string) *InvalidSSLCert {
+	return &InvalidSSLCert{
+		URL:    url,
+		Reason: reason,
+	}
+}
+
+func (err *InvalidSSLCert) IsNotFound() bool {
+	return false
+}
+
+func (err *InvalidSSLCert) Error() string {
+	message := "Received invalid SSL certificate from " + err.URL
+	if err.Reason != "" {
+		message += " - " + err.Reason
+	}
+	return message
+}
+
+func (err *InvalidSSLCert) ErrorCode() string {
+	return "invalid-ssl-cert"
+}
