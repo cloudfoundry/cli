@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -207,8 +208,7 @@ var _ = Describe("DomainRepository", func() {
 
 			_, apiErr := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-
-			Expect(apiErr.IsNotFound()).To(BeTrue())
+			Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 
 		It("returns not found when the global endpoint returns a non-shared domain", func() {
@@ -240,8 +240,7 @@ var _ = Describe("DomainRepository", func() {
 
 			_, apiErr := repo.FindByNameInOrg("domain2.cf-app.com", "my-org-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-
-			Expect(apiErr.IsNotFound()).To(BeTrue())
+			Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
 

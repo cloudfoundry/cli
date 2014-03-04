@@ -3,9 +3,9 @@ package service
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -50,22 +50,24 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 	force := c.Bool("f")
 
 	v1Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v1)
-	if apiErr != nil {
-		if apiErr.IsNotFound() {
-			cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v1.String()))
-		} else {
-			cmd.ui.Failed(apiErr.Error())
-		}
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
+		cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v1.String()))
+		return
+	default:
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
 	v2Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v2)
-	if apiErr != nil {
-		if apiErr.IsNotFound() {
-			cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v2.String()))
-		} else {
-			cmd.ui.Failed(apiErr.Error())
-		}
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
+		cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v2.String()))
+		return
+	default:
+		cmd.ui.Failed(apiErr.Error())
 		return
 	}
 
@@ -107,7 +109,6 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 	}
 
 	cmd.ui.Say("%s migrated.", pluralizeServiceInstances(changedCount))
-
 	cmd.ui.Ok()
 
 	return

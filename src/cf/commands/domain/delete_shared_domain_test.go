@@ -34,7 +34,7 @@ var _ = Describe("delete-shared-domain command", func() {
 	It("TestDeleteSharedDomainNotFound", func() {
 
 		deps := getDeleteSharedDomainDeps()
-		deps.domainRepo.FindByNameInOrgApiResponse = errors.NewNotFoundError("%s %s not found", "Domain", "foo.com")
+		deps.domainRepo.FindByNameInOrgApiResponse = errors.NewModelNotFoundError("Domain", "foo.com")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))

@@ -174,7 +174,7 @@ var _ = Describe("Services Repo", func() {
 			_, apiErr := repo.FindInstanceByName("my-service")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-			Expect(apiErr.IsNotFound()).To(BeTrue())
+			Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
 
@@ -278,7 +278,7 @@ var _ = Describe("Services Repo", func() {
 		}})
 
 		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(apiErr.IsNotFound()).To(BeTrue())
+		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 		Expect(offering.Guid).To(Equal(""))
 	})
 
@@ -490,10 +490,10 @@ var _ = Describe("Services Repo", func() {
 				_, apiErr := repo.FindServicePlanByDescription(v2)
 
 				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.IsNotFound()).To(BeTrue())
+				Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 				Expect(apiErr.Error()).To(ContainSubstring("Plan"))
 				Expect(apiErr.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiErr.Error()).To(ContainSubstring("cannot be found"))
+				Expect(apiErr.Error()).To(ContainSubstring("not found"))
 			})
 		})
 
@@ -540,10 +540,10 @@ var _ = Describe("Services Repo", func() {
 				_, apiErr := repo.FindServicePlanByDescription(v2)
 
 				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.IsNotFound()).To(BeTrue())
+				Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 				Expect(apiErr.Error()).To(ContainSubstring("Plan"))
 				Expect(apiErr.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiErr.Error()).To(ContainSubstring("cannot be found"))
+				Expect(apiErr.Error()).To(ContainSubstring("not found"))
 			})
 		})
 

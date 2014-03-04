@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -131,8 +132,8 @@ var _ = Describe("Service Brokers Repo", func() {
 		_, apiErr := repo.FindByName("my-broker")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr.IsNotFound()).To(BeTrue())
-		Expect(apiErr.Error()).To(Equal("Service Broker 'my-broker' not found"))
+		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+		Expect(apiErr.Error()).To(Equal("Service Broker my-broker not found"))
 	})
 
 	It("TestCreateServiceBroker", func() {

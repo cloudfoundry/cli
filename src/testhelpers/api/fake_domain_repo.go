@@ -65,7 +65,7 @@ func (repo *FakeDomainRepository) FindByName(name string) (domain models.DomainF
 	domain = repo.FindByNameDomain
 
 	if repo.FindByNameNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Domain", name)
+		apiErr = errors.NewModelNotFoundError("Domain", name)
 	}
 	if repo.FindByNameErr {
 		apiErr = errors.NewErrorWithMessage("Error finding domain")

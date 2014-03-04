@@ -76,7 +76,7 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 	}
 
 	if len(quotas) == 0 {
-		apiErr = errors.NewNotFoundError("Quota '%s' not found", name)
+		apiErr = errors.NewModelNotFoundError("Quota", name)
 		return
 	}
 

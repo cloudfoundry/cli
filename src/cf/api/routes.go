@@ -86,7 +86,7 @@ func (repo CloudControllerRouteRepository) FindByHost(host string) (route models
 		})
 
 	if apiErr == nil && !found {
-		apiErr = errors.NewNotFoundError("Route with host %s not found", host)
+		apiErr = errors.NewModelNotFoundError("Route", host)
 	}
 
 	return
@@ -111,7 +111,7 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		})
 
 	if apiErr == nil && !found {
-		apiErr = errors.NewNotFoundError("Route with host %s not found", host)
+		apiErr = errors.NewModelNotFoundError("Route", host)
 	}
 
 	return

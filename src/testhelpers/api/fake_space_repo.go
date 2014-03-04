@@ -63,7 +63,7 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, ap
 	}
 
 	if repo.FindByNameNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Space", name)
+		apiErr = errors.NewModelNotFoundError("Space", name)
 	}
 
 	return

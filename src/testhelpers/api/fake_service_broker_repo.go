@@ -29,7 +29,7 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models
 	serviceBroker = repo.FindByNameServiceBroker
 
 	if repo.FindByNameNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Service Broker", name)
+		apiErr = errors.NewModelNotFoundError("Service Broker", name)
 	}
 
 	return

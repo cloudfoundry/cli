@@ -140,7 +140,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteServiceAuthTokenWhenTokenDoesNotExist", func() {
 
 		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderApiResponse: errors.NewNotFoundError("not found"),
+			FindByLabelAndProviderApiResponse: errors.NewModelNotFoundError("Service Auth Token", ""),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}

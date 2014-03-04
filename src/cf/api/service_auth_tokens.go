@@ -56,7 +56,7 @@ func (repo CloudControllerServiceAuthTokenRepository) FindByLabelAndProvider(lab
 	}
 
 	if len(authTokens) == 0 {
-		apiErr = errors.NewNotFoundError("Service Auth Token %s %s not found", label, provider)
+		apiErr = errors.NewModelNotFoundError("Service Auth Token", label+" "+provider)
 		return
 	}
 

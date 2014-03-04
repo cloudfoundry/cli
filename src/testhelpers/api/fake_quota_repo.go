@@ -28,7 +28,7 @@ func (repo *FakeQuotaRepository) FindByName(name string) (quota models.QuotaFiel
 	quota = repo.FindByNameQuota
 
 	if repo.FindByNameNotFound {
-		apiErr = errors.NewNotFoundError("%s %s not found", "Org", name)
+		apiErr = errors.NewModelNotFoundError("Org", name)
 	}
 	if repo.FindByNameErr {
 		apiErr = errors.NewErrorWithMessage("Error finding quota")

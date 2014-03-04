@@ -3,10 +3,10 @@ package organization
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -59,13 +59,13 @@ func (cmd *DeleteOrg) Run(c *cli.Context) {
 
 	org, apiErr := cmd.orgRepo.FindByName(orgName)
 
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Org %s does not exist.", orgName)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}

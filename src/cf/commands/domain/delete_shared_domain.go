@@ -3,9 +3,9 @@ package domain
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -52,16 +52,17 @@ func (cmd *DeleteSharedDomain) Run(c *cli.Context) {
 	)
 
 	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(apiErr.Error())
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed("Error finding domain %s\n%s", domainName, apiErr.Error())
 		return
 	}
+
 	if !force {
 		answer := cmd.ui.Confirm(
 			`This domain is shared across all orgs.

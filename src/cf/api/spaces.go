@@ -96,7 +96,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 		})
 
 	if !foundSpace {
-		apiErr = errors.NewNotFoundError("Space %s not found.", name)
+		apiErr = errors.NewModelNotFoundError("Space", name)
 	}
 
 	return

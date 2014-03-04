@@ -3,9 +3,9 @@ package service
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -60,13 +60,13 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	instance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-	if apiErr != nil && apiErr.IsNotFound() {
+	switch apiErr.(type) {
+	case nil:
+	case errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service %s does not exist.", serviceName)
 		return
-	}
-
-	if apiErr != nil {
+	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
 	}

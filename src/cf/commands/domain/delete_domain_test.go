@@ -80,7 +80,7 @@ var _ = Describe("delete-domain command", func() {
 	It("TestDeleteDomainNotFound", func() {
 
 		domainRepo := &testapi.FakeDomainRepository{
-			FindByNameInOrgApiResponse: errors.NewNotFoundError("%s %s not found", "Domain", "foo.com"),
+			FindByNameInOrgApiResponse: errors.NewModelNotFoundError("Domain", "foo.com"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 

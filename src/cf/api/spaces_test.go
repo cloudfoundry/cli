@@ -273,7 +273,7 @@ func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepo
 	_, apiErr := findByName(repo, "Space1")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-	Expect(apiErr.IsNotFound()).To(BeTrue())
+	Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
 }
 
 func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo SpaceRepository) {
