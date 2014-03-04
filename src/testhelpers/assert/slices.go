@@ -13,7 +13,7 @@ func (line Line) String() string {
 
 type Lines []Line
 
-func SliceContains(actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+func SliceContains(actual Line, expected Lines, msgAndArgs ...interface{}) bool {
 	expectedIndex := 0
 	for _, actualValue := range actual {
 		allStringsFound := true
@@ -28,10 +28,10 @@ func SliceContains(actual []string, expected Lines, msgAndArgs ...interface{}) b
 			}
 		}
 	}
-	return Fail(fmt.Sprintf("\"%s\" not found", expected[expectedIndex]), msgAndArgs...)
+	return Fail(fmt.Sprintf("\"%s\" not found in actual:\n'%s'\n", expected[expectedIndex], actual), msgAndArgs...)
 }
 
-func SliceDoesNotContain(actual []string, expected Lines, msgAndArgs ...interface{}) bool {
+func SliceDoesNotContain(actual Line, expected Lines, msgAndArgs ...interface{}) bool {
 	for i, actualValue := range actual {
 		for _, expectedLine := range expected {
 			allStringsFound := true
