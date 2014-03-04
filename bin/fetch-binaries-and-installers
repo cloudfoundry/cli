@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p tmp/release
+wget http://go-cli.s3.amazonaws.com/builds/cf-darwin-amd64 -P tmp/release
+wget http://go-cli.s3.amazonaws.com/builds/cf-linux-amd64 -P tmp/release
+wget http://go-cli.s3.amazonaws.com/builds/cf-linux-386 -P tmp/release
+wget http://go-cli.s3.amazonaws.com/builds/cf-windows-amd64.exe -P tmp/release
+wget http://go-cli.s3.amazonaws.com/builds/cf-windows-386.exe -P tmp/release
+
+wget http://go-cli.s3.amazonaws.com/installer-osx-amd64.pkg -P tmp/release
+wget http://go-cli.s3.amazonaws.com/cf-cli_i386.rpm -P tmp/release
+wget http://go-cli.s3.amazonaws.com/cf-cli_amd64.rpm -P tmp/release
+wget http://go-cli.s3.amazonaws.com/cf-cli_amd64.deb -P tmp/release
+wget http://go-cli.s3.amazonaws.com/cf-cli_i386.deb -P tmp/release
+wget http://go-cli.s3.amazonaws.com/installer-windows-amd64.zip -P tmp/release
+wget http://go-cli.s3.amazonaws.com/installer-windows-386.zip -P tmp/release
+
+echo "all done"
