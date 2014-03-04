@@ -6,12 +6,14 @@ import (
 	"cf/configuration"
 	"cf/errors"
 	. "cf/net"
+	"crypto/tls"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"runtime"
 	"strings"
@@ -239,19 +241,62 @@ var _ = Describe("Gateway", func() {
 		})
 	})
 
-	It("validates the server's SSL certificates", func() {
-		apiServer := httptest.NewTLSServer(http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-			fmt.Fprintln(writer, `{}`)
-		}))
-		defer apiServer.Close()
+	Describe("SSL certificate validation errors", func() {
+		var (
+			request   *Request
+			apiServer *httptest.Server
+		)
 
-		request, apiErr := ccGateway.NewRequest("POST", apiServer.URL+"/v2/foo", "the-access-token", nil)
-		apiErr = ccGateway.PerformRequest(request)
+		BeforeEach(func() {
+			apiServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				fmt.Fprintln(w, `{}`)
+			}))
+			request, _ = ccGateway.NewRequest("POST", apiServer.URL+"/v2/foo", "the-access-token", nil)
+		})
 
-		Expect(apiErr).To(HaveOccurred())
-		Expect(apiErr.Error()).To(ContainSubstring("certificate"))
+		AfterEach(func() {
+			apiServer.Close()
+		})
+
+		It("returns an invalid cert error if the server's CA is unknown (e.g. cert is self-signed)", func() {
+			apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeSelfSignedTLSCert()}
+
+			apiErr := ccGateway.PerformRequest(request)
+			certErr, ok := apiErr.(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
+			Expect(certErr.Reason).To(Equal("unknown authority"))
+		})
+
+		It("returns an invalid cert error if the server's cert doesn't match its host", func() {
+			apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeTLSCertWithInvalidHost()}
+
+			apiErr := ccGateway.PerformRequest(request)
+			certErr, ok := apiErr.(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
+			Expect(certErr.Reason).To(Equal("not valid for the requested host"))
+		})
+
+		It("returns an invalid cert error if the server's cert has expired", func() {
+			apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
+
+			apiErr := ccGateway.PerformRequest(request)
+			certErr, ok := apiErr.(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
+			Expect(certErr.Reason).To(Equal(""))
+		})
 	})
 })
+
+func getHost(urlString string) string {
+	url, err := url.Parse(urlString)
+	if err != nil {
+		panic(err)
+	}
+	return url.Host
+}
 
 func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.TestResponse) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
