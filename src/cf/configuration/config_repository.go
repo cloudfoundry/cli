@@ -29,19 +29,23 @@ func NewRepositoryFromPersistor(persistor Persistor, errorHandler func(error)) R
 type Reader interface {
 	ApiEndpoint() string
 	ApiVersion() string
+	HasAPIEndpoint() bool
+
 	AuthorizationEndpoint() string
 	LoggregatorEndpoint() string
 	AccessToken() string
 	RefreshToken() string
-	OrganizationFields() models.OrganizationFields
-	SpaceFields() models.SpaceFields
 
-	HasSpace() bool
+	OrganizationFields() models.OrganizationFields
 	HasOrganization() bool
-	IsLoggedIn() bool
+
+	SpaceFields() models.SpaceFields
+	HasSpace() bool
+
 	Username() string
 	UserGuid() string
 	UserEmail() string
+	IsLoggedIn() bool
 }
 
 type ReadWriter interface {
@@ -129,6 +133,13 @@ func (c *configRepository) LoggregatorEndpoint() (logEndpoint string) {
 func (c *configRepository) ApiEndpoint() (apiEndpoint string) {
 	c.read(func() {
 		apiEndpoint = c.data.Target
+	})
+	return
+}
+
+func (c *configRepository) HasAPIEndpoint() (hasEndpoint bool) {
+	c.read(func() {
+		hasEndpoint = c.data.ApiVersion != "" && c.data.Target != ""
 	})
 	return
 }
