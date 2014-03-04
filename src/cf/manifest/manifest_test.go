@@ -180,7 +180,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}))
 
 		Expect(errs).NotTo(BeEmpty())
-		Expect(errs.Error()).To(ContainSubstring("Properties are not supported. Found property '${some_property-name}'"))
+		Expect(errs.Error()).To(ContainSubstring("'${some_property-name}'"))
 	})
 
 	It("TestParsingManifestWithNullCommand", func() {
