@@ -1,9 +1,9 @@
 Cloud Foundry CLI [![Build Status](https://travis-ci.org/cloudfoundry/cli.png?branch=master)](https://travis-ci.org/cloudfoundry/cli)
 =================
 
-This is the official command line client for Cloud Foundry. [cf v6.0.1](https://github.com/cloudfoundry/cli/releases/tag/v6.0.1) is the current supported release.
+This is the official command line client for Cloud Foundry. [cf v6.0.2](https://github.com/cloudfoundry/cli/releases/tag/v6.0.2) is the current supported release.
 
-Stable Release (v6.0.1)
+Stable Release (v6.0.2)
 =======================
 
 Installers
