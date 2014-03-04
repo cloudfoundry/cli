@@ -275,7 +275,9 @@ var _ = Describe("Gateway", func() {
 			certErr, ok := apiErr.(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
-			Expect(certErr.Reason).To(Equal("not valid for the requested host"))
+			if runtime.GOOS != "windows" {
+				Expect(certErr.Reason).To(Equal("not valid for the requested host"))
+			}
 		})
 
 		It("returns an invalid cert error if the server's cert has expired", func() {
@@ -285,7 +287,9 @@ var _ = Describe("Gateway", func() {
 			certErr, ok := apiErr.(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
-			Expect(certErr.Reason).To(Equal(""))
+			if runtime.GOOS != "windows" {
+				Expect(certErr.Reason).To(Equal(""))
+			}
 		})
 	})
 })
