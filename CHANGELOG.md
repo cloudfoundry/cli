@@ -1,3 +1,6 @@
+## v6.0.2
+* Fixed `cf push -p path/to/app.zip` on windows with zip files (eg: .zip, .war, .jar)
+
 ## v6.0.1
 * Added purge-service-offering and migrate-service-instances commands
 * Added -a flag to org-users command that makes the command display all users, rather than only privileged users (#46)
