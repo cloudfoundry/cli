@@ -33,7 +33,7 @@ then
   upload_artifacts "master"
 fi
 
-release_tags=$(git describe --tags --exact-match 2> /dev/null | egrep 'v\d'; exit 0)
+release_tags=$(git describe --tags --exact-match 2> /dev/null | egrep 'v[0-9]'; exit 0)
 
 for tag in $release_tags
 do
