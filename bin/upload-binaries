@@ -27,7 +27,7 @@ function upload_artifacts {
   )
 }
 
-if [ "$(git rev-parse head)" = "$(git rev-parse master)" ]
+if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)" ]
 then
   echo "Uploading master artifacts"
   upload_artifacts "master"
