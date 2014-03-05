@@ -25,14 +25,16 @@ Binaries
 - [Windows 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v6.0.2/cf-windows-amd64.zip)
 
 Edge Releases (master)
-=============
+======================
 
-Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI. These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
-- [Linux 64 bit binary](http://go-cli.s3.amazonaws.com/cf-linux-amd64.tgz)
-- [Linux 32 bit binary](http://go-cli.s3.amazonaws.com/cf-linux-386.tgz)
-- [Mac OS X 64 bit binary](http://go-cli.s3.amazonaws.com/cf-darwin-amd64.tgz)
-- [Windows 64 bit binary](http://go-cli.s3.amazonaws.com/cf-windows-amd64.zip)
-- [Windows 32 bit binary](http://go-cli.s3.amazonaws.com/cf-windows-386.zip)
+Edge binaries are published to our Amazon S3 bucket with each new commit that passes CI.
+These binaries are *not intended for wider use*, but for developers to test new features and fixes as they are completed:
+
+- [Linux 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-linux-amd64.tgz)
+- [Linux 32 bit binary](http://go-cli.s3.amazonaws.com/master/cf-linux-386.tgz)
+- [Mac OS X 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-darwin-amd64.tgz)
+- [Windows 64 bit binary](http://go-cli.s3.amazonaws.com/master/cf-windows-amd64.zip)
+- [Windows 32 bit binary](http://go-cli.s3.amazonaws.com/master/cf-windows-386.zip)
 
 You can follow our development progress on [Pivotal Tracker](https://www.pivotaltracker.com/s/projects/892938).
 
