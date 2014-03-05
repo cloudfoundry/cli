@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+    echo "Need to set AWS_ACCESS_KEY_ID"
+    exit 1
+fi
+
+if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+    echo "Need to set AWS_SECRET_ACCESS_KEY"
+    exit 1
+fi
+
+root_dir=$(cd $(dirname $0) && pwd)/..
+s3_config_file=$root_dir/ci/s3cfg
+
+function upload_artifacts {
+  s3_path_prefix=$1
+
+  (
+    cd release
+    for file in $(ls)
+    do
+      s3cmd --config=$s3_config_file put $file s3://go-cli/$s3_path_prefix/$file
+    done
+  )
+}
+
+if [ "$(git rev-parse head)" = "$(git rev-parse master)" ]
+then
+  echo "Uploading master artifacts"
+  upload_artifacts "master"
+fi
+
+release_tags=$(git describe --tags --exact-match 2> /dev/null | egrep 'v\d'; exit 0)
+
+for tag in $release_tags
+do
+  echo "Uploading artifacts for release" $tag
+  upload_artifacts "releases/$tag"
+done
