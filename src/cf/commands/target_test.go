@@ -25,9 +25,9 @@ var _ = Describe("target command", func() {
 
 	BeforeEach(func() {
 		ui = new(testterm.FakeUI)
-		orgRepo = &testapi.FakeOrgRepository{}
-		spaceRepo = &testapi.FakeSpaceRepository{}
-		reqFactory = &testreq.FakeReqFactory{}
+		orgRepo = new(testapi.FakeOrgRepository)
+		spaceRepo = new(testapi.FakeSpaceRepository)
+		reqFactory = new(testreq.FakeReqFactory)
 		config = testconfig.NewRepositoryWithDefaults()
 	})
 
@@ -36,10 +36,16 @@ var _ = Describe("target command", func() {
 		testcmd.RunCommand(cmd, testcmd.NewContext("target", args), reqFactory)
 	}
 
+	It("fails with usage when called with an argument but no flags", func() {
+		callTarget([]string{"some-argument"})
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
+
 	Describe("when the user is not logged in", func() {
 		It("prints the target info when no org or space is specified", func() {
 			callTarget([]string{})
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 		})
 
 		It("fails requirements when targeting a space or org", func() {
@@ -55,6 +61,14 @@ var _ = Describe("target command", func() {
 		BeforeEach(func() {
 			reqFactory.LoginSuccess = true
 		})
+
+		var expectOrgToBeCleared = func() {
+			Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
+		}
+
+		var expectSpaceToBeCleared = func() {
+			Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
+		}
 
 		It("it updates the organization in the config", func() {
 			org := models.Organization{}
@@ -100,11 +114,13 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
-			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
 			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+
 			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 			Expect(config.SpaceFields().Guid).To(Equal("my-space-guid"))
+
+			Expect(ui.ShowConfigurationCalled).To(BeTrue())
 		})
 
 		It("only updates the organization in the config when the space can't be found", func() {
@@ -119,20 +135,17 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-o", "my-organization", "-s", "my-space"})
 
-			Expect(ui.ShowConfigurationCalled).To(BeFalse())
 			Expect(orgRepo.FindByNameName).To(Equal("my-organization"))
 			Expect(config.OrganizationFields().Guid).To(Equal("my-organization-guid"))
+
 			Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 			Expect(config.SpaceFields().Guid).To(Equal(""))
+
+			Expect(ui.ShowConfigurationCalled).To(BeFalse())
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"Unable to access space", "my-space"},
 			})
-		})
-
-		It("fails with usage when called with an argument but no flags", func() {
-			callTarget([]string{"some-argument"})
-			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
 		It("fails when the user does not have access to the specified organization", func() {
@@ -142,6 +155,8 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-o", "my-organization"})
 			testassert.SliceContains(ui.Outputs, testassert.Lines{{"FAILED"}})
+			expectOrgToBeCleared()
+			expectSpaceToBeCleared()
 		})
 
 		It("fails when the organization is not found", func() {
@@ -153,6 +168,9 @@ var _ = Describe("target command", func() {
 				{"FAILED"},
 				{"my-organization", "not found"},
 			})
+
+			expectOrgToBeCleared()
+			expectSpaceToBeCleared()
 		})
 
 		It("fails to target a space if no organization is targetted", func() {
@@ -164,11 +182,11 @@ var _ = Describe("target command", func() {
 				{"FAILED"},
 				{"An org must be targeted before targeting a space"},
 			})
-			Expect(config.OrganizationFields().Guid).To(Equal(""))
+
+			expectSpaceToBeCleared()
 		})
 
 		It("fails when the user doesn't have access to the space", func() {
-			config.SetSpaceFields(models.SpaceFields{})
 			spaceRepo.FindByNameErr = true
 
 			callTarget([]string{"-s", "my-space"})
@@ -180,6 +198,9 @@ var _ = Describe("target command", func() {
 
 			Expect(config.SpaceFields().Guid).To(Equal(""))
 			Expect(ui.ShowConfigurationCalled).To(BeFalse())
+
+			Expect(config.OrganizationFields().Guid).NotTo(BeEmpty())
+			expectSpaceToBeCleared()
 		})
 
 		It("fails when the space is not found", func() {
@@ -187,6 +208,7 @@ var _ = Describe("target command", func() {
 
 			callTarget([]string{"-s", "my-space"})
 
+			expectSpaceToBeCleared()
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"FAILED"},
 				{"my-space", "not found"},
