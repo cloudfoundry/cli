@@ -46,15 +46,9 @@ func (cmd CreateService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	offerings, apiErr := cmd.serviceRepo.GetServiceOfferingsForSpace(cmd.config.SpaceFields().Guid)
+	offerings, apiErr := cmd.serviceRepo.FindServiceOfferingsForSpaceByLabel(cmd.config.SpaceFields().Guid, offeringName)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
-		return
-	}
-
-	offerings, err := findOfferings(offerings, offeringName)
-	if err != nil {
-		cmd.ui.Failed(err.Error())
 		return
 	}
 
