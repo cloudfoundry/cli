@@ -14,6 +14,7 @@ import (
 type ServiceRepository interface {
 	PurgeServiceOffering(offering models.ServiceOffering) errors.Error
 	FindServiceOfferingByLabelAndProvider(name, provider string) (offering models.ServiceOffering, apiErr errors.Error)
+	FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offering models.ServiceOfferings, apiErr errors.Error)
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr errors.Error)
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr errors.Error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr errors.Error)
@@ -34,6 +35,11 @@ func NewCloudControllerServiceRepository(config configuration.Reader, gateway ne
 	repo.config = config
 	repo.gateway = gateway
 	return
+}
+
+func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offering models.ServiceOfferings, apiErr errors.Error) {
+	return repo.getServiceOfferings(
+		fmt.Sprintf("/v2/spaces/%s/services?q=%s&inline-relations-depth=1", spaceGuid, url.QueryEscape("label:"+name)))
 }
 
 func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr errors.Error) {
