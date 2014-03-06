@@ -2,6 +2,7 @@ package space_test
 
 import (
 	. "cf/commands/space"
+	"cf/configuration"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,16 +12,14 @@ import (
 	testconfig "testhelpers/configuration"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
-	"cf/configuration"
 )
-
 
 var _ = Describe("rename-space command", func() {
 	var (
-		ui *testterm.FakeUI
+		ui         *testterm.FakeUI
 		configRepo configuration.ReadWriter
 		reqFactory *testreq.FakeReqFactory
-		spaceRepo *testapi.FakeSpaceRepository
+		spaceRepo  *testapi.FakeSpaceRepository
 	)
 
 	BeforeEach(func() {
@@ -58,20 +57,37 @@ var _ = Describe("rename-space command", func() {
 		})
 	})
 
-	It("renames a space", func() {
-		space := models.Space{}
-		space.Name = "my-space"
-		space.Guid = "my-space-guid"
-		reqFactory.Space = space
-
-		callRenameSpace([]string{"my-space", "my-new-space"})
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming space", "my-space", "my-new-space", "my-org", "my-user"},
-			{"OK"},
+	Describe("when the user is logged in and has provided an old and new space name", func() {
+		BeforeEach(func() {
+			space := models.Space{}
+			space.Name = "the-old-space-name"
+			space.Guid = "the-old-space-guid"
+			reqFactory.Space = space
 		})
 
-		Expect(spaceRepo.RenameSpaceGuid).To(Equal("my-space-guid"))
-		Expect(spaceRepo.RenameNewName).To(Equal("my-new-space"))
+		It("renames a space", func() {
+			originalSpaceName := configRepo.SpaceFields().Name
+			callRenameSpace([]string{"the-old-space-name", "my-new-space"})
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Renaming space", "the-old-space-name", "my-new-space", "my-org", "my-user"},
+				{"OK"},
+			})
+
+			Expect(spaceRepo.RenameSpaceGuid).To(Equal("the-old-space-guid"))
+			Expect(spaceRepo.RenameNewName).To(Equal("my-new-space"))
+			Expect(configRepo.SpaceFields().Name).To(Equal(originalSpaceName))
+		})
+
+		Describe("renaming the space the user has targeted", func() {
+			BeforeEach(func() {
+				configRepo.SetSpaceFields(reqFactory.Space.SpaceFields)
+			})
+
+			It("renames the targeted space", func() {
+				callRenameSpace([]string{"the-old-space-name", "my-new-space-name"})
+				Expect(configRepo.SpaceFields().Name).To(Equal("my-new-space-name"))
+			})
+		})
 	})
 })
