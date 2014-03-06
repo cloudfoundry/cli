@@ -118,12 +118,12 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) errors.Erro
 	response := new(AuthenticationResponse)
 	_, err = uaa.gateway.PerformRequestForJSONResponse(request, &response)
 
-	switch typedErr := err.(type) {
+	switch err.(type) {
 	case nil:
 	case errors.HttpError:
-		return typedErr
+		return err
 	default:
-		return errors.NewErrorWithError("auth request failed", typedErr)
+		return errors.NewErrorWithError("auth request failed", err)
 	}
 
 	if response.Error.Code != "" {
