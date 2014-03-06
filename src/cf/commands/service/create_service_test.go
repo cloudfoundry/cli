@@ -39,7 +39,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering2.Label = "postgres"
 
 		serviceRepo := &testapi.FakeServiceRepo{}
-		serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = []models.ServiceOffering{
+		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{
 			offering,
 			offering2,
 		}
@@ -67,7 +67,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		offering2 := models.ServiceOffering{}
 		offering2.Label = "postgres"
 		serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
-		serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
+		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
 		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 			[]string{},
 			serviceRepo,
@@ -96,7 +96,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			offering2.Plans = []models.ServicePlanFields{plan}
 
 			serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
-			serviceRepo.GetServiceOfferingsForSpaceReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
+			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
 			ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 				[]string{},
 				serviceRepo,

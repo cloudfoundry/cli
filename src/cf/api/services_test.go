@@ -603,6 +603,77 @@ var _ = Describe("Services Repo", func() {
 			Expect(apiErr).To(HaveOccurred())
 		})
 	})
+
+	Describe("FindServiceOfferingsForSpaceByLabel", func() {
+		It("finds service offerings within a space by label", func() {
+			_, _, repo := createServiceRepo([]testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
+				Response: testnet.TestResponse{
+					Status: 200,
+					Body: `{
+            "next_url": null,
+            "resources": [
+                {
+                  "metadata": {
+                    "guid": "offering-1-guid"
+                  },
+                  "entity": {
+                    "label": "offering-1",
+                    "provider": "provider-1",
+                    "description": "offering 1 description",
+                    "version" : "1.0",
+                    "service_plans": []
+                  }
+                }
+            ]
+        }`,
+				},
+			}})
+
+			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(apiErr).ShouldNot(HaveOccurred())
+			Expect(offerings).Should(HaveLen(1))
+			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
+		})
+
+		It("returns an error if the offering cannot be found", func() {
+			_, _, repo := createServiceRepo([]testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
+				Response: testnet.TestResponse{
+					Status: 200,
+					Body: `{
+            "next_url": null,
+            "resources": []
+        }`,
+				},
+			}})
+
+			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(apiErr).ShouldNot(HaveOccurred())
+			Expect(offerings).Should(HaveLen(0))
+		})
+
+		It("handles api errors when finding service offerings", func() {
+			_, _, repo := createServiceRepo([]testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
+				Response: testnet.TestResponse{
+					Status: 400,
+					Body: `{
+            "code": 10005,
+            "description": "The query parameter is invalid"
+        }`,
+				},
+			}})
+
+			_, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(apiErr).Should(HaveOccurred())
+			Expect(apiErr.ErrorCode()).To(Equal("10005"))
+		})
+
+	})
 })
 
 var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `

@@ -21,6 +21,16 @@ type FakeServiceRepo struct {
 		SpaceGuid string
 	}
 
+	FindServiceOfferingsForSpaceByLabelArgs struct {
+		SpaceGuid string
+		Name      string
+	}
+
+	FindServiceOfferingsForSpaceByLabelReturns struct {
+		ServiceOfferings []models.ServiceOffering
+		Error            errors.Error
+	}
+
 	CreateServiceInstanceName     string
 	CreateServiceInstancePlanGuid string
 	CreateServiceAlreadyExists    bool
@@ -71,6 +81,12 @@ func (repo *FakeServiceRepo) GetAllServiceOfferings() (models.ServiceOfferings, 
 func (repo *FakeServiceRepo) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, errors.Error) {
 	repo.GetServiceOfferingsForSpaceArgs.SpaceGuid = spaceGuid
 	return repo.GetServiceOfferingsForSpaceReturns.ServiceOfferings, repo.GetServiceOfferingsForSpaceReturns.Error
+}
+
+func (repo *FakeServiceRepo) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (models.ServiceOfferings, errors.Error) {
+	repo.FindServiceOfferingsForSpaceByLabelArgs.Name = name
+	repo.FindServiceOfferingsForSpaceByLabelArgs.SpaceGuid = spaceGuid
+	return repo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings, repo.FindServiceOfferingsForSpaceByLabelReturns.Error
 }
 
 func (repo *FakeServiceRepo) PurgeServiceOffering(offering models.ServiceOffering) (apiErr errors.Error) {
