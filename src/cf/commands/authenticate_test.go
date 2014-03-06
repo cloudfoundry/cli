@@ -3,6 +3,7 @@ package commands_test
 import (
 	. "cf/commands"
 	"cf/configuration"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -73,16 +74,26 @@ var _ = Describe("auth command", func() {
 			}))
 		})
 
-		It("TestUnsuccessfullyAuthenticatingWithoutInteractivity", func() {
-			repo.AuthError = true
-			context := testcmd.NewContext("auth", []string{"username", "password"})
-			testcmd.RunCommand(cmd, context, reqFactory)
+		Describe("when authentication fails", func() {
+			BeforeEach(func() {
+				repo.AuthError = true
+				testcmd.RunCommand(cmd, testcmd.NewContext("auth", []string{"username", "password"}), reqFactory)
+			})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{config.ApiEndpoint()},
-				{"Authenticating..."},
-				{"FAILED"},
-				{"Error authenticating"},
+			It("does not prompt the user when provided username and password", func() {
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{config.ApiEndpoint()},
+					{"Authenticating..."},
+					{"FAILED"},
+					{"Error authenticating"},
+				})
+			})
+
+			It("clears the user's session", func() {
+				Expect(config.AccessToken()).To(BeEmpty())
+				Expect(config.RefreshToken()).To(BeEmpty())
+				Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
+				Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
 			})
 		})
 	})
