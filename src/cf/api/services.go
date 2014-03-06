@@ -38,25 +38,27 @@ func NewCloudControllerServiceRepository(config configuration.Reader, gateway ne
 
 func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr errors.Error) {
 	return repo.getServiceOfferings(
-		fmt.Sprintf("%s/v2/spaces/%s/services?inline-relations-depth=1", repo.config.ApiEndpoint(), spaceGuid),
-	)
+		fmt.Sprintf("/v2/spaces/%s/services?inline-relations-depth=1", spaceGuid))
 }
 
 func (repo CloudControllerServiceRepository) GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr errors.Error) {
-	return repo.getServiceOfferings(
-		fmt.Sprintf("%s/v2/services?inline-relations-depth=1", repo.config.ApiEndpoint()),
-	)
+	return repo.getServiceOfferings("/v2/services?inline-relations-depth=1")
 }
 
 func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (offerings models.ServiceOfferings, apiErr errors.Error) {
-	resources := new(PaginatedServiceOfferingResources)
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
+	apiErr = repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		repo.config.AccessToken(),
+		path,
+		ServiceOfferingResource{},
+		func(resource interface{}) bool {
+			if so, ok := resource.(ServiceOfferingResource); ok {
+				offerings = append(offerings, so.ToModel())
+			}
+			return true
+		})
 	if apiErr != nil {
 		return
-	}
-
-	for _, r := range resources.Resources {
-		offerings = append(offerings, r.ToModel())
 	}
 
 	return
