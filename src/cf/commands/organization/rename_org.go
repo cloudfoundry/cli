@@ -11,12 +11,12 @@ import (
 
 type RenameOrg struct {
 	ui      terminal.UI
-	config  configuration.Reader
+	config  configuration.ReadWriter
 	orgRepo api.OrganizationRepository
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewRenameOrg(ui terminal.UI, config configuration.Reader, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
+func NewRenameOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.OrganizationRepository) (cmd *RenameOrg) {
 	cmd = new(RenameOrg)
 	cmd.ui = ui
 	cmd.config = config
@@ -54,4 +54,9 @@ func (cmd *RenameOrg) Run(c *cli.Context) {
 		return
 	}
 	cmd.ui.Ok()
+
+	if org.Guid == cmd.config.OrganizationFields().Guid {
+		org.Name = newName
+		cmd.config.SetOrganizationFields(org.OrganizationFields)
+	}
 }
