@@ -31,8 +31,9 @@ var _ = Describe("Gateway", func() {
 	)
 
 	BeforeEach(func() {
-		ccGateway = NewCloudControllerGateway()
-		uaaGateway = NewUAAGateway()
+		config = testconfig.NewRepository()
+		ccGateway = NewCloudControllerGateway(config)
+		uaaGateway = NewUAAGateway(config)
 	})
 
 	It("TestNewRequest", func() {
@@ -334,7 +335,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")
 
-	authGateway := NewUAAGateway()
+	authGateway := NewUAAGateway(config)
 	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
 	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)

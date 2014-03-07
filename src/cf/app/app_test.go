@@ -38,9 +38,9 @@ var _ = Describe("App", func() {
 		manifestRepo := &testmanifest.FakeManifestRepository{}
 
 		repoLocator := api.NewRepositoryLocator(config, map[string]net.Gateway{
-			"auth":             net.NewUAAGateway(),
-			"cloud-controller": net.NewCloudControllerGateway(),
-			"uaa":              net.NewUAAGateway(),
+			"auth":             net.NewUAAGateway(config),
+			"cloud-controller": net.NewCloudControllerGateway(config),
+			"uaa":              net.NewUAAGateway(config),
 		})
 
 		cmdFactory := commands.NewFactory(ui, config, manifestRepo, repoLocator)

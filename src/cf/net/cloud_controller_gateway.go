@@ -1,6 +1,7 @@
 package net
 
 import (
+	"cf/configuration"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -8,7 +9,7 @@ import (
 	"strconv"
 )
 
-func NewCloudControllerGateway() Gateway {
+func NewCloudControllerGateway(config configuration.Reader) Gateway {
 	invalidTokenCode := "1000"
 
 	type ccErrorResponse struct {
@@ -38,7 +39,7 @@ func NewCloudControllerGateway() Gateway {
 		}
 	}
 
-	gateway := newGateway(errorHandler)
+	gateway := newGateway(errorHandler, config)
 	gateway.PollingEnabled = true
 	return gateway
 }

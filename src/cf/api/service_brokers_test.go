@@ -218,7 +218,7 @@ func createServiceBrokerRepo(requests ...testnet.TestRequest) (ts *httptest.Serv
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerServiceBrokerRepository(configRepo, gateway)
 	return
 }

@@ -33,7 +33,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 	)
 
 	BeforeEach(func() {
-		gateway := net.NewCloudControllerGateway()
+		gateway := net.NewCloudControllerGateway(configRepo)
 		pwd, _ := os.Getwd()
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")

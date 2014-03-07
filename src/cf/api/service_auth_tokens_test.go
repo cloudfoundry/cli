@@ -170,7 +170,7 @@ func createServiceAuthTokenRepo(request testnet.TestRequest) (ts *httptest.Serve
 	ts, handler = testnet.NewServer([]testnet.TestRequest{request})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerServiceAuthTokenRepository(configRepo, gateway)
 	return
 }

@@ -1,12 +1,14 @@
 package net_test
 
 import (
+	"cf/configuration"
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	testconfig "testhelpers/configuration"
 )
 
 var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) {
@@ -17,9 +19,11 @@ var failingUAARequest = func(writer http.ResponseWriter, request *http.Request) 
 
 var _ = Describe("UAA Gateway", func() {
 	var gateway Gateway
+	var config configuration.Reader
 
 	BeforeEach(func() {
-		gateway = NewUAAGateway()
+		config = testconfig.NewRepository()
+		gateway = NewUAAGateway(config)
 	})
 
 	It("parses error responses", func() {

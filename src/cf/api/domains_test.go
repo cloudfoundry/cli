@@ -548,7 +548,7 @@ func createDomainRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler 
 	ts, handler = testnet.NewServer(reqs)
 	config := testconfig.NewRepositoryWithDefaults()
 	config.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(config)
 	repo = NewCloudControllerDomainRepository(config, gateway)
 	return
 }

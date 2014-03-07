@@ -127,7 +127,7 @@ func createUserProvidedServiceInstanceRepo(req testnet.TestRequest) (ts *httptes
 	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCCUserProvidedServiceInstanceRepository(configRepo, gateway)
 	return
 }

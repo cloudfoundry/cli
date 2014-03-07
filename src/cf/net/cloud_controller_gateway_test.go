@@ -1,12 +1,14 @@
 package net_test
 
 import (
+	"cf/configuration"
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"net/http"
 	"net/http/httptest"
+	testconfig "testhelpers/configuration"
 )
 
 var failingCloudControllerRequest = func(writer http.ResponseWriter, request *http.Request) {
@@ -23,9 +25,11 @@ var invalidTokenCloudControllerRequest = func(writer http.ResponseWriter, reques
 
 var _ = Describe("Cloud Controller Gateway", func() {
 	var gateway Gateway
+	var config configuration.Reader
 
 	BeforeEach(func() {
-		gateway = NewCloudControllerGateway()
+		config = testconfig.NewRepository()
+		gateway = NewCloudControllerGateway(config)
 	})
 
 	It("parses error responses", func() {
