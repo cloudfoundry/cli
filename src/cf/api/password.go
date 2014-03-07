@@ -13,22 +13,20 @@ type PasswordRepository interface {
 }
 
 type CloudControllerPasswordRepository struct {
-	config       configuration.Reader
-	gateway      net.Gateway
-	endpointRepo EndpointRepository
+	config  configuration.Reader
+	gateway net.Gateway
 }
 
-func NewCloudControllerPasswordRepository(config configuration.Reader, gateway net.Gateway, endpointRepo EndpointRepository) (repo CloudControllerPasswordRepository) {
+func NewCloudControllerPasswordRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerPasswordRepository) {
 	repo.config = config
 	repo.gateway = gateway
-	repo.endpointRepo = endpointRepo
 	return
 }
 
-func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) (apiErr errors.Error) {
-	uaaEndpoint, apiErr := repo.endpointRepo.GetUAAEndpoint()
-	if apiErr != nil {
-		return
+func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) errors.Error {
+	uaaEndpoint := repo.config.AuthorizationEndpoint()
+	if uaaEndpoint == "" {
+		return errors.NewErrorWithMessage("UAA endpoint missing from config file")
 	}
 
 	path := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())

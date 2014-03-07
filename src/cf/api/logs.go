@@ -22,22 +22,17 @@ type LogsRepository interface {
 
 type LoggregatorLogsRepository struct {
 	config       configuration.Reader
-	endpointRepo EndpointRepository
 	TrustedCerts []tls.Certificate
 }
 
-func NewLoggregatorLogsRepository(config configuration.Reader, endpointRepo EndpointRepository) LoggregatorLogsRepository {
-	return LoggregatorLogsRepository{
-		config:       config,
-		endpointRepo: endpointRepo,
-	}
+func NewLoggregatorLogsRepository(config configuration.Reader) LoggregatorLogsRepository {
+	return LoggregatorLogsRepository{config: config}
 }
 
 func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
-	host, apiErr := repo.endpointRepo.GetLoggregatorEndpoint()
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
-		return
+	host := repo.config.LoggregatorEndpoint()
+	if host == "" {
+		return errors.New("Loggregator endpoint missing from config file")
 	}
 
 	location := fmt.Sprintf("%s/dump/?app=%s", host, appGuid)
@@ -48,10 +43,11 @@ func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect fu
 }
 
 func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) error {
-	host, apiErr := repo.endpointRepo.GetLoggregatorEndpoint()
-	if apiErr != nil {
-		return errors.New(apiErr.Error())
+	host := repo.config.LoggregatorEndpoint()
+	if host == "" {
+		return errors.New("Loggregator endpoint missing from config file")
 	}
+
 	location := host + fmt.Sprintf("/tail/?app=%s", appGuid)
 	return repo.connectToWebsocket(location, onConnect, logChan, stopLoggingChan, printTimeBuffer)
 }
