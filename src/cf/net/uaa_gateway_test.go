@@ -25,7 +25,7 @@ var _ = Describe("UAA Gateway", func() {
 	It("parses error responses", func() {
 		ts := httptest.NewTLSServer(http.HandlerFunc(failingUAARequest))
 		defer ts.Close()
-		gateway.AddTrustedCerts(ts.TLS.Certificates)
+		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
 		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
 		apiErr = gateway.PerformRequest(request)

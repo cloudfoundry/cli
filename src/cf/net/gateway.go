@@ -375,6 +375,6 @@ func (gateway Gateway) doRequest(request *http.Request) (response *http.Response
 	return
 }
 
-func (gateway *Gateway) AddTrustedCerts(certificates []tls.Certificate) {
-	gateway.trustedCerts = append(gateway.trustedCerts, certificates...)
+func (gateway *Gateway) SetTrustedCerts(certificates []tls.Certificate) {
+	gateway.trustedCerts = certificates
 }

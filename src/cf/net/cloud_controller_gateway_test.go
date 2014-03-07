@@ -31,7 +31,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 	It("parses error responses", func() {
 		ts := httptest.NewTLSServer(http.HandlerFunc(failingCloudControllerRequest))
 		defer ts.Close()
-		gateway.AddTrustedCerts(ts.TLS.Certificates)
+		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
 		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
 		apiErr = gateway.PerformRequest(request)
@@ -44,7 +44,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 	It("parses invalid token responses", func() {
 		ts := httptest.NewTLSServer(http.HandlerFunc(invalidTokenCloudControllerRequest))
 		defer ts.Close()
-		gateway.AddTrustedCerts(ts.TLS.Certificates)
+		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
 		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
 		apiErr = gateway.PerformRequest(request)

@@ -70,7 +70,7 @@ var _ = Describe("Endpoints Repository", func() {
 			testServerFn(w, r)
 		}))
 		gateway = net.NewCloudControllerGateway()
-		gateway.AddTrustedCerts(testServer.TLS.Certificates)
+		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(config, gateway)
 	})
 
@@ -161,6 +161,9 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
 				Expect(config.ApiEndpoint()).To(Equal(testServer.URL))
 				Expect(config.ApiVersion()).To(Equal("42.0.0"))
+			})
+
+			It("fails if the server's cert is invalid", func() {
 			})
 
 			It("uses http when the server doesn't respond over https", func() {
