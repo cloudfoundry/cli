@@ -29,7 +29,8 @@ var exampleJSON = `
 	"SpaceFields": {
 		"Guid": "the-space-guid",
 		"Name": "the-space"
-	}
+	},
+	"SSLDisabled": true
 }`
 
 var exampleConfig = &Data{
@@ -47,6 +48,7 @@ var exampleConfig = &Data{
 		Guid: "the-space-guid",
 		Name: "the-space",
 	},
+	SSLDisabled: true,
 }
 
 var _ = Describe("V2 Config files", func() {
