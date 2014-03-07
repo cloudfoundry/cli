@@ -31,9 +31,9 @@ This is the body. Please don't get rid of me even though I contain Authorization
 			Expect(Sanitize(request)).To(Equal(expected))
 		})
 
-		It("hides passwords in the body", func() {
-
-			request := `
+		Describe("hiding passwords in the body of requests", func() {
+			It("hides passwords in query args", func() {
+				request := `
 POST /oauth/token HTTP/1.1
 Host: login.run.pivotal.io
 Accept: application/json
@@ -43,7 +43,7 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=password&password=password&scope=&username=mgehard%2Bcli%40pivotallabs.com
 `
 
-			expected := `
+				expected := `
 POST /oauth/token HTTP/1.1
 Host: login.run.pivotal.io
 Accept: application/json
@@ -52,7 +52,26 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=password&password=[PRIVATE DATA HIDDEN]&scope=&username=mgehard%2Bcli%40pivotallabs.com
 `
-			Expect(Sanitize(request)).To(Equal(expected))
+				Expect(Sanitize(request)).To(Equal(expected))
+			})
+
+			It("hides paswords in the JSON-formatted request body", func() {
+				request := `
+REQUEST: [2014-03-07T10:53:36-08:00]
+PUT /Users/user-guid-goes-here/password HTTP/1.1
+
+{"password":"stanleysPasswordIsCool","oldPassword":"stanleypassword!"}
+`
+
+				expected := `
+REQUEST: [2014-03-07T10:53:36-08:00]
+PUT /Users/user-guid-goes-here/password HTTP/1.1
+
+{"password":"[PRIVATE DATA HIDDEN]","oldPassword":"[PRIVATE DATA HIDDEN]"}
+`
+
+				Expect(Sanitize(request)).To(Equal(expected))
+			})
 		})
 
 		It("hides oauth tokens in the body of requests", func() {

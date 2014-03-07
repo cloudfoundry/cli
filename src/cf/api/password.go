@@ -29,8 +29,8 @@ func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new str
 		return errors.NewErrorWithMessage("UAA endpoint missing from config file")
 	}
 
-	path := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())
+	url := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())
 	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
 
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
+	return repo.gateway.UpdateResource(url, repo.config.AccessToken(), strings.NewReader(body))
 }
