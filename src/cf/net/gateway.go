@@ -2,6 +2,7 @@ package net
 
 import (
 	"cf"
+	"cf/configuration"
 	"cf/errors"
 	"crypto/tls"
 	"encoding/json"
@@ -63,10 +64,12 @@ type Gateway struct {
 	PollingEnabled  bool
 	PollingThrottle time.Duration
 	trustedCerts    []tls.Certificate
+	config          configuration.Reader
 }
 
-func newGateway(errHandler errorHandler) (gateway Gateway) {
+func newGateway(errHandler errorHandler, config configuration.Reader) (gateway Gateway) {
 	gateway.errHandler = errHandler
+	gateway.config = config
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
 	return
 }

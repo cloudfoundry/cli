@@ -3,10 +3,8 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/net"
-	"crypto/tls"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -71,7 +69,7 @@ var _ = Describe("Endpoints Repository", func() {
 		testServer = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			testServerFn(w, r)
 		}))
-		gateway = net.NewCloudControllerGateway()
+		gateway = net.NewCloudControllerGateway(config)
 		gateway.SetTrustedCerts(testServer.TLS.Certificates)
 		repo = NewEndpointRepository(config, gateway)
 	})
@@ -163,17 +161,6 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
 				Expect(config.ApiEndpoint()).To(Equal(testServer.URL))
 				Expect(config.ApiVersion()).To(Equal("42.0.0"))
-			})
-
-			It("fails if the server's cert is invalid", func() {
-				testServerFn = validApiInfoEndpoint
-
-				gateway.SetTrustedCerts([]tls.Certificate{})
-				repo = NewEndpointRepository(config, gateway)
-
-				schemelessURL := strings.Replace(testServer.URL, "https://", "", 1)
-				_, apiErr := repo.UpdateEndpoint(schemelessURL)
-				Expect(apiErr.(*errors.InvalidSSLCert)).NotTo(BeNil())
 			})
 
 			It("uses http when the server doesn't respond over https", func() {

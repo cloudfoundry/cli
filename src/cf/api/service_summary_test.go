@@ -85,7 +85,7 @@ func createServiceSummaryRepo(req testnet.TestRequest) (ts *httptest.Server, han
 	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerServiceSummaryRepository(configRepo, gateway)
 	return
 }

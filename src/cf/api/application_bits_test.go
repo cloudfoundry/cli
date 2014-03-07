@@ -33,7 +33,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 	It("TestUploadWithInvalidDirectory", func() {
 		config := testconfig.NewRepository()
-		gateway := net.NewCloudControllerGateway()
+		gateway := net.NewCloudControllerGateway(config)
 		zipper := &cf.ApplicationZipper{}
 
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
@@ -255,7 +255,7 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	gateway.PollingThrottle = time.Duration(0)
 	zipper := cf.ApplicationZipper{}
 	repo := NewCloudControllerApplicationBitsRepository(configRepo, gateway, zipper)

@@ -1,6 +1,7 @@
 package net
 
 import (
+	"cf/configuration"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -28,6 +29,6 @@ var uaaErrorHandler = func(response *http.Response) errorResponse {
 	return errorResponse{Code: code, Description: uaaResp.Description}
 }
 
-func NewUAAGateway() Gateway {
-	return newGateway(uaaErrorHandler)
+func NewUAAGateway(config configuration.Reader) Gateway {
+	return newGateway(uaaErrorHandler, config)
 }

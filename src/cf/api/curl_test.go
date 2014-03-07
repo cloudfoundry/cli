@@ -30,7 +30,7 @@ type curlDependencies struct {
 func newCurlDependencies() (deps curlDependencies) {
 	deps.config = testconfig.NewRepository()
 	deps.config.SetAccessToken("BEARER my_access_token")
-	deps.gateway = net.NewCloudControllerGateway()
+	deps.gateway = net.NewCloudControllerGateway(deps.config)
 	return
 }
 

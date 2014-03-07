@@ -104,7 +104,7 @@ func createServiceBindingRepo(requests []testnet.TestRequest) (ts *httptest.Serv
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerServiceBindingRepository(configRepo, gateway)
 	return
 }

@@ -97,7 +97,7 @@ func setupEventTest(requests []testnet.TestRequest) (deps eventTestDependencies)
 	configRepo.SetAccessToken("BEARER my_access_token")
 
 	deps.config = configRepo
-	deps.gateway = net.NewCloudControllerGateway()
+	deps.gateway = net.NewCloudControllerGateway(configRepo)
 
 	return
 }

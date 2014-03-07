@@ -199,7 +199,7 @@ func createOrganizationRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, h
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerOrganizationRepository(configRepo, gateway)
 	return
 }

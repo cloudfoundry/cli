@@ -23,7 +23,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	)
 
 	BeforeEach(func() {
-		gateway = net.NewUAAGateway()
+		gateway = net.NewUAAGateway(config)
 	})
 
 	AfterEach(func() {

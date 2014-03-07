@@ -333,7 +333,7 @@ func createBuildpackRepo(requests ...testnet.TestRequest) (ts *httptest.Server, 
 	ts, handler = testnet.NewServer(requests)
 	config := testconfig.NewRepositoryWithDefaults()
 	config.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(config)
 	repo = NewCloudControllerBuildpackRepository(config, gateway)
 	return
 }

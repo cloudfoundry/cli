@@ -35,7 +35,7 @@ func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Serve
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetAuthorizationEndpoint(passwordServer.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerPasswordRepository(configRepo, gateway)
 	return
 }

@@ -277,7 +277,7 @@ func createAppRepo(requests []testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerApplicationRepository(configRepo, gateway)
 	return
 }

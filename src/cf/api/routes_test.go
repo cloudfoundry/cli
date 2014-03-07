@@ -324,7 +324,7 @@ func createRoutesRepo(requests ...testnet.TestRequest) (ts *httptest.Server, han
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	domainRepo = &testapi.FakeDomainRepository{}
 
 	repo = NewCloudControllerRouteRepository(configRepo, gateway, domainRepo)

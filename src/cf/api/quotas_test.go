@@ -69,7 +69,7 @@ func createQuotaRepo(req testnet.TestRequest) (ts *httptest.Server, handler *tes
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerQuotaRepository(configRepo, gateway)
 	return
 }

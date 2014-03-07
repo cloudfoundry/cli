@@ -88,8 +88,8 @@ var _ = Describe("UserRepository", func() {
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			configRepo.SetApiEndpoint(ts.URL)
 
-			ccGateway := net.NewCloudControllerGateway()
-			uaaGateway := net.NewUAAGateway()
+			ccGateway := net.NewCloudControllerGateway(configRepo)
+			uaaGateway := net.NewUAAGateway(configRepo)
 			configRepo.SetAuthorizationEndpoint("")
 
 			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
@@ -444,8 +444,8 @@ func createUsersRepo(ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ccTarget)
-	ccGateway := net.NewCloudControllerGateway()
-	uaaGateway := net.NewUAAGateway()
+	ccGateway := net.NewCloudControllerGateway(configRepo)
+	uaaGateway := net.NewUAAGateway(configRepo)
 	configRepo.SetAuthorizationEndpoint(uaaTarget)
 	repo = NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
 	return

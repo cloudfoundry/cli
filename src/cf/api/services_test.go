@@ -867,7 +867,7 @@ func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuratio
 		config.SetApiEndpoint(ts.URL)
 	}
 
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(config)
 	repo = NewCloudControllerServiceRepository(config, gateway)
 	return
 }

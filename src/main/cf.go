@@ -42,9 +42,9 @@ func setupDependencies() (deps *cliDependencies) {
 	})
 
 	deps.apiRepoLocator = api.NewRepositoryLocator(deps.configRepo, map[string]net.Gateway{
-		"auth":             net.NewUAAGateway(),
-		"cloud-controller": net.NewCloudControllerGateway(),
-		"uaa":              net.NewUAAGateway(),
+		"auth":             net.NewUAAGateway(deps.configRepo),
+		"cloud-controller": net.NewCloudControllerGateway(deps.configRepo),
+		"uaa":              net.NewUAAGateway(deps.configRepo),
 	})
 
 	return

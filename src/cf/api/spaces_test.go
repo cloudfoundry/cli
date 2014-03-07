@@ -280,7 +280,7 @@ func createSpacesRepo(reqs ...testnet.TestRequest) (ts *httptest.Server, handler
 	ts, handler = testnet.NewServer(reqs)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway()
+	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerSpaceRepository(configRepo, gateway)
 	return
 }
