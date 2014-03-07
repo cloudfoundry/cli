@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var _ = Describe("ConfigurationRepository", func() {
+var _ = Describe("Configuration Repository", func() {
 	var config Repository
 	var repo *testconfig.FakePersistor
 
@@ -73,6 +73,9 @@ var _ = Describe("ConfigurationRepository", func() {
 		space := maker.NewSpaceFields(maker.Overrides{"name": "the-space"})
 		config.SetSpaceFields(space)
 		Expect(config.SpaceFields()).To(Equal(space))
+
+		config.SetSSLDisabled(false)
+		Expect(config.IsSSLDisabled()).To(BeFalse())
 	})
 
 	Describe("HasAPIEndpoint", func() {

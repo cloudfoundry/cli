@@ -30,7 +30,13 @@ func NewEndpointRepository(config configuration.ReadWriter, gateway net.Gateway)
 	return
 }
 
-func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (string, errors.Error) {
+func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr errors.Error) {
+	defer func() {
+		if apiErr != nil {
+			repo.config.SetApiEndpoint("")
+		}
+	}()
+
 	endpointMissingScheme := !strings.HasPrefix(endpoint, "https://") && !strings.HasPrefix(endpoint, "http://")
 
 	if endpointMissingScheme {

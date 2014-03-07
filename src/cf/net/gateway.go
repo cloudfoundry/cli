@@ -108,8 +108,7 @@ func (gateway Gateway) DeleteResource(url, accessToken string) (apiErr errors.Er
 	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, &AsyncResponse{})
 }
 
-func (gateway Gateway) ListPaginatedResources(
-	target string,
+func (gateway Gateway) ListPaginatedResources(target string,
 	accessToken string,
 	path string,
 	resource interface{},
@@ -365,7 +364,7 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 }
 
 func (gateway Gateway) doRequest(request *http.Request) (response *http.Response, err error) {
-	httpClient := newHttpClient(gateway.trustedCerts)
+	httpClient := newHttpClient(gateway.trustedCerts, gateway.config.IsSSLDisabled())
 
 	dumpRequest(request)
 

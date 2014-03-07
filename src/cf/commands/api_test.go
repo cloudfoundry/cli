@@ -6,6 +6,7 @@ import (
 	"cf/configuration"
 	"cf/errors"
 	"fmt"
+	"github.com/codegangsta/cli"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -16,7 +17,7 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callApi(args []string, config configuration.Reader, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
+func callApi(args []string, config configuration.ReadWriter, endpointRepo *testapi.FakeEndpointRepo) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 
 	cmd := NewApi(ui, config, endpointRepo)
@@ -51,20 +52,36 @@ var _ = Describe("api command", func() {
 	})
 
 	Context("when the user does not provide an endpoint", func() {
-		Context("when the endpoint is set", func() {
-			It("prints out the api endpoint", func() {
+		Context("when the endpoint is set in the config", func() {
+			var (
+				ui         *testterm.FakeUI
+				cmd        Command
+				ctx        *cli.Context
+				reqFactory *testreq.FakeReqFactory
+			)
+
+			BeforeEach(func() {
 				config.SetApiEndpoint("https://api.run.pivotal.io")
 				config.SetApiVersion("2.0")
 
-				ui := callApi([]string{}, config, endpointRepo)
+				ui = new(testterm.FakeUI)
+				cmd = NewApi(ui, config, endpointRepo)
+				ctx = testcmd.NewContext("api", []string{})
+				reqFactory = &testreq.FakeReqFactory{}
+			})
 
+			JustBeforeEach(func() {
+				testcmd.RunCommand(cmd, ctx, reqFactory)
+			})
+
+			It("prints out the api endpoint", func() {
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"https://api.run.pivotal.io", "2.0"},
 				})
 			})
 		})
 
-		Context("when the user has not set an endpoint", func() {
+		Context("when the endpoint is not set in the config", func() {
 			It("prompts the user to set an endpoint", func() {
 				ui := callApi([]string{}, config, endpointRepo)
 
@@ -75,28 +92,64 @@ var _ = Describe("api command", func() {
 		})
 	})
 
-	Context("the user provides an api endpoint", func() {
+	Context("when the user provides the --skip-ssl-validation flag", func() {
+		It("updates the SSLDisabled field in config", func() {
+			config.SetSSLDisabled(false)
+			callApi([]string{"--skip-ssl-validation", "https://example.com"}, config, endpointRepo)
+
+			Expect(config.IsSSLDisabled()).To(Equal(true))
+		})
+	})
+
+	Context("the user provides an endpoint", func() {
 		var (
 			ui *testterm.FakeUI
 		)
 
-		BeforeEach(func() {
-			ui = callApi([]string{"https://example.com"}, config, endpointRepo)
-		})
+		Describe("when the user passed in the skip-ssl-validation flag", func() {
+			It("disables SSL validation in the config", func() {
+				ui = callApi([]string{"--skip-ssl-validation", "https://example.com"}, config, endpointRepo)
 
-		It("updates the api endpoint with the given url", func() {
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Setting api endpoint to", "example.com"},
-				{"OK"},
+				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+				Expect(config.IsSSLDisabled()).To(BeTrue())
 			})
 		})
 
-		It("trims trailing slashes from the api endpoint", func() {
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Setting api endpoint to", "example.com"},
-				{"OK"},
+		Context("when the ssl certificate is valid", func() {
+			BeforeEach(func() {
+				ui = callApi([]string{"https://example.com"}, config, endpointRepo)
+			})
+
+			It("updates the api endpoint with the given url", func() {
+				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Setting api endpoint to", "example.com"},
+					{"OK"},
+				})
+			})
+
+			It("trims trailing slashes from the api endpoint", func() {
+				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Setting api endpoint to", "example.com"},
+					{"OK"},
+				})
+			})
+		})
+
+		Context("when the ssl certificate is invalid", func() {
+			BeforeEach(func() {
+				endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://example.com", "it don't work")
+			})
+
+			It("fails and gives the user a helpful message about skipping", func() {
+				ui := callApi([]string{"https://example.com"}, config, endpointRepo)
+
+				Expect(config.ApiEndpoint()).To(Equal(""))
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Invalid SSL Cert", "https://example.com"},
+					{"TIP"},
+				})
 			})
 		})
 

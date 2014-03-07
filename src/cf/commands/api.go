@@ -15,10 +15,10 @@ import (
 type Api struct {
 	ui           terminal.UI
 	endpointRepo api.EndpointRepository
-	config       configuration.Reader
+	config       configuration.ReadWriter
 }
 
-func NewApi(ui terminal.UI, config configuration.Reader, endpointRepo api.EndpointRepository) (cmd Api) {
+func NewApi(ui terminal.UI, config configuration.ReadWriter, endpointRepo api.EndpointRepository) (cmd Api) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.endpointRepo = endpointRepo
@@ -30,6 +30,8 @@ func (cmd Api) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 }
 
 func (cmd Api) Run(c *cli.Context) {
+	cmd.config.SetSSLDisabled(c.Bool("skip-ssl-validation"))
+
 	if len(c.Args()) == 0 {
 		if cmd.config.ApiEndpoint() == "" {
 			cmd.ui.Say(fmt.Sprintf("No api endpoint set. Use '%s' to set an endpoint", terminal.CommandColor(cf.Name()+" api")))

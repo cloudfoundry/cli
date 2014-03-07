@@ -66,6 +66,51 @@ var _ = Describe("Login Command", func() {
 		}
 	})
 
+	Describe("when the user passed in the skip-ssl-validation flag", func() {
+		BeforeEach(func() {
+			Flags = []string{"--skip-ssl-validation", "-a", "api.example.com", "-u", "username", "-p", "password"}
+		})
+
+		It("disables SSL validation in the config", func() {
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+			Expect(Config.IsSSLDisabled()).To(BeTrue())
+		})
+	})
+
+	Describe("SSL validation", func() {
+		Context("when the SSL certificate is invalid", func() {
+			BeforeEach(func() {
+				endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://example.com", "it don't work")
+				Flags = []string{"-a", "api.example.com", "-u", "username", "-p", "password"}
+			})
+
+			It("does not set the endpoint", func() {
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Invalid SSL Cert", "https://example.com"},
+					{"TIP"},
+				})
+			})
+		})
+
+		Context("when SSL certificate is valid", func() {
+			BeforeEach(func() {
+				Flags = []string{"-a", "api.example.com", "-u", "username", "-p", "password"}
+			})
+
+			It("sets the endpoint", func() {
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
+			})
+		})
+	})
+
 	Context("when user is not logged in and config is empty", func() {
 		Describe("when there are a small number of organizations and spaces", func() {
 			var org2 models.Organization
@@ -297,6 +342,14 @@ var _ = Describe("Login Command", func() {
 			}))
 		})
 
+		It("enables SSL by default", func() {
+			ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin"}
+			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+			Expect(Config.IsSSLDisabled()).To(BeFalse())
+		})
+
 		It("fails when the user enters invalid credentials", func() {
 			authRepo.AuthError = true
 
@@ -375,20 +428,27 @@ var _ = Describe("Login Command", func() {
 	})
 
 	Context("when the user is already logged in and the config is fully populated", func() {
+		var (
+			l Login
+		)
+
 		BeforeEach(func() {
 			Config = testconfig.NewRepositoryWithDefaults()
 			Config.SetApiEndpoint("api.example.com")
 			Config.SetAccessToken("my_access_token")
 			Config.SetRefreshToken("my_refesh_token")
 			authRepo.Config = Config
+
+			l = NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 		})
 
 		Describe("and a new login fails to set api endpoint", func() {
 			BeforeEach(func() {
 				endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
 				Flags = []string{"-a", "api.nonexistent.com"}
+			})
 
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			JustBeforeEach(func() {
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 			})
 
@@ -411,8 +471,9 @@ var _ = Describe("Login Command", func() {
 
 				Flags = []string{"-u", "user@example.com"}
 				ui.Inputs = []string{"password", "password2", "password3"}
+			})
 
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			JustBeforeEach(func() {
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 			})
 
@@ -435,8 +496,9 @@ var _ = Describe("Login Command", func() {
 		Describe("and a new login fails to target an org", func() {
 			BeforeEach(func() {
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "nonexistentorg", "-s", "my-space"}
+			})
 
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			JustBeforeEach(func() {
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 			})
 
@@ -459,8 +521,9 @@ var _ = Describe("Login Command", func() {
 		Describe("and a new login fails to target a space", func() {
 			BeforeEach(func() {
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "nonexistent"}
+			})
 
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			JustBeforeEach(func() {
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 			})
 
@@ -490,8 +553,9 @@ var _ = Describe("Login Command", func() {
 				authRepo.RefreshToken = "new_refresh_token"
 
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "new-org", "-s", "new-space"}
+			})
 
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			JustBeforeEach(func() {
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 			})
 

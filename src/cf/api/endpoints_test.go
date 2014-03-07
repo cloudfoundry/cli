@@ -5,6 +5,7 @@ import (
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
+	"crypto/tls"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -12,6 +13,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	testconfig "testhelpers/configuration"
+	testnet "testhelpers/net"
 )
 
 func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -51,10 +53,6 @@ func apiInfoEndpointWithoutLogURL(w http.ResponseWriter, r *http.Request) {
 }`)
 }
 
-var invalidJsonResponseApiEndpoint = func(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, `Foo`)
-}
-
 var _ = Describe("Endpoints Repository", func() {
 	var (
 		config       configuration.ReadWriter
@@ -79,72 +77,96 @@ var _ = Describe("Endpoints Repository", func() {
 	})
 
 	Describe("updating the endpoints", func() {
-		It("stores the data from the /info api in the config", func() {
-			testServerFn = validApiInfoEndpoint
+		Context("when the API request is successful", func() {
+			It("stores the data from the /info api in the config", func() {
+				testServerFn = validApiInfoEndpoint
 
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
+				org := models.OrganizationFields{}
+				org.Name = "my-org"
+				org.Guid = "my-org-guid"
 
-			space := models.SpaceFields{}
-			space.Name = "my-space"
-			space.Guid = "my-space-guid"
+				space := models.SpaceFields{}
+				space.Name = "my-space"
+				space.Guid = "my-space-guid"
 
-			config.SetOrganizationFields(org)
-			config.SetSpaceFields(space)
+				config.SetOrganizationFields(org)
+				config.SetSpaceFields(space)
 
-			repo.UpdateEndpoint(testServer.URL)
+				repo.UpdateEndpoint(testServer.URL)
 
-			Expect(config.AccessToken()).To(Equal(""))
-			Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
-			Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.foo.example.org:4443"))
-			Expect(config.ApiEndpoint()).To(Equal(testServer.URL))
-			Expect(config.ApiVersion()).To(Equal("42.0.0"))
-			Expect(config.HasOrganization()).To(BeFalse())
-			Expect(config.HasSpace()).To(BeFalse())
+				Expect(config.AccessToken()).To(Equal(""))
+				Expect(config.AuthorizationEndpoint()).To(Equal("https://login.example.com"))
+				Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.foo.example.org:4443"))
+				Expect(config.ApiEndpoint()).To(Equal(testServer.URL))
+				Expect(config.ApiVersion()).To(Equal("42.0.0"))
+				Expect(config.HasOrganization()).To(BeFalse())
+				Expect(config.HasSpace()).To(BeFalse())
+			})
+
+			It("does not clear the session if the api endpoint does not change", func() {
+				testServerFn = validApiInfoEndpoint
+
+				org := models.OrganizationFields{}
+				org.Name = "my-org"
+				org.Guid = "my-org-guid"
+
+				space := models.SpaceFields{}
+				space.Name = "my-space"
+				space.Guid = "my-space-guid"
+
+				config.SetApiEndpoint(testServer.URL)
+				config.SetAccessToken("some access token")
+				config.SetRefreshToken("some refresh token")
+				config.SetOrganizationFields(org)
+				config.SetSpaceFields(space)
+
+				repo.UpdateEndpoint(testServer.URL)
+
+				Expect(config.OrganizationFields()).To(Equal(org))
+				Expect(config.SpaceFields()).To(Equal(space))
+				Expect(config.AccessToken()).To(Equal("some access token"))
+				Expect(config.RefreshToken()).To(Equal("some refresh token"))
+			})
 		})
 
-		It("does not clear the session if the api endpoint does not change", func() {
-			testServerFn = validApiInfoEndpoint
-
-			org := models.OrganizationFields{}
-			org.Name = "my-org"
-			org.Guid = "my-org-guid"
-
-			space := models.SpaceFields{}
-			space.Name = "my-space"
-			space.Guid = "my-space-guid"
-
-			config.SetApiEndpoint(testServer.URL)
-			config.SetAccessToken("some access token")
-			config.SetRefreshToken("some refresh token")
-			config.SetOrganizationFields(org)
-			config.SetSpaceFields(space)
-
-			repo.UpdateEndpoint(testServer.URL)
-
-			Expect(config.OrganizationFields()).To(Equal(org))
-			Expect(config.SpaceFields()).To(Equal(space))
-			Expect(config.AccessToken()).To(Equal("some access token"))
-			Expect(config.RefreshToken()).To(Equal("some refresh token"))
-		})
-
-		It("returns a failure response when the API request fails", func() {
-			testServerFn = func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusNotFound)
+		Context("when the API request fails", func() {
+			ItClearsTheConfig := func() {
+				Expect(config.ApiEndpoint()).To(BeEmpty())
 			}
 
-			_, apiErr := repo.UpdateEndpoint(testServer.URL)
+			BeforeEach(func() {
+				config.SetApiEndpoint("example.com")
+			})
 
-			Expect(apiErr).NotTo(BeNil())
-		})
+			It("returns a failure response when the server has a bad certificate", func() {
+				testServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
 
-		It("returns a failure response when the API returns invalid JSON", func() {
-			testServerFn = invalidJsonResponseApiEndpoint
+				_, apiErr := repo.UpdateEndpoint(testServer.URL)
+				Expect(apiErr).NotTo(BeNil())
+				ItClearsTheConfig()
+			})
 
-			_, apiErr := repo.UpdateEndpoint(testServer.URL)
+			It("returns a failure response when the API request fails", func() {
+				testServerFn = func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusNotFound)
+				}
 
-			Expect(apiErr).NotTo(BeNil())
+				_, apiErr := repo.UpdateEndpoint(testServer.URL)
+
+				Expect(apiErr).NotTo(BeNil())
+				ItClearsTheConfig()
+			})
+
+			It("returns a failure response when the API returns invalid JSON", func() {
+				testServerFn = func(w http.ResponseWriter, r *http.Request) {
+					fmt.Fprintln(w, `Foo`)
+				}
+
+				_, apiErr := repo.UpdateEndpoint(testServer.URL)
+
+				Expect(apiErr).NotTo(BeNil())
+				ItClearsTheConfig()
+			})
 		})
 
 		Describe("when the specified API url doesn't have a scheme", func() {

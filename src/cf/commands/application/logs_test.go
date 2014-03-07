@@ -2,6 +2,7 @@ package application_test
 
 import (
 	. "cf/commands/application"
+	"cf/errors"
 	"cf/models"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
@@ -15,7 +16,7 @@ import (
 	"time"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("logs command", func() {
 	It("TestLogsFailWithUsage", func() {
 		reqFactory, logsRepo := getLogsDependencies()
 
@@ -106,6 +107,55 @@ var _ = Describe("Testing with ginkgo", func() {
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Connected, tailing logs for app", "my-app", "my-org", "my-space", "my-user"},
 			{"Log Line 1"},
+		})
+	})
+
+	Context("when the loggregator server has an invalid cert", func() {
+		var (
+			flags      []string
+			reqFactory *testreq.FakeReqFactory
+			logsRepo   *testapi.FakeLogsRepository
+		)
+
+		BeforeEach(func() {
+			reqFactory, logsRepo = getLogsDependencies()
+			logsRepo.TailLogErr = errors.NewInvalidSSLCert("https://example.com", "it don't work")
+		})
+
+		Context("when the skip-ssl-validation flag is not set", func() {
+			BeforeEach(func() {
+				flags = []string{"my-app"}
+			})
+
+			It("fails and informs the user about the skip-ssl-validation flag", func() {
+				ui := callLogs(flags, reqFactory, logsRepo)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Received invalid SSL certificate", "https://example.com"},
+					{"TIP"},
+				})
+			})
+		})
+	})
+
+	Context("when the loggregator server has a valid cert", func() {
+		var (
+			flags      []string
+			reqFactory *testreq.FakeReqFactory
+			logsRepo   *testapi.FakeLogsRepository
+		)
+
+		BeforeEach(func() {
+			reqFactory, logsRepo = getLogsDependencies()
+			flags = []string{"my-app"}
+		})
+
+		It("tails logs", func() {
+			ui := callLogs(flags, reqFactory, logsRepo)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Connected, tailing logs for app", "my-org", "my-space", "my-user"},
+			})
 		})
 	})
 })
