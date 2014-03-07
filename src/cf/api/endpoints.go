@@ -37,7 +37,11 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (string, er
 		finalEndpoint := "https://" + endpoint
 		apiErr := repo.attemptUpdate(finalEndpoint)
 
-		if apiErr != nil {
+		switch apiErr.(type) {
+		case nil:
+		case *errors.InvalidSSLCert:
+			return endpoint, apiErr
+		default:
 			finalEndpoint = "http://" + endpoint
 			apiErr = repo.attemptUpdate(finalEndpoint)
 		}
