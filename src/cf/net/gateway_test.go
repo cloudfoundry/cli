@@ -70,7 +70,7 @@ var _ = Describe("Gateway", func() {
 			ccGateway.SetTokenRefresher(authRepo)
 			ccGateway.PollingThrottle = 3 * time.Millisecond
 
-			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 		})
 
 		AfterEach(func() {
@@ -124,7 +124,7 @@ var _ = Describe("Gateway", func() {
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
-			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			request, apiErr = ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), fileToUpload)
 		})
@@ -162,7 +162,7 @@ var _ = Describe("Gateway", func() {
 				}`)
 			}))
 
-			uaaGateway.AddTrustedCerts(authServer.TLS.Certificates)
+			uaaGateway.SetTrustedCerts(authServer.TLS.Certificates)
 		})
 
 		AfterEach(func() {
@@ -175,7 +175,7 @@ var _ = Describe("Gateway", func() {
 				testnet.TestResponse{Status: http.StatusOK},
 			))
 			defer apiServer.Close()
-			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
@@ -192,7 +192,7 @@ var _ = Describe("Gateway", func() {
 				`{ "code": 1000, "description": "Auth token is invalid" }`,
 				testnet.TestResponse{Status: http.StatusOK}))
 			defer apiServer.Close()
-			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
@@ -211,7 +211,7 @@ var _ = Describe("Gateway", func() {
 					"error": "333", "error_description": "bad request"
 				}`}))
 			defer apiServer.Close()
-			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
@@ -229,7 +229,7 @@ var _ = Describe("Gateway", func() {
 					"code": 333, "description": "bad request"
 				}`}))
 			defer apiServer.Close()
-			ccGateway.AddTrustedCerts(apiServer.TLS.Certificates)
+			ccGateway.SetTrustedCerts(apiServer.TLS.Certificates)
 
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
@@ -335,7 +335,7 @@ func createAuthenticationRepository(apiServer *httptest.Server, authServer *http
 	config.SetRefreshToken("initial-refresh-token")
 
 	authGateway := NewUAAGateway()
-	authGateway.AddTrustedCerts(authServer.TLS.Certificates)
+	authGateway.SetTrustedCerts(authServer.TLS.Certificates)
 
 	authenticator := api.NewUAAAuthenticationRepository(authGateway, config)
 
