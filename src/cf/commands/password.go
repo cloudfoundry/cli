@@ -23,9 +23,7 @@ func NewPassword(ui terminal.UI, pwdRepo api.PasswordRepository, config configur
 }
 
 func (cmd Password) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
-	reqs = []requirements.Requirement{
-		reqFactory.NewValidAccessTokenRequirement(),
-	}
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
 	return
 }
 

@@ -53,10 +53,6 @@ func (f *FakeReqFactory) NewLoginRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.LoginSuccess}
 }
 
-func (f *FakeReqFactory) NewValidAccessTokenRequirement() requirements.Requirement {
-	return FakeRequirement{f, f.ValidAccessTokenSuccess}
-}
-
 func (f *FakeReqFactory) NewTargetedSpaceRequirement() requirements.Requirement {
 	return FakeRequirement{f, f.TargetedSpaceSuccess}
 }
