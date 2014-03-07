@@ -4,6 +4,7 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
 	"fmt"
@@ -15,10 +16,6 @@ type Api struct {
 	ui           terminal.UI
 	endpointRepo api.EndpointRepository
 	config       configuration.Reader
-}
-
-type ApiEndpointSetter interface {
-	SetApiEndpoint(endpoint string)
 }
 
 func NewApi(ui terminal.UI, config configuration.Reader, endpointRepo api.EndpointRepository) (cmd Api) {
@@ -46,28 +43,37 @@ func (cmd Api) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.SetApiEndpoint(c.Args()[0])
+	givenEndpoint := c.Args()[0]
+	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(givenEndpoint))
+	err := cmd.setApiEndpoint(givenEndpoint)
+
+	switch typedErr := err.(type) {
+	case nil:
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+		cmd.ui.ShowConfiguration(cmd.config)
+	case *errors.InvalidSSLCert:
+		cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s api --skip-ssl-validation", cf.Name()))
+		tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfApiCommand)
+		cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
+	default:
+		cmd.ui.Failed(typedErr.Error())
+	}
 }
 
-func (cmd Api) SetApiEndpoint(endpoint string) {
+func (cmd Api) setApiEndpoint(endpoint string) error {
 	if strings.HasSuffix(endpoint, "/") {
 		endpoint = strings.TrimSuffix(endpoint, "/")
 	}
 
-	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
-
-	endpoint, apiErr := cmd.endpointRepo.UpdateEndpoint(endpoint)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
+	endpoint, err := cmd.endpointRepo.UpdateEndpoint(endpoint)
+	if err != nil {
+		return err
 	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
 
 	if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}
 
-	cmd.ui.ShowConfiguration(cmd.config)
+	return nil
 }

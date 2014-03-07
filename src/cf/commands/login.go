@@ -1,13 +1,13 @@
 package commands
 
 import (
+	"cf"
 	"cf/api"
 	"cf/configuration"
-	cferrors "cf/errors"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strconv"
@@ -56,38 +56,38 @@ func (cmd Login) Run(c *cli.Context) {
 		cmd.ui.ShowConfiguration(cmd.config)
 	}()
 
-	apiErr := cmd.setApi(c)
-	if apiErr != nil {
-		cmd.ui.Failed("Invalid API endpoint.\n%s", apiErr.Error())
-		return
+	err := cmd.setApi(c)
+	switch typedErr := err.(type) {
+	case nil:
+	case *errors.InvalidSSLCert:
+		cfLoginCommand := terminal.CommandColor(fmt.Sprintf("%s login --skip-ssl-validation", cf.Name()))
+		tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfLoginCommand)
+		cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
+	default:
+		cmd.ui.Failed("Invalid API endpoint.\n%s", err.Error())
 	}
 
-	apiErr = cmd.authenticate(c)
-	if apiErr != nil {
+	err = cmd.authenticate(c)
+	if err != nil {
 		cmd.ui.Failed("Unable to authenticate.")
-		return
 	}
 
-	err := cmd.setOrganization(c)
+	err = cmd.setOrganization(c)
 	shouldSkipSpace := err != nil && err.Error() == userSkippedInput
 
 	if err != nil && !shouldSkipSpace {
 		cmd.ui.Failed(err.Error())
-		return
 	}
 
 	if !shouldSkipSpace {
 		err = cmd.setSpace(c)
 		if err != nil && err.Error() != userSkippedInput {
 			cmd.ui.Failed(err.Error())
-			return
 		}
 	}
-
-	return
 }
 
-func (cmd Login) setApi(c *cli.Context) (apiErr cferrors.Error) {
+func (cmd Login) setApi(c *cli.Context) error {
 	api := c.String("a")
 	if api == "" {
 		api = cmd.config.ApiEndpoint()
@@ -99,18 +99,18 @@ func (cmd Login) setApi(c *cli.Context) (apiErr cferrors.Error) {
 		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(api))
 	}
 
-	endpoint, apiErr := cmd.endpointRepo.UpdateEndpoint(api)
+	endpoint, err := cmd.endpointRepo.UpdateEndpoint(api)
 
-	if apiErr != nil {
+	if err != nil {
 		cmd.config.SetApiEndpoint("")
 	} else if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}
 
-	return
+	return err
 }
 
-func (cmd Login) authenticate(c *cli.Context) (apiErr cferrors.Error) {
+func (cmd Login) authenticate(c *cli.Context) (apiErr errors.Error) {
 	prompts, apiErr := cmd.authenticator.GetLoginPrompts()
 
 	var passwordKey string

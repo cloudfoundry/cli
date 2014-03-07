@@ -4,6 +4,7 @@ import (
 	"cf"
 	. "cf/commands"
 	"cf/configuration"
+	"cf/errors"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,6 +35,19 @@ var _ = Describe("api command", func() {
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
 		endpointRepo = &testapi.FakeEndpointRepo{}
+	})
+
+	Context("when the api endpoint's ssl certificate is invalid", func() {
+		It("warns the user and prints out a tip", func() {
+			endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://buttontomatoes.org", "why? no. go away")
+			ui := callApi([]string{"https://buttontomatoes.org"}, config, endpointRepo)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"SSL cert", "https://buttontomatoes.org"},
+				{"TIP", "--skip-ssl-validation"},
+			})
+		})
 	})
 
 	Context("when the user does not provide an endpoint", func() {
