@@ -51,15 +51,18 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 
 func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
-	defer func() {
+
+	printSummaryAndTip := func() {
 		cmd.ui.Say("")
 		cmd.ui.ShowConfiguration(cmd.config)
-	}()
+	}
+	defer func() { printSummaryAndTip() }()
 
 	err := cmd.setApi(c)
 	switch typedErr := err.(type) {
 	case nil:
 	case *errors.InvalidSSLCert:
+		printSummaryAndTip = func() {}
 		cfLoginCommand := terminal.CommandColor(fmt.Sprintf("%s login --skip-ssl-validation", cf.Name()))
 		tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfLoginCommand)
 		cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)

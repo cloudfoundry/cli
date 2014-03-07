@@ -349,6 +349,8 @@ var _ = Describe("Login Command", func() {
 				{"SSL cert", "https://bobs-burgers.com"},
 				{"TIP", "--skip-ssl-validation"},
 			})
+
+			Expect(ui.ShowConfigurationCalled).To(BeFalse())
 		})
 
 		It("fails when there is an error fetching the organization", func() {
