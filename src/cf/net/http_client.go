@@ -43,8 +43,8 @@ func PrepareRedirect(req *http.Request, via []*http.Request) error {
 
 func Sanitize(input string) (sanitized string) {
 	var sanitizeJson = func(propertyName string, json string) string {
-		re := regexp.MustCompile(fmt.Sprintf(`"%s":"[^"]*"`, propertyName))
-		return re.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER))
+		regex := regexp.MustCompile(fmt.Sprintf(`"%s":\s*"[^"]*"`, propertyName))
+		return regex.ReplaceAllString(json, fmt.Sprintf(`"%s":"%s"`, propertyName, PRIVATE_DATA_PLACEHOLDER))
 	}
 
 	re := regexp.MustCompile(`(?m)^Authorization: .*`)

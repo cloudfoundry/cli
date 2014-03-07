@@ -72,6 +72,30 @@ PUT /Users/user-guid-goes-here/password HTTP/1.1
 
 				Expect(Sanitize(request)).To(Equal(expected))
 			})
+
+			It("hides create-user passwords", func() {
+				request := `
+REQUEST: [2014-03-07T12:15:08-08:00]
+POST /Users HTTP/1.1
+{
+	"userName": "jiro",
+	"emails": [{"value":"jiro"}],
+	"password": "leansushi",
+	"name": {"givenName":"jiro", "familyName":"jiro"}
+}
+`
+				expected := `
+REQUEST: [2014-03-07T12:15:08-08:00]
+POST /Users HTTP/1.1
+{
+	"userName": "jiro",
+	"emails": [{"value":"jiro"}],
+	"password":"[PRIVATE DATA HIDDEN]",
+	"name": {"givenName":"jiro", "familyName":"jiro"}
+}
+`
+				Expect(Sanitize(request)).To(Equal(expected))
+			})
 		})
 
 		It("hides oauth tokens in the body of requests", func() {
