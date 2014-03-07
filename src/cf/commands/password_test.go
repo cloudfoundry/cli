@@ -22,14 +22,14 @@ var _ = Describe("password command", func() {
 	})
 
 	It("does not pass requirements if you are not logged in", func() {
-		deps.ReqFactory.ValidAccessTokenSuccess = false
+		deps.ReqFactory.LoginSuccess = false
 		callPassword([]string{}, deps)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	Context("when logged in successfully", func() {
 		BeforeEach(func() {
-			deps.ReqFactory.ValidAccessTokenSuccess = true
+			deps.ReqFactory.LoginSuccess = true
 		})
 
 		It("passes requirements", func() {
@@ -108,7 +108,7 @@ type passwordDeps struct {
 
 func getPasswordDeps() passwordDeps {
 	return passwordDeps{
-		ReqFactory: &testreq.FakeReqFactory{ValidAccessTokenSuccess: true},
+		ReqFactory: &testreq.FakeReqFactory{LoginSuccess: true},
 		PwdRepo:    &testapi.FakePasswordRepo{UpdateUnauthorized: true},
 		Config:     testconfig.NewRepository(),
 	}
