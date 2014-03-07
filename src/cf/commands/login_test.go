@@ -336,6 +336,21 @@ var _ = Describe("Login Command", func() {
 			})
 		})
 
+		It("fails when the server response is an invalid ssl cert error", func() {
+			endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS")
+
+			ui.Inputs = []string{"bobs-burgers.com"}
+
+			cmd := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("login", Flags), nil)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"SSL cert", "https://bobs-burgers.com"},
+				{"TIP", "--skip-ssl-validation"},
+			})
+		})
+
 		It("fails when there is an error fetching the organization", func() {
 			orgRepo.FindByNameErr = true
 
