@@ -15,6 +15,7 @@ type configJsonV2 struct {
 	RefreshToken          string
 	OrganizationFields    models.OrganizationFields
 	SpaceFields           models.SpaceFields
+	SSLDisabled           bool
 }
 
 func JsonMarshalV2(config *Data) (output []byte, err error) {
@@ -28,6 +29,7 @@ func JsonMarshalV2(config *Data) (output []byte, err error) {
 		RefreshToken:          config.RefreshToken,
 		OrganizationFields:    config.OrganizationFields,
 		SpaceFields:           config.SpaceFields,
+		SSLDisabled:           config.SSLDisabled,
 	})
 }
 
@@ -51,6 +53,7 @@ func JsonUnmarshalV2(input []byte, config *Data) (err error) {
 	config.OrganizationFields = configJson.OrganizationFields
 	config.LoggregatorEndPoint = configJson.LoggregatorEndpoint
 	config.AuthorizationEndpoint = configJson.AuthorizationEndpoint
+	config.SSLDisabled = configJson.SSLDisabled
 
 	return
 }
