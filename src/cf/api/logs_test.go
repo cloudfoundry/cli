@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 	"net/http/httptest"
 	"strings"
-	testapi "testhelpers/api"
 	testconfig "testhelpers/configuration"
 	"time"
 )
@@ -126,10 +125,9 @@ func setupTestServerAndLogsRepo(messages ...[]byte) (testServer *httptest.Server
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint("https://localhost")
-	endpointRepo := &testapi.FakeEndpointRepo{}
-	endpointRepo.LoggregatorEndpointReturns.Endpoint = strings.Replace(testServer.URL, "https", "wss", 1)
+	configRepo.SetLoggregatorEndpoint(strings.Replace(testServer.URL, "https", "wss", 1))
 
-	repo := NewLoggregatorLogsRepository(configRepo, endpointRepo)
+	repo := NewLoggregatorLogsRepository(configRepo)
 	logsRepo = &repo
 	return
 }

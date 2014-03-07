@@ -90,14 +90,12 @@ var _ = Describe("UserRepository", func() {
 
 			ccGateway := net.NewCloudControllerGateway()
 			uaaGateway := net.NewUAAGateway()
-			endpointRepo := &testapi.FakeEndpointRepo{}
-			endpointRepo.UAAEndpointReturns.Error = errors.NewErrorWithError("Failed to get endpoint!", errors.New("Failed!"))
+			configRepo.SetAuthorizationEndpoint("")
 
-			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
+			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
 
 			_, apiErr := repo.ListUsersInOrgForRole("my-org-guid", models.ORG_MANAGER)
-
-			Expect(apiErr).To(Equal(endpointRepo.UAAEndpointReturns.Error))
+			Expect(apiErr).To(HaveOccurred())
 		})
 	})
 
@@ -448,8 +446,7 @@ func createUsersRepo(ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest
 	configRepo.SetApiEndpoint(ccTarget)
 	ccGateway := net.NewCloudControllerGateway()
 	uaaGateway := net.NewUAAGateway()
-	endpointRepo := &testapi.FakeEndpointRepo{}
-	endpointRepo.UAAEndpointReturns.Endpoint = uaaTarget
-	repo = NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway, endpointRepo)
+	configRepo.SetAuthorizationEndpoint(uaaTarget)
+	repo = NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
 	return
 }

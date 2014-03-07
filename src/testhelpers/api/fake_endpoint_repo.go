@@ -40,13 +40,3 @@ func (repo *FakeEndpointRepo) GetLoggregatorEndpoint() (endpoint string, apiErr 
 	apiErr = repo.LoggregatorEndpointReturns.Error
 	return
 }
-
-func (repo *FakeEndpointRepo) GetCloudControllerEndpoint() (endpoint string, apiErr errors.Error) {
-	return
-}
-
-func (repo *FakeEndpointRepo) GetUAAEndpoint() (endpoint string, apiErr errors.Error) {
-	endpoint = repo.UAAEndpointReturns.Endpoint
-	apiErr = repo.UAAEndpointReturns.Error
-	return
-}

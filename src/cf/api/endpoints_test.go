@@ -33,8 +33,8 @@ func validApiInfoEndpoint(w http.ResponseWriter, r *http.Request) {
 }`)
 }
 
-func ApiInfoEndpointWithoutLogURL(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/v2/info" {
+func apiInfoEndpointWithoutLogURL(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasSuffix(r.URL.Path, "/v2/info") {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -104,7 +104,7 @@ var _ = Describe("Endpoints Repository", func() {
 			Expect(config.HasSpace()).To(BeFalse())
 		})
 
-		It("TestUpdateEndpointWhenUrlIsAlreadyTargeted", func() {
+		It("does not clear the session if the api endpoint does not change", func() {
 			testServerFn = validApiInfoEndpoint
 
 			org := models.OrganizationFields{}
@@ -179,81 +179,34 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.ApiVersion()).To(Equal("42.0.0"))
 			})
 		})
-	})
 
-	Describe("getting API endpoints from a saved config", func() {
-		It("TestGetCloudControllerEndpoint", func() {
-			config.SetApiEndpoint("http://api.example.com")
-
-			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
-
-			endpoint, apiErr := repo.GetCloudControllerEndpoint()
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(endpoint).To(Equal("http://api.example.com"))
-		})
-
-		It("TestGetLoggregatorEndpoint", func() {
-			config.SetLoggregatorEndpoint("wss://loggregator.example.com:4443")
-
-			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
-
-			endpoint, apiErr := repo.GetLoggregatorEndpoint()
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(endpoint).To(Equal("wss://loggregator.example.com:4443"))
-		})
-
-		Describe("when the loggregator endpoint is not saved in the config (old CC)", func() {
+		Describe("when the loggregator endpoint is not returned by the /info API (old CC)", func() {
 			BeforeEach(func() {
-				config.SetLoggregatorEndpoint("")
+				testServerFn = apiInfoEndpointWithoutLogURL
 			})
 
 			It("extrapolates the loggregator URL based on the API URL (SSL API)", func() {
-				config.SetApiEndpoint("https://api.run.pivotal.io")
+				_, err := repo.UpdateEndpoint(testServer.URL)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.0.0.1:443"))
+			})
 
-				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
-
-				endpoint, apiErr := repo.GetLoggregatorEndpoint()
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(endpoint).To(Equal("wss://loggregator.run.pivotal.io:4443"))
+			It("extrapolates the loggregator URL if there is a trailing slash", func() {
+				_, err := repo.UpdateEndpoint(testServer.URL + "/")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(config.LoggregatorEndpoint()).To(Equal("wss://loggregator.0.0.1:443"))
 			})
 
 			It("extrapolates the loggregator URL based on the API URL (non-SSL API)", func() {
-				config.SetApiEndpoint("http://api.run.pivotal.io")
+				testServer.Close()
+				testServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					testServerFn(w, r)
+				}))
 
-				repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
-
-				endpoint, apiErr := repo.GetLoggregatorEndpoint()
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(endpoint).To(Equal("ws://loggregator.run.pivotal.io:80"))
+				_, err := repo.UpdateEndpoint(testServer.URL)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(config.LoggregatorEndpoint()).To(Equal("ws://loggregator.0.0.1:80"))
 			})
-		})
-
-		It("TestGetUAAEndpoint", func() {
-			config := testconfig.NewRepository()
-			config.SetAuthorizationEndpoint("https://login.example.com")
-
-			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
-
-			endpoint, apiErr := repo.GetUAAEndpoint()
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(endpoint).To(Equal("https://uaa.example.com"))
-		})
-
-		It("TestEndpointsReturnAnErrorWhenMissing", func() {
-			config := testconfig.NewRepository()
-			repo := NewEndpointRepository(config, net.NewCloudControllerGateway())
-
-			_, apiErr := repo.GetLoggregatorEndpoint()
-			Expect(apiErr).To(HaveOccurred())
-
-			_, apiErr = repo.GetCloudControllerEndpoint()
-			Expect(apiErr).To(HaveOccurred())
-
-			_, apiErr = repo.GetUAAEndpoint()
-			Expect(apiErr).To(HaveOccurred())
 		})
 	})
 })

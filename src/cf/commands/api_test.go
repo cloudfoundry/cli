@@ -49,6 +49,7 @@ var _ = Describe("api command", func() {
 				})
 			})
 		})
+
 		Context("when the user has not set an endpoint", func() {
 			It("prompts the user to set an endpoint", func() {
 				ui := callApi([]string{}, config, endpointRepo)
