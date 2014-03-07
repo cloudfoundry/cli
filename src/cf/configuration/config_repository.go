@@ -31,7 +31,7 @@ type Reader interface {
 	ApiVersion() string
 	HasAPIEndpoint() bool
 
-	AuthorizationEndpoint() string
+	AuthenticationEndpoint() string
 	LoggregatorEndpoint() string
 	AccessToken() string
 	RefreshToken() string
@@ -54,7 +54,7 @@ type ReadWriter interface {
 	ClearSession()
 	SetApiEndpoint(string)
 	SetApiVersion(string)
-	SetAuthorizationEndpoint(string)
+	SetAuthenticationEndpoint(string)
 	SetLoggregatorEndpoint(string)
 	SetAccessToken(string)
 	SetRefreshToken(string)
@@ -118,7 +118,7 @@ func (c *configRepository) ApiVersion() (apiVersion string) {
 	return
 }
 
-func (c *configRepository) AuthorizationEndpoint() (authEndpoint string) {
+func (c *configRepository) AuthenticationEndpoint() (authEndpoint string) {
 	c.read(func() {
 		authEndpoint = c.data.AuthorizationEndpoint
 	})
@@ -246,7 +246,7 @@ func (c *configRepository) SetApiVersion(version string) {
 	})
 }
 
-func (c *configRepository) SetAuthorizationEndpoint(endpoint string) {
+func (c *configRepository) SetAuthenticationEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.AuthorizationEndpoint = endpoint
 	})

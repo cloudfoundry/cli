@@ -54,8 +54,8 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetApiVersion("3")
 		Expect(config.ApiVersion()).To(Equal("3"))
 
-		config.SetAuthorizationEndpoint("http://auth.the-endpoint")
-		Expect(config.AuthorizationEndpoint()).To(Equal("http://auth.the-endpoint"))
+		config.SetAuthenticationEndpoint("http://auth.the-endpoint")
+		Expect(config.AuthenticationEndpoint()).To(Equal("http://auth.the-endpoint"))
 
 		config.SetLoggregatorEndpoint("http://logs.the-endpoint")
 		Expect(config.LoggregatorEndpoint()).To(Equal("http://logs.the-endpoint"))

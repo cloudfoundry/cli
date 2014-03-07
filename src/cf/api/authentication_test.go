@@ -42,7 +42,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(config.AuthorizationEndpoint()).To(Equal(ts.URL))
+		Expect(config.AuthenticationEndpoint()).To(Equal(ts.URL))
 		Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
 		Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
 	})
@@ -222,7 +222,7 @@ var loginInfoFailureRequest = testnet.TestRequest{
 func setupAuthDependencies(request testnet.TestRequest) (*httptest.Server, *testnet.TestHandler, configuration.ReadWriter) {
 	ts, handler := testnet.NewServer([]testnet.TestRequest{request})
 	config := testconfig.NewRepository()
-	config.SetAuthorizationEndpoint(ts.URL)
+	config.SetAuthenticationEndpoint(ts.URL)
 
 	return ts, handler, config
 }

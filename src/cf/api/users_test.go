@@ -90,7 +90,7 @@ var _ = Describe("UserRepository", func() {
 
 			ccGateway := net.NewCloudControllerGateway(configRepo)
 			uaaGateway := net.NewUAAGateway(configRepo)
-			configRepo.SetAuthorizationEndpoint("")
+			configRepo.SetAuthenticationEndpoint("")
 
 			repo := NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
 
@@ -446,7 +446,7 @@ func createUsersRepo(ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest
 	configRepo.SetApiEndpoint(ccTarget)
 	ccGateway := net.NewCloudControllerGateway(configRepo)
 	uaaGateway := net.NewUAAGateway(configRepo)
-	configRepo.SetAuthorizationEndpoint(uaaTarget)
+	configRepo.SetAuthenticationEndpoint(uaaTarget)
 	repo = NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
 	return
 }

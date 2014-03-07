@@ -70,7 +70,7 @@ func (r *LoginResource) ToModel() (prompts map[string]configuration.AuthPrompt) 
 }
 
 func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
-	url := fmt.Sprintf("%s/login", uaa.config.AuthorizationEndpoint())
+	url := fmt.Sprintf("%s/login", uaa.config.AuthenticationEndpoint())
 	resource := &LoginResource{}
 	apiErr = uaa.gateway.GetResource(url, "", resource)
 	prompts = resource.ToModel()
@@ -108,7 +108,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) errors.Erro
 		Error        uaaErrorResponse `json:"error"`
 	}
 
-	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthorizationEndpoint())
+	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
 	request, err := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
 		return errors.NewErrorWithError("Failed to start oauth request", err)
