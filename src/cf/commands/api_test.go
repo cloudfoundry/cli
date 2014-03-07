@@ -33,7 +33,7 @@ var _ = Describe("api command", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
-		endpointRepo = &testapi.FakeEndpointRepo{Config: config}
+		endpointRepo = &testapi.FakeEndpointRepo{}
 	})
 
 	Context("when the user does not provide an endpoint", func() {

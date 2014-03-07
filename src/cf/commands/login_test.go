@@ -35,7 +35,7 @@ var _ = Describe("Login Command", func() {
 			RefreshToken: "my_refresh_token",
 			Config:       Config,
 		}
-		endpointRepo = &testapi.FakeEndpointRepo{Config: Config}
+		endpointRepo = &testapi.FakeEndpointRepo{}
 
 		org := models.Organization{}
 		org.Name = "my-org"
@@ -109,7 +109,6 @@ var _ = Describe("Login Command", func() {
 					{"2. some-space"},
 				})
 
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
@@ -142,7 +141,6 @@ var _ = Describe("Login Command", func() {
 					{"2. some-space"},
 				})
 
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
@@ -166,7 +164,6 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
@@ -250,7 +247,6 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
@@ -310,7 +306,7 @@ var _ = Describe("Login Command", func() {
 			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-			Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
 			Expect(Config.OrganizationFields().Guid).To(BeEmpty())
 			Expect(Config.SpaceFields().Guid).To(BeEmpty())
 			Expect(Config.AccessToken()).To(BeEmpty())
@@ -349,7 +345,7 @@ var _ = Describe("Login Command", func() {
 			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-			Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
 			Expect(Config.OrganizationFields().Guid).To(BeEmpty())
 			Expect(Config.SpaceFields().Guid).To(BeEmpty())
 			Expect(Config.AccessToken()).To(Equal("my_access_token"))
