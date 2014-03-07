@@ -51,6 +51,7 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 
 func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
+	cmd.config.SetSSLDisabled(c.Bool("skip-ssl-validation"))
 
 	printSummaryAndTip := func() {
 		cmd.ui.Say("")
@@ -115,7 +116,9 @@ func (cmd Login) setApi(c *cli.Context) error {
 
 func (cmd Login) authenticate(c *cli.Context) (apiErr errors.Error) {
 	prompts, apiErr := cmd.authenticator.GetLoginPrompts()
-
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
+	}
 	var passwordKey string
 	credentials := make(map[string]string)
 	for key, prompt := range prompts {

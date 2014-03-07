@@ -27,6 +27,7 @@ type Data struct {
 	OrganizationFields    models.OrganizationFields
 	SpaceFields           models.SpaceFields
 	AuthenticationPrompts map[string]AuthPrompt
+	SSLDisabled           bool
 }
 
 func NewData() (data *Data) {

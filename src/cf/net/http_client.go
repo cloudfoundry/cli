@@ -17,11 +17,12 @@ const (
 	PRIVATE_DATA_PLACEHOLDER = "[PRIVATE DATA HIDDEN]"
 )
 
-func newHttpClient(trustedCerts []tls.Certificate) *http.Client {
+func newHttpClient(trustedCerts []tls.Certificate, disableSSL bool) *http.Client {
 	tr := &http.Transport{
-		TLSClientConfig: TLSConfigWithTrustedCerts(trustedCerts),
+		TLSClientConfig: NewTLSConfig(trustedCerts, disableSSL),
 		Proxy:           http.ProxyFromEnvironment,
 	}
+
 	return &http.Client{
 		Transport:     tr,
 		CheckRedirect: PrepareRedirect,

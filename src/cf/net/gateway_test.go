@@ -259,39 +259,54 @@ var _ = Describe("Gateway", func() {
 			apiServer.Close()
 		})
 
-		It("returns an invalid cert error if the server's CA is unknown (e.g. cert is self-signed)", func() {
-			apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeSelfSignedTLSCert()}
+		Context("when SSL validation is enabled", func() {
+			It("returns an invalid cert error if the server's CA is unknown (e.g. cert is self-signed)", func() {
+				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeSelfSignedTLSCert()}
 
-			apiErr := ccGateway.PerformRequest(request)
-			certErr, ok := apiErr.(*errors.InvalidSSLCert)
-			Expect(ok).To(BeTrue())
-			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
-			Expect(certErr.Reason).To(Equal("unknown authority"))
+				apiErr := ccGateway.PerformRequest(request)
+				certErr, ok := apiErr.(*errors.InvalidSSLCert)
+				Expect(ok).To(BeTrue())
+				Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
+				Expect(certErr.Reason).To(Equal("unknown authority"))
+			})
+
+			It("returns an invalid cert error if the server's cert doesn't match its host", func() {
+				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeTLSCertWithInvalidHost()}
+
+				apiErr := ccGateway.PerformRequest(request)
+				certErr, ok := apiErr.(*errors.InvalidSSLCert)
+				Expect(ok).To(BeTrue())
+				Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
+				if runtime.GOOS != "windows" {
+					Expect(certErr.Reason).To(Equal("not valid for the requested host"))
+				}
+			})
+
+			It("returns an invalid cert error if the server's cert has expired", func() {
+				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
+
+				apiErr := ccGateway.PerformRequest(request)
+				certErr, ok := apiErr.(*errors.InvalidSSLCert)
+				Expect(ok).To(BeTrue())
+				Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
+				if runtime.GOOS != "windows" {
+					Expect(certErr.Reason).To(Equal(""))
+				}
+			})
 		})
 
-		It("returns an invalid cert error if the server's cert doesn't match its host", func() {
-			apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeTLSCertWithInvalidHost()}
+		Context("when SSL validation is disabled", func() {
+			BeforeEach(func() {
+				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
+				config.SetSSLDisabled(true)
+			})
 
-			apiErr := ccGateway.PerformRequest(request)
-			certErr, ok := apiErr.(*errors.InvalidSSLCert)
-			Expect(ok).To(BeTrue())
-			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
-			if runtime.GOOS != "windows" {
-				Expect(certErr.Reason).To(Equal("not valid for the requested host"))
-			}
+			It("succeeds", func() {
+				apiErr := ccGateway.PerformRequest(request)
+				Expect(apiErr).NotTo(HaveOccurred())
+			})
 		})
 
-		It("returns an invalid cert error if the server's cert has expired", func() {
-			apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
-
-			apiErr := ccGateway.PerformRequest(request)
-			certErr, ok := apiErr.(*errors.InvalidSSLCert)
-			Expect(ok).To(BeTrue())
-			Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
-			if runtime.GOOS != "windows" {
-				Expect(certErr.Reason).To(Equal(""))
-			}
-		})
 	})
 })
 

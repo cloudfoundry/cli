@@ -23,6 +23,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	)
 
 	BeforeEach(func() {
+		config = testconfig.NewRepositoryWithDefaults()
 		gateway = net.NewUAAGateway(config)
 	})
 

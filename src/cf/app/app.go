@@ -42,6 +42,9 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("api", c)
 			},
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
+			},
 		},
 		{
 			Name:        "app",
@@ -385,6 +388,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name()) +
 				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name()),
 			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
 				StringFlagWithNoDefault{cli.StringFlag{
 					Name: "a", Usage: "API endpoint (e.g. https://api.example.com)",
 				}},
@@ -413,6 +417,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "recent", Usage: "Dump recent logs instead of tailing"},
 			},
+
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("logs", c)
 			},

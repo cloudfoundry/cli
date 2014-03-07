@@ -7,17 +7,21 @@ import (
 	"net/url"
 )
 
-func TLSConfigWithTrustedCerts(trustedCerts []tls.Certificate) *tls.Config {
+func NewTLSConfig(trustedCerts []tls.Certificate, disableSSL bool) (TLSConfig *tls.Config) {
+	TLSConfig = &tls.Config{}
+
 	if len(trustedCerts) > 0 {
 		certPool := x509.NewCertPool()
 		for _, tlsCert := range trustedCerts {
 			cert, _ := x509.ParseCertificate(tlsCert.Certificate[0])
 			certPool.AddCert(cert)
 		}
-		return &tls.Config{RootCAs: certPool}
-	} else {
-		return &tls.Config{}
+		TLSConfig.RootCAs = certPool
 	}
+
+	TLSConfig.InsecureSkipVerify = disableSSL
+
+	return
 }
 
 func wrapSSLErrors(host string, err error) errors.Error {

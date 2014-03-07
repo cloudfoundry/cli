@@ -64,7 +64,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 	}
 
 	wsConfig.Header.Add("Authorization", repo.config.AccessToken())
-	wsConfig.TlsConfig = net.TLSConfigWithTrustedCerts(repo.TrustedCerts)
+	wsConfig.TlsConfig = net.NewTLSConfig(repo.TrustedCerts, repo.config.IsSSLDisabled())
 
 	ws, err := websocket.DialConfig(wsConfig)
 	if err != nil {
@@ -145,4 +145,8 @@ func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgC
 		}
 		msgChan <- msg
 	}
+}
+
+func (repo *LoggregatorLogsRepository) AddTrustedCerts(certificates []tls.Certificate) {
+	repo.TrustedCerts = append(repo.TrustedCerts, certificates...)
 }

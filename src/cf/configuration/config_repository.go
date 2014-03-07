@@ -46,6 +46,7 @@ type Reader interface {
 	UserGuid() string
 	UserEmail() string
 	IsLoggedIn() bool
+	IsSSLDisabled() bool
 }
 
 type ReadWriter interface {
@@ -59,6 +60,7 @@ type ReadWriter interface {
 	SetRefreshToken(string)
 	SetOrganizationFields(models.OrganizationFields)
 	SetSpaceFields(models.SpaceFields)
+	SetSSLDisabled(bool)
 }
 
 type Repository interface {
@@ -214,6 +216,13 @@ func (c *configRepository) HasSpace() (hasSpace bool) {
 	return
 }
 
+func (c *configRepository) IsSSLDisabled() (isSSLDisabled bool) {
+	c.read(func() {
+		isSSLDisabled = c.data.SSLDisabled
+	})
+	return
+}
+
 // SETTERS
 
 func (c *configRepository) ClearSession() {
@@ -270,5 +279,11 @@ func (c *configRepository) SetOrganizationFields(org models.OrganizationFields) 
 func (c *configRepository) SetSpaceFields(space models.SpaceFields) {
 	c.write(func() {
 		c.data.SpaceFields = space
+	})
+}
+
+func (c *configRepository) SetSSLDisabled(disabled bool) {
+	c.write(func() {
+		c.data.SSLDisabled = disabled
 	})
 }

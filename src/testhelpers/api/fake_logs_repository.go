@@ -22,6 +22,7 @@ func (l *FakeLogsRepository) RecentLogsFor(appGuid string, onConnect func(), log
 
 func (l *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printInterval time.Duration) (err error) {
 	err = l.TailLogErr
+
 	if err != nil {
 		return
 	}

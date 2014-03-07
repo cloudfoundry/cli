@@ -3,10 +3,10 @@ package application
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
 	"time"
@@ -47,20 +47,21 @@ func (cmd *Logs) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 func (cmd *Logs) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
 	logChan := make(chan *logmessage.Message, 1000)
+	errChan := make(chan error)
 
 	go func() {
 		defer close(logChan)
 		if c.Bool("recent") {
-			cmd.recentLogsFor(app, logChan)
+			cmd.recentLogsFor(app, logChan, errChan)
 		} else {
-			cmd.tailLogsFor(app, logChan)
+			cmd.tailLogsFor(app, logChan, errChan)
 		}
 	}()
 
-	cmd.displayLogMessages(logChan)
+	cmd.displayLogMessages(logChan, errChan)
 }
 
-func (cmd *Logs) recentLogsFor(app models.Application, logChan chan *logmessage.Message) {
+func (cmd *Logs) recentLogsFor(app models.Application, logChan chan *logmessage.Message, errChan chan error) {
 	onConnect := func() {
 		cmd.ui.Say("Connected, dumping recent logs for app %s in org %s / space %s as %s...\n",
 			terminal.EntityNameColor(app.Name),
@@ -77,7 +78,7 @@ func (cmd *Logs) recentLogsFor(app models.Application, logChan chan *logmessage.
 	}
 }
 
-func (cmd *Logs) tailLogsFor(app models.Application, logChan chan *logmessage.Message) {
+func (cmd *Logs) tailLogsFor(app models.Application, logChan chan *logmessage.Message, errChan chan error) {
 	onConnect := func() {
 		cmd.ui.Say("Connected, tailing logs for app %s in org %s / space %s as %s...\n",
 			terminal.EntityNameColor(app.Name),
@@ -93,13 +94,27 @@ func (cmd *Logs) tailLogsFor(app models.Application, logChan chan *logmessage.Me
 
 	err := cmd.logsRepo.TailLogsFor(app.Guid, onConnect, logChan, stopLoggingChan, 5*time.Second)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		errChan <- err
 	}
 }
 
-func (cmd *Logs) displayLogMessages(logChan chan *logmessage.Message) {
-	for msg := range logChan {
-		cmd.ui.Say("%s", LogMessageOutput(msg))
+func (cmd *Logs) displayLogMessages(logChan chan *logmessage.Message, errChan chan error) {
+	for {
+		select {
+		case err := <-errChan:
+			switch err.(type) {
+			case nil:
+			case *errors.InvalidSSLCert:
+				cmd.ui.Failed(err.Error() + "\nTIP: use the --skip-ssl-validation to suppress this error")
+			default:
+				cmd.ui.Failed(err.Error())
+			}
+
+		case msg, ok := <-logChan:
+			if !ok {
+				return
+			}
+			cmd.ui.Say("%s", LogMessageOutput(msg))
+		}
 	}
 }
