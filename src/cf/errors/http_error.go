@@ -3,9 +3,10 @@ package errors
 import "fmt"
 
 type HttpError interface {
-	Error
-	StatusCode() int
-	Headers() string
+	error
+	StatusCode() int   // actual HTTP status code
+	ErrorCode() string // error code returned in response body from CC or UAA
+	Headers() string   // see: known_error_codes.go
 	Body() string
 }
 
