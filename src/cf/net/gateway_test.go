@@ -345,7 +345,7 @@ func refreshTokenApiEndPoint(unauthorizedBody string, secondReqResp testnet.Test
 
 func createAuthenticationRepository(apiServer *httptest.Server, authServer *httptest.Server) (configuration.ReadWriter, api.AuthenticationRepository) {
 	config := testconfig.NewRepository()
-	config.SetAuthorizationEndpoint(authServer.URL)
+	config.SetAuthenticationEndpoint(authServer.URL)
 	config.SetApiEndpoint(apiServer.URL)
 	config.SetAccessToken("bearer initial-access-token")
 	config.SetRefreshToken("initial-refresh-token")

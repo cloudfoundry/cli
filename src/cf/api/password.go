@@ -24,9 +24,9 @@ func NewCloudControllerPasswordRepository(config configuration.Reader, gateway n
 }
 
 func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) errors.Error {
-	uaaEndpoint := repo.config.AuthorizationEndpoint()
+	uaaEndpoint := repo.config.AuthenticationEndpoint()
 	if uaaEndpoint == "" {
-		return errors.NewErrorWithMessage("UAA endpoint missing from config file")
+		return errors.NewErrorWithMessage("Authorization endpoint missing from config file")
 	}
 
 	url := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())
