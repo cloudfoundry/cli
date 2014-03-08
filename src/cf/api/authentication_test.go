@@ -3,6 +3,7 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/net"
 	"encoding/base64"
 	"fmt"
@@ -16,10 +17,10 @@ import (
 
 var _ = Describe("AuthenticationRepository", func() {
 	var (
-		gateway net.Gateway
-		ts      *httptest.Server
-		handler *testnet.TestHandler
-		config  configuration.ReadWriter
+		gateway    net.Gateway
+		testServer *httptest.Server
+		handler    *testnet.TestHandler
+		config     configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
@@ -28,11 +29,11 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	AfterEach(func() {
-		ts.Close()
+		testServer.Close()
 	})
 
 	It("logs in", func() {
-		ts, handler, config = setupAuthDependencies(successfulLoginRequest)
+		testServer, handler, config = setupAuthDependencies(successfulLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiErr := auth.Authenticate(map[string]string{
@@ -42,13 +43,13 @@ var _ = Describe("AuthenticationRepository", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(config.AuthenticationEndpoint()).To(Equal(ts.URL))
+		Expect(config.AuthenticationEndpoint()).To(Equal(testServer.URL))
 		Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
 		Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
 	})
 
 	It("returns a failure response when login fails", func() {
-		ts, handler, config = setupAuthDependencies(unsuccessfulLoginRequest)
+		testServer, handler, config = setupAuthDependencies(unsuccessfulLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiErr := auth.Authenticate(map[string]string{
@@ -63,7 +64,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	It("returns a failure response when an error occurs during login", func() {
-		ts, handler, config = setupAuthDependencies(errorLoginRequest)
+		testServer, handler, config = setupAuthDependencies(errorLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiErr := auth.Authenticate(map[string]string{
@@ -78,7 +79,7 @@ var _ = Describe("AuthenticationRepository", func() {
 	})
 
 	It("returns an error response when the UAA has an error but still returns a 200", func() {
-		ts, handler, config = setupAuthDependencies(errorMaskedAsSuccessLoginRequest)
+		testServer, handler, config = setupAuthDependencies(errorMaskedAsSuccessLoginRequest)
 
 		auth := NewUAAAuthenticationRepository(gateway, config)
 		apiErr := auth.Authenticate(map[string]string{
@@ -92,29 +93,46 @@ var _ = Describe("AuthenticationRepository", func() {
 		Expect(config.AccessToken()).To(BeEmpty())
 	})
 
-	It("gets the login prompts", func() {
-		ts, handler, config = setupAuthDependencies(loginInfoRequest)
-		auth := NewUAAAuthenticationRepository(gateway, config)
+	Describe("getting login resources", func() {
+		var (
+			apiErr  errors.Error
+			prompts map[string]configuration.AuthPrompt
+		)
 
-		prompts, apiErr := auth.GetLoginPrompts()
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(prompts).To(Equal(map[string]configuration.AuthPrompt{
-			"username": configuration.AuthPrompt{
-				DisplayName: "Email",
-				Type:        configuration.AuthPromptTypeText,
-			},
-			"pin": configuration.AuthPrompt{
-				DisplayName: "PIN Number",
-				Type:        configuration.AuthPromptTypePassword,
-			},
-		}))
+		BeforeEach(func() {
+			testServer, handler, config = setupAuthDependencies(loginInfoRequest)
+			defer testServer.Close()
+			auth := NewUAAAuthenticationRepository(gateway, config)
+			prompts, apiErr = auth.GetLoginPromptsAndSaveUAAServerURL()
+		})
+
+		It("does not return an error", func() {
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("gets the login prompts", func() {
+			Expect(prompts).To(Equal(map[string]configuration.AuthPrompt{
+				"username": configuration.AuthPrompt{
+					DisplayName: "Email",
+					Type:        configuration.AuthPromptTypeText,
+				},
+				"pin": configuration.AuthPrompt{
+					DisplayName: "PIN Number",
+					Type:        configuration.AuthPromptTypePassword,
+				},
+			}))
+		})
+
+		It("saves the UAA server to the config", func() {
+			Expect(config.UaaEndpoint()).To(Equal("https://uaa.run.pivotal.io"))
+		})
 	})
 
 	It("returns a failure response when the login info API fails", func() {
-		ts, handler, config = setupAuthDependencies(loginInfoFailureRequest)
+		testServer, handler, config = setupAuthDependencies(loginInfoFailureRequest)
 		auth := NewUAAAuthenticationRepository(gateway, config)
 
-		prompts, apiErr := auth.GetLoginPrompts()
+		prompts, apiErr := auth.GetLoginPromptsAndSaveUAAServerURL()
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiErr).To(HaveOccurred())
 		Expect(prompts).To(BeEmpty())
@@ -203,6 +221,14 @@ var loginInfoRequest = testnet.TestRequest{
 		"version":"1.4.7"
 	},
 	"commit_id":"2701cc8",
+	"links":{
+	    "register":"https://console.run.pivotal.io/register",
+	    "passwd":"https://console.run.pivotal.io/password_resets/new",
+	    "home":"https://console.run.pivotal.io",
+	    "support":"https://support.cloudfoundry.com/home",
+	    "login":"https://login.run.pivotal.io",
+	    "uaa":"https://uaa.run.pivotal.io"
+	 },
 	"prompts":{
 		"username": ["text","Email"],
 		"pin": ["password", "PIN Number"]

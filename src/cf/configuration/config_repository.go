@@ -33,6 +33,7 @@ type Reader interface {
 
 	AuthenticationEndpoint() string
 	LoggregatorEndpoint() string
+	UaaEndpoint() string
 	AccessToken() string
 	RefreshToken() string
 
@@ -56,6 +57,7 @@ type ReadWriter interface {
 	SetApiVersion(string)
 	SetAuthenticationEndpoint(string)
 	SetLoggregatorEndpoint(string)
+	SetUaaEndpoint(string)
 	SetAccessToken(string)
 	SetRefreshToken(string)
 	SetOrganizationFields(models.OrganizationFields)
@@ -128,6 +130,13 @@ func (c *configRepository) AuthenticationEndpoint() (authEndpoint string) {
 func (c *configRepository) LoggregatorEndpoint() (logEndpoint string) {
 	c.read(func() {
 		logEndpoint = c.data.LoggregatorEndPoint
+	})
+	return
+}
+
+func (c *configRepository) UaaEndpoint() (uaaEndpoint string) {
+	c.read(func() {
+		uaaEndpoint = c.data.UaaEndpoint
 	})
 	return
 }
@@ -255,6 +264,12 @@ func (c *configRepository) SetAuthenticationEndpoint(endpoint string) {
 func (c *configRepository) SetLoggregatorEndpoint(endpoint string) {
 	c.write(func() {
 		c.data.LoggregatorEndPoint = endpoint
+	})
+}
+
+func (c *configRepository) SetUaaEndpoint(uaaEndpoint string) {
+	c.write(func() {
+		c.data.UaaEndpoint = uaaEndpoint
 	})
 }
 

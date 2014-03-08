@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 )
 
-type configJsonV2 struct {
+type configJsonV3 struct {
 	ConfigVersion         int
 	Target                string
 	ApiVersion            string
 	AuthorizationEndpoint string
 	LoggregatorEndpoint   string
+	UaaEndpoint           string
 	AccessToken           string
 	RefreshToken          string
 	OrganizationFields    models.OrganizationFields
@@ -18,13 +19,14 @@ type configJsonV2 struct {
 	SSLDisabled           bool
 }
 
-func JsonMarshalV2(config *Data) (output []byte, err error) {
-	return json.Marshal(configJsonV2{
-		ConfigVersion:         2,
+func JsonMarshalV3(config *Data) (output []byte, err error) {
+	return json.Marshal(configJsonV3{
+		ConfigVersion:         3,
 		Target:                config.Target,
 		ApiVersion:            config.ApiVersion,
 		AuthorizationEndpoint: config.AuthorizationEndpoint,
 		LoggregatorEndpoint:   config.LoggregatorEndPoint,
+		UaaEndpoint:           config.UaaEndpoint,
 		AccessToken:           config.AccessToken,
 		RefreshToken:          config.RefreshToken,
 		OrganizationFields:    config.OrganizationFields,
@@ -33,15 +35,15 @@ func JsonMarshalV2(config *Data) (output []byte, err error) {
 	})
 }
 
-func JsonUnmarshalV2(input []byte, config *Data) (err error) {
-	configJson := new(configJsonV2)
+func JsonUnmarshalV3(input []byte, config *Data) (err error) {
+	configJson := new(configJsonV3)
 
 	err = json.Unmarshal(input, configJson)
 	if err != nil {
 		return
 	}
 
-	if configJson.ConfigVersion != 2 {
+	if configJson.ConfigVersion != 3 {
 		return
 	}
 
@@ -53,6 +55,7 @@ func JsonUnmarshalV2(input []byte, config *Data) (err error) {
 	config.OrganizationFields = configJson.OrganizationFields
 	config.LoggregatorEndPoint = configJson.LoggregatorEndpoint
 	config.AuthorizationEndpoint = configJson.AuthorizationEndpoint
+	config.UaaEndpoint = configJson.UaaEndpoint
 	config.SSLDisabled = configJson.SSLDisabled
 
 	return

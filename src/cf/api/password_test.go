@@ -13,7 +13,7 @@ import (
 )
 
 var _ = Describe("CloudControllerPasswordRepository", func() {
-	It("TestUpdatePassword", func() {
+	It("updates your password", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:   "PUT",
 			Path:     "/Users/my-user-guid/password",
@@ -34,7 +34,7 @@ func createPasswordRepo(req testnet.TestRequest) (passwordServer *httptest.Serve
 	passwordServer, handler = testnet.NewServer([]testnet.TestRequest{req})
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetAuthenticationEndpoint(passwordServer.URL)
+	configRepo.SetUaaEndpoint(passwordServer.URL)
 	gateway := net.NewCloudControllerGateway(configRepo)
 	repo = NewCloudControllerPasswordRepository(configRepo, gateway)
 	return

@@ -56,12 +56,12 @@ func (dp DiskPersistor) read() (data *Data, err error) {
 		return
 	}
 
-	err = JsonUnmarshalV2(jsonBytes, data)
+	err = JsonUnmarshalV3(jsonBytes, data)
 	return
 }
 
 func (dp DiskPersistor) write(data *Data) (err error) {
-	bytes, err := JsonMarshalV2(data)
+	bytes, err := JsonMarshalV3(data)
 	if err != nil {
 		return
 	}

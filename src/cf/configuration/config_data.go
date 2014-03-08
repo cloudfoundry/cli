@@ -22,11 +22,11 @@ type Data struct {
 	ApiVersion            string
 	AuthorizationEndpoint string
 	LoggregatorEndPoint   string
+	UaaEndpoint           string
 	AccessToken           string
 	RefreshToken          string
 	OrganizationFields    models.OrganizationFields
 	SpaceFields           models.SpaceFields
-	AuthenticationPrompts map[string]AuthPrompt
 	SSLDisabled           bool
 }
 

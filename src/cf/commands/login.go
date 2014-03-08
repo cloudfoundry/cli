@@ -115,7 +115,7 @@ func (cmd Login) setApi(c *cli.Context) error {
 }
 
 func (cmd Login) authenticate(c *cli.Context) (apiErr errors.Error) {
-	prompts, apiErr := cmd.authenticator.GetLoginPrompts()
+	prompts, apiErr := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
 	}

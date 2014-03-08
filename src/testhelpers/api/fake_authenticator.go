@@ -42,7 +42,7 @@ func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken strin
 	return
 }
 
-func (auth *FakeAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
+func (auth *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
 	prompts = auth.GetLoginPromptsReturns.Prompts
 	apiErr = auth.GetLoginPromptsReturns.Error
 	return
