@@ -15,7 +15,7 @@ import (
 type AuthenticationRepository interface {
 	Authenticate(credentials map[string]string) (apiErr errors.Error)
 	RefreshAuthToken() (updatedToken string, apiErr errors.Error)
-	GetLoginPrompts() (map[string]configuration.AuthPrompt, errors.Error)
+	GetLoginPromptsAndSaveUAAServerURL() (map[string]configuration.AuthPrompt, errors.Error)
 }
 
 type UAAAuthenticationRepository struct {
@@ -51,6 +51,7 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 
 type LoginResource struct {
 	Prompts map[string][]string
+	Links   map[string]string
 }
 
 var knownAuthPromptTypes = map[string]configuration.AuthPromptType{
@@ -58,7 +59,7 @@ var knownAuthPromptTypes = map[string]configuration.AuthPromptType{
 	"password": configuration.AuthPromptTypePassword,
 }
 
-func (r *LoginResource) ToModel() (prompts map[string]configuration.AuthPrompt) {
+func (r *LoginResource) parsePrompts() (prompts map[string]configuration.AuthPrompt) {
 	prompts = make(map[string]configuration.AuthPrompt)
 	for key, val := range r.Prompts {
 		prompts[key] = configuration.AuthPrompt{
@@ -69,11 +70,13 @@ func (r *LoginResource) ToModel() (prompts map[string]configuration.AuthPrompt) 
 	return
 }
 
-func (uaa UAAAuthenticationRepository) GetLoginPrompts() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
+func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthenticationEndpoint())
 	resource := &LoginResource{}
 	apiErr = uaa.gateway.GetResource(url, "", resource)
-	prompts = resource.ToModel()
+
+	prompts = resource.parsePrompts()
+	uaa.config.SetUaaEndpoint(resource.Links["uaa"])
 	return
 }
 

@@ -446,7 +446,7 @@ func createUsersRepo(ccReqs []testnet.TestRequest, uaaReqs []testnet.TestRequest
 	configRepo.SetApiEndpoint(ccTarget)
 	ccGateway := net.NewCloudControllerGateway(configRepo)
 	uaaGateway := net.NewUAAGateway(configRepo)
-	configRepo.SetAuthenticationEndpoint(uaaTarget)
+	configRepo.SetUaaEndpoint(uaaTarget)
 	repo = NewCloudControllerUserRepository(configRepo, uaaGateway, ccGateway)
 	return
 }

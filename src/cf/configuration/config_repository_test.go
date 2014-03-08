@@ -60,6 +60,9 @@ var _ = Describe("Configuration Repository", func() {
 		config.SetLoggregatorEndpoint("http://logs.the-endpoint")
 		Expect(config.LoggregatorEndpoint()).To(Equal("http://logs.the-endpoint"))
 
+		config.SetUaaEndpoint("http://uaa.the-endpoint")
+		Expect(config.UaaEndpoint()).To(Equal("http://uaa.the-endpoint"))
+
 		config.SetAccessToken("the-token")
 		Expect(config.AccessToken()).To(Equal("the-token"))
 

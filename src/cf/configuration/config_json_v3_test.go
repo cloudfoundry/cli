@@ -10,11 +10,12 @@ import (
 
 var exampleJSON = `
 {
-	"ConfigVersion": 2,
+	"ConfigVersion": 3,
 	"Target": "api.example.com",
-	"ApiVersion": "2",
+	"ApiVersion": "3",
 	"AuthorizationEndpoint": "auth.example.com",
 	"LoggregatorEndpoint": "logs.example.com",
+	"UaaEndpoint": "uaa.example.com",
 	"AccessToken": "the-access-token",
 	"RefreshToken": "the-refresh-token",
 	"OrganizationFields": {
@@ -35,9 +36,10 @@ var exampleJSON = `
 
 var exampleConfig = &Data{
 	Target:                "api.example.com",
-	ApiVersion:            "2",
+	ApiVersion:            "3",
 	AuthorizationEndpoint: "auth.example.com",
 	LoggregatorEndPoint:   "logs.example.com",
+	UaaEndpoint:           "uaa.example.com",
 	AccessToken:           "the-access-token",
 	RefreshToken:          "the-refresh-token",
 	OrganizationFields: models.OrganizationFields{
@@ -51,10 +53,10 @@ var exampleConfig = &Data{
 	SSLDisabled: true,
 }
 
-var _ = Describe("V2 Config files", func() {
+var _ = Describe("V3 Config files", func() {
 	Describe("serialization", func() {
 		It("creates a JSON string from the config object", func() {
-			jsonData, err := JsonMarshalV2(exampleConfig)
+			jsonData, err := JsonMarshalV3(exampleConfig)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(stripWhitespace(string(jsonData))).To(Equal(stripWhitespace(exampleJSON)))
@@ -64,14 +66,14 @@ var _ = Describe("V2 Config files", func() {
 	Describe("parsing", func() {
 		It("returns an error when the JSON is invalid", func() {
 			configData := NewData()
-			err := JsonUnmarshalV2([]byte(`{ "not_valid": ### }`), configData)
+			err := JsonUnmarshalV3([]byte(`{ "not_valid": ### }`), configData)
 
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("creates a config object from valid JSON", func() {
 			configData := NewData()
-			err := JsonUnmarshalV2([]byte(exampleJSON), configData)
+			err := JsonUnmarshalV3([]byte(exampleJSON), configData)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(configData).To(Equal(exampleConfig))

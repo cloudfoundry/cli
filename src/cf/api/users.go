@@ -284,7 +284,7 @@ func (repo CloudControllerUserRepository) addOrgUserRole(userGuid, orgGuid strin
 }
 
 func (repo CloudControllerUserRepository) getAuthEndpoint() (string, errors.Error) {
-	uaaEndpoint := repo.config.AuthenticationEndpoint()
+	uaaEndpoint := repo.config.UaaEndpoint()
 	if uaaEndpoint == "" {
 		return "", errors.NewErrorWithMessage("UAA endpoint missing from config file")
 	}
