@@ -37,9 +37,31 @@ func NewCloudControllerServiceRepository(config configuration.Reader, gateway ne
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offering models.ServiceOfferings, apiErr errors.Error) {
-	return repo.getServiceOfferings(
+func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offerings models.ServiceOfferings, apiErr errors.Error) {
+	offerings, apiErr = repo.getServiceOfferings(
 		fmt.Sprintf("/v2/spaces/%s/services?q=%s&inline-relations-depth=1", spaceGuid, url.QueryEscape("label:"+name)))
+
+	if apiErr != nil && apiErr.ErrorCode() == cf.BAD_QUERY_PARAM {
+		return repo.findServiceOfferingsByPaginating(spaceGuid, name)
+	}
+
+	return
+}
+
+func (repo CloudControllerServiceRepository) findServiceOfferingsByPaginating(spaceGuid, label string) (offerings models.ServiceOfferings, apiErr errors.Error) {
+	offerings, apiErr = repo.GetServiceOfferingsForSpace(spaceGuid)
+	if apiErr != nil {
+		return
+	}
+
+	matchingOffering := models.ServiceOfferings{}
+
+	for _, offering := range offerings {
+		if offering.Label == label {
+			matchingOffering = append(matchingOffering, offering)
+		}
+	}
+	return matchingOffering, nil
 }
 
 func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr errors.Error) {
