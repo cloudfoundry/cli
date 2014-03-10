@@ -23,14 +23,14 @@ var _ = Describe("Services Repo", func() {
 		config := testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
 
-		ts, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
+		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/services?inline-relations-depth=1",
 				Response: multipleOfferingsResponse,
 			}),
 		}, config)
-		defer ts.Close()
+		defer testServer.Close()
 
 		offerings, apiErr := repo.GetAllServiceOfferings()
 
@@ -43,14 +43,14 @@ var _ = Describe("Services Repo", func() {
 		config := testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
 
-		ts, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
+		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
 			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
 				Response: multipleOfferingsResponse,
 			}),
 		}, config)
-		defer ts.Close()
+		defer testServer.Close()
 
 		offerings, apiErr := repo.GetServiceOfferingsForSpace("my-space-guid")
 
@@ -68,8 +68,8 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
-			ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer ts.Close()
+			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer testServer.Close()
 
 			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("instance-name", "plan-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -87,8 +87,8 @@ var _ = Describe("Services Repo", func() {
 					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
 				}})
 
-			ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
-			defer ts.Close()
+			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
+			defer testServer.Close()
 
 			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("my-service", "plan-guid")
 
@@ -107,8 +107,8 @@ var _ = Describe("Services Repo", func() {
 					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
 				}})
 
-			ts, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
-			defer ts.Close()
+			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
+			defer testServer.Close()
 
 			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
@@ -120,8 +120,8 @@ var _ = Describe("Services Repo", func() {
 
 	Describe("finding service instances by name", func() {
 		It("returns the service instance", func() {
-			ts, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq, serviceOfferingReq})
-			defer ts.Close()
+			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq, serviceOfferingReq})
+			defer testServer.Close()
 
 			instance, apiErr := repo.FindInstanceByName("my-service")
 
@@ -142,8 +142,8 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns user provided services", func() {
-			ts, handler, repo := createServiceRepo([]testnet.TestRequest{findUserProvidedServiceInstanceReq})
-			defer ts.Close()
+			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{findUserProvidedServiceInstanceReq})
+			defer testServer.Close()
 
 			instance, apiErr := repo.FindInstanceByName("my-service")
 
@@ -168,8 +168,8 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
 			})
 
-			ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer ts.Close()
+			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer testServer.Close()
 
 			_, apiErr := repo.FindInstanceByName("my-service")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -184,8 +184,9 @@ var _ = Describe("Services Repo", func() {
 			Path:     "/v2/service_instances/my-service-instance-guid",
 			Response: testnet.TestResponse{Status: http.StatusOK},
 		})
-		ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-		defer ts.Close()
+		testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+		defer testServer.Close()
+
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
 		apiErr := repo.DeleteService(serviceInstance)
@@ -194,7 +195,8 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	It("TestDeleteServiceWithServiceBindings", func() {
-		_, _, repo := createServiceRepo([]testnet.TestRequest{})
+		testServer, _, repo := createServiceRepo([]testnet.TestRequest{})
+		defer testServer.Close()
 
 		serviceInstance := models.ServiceInstance{}
 		serviceInstance.Guid = "my-service-instance-guid"
@@ -234,7 +236,7 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	It("finds service offerings by label and provider", func() {
-		_, _, repo := createServiceRepo([]testnet.TestRequest{{
+		testServer, _, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "GET",
 			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
 			Response: testnet.TestResponse{
@@ -258,6 +260,7 @@ var _ = Describe("Services Repo", func() {
         }`,
 			},
 		}})
+		defer testServer.Close()
 
 		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(offering.Guid).To(Equal("offering-1-guid"))
@@ -265,7 +268,7 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	It("returns an error if the offering cannot be found", func() {
-		_, _, repo := createServiceRepo([]testnet.TestRequest{{
+		testServer, _, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "GET",
 			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
 			Response: testnet.TestResponse{
@@ -276,6 +279,7 @@ var _ = Describe("Services Repo", func() {
         }`,
 			},
 		}})
+		defer testServer.Close()
 
 		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
@@ -283,7 +287,7 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	It("handles api errors when finding service offerings", func() {
-		_, _, repo := createServiceRepo([]testnet.TestRequest{{
+		testServer, _, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "GET",
 			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
 			Response: testnet.TestResponse{
@@ -294,6 +298,7 @@ var _ = Describe("Services Repo", func() {
         }`,
 			},
 		}})
+		defer testServer.Close()
 
 		_, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(apiErr).To(HaveOccurred())
@@ -301,13 +306,14 @@ var _ = Describe("Services Repo", func() {
 	})
 
 	It("purges service offerings", func() {
-		_, handler, repo := createServiceRepo([]testnet.TestRequest{{
+		testServer, handler, repo := createServiceRepo([]testnet.TestRequest{{
 			Method: "DELETE",
 			Path:   "/v2/services/the-service-guid?purge=true",
 			Response: testnet.TestResponse{
 				Status: 204,
 			},
 		}})
+		defer testServer.Close()
 
 		offering := maker.NewServiceOffering("the-offering")
 		offering.Guid = "the-service-guid"
@@ -354,8 +360,8 @@ var _ = Describe("Services Repo", func() {
                     }
                 `},
 			})
-			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer ts.Close()
+			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer testServer.Close()
 
 			count, apiErr := repo.GetServiceInstanceCountForServicePlan(planGuid)
 			Expect(count).To(Equal(9))
@@ -368,8 +374,8 @@ var _ = Describe("Services Repo", func() {
 				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
 				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
 			})
-			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer ts.Close()
+			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer testServer.Close()
 
 			_, apiErr := repo.GetServiceInstanceCountForServicePlan(planGuid)
 
@@ -410,8 +416,8 @@ var _ = Describe("Services Repo", func() {
                           ]
                         }`}})
 
-				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer ts.Close()
+				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer testServer.Close()
 
 				v1 := ServicePlanDescription{
 					ServiceLabel:    "v1-elephantsql",
@@ -456,8 +462,8 @@ var _ = Describe("Services Repo", func() {
                           ]
                         }`}})
 
-				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer ts.Close()
+				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer testServer.Close()
 
 				v2 := ServicePlanDescription{
 					ServiceLabel:    "v2-elephantsql",
@@ -479,8 +485,8 @@ var _ = Describe("Services Repo", func() {
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
 				})
 
-				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer ts.Close()
+				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer testServer.Close()
 
 				v2 := ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
@@ -529,8 +535,8 @@ var _ = Describe("Services Repo", func() {
                           ]
                         }`}})
 
-				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer ts.Close()
+				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer testServer.Close()
 
 				v2 := ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
@@ -554,8 +560,8 @@ var _ = Describe("Services Repo", func() {
 					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusInternalServerError}})
 
-				ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer ts.Close()
+				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+				defer testServer.Close()
 
 				v2 := ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
@@ -580,8 +586,8 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"changed_count":3}`},
 			})
 
-			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer ts.Close()
+			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer testServer.Close()
 
 			changedCount, apiErr := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
 			Expect(apiErr).NotTo(HaveOccurred())
@@ -596,8 +602,8 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
 			})
 
-			ts, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer ts.Close()
+			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
+			defer testServer.Close()
 
 			_, apiErr := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
 			Expect(apiErr).To(HaveOccurred())
@@ -662,17 +668,81 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{
 					Status: 400,
 					Body: `{
-            "code": 10005,
-            "description": "The query parameter is invalid"
+            "code": 9001,
+            "description": "Something Happened"
         }`,
 				},
 			}})
 
 			_, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
 			Expect(apiErr).Should(HaveOccurred())
-			Expect(apiErr.ErrorCode()).To(Equal("10005"))
 		})
 
+		Describe("when api returns query by label is invalid", func() {
+			It("makes a backwards-compatible request", func() {
+				failedRequestByQueryLabel := testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:my-service-offering")),
+					Response: testnet.TestResponse{
+						Status: 400,
+						Body:   `{"code": 10005,"description": "The query parameter is invalid"}`,
+					},
+				}
+
+				firstPaginatedRequest := testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?inline-relations-depth=1"),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `{"next_url": "/v2/spaces/my-space-guid/services?page=2&inline-relations-depth=1",
+								"resources": [
+									{
+									  "metadata": {
+										"guid": "my-service-offering-guid"
+									  },
+									  "entity": {
+										"label": "my-service-offering",
+										"provider": "some-other-provider",
+										"description": "a description that does not match your provider",
+										"version" : "1.0",
+										"service_plans": []
+									  }
+									}
+								]}`,
+					},
+				}
+
+				secondPaginatedRequest := testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?inline-relations-depth=1"),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `{"next_url": null,
+									"resources": [
+										{
+										  "metadata": {
+											"guid": "my-service-offering-guid"
+										  },
+										  "entity": {
+											"label": "my-service-offering",
+											"provider": "my-provider",
+											"description": "offering 1 description",
+											"version" : "1.0",
+											"service_plans": []
+										  }
+										}
+									]}`,
+					},
+				}
+
+				testServer, _, repo := createServiceRepo([]testnet.TestRequest{failedRequestByQueryLabel, firstPaginatedRequest, secondPaginatedRequest})
+				defer testServer.Close()
+
+				serviceOfferings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "my-service-offering")
+				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(len(serviceOfferings)).To(Equal(2))
+			})
+		})
 	})
 })
 
@@ -846,26 +916,24 @@ func testRenameService(endpointPath string, serviceInstance models.ServiceInstan
 		Response: testnet.TestResponse{Status: http.StatusCreated},
 	})
 
-	ts, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-	defer ts.Close()
+	testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
+	defer testServer.Close()
 
 	apiErr := repo.RenameService(serviceInstance, "new-name")
 	Expect(handler).To(testnet.HaveAllRequestsCalled())
 	Expect(apiErr).NotTo(HaveOccurred())
 }
 
-func createServiceRepo(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+func createServiceRepo(reqs []testnet.TestRequest) (testServer *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
 	config := testconfig.NewRepository()
 	config.SetAccessToken("BEARER my_access_token")
 	config.SetSpaceFields(models.SpaceFields{Guid: "my-space-guid"})
 	return createServiceRepoWithConfig(reqs, config)
 }
 
-func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	if len(reqs) > 0 {
-		ts, handler = testnet.NewServer(reqs)
-		config.SetApiEndpoint(ts.URL)
-	}
+func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (testServer *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
+	testServer, handler = testnet.NewServer(reqs)
+	config.SetApiEndpoint(testServer.URL)
 
 	gateway := net.NewCloudControllerGateway(config)
 	repo = NewCloudControllerServiceRepository(config, gateway)
