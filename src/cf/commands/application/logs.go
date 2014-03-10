@@ -73,8 +73,7 @@ func (cmd *Logs) recentLogsFor(app models.Application, logChan chan *logmessage.
 
 	err := cmd.logsRepo.RecentLogsFor(app.Guid, onConnect, logChan)
 	if err != nil {
-		cmd.ui.Failed(err.Error())
-		return
+		errChan <- err
 	}
 }
 

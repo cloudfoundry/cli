@@ -17,30 +17,22 @@ import (
 )
 
 var _ = Describe("logs command", func() {
-	It("TestLogsFailWithUsage", func() {
+	It("fails with usage when called without one argument", func() {
 		reqFactory, logsRepo := getLogsDependencies()
 
 		ui := callLogs([]string{}, reqFactory, logsRepo)
 		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callLogs([]string{"foo"}, reqFactory, logsRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
 	})
-	It("TestLogsRequirements", func() {
 
+	It("fails requirements when not logged in", func() {
 		reqFactory, logsRepo := getLogsDependencies()
-
-		reqFactory.LoginSuccess = true
-		callLogs([]string{"my-app"}, reqFactory, logsRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-
 		reqFactory.LoginSuccess = false
+
 		callLogs([]string{"my-app"}, reqFactory, logsRepo)
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestLogsOutputsRecentLogs", func() {
 
+	It("TestLogsOutputsRecentLogs", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
@@ -66,8 +58,8 @@ var _ = Describe("logs command", func() {
 			{"Log Line 2"},
 		})
 	})
-	It("TestLogsEscapeFormattingVerbs", func() {
 
+	It("TestLogsEscapeFormattingVerbs", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
@@ -86,8 +78,8 @@ var _ = Describe("logs command", func() {
 			{"hello%2Bworld%v"},
 		})
 	})
-	It("TestLogsTailsTheAppLogs", func() {
 
+	It("TestLogsTailsTheAppLogs", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
@@ -112,23 +104,28 @@ var _ = Describe("logs command", func() {
 
 	Context("when the loggregator server has an invalid cert", func() {
 		var (
-			flags      []string
 			reqFactory *testreq.FakeReqFactory
 			logsRepo   *testapi.FakeLogsRepository
 		)
 
 		BeforeEach(func() {
 			reqFactory, logsRepo = getLogsDependencies()
-			logsRepo.TailLogErr = errors.NewInvalidSSLCert("https://example.com", "it don't work")
 		})
 
 		Context("when the skip-ssl-validation flag is not set", func() {
-			BeforeEach(func() {
-				flags = []string{"my-app"}
+			It("fails and informs the user about the skip-ssl-validation flag", func() {
+				logsRepo.TailLogErr = errors.NewInvalidSSLCert("https://example.com", "it don't work good")
+				ui := callLogs([]string{"my-app"}, reqFactory, logsRepo)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Received invalid SSL certificate", "https://example.com"},
+					{"TIP"},
+				})
 			})
 
-			It("fails and informs the user about the skip-ssl-validation flag", func() {
-				ui := callLogs(flags, reqFactory, logsRepo)
+			It("informs the user of the error when they include the --recent flag", func() {
+				logsRepo.RecentLogErr = errors.NewInvalidSSLCert("https://example.com", "how does SSL work???")
+				ui := callLogs([]string{"--recent", "my-app"}, reqFactory, logsRepo)
 
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Received invalid SSL certificate", "https://example.com"},

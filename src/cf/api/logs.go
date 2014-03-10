@@ -68,6 +68,7 @@ func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConn
 
 	ws, err := websocket.DialConfig(wsConfig)
 	if err != nil {
+		err = net.WrapSSLErrors(location, err)
 		return
 	}
 
