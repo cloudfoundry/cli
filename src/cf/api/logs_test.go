@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/configuration"
 	"code.google.com/p/go.net/websocket"
 	"code.google.com/p/gogoprotobuf/proto"
 	"crypto/tls"
@@ -21,6 +22,7 @@ var _ = Describe("loggregator logs repository", func() {
 		testServer     *httptest.Server
 		requestHandler *requestHandlerWithExpectedPath
 		logsRepo       *LoggregatorLogsRepository
+		configRepo     configuration.ReadWriter
 		messagesToSend [][]byte
 	)
 
@@ -32,8 +34,30 @@ var _ = Describe("loggregator logs repository", func() {
 			marshalledLogMessageWithTime("My message 3", startTime.UnixNano()),
 		}
 		logChan = make(chan *logmessage.Message, 1000)
-		testServer, requestHandler, logsRepo = setupTestServerAndLogsRepo(messagesToSend...)
 
+		requestHandler = new(requestHandlerWithExpectedPath)
+		requestHandler.handlerFunc = func(conn *websocket.Conn) {
+			request := conn.Request()
+			requestHandler.lastPath = request.URL.Path
+			Expect(request.URL.RawQuery).To(Equal("app=my-app-guid"))
+			Expect(request.Method).To(Equal("GET"))
+			Expect(request.Header.Get("Authorization")).To(ContainSubstring("BEARER my_access_token"))
+
+			for _, msg := range messagesToSend {
+				conn.Write(msg)
+			}
+			time.Sleep(time.Duration(50) * time.Millisecond)
+			conn.Close()
+		}
+
+		testServer = httptest.NewTLSServer(websocket.Handler(requestHandler.handlerFunc))
+
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		configRepo.SetApiEndpoint("https://localhost")
+		configRepo.SetLoggregatorEndpoint(strings.Replace(testServer.URL, "https", "wss", 1))
+
+		repo := NewLoggregatorLogsRepository(configRepo)
+		logsRepo = &repo
 		logsRepo.AddTrustedCerts(testServer.TLS.Certificates)
 	})
 
@@ -96,10 +120,10 @@ var _ = Describe("loggregator logs repository", func() {
 
 			Context("when skip-validation-errors flag is set", func() {
 				BeforeEach(func() {
-					//					logsRepo.DisableSSL()
+					configRepo.SetSSLDisabled(true)
 				})
 
-				XIt("ignores SSL validation errors", func() {
+				It("ignores SSL validation errors", func() {
 					err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
 					Expect(err).NotTo(HaveOccurred())
 				})
@@ -124,33 +148,6 @@ func parseMessage(msgBytes []byte) (msg *logmessage.Message) {
 type requestHandlerWithExpectedPath struct {
 	handlerFunc func(conn *websocket.Conn)
 	lastPath    string
-}
-
-func setupTestServerAndLogsRepo(messages ...[]byte) (testServer *httptest.Server, requestHandler *requestHandlerWithExpectedPath, logsRepo *LoggregatorLogsRepository) {
-	requestHandler = new(requestHandlerWithExpectedPath)
-	requestHandler.handlerFunc = func(conn *websocket.Conn) {
-		request := conn.Request()
-		requestHandler.lastPath = request.URL.Path
-		Expect(request.URL.RawQuery).To(Equal("app=my-app-guid"))
-		Expect(request.Method).To(Equal("GET"))
-		Expect(request.Header.Get("Authorization")).To(ContainSubstring("BEARER my_access_token"))
-
-		for _, msg := range messages {
-			conn.Write(msg)
-		}
-		time.Sleep(time.Duration(50) * time.Millisecond)
-		conn.Close()
-	}
-
-	testServer = httptest.NewTLSServer(websocket.Handler(requestHandler.handlerFunc))
-
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint("https://localhost")
-	configRepo.SetLoggregatorEndpoint(strings.Replace(testServer.URL, "https", "wss", 1))
-
-	repo := NewLoggregatorLogsRepository(configRepo)
-	logsRepo = &repo
-	return
 }
 
 func marshalledLogMessageWithTime(messageString string, timestamp int64) []byte {
