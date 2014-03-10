@@ -6,14 +6,22 @@ import (
 )
 
 type FakeLogsRepository struct {
-	AppLoggedGuid     string
-	RecentLogs        []*logmessage.Message
+	AppLoggedGuid string
+	RecentLogs    []*logmessage.Message
+	RecentLogErr  error
+
 	TailLogMessages   []*logmessage.Message
 	TailLogStopCalled bool
 	TailLogErr        error
 }
 
 func (l *FakeLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
+	err = l.RecentLogErr
+
+	if err != nil {
+		return
+	}
+
 	stopLoggingChan := make(chan bool)
 	defer close(stopLoggingChan)
 	l.logsFor(appGuid, l.RecentLogs, onConnect, logChan, stopLoggingChan)

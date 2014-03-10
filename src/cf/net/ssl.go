@@ -2,6 +2,7 @@ package net
 
 import (
 	"cf/errors"
+	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
 	"crypto/x509"
 	"net/url"
@@ -24,17 +25,29 @@ func NewTLSConfig(trustedCerts []tls.Certificate, disableSSL bool) (TLSConfig *t
 	return
 }
 
-func wrapSSLErrors(host string, err error) errors.Error {
+func WrapSSLErrors(host string, err error) errors.Error {
 	urlError, ok := err.(*url.Error)
 	if ok {
-		switch urlError.Err.(type) {
-		case x509.UnknownAuthorityError:
-			return errors.NewInvalidSSLCert(host, "unknown authority")
-		case x509.HostnameError:
-			return errors.NewInvalidSSLCert(host, "not valid for the requested host")
-		case x509.CertificateInvalidError:
-			return errors.NewInvalidSSLCert(host, "")
-		}
+		return wrapSSLErrorInternal(host, urlError.Err)
 	}
+
+	websocketError, ok := err.(*websocket.DialError)
+	if ok {
+		return wrapSSLErrorInternal(host, websocketError.Err)
+	}
+
 	return errors.NewErrorWithError("Error performing request", err)
+}
+
+func wrapSSLErrorInternal(host string, err error) errors.Error {
+	switch err.(type) {
+	case x509.UnknownAuthorityError:
+		return errors.NewInvalidSSLCert(host, "unknown authority")
+	case x509.HostnameError:
+		return errors.NewInvalidSSLCert(host, "not valid for the requested host")
+	case x509.CertificateInvalidError:
+		return errors.NewInvalidSSLCert(host, "")
+	default:
+		return errors.NewErrorWithError("Error performing request", err)
+	}
 }
