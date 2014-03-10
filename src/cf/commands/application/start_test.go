@@ -215,14 +215,14 @@ var _ = Describe("Testing with ginkgo", func() {
 		})
 	})
 
-	XIt("TestStartApplicationWhenStagingFails", func() {
-		// TODO: fix this flakey test
+	It("displays an error message when staging fails", func() {
 		displayApp := &testcmd.FakeAppDisplayer{}
 		instances := [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
 		errorCodes := []string{"170001"}
 
 		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
+		println(ui.DumpOutputs())
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app"},
 			{"OK"},
