@@ -38,8 +38,8 @@ var _ = Describe("Login Command", func() {
 		endpointRepo = &testapi.FakeEndpointRepo{}
 
 		org := models.Organization{}
-		org.Name = "my-org"
-		org.Guid = "my-org-guid"
+		org.Name = "my-new-org"
+		org.Guid = "my-new-org-guid"
 
 		orgRepo = &testapi.FakeOrgRepository{
 			Organizations:          []models.Organization{org},
@@ -122,8 +122,8 @@ var _ = Describe("Login Command", func() {
 				org1.Name = "some-org"
 
 				org2 = models.Organization{}
-				org2.Guid = "my-org-guid"
-				org2.Name = "my-org"
+				org2.Guid = "my-new-org-guid"
+				org2.Name = "my-new-org"
 
 				space1 := models.Space{}
 				space1.Guid = "my-space-guid"
@@ -148,13 +148,13 @@ var _ = Describe("Login Command", func() {
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Select an org"},
 					{"1. some-org"},
-					{"2. my-org"},
+					{"2. my-new-org"},
 					{"Select a space"},
 					{"1. my-space"},
 					{"2. some-space"},
 				})
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -165,14 +165,14 @@ var _ = Describe("Login Command", func() {
 					"password": "password",
 				}))
 
-				Expect(orgRepo.FindByNameName).To(Equal("my-org"))
+				Expect(orgRepo.FindByNameName).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 
 			It("lets the user select an org and space by name", func() {
-				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-org", "my-space"}
+				ui.Inputs = []string{"api.example.com", "user@example.com", "password", "my-new-org", "my-space"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
@@ -180,13 +180,13 @@ var _ = Describe("Login Command", func() {
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Select an org"},
 					{"1. some-org"},
-					{"2. my-org"},
+					{"2. my-new-org"},
 					{"Select a space"},
 					{"1. my-space"},
 					{"2. some-space"},
 				})
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -197,19 +197,19 @@ var _ = Describe("Login Command", func() {
 					"password": "password",
 				}))
 
-				Expect(orgRepo.FindByNameName).To(Equal("my-org"))
+				Expect(orgRepo.FindByNameName).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 
 			It("lets the user specify an org and space using flags", func() {
-				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "my-space"}
+				Flags = []string{"-a", "api.example.com", "-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "my-space"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -226,14 +226,14 @@ var _ = Describe("Login Command", func() {
 			It("doesn't ask the user for the API url if they have it in their config", func() {
 				Config.SetApiEndpoint("http://api.example.com")
 
-				Flags = []string{"-o", "my-org", "-s", "my-space"}
+				Flags = []string{"-o", "my-new-org", "-s", "my-space"}
 				ui.Inputs = []string{"user@example.com", "password"}
 
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
 				Expect(Config.ApiEndpoint()).To(Equal("http://api.example.com"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -292,7 +292,7 @@ var _ = Describe("Login Command", func() {
 				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("my-space-guid"))
 				Expect(Config.AccessToken()).To(Equal("my_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -409,7 +409,7 @@ var _ = Describe("Login Command", func() {
 		It("fails when there is an error fetching the organization", func() {
 			orgRepo.FindByNameErr = true
 
-			Flags = []string{"-u", "user@example.com", "-o", "my-org", "-s", "my-space"}
+			Flags = []string{"-u", "user@example.com", "-o", "my-new-org", "-s", "my-space"}
 			ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
 
 			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
@@ -427,85 +427,165 @@ var _ = Describe("Login Command", func() {
 		})
 	})
 
-	Context("when the user is already logged in and the config is fully populated", func() {
-		var (
-			l Login
-		)
+	Describe("updates to the config", func() {
+		var l Login
 
 		BeforeEach(func() {
-			Config = testconfig.NewRepositoryWithDefaults()
-			Config.SetApiEndpoint("api.example.com")
-			Config.SetAccessToken("my_access_token")
-			Config.SetRefreshToken("my_refesh_token")
-			authRepo.Config = Config
-
+			Config.SetApiEndpoint("api.the-old-endpoint.com")
+			Config.SetAccessToken("the-old-access-token")
+			Config.SetRefreshToken("the-old-refresh-token")
 			l = NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
 		})
 
-		Describe("and a new login fails to set api endpoint", func() {
-			BeforeEach(func() {
-				endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
-				Flags = []string{"-a", "api.nonexistent.com"}
-			})
+		JustBeforeEach(func() {
+			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+		})
 
-			JustBeforeEach(func() {
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-			})
-
-			It("clears the entire config", func() {
-				Expect(Config.ApiEndpoint()).To(BeEmpty())
-				Expect(Config.AccessToken()).To(BeEmpty())
-				Expect(Config.RefreshToken()).To(BeEmpty())
-				Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-				Expect(Config.SpaceFields().Guid).To(BeEmpty())
-			})
-
-			It("shows target", func() {
+		var ItShowsTheTarget = func() {
+			It("shows the target", func() {
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+			})
+		}
+
+		Describe("when the user is setting an API", func() {
+			BeforeEach(func() {
+				l = NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				Flags = []string{"-a", "https://api.the-server.com", "-u", "the-user-name", "-p", "the-password"}
+			})
+
+			Describe("when the --skip-ssl-validation flag is provided", func() {
+				BeforeEach(func() {
+					Flags = append(Flags, "--skip-ssl-validation")
+				})
+
+				Describe("setting api endpoint is successful", func() {
+					BeforeEach(func() {
+						Config.SetSSLDisabled(false)
+					})
+
+					It("stores the API endpoint and the skip-ssl flag", func() {
+						Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://api.the-server.com"))
+						Expect(Config.IsSSLDisabled()).To(BeTrue())
+					})
+				})
+
+				Describe("setting api endpoint failed", func() {
+					BeforeEach(func() {
+						Config.SetSSLDisabled(true)
+						endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
+					})
+
+					It("clears the entire config", func() {
+						Expect(Config.ApiEndpoint()).To(BeEmpty())
+						Expect(Config.IsSSLDisabled()).To(BeFalse())
+						Expect(Config.AccessToken()).To(BeEmpty())
+						Expect(Config.RefreshToken()).To(BeEmpty())
+						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+						Expect(Config.SpaceFields().Guid).To(BeEmpty())
+					})
+
+					ItShowsTheTarget()
+				})
+			})
+
+			Describe("when the --skip-ssl-validation flag is not provided", func() {
+				Describe("setting api endpoint is successful", func() {
+					BeforeEach(func() {
+						Config.SetSSLDisabled(true)
+					})
+
+					It("updates the API endpoint and enables SSL validation", func() {
+						Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://api.the-server.com"))
+						Expect(Config.IsSSLDisabled()).To(BeFalse())
+					})
+				})
+
+				Describe("setting api endpoint failed", func() {
+					BeforeEach(func() {
+						Config.SetSSLDisabled(true)
+						endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
+					})
+
+					It("clears the entire config", func() {
+						Expect(Config.ApiEndpoint()).To(BeEmpty())
+						Expect(Config.IsSSLDisabled()).To(BeFalse())
+						Expect(Config.AccessToken()).To(BeEmpty())
+						Expect(Config.RefreshToken()).To(BeEmpty())
+						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+						Expect(Config.SpaceFields().Guid).To(BeEmpty())
+					})
+
+					ItShowsTheTarget()
+				})
 			})
 		})
 
-		Describe("and a new login fails authenticaton", func() {
+		Describe("when user is logging in and not setting the api endpoint", func() {
 			BeforeEach(func() {
-				authRepo.AuthError = true
-
-				Flags = []string{"-u", "user@example.com"}
-				ui.Inputs = []string{"password", "password2", "password3"}
+				Flags = []string{"-u", "the-user-name", "-p", "the-password"}
 			})
 
-			JustBeforeEach(func() {
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+			Describe("when the --skip-ssl-validation flag is provided", func() {
+				BeforeEach(func() {
+					Flags = append(Flags, "--skip-ssl-validation")
+					Config.SetSSLDisabled(false)
+				})
+
+				It("disables SSL validation", func() {
+					Expect(Config.IsSSLDisabled()).To(BeTrue())
+				})
 			})
 
-			It("has ApiEndpoint in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
+			Describe("when the --skip-ssl-validation flag is not provided", func() {
+				BeforeEach(func() {
+					Config.SetSSLDisabled(true)
+				})
+
+				It("should not change config's SSLDisabled flag", func() {
+					Expect(Config.IsSSLDisabled()).To(BeTrue())
+				})
 			})
 
-			It("clears Access Token, Refresh Token, Org, and Space in the config", func() {
-				Expect(Config.AccessToken()).To(BeEmpty())
-				Expect(Config.RefreshToken()).To(BeEmpty())
-				Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-				Expect(Config.SpaceFields().Guid).To(BeEmpty())
-			})
+			Describe("and the login fails authenticaton", func() {
+				BeforeEach(func() {
+					authRepo.AuthError = true
 
-			It("shows target", func() {
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
+					Config.SetSSLDisabled(true)
+
+					Flags = []string{"-u", "user@example.com"}
+					ui.Inputs = []string{"password", "password2", "password3"}
+				})
+
+				It("does not change the api endpoint or SSL setting in the config", func() {
+					Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+					Expect(Config.IsSSLDisabled()).To(BeTrue())
+				})
+
+				It("clears Access Token, Refresh Token, Org, and Space in the config", func() {
+					Expect(Config.AccessToken()).To(BeEmpty())
+					Expect(Config.RefreshToken()).To(BeEmpty())
+					Expect(Config.OrganizationFields().Guid).To(BeEmpty())
+					Expect(Config.SpaceFields().Guid).To(BeEmpty())
+				})
+
+				ItShowsTheTarget()
 			})
 		})
 
-		Describe("and a new login fails to target an org", func() {
+		Describe("and the login fails to target an org", func() {
 			BeforeEach(func() {
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "nonexistentorg", "-s", "my-space"}
+
+				Config.SetSSLDisabled(true)
 			})
 
 			JustBeforeEach(func() {
 				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
 			})
 
-			It("has ApiEndpoint, Access Token, Refresh Token in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
-				Expect(Config.AccessToken()).To(Equal("my_access_token"))
-				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
+			It("does not update the api endpoint or ssl setting in the config", func() {
+				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
 			It("clears Org, and Space in the config", func() {
@@ -518,32 +598,30 @@ var _ = Describe("Login Command", func() {
 			})
 		})
 
-		Describe("and a new login fails to target a space", func() {
+		Describe("and the login fails to target a space", func() {
 			BeforeEach(func() {
-				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "my-org", "-s", "nonexistent"}
+				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "my-new-org", "-s", "nonexistent"}
+
+				Config.SetSSLDisabled(true)
 			})
 
-			JustBeforeEach(func() {
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+			It("does not update the api endpoint or ssl setting in the config", func() {
+				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
-			It("has ApiEndpoint, Access Token, Refresh Token, and Org in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
-				Expect(Config.AccessToken()).To(Equal("my_access_token"))
-				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
-				Expect(Config.OrganizationFields().Guid).To(Equal("my-org-guid"))
+			It("updates the org in the config", func() {
+				Expect(Config.OrganizationFields().Guid).To(Equal("my-new-org-guid"))
 			})
 
-			It("clears Space in the config", func() {
+			It("clears the space in the config", func() {
 				Expect(Config.SpaceFields().Guid).To(BeEmpty())
 			})
 
-			It("shows target", func() {
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
-			})
+			ItShowsTheTarget()
 		})
 
-		Describe("and a new login succeeds", func() {
+		Describe("and the login succeeds", func() {
 			BeforeEach(func() {
 				orgRepo.Organizations[0].Name = "new-org"
 				orgRepo.Organizations[0].Guid = "new-org-guid"
@@ -553,23 +631,24 @@ var _ = Describe("Login Command", func() {
 				authRepo.RefreshToken = "new_refresh_token"
 
 				Flags = []string{"-u", "user@example.com", "-p", "password", "-o", "new-org", "-s", "new-space"}
+
+				Config.SetApiEndpoint("api.the-old-endpoint.com")
+				Config.SetSSLDisabled(true)
 			})
 
-			JustBeforeEach(func() {
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+			It("does not update the api endpoint or SSL setting", func() {
+				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
+				Expect(Config.IsSSLDisabled()).To(BeTrue())
 			})
 
 			It("updates Access Token, Refresh Token, Org, and Space in the config", func() {
-				Expect(Config.ApiEndpoint()).To(Equal("api.example.com"))
 				Expect(Config.AccessToken()).To(Equal("new_access_token"))
 				Expect(Config.RefreshToken()).To(Equal("new_refresh_token"))
 				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
 			})
 
-			It("shows target", func() {
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
-			})
+			ItShowsTheTarget()
 		})
 	})
 })
