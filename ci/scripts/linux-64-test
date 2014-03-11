@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+git fetch
+git checkout $GIT_COMMIT
+git submodule update --init
+bin/replace-sha
+bin/go build -v -o cf-linux-amd64 main
+bin/test
