@@ -18,12 +18,13 @@ const maxLoginTries = 3
 const maxChoices = 50
 
 type Login struct {
-	ui            terminal.UI
-	config        configuration.ReadWriter
-	authenticator api.AuthenticationRepository
-	endpointRepo  api.EndpointRepository
-	orgRepo       api.OrganizationRepository
-	spaceRepo     api.SpaceRepository
+	ui                      terminal.UI
+	config                  configuration.ReadWriter
+	authenticator           api.AuthenticationRepository
+	endpointRepo            api.EndpointRepository
+	orgRepo                 api.OrganizationRepository
+	spaceRepo               api.SpaceRepository
+	shouldShowConfiguration bool
 }
 
 func NewLogin(ui terminal.UI,
@@ -32,18 +33,16 @@ func NewLogin(ui terminal.UI,
 	endpointRepo api.EndpointRepository,
 	orgRepo api.OrganizationRepository,
 	spaceRepo api.SpaceRepository) (cmd Login) {
-
-	cmd.ui = ui
-	cmd.config = config
-	cmd.authenticator = authenticator
-	cmd.endpointRepo = endpointRepo
-	cmd.orgRepo = orgRepo
-	cmd.spaceRepo = spaceRepo
-
-	return
+	return Login{
+		ui:                      ui,
+		config:                  config,
+		authenticator:           authenticator,
+		endpointRepo:            endpointRepo,
+		orgRepo:                 orgRepo,
+		spaceRepo:               spaceRepo,
+		shouldShowConfiguration: true,
+	}
 }
-
-const userSkippedInput string = "user_skipped_input"
 
 func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	return
@@ -52,51 +51,29 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
 
-	printSummaryAndTip := func() {
-		cmd.ui.Say("")
-		cmd.ui.ShowConfiguration(cmd.config)
-	}
-	defer func() { printSummaryAndTip() }()
-
-	err := cmd.setApi(c)
-	switch typedErr := err.(type) {
-	case nil:
-	case *errors.InvalidSSLCert:
-		printSummaryAndTip = func() {}
-		cfLoginCommand := terminal.CommandColor(fmt.Sprintf("%s login --skip-ssl-validation", cf.Name()))
-		tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfLoginCommand)
-		cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
-	default:
-		cmd.ui.Failed("Invalid API endpoint.\n%s", err.Error())
-	}
-
-	err = cmd.authenticate(c)
-	if err != nil {
-		cmd.ui.Failed("Unable to authenticate.")
-	}
-
-	err = cmd.setOrganization(c)
-	shouldSkipSpace := err != nil && err.Error() == userSkippedInput
-
-	if err != nil && !shouldSkipSpace {
-		cmd.ui.Failed(err.Error())
-	}
-
-	if !shouldSkipSpace {
-		err = cmd.setSpace(c)
-		if err != nil && err.Error() != userSkippedInput {
-			cmd.ui.Failed(err.Error())
+	defer func() {
+		if cmd.shouldShowConfiguration {
+			cmd.ui.Say("")
+			cmd.ui.ShowConfiguration(cmd.config)
 		}
+	}()
+
+	(&cmd).setApi(c)
+	cmd.authenticate(c)
+
+	orgIsSet := cmd.setOrganization(c)
+	if orgIsSet {
+		cmd.setSpace(c)
 	}
 }
 
-func (cmd Login) setApi(c *cli.Context) error {
+func (cmd *Login) setApi(c *cli.Context) {
 	api := c.String("a")
-	disableSSL := c.Bool("skip-ssl-validation")
+	skipSSL := c.Bool("skip-ssl-validation")
 
 	if api == "" {
-		disableSSL = disableSSL || cmd.config.IsSSLDisabled()
 		api = cmd.config.ApiEndpoint()
+		skipSSL = cmd.config.IsSSLDisabled() || skipSSL
 	}
 
 	if api == "" {
@@ -105,23 +82,33 @@ func (cmd Login) setApi(c *cli.Context) error {
 		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(api))
 	}
 
-	cmd.config.SetSSLDisabled(disableSSL)
+	cmd.config.SetSSLDisabled(skipSSL)
 	endpoint, err := cmd.endpointRepo.UpdateEndpoint(api)
 
 	if err != nil {
 		cmd.config.SetApiEndpoint("")
 		cmd.config.SetSSLDisabled(false)
-	} else if !strings.HasPrefix(endpoint, "https://") {
-		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
+
+		switch typedErr := err.(type) {
+		case *errors.InvalidSSLCert:
+			cmd.shouldShowConfiguration = false
+			cfLoginCommand := terminal.CommandColor(fmt.Sprintf("%s login --skip-ssl-validation", cf.Name()))
+			tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfLoginCommand)
+			cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
+		default:
+			cmd.ui.Failed("Invalid API endpoint.\n%s", err.Error())
+		}
 	}
 
-	return err
+	if !strings.HasPrefix(endpoint, "https://") {
+		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
+	}
 }
 
-func (cmd Login) authenticate(c *cli.Context) (apiErr errors.Error) {
-	prompts, apiErr := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+func (cmd Login) authenticate(c *cli.Context) {
+	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 	}
 	var passwordKey string
 	credentials := make(map[string]string)
@@ -146,20 +133,23 @@ func (cmd Login) authenticate(c *cli.Context) (apiErr errors.Error) {
 		cmd.ui.Say("Authenticating...")
 
 		credentials[passwordKey] = password
-		apiErr = cmd.authenticator.Authenticate(credentials)
+		err = cmd.authenticator.Authenticate(credentials)
 
-		if apiErr == nil {
+		if err == nil {
 			cmd.ui.Ok()
 			cmd.ui.Say("")
 			break
 		}
 
-		cmd.ui.Say(apiErr.Error())
+		cmd.ui.Say(err.Error())
 	}
-	return
+
+	if err != nil {
+		cmd.ui.Failed("Unable to authenticate.")
+	}
 }
 
-func (cmd Login) setOrganization(c *cli.Context) (err error) {
+func (cmd Login) setOrganization(c *cli.Context) (isOrgSet bool) {
 	orgName := c.String("o")
 
 	if orgName == "" {
@@ -168,32 +158,29 @@ func (cmd Login) setOrganization(c *cli.Context) (err error) {
 			availableOrgs = append(availableOrgs, o)
 			return len(availableOrgs) < maxChoices
 		})
-
 		if apiErr != nil {
-			err = errors.New(fmt.Sprintf("Error finding avilable orgs\n%s", apiErr.Error()))
-			return
+			cmd.ui.Failed("Error finding avilable orgs\n%s", apiErr.Error())
 		}
 
 		if len(availableOrgs) == 1 {
-			return cmd.targetOrganization(availableOrgs[0])
+			cmd.targetOrganization(availableOrgs[0])
+			return true
 		}
 
 		orgName = cmd.promptForOrgName(availableOrgs)
 		if orgName == "" {
 			cmd.ui.Say("")
-			err = errors.New(userSkippedInput)
-			return
+			return false
 		}
 	}
 
-	org, apiErr := cmd.orgRepo.FindByName(orgName)
-	if apiErr != nil {
-		err = errors.New(apiErr.Error())
-		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err)
-		return
+	org, err := cmd.orgRepo.FindByName(orgName)
+	if err != nil {
+		cmd.ui.Failed("Error finding org %s\n%s", terminal.EntityNameColor(orgName), err.Error())
 	}
 
-	return cmd.targetOrganization(org)
+	cmd.targetOrganization(org)
+	return true
 }
 
 func (cmd Login) promptForOrgName(orgs []models.Organization) string {
@@ -205,50 +192,43 @@ func (cmd Login) promptForOrgName(orgs []models.Organization) string {
 	return cmd.promptForName(orgNames, "Select an org (or press enter to skip):", "Org")
 }
 
-func (cmd Login) targetOrganization(org models.Organization) (err error) {
+func (cmd Login) targetOrganization(org models.Organization) {
 	cmd.config.SetOrganizationFields(org.OrganizationFields)
 	cmd.ui.Say("Targeted org %s\n", terminal.EntityNameColor(org.Name))
-	return
 }
 
-func (cmd Login) setSpace(c *cli.Context) (err error) {
+func (cmd Login) setSpace(c *cli.Context) {
 	spaceName := c.String("s")
 
 	if spaceName == "" {
 		var availableSpaces []models.Space
-		apiErr := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
+		err := cmd.spaceRepo.ListSpaces(func(space models.Space) bool {
 			availableSpaces = append(availableSpaces, space)
 			return (len(availableSpaces) < maxChoices)
 		})
-
-		if apiErr != nil {
-			err = errors.New(fmt.Sprintf("Error finding available spaces\n%s", apiErr.Error()))
-			cmd.ui.Failed(err.Error())
-			return
+		if err != nil {
+			cmd.ui.Failed("Error finding available spaces\n%s", err.Error())
 		}
 
 		// Target only space if possible
 		if len(availableSpaces) == 1 {
-			return cmd.targetSpace(availableSpaces[0])
+			cmd.targetSpace(availableSpaces[0])
+			return
 		}
 
 		spaceName = cmd.promptForSpaceName(availableSpaces)
 		if spaceName == "" {
 			cmd.ui.Say("")
-			err = errors.New(userSkippedInput)
 			return
 		}
 	}
 
-	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
-	if apiErr != nil {
-		err = errors.New(fmt.Sprintf("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), apiErr.Error()))
-		cmd.ui.Failed(err.Error())
-		return
+	space, err := cmd.spaceRepo.FindByName(spaceName)
+	if err != nil {
+		cmd.ui.Failed("Error finding space %s\n%s", terminal.EntityNameColor(spaceName), err.Error())
 	}
 
-	err = cmd.targetSpace(space)
-	return
+	cmd.targetSpace(space)
 }
 
 func (cmd Login) promptForSpaceName(spaces []models.Space) string {
@@ -260,10 +240,9 @@ func (cmd Login) promptForSpaceName(spaces []models.Space) string {
 	return cmd.promptForName(spaceNames, "Select a space (or press enter to skip):", "Space")
 }
 
-func (cmd Login) targetSpace(space models.Space) (err error) {
+func (cmd Login) targetSpace(space models.Space) {
 	cmd.config.SetSpaceFields(space.SpaceFields)
 	cmd.ui.Say("Targeted space %s\n", terminal.EntityNameColor(space.Name))
-	return
 }
 
 func (cmd Login) promptForName(names []string, listPrompt, itemPrompt string) string {
