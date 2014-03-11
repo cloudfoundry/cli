@@ -66,52 +66,7 @@ var _ = Describe("Login Command", func() {
 		}
 	})
 
-	Describe("when the user passed in the skip-ssl-validation flag", func() {
-		BeforeEach(func() {
-			Flags = []string{"--skip-ssl-validation", "-a", "api.example.com", "-u", "username", "-p", "password"}
-		})
-
-		It("disables SSL validation in the config", func() {
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-			Expect(Config.IsSSLDisabled()).To(BeTrue())
-		})
-	})
-
-	Describe("SSL validation", func() {
-		Context("when the SSL certificate is invalid", func() {
-			BeforeEach(func() {
-				endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://example.com", "it don't work")
-				Flags = []string{"-a", "api.example.com", "-u", "username", "-p", "password"}
-			})
-
-			It("does not set the endpoint", func() {
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-				testassert.SliceContains(ui.Outputs, testassert.Lines{
-					{"Invalid SSL Cert", "https://example.com"},
-					{"TIP"},
-				})
-			})
-		})
-
-		Context("when SSL certificate is valid", func() {
-			BeforeEach(func() {
-				Flags = []string{"-a", "api.example.com", "-u", "username", "-p", "password"}
-			})
-
-			It("sets the endpoint", func() {
-				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-			})
-		})
-	})
-
-	Context("when user is not logged in and config is empty", func() {
+	Context("interactive usage", func() {
 		Describe("when there are a small number of organizations and spaces", func() {
 			var org2 models.Organization
 			var space2 models.Space
@@ -341,90 +296,6 @@ var _ = Describe("Login Command", func() {
 				"pin":               "the-pin",
 			}))
 		})
-
-		It("enables SSL by default", func() {
-			ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin"}
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(Config.IsSSLDisabled()).To(BeFalse())
-		})
-
-		It("fails when the user enters invalid credentials", func() {
-			authRepo.AuthError = true
-
-			Flags = []string{"-u", "user@example.com"}
-			ui.Inputs = []string{"api.example.com", "password", "password2", "password3"}
-
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-			Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-			Expect(Config.SpaceFields().Guid).To(BeEmpty())
-			Expect(Config.AccessToken()).To(BeEmpty())
-			Expect(Config.RefreshToken()).To(BeEmpty())
-
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Failed"},
-			})
-		})
-
-		It("fails when the /v2/info API returns an error", func() {
-			endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("Server error")
-
-			ui.Inputs = []string{"api.example.com"}
-
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(Config.ApiEndpoint()).To(BeEmpty())
-			Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-			Expect(Config.SpaceFields().Guid).To(BeEmpty())
-			Expect(Config.AccessToken()).To(BeEmpty())
-			Expect(Config.RefreshToken()).To(BeEmpty())
-
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Failed"},
-			})
-		})
-
-		It("fails when the server response is an invalid ssl cert error", func() {
-			endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS")
-
-			ui.Inputs = []string{"bobs-burgers.com"}
-
-			cmd := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("login", Flags), nil)
-
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"FAILED"},
-				{"SSL cert", "https://bobs-burgers.com"},
-				{"TIP", "--skip-ssl-validation"},
-			})
-
-			Expect(ui.ShowConfigurationCalled).To(BeFalse())
-		})
-
-		It("fails when there is an error fetching the organization", func() {
-			orgRepo.FindByNameErr = true
-
-			Flags = []string{"-u", "user@example.com", "-o", "my-new-org", "-s", "my-space"}
-			ui.Inputs = []string{"api.example.com", "user@example.com", "password"}
-
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-			Expect(Config.OrganizationFields().Guid).To(BeEmpty())
-			Expect(Config.SpaceFields().Guid).To(BeEmpty())
-			Expect(Config.AccessToken()).To(Equal("my_access_token"))
-			Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
-
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Failed"},
-			})
-		})
 	})
 
 	Describe("updates to the config", func() {
@@ -447,6 +318,25 @@ var _ = Describe("Login Command", func() {
 			})
 		}
 
+		var ItFails = func() {
+			It("fails", func() {
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Failed"},
+				})
+			})
+		}
+
+		var ItSucceeds = func() {
+			It("runs successfully", func() {
+				testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+					{"Failed"},
+				})
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"OK"},
+				})
+			})
+		}
+
 		Describe("when the user is setting an API", func() {
 			BeforeEach(func() {
 				l = NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
@@ -463,6 +353,9 @@ var _ = Describe("Login Command", func() {
 						Config.SetSSLDisabled(false)
 					})
 
+					ItSucceeds()
+					ItShowsTheTarget()
+
 					It("stores the API endpoint and the skip-ssl flag", func() {
 						Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://api.the-server.com"))
 						Expect(Config.IsSSLDisabled()).To(BeTrue())
@@ -475,6 +368,9 @@ var _ = Describe("Login Command", func() {
 						endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
 					})
 
+					ItFails()
+					ItShowsTheTarget()
+
 					It("clears the entire config", func() {
 						Expect(Config.ApiEndpoint()).To(BeEmpty())
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
@@ -483,8 +379,6 @@ var _ = Describe("Login Command", func() {
 						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
 						Expect(Config.SpaceFields().Guid).To(BeEmpty())
 					})
-
-					ItShowsTheTarget()
 				})
 			})
 
@@ -493,6 +387,9 @@ var _ = Describe("Login Command", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
 					})
+
+					ItSucceeds()
+					ItShowsTheTarget()
 
 					It("updates the API endpoint and enables SSL validation", func() {
 						Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://api.the-server.com"))
@@ -506,6 +403,9 @@ var _ = Describe("Login Command", func() {
 						endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
 					})
 
+					ItFails()
+					ItShowsTheTarget()
+
 					It("clears the entire config", func() {
 						Expect(Config.ApiEndpoint()).To(BeEmpty())
 						Expect(Config.IsSSLDisabled()).To(BeFalse())
@@ -514,8 +414,23 @@ var _ = Describe("Login Command", func() {
 						Expect(Config.OrganizationFields().Guid).To(BeEmpty())
 						Expect(Config.SpaceFields().Guid).To(BeEmpty())
 					})
+				})
+			})
 
-					ItShowsTheTarget()
+			Describe("when there is an invalid SSL cert", func() {
+				BeforeEach(func() {
+					endpointRepo.UpdateEndpointError = errors.NewInvalidSSLCert("https://bobs-burgers.com", "SELF SIGNED SADNESS")
+					ui.Inputs = []string{"bobs-burgers.com"}
+				})
+
+				It("fails and suggests the user skip SSL validation", func() {
+					testassert.SliceContains(ui.Outputs, testassert.Lines{
+						{"FAILED"},
+						{"SSL cert", "https://bobs-burgers.com"},
+						{"TIP", "--skip-ssl-validation"},
+					})
+
+					Expect(ui.ShowConfigurationCalled).To(BeFalse())
 				})
 			})
 		})
@@ -556,6 +471,9 @@ var _ = Describe("Login Command", func() {
 					ui.Inputs = []string{"password", "password2", "password3"}
 				})
 
+				ItFails()
+				ItShowsTheTarget()
+
 				It("does not change the api endpoint or SSL setting in the config", func() {
 					Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
 					Expect(Config.IsSSLDisabled()).To(BeTrue())
@@ -567,8 +485,6 @@ var _ = Describe("Login Command", func() {
 					Expect(Config.OrganizationFields().Guid).To(BeEmpty())
 					Expect(Config.SpaceFields().Guid).To(BeEmpty())
 				})
-
-				ItShowsTheTarget()
 			})
 		})
 
@@ -579,9 +495,8 @@ var _ = Describe("Login Command", func() {
 				Config.SetSSLDisabled(true)
 			})
 
-			JustBeforeEach(func() {
-				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-			})
+			ItFails()
+			ItShowsTheTarget()
 
 			It("does not update the api endpoint or ssl setting in the config", func() {
 				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
@@ -592,10 +507,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.OrganizationFields().Guid).To(BeEmpty())
 				Expect(Config.SpaceFields().Guid).To(BeEmpty())
 			})
-
-			It("shows target", func() {
-				Expect(ui.ShowConfigurationCalled).To(BeTrue())
-			})
 		})
 
 		Describe("and the login fails to target a space", func() {
@@ -604,6 +515,9 @@ var _ = Describe("Login Command", func() {
 
 				Config.SetSSLDisabled(true)
 			})
+
+			ItFails()
+			ItShowsTheTarget()
 
 			It("does not update the api endpoint or ssl setting in the config", func() {
 				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
@@ -617,8 +531,6 @@ var _ = Describe("Login Command", func() {
 			It("clears the space in the config", func() {
 				Expect(Config.SpaceFields().Guid).To(BeEmpty())
 			})
-
-			ItShowsTheTarget()
 		})
 
 		Describe("and the login succeeds", func() {
@@ -636,6 +548,9 @@ var _ = Describe("Login Command", func() {
 				Config.SetSSLDisabled(true)
 			})
 
+			ItSucceeds()
+			ItShowsTheTarget()
+
 			It("does not update the api endpoint or SSL setting", func() {
 				Expect(Config.ApiEndpoint()).To(Equal("api.the-old-endpoint.com"))
 				Expect(Config.IsSSLDisabled()).To(BeTrue())
@@ -647,8 +562,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.OrganizationFields().Guid).To(Equal("new-org-guid"))
 				Expect(Config.SpaceFields().Guid).To(Equal("new-space-guid"))
 			})
-
-			ItShowsTheTarget()
 		})
 	})
 })
