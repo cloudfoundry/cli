@@ -51,7 +51,6 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 
 func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
-	cmd.config.SetSSLDisabled(c.Bool("skip-ssl-validation"))
 
 	printSummaryAndTip := func() {
 		cmd.ui.Say("")
@@ -93,7 +92,10 @@ func (cmd Login) Run(c *cli.Context) {
 
 func (cmd Login) setApi(c *cli.Context) error {
 	api := c.String("a")
+	disableSSL := c.Bool("skip-ssl-validation")
+
 	if api == "" {
+		disableSSL = disableSSL || cmd.config.IsSSLDisabled()
 		api = cmd.config.ApiEndpoint()
 	}
 
@@ -103,10 +105,12 @@ func (cmd Login) setApi(c *cli.Context) error {
 		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(api))
 	}
 
+	cmd.config.SetSSLDisabled(disableSSL)
 	endpoint, err := cmd.endpointRepo.UpdateEndpoint(api)
 
 	if err != nil {
 		cmd.config.SetApiEndpoint("")
+		cmd.config.SetSSLDisabled(false)
 	} else if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}
