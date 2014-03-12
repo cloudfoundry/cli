@@ -14,9 +14,8 @@ import (
 //  - `**` matches zero or more chars in zero or more components
 //  - any other sequence matches itself
 type Glob struct {
-	Pattern string         // original glob pattern
-	s       string         // translated to regexp pattern
-	r       *regexp.Regexp // compiled regexp
+	pattern string         // original glob pattern
+	regexp  *regexp.Regexp // compiled regexp
 }
 
 const charPat = `[^/]`
@@ -76,7 +75,7 @@ func CompileGlob(pat string) (glob Glob, err error) {
 	if err != nil {
 		return
 	}
-	glob = Glob{pat, s, r}
+	glob = Glob{pat, r}
 	return
 }
 
@@ -90,8 +89,12 @@ func MustCompileGlob(pat string) Glob {
 	return g
 }
 
+func (g Glob) String() string {
+	return g.pattern
+}
+
 func (g Glob) Match(path string) bool {
-	return g.r.MatchString(toSlash(path))
+	return g.regexp.MatchString(toSlash(path))
 }
 
 type GlobError string
