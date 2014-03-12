@@ -1,7 +1,7 @@
 package api
 
 import (
-	"cf"
+	"cf/app_files"
 	"cf/configuration"
 	"cf/net"
 )
@@ -45,7 +45,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
-	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, cf.ApplicationZipper{})
+	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
 	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
@@ -69,7 +69,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.userProvidedServiceInstanceRepo = NewCCUserProvidedServiceInstanceRepository(config, cloudControllerGateway)
 	loc.userRepo = NewCloudControllerUserRepository(config, uaaGateway, cloudControllerGateway)
 	loc.buildpackRepo = NewCloudControllerBuildpackRepository(config, cloudControllerGateway)
-	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, cf.ApplicationZipper{})
+	loc.buildpackBitsRepo = NewCloudControllerBuildpackBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
 
 	return
 }

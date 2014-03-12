@@ -2,7 +2,7 @@ package api_test
 
 import (
 	"archive/zip"
-	"cf"
+	"cf/app_files"
 	. "cf/api"
 	"cf/errors"
 	"cf/models"
@@ -34,7 +34,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 	It("TestUploadWithInvalidDirectory", func() {
 		config := testconfig.NewRepository()
 		gateway := net.NewCloudControllerGateway(config)
-		zipper := &cf.ApplicationZipper{}
+		zipper := &app_files.ApplicationZipper{}
 
 		repo := NewCloudControllerApplicationBitsRepository(config, gateway, zipper)
 
@@ -257,7 +257,7 @@ func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Appli
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway(configRepo)
 	gateway.PollingThrottle = time.Duration(0)
-	zipper := cf.ApplicationZipper{}
+	zipper := app_files.ApplicationZipper{}
 	repo := NewCloudControllerApplicationBitsRepository(configRepo, gateway, zipper)
 
 	var (

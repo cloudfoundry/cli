@@ -2,7 +2,7 @@ package api_test
 
 import (
 	"archive/zip"
-	"cf"
+	"cf/app_files"
 	. "cf/api"
 	"cf/configuration"
 	"cf/models"
@@ -38,7 +38,7 @@ var _ = Describe("BuildpackBitsRepository", func() {
 
 		buildpacksDir = filepath.Join(pwd, "../../fixtures/buildpacks")
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, cf.ApplicationZipper{})
+		repo = NewCloudControllerBuildpackBitsRepository(configRepo, gateway, app_files.ApplicationZipper{})
 		buildpack = models.Buildpack{Name: "my-cool-buildpack", Guid: "my-cool-buildpack-guid"}
 
 		testServer, testServerHandler = testnet.NewServer([]testnet.TestRequest{uploadBuildpackRequest()})

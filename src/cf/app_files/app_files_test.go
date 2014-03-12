@@ -1,4 +1,4 @@
-package cf_test
+package app_files_test
 
 import (
 	. "cf"
