@@ -25,7 +25,7 @@ var _ = Describe("Zipper", func() {
 			workingDir, err := os.Getwd()
 			Expect(err).NotTo(HaveOccurred())
 
-			dir := filepath.Join(workingDir, "../fixtures/zip/")
+			dir := filepath.Join(workingDir, "../../fixtures/zip/")
 			err = os.Chmod(filepath.Join(dir, "subDir/bar.txt"), 0666)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -77,7 +77,7 @@ var _ = Describe("Zipper", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			zipper := ApplicationZipper{}
-			fixture := filepath.Join(dir, "../fixtures/applications/example-app.zip")
+			fixture := filepath.Join(dir, "../../fixtures/applications/example-app.zip")
 			err = zipper.Zip(fixture, zipFile)
 			Expect(err).NotTo(HaveOccurred())
 
