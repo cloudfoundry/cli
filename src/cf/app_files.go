@@ -20,8 +20,6 @@ var DefaultIgnoreFiles = []string{
 	"_darcs",
 }
 
-type Globs []glob.Glob
-
 func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 	dir, err = filepath.Abs(dir)
 	if err != nil {
@@ -116,9 +114,9 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	return
 }
 
-func fileShouldBeIgnored(exclusions Globs, inclusions Globs, relPath string) bool {
+func fileShouldBeIgnored(exclusions, inclusions []glob.Glob, relPath string) bool {
 	for _, inclusion := range inclusions {
-		if strings.HasPrefix(inclusion.Pattern, "/") && !strings.HasPrefix(relPath, "/") {
+		if strings.HasPrefix(inclusion.String(), "/") && !strings.HasPrefix(relPath, "/") {
 			relPath = "/" + relPath
 		}
 
@@ -128,7 +126,7 @@ func fileShouldBeIgnored(exclusions Globs, inclusions Globs, relPath string) boo
 	}
 
 	for _, exclusion := range exclusions {
-		if strings.HasPrefix(exclusion.Pattern, "/") && !strings.HasPrefix(relPath, "/") {
+		if strings.HasPrefix(exclusion.String(), "/") && !strings.HasPrefix(relPath, "/") {
 			relPath = "/" + relPath
 		}
 
@@ -139,7 +137,7 @@ func fileShouldBeIgnored(exclusions Globs, inclusions Globs, relPath string) boo
 	return false
 }
 
-func readCfIgnoreGlobs(dir string) (exclusions Globs, inclusions Globs) {
+func readCfIgnoreGlobs(dir string) (exclusions []glob.Glob, inclusions []glob.Glob) {
 	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
 	if err != nil {
 		return
@@ -167,7 +165,7 @@ func readCfIgnoreGlobs(dir string) (exclusions Globs, inclusions Globs) {
 	return
 }
 
-func globsForPattern(cfignorePattern string) (globs Globs) {
+func globsForPattern(cfignorePattern string) (globs []glob.Glob) {
 	globs = append(globs, glob.MustCompileGlob(cfignorePattern))
 	globs = append(globs, glob.MustCompileGlob(path.Join(cfignorePattern, "*")))
 	globs = append(globs, glob.MustCompileGlob(path.Join(cfignorePattern, "**", "*")))
