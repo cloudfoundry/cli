@@ -86,8 +86,7 @@ func CountFiles(directory string) uint64 {
 type walkAppFileFunc func(fileName, fullPath string) (err error)
 
 func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
-	exclusions := readCfIgnoreExclusions(dir)
-	inclusions := readCfIgnoreInclusions(dir)
+	exclusions, inclusions := readCfIgnoreGlobs(dir)
 	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
 		err = inErr
 		if err != nil {
@@ -127,6 +126,7 @@ func fileShouldBeIgnored(exclusions Globs, inclusions Globs, relPath string) boo
 			return false
 		}
 	}
+
 	for _, exclusion := range exclusions {
 		if strings.HasPrefix(exclusion.Pattern, "/") && !strings.HasPrefix(relPath, "/") {
 			relPath = "/" + relPath
@@ -139,52 +139,29 @@ func fileShouldBeIgnored(exclusions Globs, inclusions Globs, relPath string) boo
 	return false
 }
 
-func readCfIgnoreExclusions(dir string) (exclusions Globs) {
+func readCfIgnoreGlobs(dir string) (exclusions Globs, inclusions Globs) {
 	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
 	if err != nil {
 		return
 	}
 
-	ignores := strings.Split(fileutils.ReadFile(cfIgnore), "\n")
-	ignores = append(DefaultIgnoreFiles, ignores...)
+	lines := strings.Split(fileutils.ReadFile(cfIgnore), "\n")
+	lines = append(DefaultIgnoreFiles, lines...)
 
-	for _, pattern := range ignores {
+	for _, pattern := range lines {
 		pattern = strings.TrimSpace(pattern)
 		if pattern == "" {
 			continue
 		}
-		// Lines commencing with ! describe explicit inclusion patterns
-		if strings.Index(pattern, "!") == 0 {
-			continue
-		}
 
-		pattern = path.Clean(pattern)
-		patternExclusions := globsForPattern(pattern)
-		exclusions = append(exclusions, patternExclusions...)
-	}
-	return
-}
-
-func readCfIgnoreInclusions(dir string) (inclusions Globs) {
-	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
-	if err != nil {
-		return
-	}
-
-	includes := strings.Split(fileutils.ReadFile(cfIgnore), "\n")
-	for _, pattern := range includes {
-		pattern = strings.TrimSpace(pattern)
-		if pattern == "" {
-			continue
+		if strings.HasPrefix(pattern, "!") {
+			pattern := pattern[1:]
+			pattern = path.Clean(pattern)
+			inclusions = append(inclusions, globsForPattern(pattern)...)
+		} else {
+			pattern = path.Clean(pattern)
+			exclusions = append(exclusions, globsForPattern(pattern)...)
 		}
-		// Lines commencing with ! describe explicit inclusion patterns
-		if strings.Index(pattern, "!") != 0 {
-			continue
-		}
-		pattern := pattern[1:]
-		pattern = path.Clean(pattern)
-		patternInclusions := globsForPattern(pattern)
-		inclusions = append(inclusions, patternInclusions...)
 	}
 
 	return
