@@ -3,7 +3,7 @@ package app_files_test
 import (
 	"archive/zip"
 	"bytes"
-	. "cf"
+	. "cf/app_files"
 	"fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
