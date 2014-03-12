@@ -1,7 +1,7 @@
 package app_files_test
 
 import (
-	. "cf"
+	. "cf/app_files"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"path"
@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("AppFiles", func() {
-	fixturePath := filepath.Join("..", "fixtures", "applications")
+	fixturePath := filepath.Join("..", "..", "fixtures", "applications")
 
 	Describe("AppFilesInDir", func() {
 		It("all files have '/' path separators", func() {
