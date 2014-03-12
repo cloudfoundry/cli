@@ -318,6 +318,12 @@ var _ = Describe("Login Command", func() {
 			})
 		}
 
+		var ItDoesntShowTheTarget = func() {
+			It("does not show the target info", func() {
+				Expect(ui.ShowConfigurationCalled).To(BeFalse())
+			})
+		}
+
 		var ItFails = func() {
 			It("fails", func() {
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -369,7 +375,7 @@ var _ = Describe("Login Command", func() {
 					})
 
 					ItFails()
-					ItShowsTheTarget()
+					ItDoesntShowTheTarget()
 
 					It("clears the entire config", func() {
 						Expect(Config.ApiEndpoint()).To(BeEmpty())
@@ -404,7 +410,7 @@ var _ = Describe("Login Command", func() {
 					})
 
 					ItFails()
-					ItShowsTheTarget()
+					ItDoesntShowTheTarget()
 
 					It("clears the entire config", func() {
 						Expect(Config.ApiEndpoint()).To(BeEmpty())
@@ -429,9 +435,9 @@ var _ = Describe("Login Command", func() {
 						{"SSL cert", "https://bobs-burgers.com"},
 						{"TIP", "--skip-ssl-validation"},
 					})
-
-					Expect(ui.ShowConfigurationCalled).To(BeFalse())
 				})
+
+				ItDoesntShowTheTarget()
 			})
 		})
 
