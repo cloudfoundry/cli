@@ -2,16 +2,15 @@ package app_files
 
 import (
 	"glob"
-	"strings"
 	"path"
+	"strings"
 )
-
 
 type CfIgnore interface {
 	FileShouldBeIgnored(path string) bool
 }
 
-func NewCfIgnore(text string) (CfIgnore) {
+func NewCfIgnore(text string) CfIgnore {
 	patterns := []ignorePattern{}
 	inclusions := []glob.Glob{}
 	exclusions := []glob.Glob{}
@@ -34,7 +33,6 @@ func NewCfIgnore(text string) (CfIgnore) {
 			exclusions = append(exclusions, globsForPattern(pattern)...)
 		}
 	}
-
 
 	for _, glob := range exclusions {
 		patterns = append(patterns, ignorePattern{true, glob})
@@ -78,7 +76,7 @@ func globsForPattern(pattern string) (globs []glob.Glob) {
 
 type ignorePattern struct {
 	exclude bool
-	glob glob.Glob
+	glob    glob.Glob
 }
 
 type cfIgnore []ignorePattern

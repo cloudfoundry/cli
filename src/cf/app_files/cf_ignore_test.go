@@ -1,0 +1,42 @@
+package app_files_test
+
+import (
+	. "cf/app_files"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("CF Ignore", func() {
+	It("excludes files based on exact path matches", func() {
+		ignore := NewCfIgnore(`the-dir/the-path`)
+		Expect(ignore.FileShouldBeIgnored("the-dir/the-path")).To(BeTrue())
+	})
+
+	It("excludes the contents of directories based on exact path matches", func() {
+		ignore := NewCfIgnore(`dir1/dir2`)
+		Expect(ignore.FileShouldBeIgnored("dir1/dir2/the-file")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("dir1/dir2/dir3/the-file")).To(BeTrue())
+	})
+
+	It("excludes files based on star patterns", func() {
+		ignore := NewCfIgnore(`dir1/*.so`)
+		Expect(ignore.FileShouldBeIgnored("dir1/file1.so")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("dir1/file2.cc")).To(BeFalse())
+	})
+
+	It("excludes files based on double-star patterns", func() {
+		ignore := NewCfIgnore(`dir1/**/*.so`)
+		Expect(ignore.FileShouldBeIgnored("dir1/dir2/dir3/file1.so")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("different-dir/dir2/file.so")).To(BeFalse())
+	})
+
+	It("allows files to be explicitly included", func() {
+		ignore := NewCfIgnore(`
+node_modules/*
+!node_modules/common
+`)
+
+		Expect(ignore.FileShouldBeIgnored("node_modules/something-else")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("node_modules/common")).To(BeFalse())
+	})
+})
