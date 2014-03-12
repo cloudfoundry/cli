@@ -1,4 +1,4 @@
-package cf
+package app_files
 
 import (
 	"archive/zip"

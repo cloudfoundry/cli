@@ -2,7 +2,7 @@ package api
 
 import (
 	"archive/zip"
-	"cf"
+	"cf/app_files"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -27,11 +27,11 @@ type BuildpackBitsRepository interface {
 type CloudControllerBuildpackBitsRepository struct {
 	config       configuration.Reader
 	gateway      net.Gateway
-	zipper       cf.Zipper
+	zipper       app_files.Zipper
 	TrustedCerts []tls.Certificate
 }
 
-func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerBuildpackBitsRepository) {
+func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gateway net.Gateway, zipper app_files.Zipper) (repo CloudControllerBuildpackBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper

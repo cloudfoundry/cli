@@ -3,7 +3,7 @@ package api
 import (
 	"archive/zip"
 	"bytes"
-	"cf"
+	"cf/app_files"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -32,10 +32,10 @@ type ApplicationBitsRepository interface {
 type CloudControllerApplicationBitsRepository struct {
 	config  configuration.Reader
 	gateway net.Gateway
-	zipper  cf.Zipper
+	zipper  app_files.Zipper
 }
 
-func NewCloudControllerApplicationBitsRepository(config configuration.Reader, gateway net.Gateway, zipper cf.Zipper) (repo CloudControllerApplicationBitsRepository) {
+func NewCloudControllerApplicationBitsRepository(config configuration.Reader, gateway net.Gateway, zipper app_files.Zipper) (repo CloudControllerApplicationBitsRepository) {
 	repo.config = config
 	repo.gateway = gateway
 	repo.zipper = zipper
@@ -80,7 +80,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 				apiErr = errors.NewErrorWithError("Error zipping application", err)
 				return
 			}
-			cb(appDir, uint64(stat.Size()), cf.CountFiles(uploadDir))
+			cb(appDir, uint64(stat.Size()), app_files.CountFiles(uploadDir))
 
 			apiErr = repo.uploadBits(appGuid, zipFile, presentResourcesJson)
 			if apiErr != nil {
@@ -138,7 +138,7 @@ func (repo CloudControllerApplicationBitsRepository) sourceDir(appDir string, cb
 
 func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir string, uploadDir string) (presentResourcesJson []byte, err error) {
 	// Find which files need to be uploaded
-	allAppFiles, err := cf.AppFilesInDir(appDir)
+	allAppFiles, err := app_files.AppFilesInDir(appDir)
 	if err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (repo CloudControllerApplicationBitsRepository) copyUploadableFiles(appDir 
 	}
 
 	// Copy files into a temporary directory and return it
-	err = cf.CopyFiles(appFilesToUpload, appDir, uploadDir)
+	err = app_files.CopyFiles(appFilesToUpload, appDir, uploadDir)
 	if err != nil {
 		return
 	}
