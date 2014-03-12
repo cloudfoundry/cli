@@ -2,8 +2,8 @@ package api_test
 
 import (
 	"archive/zip"
-	"cf/app_files"
 	. "cf/api"
+	"cf/app_files"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
