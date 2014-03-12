@@ -5,11 +5,8 @@ import (
 	"crypto/sha1"
 	"fileutils"
 	"fmt"
-	"glob"
 	"os"
-	"path"
 	"path/filepath"
-	"strings"
 )
 
 var DefaultIgnoreFiles = []string{
@@ -84,7 +81,7 @@ func CountFiles(directory string) uint64 {
 type walkAppFileFunc func(fileName, fullPath string) (err error)
 
 func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
-	exclusions, inclusions := readCfIgnoreGlobs(dir)
+	cfIgnore := loadIgnoreFile(dir)
 	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
 		err = inErr
 		if err != nil {
@@ -101,11 +98,10 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 
 		fileRelativePath, _ := filepath.Rel(dir, fullPath)
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
-		if fileShouldBeIgnored(exclusions, inclusions, fileRelativeUnixPath) {
-			return
-		}
 
-		err = onEachFile(fileRelativePath, fullPath)
+		if !cfIgnore.FileShouldBeIgnored(fileRelativeUnixPath) {
+			err = onEachFile(fileRelativePath, fullPath)
+		}
 
 		return
 	}
@@ -114,66 +110,11 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	return
 }
 
-func fileShouldBeIgnored(exclusions, inclusions []glob.Glob, relPath string) bool {
-	for _, inclusion := range inclusions {
-		if strings.HasPrefix(inclusion.String(), "/") && !strings.HasPrefix(relPath, "/") {
-			relPath = "/" + relPath
-		}
-
-		if inclusion.Match(relPath) {
-			return false
-		}
+func loadIgnoreFile(dir string) CfIgnore {
+	file, err := os.Open(filepath.Join(dir, ".cfignore"))
+	if err == nil {
+		return NewCfIgnore(fileutils.ReadFile(file))
+	} else {
+		return NewCfIgnore("")
 	}
-
-	for _, exclusion := range exclusions {
-		if strings.HasPrefix(exclusion.String(), "/") && !strings.HasPrefix(relPath, "/") {
-			relPath = "/" + relPath
-		}
-
-		if exclusion.Match(relPath) {
-			return true
-		}
-	}
-	return false
-}
-
-func readCfIgnoreGlobs(dir string) (exclusions []glob.Glob, inclusions []glob.Glob) {
-	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
-	if err != nil {
-		return
-	}
-
-	lines := strings.Split(fileutils.ReadFile(cfIgnore), "\n")
-	lines = append(DefaultIgnoreFiles, lines...)
-
-	for _, pattern := range lines {
-		pattern = strings.TrimSpace(pattern)
-		if pattern == "" {
-			continue
-		}
-
-		if strings.HasPrefix(pattern, "!") {
-			pattern := pattern[1:]
-			pattern = path.Clean(pattern)
-			inclusions = append(inclusions, globsForPattern(pattern)...)
-		} else {
-			pattern = path.Clean(pattern)
-			exclusions = append(exclusions, globsForPattern(pattern)...)
-		}
-	}
-
-	return
-}
-
-func globsForPattern(cfignorePattern string) (globs []glob.Glob) {
-	globs = append(globs, glob.MustCompileGlob(cfignorePattern))
-	globs = append(globs, glob.MustCompileGlob(path.Join(cfignorePattern, "*")))
-	globs = append(globs, glob.MustCompileGlob(path.Join(cfignorePattern, "**", "*")))
-
-	if !strings.HasPrefix(cfignorePattern, "/") {
-		globs = append(globs, glob.MustCompileGlob(path.Join("**", cfignorePattern)))
-		globs = append(globs, glob.MustCompileGlob(path.Join("**", cfignorePattern, "*")))
-		globs = append(globs, glob.MustCompileGlob(path.Join("**", cfignorePattern, "**", "*")))
-	}
-	return
 }
