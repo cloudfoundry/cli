@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"path/filepath"
+	"path"
 )
 
 var _ = Describe("AppFiles", func() {
@@ -31,8 +32,8 @@ var _ = Describe("AppFiles", func() {
 			}
 
 			Expect(paths).To(Equal([]string{
-				filepath.Join("dir1", "child-dir", "file3.txt"),
-				filepath.Join("dir1", "file1.txt"),
+				path.Join("dir1", "child-dir", "file3.txt"),
+				path.Join("dir1", "file1.txt"),
 			}))
 		})
 	})
