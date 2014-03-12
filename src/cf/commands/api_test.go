@@ -63,6 +63,7 @@ var _ = Describe("api command", func() {
 			BeforeEach(func() {
 				config.SetApiEndpoint("https://api.run.pivotal.io")
 				config.SetApiVersion("2.0")
+				config.SetSSLDisabled(true)
 
 				ui = new(testterm.FakeUI)
 				cmd = NewApi(ui, config, endpointRepo)
@@ -78,6 +79,10 @@ var _ = Describe("api command", func() {
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"https://api.run.pivotal.io", "2.0"},
 				})
+			})
+
+			It("should not change the SSL setting in the config", func() {
+				Expect(config.IsSSLDisabled()).To(BeTrue())
 			})
 		})
 
