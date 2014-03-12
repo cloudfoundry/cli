@@ -86,7 +86,8 @@ func CountFiles(directory string) uint64 {
 type walkAppFileFunc func(fileName, fullPath string) (err error)
 
 func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
-	exclusions := readCfIgnore(dir)
+	exclusions := readCfIgnoreExclusions(dir)
+	inclusions := readCfIgnoreInclusions(dir)
 	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
 		err = inErr
 		if err != nil {
@@ -103,7 +104,7 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 
 		fileRelativePath, _ := filepath.Rel(dir, fullPath)
 		fileRelativeUnixPath := filepath.ToSlash(fileRelativePath)
-		if fileShouldBeIgnored(exclusions, fileRelativeUnixPath) {
+		if fileShouldBeIgnored(exclusions, inclusions, fileRelativeUnixPath) {
 			return
 		}
 
@@ -116,7 +117,16 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 	return
 }
 
-func fileShouldBeIgnored(exclusions Globs, relPath string) bool {
+func fileShouldBeIgnored(exclusions Globs, inclusions Globs, relPath string) bool {
+	for _, inclusion := range inclusions {
+		if strings.HasPrefix(inclusion.Pattern, "/") && !strings.HasPrefix(relPath, "/") {
+			relPath = "/" + relPath
+		}
+
+		if inclusion.Match(relPath) {
+			return false
+		}
+	}
 	for _, exclusion := range exclusions {
 		if strings.HasPrefix(exclusion.Pattern, "/") && !strings.HasPrefix(relPath, "/") {
 			relPath = "/" + relPath
@@ -129,7 +139,7 @@ func fileShouldBeIgnored(exclusions Globs, relPath string) bool {
 	return false
 }
 
-func readCfIgnore(dir string) (exclusions Globs) {
+func readCfIgnoreExclusions(dir string) (exclusions Globs) {
 	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
 	if err != nil {
 		return
@@ -143,22 +153,52 @@ func readCfIgnore(dir string) (exclusions Globs) {
 		if pattern == "" {
 			continue
 		}
+		// Lines commencing with ! describe explicit inclusion patterns
+		if strings.Index(pattern, "!") == 0 {
+			continue
+		}
+
 		pattern = path.Clean(pattern)
-		patternExclusions := exclusionsForPattern(pattern)
+		patternExclusions := globsForPattern(pattern)
 		exclusions = append(exclusions, patternExclusions...)
 	}
 	return
 }
 
-func exclusionsForPattern(cfignorePattern string) (exclusions Globs) {
-	exclusions = append(exclusions, glob.MustCompileGlob(cfignorePattern))
-	exclusions = append(exclusions, glob.MustCompileGlob(path.Join(cfignorePattern, "*")))
-	exclusions = append(exclusions, glob.MustCompileGlob(path.Join(cfignorePattern, "**", "*")))
+func readCfIgnoreInclusions(dir string) (inclusions Globs) {
+	cfIgnore, err := os.Open(filepath.Join(dir, ".cfignore"))
+	if err != nil {
+		return
+	}
+
+	includes := strings.Split(fileutils.ReadFile(cfIgnore), "\n")
+	for _, pattern := range includes {
+		pattern = strings.TrimSpace(pattern)
+		if pattern == "" {
+			continue
+		}
+		// Lines commencing with ! describe explicit inclusion patterns
+		if strings.Index(pattern, "!") != 0 {
+			continue
+		}
+		pattern := pattern[1:]
+		pattern = path.Clean(pattern)
+		patternInclusions := globsForPattern(pattern)
+		inclusions = append(inclusions, patternInclusions...)
+	}
+
+	return
+}
+
+func globsForPattern(cfignorePattern string) (globs Globs) {
+	globs = append(globs, glob.MustCompileGlob(cfignorePattern))
+	globs = append(globs, glob.MustCompileGlob(path.Join(cfignorePattern, "*")))
+	globs = append(globs, glob.MustCompileGlob(path.Join(cfignorePattern, "**", "*")))
 
 	if !strings.HasPrefix(cfignorePattern, "/") {
-		exclusions = append(exclusions, glob.MustCompileGlob(path.Join("**", cfignorePattern)))
-		exclusions = append(exclusions, glob.MustCompileGlob(path.Join("**", cfignorePattern, "*")))
-		exclusions = append(exclusions, glob.MustCompileGlob(path.Join("**", cfignorePattern, "**", "*")))
+		globs = append(globs, glob.MustCompileGlob(path.Join("**", cfignorePattern)))
+		globs = append(globs, glob.MustCompileGlob(path.Join("**", cfignorePattern, "*")))
+		globs = append(globs, glob.MustCompileGlob(path.Join("**", cfignorePattern, "**", "*")))
 	}
 	return
 }
