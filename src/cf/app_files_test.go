@@ -4,8 +4,8 @@ import (
 	. "cf"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"path/filepath"
 	"path"
+	"path/filepath"
 )
 
 var _ = Describe("AppFiles", func() {

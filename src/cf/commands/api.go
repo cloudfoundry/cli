@@ -43,39 +43,39 @@ func (cmd Api) Run(c *cli.Context) {
 		return
 	}
 
-	cmd.config.SetSSLDisabled(c.Bool("skip-ssl-validation"))
+	endpoint := c.Args()[0]
 
-	givenEndpoint := c.Args()[0]
-	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(givenEndpoint))
-	err := cmd.setApiEndpoint(givenEndpoint)
+	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(endpoint))
+	cmd.setApiEndpoint(endpoint, c.Bool("skip-ssl-validation"))
+	cmd.ui.Ok()
 
-	switch typedErr := err.(type) {
-	case nil:
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-		cmd.ui.ShowConfiguration(cmd.config)
-	case *errors.InvalidSSLCert:
-		cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s api --skip-ssl-validation", cf.Name()))
-		tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfApiCommand)
-		cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
-	default:
-		cmd.ui.Failed(typedErr.Error())
-	}
+	cmd.ui.Say("")
+	cmd.ui.ShowConfiguration(cmd.config)
 }
 
-func (cmd Api) setApiEndpoint(endpoint string) error {
+func (cmd Api) setApiEndpoint(endpoint string, skipSSL bool) {
 	if strings.HasSuffix(endpoint, "/") {
 		endpoint = strings.TrimSuffix(endpoint, "/")
 	}
 
+	cmd.config.SetSSLDisabled(skipSSL)
 	endpoint, err := cmd.endpointRepo.UpdateEndpoint(endpoint)
+
 	if err != nil {
-		return err
+		cmd.config.SetApiEndpoint("")
+		cmd.config.SetSSLDisabled(false)
+
+		switch typedErr := err.(type) {
+		case *errors.InvalidSSLCert:
+			cfApiCommand := terminal.CommandColor(fmt.Sprintf("%s api --skip-ssl-validation", cf.Name()))
+			tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfApiCommand)
+			cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
+		default:
+			cmd.ui.Failed(typedErr.Error())
+		}
 	}
 
 	if !strings.HasPrefix(endpoint, "https://") {
 		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
 	}
-
-	return nil
 }

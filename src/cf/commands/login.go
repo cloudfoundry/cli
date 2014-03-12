@@ -1,30 +1,25 @@
 package commands
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"fmt"
 	"github.com/codegangsta/cli"
 	"strconv"
-	"strings"
 )
 
 const maxLoginTries = 3
 const maxChoices = 50
 
 type Login struct {
-	ui                      terminal.UI
-	config                  configuration.ReadWriter
-	authenticator           api.AuthenticationRepository
-	endpointRepo            api.EndpointRepository
-	orgRepo                 api.OrganizationRepository
-	spaceRepo               api.SpaceRepository
-	shouldShowConfiguration bool
+	ui            terminal.UI
+	config        configuration.ReadWriter
+	authenticator api.AuthenticationRepository
+	endpointRepo  api.EndpointRepository
+	orgRepo       api.OrganizationRepository
+	spaceRepo     api.SpaceRepository
 }
 
 func NewLogin(ui terminal.UI,
@@ -34,13 +29,12 @@ func NewLogin(ui terminal.UI,
 	orgRepo api.OrganizationRepository,
 	spaceRepo api.SpaceRepository) (cmd Login) {
 	return Login{
-		ui:                      ui,
-		config:                  config,
-		authenticator:           authenticator,
-		endpointRepo:            endpointRepo,
-		orgRepo:                 orgRepo,
-		spaceRepo:               spaceRepo,
-		shouldShowConfiguration: true,
+		ui:            ui,
+		config:        config,
+		authenticator: authenticator,
+		endpointRepo:  endpointRepo,
+		orgRepo:       orgRepo,
+		spaceRepo:     spaceRepo,
 	}
 }
 
@@ -51,58 +45,38 @@ func (cmd Login) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 func (cmd Login) Run(c *cli.Context) {
 	cmd.config.ClearSession()
 
+	endpoint, skipSSL := cmd.decideEndpoint(c)
+	NewApi(cmd.ui, cmd.config, cmd.endpointRepo).setApiEndpoint(endpoint, skipSSL)
+
 	defer func() {
-		if cmd.shouldShowConfiguration {
-			cmd.ui.Say("")
-			cmd.ui.ShowConfiguration(cmd.config)
-		}
+		cmd.ui.Say("")
+		cmd.ui.ShowConfiguration(cmd.config)
 	}()
 
-	(&cmd).setApi(c)
 	cmd.authenticate(c)
 
 	orgIsSet := cmd.setOrganization(c)
+
 	if orgIsSet {
 		cmd.setSpace(c)
 	}
 }
 
-func (cmd *Login) setApi(c *cli.Context) {
-	api := c.String("a")
+func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
+	endpoint := c.String("a")
 	skipSSL := c.Bool("skip-ssl-validation")
-
-	if api == "" {
-		api = cmd.config.ApiEndpoint()
+	if endpoint == "" {
+		endpoint = cmd.config.ApiEndpoint()
 		skipSSL = cmd.config.IsSSLDisabled() || skipSSL
 	}
 
-	if api == "" {
-		api = cmd.ui.Ask("API endpoint%s", terminal.PromptColor(">"))
+	if endpoint == "" {
+		endpoint = cmd.ui.Ask("API endpoint%s", terminal.PromptColor(">"))
 	} else {
-		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(api))
+		cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(endpoint))
 	}
 
-	cmd.config.SetSSLDisabled(skipSSL)
-	endpoint, err := cmd.endpointRepo.UpdateEndpoint(api)
-
-	if err != nil {
-		cmd.config.SetApiEndpoint("")
-		cmd.config.SetSSLDisabled(false)
-
-		switch typedErr := err.(type) {
-		case *errors.InvalidSSLCert:
-			cmd.shouldShowConfiguration = false
-			cfLoginCommand := terminal.CommandColor(fmt.Sprintf("%s login --skip-ssl-validation", cf.Name()))
-			tipMessage := fmt.Sprintf("TIP: Use '%s' to continue with an insecure API endpoint", cfLoginCommand)
-			cmd.ui.Failed("Invalid SSL Cert for %s\n%s", typedErr.URL, tipMessage)
-		default:
-			cmd.ui.Failed("Invalid API endpoint.\n%s", err.Error())
-		}
-	}
-
-	if !strings.HasPrefix(endpoint, "https://") {
-		cmd.ui.Say(terminal.WarningColor("Warning: Insecure http API endpoint detected: secure https API endpoints are recommended\n"))
-	}
+	return endpoint, skipSSL
 }
 
 func (cmd Login) authenticate(c *cli.Context) {

@@ -121,11 +121,8 @@ var _ = Describe("api command", func() {
 		})
 
 		Context("when the ssl certificate is valid", func() {
-			BeforeEach(func() {
-				ui = callApi([]string{"https://example.com"}, config, endpointRepo)
-			})
-
 			It("updates the api endpoint with the given url", func() {
+				ui = callApi([]string{"https://example.com"}, config, endpointRepo)
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Setting api endpoint to", "example.com"},
@@ -134,6 +131,7 @@ var _ = Describe("api command", func() {
 			})
 
 			It("trims trailing slashes from the api endpoint", func() {
+				ui = callApi([]string{"https://example.com/"}, config, endpointRepo)
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("https://example.com"))
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Setting api endpoint to", "example.com"},
