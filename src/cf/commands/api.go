@@ -30,8 +30,6 @@ func (cmd Api) GetRequirements(reqFactory requirements.Factory, c *cli.Context) 
 }
 
 func (cmd Api) Run(c *cli.Context) {
-	cmd.config.SetSSLDisabled(c.Bool("skip-ssl-validation"))
-
 	if len(c.Args()) == 0 {
 		if cmd.config.ApiEndpoint() == "" {
 			cmd.ui.Say(fmt.Sprintf("No api endpoint set. Use '%s' to set an endpoint", terminal.CommandColor(cf.Name()+" api")))
@@ -44,6 +42,8 @@ func (cmd Api) Run(c *cli.Context) {
 		}
 		return
 	}
+
+	cmd.config.SetSSLDisabled(c.Bool("skip-ssl-validation"))
 
 	givenEndpoint := c.Args()[0]
 	cmd.ui.Say("Setting api endpoint to %s...", terminal.EntityNameColor(givenEndpoint))
