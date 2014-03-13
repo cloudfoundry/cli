@@ -46,21 +46,6 @@ func CopyPathToPath(fromPath, toPath string) (err error) {
 	return CopyPathToWriter(fromPath, dst)
 }
 
-func IsDirEmpty(dir string) (isEmpty bool, err error) {
-	dirFile, err := os.Open(dir)
-	if err != nil {
-		return
-	}
-
-	_, readErr := dirFile.Readdirnames(1)
-	if readErr != nil {
-		isEmpty = true
-	} else {
-		isEmpty = false
-	}
-	return
-}
-
 func CopyPathToWriter(originalFilePath string, targetWriter io.Writer) (err error) {
 	originalFile, err := os.Open(originalFilePath)
 	if err != nil {
@@ -84,6 +69,21 @@ func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
 	defer destFile.Close()
 
 	_, err = io.Copy(destFile, src)
+	return
+}
+
+func IsDirEmpty(dir string) (isEmpty bool, err error) {
+	dirFile, err := os.Open(dir)
+	if err != nil {
+		return
+	}
+
+	_, readErr := dirFile.Readdirnames(1)
+	if readErr != nil {
+		isEmpty = true
+	} else {
+		isEmpty = false
+	}
 	return
 }
 
