@@ -37,11 +37,18 @@ func Read(file *os.File) string {
 }
 
 func CopyPathToPath(fromPath, toPath string) (err error) {
+	srcFileInfo, err := os.Stat(fromPath)
+	if err != nil {
+		return
+	}
+
 	dst, err := Create(toPath)
 	if err != nil {
 		return
 	}
 	defer dst.Close()
+
+	dst.Chmod(srcFileInfo.Mode())
 
 	return CopyPathToWriter(fromPath, dst)
 }
@@ -85,18 +92,4 @@ func IsDirEmpty(dir string) (isEmpty bool, err error) {
 		isEmpty = false
 	}
 	return
-}
-
-func SetMode(dest string, fileMode os.FileMode) (err error) {
-	err = os.Chmod(dest, fileMode)
-	return
-}
-
-func SetModeFromPath(dest string, src string) (err error) {
-	fileInfo, err := os.Stat(src)
-	if err != nil {
-		return
-	}
-
-	return SetMode(dest, fileInfo.Mode())
 }
