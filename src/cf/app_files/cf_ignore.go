@@ -12,33 +12,25 @@ type CfIgnore interface {
 
 func NewCfIgnore(text string) CfIgnore {
 	patterns := []ignorePattern{}
-	inclusions := []glob.Glob{}
-	exclusions := []glob.Glob{}
-
 	lines := strings.Split(text, "\n")
 	lines = append(DefaultIgnoreFiles, lines...)
 
-	for _, pattern := range lines {
-		pattern = strings.TrimSpace(pattern)
-		if pattern == "" {
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
 			continue
 		}
 
-		if strings.HasPrefix(pattern, "!") {
-			pattern := pattern[1:]
-			pattern = path.Clean(pattern)
-			inclusions = append(inclusions, globsForPattern(pattern)...)
-		} else {
-			pattern = path.Clean(pattern)
-			exclusions = append(exclusions, globsForPattern(pattern)...)
+		ignore := true
+		if strings.HasPrefix(line, "!") {
+			line = line[1:]
+			ignore = false
 		}
-	}
 
-	for _, glob := range exclusions {
-		patterns = append(patterns, ignorePattern{true, glob})
-	}
-	for _, glob := range inclusions {
-		patterns = append(patterns, ignorePattern{false, glob})
+		line = path.Clean(line)
+		for _, p := range globsForPattern(line) {
+			patterns = append(patterns, ignorePattern{ignore, p})
+		}
 	}
 
 	return cfIgnore(patterns)

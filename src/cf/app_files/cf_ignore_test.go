@@ -39,4 +39,15 @@ node_modules/*
 		Expect(ignore.FileShouldBeIgnored("node_modules/something-else")).To(BeTrue())
 		Expect(ignore.FileShouldBeIgnored("node_modules/common")).To(BeFalse())
 	})
+
+	It("applies the patterns in order from top to bottom", func() {
+		ignore := NewCfIgnore(`
+stuff/*
+!stuff/*.c
+stuff/exclude.c`)
+
+		Expect(ignore.FileShouldBeIgnored("stuff/something.txt")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("stuff/exclude.c")).To(BeTrue())
+		Expect(ignore.FileShouldBeIgnored("stuff/include.c")).To(BeFalse())
+	})
 })
