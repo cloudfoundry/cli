@@ -189,7 +189,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(appDir, destDir 
 				return
 			}
 
-			err = fileutils.SetExecutableBits(destFilePath, f.FileInfo())
+			err = fileutils.SetMode(destFilePath, f.FileInfo().Mode())
 			if err != nil {
 				return
 			}
