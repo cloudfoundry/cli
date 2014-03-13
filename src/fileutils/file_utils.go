@@ -8,7 +8,7 @@ import (
 )
 
 func Open(path string) (file *os.File, err error) {
-	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModeTemporary|os.ModePerm)
+	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModePerm)
 	if err != nil {
 		return
 	}
@@ -17,7 +17,7 @@ func Open(path string) (file *os.File, err error) {
 }
 
 func Create(path string) (file *os.File, err error) {
-	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModeTemporary|os.ModePerm)
+	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModePerm)
 	if err != nil {
 		return
 	}
