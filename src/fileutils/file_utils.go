@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func OpenFile(path string) (file *os.File, err error) {
+func Open(path string) (file *os.File, err error) {
 	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModeTemporary|os.ModePerm)
 	if err != nil {
 		return
@@ -16,7 +16,7 @@ func OpenFile(path string) (file *os.File, err error) {
 	return os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 }
 
-func CreateFile(path string) (file *os.File, err error) {
+func Create(path string) (file *os.File, err error) {
 	err = os.MkdirAll(filepath.Dir(path), os.ModeDir|os.ModeTemporary|os.ModePerm)
 	if err != nil {
 		return
@@ -25,7 +25,7 @@ func CreateFile(path string) (file *os.File, err error) {
 	return os.Create(path)
 }
 
-func ReadFile(file *os.File) string {
+func Read(file *os.File) string {
 	buf := &bytes.Buffer{}
 	_, err := io.Copy(buf, file)
 
@@ -36,8 +36,8 @@ func ReadFile(file *os.File) string {
 	return string(buf.Bytes())
 }
 
-func CopyFilePaths(fromPath, toPath string) (err error) {
-	dst, err := CreateFile(toPath)
+func CopyPathToPath(fromPath, toPath string) (err error) {
+	dst, err := Create(toPath)
 	if err != nil {
 		return
 	}
@@ -77,7 +77,7 @@ func CopyPathToWriter(originalFilePath string, targetWriter io.Writer) (err erro
 }
 
 func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
-	destFile, err := CreateFile(targetPath)
+	destFile, err := Create(targetPath)
 	if err != nil {
 		return
 	}
@@ -87,16 +87,16 @@ func CopyReaderToPath(src io.Reader, targetPath string) (err error) {
 	return
 }
 
-func SetExecutableBits(dest string, fileInfoToCopy os.FileInfo) (err error) {
-	err = os.Chmod(dest, fileInfoToCopy.Mode())
+func SetMode(dest string, fileMode os.FileMode) (err error) {
+	err = os.Chmod(dest, fileMode)
 	return
 }
 
-func SetExecutableBitsWithPaths(dest string, src string) (err error) {
-	fileToCopyInfo, err := os.Stat(src)
+func SetModeFromPath(dest string, src string) (err error) {
+	fileInfo, err := os.Stat(src)
 	if err != nil {
 		return
 	}
 
-	return SetExecutableBits(dest, fileToCopyInfo)
+	return SetMode(dest, fileInfo.Mode())
 }
