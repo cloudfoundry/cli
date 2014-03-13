@@ -76,7 +76,11 @@ func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (pro
 	apiErr = uaa.gateway.GetResource(url, "", resource)
 
 	prompts = resource.parsePrompts()
-	uaa.config.SetUaaEndpoint(resource.Links["uaa"])
+	if resource.Links["uaa"] == "" {
+		uaa.config.SetUaaEndpoint(uaa.config.AuthenticationEndpoint())
+	} else {
+		uaa.config.SetUaaEndpoint(resource.Links["uaa"])
+	}
 	return
 }
 
