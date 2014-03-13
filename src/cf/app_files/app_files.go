@@ -63,8 +63,6 @@ func CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err erro
 		if err != nil {
 			return
 		}
-
-		fileutils.SetModeFromPath(toPath, fromPath)
 	}
 	return
 }
