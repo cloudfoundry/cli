@@ -1,7 +1,6 @@
 package fileutils
 
 import (
-	"bytes"
 	"io"
 	"os"
 	"path/filepath"
@@ -23,17 +22,6 @@ func Create(path string) (file *os.File, err error) {
 	}
 
 	return os.Create(path)
-}
-
-func Read(file *os.File) string {
-	buf := &bytes.Buffer{}
-	_, err := io.Copy(buf, file)
-
-	if err != nil {
-		return ""
-	}
-
-	return string(buf.Bytes())
 }
 
 func CopyPathToPath(fromPath, toPath string) (err error) {
