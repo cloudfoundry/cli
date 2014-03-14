@@ -388,7 +388,6 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				fmt.Sprintf("   %s login -u name@example.com -p \"my password\" (use quotes for passwords with a space)\n", cf.Name()) +
 				fmt.Sprintf("   %s login -u name@example.com -p \"\\\"password\\\"\" (escape quotes if used in password)", cf.Name()),
 			Flags: []cli.Flag{
-				cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
 				StringFlagWithNoDefault{cli.StringFlag{
 					Name: "a", Usage: "API endpoint (e.g. https://api.example.com)",
 				}},
@@ -396,6 +395,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("p", "Password"),
 				NewStringFlag("o", "Org"),
 				NewStringFlag("s", "Space"),
+				cli.BoolFlag{Name: "skip-ssl-validation", Usage: "Please don't"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("login", c)
