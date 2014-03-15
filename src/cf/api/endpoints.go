@@ -78,6 +78,7 @@ func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) errors.Error
 	repo.config.SetApiEndpoint(endpoint)
 	repo.config.SetApiVersion(serverResponse.ApiVersion)
 	repo.config.SetAuthenticationEndpoint(serverResponse.AuthorizationEndpoint)
+	repo.config.SetUaaEndpoint(serverResponse.AuthorizationEndpoint)
 
 	if serverResponse.LoggregatorEndpoint == "" {
 		repo.config.SetLoggregatorEndpoint(defaultLoggregatorEndpoint(endpoint))
