@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"generic"
+	"github.com/tjarratt/babble"
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Manifest struct {
@@ -21,19 +23,21 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) {
-	errs = walkManifestLookingForProperties(m.Data)
+	babbler := babble.NewBabbler()
+	rawData, errs := expandProperties(m.Data, babbler)
+	data := generic.NewMap(rawData)
 	if !errs.Empty() {
 		return
 	}
 
-	if m.Data.Has("applications") {
-		appMaps, ok := m.Data.Get("applications").([]interface{})
+	if data.Has("applications") {
+		appMaps, ok := data.Get("applications").([]interface{})
 		if !ok {
 			errs = append(errs, errors.New("Expected applications to be a list"))
 			return
 		}
 
-		globalProperties := m.Data.Except([]interface{}{"applications"})
+		globalProperties := data.Except([]interface{}{"applications"})
 
 		for _, appData := range appMaps {
 			if !generic.IsMappable(appData) {
@@ -57,33 +61,50 @@ func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) 
 	return
 }
 
-func walkManifestLookingForProperties(data generic.Map) (errs ManifestErrors) {
-	generic.Each(data, func(key, value interface{}) {
-		errs = append(errs, walkMapLookingForProperties(value)...)
-	})
-
-	return
-}
-
 var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
 
-func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
-	switch value := value.(type) {
+func expandProperties(input interface{}, babbler babble.Babbler) (output interface{}, errs ManifestErrors) {
+	switch input := input.(type) {
 	case string:
-		match := propertyRegex.FindString(value)
-		if match != "" {
-			err := errors.New(fmt.Sprintf("Property '%s' found in manifest. This feature is no longer supported. Please remove it and try again.", match))
-			errs = append(errs, err)
+		match := propertyRegex.FindStringSubmatch(input)
+		if match != nil {
+			if match[0] == "${random-word}" {
+				output = strings.Replace(input, "${random-word}", strings.ToLower(babbler.Babble()), -1)
+			} else {
+				err := errors.New(fmt.Sprintf("Property '%s' found in manifest. This feature is no longer supported. Please remove it and try again.", match[0]))
+				errs = append(errs, err)
+			}
+		} else {
+			output = input
 		}
 	case []interface{}:
-		for _, item := range value {
-			errs = append(errs, walkMapLookingForProperties(item)...)
+		outputSlice := make([]interface{}, len(input))
+		for index, item := range input {
+			itemOutput, itemErrs := expandProperties(item, babbler)
+			outputSlice[index] = itemOutput
+			errs = append(errs, itemErrs...)
 		}
+		output = outputSlice
 	case map[interface{}]interface{}:
-		for _, item := range value {
-			errs = append(errs, walkMapLookingForProperties(item)...)
+		outputMap := make(map[interface{}]interface{})
+		for key, value := range input {
+			itemOutput, itemErrs := expandProperties(value, babbler)
+			outputMap[key] = itemOutput
+			errs = append(errs, itemErrs...)
 		}
+		output = outputMap
+	case generic.Map:
+		outputMap := generic.NewMap()
+		generic.Each(input, func(key, value interface{}) {
+			itemOutput, itemErrs := expandProperties(value, babbler)
+			outputMap.Set(key, itemOutput)
+			errs = append(errs, itemErrs...)
+		})
+		output = outputMap
+	default:
+		output = input
 	}
+
 	return
 }
 
