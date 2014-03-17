@@ -6,7 +6,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"path/filepath"
-	"runtime"
 )
 
 var _ = Describe("ManifestDiskRepository", func() {
@@ -39,11 +38,20 @@ var _ = Describe("ManifestDiskRepository", func() {
 	})
 
 	Describe("given a path to a file", func() {
-		It("reads the file at that path", func() {
-			m, errs := repo.ReadManifest("../../fixtures/manifests/different-manifest.yml")
+		var (
+			inputPath string
+			m         *Manifest
+			errs      ManifestErrors
+		)
 
+		BeforeEach(func() {
+			inputPath = filepath.Clean("../../fixtures/manifests/different-manifest.yml")
+			m, errs = repo.ReadManifest(inputPath)
+		})
+
+		It("reads the file at that path", func() {
 			Expect(errs).To(BeEmpty())
-			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/different-manifest.yml")))
+			Expect(m.Path).To(Equal(inputPath))
 
 			applications, errs := m.Applications()
 			Expect(errs).To(BeEmpty())
@@ -51,19 +59,13 @@ var _ = Describe("ManifestDiskRepository", func() {
 		})
 
 		It("passes the base directory to the manifest file", func() {
-			m, errs := repo.ReadManifest("../../fixtures/manifests/different-manifest.yml")
-			Expect(errs).To(BeEmpty())
-
 			applications, errs := m.Applications()
 			Expect(errs).To(BeEmpty())
 			Expect(len(applications)).To(Equal(1))
 			Expect(*applications[0].Name).To(Equal("from-different-manifest"))
 
-			if runtime.GOOS == "windows" {
-				Expect(*applications[0].Path).To(Equal("..\\..\\fixtures\\manifests"))
-			} else {
-				Expect(*applications[0].Path).To(Equal("../../fixtures/manifests"))
-			}
+			appPath := filepath.Clean("../../fixtures/manifests")
+			Expect(*applications[0].Path).To(Equal(appPath))
 		})
 	})
 
