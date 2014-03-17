@@ -375,7 +375,7 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 }
 
 func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppParams) {
-	m := cmd.instantiateManifest(c)
+	apps := cmd.instantiateManifest(c)
 
 	contextParams, err := newAppParamsFromContext(c)
 	if err != nil {
@@ -383,12 +383,12 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppP
 		return
 	}
 
-	if contextParams.Name == nil && len(m.Applications) > 1 && !contextParams.Equals(&models.AppParams{}) {
+	if contextParams.Name == nil && len(apps) > 1 && !contextParams.Equals(&models.AppParams{}) {
 		cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
 		return
 	}
 
-	appSet, err = cmd.createAppSetFromContextAndManifest(c, contextParams, m)
+	appSet, err = cmd.createAppSetFromContextAndManifest(c, contextParams, apps)
 	if err != nil {
 		cmd.ui.Failed("Error: %s", err)
 	}
@@ -396,10 +396,9 @@ func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppP
 	return
 }
 
-func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
+func (cmd *Push) instantiateManifest(c *cli.Context) []models.AppParams {
 	if c.Bool("no-manifest") {
-		m = manifest.NewEmptyManifest()
-		return
+		return []models.AppParams{}
 	}
 
 	var path string
@@ -410,49 +409,56 @@ func (cmd *Push) instantiateManifest(c *cli.Context) (m *manifest.Manifest) {
 		path, err = os.Getwd()
 		if err != nil {
 			cmd.ui.Failed("Could not determine the current working directory!", err)
-			return
 		}
 	}
 
-	m, manifestPath, errs := cmd.manifestRepo.ReadManifest(path)
+	m, errs := cmd.manifestRepo.ReadManifest(path)
 
 	if !errs.Empty() {
-		if manifestPath == "" && c.String("f") == "" {
-			m = manifest.NewEmptyManifest()
+		if m.Path == "" && c.String("f") == "" {
+			return []models.AppParams{}
 		} else {
 			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
 		}
-		return
 	}
 
-	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(manifestPath))
-	return
+	apps, errs := m.Applications()
+	if !errs.Empty() {
+		if m.Path == "" && c.String("f") == "" {
+			return []models.AppParams{}
+		} else {
+			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+		}
+	}
+
+	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(m.Path))
+	return apps
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams models.AppParams, m *manifest.Manifest) (appSet []models.AppParams, err error) {
-	if len(m.Applications) > 1 {
+func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams models.AppParams, manifestApps []models.AppParams) (appSet []models.AppParams, err error) {
+	if len(manifestApps) > 1 {
 		if contextParams.Name != nil {
 			var app models.AppParams
-			app, err = findAppWithNameInManifest(*contextParams.Name, m)
+			app, err = findAppWithNameInManifest(*contextParams.Name, manifestApps)
 
 			if err != nil {
 				cmd.ui.Failed(fmt.Sprintf("Could not find app named '%s' in manifest", *contextParams.Name))
 				return
 			}
 
-			m.Applications = []models.AppParams{app}
+			manifestApps = []models.AppParams{app}
 		}
 	}
 
-	appSet = make([]models.AppParams, 0, len(m.Applications))
-	if len(m.Applications) == 0 {
+	appSet = make([]models.AppParams, 0, len(manifestApps))
+	if len(manifestApps) == 0 {
 		if contextParams.Name == nil || *contextParams.Name == "" {
 			cmd.ui.FailWithUsage(c, "push")
 			return
 		}
 		err = addApp(&appSet, contextParams)
 	} else {
-		for _, manifestAppParams := range m.Applications {
+		for _, manifestAppParams := range manifestApps {
 			manifestAppParams.Merge(&contextParams)
 			err = addApp(&appSet, manifestAppParams)
 		}
@@ -473,8 +479,8 @@ func addApp(apps *[]models.AppParams, app models.AppParams) (err error) {
 	return
 }
 
-func findAppWithNameInManifest(name string, m *manifest.Manifest) (app models.AppParams, err error) {
-	for _, appParams := range m.Applications {
+func findAppWithNameInManifest(name string, manifestApps []models.AppParams) (app models.AppParams, err error) {
+	for _, appParams := range manifestApps {
 		if appParams.Name != nil && *appParams.Name == name {
 			app = appParams
 			return

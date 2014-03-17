@@ -222,7 +222,6 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
-		println(ui.DumpOutputs())
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"my-app"},
 			{"OK"},

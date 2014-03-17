@@ -10,9 +10,13 @@ import (
 	testassert "testhelpers/assert"
 )
 
+func NewManifest(path string, data generic.Map) (m *manifest.Manifest) {
+	return &manifest.Manifest{Path: path, Data: data}
+}
+
 var _ = Describe("Manifests", func() {
 	It("merges global properties into each app's properties", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
 			"memory":    "512M",
 			"applications": []interface{}{
@@ -23,16 +27,16 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		apps, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
 
-		apps := m.Applications
 		Expect(*apps[0].InstanceCount).To(Equal(3))
 		Expect(*apps[0].Memory).To(Equal(uint64(512)))
 		Expect(*apps[0].NoRoute).To(BeTrue())
 	})
 
 	It("returns an error when the memory limit doesn't have a unit", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
 			"memory":    "512",
 			"applications": []interface{}{
@@ -42,12 +46,13 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		_, errs := m.Applications()
 		Expect(errs).NotTo(BeEmpty())
 		Expect(errs.Error()).To(ContainSubstring("memory"))
 	})
 
 	It("sets applications' health check timeouts", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
 					"name":    "bitcoin-miner",
@@ -56,12 +61,13 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		apps, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
-		Expect(*m.Applications[0].HealthCheckTimeout).To(Equal(360))
+		Expect(*apps[0].HealthCheckTimeout).To(Equal(360))
 	})
 
 	It("does not allow nil values for environment variables", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"env": generic.NewMap(map[interface{}]interface{}{
 				"bar": nil,
 			}),
@@ -72,23 +78,26 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		_, errs := m.Applications()
 		Expect(errs).NotTo(BeEmpty())
 		Expect(errs.Error()).To(ContainSubstring("env var 'bar' should not be null"))
 	})
 
 	It("returns an empty map when no env was present in the manifest", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{"name": "no-env-vars"},
 			},
 		}))
+
+		apps, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
-		Expect(*m.Applications[0].EnvironmentVars).NotTo(BeNil())
+		Expect(*apps[0].EnvironmentVars).NotTo(BeNil())
 	})
 
 	It("allows applications to have absolute paths", func() {
 		if runtime.GOOS == "windows" {
-			m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[interface{}]interface{}{
+			m := NewManifest(`C:\some\path\manifest.yml`, generic.NewMap(map[interface{}]interface{}{
 				"applications": []interface{}{
 					map[interface{}]interface{}{
 						"path": `C:\another\path`,
@@ -96,10 +105,11 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
+			apps, errs := m.Applications()
 			Expect(errs).To(BeEmpty())
-			Expect(*m.Applications[0].Path).To(Equal(`C:\another\path`))
+			Expect(*apps[0].Path).To(Equal(`C:\another\path`))
 		} else {
-			m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 				"applications": []interface{}{
 					map[interface{}]interface{}{
 						"path": "/another/path-segment",
@@ -107,13 +117,14 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
+			apps, errs := m.Applications()
 			Expect(errs).To(BeEmpty())
-			Expect(*m.Applications[0].Path).To(Equal("/another/path-segment"))
+			Expect(*apps[0].Path).To(Equal("/another/path-segment"))
 		}
 	})
 
 	It("expands relative app paths based on the manifest's path", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
 					"path": "../another/path-segment",
@@ -121,16 +132,17 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		apps, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
 		if runtime.GOOS == "windows" {
-			Expect(*m.Applications[0].Path).To(Equal("\\some\\another\\path-segment"))
+			Expect(*apps[0].Path).To(Equal("\\some\\another\\path-segment"))
 		} else {
-			Expect(*m.Applications[0].Path).To(Equal("/some/another/path-segment"))
+			Expect(*apps[0].Path).To(Equal("/some/another/path-segment"))
 		}
 	})
 
 	It("returns errors when there are null values", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
 					"buildpack":  nil,
@@ -150,6 +162,7 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		_, errs := m.Applications()
 		Expect(errs).NotTo(BeEmpty())
 		errorSlice := strings.Split(errs.Error(), "\n")
 		manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
@@ -161,7 +174,7 @@ var _ = Describe("Manifests", func() {
 	})
 
 	It("returns an error when the manifest contains old-style property syntax", func() {
-		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
 					"env": map[interface{}]interface{}{
@@ -171,12 +184,13 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		_, errs := m.Applications()
 		Expect(errs).NotTo(BeEmpty())
 		Expect(errs.Error()).To(ContainSubstring("'${some_property-name}'"))
 	})
 
 	It("sets the command to blank when its value is null in the manifest", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
 					"command": nil,
@@ -184,18 +198,39 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
+		apps, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
-		Expect(*m.Applications[0].Command).To(Equal(""))
+		Expect(*apps[0].Command).To(Equal(""))
 	})
 
 	It("does not set the start command when the manifest doesn't have the 'command' key", func() {
-		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{},
 			},
 		}))
 
+		apps, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
-		Expect(m.Applications[0].Command).To(BeNil())
+		Expect(apps[0].Command).To(BeNil())
+	})
+
+	It("can build the applications multiple times", func() {
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+			"memory": "254m",
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"name": "bitcoin-miner",
+				},
+				map[interface{}]interface{}{
+					"name": "bitcoin-miner",
+				},
+			},
+		}))
+
+		apps1, errs := m.Applications()
+		apps2, errs := m.Applications()
+		Expect(errs).To(BeEmpty())
+		Expect(apps1).To(Equal(apps2))
 	})
 })

@@ -12,22 +12,48 @@ import (
 )
 
 type Manifest struct {
-	Applications []models.AppParams
+	Path string
+	Data generic.Map
 }
 
 func NewEmptyManifest() (m *Manifest) {
-	m, _ = NewManifest("", generic.NewMap())
-	return m
+	return &Manifest{Data: generic.NewMap()}
 }
 
-func NewManifest(basePath string, data generic.Map) (m *Manifest, errs ManifestErrors) {
-	errs = walkManifestLookingForProperties(data)
+func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) {
+	errs = walkManifestLookingForProperties(m.Data)
 	if !errs.Empty() {
 		return
 	}
 
-	m = &Manifest{}
-	m.Applications, errs = mapToAppSet(basePath, data)
+	if m.Data.Has("applications") {
+		appMaps, ok := m.Data.Get("applications").([]interface{})
+		if !ok {
+			errs = append(errs, errors.New("Expected applications to be a list"))
+			return
+		}
+
+		globalProperties := m.Data.Except([]interface{}{"applications"})
+
+		for _, appData := range appMaps {
+			if !generic.IsMappable(appData) {
+				errs = append(errs, errors.New("Expected application to be a dictionary"))
+				continue
+			}
+
+			appMap := generic.DeepMerge(globalProperties, generic.NewMap(appData))
+
+			basePath := filepath.Dir(m.Path)
+			appParams, appErrs := mapToAppParams(basePath, appMap)
+			if !appErrs.Empty() {
+				errs = append(errs, appErrs)
+				continue
+			}
+
+			apps = append(apps, appParams)
+		}
+	}
+
 	return
 }
 
@@ -58,38 +84,6 @@ func walkMapLookingForProperties(value interface{}) (errs ManifestErrors) {
 			errs = append(errs, walkMapLookingForProperties(item)...)
 		}
 	}
-	return
-}
-
-func mapToAppSet(basePath string, data generic.Map) (appSet []models.AppParams, errs ManifestErrors) {
-	if data.Has("applications") {
-		appMaps, ok := data.Get("applications").([]interface{})
-		if !ok {
-			errs = append(errs, errors.New("Expected applications to be a list"))
-			return
-		}
-
-		// we delete applications so that we may merge top level app params into each app
-		data.Delete("applications")
-
-		for _, appData := range appMaps {
-			if !generic.IsMappable(appData) {
-				errs = append(errs, errors.New("Expected application to be a dictionary"))
-				continue
-			}
-
-			appMap := generic.DeepMerge(data, generic.NewMap(appData))
-
-			appParams, appErrs := mapToAppParams(basePath, appMap)
-			if !appErrs.Empty() {
-				errs = append(errs, appErrs)
-				continue
-			}
-
-			appSet = append(appSet, appParams)
-		}
-	}
-
 	return
 }
 
