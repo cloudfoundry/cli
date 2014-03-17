@@ -10,34 +10,8 @@ import (
 	testassert "testhelpers/assert"
 )
 
-func testManifestWithAbsolutePathOnPosix() {
-	m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
-		"applications": []interface{}{
-			map[interface{}]interface{}{
-				"path": "/another/path-segment",
-			},
-		},
-	}))
-
-	Expect(errs).To(BeEmpty())
-	Expect(*m.Applications[0].Path).To(Equal("/another/path-segment"))
-}
-
-func testManifestWithAbsolutePathOnWindows() {
-	m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[interface{}]interface{}{
-		"applications": []interface{}{
-			map[interface{}]interface{}{
-				"path": `C:\another\path`,
-			},
-		},
-	}))
-
-	Expect(errs).To(BeEmpty())
-	Expect(*m.Applications[0].Path).To(Equal(`C:\another\path`))
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestManifestWithGlobalAndAppSpecificProperties", func() {
+var _ = Describe("Manifests", func() {
+	It("merges global properties into each app's properties", func() {
 		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
 			"memory":    "512M",
@@ -57,7 +31,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(*apps[0].NoRoute).To(BeTrue())
 	})
 
-	It("TestManifestWithInvalidMemory", func() {
+	It("returns an error when the memory limit doesn't have a unit", func() {
 		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",
 			"memory":    "512",
@@ -72,7 +46,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(errs.Error()).To(ContainSubstring("memory"))
 	})
 
-	It("TestManifestWithTimeoutSetsHealthCheckTimeout", func() {
+	It("sets applications' health check timeouts", func() {
 		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
@@ -86,7 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(*m.Applications[0].HealthCheckTimeout).To(Equal(360))
 	})
 
-	It("TestManifestWithEmptyEnvVarIsInvalid", func() {
+	It("does not allow nil values for environment variables", func() {
 		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"env": generic.NewMap(map[interface{}]interface{}{
 				"bar": nil,
@@ -112,15 +86,33 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(*m.Applications[0].EnvironmentVars).NotTo(BeNil())
 	})
 
-	It("TestManifestWithAbsolutePath", func() {
+	It("allows applications to have absolute paths", func() {
 		if runtime.GOOS == "windows" {
-			testManifestWithAbsolutePathOnWindows()
+			m, errs := manifest.NewManifest(`C:\some\path`, generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					map[interface{}]interface{}{
+						"path": `C:\another\path`,
+					},
+				},
+			}))
+
+			Expect(errs).To(BeEmpty())
+			Expect(*m.Applications[0].Path).To(Equal(`C:\another\path`))
 		} else {
-			testManifestWithAbsolutePathOnPosix()
+			m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					map[interface{}]interface{}{
+						"path": "/another/path-segment",
+					},
+				},
+			}))
+
+			Expect(errs).To(BeEmpty())
+			Expect(*m.Applications[0].Path).To(Equal("/another/path-segment"))
 		}
 	})
 
-	It("TestManifestWithRelativePath", func() {
+	It("expands relative app paths based on the manifest's path", func() {
 		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
@@ -137,7 +129,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 	})
 
-	It("TestParsingManifestWithNulls", func() {
+	It("returns errors when there are null values", func() {
 		_, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
@@ -183,7 +175,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(errs.Error()).To(ContainSubstring("'${some_property-name}'"))
 	})
 
-	It("TestParsingManifestWithNullCommand", func() {
+	It("sets the command to blank when its value is null in the manifest", func() {
 		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
@@ -196,7 +188,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(*m.Applications[0].Command).To(Equal(""))
 	})
 
-	It("TestParsingEmptyManifestDoesNotSetCommand", func() {
+	It("does not set the start command when the manifest doesn't have the 'command' key", func() {
 		m, errs := manifest.NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{},
