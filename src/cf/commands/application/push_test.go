@@ -329,7 +329,7 @@ var _ = Describe("Push Command", func() {
 	It("TestPushingAppManifestWithErrors", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Path = "/some-path/"
+		deps.manifestRepo.ReadManifestReturns.Manifest = &manifest.Manifest{Path: "/some-path/"}
 		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{
 			errors.New("buildpack should not be null"),
 			errors.New("disk_quota should not be null"),
@@ -528,7 +528,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{syscall.ENOENT}
-		deps.manifestRepo.ReadManifestReturns.Path = ""
+		deps.manifestRepo.ReadManifestReturns.Manifest.Path = ""
 
 		ui := callPush([]string{"--no-route", "app-name"}, deps)
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -546,7 +546,7 @@ var _ = Describe("Push Command", func() {
 		deps := getPushDependencies()
 		deps.appRepo.ReadNotFound = true
 		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
-		deps.manifestRepo.ReadManifestReturns.Path = "manifest.yml"
+		deps.manifestRepo.ReadManifestReturns.Manifest.Path = "manifest.yml"
 
 		ui := callPush([]string{"-p", "some/relative/path"}, deps)
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -628,8 +628,7 @@ var _ = Describe("Push Command", func() {
 		deps.appRepo.ReadNotFound = true
 
 		workerManifest := singleAppManifest()
-		noRoute := true
-		workerManifest.Applications[0].NoRoute = &noRoute
+		workerManifest.Data.Get("applications").([]interface{})[0].(generic.Map).Set("no-route", true)
 		deps.manifestRepo.ReadManifestReturns.Manifest = workerManifest
 
 		ui := callPush([]string{
@@ -1000,59 +999,50 @@ var _ = Describe("Push Command", func() {
 })
 
 func singleAppManifest() *manifest.Manifest {
-	name := "manifest-app-name"
-	memory := uint64(128)
-	instances := 1
-	host := "manifest-host"
-	domain := "manifest-example.com"
-	stack := "custom-stack"
-	timeout := 360
-	buildpackUrl := "some-buildpack"
-	command := `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`
-	path := "/some/path/from/manifest"
-
 	return &manifest.Manifest{
-		Applications: []models.AppParams{
-			models.AppParams{
-				Name:               &name,
-				Memory:             &memory,
-				InstanceCount:      &instances,
-				Host:               &host,
-				Domain:             &domain,
-				StackName:          &stack,
-				HealthCheckTimeout: &timeout,
-				BuildpackUrl:       &buildpackUrl,
-				Command:            &command,
-				Path:               &path,
-				EnvironmentVars: &map[string]string{
-					"FOO":  "baz",
-					"PATH": "/u/apps/my-app/bin",
-				},
+		Data: generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				generic.NewMap(map[interface{}]interface{}{
+					"name":      "manifest-app-name",
+					"memory":    "128MB",
+					"instances": 1,
+					"host":      "manifest-host",
+					"domain":    "manifest-example.com",
+					"stack":     "custom-stack",
+					"timeout":   360,
+					"buildpack": "some-buildpack",
+					"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
+					"path":      "/some/path/from/manifest",
+					"env": generic.NewMap(map[interface{}]interface{}{
+						"FOO":  "baz",
+						"PATH": "/u/apps/my-app/bin",
+					}),
+				}),
 			},
-		},
+		}),
 	}
 }
 
 func manifestWithServicesAndEnv() *manifest.Manifest {
-	name1 := "app1"
-	name2 := "app2"
 	return &manifest.Manifest{
-		Applications: []models.AppParams{
-			models.AppParams{
-				Name:     &name1,
-				Services: &[]string{"app1-service", "global-service"},
-				EnvironmentVars: &map[string]string{
-					"SOMETHING": "definitely-something",
-				},
+		Data: generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				generic.NewMap(map[interface{}]interface{}{
+					"name":     "app1",
+					"services": []interface{}{"app1-service", "global-service"},
+					"env": generic.NewMap(map[interface{}]interface{}{
+						"SOMETHING": "definitely-something",
+					}),
+				}),
+				generic.NewMap(map[interface{}]interface{}{
+					"name":     "app2",
+					"services": []interface{}{"app2-service", "global-service"},
+					"env": generic.NewMap(map[interface{}]interface{}{
+						"SOMETHING": "nothing",
+					}),
+				}),
 			},
-			models.AppParams{
-				Name:     &name2,
-				Services: &[]string{"app2-service", "global-service"},
-				EnvironmentVars: &map[string]string{
-					"SOMETHING": "nothing",
-				},
-			},
-		},
+		}),
 	}
 }
 
