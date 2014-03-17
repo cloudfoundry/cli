@@ -1,0 +1,9 @@
+#!/bin/bash
+
+git fetch --tags
+git checkout $GIT_COMMIT
+
+bin/retrieve-binaries
+bin/build-installers
+bin/upload-binaries
+/bin/bash --login -c "rvm use 1.9 && bin/pivotal-tracker-deliver"
