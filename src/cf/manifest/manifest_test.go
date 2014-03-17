@@ -173,28 +173,52 @@ var _ = Describe("Manifests", func() {
 		}
 	})
 
-	It("returns an error when the manifest contains old-style property syntax", func() {
-		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
-			"applications": []interface{}{
-				map[interface{}]interface{}{
-					"env": map[interface{}]interface{}{
-						"bar": "many-${some_property-name}-are-cool",
-					},
+	Describe("old-style property syntax", func() {
+		It("returns an error when the manifest contains non-whitelist properties", func() {
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					generic.NewMap(map[interface{}]interface{}{
+						"env": generic.NewMap(map[interface{}]interface{}{
+							"bar": "many-${some_property-name}-are-cool",
+						}),
+					}),
 				},
-			},
-		}))
+			}))
 
-		_, errs := m.Applications()
-		Expect(errs).NotTo(BeEmpty())
-		Expect(errs.Error()).To(ContainSubstring("'${some_property-name}'"))
+			_, errs := m.Applications()
+			Expect(errs).NotTo(BeEmpty())
+			Expect(errs.Error()).To(ContainSubstring("'${some_property-name}'"))
+		})
+
+		It("replaces the '${random-word} with a combination of 2 random words", func() {
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					generic.NewMap(map[interface{}]interface{}{
+						"env": generic.NewMap(map[interface{}]interface{}{
+							"bar": "prefix_${random-word}_suffix",
+							"foo": "some-value",
+						}),
+					}),
+				},
+			}))
+
+			apps, errs := m.Applications()
+			Expect(errs).To(BeEmpty())
+			Expect((*apps[0].EnvironmentVars)["bar"]).To(MatchRegexp(`prefix_\w+-\w+_suffix`))
+			Expect((*apps[0].EnvironmentVars)["foo"]).To(Equal("some-value"))
+
+			apps2, _ := m.Applications()
+			Expect((*apps2[0].EnvironmentVars)["bar"]).To(MatchRegexp(`prefix_\w+-\w+_suffix`))
+			Expect((*apps2[0].EnvironmentVars)["bar"]).NotTo(Equal((*apps[0].EnvironmentVars)["bar"]))
+		})
 	})
 
 	It("sets the command to blank when its value is null in the manifest", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
-				map[interface{}]interface{}{
+				generic.NewMap(map[interface{}]interface{}{
 					"command": nil,
-				},
+				}),
 			},
 		}))
 
