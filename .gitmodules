@@ -16,3 +16,6 @@
 [submodule "src/github.com/fraenkel/candiedyaml"]
 	path = src/github.com/fraenkel/candiedyaml
 	url = https://github.com/fraenkel/candiedyaml.git
+[submodule "src/github.com/cloudfoundry/gofileutils"]
+	path = src/github.com/cloudfoundry/gofileutils
+	url = https://github.com/cloudfoundry/gofileutils
