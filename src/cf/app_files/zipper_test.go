@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	. "cf/app_files"
-	"fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io"

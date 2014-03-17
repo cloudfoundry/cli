@@ -3,7 +3,7 @@ package trace_test
 import (
 	"bytes"
 	"cf/trace"
-	"fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"io/ioutil"

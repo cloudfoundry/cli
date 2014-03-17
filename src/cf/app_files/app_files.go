@@ -3,8 +3,9 @@ package app_files
 import (
 	"cf/models"
 	"crypto/sha1"
-	"fileutils"
 	"fmt"
+	"github.com/cloudfoundry/gofileutils/fileutils"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -59,12 +60,10 @@ func CopyFiles(appFiles []models.AppFileFields, fromDir, toDir string) (err erro
 	for _, file := range appFiles {
 		fromPath := filepath.Join(fromDir, file.Path)
 		toPath := filepath.Join(toDir, file.Path)
-		err = fileutils.CopyFilePaths(fromPath, toPath)
+		err = fileutils.CopyPathToPath(fromPath, toPath)
 		if err != nil {
 			return
 		}
-
-		fileutils.SetExecutableBitsWithPaths(toPath, fromPath)
 	}
 	return
 }
@@ -111,9 +110,9 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 }
 
 func loadIgnoreFile(dir string) CfIgnore {
-	file, err := os.Open(filepath.Join(dir, ".cfignore"))
+	fileContents, err := ioutil.ReadFile(filepath.Join(dir, ".cfignore"))
 	if err == nil {
-		return NewCfIgnore(fileutils.ReadFile(file))
+		return NewCfIgnore(string(fileContents))
 	} else {
 		return NewCfIgnore("")
 	}
