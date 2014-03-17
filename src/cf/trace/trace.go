@@ -1,7 +1,7 @@
 package trace
 
 import (
-	"fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"log"
 	"os"

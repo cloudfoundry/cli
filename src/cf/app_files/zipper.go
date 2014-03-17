@@ -3,7 +3,7 @@ package app_files
 import (
 	"archive/zip"
 	"errors"
-	"fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	"os"
 	"path/filepath"
 )
