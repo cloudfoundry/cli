@@ -11,6 +11,15 @@ type Application struct {
 	Routes []RouteSummary
 }
 
+func (model Application) HasRoute(route Route) bool {
+	for _, boundRoute := range model.Routes {
+		if boundRoute.Guid == route.Guid {
+			return true
+		}
+	}
+	return false
+}
+
 func (model Application) ToParams() (params AppParams) {
 	state := strings.ToUpper(model.State)
 	params = AppParams{
