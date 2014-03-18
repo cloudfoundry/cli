@@ -11,15 +11,15 @@ type WordGenerator interface {
 }
 
 type wordGenerator struct {
-	source     rand.Source
+	numberGenerator     *rand.Rand
 	adjectives []string
 	nouns      []string
 }
 
 func (wg wordGenerator) Babble() (word string) {
-	idx := int(wg.source.Int63()) % len(wg.adjectives)
+	idx := int(wg.numberGenerator.Int()) % len(wg.adjectives)
 	word = wg.adjectives[idx] + "-"
-	idx = int(wg.source.Int63()) % len(wg.nouns)
+	idx = int(wg.numberGenerator.Int()) % len(wg.nouns)
 	word += wg.nouns[idx]
 	return
 }
@@ -27,10 +27,11 @@ func (wg wordGenerator) Babble() (word string) {
 func NewWordGenerator() WordGenerator {
 	adjectiveBytes, _ := Asset("src/words/dict/adjectives.txt")
 	nounBytes, _ := Asset("src/words/dict/nouns.txt")
+	source := rand.NewSource(time.Now().UnixNano())
 
 	return wordGenerator{
 		adjectives: strings.Split(string(adjectiveBytes), "\n"),
 		nouns:      strings.Split(string(nounBytes), "\n"),
-		source:     rand.NewSource(time.Now().UnixNano()),
+		numberGenerator:     rand.New(source),
 	}
 }
