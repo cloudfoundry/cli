@@ -17,6 +17,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"words"
 )
 
 type Push struct {
@@ -33,12 +34,14 @@ type Push struct {
 	stackRepo      api.StackRepository
 	appBitsRepo    api.ApplicationBitsRepository
 	globalServices []models.ServiceInstance
+	wordGenerator  words.WordGenerator
 }
 
 func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.ManifestRepository,
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
-	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository) (cmd *Push) {
+	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository,
+	wordGenerator words.WordGenerator) (cmd *Push) {
 	cmd = &Push{}
 	cmd.ui = ui
 	cmd.config = config
@@ -52,6 +55,7 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	cmd.serviceRepo = serviceRepo
 	cmd.stackRepo = stackRepo
 	cmd.appBitsRepo = appBitsRepo
+	cmd.wordGenerator = wordGenerator
 	return
 }
 
@@ -153,7 +157,11 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 	if params.Host != nil {
 		defaultHostname = *params.Host
 	} else {
-		defaultHostname = hostNameForString(app.Name)
+		if c.Bool("random-route") {
+			defaultHostname = hostNameForString(app.Name) + "-" + cmd.wordGenerator.Babble()
+		} else {
+			defaultHostname = hostNameForString(app.Name)
+		}
 	}
 
 	var domainName string

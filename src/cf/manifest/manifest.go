@@ -6,12 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"generic"
-	"math/rand"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 	"words"
 )
 
@@ -24,33 +22,8 @@ func NewEmptyManifest() (m *Manifest) {
 	return &Manifest{Data: generic.NewMap()}
 }
 
-type WordGenerator struct {
-	source     rand.Source
-	adjectives []string
-	nouns      []string
-}
-
-func (wg WordGenerator) Babble() (word string) {
-	idx := int(wg.source.Int63()) % len(wg.adjectives)
-	word = wg.adjectives[idx] + "-"
-	idx = int(wg.source.Int63()) % len(wg.nouns)
-	word += wg.nouns[idx]
-	return
-}
-
-func NewWordGenerator() WordGenerator {
-	adjectiveBytes, _ := words.Asset("src/words/dict/adjectives.txt")
-	nounBytes, _ := words.Asset("src/words/dict/nouns.txt")
-
-	return WordGenerator{
-		adjectives: strings.Split(string(adjectiveBytes), "\n"),
-		nouns:      strings.Split(string(nounBytes), "\n"),
-		source:     rand.NewSource(time.Now().UnixNano()),
-	}
-}
-
 func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) {
-	babbler := NewWordGenerator()
+	babbler := words.NewWordGenerator()
 	rawData, errs := expandProperties(m.Data, babbler)
 	data := generic.NewMap(rawData)
 	if !errs.Empty() {
@@ -90,7 +63,7 @@ func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) 
 
 var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
 
-func expandProperties(input interface{}, babbler WordGenerator) (output interface{}, errs ManifestErrors) {
+func expandProperties(input interface{}, babbler words.WordGenerator) (output interface{}, errs ManifestErrors) {
 	switch input := input.(type) {
 	case string:
 		match := propertyRegex.FindStringSubmatch(input)
