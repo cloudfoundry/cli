@@ -6,13 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"generic"
+	"math/rand"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-	"words"
-	"math/rand"
 	"time"
+	"words"
 )
 
 type Manifest struct {
@@ -25,9 +25,9 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 type WordGenerator struct {
-	source rand.Source
+	source     rand.Source
 	adjectives []string
-	nouns []string
+	nouns      []string
 }
 
 func (wg WordGenerator) Babble() (word string) {
@@ -44,8 +44,8 @@ func NewWordGenerator() WordGenerator {
 
 	return WordGenerator{
 		adjectives: strings.Split(string(adjectiveBytes), "\n"),
-		nouns: strings.Split(string(nounBytes), "\n"),
-		source: rand.NewSource(time.Now().UnixNano()),
+		nouns:      strings.Split(string(nounBytes), "\n"),
+		source:     rand.NewSource(time.Now().UnixNano()),
 	}
 }
 
