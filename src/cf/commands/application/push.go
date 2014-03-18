@@ -139,11 +139,7 @@ func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {
 }
 
 func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams, c *cli.Context) {
-	if c.Bool("no-route") {
-		return
-	}
-
-	if params.NoRoute != nil && *params.NoRoute {
+	if params.NoRoute {
 		cmd.ui.Say("App %s is a worker, skipping route creation", terminal.EntityNameColor(app.Name))
 		return
 	}
@@ -168,7 +164,7 @@ func (cmd Push) hostName(appParams models.AppParams, c *cli.Context) string {
 	if appParams.Host != nil {
 		return *appParams.Host
 	} else {
-		if c.Bool("random-route") {
+		if appParams.RandomHostname {
 			return hostNameForString(*appParams.Name) + "-" + cmd.wordGenerator.Babble()
 		} else {
 			return hostNameForString(*appParams.Name)
@@ -180,10 +176,10 @@ var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
 var whitespaceRegex = regexp.MustCompile(`[\s_]+`)
 
 func hostNameForString(name string) string {
-	nameBytes := []byte(strings.ToLower(name))
-	nameBytes = whitespaceRegex.ReplaceAll(nameBytes, []byte("-"))
-	nameBytes = forbiddenHostCharRegex.ReplaceAll(nameBytes, []byte{})
-	return string(nameBytes)
+	name = strings.ToLower(name)
+	name = whitespaceRegex.ReplaceAllString(name, "-")
+	name = forbiddenHostCharRegex.ReplaceAllString(name, "")
+	return name
 }
 
 func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli.Context) {
@@ -492,6 +488,9 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 		}
 		appParams.Memory = &memory
 	}
+
+	appParams.NoRoute = c.Bool("no-route")
+	appParams.RandomHostname = c.Bool("random-hostname")
 
 	if c.String("n") != "" {
 		hostname := c.String("n")

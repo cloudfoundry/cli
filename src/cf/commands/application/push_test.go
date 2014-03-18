@@ -95,14 +95,36 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("provides a random hostname when the --random-route flag is passed", func() {
-		deps := getPushDependencies()
-		deps.wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
-		deps.appRepo.ReadNotFound = true
+	Describe("randomized hostnames", func() {
+		var (
+			deps        pushDependencies
+			manifestApp generic.Map
+		)
 
-		callPush([]string{"--random-route", "my-new-app"}, deps)
+		BeforeEach(func() {
+			deps = getPushDependencies()
+			deps.wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
+			deps.appRepo.ReadNotFound = true
 
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
+			manifest := singleAppManifest()
+			manifestApp = manifest.Data.Get("applications").([]interface{})[0].(generic.Map)
+			manifestApp.Delete("host")
+			deps.manifestRepo.ReadManifestReturns.Manifest = manifest
+		})
+
+		It("provides a random hostname when the --random-hostname flag is passed", func() {
+			callPush([]string{"--random-hostname", "my-new-app"}, deps)
+
+			Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
+		})
+
+		It("provides a random hostname when the random-hostname option is set in the manifest", func() {
+			manifestApp.Set("random-hostname", true)
+
+			callPush([]string{"my-new-app"}, deps)
+
+			Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
+		})
 	})
 
 	It("TestPushingAppWhenItDoesNotExist", func() {

@@ -517,7 +517,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
 				cli.BoolFlag{Name: "no-manifest", Usage: "Ignore manifest file"},
 				cli.BoolFlag{Name: "no-route", Usage: "Do not map a route to this app"},
-				cli.BoolFlag{Name: "random-route", Usage: "Create a random route for this app"},
+				cli.BoolFlag{Name: "random-hostname", Usage: "Create a random hostname for this app"},
 				cli.BoolFlag{Name: "no-start", Usage: "Do not start an app after pushing"},
 			},
 			Action: func(c *cli.Context) {

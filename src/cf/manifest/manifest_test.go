@@ -32,7 +32,7 @@ var _ = Describe("Manifests", func() {
 
 		Expect(*apps[0].InstanceCount).To(Equal(3))
 		Expect(*apps[0].Memory).To(Equal(uint64(512)))
-		Expect(*apps[0].NoRoute).To(BeTrue())
+		Expect(apps[0].NoRoute).To(BeTrue())
 	})
 
 	It("returns an error when the memory limit doesn't have a unit", func() {
@@ -145,19 +145,20 @@ var _ = Describe("Manifests", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
-					"buildpack":  nil,
-					"disk_quota": nil,
-					"domain":     nil,
-					"host":       nil,
-					"name":       nil,
-					"path":       nil,
-					"stack":      nil,
-					"memory":     nil,
-					"instances":  nil,
-					"timeout":    nil,
-					"no-route":   nil,
-					"services":   nil,
-					"env":        nil,
+					"buildpack":       nil,
+					"disk_quota":      nil,
+					"domain":          nil,
+					"host":            nil,
+					"name":            nil,
+					"path":            nil,
+					"stack":           nil,
+					"memory":          nil,
+					"instances":       nil,
+					"timeout":         nil,
+					"no-route":        nil,
+					"services":        nil,
+					"env":             nil,
+					"random-hostname": nil,
 				},
 			},
 		}))
@@ -166,11 +167,47 @@ var _ = Describe("Manifests", func() {
 		Expect(errs).NotTo(BeEmpty())
 		errorSlice := strings.Split(errs.Error(), "\n")
 		manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
-			"memory", "instances", "timeout", "no-route", "services", "env"}
+			"memory", "instances", "timeout", "no-route", "services", "env", "random-hostname"}
 
 		for _, key := range manifestKeys {
 			testassert.SliceContains(errorSlice, testassert.Lines{{key, "not be null"}})
 		}
+	})
+
+	It("parses known manifest keys", func() {
+		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				map[interface{}]interface{}{
+					"buildpack":       "my-buildpack",
+					"disk_quota":      "512M",
+					"domain":          "my-domain",
+					"host":            "my-hostname",
+					"name":            "my-app-name",
+					"stack":           "my-stack",
+					"memory":          "256M",
+					"instances":       1,
+					"timeout":         11,
+					"no-route":        true,
+					"random-hostname": true,
+				},
+			},
+		}))
+
+		apps, errs := m.Applications()
+		Expect(errs).To(BeEmpty())
+		Expect(len(apps)).To(Equal(1))
+
+		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
+		Expect(*apps[0].DiskQuota).To(Equal(uint64(512)))
+		Expect(*apps[0].Domain).To(Equal("my-domain"))
+		Expect(*apps[0].Host).To(Equal("my-hostname"))
+		Expect(*apps[0].Name).To(Equal("my-app-name"))
+		Expect(*apps[0].StackName).To(Equal("my-stack"))
+		Expect(*apps[0].Memory).To(Equal(uint64(256)))
+		Expect(*apps[0].InstanceCount).To(Equal(1))
+		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
+		Expect(apps[0].NoRoute).To(BeTrue())
+		Expect(apps[0].RandomHostname).To(BeTrue())
 	})
 
 	Describe("old-style property syntax", func() {

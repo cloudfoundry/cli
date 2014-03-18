@@ -126,6 +126,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.InstanceCount = intVal(yamlMap, "instances", &errs)
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
+	appParams.RandomHostname = boolVal(yamlMap, "random-hostname", &errs)
 	appParams.Services = sliceOrEmptyVal(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 
@@ -224,18 +225,17 @@ func intVal(yamlMap generic.Map, key string, errs *ManifestErrors) *int {
 	return &intVal
 }
 
-func boolVal(yamlMap generic.Map, key string, errs *ManifestErrors) *bool {
+func boolVal(yamlMap generic.Map, key string, errs *ManifestErrors) bool {
 	switch val := yamlMap.Get(key).(type) {
 	case nil:
-		return nil
+		return false
 	case bool:
-		return &val
+		return val
 	case string:
-		boolVal := val == "true"
-		return &boolVal
+		return val == "true"
 	default:
 		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a boolean.", key)))
-		return nil
+		return false
 	}
 }
 
