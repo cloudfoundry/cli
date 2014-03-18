@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+$(dirname $0)/go install github.com/jteeuwen/go-bindata/go-bindata
+$(dirname $0)/go-bindata -pkg=words -o src/words/words.go src/words/dict

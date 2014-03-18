@@ -16,6 +16,6 @@
 [submodule "src/github.com/fraenkel/candiedyaml"]
 	path = src/github.com/fraenkel/candiedyaml
 	url = https://github.com/fraenkel/candiedyaml.git
-[submodule "src/github.com/tjarratt/babble"]
-	path = src/github.com/tjarratt/babble
-	url = https://github.com/tjarratt/babble.git
+[submodule "src/github.com/jteeuwen/go-bindata"]
+	path = src/github.com/jteeuwen/go-bindata
+	url = https://github.com/jteeuwen/go-bindata.git
