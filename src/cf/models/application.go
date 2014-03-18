@@ -70,9 +70,9 @@ type AppParams struct {
 	InstanceCount      *int
 	Memory             *uint64
 	Name               *string
-	NoRoute            *bool
+	NoRoute            bool
+	RandomHostname     bool
 	Path               *string
-	RunningInstances   *int
 	Services           *[]string
 	SpaceGuid          *string
 	StackGuid          *string
@@ -114,14 +114,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.Name != nil {
 		app.Name = other.Name
 	}
-	if other.NoRoute != nil {
-		app.NoRoute = other.NoRoute
-	}
 	if other.Path != nil {
 		app.Path = other.Path
-	}
-	if other.RunningInstances != nil {
-		app.RunningInstances = other.RunningInstances
 	}
 	if other.Services != nil {
 		app.Services = other.Services
@@ -138,6 +132,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.State != nil {
 		app.State = other.State
 	}
+
+	app.NoRoute = app.NoRoute || other.NoRoute
+	app.RandomHostname = app.RandomHostname || other.RandomHostname
 }
 
 func (app *AppParams) Equals(otherParams *AppParams) bool {
