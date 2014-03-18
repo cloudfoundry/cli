@@ -153,44 +153,27 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 		return
 	}
 
-	var defaultHostname string
-	if params.Host != nil {
-		defaultHostname = *params.Host
-	} else {
-		if c.Bool("random-route") {
-			defaultHostname = hostNameForString(app.Name) + "-" + cmd.wordGenerator.Babble()
-		} else {
-			defaultHostname = hostNameForString(app.Name)
-		}
-	}
-
-	var domainName string
-	if params.Domain != nil {
-		domainName = *params.Domain
-	} else {
-		domainName = c.String("d")
-	}
-
-	hostName := cmd.hostname(c, defaultHostname)
-	domain := cmd.domain(c, domainName)
-	route := cmd.route(hostName, domain)
-
-	for _, boundRoute := range app.Routes {
-		if boundRoute.Guid == route.Guid {
-			return
-		}
-	}
-
-	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
-
-	apiErr := cmd.routeRepo.Bind(route.Guid, app.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
-	}
+	domain := cmd.findDomain(params)
+	cmd.bindRouteToApp(cmd.hostName(params, c), domain, app)
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
+}
+
+func (cmd Push) hostName(appParams models.AppParams, c *cli.Context) string {
+	if c.Bool("no-hostname") {
+		return ""
+	}
+
+	if appParams.Host != nil {
+		return *appParams.Host
+	} else {
+		if c.Bool("random-route") {
+			return hostNameForString(*appParams.Name) + "-" + cmd.wordGenerator.Babble()
+		} else {
+			return hostNameForString(*appParams.Name)
+		}
+	}
 }
 
 var forbiddenHostCharRegex = regexp.MustCompile("[^a-z0-9-]")
@@ -222,7 +205,7 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 	cmd.starter.ApplicationStart(app)
 }
 
-func (cmd *Push) route(hostName string, domain models.DomainFields) (route models.Route) {
+func (cmd *Push) bindRouteToApp(hostName string, domain models.DomainFields, app models.Application) {
 	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 	if apiErr != nil {
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
@@ -239,28 +222,33 @@ func (cmd *Push) route(hostName string, domain models.DomainFields) (route model
 		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
 	}
 
-	return
-}
-
-func (cmd *Push) domain(c *cli.Context, domainName string) (domain models.DomainFields) {
-	var apiErr errors.Error
-
-	if domainName != "" {
-		domain, apiErr = cmd.domainRepo.FindByNameInOrg(domainName, cmd.config.OrganizationFields().Guid)
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-		}
+	if app.HasRoute(route) {
 		return
 	}
 
-	domain, err := cmd.findDefaultDomain()
+	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
 
-	if err != nil {
-		cmd.ui.Failed(err.Error())
+	apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
+	if apiErr != nil {
+		cmd.ui.Failed(apiErr.Error())
 	}
+}
 
-	if domain.Guid == "" {
-		cmd.ui.Failed("No default domain exists")
+func (cmd *Push) findDomain(appParams models.AppParams) (domain models.DomainFields) {
+	var err error
+	if appParams.Domain != nil {
+		domain, err = cmd.domainRepo.FindByNameInOrg(*appParams.Domain, cmd.config.OrganizationFields().Guid)
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+	} else {
+		domain, err = cmd.findDefaultDomain()
+		if err != nil {
+			cmd.ui.Failed(err.Error())
+		}
+		if domain.Guid == "" {
+			cmd.ui.Failed("No default domain exists")
+		}
 	}
 
 	return
@@ -292,23 +280,9 @@ func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 	return
 }
 
-func (cmd *Push) hostname(c *cli.Context, defaultName string) (hostName string) {
-	if c.Bool("no-hostname") {
-		return
-	}
-
-	hostName = c.String("n")
-	if hostName == "" {
-		hostName = defaultName
-	}
-
-	return
-}
-
 func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Application) {
 	if appParams.Name == nil {
 		cmd.ui.Failed("Error: No name found for app")
-		return
 	}
 
 	app, apiErr := cmd.appRepo.Read(*appParams.Name)
@@ -517,6 +491,16 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 			return
 		}
 		appParams.Memory = &memory
+	}
+
+	if c.String("n") != "" {
+		hostname := c.String("n")
+		appParams.Host = &hostname
+	}
+
+	if c.String("d") != "" {
+		domain := c.String("d")
+		appParams.Domain = &domain
 	}
 
 	if c.String("c") != "" {
