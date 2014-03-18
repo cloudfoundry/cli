@@ -317,7 +317,7 @@ var _ = Describe("Push Command", func() {
 		Expect(*deps.appRepo.CreatedAppParams().StackName).To(Equal("custom-stack"))
 		Expect(*deps.appRepo.CreatedAppParams().BuildpackUrl).To(Equal("some-buildpack"))
 		Expect(*deps.appRepo.CreatedAppParams().Command).To(Equal("JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run"))
-		Expect(deps.appBitsRepo.UploadedDir).To(Equal(filepath.Clean("/some/path/from/manifest")))
+		Expect(deps.appBitsRepo.UploadedDir).To(Equal(filepath.Clean("some/path/from/manifest")))
 
 		envVars := *deps.appRepo.CreatedAppParams().EnvironmentVars
 		Expect(envVars).To(Equal(map[string]string{
@@ -1000,6 +1000,7 @@ var _ = Describe("Push Command", func() {
 
 func singleAppManifest() *manifest.Manifest {
 	return &manifest.Manifest{
+		Path: "manifest.yml",
 		Data: generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				generic.NewMap(map[interface{}]interface{}{
@@ -1012,7 +1013,7 @@ func singleAppManifest() *manifest.Manifest {
 					"timeout":   360,
 					"buildpack": "some-buildpack",
 					"command":   `JAVA_HOME=$PWD/.openjdk JAVA_OPTS="-Xss995K" ./bin/start.sh run`,
-					"path":      filepath.Clean("/some/path/from/manifest"),
+					"path":      filepath.Clean("some/path/from/manifest"),
 					"env": generic.NewMap(map[interface{}]interface{}{
 						"FOO":  "baz",
 						"PATH": "/u/apps/my-app/bin",
