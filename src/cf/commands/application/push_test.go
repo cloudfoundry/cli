@@ -19,6 +19,8 @@ import (
 	testmanifest "testhelpers/manifest"
 	testreq "testhelpers/requirements"
 	testterm "testhelpers/terminal"
+	testwords "testhelpers/words"
+	"words"
 )
 
 var _ = Describe("Push Command", func() {
@@ -37,7 +39,7 @@ var _ = Describe("Push Command", func() {
 		appBitsRepo := deps.appBitsRepo
 		serviceRepo := deps.serviceRepo
 
-		cmd := NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo)
+		cmd := NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, words.NewWordGenerator())
 		ctxt := testcmd.NewContext("push", []string{})
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
@@ -91,6 +93,16 @@ var _ = Describe("Push Command", func() {
 			{"Uploading my-new-app"},
 			{"OK"},
 		})
+	})
+
+	It("provides a random hostname when the --random-route flag is passed", func() {
+		deps := getPushDependencies()
+		deps.wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
+		deps.appRepo.ReadNotFound = true
+
+		callPush([]string{"--random-route", "my-new-app"}, deps)
+
+		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
 	})
 
 	It("TestPushingAppWhenItDoesNotExist", func() {
@@ -1048,16 +1060,17 @@ func manifestWithServicesAndEnv() *manifest.Manifest {
 }
 
 type pushDependencies struct {
-	manifestRepo *testmanifest.FakeManifestRepository
-	starter      *testcmd.FakeAppStarter
-	stopper      *testcmd.FakeAppStopper
-	binder       *testcmd.FakeAppBinder
-	appRepo      *testapi.FakeApplicationRepository
-	domainRepo   *testapi.FakeDomainRepository
-	routeRepo    *testapi.FakeRouteRepository
-	stackRepo    *testapi.FakeStackRepository
-	appBitsRepo  *testapi.FakeApplicationBitsRepository
-	serviceRepo  *testapi.FakeServiceRepo
+	manifestRepo  *testmanifest.FakeManifestRepository
+	starter       *testcmd.FakeAppStarter
+	stopper       *testcmd.FakeAppStopper
+	binder        *testcmd.FakeAppBinder
+	appRepo       *testapi.FakeApplicationRepository
+	domainRepo    *testapi.FakeDomainRepository
+	routeRepo     *testapi.FakeRouteRepository
+	stackRepo     *testapi.FakeStackRepository
+	appBitsRepo   *testapi.FakeApplicationBitsRepository
+	serviceRepo   *testapi.FakeServiceRepo
+	wordGenerator words.WordGenerator
 }
 
 func getPushDependencies() (deps pushDependencies) {
@@ -1075,6 +1088,7 @@ func getPushDependencies() (deps pushDependencies) {
 	deps.stackRepo = &testapi.FakeStackRepository{}
 	deps.appBitsRepo = &testapi.FakeApplicationBitsRepository{}
 	deps.serviceRepo = &testapi.FakeServiceRepo{}
+	deps.wordGenerator = words.NewWordGenerator()
 
 	return
 }
@@ -1087,7 +1101,8 @@ func callPush(args []string, deps pushDependencies) (ui *testterm.FakeUI) {
 
 	cmd := NewPush(ui, configRepo, deps.manifestRepo, deps.starter,
 		deps.stopper, deps.binder, deps.appRepo, deps.domainRepo,
-		deps.routeRepo, deps.stackRepo, deps.serviceRepo, deps.appBitsRepo)
+		deps.routeRepo, deps.stackRepo, deps.serviceRepo, deps.appBitsRepo,
+		deps.wordGenerator)
 
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 	testcmd.RunCommand(cmd, ctxt, reqFactory)

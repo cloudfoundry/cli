@@ -16,6 +16,7 @@ import (
 	"cf/manifest"
 	"cf/terminal"
 	"errors"
+	"words"
 )
 
 type Factory interface {
@@ -112,7 +113,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["start"] = start
 	factory.cmdsByName["stop"] = stop
 	factory.cmdsByName["restart"] = restart
-	factory.cmdsByName["push"] = application.NewPush(ui, config, manifestRepo, start, stop, bind, repoLocator.GetApplicationRepository(), repoLocator.GetDomainRepository(), repoLocator.GetRouteRepository(), repoLocator.GetStackRepository(), repoLocator.GetServiceRepository(), repoLocator.GetApplicationBitsRepository())
+	factory.cmdsByName["push"] = application.NewPush(ui, config, manifestRepo, start, stop, bind, repoLocator.GetApplicationRepository(), repoLocator.GetDomainRepository(), repoLocator.GetRouteRepository(), repoLocator.GetStackRepository(), repoLocator.GetServiceRepository(), repoLocator.GetApplicationBitsRepository(), words.NewWordGenerator())
 	factory.cmdsByName["scale"] = application.NewScale(ui, config, restart, repoLocator.GetApplicationRepository())
 
 	spaceRoleSetter := user.NewSetSpaceRole(ui, config, repoLocator.GetSpaceRepository(), repoLocator.GetUserRepository())
