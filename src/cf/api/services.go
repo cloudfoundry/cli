@@ -37,12 +37,16 @@ func NewCloudControllerServiceRepository(config configuration.Reader, gateway ne
 	return
 }
 
-func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offerings models.ServiceOfferings, apiErr errors.Error) {
-	offerings, apiErr = repo.getServiceOfferings(
+func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel(spaceGuid, name string) (offerings models.ServiceOfferings, err errors.Error) {
+	offerings, err = repo.getServiceOfferings(
 		fmt.Sprintf("/v2/spaces/%s/services?q=%s&inline-relations-depth=1", spaceGuid, url.QueryEscape("label:"+name)))
 
-	if apiErr != nil && apiErr.ErrorCode() == cf.BAD_QUERY_PARAM {
-		return repo.findServiceOfferingsByPaginating(spaceGuid, name)
+	if err != nil && err.ErrorCode() == cf.BAD_QUERY_PARAM {
+		offerings, err = repo.findServiceOfferingsByPaginating(spaceGuid, name)
+	}
+
+	if err == nil && len(offerings) == 0 {
+		err = errors.NewModelNotFoundError("Service offering", name)
 	}
 
 	return
