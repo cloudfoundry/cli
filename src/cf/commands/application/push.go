@@ -13,7 +13,6 @@ import (
 	"fmt"
 	"github.com/codegangsta/cli"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -150,25 +149,49 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 	}
 
 	domain := cmd.findDomain(params)
-	cmd.bindRouteToApp(cmd.hostName(params, c), domain, app)
+	hostname := cmd.hostnameForApp(params, c)
+
+	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostname, domain.Name)
+
+	// FIXME: ensure this is a NotFound error
+	if apiErr != nil {
+		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)))
+
+		route, apiErr = cmd.routeRepo.Create(hostname, domain.Guid)
+		if apiErr != nil {
+			cmd.ui.Failed(apiErr.Error())
+		}
+
+		cmd.ui.Ok()
+		cmd.ui.Say("")
+	} else {
+		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
+	}
+
+	if !app.HasRoute(route) {
+		cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)), terminal.EntityNameColor(app.Name))
+
+		apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
+		if apiErr != nil {
+			cmd.ui.Failed(apiErr.Error())
+		}
+	}
 
 	cmd.ui.Ok()
 	cmd.ui.Say("")
 }
 
-func (cmd Push) hostName(appParams models.AppParams, c *cli.Context) string {
+func (cmd Push) hostnameForApp(appParams models.AppParams, c *cli.Context) string {
 	if c.Bool("no-hostname") {
 		return ""
 	}
 
 	if appParams.Host != nil {
 		return *appParams.Host
+	} else if appParams.RandomHostname {
+		return hostNameForString(*appParams.Name) + "-" + cmd.wordGenerator.Babble()
 	} else {
-		if appParams.RandomHostname {
-			return hostNameForString(*appParams.Name) + "-" + cmd.wordGenerator.Babble()
-		} else {
-			return hostNameForString(*appParams.Name)
-		}
+		return hostNameForString(*appParams.Name)
 	}
 }
 
@@ -199,35 +222,6 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 	}
 
 	cmd.starter.ApplicationStart(app)
-}
-
-func (cmd *Push) bindRouteToApp(hostName string, domain models.DomainFields, app models.Application) {
-	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
-	if apiErr != nil {
-		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)))
-
-		route, apiErr = cmd.routeRepo.Create(hostName, domain.Guid)
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
-			return
-		}
-
-		cmd.ui.Ok()
-		cmd.ui.Say("")
-	} else {
-		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
-	}
-
-	if app.HasRoute(route) {
-		return
-	}
-
-	cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostName)), terminal.EntityNameColor(app.Name))
-
-	apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-	}
 }
 
 func (cmd *Push) findDomain(appParams models.AppParams) (domain models.DomainFields) {
@@ -539,12 +533,7 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 	}
 
 	if c.String("p") != "" {
-		var path string
-		path, err = filepath.Abs(c.String("p"))
-		if err != nil {
-			err = errors.New(fmt.Sprintf("Error finding app path: %s", err))
-			return
-		}
+		path := c.String("p")
 		appParams.Path = &path
 	}
 	return
