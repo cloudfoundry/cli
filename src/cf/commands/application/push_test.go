@@ -2,6 +2,7 @@ package application_test
 
 import (
 	. "cf/commands/application"
+	"cf/configuration"
 	"cf/errors"
 	"cf/manifest"
 	"cf/models"
@@ -24,64 +25,95 @@ import (
 )
 
 var _ = Describe("Push Command", func() {
-	It("TestPushingRequirements", func() {
-		ui := new(testterm.FakeUI)
-		configRepo := testconfig.NewRepository()
-		deps := getPushDependencies()
-		manifestRepo := deps.manifestRepo
-		starter := deps.starter
-		stopper := deps.stopper
-		binder := deps.binder
-		appRepo := deps.appRepo
-		domainRepo := deps.domainRepo
-		routeRepo := deps.routeRepo
-		stackRepo := deps.stackRepo
-		appBitsRepo := deps.appBitsRepo
-		serviceRepo := deps.serviceRepo
+	var (
+		cmd           *Push
+		ui            *testterm.FakeUI
+		configRepo    configuration.ReadWriter
+		manifestRepo  *testmanifest.FakeManifestRepository
+		starter       *testcmd.FakeAppStarter
+		stopper       *testcmd.FakeAppStopper
+		binder        *testcmd.FakeAppBinder
+		appRepo       *testapi.FakeApplicationRepository
+		domainRepo    *testapi.FakeDomainRepository
+		routeRepo     *testapi.FakeRouteRepository
+		stackRepo     *testapi.FakeStackRepository
+		appBitsRepo   *testapi.FakeApplicationBitsRepository
+		serviceRepo   *testapi.FakeServiceRepo
+		wordGenerator words.WordGenerator
+	)
 
-		cmd := NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, words.NewWordGenerator())
-		ctxt := testcmd.NewContext("push", []string{})
+	BeforeEach(func() {
+		manifestRepo = &testmanifest.FakeManifestRepository{}
+		starter = &testcmd.FakeAppStarter{}
+		stopper = &testcmd.FakeAppStopper{}
+		binder = &testcmd.FakeAppBinder{}
+		appRepo = &testapi.FakeApplicationRepository{}
 
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-		testcmd.RunCommand(cmd, ctxt, reqFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		domainRepo = &testapi.FakeDomainRepository{}
+		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
+		domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-		testcmd.RunCommand(cmd, ctxt, reqFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		routeRepo = &testapi.FakeRouteRepository{}
+		stackRepo = &testapi.FakeStackRepository{}
+		appBitsRepo = &testapi.FakeApplicationBitsRepository{}
+		serviceRepo = &testapi.FakeServiceRepo{}
+		wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
 
-		testcmd.CommandDidPassRequirements = true
+		ui = new(testterm.FakeUI)
+		configRepo = testconfig.NewRepositoryWithDefaults()
 
-		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-		testcmd.RunCommand(cmd, ctxt, reqFactory)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, wordGenerator)
 	})
 
-	It("TestPushingAppWithOldV2DomainsEndpoint", func() {
-		deps := getPushDependencies()
+	callPush := func(args ...string) {
+		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		testcmd.RunCommand(cmd, testcmd.NewContext("push", args), reqFactory)
+	}
 
-		privateDomain := models.DomainFields{}
-		privateDomain.Shared = false
-		privateDomain.Name = "private.cf-app.com"
-		privateDomain.Guid = "private-domain-guid"
+	Describe("requirements", func() {
+		It("passes when logged in and a space is targeted", func() {
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		})
 
-		sharedDomain := models.DomainFields{}
-		sharedDomain.Name = "shared.cf-app.com"
-		sharedDomain.Shared = true
-		sharedDomain.Guid = "shared-domain-guid"
+		It("fails when not logged in", func() {
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
+			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 
-		deps.domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "", "", "", "")
-		deps.domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.appRepo.ReadNotFound = true
+		It("fails when a space is not targeted", func() {
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
+			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+	})
 
-		ui := callPush([]string{"-t", "111", "my-new-app"}, deps)
+	It("successfully pushes an app when the CC API only supports the old domains endpoints", func() {
+		privateDomain := models.DomainFields{
+			Shared: false,
+			Name:   "private.cf-app.com",
+			Guid:   "private-domain-guid",
+		}
+		sharedDomain := models.DomainFields{
+			Name:   "shared.cf-app.com",
+			Shared: true,
+			Guid:   "shared-domain-guid",
+		}
 
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("shared-domain-guid"))
-		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
-		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
+		domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "", "", "", "")
+		domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
+		routeRepo.FindByHostAndDomainErr = true
+		appRepo.ReadNotFound = true
+
+		callPush("-t", "111", "my-new-app")
+
+		Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
+		Expect(routeRepo.CreatedHost).To(Equal("my-new-app"))
+		Expect(routeRepo.CreatedDomainGuid).To(Equal("shared-domain-guid"))
+		Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+		Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating app", "my-new-app", "my-org", "my-space"},
@@ -96,54 +128,46 @@ var _ = Describe("Push Command", func() {
 	})
 
 	Describe("randomized hostnames", func() {
-		var (
-			deps        pushDependencies
-			manifestApp generic.Map
-		)
+		var manifestApp generic.Map
 
 		BeforeEach(func() {
-			deps = getPushDependencies()
-			deps.wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
-			deps.appRepo.ReadNotFound = true
+			appRepo.ReadNotFound = true
 
 			manifest := singleAppManifest()
 			manifestApp = manifest.Data.Get("applications").([]interface{})[0].(generic.Map)
 			manifestApp.Delete("host")
-			deps.manifestRepo.ReadManifestReturns.Manifest = manifest
+			manifestRepo.ReadManifestReturns.Manifest = manifest
 		})
 
 		It("provides a random hostname when the --random-hostname flag is passed", func() {
-			callPush([]string{"--random-hostname", "my-new-app"}, deps)
-
-			Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
+			callPush("--random-hostname", "my-new-app")
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
 		})
 
 		It("provides a random hostname when the random-hostname option is set in the manifest", func() {
 			manifestApp.Set("random-hostname", true)
 
-			callPush([]string{"my-new-app"}, deps)
+			callPush("my-new-app")
 
-			Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
 		})
 	})
 
-	It("TestPushingAppWhenItDoesNotExist", func() {
-		deps := getPushDependencies()
+	It("creates an app when pushing for the first time", func() {
+		routeRepo.FindByHostAndDomainErr = true
+		appRepo.ReadNotFound = true
 
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.appRepo.ReadNotFound = true
+		callPush("-t", "111", "my-new-app")
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
+		Expect(*appRepo.CreatedAppParams().SpaceGuid).To(Equal("my-space-guid"))
 
-		ui := callPush([]string{"-t", "111", "my-new-app"}, deps)
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
-		Expect(*deps.appRepo.CreatedAppParams().SpaceGuid).To(Equal("my-space-guid"))
+		Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
+		Expect(routeRepo.CreatedHost).To(Equal("my-new-app"))
+		Expect(routeRepo.CreatedDomainGuid).To(Equal("foo-domain-guid"))
+		Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+		Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
 
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("foo-domain-guid"))
-		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
-		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
-
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
+		Expect(appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating app", "my-new-app", "my-org", "my-space"},
@@ -156,23 +180,21 @@ var _ = Describe("Push Command", func() {
 			{"OK"},
 		})
 
-		Expect(deps.stopper.AppToStop.Guid).To(Equal(""))
-		Expect(deps.starter.AppToStart.Guid).To(Equal("my-new-app-guid"))
-		Expect(deps.starter.AppToStart.Name).To(Equal("my-new-app"))
-		Expect(deps.starter.Timeout).To(Equal(111))
+		Expect(stopper.AppToStop.Guid).To(Equal(""))
+		Expect(starter.AppToStart.Guid).To(Equal("my-new-app-guid"))
+		Expect(starter.AppToStart.Name).To(Equal("my-new-app"))
+		Expect(starter.Timeout).To(Equal(111))
 	})
 
-	It("TestPushingAppWithACrazyName", func() {
-		deps := getPushDependencies()
+	It("strips special characters when creating a default route", func() {
+		routeRepo.FindByHostAndDomainErr = true
+		appRepo.ReadNotFound = true
 
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.appRepo.ReadNotFound = true
+		callPush("-t", "111", "Tim's 1st-Crazy__app!")
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("Tim's 1st-Crazy__app!"))
 
-		ui := callPush([]string{"-t", "111", "Tim's 1st-Crazy__app!"}, deps)
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("Tim's 1st-Crazy__app!"))
-
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("tims-1st-crazy-app"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal("tims-1st-crazy-app"))
+		Expect(routeRepo.FindByHostAndDomainHost).To(Equal("tims-1st-crazy-app"))
+		Expect(routeRepo.CreatedHost).To(Equal("tims-1st-crazy-app"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating", "tims-1st-crazy-app.foo.cf-app.com"},
@@ -183,24 +205,22 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingAppWhenItDoesNotExistButRouteExists", func() {
-		deps := getPushDependencies()
-
+	It("binds to existing routes when pushing an app", func() {
 		route := models.Route{}
 		route.Guid = "my-route-guid"
 		route.Host = "my-new-app"
-		route.Domain = deps.domainRepo.ListSharedDomainsDomains[0]
+		route.Domain = domainRepo.ListSharedDomainsDomains[0]
 
-		deps.routeRepo.FindByHostAndDomainRoute = route
-		deps.appRepo.ReadNotFound = true
+		routeRepo.FindByHostAndDomainRoute = route
+		appRepo.ReadNotFound = true
 
-		ui := callPush([]string{"my-new-app"}, deps)
+		callPush("my-new-app")
 
-		Expect(deps.routeRepo.CreatedHost).To(BeEmpty())
-		Expect(deps.routeRepo.CreatedDomainGuid).To(BeEmpty())
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
-		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
+		Expect(routeRepo.CreatedHost).To(BeEmpty())
+		Expect(routeRepo.CreatedDomainGuid).To(BeEmpty())
+		Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
+		Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+		Expect(routeRepo.BoundRouteGuid).To(Equal("my-route-guid"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using", "my-new-app.foo.cf-app.com"},
@@ -209,20 +229,19 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingAppWithCustomFlags", func() {
-		deps := getPushDependencies()
-		deps.domainRepo.FindByNameInOrgDomain = models.DomainFields{
+	It("creates an app from the flags provided on the command line", func() {
+		domainRepo.FindByNameInOrgDomain = models.DomainFields{
 			Name: "bar.cf-app.com",
 			Guid: "bar-domain-guid",
 		}
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.stackRepo.FindByNameStack = models.Stack{
+		routeRepo.FindByHostAndDomainErr = true
+		stackRepo.FindByNameStack = models.Stack{
 			Name: "customLinux",
 			Guid: "custom-linux-guid",
 		}
-		deps.appRepo.ReadNotFound = true
+		appRepo.ReadNotFound = true
 
-		ui := callPush([]string{
+		callPush(
 			"-c", "unicorn -c config/unicorn.rb -D",
 			"-d", "bar.cf-app.com",
 			"-n", "my-hostname",
@@ -233,7 +252,7 @@ var _ = Describe("Push Command", func() {
 			"-t", "1",
 			"--no-start",
 			"my-new-app",
-		}, deps)
+		)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using", "customLinux"},
@@ -247,37 +266,36 @@ var _ = Describe("Push Command", func() {
 			{"OK"},
 		})
 
-		Expect(deps.stackRepo.FindByNameName).To(Equal("customLinux"))
+		Expect(stackRepo.FindByNameName).To(Equal("customLinux"))
 
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
-		Expect(*deps.appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
-		Expect(*deps.appRepo.CreatedAppParams().InstanceCount).To(Equal(3))
-		Expect(*deps.appRepo.CreatedAppParams().Memory).To(Equal(uint64(2048)))
-		Expect(*deps.appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
-		Expect(*deps.appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))
-		Expect(*deps.appRepo.CreatedAppParams().BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
+		Expect(*appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
+		Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(3))
+		Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(2048)))
+		Expect(*appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
+		Expect(*appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))
+		Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
 
-		Expect(deps.domainRepo.FindByNameInOrgName).To(Equal("bar.cf-app.com"))
-		Expect(deps.domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
+		Expect(domainRepo.FindByNameInOrgName).To(Equal("bar.cf-app.com"))
+		Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
 
-		Expect(deps.routeRepo.CreatedHost).To(Equal("my-hostname"))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("bar-domain-guid"))
-		Expect(deps.routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
-		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("my-hostname-route-guid"))
+		Expect(routeRepo.CreatedHost).To(Equal("my-hostname"))
+		Expect(routeRepo.CreatedDomainGuid).To(Equal("bar-domain-guid"))
+		Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+		Expect(routeRepo.BoundRouteGuid).To(Equal("my-hostname-route-guid"))
 
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
+		Expect(appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
 
-		Expect(deps.starter.AppToStart.Name).To(Equal(""))
+		Expect(starter.AppToStart.Name).To(Equal(""))
 	})
 
-	It("TestPushingAppWithInvalidTimeout", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("fails when a non-numeric start timeout is given", func() {
+		appRepo.ReadNotFound = true
 
-		ui := callPush([]string{
+		callPush(
 			"-t", "FooeyTimeout",
 			"my-new-app",
-		}, deps)
+		)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
@@ -285,59 +303,50 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingAppToResetStartCommand", func() {
-		deps := getPushDependencies()
-
+	It("resets the app's command when the -c flag is provided as 'null'", func() {
 		existingApp := models.Application{}
 		existingApp.Name = "existing-app"
 		existingApp.Guid = "existing-app-guid"
 		existingApp.Command = "unicorn -c config/unicorn.rb -D"
 
-		deps.appRepo.ReadApp = existingApp
+		appRepo.ReadApp = existingApp
 
-		args := []string{
-			"-c", "null",
-			"existing-app",
-		}
-		_ = callPush(args, deps)
+		callPush("-c", "null", "existing-app")
 
-		Expect(*deps.appRepo.UpdateParams.Command).To(Equal(""))
+		Expect(*appRepo.UpdateParams.Command).To(Equal(""))
 	})
 
-	It("TestPushingAppMergesManifestEnvVarsWithExistingEnvVars", func() {
-		deps := getPushDependencies()
-
+	It("merges env vars from the manifest with those from the server", func() {
 		existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
 		existingApp.EnvironmentVars = map[string]string{
 			"crazy": "pants",
 			"FOO":   "NotYoBaz",
 			"foo":   "manchu",
 		}
-		deps.appRepo.ReadApp = existingApp
+		appRepo.ReadApp = existingApp
 
-		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
+		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
-		_ = callPush([]string{"existing-app"}, deps)
+		callPush("existing-app")
 
-		updatedAppEnvVars := *deps.appRepo.UpdateParams.EnvironmentVars
+		updatedAppEnvVars := *appRepo.UpdateParams.EnvironmentVars
 		Expect(updatedAppEnvVars["crazy"]).To(Equal("pants"))
 		Expect(updatedAppEnvVars["FOO"]).To(Equal("baz"))
 		Expect(updatedAppEnvVars["foo"]).To(Equal("manchu"))
 		Expect(updatedAppEnvVars["PATH"]).To(Equal("/u/apps/my-app/bin"))
 	})
 
-	It("TestPushingAppWithSingleAppManifest", func() {
-		deps := getPushDependencies()
+	It("pushes an app when provided a manifest with one app defined", func() {
 		domain := models.DomainFields{}
 		domain.Name = "manifest-example.com"
 		domain.Guid = "bar-domain-guid"
-		deps.domainRepo.FindByNameInOrgDomain = domain
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.appRepo.ReadNotFound = true
+		domainRepo.FindByNameInOrgDomain = domain
+		routeRepo.FindByHostAndDomainErr = true
+		appRepo.ReadNotFound = true
 
-		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
+		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
-		ui := callPush([]string{}, deps)
+		callPush()
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating route", "manifest-host.manifest-example.com"},
 			{"OK"},
@@ -345,31 +354,30 @@ var _ = Describe("Push Command", func() {
 			{"manifest-app-name"},
 		})
 
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("manifest-app-name"))
-		Expect(*deps.appRepo.CreatedAppParams().Memory).To(Equal(uint64(128)))
-		Expect(*deps.appRepo.CreatedAppParams().InstanceCount).To(Equal(1))
-		Expect(*deps.appRepo.CreatedAppParams().StackName).To(Equal("custom-stack"))
-		Expect(*deps.appRepo.CreatedAppParams().BuildpackUrl).To(Equal("some-buildpack"))
-		Expect(*deps.appRepo.CreatedAppParams().Command).To(Equal("JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run"))
-		Expect(deps.appBitsRepo.UploadedDir).To(Equal(filepath.Clean("some/path/from/manifest")))
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("manifest-app-name"))
+		Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(128)))
+		Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(1))
+		Expect(*appRepo.CreatedAppParams().StackName).To(Equal("custom-stack"))
+		Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("some-buildpack"))
+		Expect(*appRepo.CreatedAppParams().Command).To(Equal("JAVA_HOME=$PWD/.openjdk JAVA_OPTS=\"-Xss995K\" ./bin/start.sh run"))
+		Expect(appBitsRepo.UploadedDir).To(Equal(filepath.Clean("some/path/from/manifest")))
 
-		envVars := *deps.appRepo.CreatedAppParams().EnvironmentVars
+		envVars := *appRepo.CreatedAppParams().EnvironmentVars
 		Expect(envVars).To(Equal(map[string]string{
 			"PATH": "/u/apps/my-app/bin",
 			"FOO":  "baz",
 		}))
 	})
 
-	It("TestPushingAppManifestWithErrors", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = &manifest.Manifest{Path: "/some-path/"}
-		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{
+	It("fails when parsing the manifest has errors", func() {
+		appRepo.ReadNotFound = true
+		manifestRepo.ReadManifestReturns.Manifest = &manifest.Manifest{Path: "/some-path/"}
+		manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{
 			errors.New("buildpack should not be null"),
 			errors.New("disk_quota should not be null"),
 		}
 
-		ui := callPush([]string{}, deps)
+		callPush()
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
@@ -379,82 +387,77 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingManyAppsFromManifest", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
-
-		ui := callPush([]string{}, deps)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating", "app1"},
-			{"Creating", "app2"},
+	Context("when a manifest has many apps", func() {
+		BeforeEach(func() {
+			appRepo.ReadNotFound = true
+			manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 		})
-		Expect(len(deps.appRepo.CreateAppParams)).To(Equal(2))
 
-		firstApp := deps.appRepo.CreateAppParams[0]
-		secondApp := deps.appRepo.CreateAppParams[1]
-		Expect(*firstApp.Name).To(Equal("app1"))
-		Expect(*secondApp.Name).To(Equal("app2"))
+		It("pushes each app", func() {
+			callPush()
 
-		envVars := *firstApp.EnvironmentVars
-		Expect(envVars["SOMETHING"]).To(Equal("definitely-something"))
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating", "app1"},
+				{"Creating", "app2"},
+			})
+			Expect(len(appRepo.CreateAppParams)).To(Equal(2))
 
-		envVars = *secondApp.EnvironmentVars
-		Expect(envVars["SOMETHING"]).To(Equal("nothing"))
+			firstApp := appRepo.CreateAppParams[0]
+			secondApp := appRepo.CreateAppParams[1]
+			Expect(*firstApp.Name).To(Equal("app1"))
+			Expect(*secondApp.Name).To(Equal("app2"))
+
+			envVars := *firstApp.EnvironmentVars
+			Expect(envVars["SOMETHING"]).To(Equal("definitely-something"))
+
+			envVars = *secondApp.EnvironmentVars
+			Expect(envVars["SOMETHING"]).To(Equal("nothing"))
+		})
+
+		It("pushes a single app when given the name of a single app in the manifest", func() {
+			callPush("app2")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating", "app2"},
+			})
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"Creating", "app1"},
+			})
+			Expect(len(appRepo.CreateAppParams)).To(Equal(1))
+			Expect(*appRepo.CreateAppParams[0].Name).To(Equal("app2"))
+		})
+
+		It("fails when given the name of an app that is not in the manifest", func() {
+			callPush("non-existant-app")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Failed"},
+			})
+			Expect(len(appRepo.CreateAppParams)).To(Equal(0))
+		})
 	})
 
-	It("TestPushingASingleAppFromAManifestWithManyApps", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
+	It("binds service instances to the app", func() {
+		appRepo.ReadNotFound = true
 
-		ui := callPush([]string{"app2"}, deps)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating", "app2"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"Creating", "app1"},
-		})
-		Expect(len(deps.appRepo.CreateAppParams)).To(Equal(1))
-		Expect(*deps.appRepo.CreateAppParams[0].Name).To(Equal("app2"))
-	})
-
-	It("TestNamedAppInAManifestIsNotFound", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
-
-		ui := callPush([]string{"non-existant-app"}, deps)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Failed"},
-		})
-		Expect(len(deps.appRepo.CreateAppParams)).To(Equal(0))
-	})
-
-	It("TestPushingWithBindingMergedServices", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-
-		deps.serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
+		serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
 			"global-service": maker.NewServiceInstance("global-service"),
 			"app1-service":   maker.NewServiceInstance("app1-service"),
 			"app2-service":   maker.NewServiceInstance("app2-service"),
 		})
 
-		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
+		manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush([]string{}, deps)
-		Expect(len(deps.binder.AppsToBind)).To(Equal(4))
-		Expect(deps.binder.AppsToBind[0].Name).To(Equal("app1"))
-		Expect(deps.binder.AppsToBind[1].Name).To(Equal("app1"))
-		Expect(deps.binder.InstancesToBindTo[0].Name).To(Equal("app1-service"))
-		Expect(deps.binder.InstancesToBindTo[1].Name).To(Equal("global-service"))
+		callPush()
+		Expect(len(binder.AppsToBind)).To(Equal(4))
+		Expect(binder.AppsToBind[0].Name).To(Equal("app1"))
+		Expect(binder.AppsToBind[1].Name).To(Equal("app1"))
+		Expect(binder.InstancesToBindTo[0].Name).To(Equal("app1-service"))
+		Expect(binder.InstancesToBindTo[1].Name).To(Equal("global-service"))
 
-		Expect(deps.binder.AppsToBind[2].Name).To(Equal("app2"))
-		Expect(deps.binder.AppsToBind[3].Name).To(Equal("app2"))
-		Expect(deps.binder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
-		Expect(deps.binder.InstancesToBindTo[3].Name).To(Equal("global-service"))
+		Expect(binder.AppsToBind[2].Name).To(Equal("app2"))
+		Expect(binder.AppsToBind[3].Name).To(Equal("app2"))
+		Expect(binder.InstancesToBindTo[2].Name).To(Equal("app2-service"))
+		Expect(binder.InstancesToBindTo[3].Name).To(Equal("global-service"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating", "app1"},
@@ -472,84 +475,43 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushWithServicesThatAreNotFound", func() {
-		deps := getPushDependencies()
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.serviceRepo.FindInstanceByNameErr = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
+	It("fails when the service instances can't be found", func() {
+		routeRepo.FindByHostAndDomainErr = true
+		serviceRepo.FindInstanceByNameErr = true
+		manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 
-		ui := callPush([]string{}, deps)
+		callPush()
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"Could not find service", "app1-service", "app1"},
 		})
 	})
 
-	It("TestPushingAppWithPath", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("uploads the application bits from the -p path", func() {
+		appRepo.ReadNotFound = true
 
-		absPath, err := filepath.Abs("../../../fixtures/example-app")
-		Expect(err).NotTo(HaveOccurred())
+		callPush("-p", "../some/path-to/an-app", "app-with-path")
 
-		callPush([]string{
-			"-p", absPath,
-			"app-with-path",
-		}, deps)
-
-		Expect(deps.appBitsRepo.UploadedDir).To(Equal(absPath))
+		Expect(appBitsRepo.UploadedDir).To(Equal("../some/path-to/an-app"))
 	})
 
-	It("TestPushingAppWithPathToZipFile", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("pushes the current working directory if a path is not given", func() {
+		appRepo.ReadNotFound = true
 
-		absPath, err := filepath.Abs("../../../fixtures/example-app.jar")
-		Expect(err).NotTo(HaveOccurred())
-
-		callPush([]string{
-			"-p", absPath,
-			"app-with-path",
-		}, deps)
-
-		Expect(deps.appBitsRepo.UploadedDir).To(Equal(absPath))
-	})
-
-	It("TestPushingWithDefaultAppPath", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-
-		callPush([]string{"app-with-default-path"}, deps)
+		callPush("app-with-default-path")
 
 		dir, err := os.Getwd()
 		Expect(err).NotTo(HaveOccurred())
-		Expect(deps.appBitsRepo.UploadedDir).To(Equal(dir))
+		Expect(appBitsRepo.UploadedDir).To(Equal(dir))
 	})
 
-	It("TestPushingWithRelativeAppPath", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("fails when given a bad manifest path", func() {
+		appRepo.ReadNotFound = true
 
-		callPush([]string{
-			"-p", "../../../fixtures/example-app",
-			"app-with-relative-path",
-		}, deps)
+		manifestRepo.ReadManifestReturns.Manifest = manifest.NewEmptyManifest()
+		manifestRepo.ReadManifestReturns.Errors = []error{errors.New("read manifest error")}
 
-		dir, err := os.Getwd()
-		Expect(err).NotTo(HaveOccurred())
-		Expect(deps.appBitsRepo.UploadedDir).To(Equal(filepath.Join(dir, "../../../fixtures/example-app")))
-	})
-
-	It("TestPushingWithBadManifestPath", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-
-		deps.manifestRepo.ReadManifestReturns.Manifest = manifest.NewEmptyManifest()
-		deps.manifestRepo.ReadManifestReturns.Errors = []error{errors.New("read manifest error")}
-
-		ui := callPush([]string{
-			"-f", "bad/manifest/path",
-		}, deps)
+		callPush("-f", "bad/manifest/path")
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
@@ -557,14 +519,13 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingWithDefaultManifestNotFound", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
-		deps.manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{syscall.ENOENT}
-		deps.manifestRepo.ReadManifestReturns.Manifest.Path = ""
+	It("does not fail when the current working directory does not contain a manifest", func() {
+		appRepo.ReadNotFound = true
+		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
+		manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{syscall.ENOENT}
+		manifestRepo.ReadManifestReturns.Manifest.Path = ""
 
-		ui := callPush([]string{"--no-route", "app-name"}, deps)
+		callPush("--no-route", "app-name")
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating app", "app-name"},
 			{"OK"},
@@ -576,126 +537,95 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingWithManifestInAppDirectory", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-		deps.manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
-		deps.manifestRepo.ReadManifestReturns.Manifest.Path = "manifest.yml"
+	It("uses the manifest in the current directory by default", func() {
+		appRepo.ReadNotFound = true
+		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
+		manifestRepo.ReadManifestReturns.Manifest.Path = "manifest.yml"
 
-		ui := callPush([]string{"-p", "some/relative/path"}, deps)
+		callPush("-p", "some/relative/path")
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Using manifest file", "manifest.yml"},
 		})
 
 		cwd, _ := os.Getwd()
-		Expect(deps.manifestRepo.ReadManifestArgs.Path).To(Equal(cwd))
+		Expect(manifestRepo.ReadManifestArgs.Path).To(Equal(cwd))
 	})
 
-	It("TestPushingWithNoManifestFlag", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("does not use a manifest if the 'no-manifest' flag is passed", func() {
+		appRepo.ReadNotFound = true
 
-		ui := callPush([]string{"--no-route", "--no-manifest", "app-name"}, deps)
+		callPush("--no-route", "--no-manifest", "app-name")
 
 		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
 			{"FAILED"},
 			{"hacker-manifesto"},
 		})
 
-		Expect(deps.manifestRepo.ReadManifestArgs.Path).To(Equal(""))
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("app-name"))
+		Expect(manifestRepo.ReadManifestArgs.Path).To(Equal(""))
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("app-name"))
 	})
 
-	It("TestPushingWithNoManifestFlagAndMissingAppName", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-
-		ui := callPush([]string{"--no-route", "--no-manifest"}, deps)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-		})
-	})
-
-	It("TestPushingAppWithNoRoute", func() {
-		deps := getPushDependencies()
+	It("does not create a route when provided the --no-route flag", func() {
 		domain := models.DomainFields{}
 		domain.Name = "bar.cf-app.com"
 		domain.Guid = "bar-domain-guid"
 
-		deps.domainRepo.FindByNameInOrgDomain = domain
-		deps.routeRepo.FindByHostErr = true
-		deps.appRepo.ReadNotFound = true
+		domainRepo.FindByNameInOrgDomain = domain
+		routeRepo.FindByHostErr = true
+		appRepo.ReadNotFound = true
 
-		callPush([]string{
+		callPush(
 			"--no-route",
 			"my-new-app",
-		}, deps)
+		)
 
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal(""))
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
+		Expect(routeRepo.CreatedHost).To(Equal(""))
+		Expect(routeRepo.CreatedDomainGuid).To(Equal(""))
 	})
 
-	It("TestPushingAppWithNoHostname", func() {
-		deps := getPushDependencies()
+	It("maps the root domain route to the app when given the --no-hostname flag", func() {
 		domain := models.DomainFields{}
 		domain.Name = "bar.cf-app.com"
 		domain.Guid = "bar-domain-guid"
 		domain.Shared = true
 
-		deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.appRepo.ReadNotFound = true
+		domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
+		routeRepo.FindByHostAndDomainErr = true
+		appRepo.ReadNotFound = true
 
-		callPush([]string{
+		callPush(
 			"--no-hostname",
 			"my-new-app",
-		}, deps)
+		)
 
-		Expect(*deps.appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("bar-domain-guid"))
+		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
+		Expect(routeRepo.CreatedHost).To(Equal(""))
+		Expect(routeRepo.CreatedDomainGuid).To(Equal("bar-domain-guid"))
 	})
 
-	It("TestPushingAppAsWorker", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("Does not create a route when the no-route property is in the manifest", func() {
+		appRepo.ReadNotFound = true
 
 		workerManifest := singleAppManifest()
 		workerManifest.Data.Get("applications").([]interface{})[0].(generic.Map).Set("no-route", true)
-		deps.manifestRepo.ReadManifestReturns.Manifest = workerManifest
+		manifestRepo.ReadManifestReturns.Manifest = workerManifest
 
-		ui := callPush([]string{
+		callPush(
 			"worker-app",
-		}, deps)
+		)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"worker-app", "is a worker", "skipping route creation"},
 		})
-		Expect(deps.routeRepo.BoundAppGuid).To(Equal(""))
-		Expect(deps.routeRepo.BoundRouteGuid).To(Equal(""))
+		Expect(routeRepo.BoundAppGuid).To(Equal(""))
+		Expect(routeRepo.BoundRouteGuid).To(Equal(""))
 	})
 
-	It("TestPushingAppWithMemoryInMegaBytes", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
+	It("fails when given an invalid memory limit", func() {
+		appRepo.ReadNotFound = true
 
-		callPush([]string{
-			"-m", "256M",
-			"my-new-app",
-		}, deps)
-
-		Expect(*deps.appRepo.CreatedAppParams().Memory).To(Equal(uint64(256)))
-	})
-
-	It("TestPushingAppWithInvalidMemory", func() {
-		deps := getPushDependencies()
-		deps.appRepo.ReadNotFound = true
-
-		ui := callPush([]string{
-			"-m", "abcM",
-			"my-new-app",
-		}, deps)
+		callPush("-m", "abcM", "my-new-app")
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},
@@ -703,33 +633,29 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingAppWhenItAlreadyExistsAndNothingIsSpecified", func() {
-		deps := getPushDependencies()
+	It("stops the app, achieving a full-downtime deploy!", func() {
 		existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
+		appRepo.ReadApp = existingApp
+		appRepo.UpdateAppResult = existingApp
 
-		_ = callPush([]string{"existing-app"}, deps)
+		callPush("existing-app")
 
-		Expect(deps.stopper.AppToStop.Guid).To(Equal(existingApp.Guid))
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal(existingApp.Guid))
+		Expect(stopper.AppToStop.Guid).To(Equal(existingApp.Guid))
+		Expect(appBitsRepo.UploadedAppGuid).To(Equal(existingApp.Guid))
 	})
 
-	It("TestPushingAppWhenItIsStopped", func() {
-		deps := getPushDependencies()
+	It("does not stop the app when it is already stopped", func() {
 		stoppedApp := maker.NewApp(maker.Overrides{"state": "stopped", "name": "stopped-app"})
 
-		deps.appRepo.ReadApp = stoppedApp
-		deps.appRepo.UpdateAppResult = stoppedApp
+		appRepo.ReadApp = stoppedApp
+		appRepo.UpdateAppResult = stoppedApp
 
-		_ = callPush([]string{"stopped-app"}, deps)
+		callPush("stopped-app")
 
-		Expect(deps.stopper.AppToStop.Guid).To(Equal(""))
+		Expect(stopper.AppToStop.Guid).To(Equal(""))
 	})
 
-	It("TestPushingAppWhenItAlreadyExistsAndChangingOptions", func() {
-		deps := getPushDependencies()
-
+	It("updates the app if it already exists", func() {
 		existingRoute := models.RouteSummary{}
 		existingRoute.Host = "existing-app"
 
@@ -738,268 +664,167 @@ var _ = Describe("Push Command", func() {
 		existingApp.Guid = "existing-app-guid"
 		existingApp.Routes = []models.RouteSummary{existingRoute}
 
-		deps.appRepo.ReadApp = existingApp
+		appRepo.ReadApp = existingApp
 
 		stack := models.Stack{}
 		stack.Name = "differentStack"
 		stack.Guid = "differentStack-guid"
-		deps.stackRepo.FindByNameStack = stack
+		stackRepo.FindByNameStack = stack
 
-		args := []string{
+		callPush(
 			"-c", "different start command",
 			"-i", "10",
 			"-m", "1G",
 			"-b", "https://github.com/heroku/heroku-buildpack-different.git",
 			"-s", "differentStack",
 			"existing-app",
-		}
-		_ = callPush(args, deps)
+		)
 
-		Expect(*deps.appRepo.UpdateParams.Command).To(Equal("different start command"))
-		Expect(*deps.appRepo.UpdateParams.InstanceCount).To(Equal(10))
-		Expect(*deps.appRepo.UpdateParams.Memory).To(Equal(uint64(1024)))
-		Expect(*deps.appRepo.UpdateParams.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-different.git"))
-		Expect(*deps.appRepo.UpdateParams.StackGuid).To(Equal("differentStack-guid"))
+		Expect(*appRepo.UpdateParams.Command).To(Equal("different start command"))
+		Expect(*appRepo.UpdateParams.InstanceCount).To(Equal(10))
+		Expect(*appRepo.UpdateParams.Memory).To(Equal(uint64(1024)))
+		Expect(*appRepo.UpdateParams.BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-different.git"))
+		Expect(*appRepo.UpdateParams.StackGuid).To(Equal("differentStack-guid"))
 	})
 
-	It("TestPushingAppWhenItAlreadyExistsAndDomainIsSpecifiedIsAlreadyBound", func() {
-		deps := getPushDependencies()
+	Describe("when the app already exists and has a route bound", func() {
+		BeforeEach(func() {
+			domain := models.DomainFields{
+				Name:   "example.com",
+				Guid:   "domain-guid",
+				Shared: true,
+			}
 
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
-		domain.Guid = "domain-guid"
+			domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 
-		existingRoute := models.RouteSummary{}
-		existingRoute.Host = "existing-app"
-		existingRoute.Domain = domain
+			existingRoute := models.RouteSummary{}
+			existingRoute.Host = "existing-app"
+			existingRoute.Domain = domain
 
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-		existingApp.Routes = []models.RouteSummary{existingRoute}
+			routeRepo.FindByHostAndDomainRoute = models.Route{
+				RouteSummary: existingRoute,
+			}
 
-		foundRoute := models.Route{}
-		foundRoute.RouteFields = existingRoute.RouteFields
-		foundRoute.Domain = existingRoute.Domain
+			existingApp := models.Application{}
+			existingApp.Name = "existing-app"
+			existingApp.Guid = "existing-app-guid"
+			existingApp.Routes = []models.RouteSummary{existingRoute}
 
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
-		deps.routeRepo.FindByHostAndDomainRoute = foundRoute
+			appRepo.ReadApp = existingApp
+			appRepo.UpdateAppResult = existingApp
+		})
 
-		ui := callPush([]string{"-d", "example.com", "existing-app"}, deps)
+		It("uses the existing route when an app already has it bound", func() {
+			callPush("-d", "example.com", "existing-app")
 
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Using route", "existing-app", "example.com"},
+			})
+		})
+
+		It("does not add a route to the app if no route-related flags are given", func() {
+			callPush("existing-app")
+
+			Expect(appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
+			Expect(domainRepo.FindByNameInOrgName).To(Equal(""))
+			Expect(routeRepo.FindByHostAndDomainDomain).To(Equal(""))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal(""))
+			Expect(routeRepo.CreatedHost).To(Equal(""))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal(""))
+		})
+
+		It("creates and binds a route when a different domain is specified", func() {
+			newDomain := models.DomainFields{Guid: "domain-guid", Name: "newdomain.com"}
+			routeRepo.FindByHostAndDomainNotFound = true
+			domainRepo.FindByNameInOrgDomain = newDomain
+
+			callPush("-d", "newdomain.com", "existing-app")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating route", "existing-app.newdomain.com"},
+				{"OK"},
+				{"Binding", "existing-app.newdomain.com"},
+			})
+
+			Expect(domainRepo.FindByNameInOrgName).To(Equal("newdomain.com"))
+			Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
+			Expect(routeRepo.FindByHostAndDomainDomain).To(Equal("newdomain.com"))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("existing-app"))
+			Expect(routeRepo.CreatedHost).To(Equal("existing-app"))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
+		})
+
+		It("creates and binds a route when a different hostname is specified", func() {
+			routeRepo.FindByHostAndDomainNotFound = true
+
+			callPush("-n", "new-host", "existing-app")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating route", "new-host.example.com"},
+				{"OK"},
+				{"Binding", "new-host.example.com"},
+			})
+
+			Expect(routeRepo.FindByHostAndDomainDomain).To(Equal("example.com"))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("new-host"))
+			Expect(routeRepo.CreatedHost).To(Equal("new-host"))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
+		})
+
+		It("does not create a route when the --no-route flag is given", func() {
+			callPush("--no-route", "existing-app")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Uploading", "existing-app"},
+				{"OK"},
+			})
+
+			Expect(appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
+			Expect(domainRepo.FindByNameInOrgName).To(Equal(""))
+			Expect(routeRepo.FindByHostAndDomainDomain).To(Equal(""))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal(""))
+			Expect(routeRepo.CreatedHost).To(Equal(""))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal(""))
+		})
+
+		It("binds the root domain route to an app with a pre-existing route when the --no-hostname flag is given", func() {
+			routeRepo.FindByHostAndDomainNotFound = true
+
+			callPush("--no-hostname", "existing-app")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating route", "example.com"},
+				{"OK"},
+				{"Binding", "example.com"},
+			})
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"existing-app.example.com"},
+			})
+
+			Expect(routeRepo.FindByHostAndDomainDomain).To(Equal("example.com"))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal(""))
+			Expect(routeRepo.CreatedHost).To(Equal(""))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
+		})
+	})
+
+	It("displays information about the files being uploaded", func() {
+		appRepo.ReadNotFound = true
+		appBitsRepo.CallbackPath = "path/to/app"
+		appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
+		appBitsRepo.CallbackFileCount = 11
+
+		callPush("appName")
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Using route", "existing-app", "example.com"},
+			{"Uploading", "path/to/app"},
+			{"61M", "11 files"},
 		})
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
 	})
 
-	It("TestPushingAppWhenItAlreadyExistsAndDomainSpecifiedIsNotBound", func() {
-		deps := getPushDependencies()
+	It("fails when the app can't be uploaded", func() {
+		appBitsRepo.UploadAppErr = true
 
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
-
-		existingRoute := models.RouteSummary{}
-		existingRoute.Host = "existing-app"
-		existingRoute.Domain = domain
-
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-		existingApp.Routes = []models.RouteSummary{existingRoute}
-
-		foundDomain := models.DomainFields{}
-		foundDomain.Guid = "domain-guid"
-		foundDomain.Name = "newdomain.com"
-
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
-		deps.routeRepo.FindByHostAndDomainNotFound = true
-		deps.domainRepo.FindByNameInOrgDomain = foundDomain
-
-		ui := callPush([]string{"-d", "newdomain.com", "existing-app"}, deps)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route", "existing-app.newdomain.com"},
-			{"OK"},
-			{"Binding", "existing-app.newdomain.com"},
-		})
-
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
-		Expect(deps.domainRepo.FindByNameInOrgName).To(Equal("newdomain.com"))
-		Expect(deps.domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
-		Expect(deps.routeRepo.FindByHostAndDomainDomain).To(Equal("newdomain.com"))
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("existing-app"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal("existing-app"))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
-	})
-
-	It("TestPushingAppWithNoFlagsWhenAppIsAlreadyBoundToDomain", func() {
-		deps := getPushDependencies()
-
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
-
-		existingRoute := models.RouteSummary{}
-		existingRoute.Host = "foo"
-		existingRoute.Domain = domain
-
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-		existingApp.Routes = []models.RouteSummary{existingRoute}
-
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
-
-		_ = callPush([]string{"existing-app"}, deps)
-
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
-		Expect(deps.domainRepo.FindByNameInOrgName).To(Equal(""))
-		Expect(deps.routeRepo.FindByHostAndDomainDomain).To(Equal(""))
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal(""))
-	})
-
-	It("TestPushingAppWhenItAlreadyExistsAndHostIsSpecified", func() {
-		deps := getPushDependencies()
-
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
-		domain.Guid = "domain-guid"
-		domain.Shared = true
-
-		existingRoute := models.RouteSummary{}
-		existingRoute.Host = "existing-app"
-		existingRoute.Domain = domain
-
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-		existingApp.Routes = []models.RouteSummary{existingRoute}
-
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
-		deps.routeRepo.FindByHostAndDomainNotFound = true
-		deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
-
-		ui := callPush([]string{"-n", "new-host", "existing-app"}, deps)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route", "new-host.example.com"},
-			{"OK"},
-			{"Binding", "new-host.example.com"},
-		})
-
-		Expect(deps.routeRepo.FindByHostAndDomainDomain).To(Equal("example.com"))
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("new-host"))
-		Expect(deps.routeRepo.CreatedHost).To(Equal("new-host"))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
-	})
-
-	It("TestPushingAppWhenItAlreadyExistsAndNoRouteFlagIsPresent", func() {
-		deps := getPushDependencies()
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
-
-		ui := callPush([]string{"--no-route", "existing-app"}, deps)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Uploading", "existing-app"},
-			{"OK"},
-		})
-
-		Expect(deps.appBitsRepo.UploadedAppGuid).To(Equal("existing-app-guid"))
-		Expect(deps.domainRepo.FindByNameInOrgName).To(Equal(""))
-		Expect(deps.routeRepo.FindByHostAndDomainDomain).To(Equal(""))
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal(""))
-	})
-
-	It("TestPushingAppWhenItAlreadyExistsAndNoHostFlagIsPresent", func() {
-		deps := getPushDependencies()
-
-		domain := models.DomainFields{}
-		domain.Name = "example.com"
-		domain.Guid = "domain-guid"
-		domain.Shared = true
-
-		existingRoute := models.RouteSummary{}
-		existingRoute.Host = "existing-app"
-		existingRoute.Domain = domain
-
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-		existingApp.Routes = []models.RouteSummary{existingRoute}
-
-		deps.appRepo.ReadApp = existingApp
-		deps.appRepo.UpdateAppResult = existingApp
-		deps.routeRepo.FindByHostAndDomainNotFound = true
-		deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
-
-		ui := callPush([]string{"--no-hostname", "existing-app"}, deps)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route", "example.com"},
-			{"OK"},
-			{"Binding", "example.com"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"existing-app.example.com"},
-		})
-
-		Expect(deps.routeRepo.FindByHostAndDomainDomain).To(Equal("example.com"))
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedHost).To(Equal(""))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("domain-guid"))
-	})
-
-	It("TestPushingAppWhenItAlreadyExistsWithoutARouteCreatesADefaultDomain", func() {
-		deps := getPushDependencies()
-
-		sharedDomain := models.DomainFields{}
-		sharedDomain.Name = "foo.cf-app.com"
-		sharedDomain.Shared = true
-		sharedDomain.Guid = "foo-domain-guid"
-
-		deps.routeRepo.FindByHostAndDomainErr = true
-		deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
-		deps.appRepo.ReadApp = maker.NewApp(maker.Overrides{"name": "existing-app", "guid": "existing-app-guid"})
-		deps.appRepo.UpdateAppResult = deps.appRepo.ReadApp
-
-		ui := callPush([]string{"-t", "111", "existing-app"}, deps)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating route", "existing-app.foo.cf-app.com"},
-			{"OK"},
-			{"Binding", "existing-app.foo.cf-app.com"},
-			{"OK"},
-			{"Uploading"},
-			{"OK"},
-		})
-
-		Expect(deps.routeRepo.FindByHostAndDomainDomain).To(Equal("foo.cf-app.com"))
-		Expect(deps.routeRepo.FindByHostAndDomainHost).To(Equal("existing-app"))
-
-		Expect(deps.routeRepo.CreatedHost).To(Equal("existing-app"))
-		Expect(deps.routeRepo.CreatedDomainGuid).To(Equal("foo-domain-guid"))
-
-		Expect(deps.routeRepo.BoundAppGuid).To(Equal("existing-app-guid"))
-		Expect(deps.routeRepo.BoundRouteGuid).To(Equal("existing-app-route-guid"))
-	})
-
-	It("TestPushingAppWithInvalidPath", func() {
-		deps := getPushDependencies()
-		deps.appBitsRepo.UploadAppErr = true
-
-		ui := callPush([]string{"app"}, deps)
+		callPush("app")
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Uploading"},
@@ -1007,25 +832,8 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("TestPushingAppDescribesUpload", func() {
-		deps := getPushDependencies()
-
-		deps.appRepo.ReadNotFound = true
-		deps.appBitsRepo.CallbackPath = "path/to/app"
-		deps.appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
-		deps.appBitsRepo.CallbackFileCount = 11
-
-		ui := callPush([]string{"appName"}, deps)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Uploading", "path/to/app"},
-			{"61M", "11 files"},
-		})
-	})
-
-	It("TestPushingWithNoManifestAndNoName", func() {
-		deps := getPushDependencies()
-
-		ui := callPush([]string{}, deps)
+	It("fails when neither a manifest nor a name is given", func() {
+		callPush()
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Incorrect Usage"},
 		})
@@ -1079,55 +887,4 @@ func manifestWithServicesAndEnv() *manifest.Manifest {
 			},
 		}),
 	}
-}
-
-type pushDependencies struct {
-	manifestRepo  *testmanifest.FakeManifestRepository
-	starter       *testcmd.FakeAppStarter
-	stopper       *testcmd.FakeAppStopper
-	binder        *testcmd.FakeAppBinder
-	appRepo       *testapi.FakeApplicationRepository
-	domainRepo    *testapi.FakeDomainRepository
-	routeRepo     *testapi.FakeRouteRepository
-	stackRepo     *testapi.FakeStackRepository
-	appBitsRepo   *testapi.FakeApplicationBitsRepository
-	serviceRepo   *testapi.FakeServiceRepo
-	wordGenerator words.WordGenerator
-}
-
-func getPushDependencies() (deps pushDependencies) {
-	deps.manifestRepo = &testmanifest.FakeManifestRepository{}
-	deps.starter = &testcmd.FakeAppStarter{}
-	deps.stopper = &testcmd.FakeAppStopper{}
-	deps.binder = &testcmd.FakeAppBinder{}
-	deps.appRepo = &testapi.FakeApplicationRepository{}
-
-	deps.domainRepo = &testapi.FakeDomainRepository{}
-	sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-	deps.domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
-
-	deps.routeRepo = &testapi.FakeRouteRepository{}
-	deps.stackRepo = &testapi.FakeStackRepository{}
-	deps.appBitsRepo = &testapi.FakeApplicationBitsRepository{}
-	deps.serviceRepo = &testapi.FakeServiceRepo{}
-	deps.wordGenerator = words.NewWordGenerator()
-
-	return
-}
-
-func callPush(args []string, deps pushDependencies) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("push", args)
-
-	configRepo := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewPush(ui, configRepo, deps.manifestRepo, deps.starter,
-		deps.stopper, deps.binder, deps.appRepo, deps.domainRepo,
-		deps.routeRepo, deps.stackRepo, deps.serviceRepo, deps.appBitsRepo,
-		deps.wordGenerator)
-
-	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-
-	return
 }
