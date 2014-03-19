@@ -8,7 +8,7 @@ import (
 type FakeAuthenticationRepository struct {
 	Config           configuration.ReadWriter
 	AuthenticateArgs struct {
-		Credentials map[string]string
+		Credentials []map[string]string
 	}
 	GetLoginPromptsReturns struct {
 		Error   errors.Error
@@ -21,7 +21,7 @@ type FakeAuthenticationRepository struct {
 }
 
 func (auth *FakeAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr errors.Error) {
-	auth.AuthenticateArgs.Credentials = credentials
+	auth.AuthenticateArgs.Credentials = append(auth.AuthenticateArgs.Credentials, copyMap(credentials))
 
 	if auth.AuthError {
 		apiErr = errors.NewErrorWithMessage("Error authenticating.")
@@ -46,4 +46,12 @@ func (auth *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (
 	prompts = auth.GetLoginPromptsReturns.Prompts
 	apiErr = auth.GetLoginPromptsReturns.Error
 	return
+}
+
+func copyMap(input map[string]string) map[string]string {
+	output := map[string]string{}
+	for key, val := range input {
+		output[key] = val
+	}
+	return output
 }
