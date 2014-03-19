@@ -68,9 +68,11 @@ var _ = Describe("auth command", func() {
 				{"OK"},
 			})
 
-			Expect(repo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-				"username": "foo@example.com",
-				"password": "password",
+			Expect(repo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+				{
+					"username": "foo@example.com",
+					"password": "password",
+				},
 			}))
 		})
 

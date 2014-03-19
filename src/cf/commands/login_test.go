@@ -115,10 +115,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-					"username": "user@example.com",
-					"password": "password",
-				}))
 
 				Expect(orgRepo.FindByNameName).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
@@ -147,10 +143,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-					"username": "user@example.com",
-					"password": "password",
-				}))
 
 				Expect(orgRepo.FindByNameName).To(Equal("my-new-org"))
 				Expect(spaceRepo.FindByNameName).To(Equal("my-space"))
@@ -170,9 +162,11 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-					"username": "user@example.com",
-					"password": "password",
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"username": "user@example.com",
+						"password": "password",
+					},
 				}))
 
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
@@ -194,11 +188,6 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-					"username": "user@example.com",
-					"password": "password",
-				}))
-
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
@@ -253,48 +242,120 @@ var _ = Describe("Login Command", func() {
 				Expect(Config.RefreshToken()).To(Equal("my_refresh_token"))
 
 				Expect(endpointRepo.UpdateEndpointReceived).To(Equal("http://api.example.com"))
-				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-					"username": "user@example.com",
-					"password": "password",
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"username": "user@example.com",
+						"password": "password",
+					},
 				}))
 				Expect(ui.ShowConfigurationCalled).To(BeTrue())
 			})
 		})
 
-		It("asks the user for fields given by the login info API", func() {
-			authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
-				"pin": configuration.AuthPrompt{
-					DisplayName: "PIN Number",
-					Type:        configuration.AuthPromptTypePassword,
-				},
-				"account_number": configuration.AuthPrompt{
-					DisplayName: "Account Number",
-					Type:        configuration.AuthPromptTypeText,
-				},
-				"department_number": configuration.AuthPrompt{
-					DisplayName: "Dept Number",
-					Type:        configuration.AuthPromptTypeText,
-				},
-			}
-
-			ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin"}
-
-			l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
-			testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
-
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Account Number>"},
-				{"Dept Number>"},
-			})
-			testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
-				{"PIN Number>"},
+		Describe("login prompts", func() {
+			BeforeEach(func() {
+				authRepo.GetLoginPromptsReturns.Prompts = map[string]configuration.AuthPrompt{
+					"pin": configuration.AuthPrompt{
+						DisplayName: "PIN Number",
+						Type:        configuration.AuthPromptTypePassword,
+					},
+					"password": configuration.AuthPrompt{
+						DisplayName: "Your Password",
+						Type:        configuration.AuthPromptTypePassword,
+					},
+					"account_number": configuration.AuthPrompt{
+						DisplayName: "Account Number",
+						Type:        configuration.AuthPromptTypeText,
+					},
+					"department_number": configuration.AuthPrompt{
+						DisplayName: "Dept Number",
+						Type:        configuration.AuthPromptTypeText,
+					},
+				}
 			})
 
-			Expect(authRepo.AuthenticateArgs.Credentials).To(Equal(map[string]string{
-				"account_number":    "the-account-number",
-				"department_number": "the-department-number",
-				"pin":               "the-pin",
-			}))
+			It("asks the user for fields given by the login info API", func() {
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin", "the-password"}
+
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+				testassert.SliceContains(ui.Prompts, testassert.Lines{
+					{"Account Number>"},
+					{"Dept Number>"},
+				})
+				testassert.SliceContains(ui.PasswordPrompts, testassert.Lines{
+					{"PIN Number>"},
+					{"Your Password>"},
+				})
+
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin",
+						"password":          "the-password",
+					},
+				}))
+			})
+
+			It("take the password from the -p flag", func() {
+				Flags = []string{"-p", "the-password"}
+
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number", "the-pin"}
+
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+				testassert.SliceDoesNotContain(ui.PasswordPrompts, testassert.Lines{
+					{"Your Password>"},
+				})
+
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin",
+						"password":          "the-password",
+					},
+				}))
+			})
+
+			It("tries 3 times for the password-type prompts", func() {
+				authRepo.AuthError = true
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number",
+					"the-pin-1", "the-password-1",
+					"the-pin-2", "the-password-2",
+					"the-pin-3", "the-password-3"}
+
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin-1",
+						"password":          "the-password-1",
+					},
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin-2",
+						"password":          "the-password-2",
+					},
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin-3",
+						"password":          "the-password-3",
+					},
+				}))
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Failed"},
+				})
+			})
 		})
 	})
 
@@ -474,7 +535,7 @@ var _ = Describe("Login Command", func() {
 					Config.SetSSLDisabled(true)
 
 					Flags = []string{"-u", "user@example.com"}
-					ui.Inputs = []string{"password", "password2", "password3"}
+					ui.Inputs = []string{"password", "password2", "password3", "password4"}
 				})
 
 				ItFails()

@@ -84,11 +84,11 @@ func (cmd Login) authenticate(c *cli.Context) {
 	if err != nil {
 		cmd.ui.Failed(err.Error())
 	}
-	var passwordKey string
+	passwordKeys := []string{}
 	credentials := make(map[string]string)
 	for key, prompt := range prompts {
 		if prompt.Type == configuration.AuthPromptTypePassword {
-			passwordKey = key
+			passwordKeys = append(passwordKeys, key)
 		} else if key == "username" && c.String("u") != "" {
 			credentials[key] = c.String("u")
 		} else {
@@ -96,17 +96,19 @@ func (cmd Login) authenticate(c *cli.Context) {
 		}
 	}
 
-	password := c.String("p")
-	passwordPrompt := prompts[passwordKey]
-
 	for i := 0; i < maxLoginTries; i++ {
-		if password == "" || i > 0 {
-			password = cmd.ui.AskForPassword("%s%s", passwordPrompt.DisplayName, terminal.PromptColor(">"))
+		for _, key := range passwordKeys {
+			value := ""
+			if key == "password" && c.String("p") != "" {
+				value = c.String("p")
+			} else {
+				value = cmd.ui.AskForPassword("%s%s", prompts[key].DisplayName, terminal.PromptColor(">"))
+			}
+
+			credentials[key] = value
 		}
 
 		cmd.ui.Say("Authenticating...")
-
-		credentials[passwordKey] = password
 		err = cmd.authenticator.Authenticate(credentials)
 
 		if err == nil {
