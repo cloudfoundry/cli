@@ -50,15 +50,11 @@ func setupDependencies() (deps *cliDependencies) {
 	return
 }
 
-func teardownDependencies(deps *cliDependencies) {
-	deps.configRepo.Close()
-}
-
 func main() {
 	defer handlePanics()
 
 	deps := setupDependencies()
-	defer teardownDependencies(deps)
+	defer deps.configRepo.Close()
 
 	cmdFactory := commands.NewFactory(deps.termUI, deps.configRepo, deps.manifestRepo, deps.apiRepoLocator)
 	reqFactory := requirements.NewFactory(deps.termUI, deps.configRepo, deps.apiRepoLocator)
@@ -125,7 +121,9 @@ func handlePanics() {
 		default:
 			displayCrashDialog("An unexpected type of error")
 		}
+	}
 
+	if err != nil {
 		os.Exit(1)
 	}
 }
