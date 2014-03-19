@@ -638,8 +638,8 @@ var _ = Describe("Services Repo", func() {
 			}})
 
 			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr).ShouldNot(HaveOccurred())
-			Expect(offerings).Should(HaveLen(1))
+			Expect(apiErr).ToNot(HaveOccurred())
+			Expect(offerings).To(HaveLen(1))
 			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
 		})
 
@@ -650,15 +650,15 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{
 					Status: 200,
 					Body: `{
-            "next_url": null,
-            "resources": []
-        }`,
+						"next_url": null,
+						"resources": []
+					}`,
 				},
 			}})
 
 			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr).ShouldNot(HaveOccurred())
-			Expect(offerings).Should(HaveLen(0))
+			Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+			Expect(offerings).To(HaveLen(0))
 		})
 
 		It("handles api errors when finding service offerings", func() {
@@ -668,14 +668,14 @@ var _ = Describe("Services Repo", func() {
 				Response: testnet.TestResponse{
 					Status: 400,
 					Body: `{
-            "code": 9001,
-            "description": "Something Happened"
-        }`,
+						"code": 9001,
+						"description": "Something Happened"
+					}`,
 				},
 			}})
 
 			_, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr).Should(HaveOccurred())
+			Expect(apiErr.(errors.HttpError)).NotTo(BeNil())
 		})
 
 		Describe("when api returns query by label is invalid", func() {
@@ -694,21 +694,23 @@ var _ = Describe("Services Repo", func() {
 					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?inline-relations-depth=1"),
 					Response: testnet.TestResponse{
 						Status: 200,
-						Body: `{"next_url": "/v2/spaces/my-space-guid/services?page=2&inline-relations-depth=1",
-								"resources": [
-									{
-									  "metadata": {
-										"guid": "my-service-offering-guid"
-									  },
-									  "entity": {
-										"label": "my-service-offering",
-										"provider": "some-other-provider",
-										"description": "a description that does not match your provider",
-										"version" : "1.0",
-										"service_plans": []
-									  }
-									}
-								]}`,
+						Body: `{
+							"next_url": "/v2/spaces/my-space-guid/services?page=2&inline-relations-depth=1",
+							"resources": [
+								{
+								  "metadata": {
+									"guid": "my-service-offering-guid"
+								  },
+								  "entity": {
+									"label": "my-service-offering",
+									"provider": "some-other-provider",
+									"description": "a description that does not match your provider",
+									"version" : "1.0",
+									"service_plans": []
+								  }
+								}
+							]
+						}`,
 					},
 				}
 
