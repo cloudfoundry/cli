@@ -139,13 +139,13 @@ var _ = Describe("Push Command", func() {
 			manifestRepo.ReadManifestReturns.Manifest = manifest
 		})
 
-		It("provides a random hostname when the --random-hostname flag is passed", func() {
-			callPush("--random-hostname", "my-new-app")
+		It("provides a random hostname when the --random-route flag is passed", func() {
+			callPush("--random-route", "my-new-app")
 			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app-laughing-cow"))
 		})
 
-		It("provides a random hostname when the random-hostname option is set in the manifest", func() {
-			manifestApp.Set("random-hostname", true)
+		It("provides a random hostname when the random-route option is set in the manifest", func() {
+			manifestApp.Set("random-route", true)
 
 			callPush("my-new-app")
 
