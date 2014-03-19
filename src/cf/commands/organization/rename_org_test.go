@@ -75,7 +75,7 @@ var _ = Describe("rename-org command", func() {
 			Expect(configRepo.OrganizationFields().Name).To(Equal(targetedOrgName))
 		})
 
-		Describe("when the organization is currently targetted", func() {
+		Describe("when the organization is currently targeted", func() {
 			It("updates the name of the org in the config", func() {
 				configRepo.SetOrganizationFields(models.OrganizationFields{
 					Guid: "the-old-org-guid",

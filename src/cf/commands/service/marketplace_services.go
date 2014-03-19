@@ -47,7 +47,7 @@ func (cmd MarketplaceServices) Run(c *cli.Context) {
 		cmd.ui.Say("Getting all services from marketplace...")
 		serviceOfferings, apiErr = cmd.serviceRepo.GetAllServiceOfferings()
 	} else {
-		cmd.ui.Failed("Cannot list marketplace services without a targetted space")
+		cmd.ui.Failed("Cannot list marketplace services without a targeted space")
 	}
 
 	if apiErr != nil {

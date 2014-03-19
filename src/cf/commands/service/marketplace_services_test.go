@@ -63,7 +63,7 @@ var _ = Describe("Marketplace Services", func() {
 			config = testconfig.NewRepositoryWithDefaults()
 		})
 
-		Context("when the user has a space targetted", func() {
+		Context("when the user has a space targeted", func() {
 			BeforeEach(func() {
 				config.SetSpaceFields(models.SpaceFields{
 					Guid: "the-space-guid",
@@ -89,7 +89,7 @@ var _ = Describe("Marketplace Services", func() {
 			})
 		})
 
-		Context("when the user doesn't have a space targetted", func() {
+		Context("when the user doesn't have a space targeted", func() {
 			BeforeEach(func() {
 				config.SetSpaceFields(models.SpaceFields{})
 			})
