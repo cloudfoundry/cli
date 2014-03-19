@@ -18,7 +18,7 @@ import (
 )
 
 var _ = Describe("Show App Command", func() {
-	It("requires the user to be logged in and have a targetted space", func() {
+	It("requires the user to be logged in and have a targeted space", func() {
 		args := []string{"my-app", "/foo"}
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{}

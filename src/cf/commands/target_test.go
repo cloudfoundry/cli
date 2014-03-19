@@ -173,7 +173,7 @@ var _ = Describe("target command", func() {
 			expectSpaceToBeCleared()
 		})
 
-		It("fails to target a space if no organization is targetted", func() {
+		It("fails to target a space if no organization is targeted", func() {
 			config.SetOrganizationFields(models.OrganizationFields{})
 
 			callTarget([]string{"-s", "my-space"})
