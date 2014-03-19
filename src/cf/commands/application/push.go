@@ -484,7 +484,7 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 	}
 
 	appParams.NoRoute = c.Bool("no-route")
-	appParams.RandomHostname = c.Bool("random-hostname")
+	appParams.RandomHostname = c.Bool("random-route")
 
 	if c.String("n") != "" {
 		hostname := c.String("n")

@@ -145,20 +145,20 @@ var _ = Describe("Manifests", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
-					"buildpack":       nil,
-					"disk_quota":      nil,
-					"domain":          nil,
-					"host":            nil,
-					"name":            nil,
-					"path":            nil,
-					"stack":           nil,
-					"memory":          nil,
-					"instances":       nil,
-					"timeout":         nil,
-					"no-route":        nil,
-					"services":        nil,
-					"env":             nil,
-					"random-hostname": nil,
+					"buildpack":    nil,
+					"disk_quota":   nil,
+					"domain":       nil,
+					"host":         nil,
+					"name":         nil,
+					"path":         nil,
+					"stack":        nil,
+					"memory":       nil,
+					"instances":    nil,
+					"timeout":      nil,
+					"no-route":     nil,
+					"services":     nil,
+					"env":          nil,
+					"random-route": nil,
 				},
 			},
 		}))
@@ -167,7 +167,7 @@ var _ = Describe("Manifests", func() {
 		Expect(errs).NotTo(BeEmpty())
 		errorSlice := strings.Split(errs.Error(), "\n")
 		manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
-			"memory", "instances", "timeout", "no-route", "services", "env", "random-hostname"}
+			"memory", "instances", "timeout", "no-route", "services", "env", "random-route"}
 
 		for _, key := range manifestKeys {
 			testassert.SliceContains(errorSlice, testassert.Lines{{key, "not be null"}})
@@ -178,17 +178,17 @@ var _ = Describe("Manifests", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
-					"buildpack":       "my-buildpack",
-					"disk_quota":      "512M",
-					"domain":          "my-domain",
-					"host":            "my-hostname",
-					"name":            "my-app-name",
-					"stack":           "my-stack",
-					"memory":          "256M",
-					"instances":       1,
-					"timeout":         11,
-					"no-route":        true,
-					"random-hostname": true,
+					"buildpack":    "my-buildpack",
+					"disk_quota":   "512M",
+					"domain":       "my-domain",
+					"host":         "my-hostname",
+					"name":         "my-app-name",
+					"stack":        "my-stack",
+					"memory":       "256M",
+					"instances":    1,
+					"timeout":      11,
+					"no-route":     true,
+					"random-route": true,
 				},
 			},
 		}))
