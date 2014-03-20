@@ -2,7 +2,6 @@ package api
 
 import (
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -33,7 +32,7 @@ type InstanceStatsApiResponse struct {
 }
 
 type AppInstancesRepository interface {
-	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr errors.Error)
+	GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error)
 }
 
 type CloudControllerAppInstancesRepository struct {
@@ -47,7 +46,7 @@ func NewCloudControllerAppInstancesRepository(config configuration.Reader, gatew
 	return
 }
 
-func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr errors.Error) {
+func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid)
 	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken(), nil)
 	if apiErr != nil {
@@ -77,7 +76,7 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 	return repo.updateInstancesWithStats(appGuid, instances)
 }
 
-func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiErr errors.Error) {
+func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.ApiEndpoint(), guid)
 	statsResponse := StatsApiResponse{}
 	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), &statsResponse)

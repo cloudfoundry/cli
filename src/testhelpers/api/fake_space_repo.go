@@ -37,7 +37,7 @@ func (repo FakeSpaceRepository) GetCurrentSpace() (space models.Space) {
 	return repo.CurrentSpace
 }
 
-func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) errors.Error {
+func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	for _, space := range repo.Spaces {
 		if !callback(space) {
 			break
@@ -46,7 +46,7 @@ func (repo FakeSpaceRepository) ListSpaces(callback func(models.Space) bool) err
 	return nil
 }
 
-func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiErr errors.Error) {
+func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, apiErr error) {
 	repo.FindByNameName = name
 
 	var foundSpace bool = false
@@ -59,7 +59,7 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, ap
 	}
 
 	if repo.FindByNameErr || !foundSpace {
-		apiErr = errors.NewErrorWithMessage("Error finding space by name.")
+		apiErr = errors.New("Error finding space by name.")
 	}
 
 	if repo.FindByNameNotFound {
@@ -69,21 +69,21 @@ func (repo *FakeSpaceRepository) FindByName(name string) (space models.Space, ap
 	return
 }
 
-func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr errors.Error) {
+func (repo *FakeSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error) {
 	repo.FindByNameInOrgName = name
 	repo.FindByNameInOrgOrgGuid = orgGuid
 	space = repo.FindByNameInOrgSpace
 	return
 }
 
-func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiErr errors.Error) {
+func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiErr error) {
 	space = repo.SummarySpace
 	return
 }
 
-func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr errors.Error) {
+func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
 	if repo.CreateSpaceExists {
-		apiErr = errors.NewError("Space already exists", cf.SPACE_EXISTS)
+		apiErr = errors.NewHttpError(400, "", "", cf.SPACE_EXISTS, "Space already exists")
 		return
 	}
 	repo.CreateSpaceName = name
@@ -92,13 +92,13 @@ func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space mode
 	return
 }
 
-func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiErr errors.Error) {
+func (repo *FakeSpaceRepository) Rename(spaceGuid, newName string) (apiErr error) {
 	repo.RenameSpaceGuid = spaceGuid
 	repo.RenameNewName = newName
 	return
 }
 
-func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiErr errors.Error) {
+func (repo *FakeSpaceRepository) Delete(spaceGuid string) (apiErr error) {
 	repo.DeletedSpaceGuid = spaceGuid
 	return
 }

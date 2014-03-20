@@ -2,6 +2,7 @@ package net_test
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -42,7 +43,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The host is taken: test1"))
-		Expect(apiErr.ErrorCode()).To(ContainSubstring("210003"))
+		Expect(apiErr.(errors.HttpError).ErrorCode()).To(ContainSubstring("210003"))
 	})
 
 	It("parses invalid token responses", func() {
@@ -55,6 +56,6 @@ var _ = Describe("Cloud Controller Gateway", func() {
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The token is invalid"))
-		Expect(apiErr.ErrorCode()).To(ContainSubstring(INVALID_TOKEN_CODE))
+		Expect(apiErr.(errors.HttpError).ErrorCode()).To(ContainSubstring(INVALID_TOKEN_CODE))
 	})
 })

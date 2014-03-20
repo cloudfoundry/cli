@@ -2,6 +2,7 @@ package net_test
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	. "cf/net"
 	"fmt"
 	. "github.com/onsi/ginkgo"
@@ -36,6 +37,6 @@ var _ = Describe("UAA Gateway", func() {
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The foo is wrong"))
-		Expect(apiErr.ErrorCode()).To(ContainSubstring("foo"))
+		Expect(apiErr.(errors.HttpError).ErrorCode()).To(ContainSubstring("foo"))
 	})
 })

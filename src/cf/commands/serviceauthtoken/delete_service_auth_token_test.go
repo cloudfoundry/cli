@@ -155,7 +155,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	It("TestDeleteServiceAuthTokenFailsWithError", func() {
 
 		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderApiResponse: errors.NewErrorWithMessage("OH NOES"),
+			FindByLabelAndProviderApiResponse: errors.New("OH NOES"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
 		args := []string{"a label", "a provider"}

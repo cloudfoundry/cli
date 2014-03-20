@@ -3,7 +3,6 @@ package service
 import (
 	"cf/api"
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
@@ -33,7 +32,7 @@ func (cmd MarketplaceServices) GetRequirements(reqFactory requirements.Factory, 
 func (cmd MarketplaceServices) Run(c *cli.Context) {
 	var (
 		serviceOfferings models.ServiceOfferings
-		apiErr           errors.Error
+		apiErr           error
 	)
 
 	if cmd.config.HasSpace() {

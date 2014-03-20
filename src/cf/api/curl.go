@@ -14,7 +14,7 @@ import (
 )
 
 type CurlRepository interface {
-	Request(method, path, header, body string) (resHeaders, resBody string, apiErr errors.Error)
+	Request(method, path, header, body string) (resHeaders, resBody string, apiErr error)
 }
 
 type CloudControllerCurlRepository struct {
@@ -28,7 +28,7 @@ func NewCloudControllerCurlRepository(config configuration.Reader, gateway net.G
 	return
 }
 
-func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, apiErr errors.Error) {
+func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, apiErr error) {
 	url := fmt.Sprintf("%s/%s", repo.config.ApiEndpoint(), strings.TrimLeft(path, "/"))
 
 	req, apiErr := repo.gateway.NewRequest(method, url, repo.config.AccessToken(), strings.NewReader(body))

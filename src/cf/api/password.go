@@ -9,7 +9,7 @@ import (
 )
 
 type PasswordRepository interface {
-	UpdatePassword(old string, new string) errors.Error
+	UpdatePassword(old string, new string) error
 }
 
 type CloudControllerPasswordRepository struct {
@@ -23,10 +23,10 @@ func NewCloudControllerPasswordRepository(config configuration.Reader, gateway n
 	return
 }
 
-func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) errors.Error {
+func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new string) error {
 	uaaEndpoint := repo.config.UaaEndpoint()
 	if uaaEndpoint == "" {
-		return errors.NewErrorWithMessage("UAA endpoint missing from config file")
+		return errors.New("UAA endpoint missing from config file")
 	}
 
 	url := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())

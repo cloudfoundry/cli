@@ -114,7 +114,7 @@ var _ = Describe("delete-buildpack command", func() {
 		buildpack.Guid = "my-buildpack-guid"
 		buildpackRepo := &testapi.FakeBuildpackRepository{
 			FindByNameBuildpack: buildpack,
-			DeleteApiResponse:   errors.NewErrorWithMessage("failed badly"),
+			DeleteApiResponse:   errors.New("failed badly"),
 		}
 
 		cmd := NewDeleteBuildpack(ui, buildpackRepo)

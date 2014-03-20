@@ -24,12 +24,12 @@ type FakeApplicationRepository struct {
 	DeletedAppGuid string
 }
 
-func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr errors.Error) {
+func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr error) {
 	repo.ReadName = name
 	app = repo.ReadApp
 
 	if repo.ReadErr {
-		apiErr = errors.NewErrorWithMessage("Error finding app by name.")
+		apiErr = errors.New("Error finding app by name.")
 	}
 	if repo.ReadAuthErr {
 		apiErr = errors.NewHttpError(401, "", "", "1000", "Authentication failed.")
@@ -48,7 +48,7 @@ func (repo *FakeApplicationRepository) CreatedAppParams() (params models.AppPara
 	return
 }
 
-func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiErr errors.Error) {
+func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultApp models.Application, apiErr error) {
 	if repo.CreateAppParams == nil {
 		repo.CreateAppParams = []models.AppParams{}
 	}
@@ -85,17 +85,17 @@ func (repo *FakeApplicationRepository) Create(params models.AppParams) (resultAp
 	return
 }
 
-func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr errors.Error) {
+func (repo *FakeApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error) {
 	repo.UpdateAppGuid = appGuid
 	repo.UpdateParams = params
 	updatedApp = repo.UpdateAppResult
 	if repo.UpdateErr {
-		apiErr = errors.NewErrorWithMessage("Error updating app.")
+		apiErr = errors.New("Error updating app.")
 	}
 	return
 }
 
-func (repo *FakeApplicationRepository) Delete(appGuid string) (apiErr errors.Error) {
+func (repo *FakeApplicationRepository) Delete(appGuid string) (apiErr error) {
 	repo.DeletedAppGuid = appGuid
 	return
 }

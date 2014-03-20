@@ -2,7 +2,6 @@ package api
 
 import (
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -83,8 +82,8 @@ type DomainSummary struct {
 }
 
 type AppSummaryRepository interface {
-	GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr errors.Error)
-	GetSummary(appGuid string) (summary models.AppSummary, apiErr errors.Error)
+	GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr error)
+	GetSummary(appGuid string) (summary models.AppSummary, apiErr error)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -98,7 +97,7 @@ func NewCloudControllerAppSummaryRepository(config configuration.Reader, gateway
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr errors.Error) {
+func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr error) {
 	resources := new(ApplicationSummaries)
 
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
@@ -113,7 +112,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.AppSummary, apiErr errors.Error) {
+func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.AppSummary, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.ApiEndpoint(), appGuid)
 	summaryResponse := new(ApplicationFromSummary)
 	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), summaryResponse)

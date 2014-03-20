@@ -95,19 +95,22 @@ func (cmd *Push) Run(c *cli.Context) {
 
 func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 	for _, serviceName := range services {
-		serviceInstance, apiErr := cmd.serviceRepo.FindInstanceByName(serviceName)
+		serviceInstance, err := cmd.serviceRepo.FindInstanceByName(serviceName)
 
-		if apiErr != nil {
+		if err != nil {
 			cmd.ui.Failed("Could not find service %s to bind to %s", serviceName, app.Name)
 			return
 		}
 
 		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, cmd.config.Username())
-		apiErr = cmd.binder.BindApplication(app, serviceInstance)
+		err = cmd.binder.BindApplication(app, serviceInstance)
 
-		if apiErr != nil && apiErr.ErrorCode() != service.AppAlreadyBoundErrorCode {
-			cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, apiErr)
-			return
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == service.AppAlreadyBoundErrorCode {
+			err = nil
+		}
+
+		if err != nil {
+			cmd.ui.Failed("Could not find to service %s\nError: %s", serviceName, err)
 		}
 
 		cmd.ui.Ok()
@@ -294,7 +297,7 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	return
 }
 
-func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiErr errors.Error) {
+func (cmd *Push) createApp(appParams models.AppParams) (app models.Application, apiErr error) {
 	spaceGuid := cmd.config.SpaceFields().Guid
 	appParams.SpaceGuid = &spaceGuid
 
@@ -333,7 +336,7 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 		}
 	}
 
-	var apiErr errors.Error
+	var apiErr error
 	updatedApp, apiErr = cmd.appRepo.Update(app.Guid, appParams)
 	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())

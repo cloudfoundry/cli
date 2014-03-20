@@ -25,7 +25,7 @@ func NewTLSConfig(trustedCerts []tls.Certificate, disableSSL bool) (TLSConfig *t
 	return
 }
 
-func WrapSSLErrors(host string, err error) errors.Error {
+func WrapSSLErrors(host string, err error) error {
 	urlError, ok := err.(*url.Error)
 	if ok {
 		return wrapSSLErrorInternal(host, urlError.Err)
@@ -39,7 +39,7 @@ func WrapSSLErrors(host string, err error) errors.Error {
 	return errors.NewErrorWithError("Error performing request", err)
 }
 
-func wrapSSLErrorInternal(host string, err error) errors.Error {
+func wrapSSLErrorInternal(host string, err error) error {
 	switch err.(type) {
 	case x509.UnknownAuthorityError:
 		return errors.NewInvalidSSLCert(host, "unknown authority")

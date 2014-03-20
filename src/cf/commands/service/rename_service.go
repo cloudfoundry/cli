@@ -4,9 +4,9 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -54,15 +54,14 @@ func (cmd *RenameService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
-	apiErr := cmd.serviceRepo.RenameService(serviceInstance, newName)
+	err := cmd.serviceRepo.RenameService(serviceInstance, newName)
 
-	if apiErr != nil {
-		if apiErr.ErrorCode() == cf.SERVICE_INSTANCE_NAME_TAKEN {
-			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", apiErr.Error(), cf.Name())
+	if err != nil {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == cf.SERVICE_INSTANCE_NAME_TAKEN {
+			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", err.Error(), cf.Name())
 		} else {
-			cmd.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(err.Error())
 		}
-		return
 	}
 
 	cmd.ui.Ok()

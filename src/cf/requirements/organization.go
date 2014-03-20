@@ -2,7 +2,6 @@ package requirements
 
 import (
 	"cf/api"
-	"cf/errors"
 	"cf/models"
 	"cf/terminal"
 )
@@ -28,7 +27,7 @@ func NewOrganizationRequirement(name string, ui terminal.UI, sR api.Organization
 }
 
 func (req *organizationApiRequirement) Execute() (success bool) {
-	var apiErr errors.Error
+	var apiErr error
 	req.org, apiErr = req.orgRepo.FindByName(req.name)
 
 	if apiErr != nil {

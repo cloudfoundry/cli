@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	. "cf/api"
 	"cf/app_files"
-	"cf/errors"
 	"cf/models"
 	"cf/net"
 	"fmt"
@@ -249,7 +248,7 @@ func createProgressEndpoint(status string) (req testnet.TestRequest) {
 	return
 }
 
-func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiErr errors.Error) {
+func testUploadApp(dir string, requests []testnet.TestRequest) (app models.Application, apiErr error) {
 	ts, handler := testnet.NewServer(requests)
 	defer ts.Close()
 

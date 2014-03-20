@@ -3,7 +3,6 @@ package requirements
 import (
 	"cf/api"
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/terminal"
 )
@@ -31,7 +30,7 @@ func NewDomainRequirement(name string, ui terminal.UI, config configuration.Read
 }
 
 func (req *domainApiRequirement) Execute() bool {
-	var apiErr errors.Error
+	var apiErr error
 	req.domain, apiErr = req.domainRepo.FindByNameInOrg(req.name, req.config.OrganizationFields().Guid)
 
 	if apiErr != nil {

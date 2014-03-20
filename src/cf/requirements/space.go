@@ -2,7 +2,6 @@ package requirements
 
 import (
 	"cf/api"
-	"cf/errors"
 	"cf/models"
 	"cf/terminal"
 )
@@ -28,7 +27,7 @@ func NewSpaceRequirement(name string, ui terminal.UI, sR api.SpaceRepository) (r
 }
 
 func (req *spaceApiRequirement) Execute() (success bool) {
-	var apiErr errors.Error
+	var apiErr error
 	req.space, apiErr = req.spaceRepo.FindByName(req.name)
 
 	if apiErr != nil {

@@ -47,7 +47,7 @@ var _ = Describe("delete-shared-domain command", func() {
 	It("TestDeleteSharedDomainFindError", func() {
 
 		deps := getDeleteSharedDomainDeps()
-		deps.domainRepo.FindByNameInOrgApiResponse = errors.NewErrorWithMessage("couldn't find the droids you're lookin for")
+		deps.domainRepo.FindByNameInOrgApiResponse = errors.New("couldn't find the droids you're lookin for")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteDomainGuid).To(Equal(""))
@@ -61,7 +61,7 @@ var _ = Describe("delete-shared-domain command", func() {
 	It("TestDeleteSharedDomainDeleteError", func() {
 
 		deps := getDeleteSharedDomainDeps()
-		deps.domainRepo.DeleteSharedApiResponse = errors.NewErrorWithMessage("failed badly")
+		deps.domainRepo.DeleteSharedApiResponse = errors.New("failed badly")
 		ui := callDeleteSharedDomain([]string{"foo.com"}, []string{"y"}, deps)
 
 		Expect(deps.domainRepo.DeleteSharedDomainGuid).To(Equal("foo-guid"))

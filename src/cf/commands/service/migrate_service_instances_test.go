@@ -140,7 +140,7 @@ func init() {
 				Context("when finding the v1 plan fails", func() {
 					Context("because the plan does not exist", func() {
 						BeforeEach(func() {
-							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{errors.NewModelNotFoundError("Service Plan", "")}
+							serviceRepo.FindServicePlanByDescriptionResponses = []error{errors.NewModelNotFoundError("Service Plan", "")}
 						})
 
 						It("notifies the user of the failure", func() {
@@ -163,7 +163,7 @@ func init() {
 
 					Context("because there was an http error", func() {
 						BeforeEach(func() {
-							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{errors.NewErrorWithMessage("uh oh")}
+							serviceRepo.FindServicePlanByDescriptionResponses = []error{errors.New("uh oh")}
 						})
 
 						It("notifies the user of the failure", func() {
@@ -188,7 +188,7 @@ func init() {
 				Context("when finding the v2 plan fails", func() {
 					Context("because the plan does not exist", func() {
 						BeforeEach(func() {
-							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{nil, errors.NewModelNotFoundError("Service Plan", "")}
+							serviceRepo.FindServicePlanByDescriptionResponses = []error{nil, errors.NewModelNotFoundError("Service Plan", "")}
 						})
 
 						It("notifies the user of the failure", func() {
@@ -211,7 +211,7 @@ func init() {
 
 					Context("because there was an http error", func() {
 						BeforeEach(func() {
-							serviceRepo.FindServicePlanByDescriptionResponses = []errors.Error{nil, errors.NewErrorWithMessage("uh oh")}
+							serviceRepo.FindServicePlanByDescriptionResponses = []error{nil, errors.New("uh oh")}
 						})
 
 						It("notifies the user of the failure", func() {
@@ -235,7 +235,7 @@ func init() {
 
 				Context("when migrating the plans fails", func() {
 					BeforeEach(func() {
-						serviceRepo.MigrateServicePlanFromV1ToV2Response = errors.NewErrorWithMessage("ruh roh")
+						serviceRepo.MigrateServicePlanFromV1ToV2Response = errors.New("ruh roh")
 					})
 
 					It("notifies the user of the failure", func() {
@@ -274,7 +274,7 @@ func init() {
 
 				Context("when it cannot fetch the number of instances", func() {
 					BeforeEach(func() {
-						serviceRepo.ServiceInstanceCountApiResponse = errors.NewErrorWithMessage("service instance fetch is very bad")
+						serviceRepo.ServiceInstanceCountApiResponse = errors.New("service instance fetch is very bad")
 					})
 
 					It("notifies the user of the failure", func() {

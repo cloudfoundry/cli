@@ -122,7 +122,7 @@ var _ = Describe("curl command", func() {
 		})
 
 		It("prints a failure message when the response is not success", func() {
-			deps.curlRepo.Error = errors.NewErrorWithMessage("ooops")
+			deps.curlRepo.Error = errors.New("ooops")
 			runCurlWithInputs(deps, []string{"/foo"})
 
 			testassert.SliceContains(deps.ui.Outputs, testassert.Lines{

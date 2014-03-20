@@ -4,11 +4,11 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/formatters"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"strings"
@@ -67,9 +67,13 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	)
 
 	appSummary, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
-	appIsStopped := (apiErr != nil && (apiErr.ErrorCode() == cf.APP_STOPPED ||
-		apiErr.ErrorCode() == cf.APP_NOT_STAGED)) ||
-		appSummary.State == "stopped"
+
+	appIsStopped := (appSummary.State == "stopped")
+	if err, ok := apiErr.(errors.HttpError); ok {
+		if err.ErrorCode() == cf.APP_STOPPED || err.ErrorCode() == cf.APP_NOT_STAGED {
+			appIsStopped = true
+		}
+	}
 
 	if apiErr != nil && !appIsStopped {
 		cmd.ui.Failed(apiErr.Error())

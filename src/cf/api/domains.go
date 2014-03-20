@@ -31,15 +31,15 @@ type DomainEntity struct {
 }
 
 type DomainRepository interface {
-	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) errors.Error
-	ListSharedDomains(cb func(models.DomainFields) bool) errors.Error
-	FindByName(name string) (domain models.DomainFields, apiErr errors.Error)
-	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr errors.Error)
-	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr errors.Error)
-	CreateSharedDomain(domainName string) (apiErr errors.Error)
-	Delete(domainGuid string) (apiErr errors.Error)
-	DeleteSharedDomain(domainGuid string) (apiErr errors.Error)
-	ListDomains(cb func(models.DomainFields) bool) errors.Error
+	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error
+	ListSharedDomains(cb func(models.DomainFields) bool) error
+	FindByName(name string) (domain models.DomainFields, apiErr error)
+	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr error)
+	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error)
+	CreateSharedDomain(domainName string) (apiErr error)
+	Delete(domainGuid string) (apiErr error)
+	DeleteSharedDomain(domainGuid string) (apiErr error)
+	ListDomains(cb func(models.DomainFields) bool) error
 }
 
 type CloudControllerDomainRepository struct {
@@ -53,15 +53,15 @@ func NewCloudControllerDomainRepository(config configuration.Reader, gateway net
 	return
 }
 
-func (repo CloudControllerDomainRepository) ListSharedDomains(cb func(models.DomainFields) bool) errors.Error {
+func (repo CloudControllerDomainRepository) ListSharedDomains(cb func(models.DomainFields) bool) error {
 	return repo.listDomains("/v2/shared_domains", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomains(cb func(models.DomainFields) bool) errors.Error {
+func (repo CloudControllerDomainRepository) ListDomains(cb func(models.DomainFields) bool) error {
 	return repo.listDomains("/v2/domains", cb)
 }
 
-func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) errors.Error {
+func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
 	apiErr := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
 
 	// FIXME: needs semantic versioning
@@ -73,7 +73,7 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb
 	return apiErr
 }
 
-func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -88,13 +88,13 @@ func (repo CloudControllerDomainRepository) isOrgDomain(orgGuid string, domain m
 	return orgGuid == domain.OwningOrganizationGuid || domain.Shared
 }
 
-func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr error) {
 	return repo.findOneWithPath(
 		fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name)),
 		name)
 }
 
-func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiErr error) {
 	domain, apiErr = repo.findOneWithPath(
 		fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=%s", orgGuid, url.QueryEscape("name:"+name)),
 		name)
@@ -110,7 +110,7 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid
 	return
 }
 
-func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (domain models.DomainFields, apiErr error) {
 	foundDomain := false
 	apiErr = repo.listDomains(path, func(result models.DomainFields) bool {
 		domain = result
@@ -125,7 +125,7 @@ func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (
 	return
 }
 
-func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error) {
 	data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid)
 	resource := new(DomainResource)
 
@@ -145,7 +145,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	return
 }
 
-func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiErr error) {
 	path := repo.config.ApiEndpoint() + "/v2/shared_domains"
 	data := strings.NewReader(fmt.Sprintf(`{"name":"%s"}`, domainName))
 	apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
@@ -159,7 +159,7 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 	return
 }
 
-func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
 	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
@@ -171,7 +171,7 @@ func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiErr er
 	return
 }
 
-func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiErr errors.Error) {
+func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/shared_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
 	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 

@@ -11,7 +11,7 @@ type FakePasswordRepo struct {
 	UpdateOldPassword  string
 }
 
-func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr errors.Error) {
+func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr error) {
 	repo.UpdateOldPassword = old
 	repo.UpdateNewPassword = new
 

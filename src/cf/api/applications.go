@@ -127,10 +127,10 @@ type PaginatedApplicationResources struct {
 }
 
 type ApplicationRepository interface {
-	Create(params models.AppParams) (createdApp models.Application, apiErr errors.Error)
-	Read(name string) (app models.Application, apiErr errors.Error)
-	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr errors.Error)
-	Delete(appGuid string) (apiErr errors.Error)
+	Create(params models.AppParams) (createdApp models.Application, apiErr error)
+	Read(name string) (app models.Application, apiErr error)
+	Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error)
+	Delete(appGuid string) (apiErr error)
 }
 
 type CloudControllerApplicationRepository struct {
@@ -144,7 +144,7 @@ func NewCloudControllerApplicationRepository(config configuration.Reader, gatewa
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiErr errors.Error) {
+func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiErr error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
 		apiErr = errors.NewErrorWithError("Failed to marshal JSON", err)
@@ -162,7 +162,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiErr errors.Error) {
+func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
 	appResources := new(PaginatedApplicationResources)
 	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), appResources)
@@ -180,7 +180,7 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app models.A
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr errors.Error) {
+func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
 		apiErr = errors.NewErrorWithError("Failed to marshal JSON", err)
@@ -205,7 +205,7 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppP
 	return
 }
 
-func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr errors.Error) {
+func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.ApiEndpoint(), appGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
 }

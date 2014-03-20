@@ -12,11 +12,11 @@ import (
 )
 
 type BuildpackRepository interface {
-	FindByName(name string) (buildpack models.Buildpack, apiErr errors.Error)
-	ListBuildpacks(func(models.Buildpack) bool) errors.Error
-	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr errors.Error)
-	Delete(buildpackGuid string) (apiErr errors.Error)
-	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr errors.Error)
+	FindByName(name string) (buildpack models.Buildpack, apiErr error)
+	ListBuildpacks(func(models.Buildpack) bool) error
+	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error)
+	Delete(buildpackGuid string) (apiErr error)
+	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error)
 }
 
 type CloudControllerBuildpackRepository struct {
@@ -30,7 +30,7 @@ func NewCloudControllerBuildpackRepository(config configuration.Reader, gateway 
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) errors.Error {
+func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -41,7 +41,7 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 		})
 }
 
-func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr errors.Error) {
+func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
 	foundIt := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
@@ -60,7 +60,7 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr errors.Error) {
+func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	path := repo.config.ApiEndpoint() + buildpacks_path
 	entity := BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
@@ -79,13 +79,13 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr errors.Error) {
+func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpackGuid)
 	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	return
 }
 
-func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr errors.Error) {
+func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
 
 	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled, "", "", buildpack.Locked}

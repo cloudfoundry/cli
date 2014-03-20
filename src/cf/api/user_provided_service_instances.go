@@ -11,8 +11,8 @@ import (
 )
 
 type UserProvidedServiceInstanceRepository interface {
-	Create(name, drainUrl string, params map[string]string) (apiErr errors.Error)
-	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr errors.Error)
+	Create(name, drainUrl string, params map[string]string) (apiErr error)
+	Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error)
 }
 
 type CCUserProvidedServiceInstanceRepository struct {
@@ -26,7 +26,7 @@ func NewCCUserProvidedServiceInstanceRepository(config configuration.Reader, gat
 	return
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiErr errors.Error) {
+func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string, params map[string]string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances", repo.config.ApiEndpoint())
 
 	type RequestBody struct {
@@ -51,7 +51,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	return repo.gateway.CreateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
 }
 
-func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr errors.Error) {
+func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/user_provided_service_instances/%s", repo.config.ApiEndpoint(), serviceInstanceFields.Guid)
 
 	type RequestBody struct {

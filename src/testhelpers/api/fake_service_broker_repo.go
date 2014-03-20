@@ -24,7 +24,7 @@ type FakeServiceBrokerRepo struct {
 	ListErr        bool
 }
 
-func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiErr errors.Error) {
+func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models.ServiceBroker, apiErr error) {
 	repo.FindByNameName = name
 	serviceBroker = repo.FindByNameServiceBroker
 
@@ -35,7 +35,7 @@ func (repo *FakeServiceBrokerRepo) FindByName(name string) (serviceBroker models
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker models.ServiceBroker) bool) errors.Error {
+func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker models.ServiceBroker) bool) error {
 	for _, broker := range repo.ServiceBrokers {
 		if !callback(broker) {
 			break
@@ -43,13 +43,13 @@ func (repo *FakeServiceBrokerRepo) ListServiceBrokers(callback func(broker model
 	}
 
 	if repo.ListErr {
-		return errors.NewErrorWithMessage("Error finding service brokers")
+		return errors.New("Error finding service brokers")
 	} else {
 		return nil
 	}
 }
 
-func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiErr errors.Error) {
+func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) (apiErr error) {
 	repo.CreateName = name
 	repo.CreateUrl = url
 	repo.CreateUsername = username
@@ -57,18 +57,18 @@ func (repo *FakeServiceBrokerRepo) Create(name, url, username, password string) 
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiErr errors.Error) {
+func (repo *FakeServiceBrokerRepo) Update(serviceBroker models.ServiceBroker) (apiErr error) {
 	repo.UpdatedServiceBroker = serviceBroker
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiErr errors.Error) {
+func (repo *FakeServiceBrokerRepo) Rename(guid, name string) (apiErr error) {
 	repo.RenamedServiceBrokerGuid = guid
 	repo.RenamedServiceBrokerName = name
 	return
 }
 
-func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiErr errors.Error) {
+func (repo *FakeServiceBrokerRepo) Delete(guid string) (apiErr error) {
 	repo.DeletedServiceBrokerGuid = guid
 	return
 }

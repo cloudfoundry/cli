@@ -432,7 +432,7 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
+						endpointRepo.UpdateEndpointError = errors.New("API endpoint not found")
 					})
 
 					ItFails()
@@ -467,7 +467,7 @@ var _ = Describe("Login Command", func() {
 				Describe("setting api endpoint failed", func() {
 					BeforeEach(func() {
 						Config.SetSSLDisabled(true)
-						endpointRepo.UpdateEndpointError = errors.NewErrorWithMessage("API endpoint not found")
+						endpointRepo.UpdateEndpointError = errors.New("API endpoint not found")
 					})
 
 					ItFails()

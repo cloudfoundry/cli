@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/errors"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -60,7 +61,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(BeNil())
-		Expect(apiErr.ErrorCode()).To(Equal("90003"))
+		Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("90003"))
 	})
 
 	It("TestDeleteServiceBinding", func() {

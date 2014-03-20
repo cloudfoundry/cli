@@ -7,13 +7,13 @@ import (
 
 type FakeBuildpackBitsRepository struct {
 	UploadBuildpackErr         bool
-	UploadBuildpackApiResponse errors.Error
+	UploadBuildpackApiResponse error
 	UploadBuildpackPath        string
 }
 
-func (repo *FakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) errors.Error {
+func (repo *FakeBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, dir string) error {
 	if repo.UploadBuildpackErr {
-		return errors.NewErrorWithMessage("Invalid buildpack")
+		return errors.New("Invalid buildpack")
 	}
 
 	repo.UploadBuildpackPath = dir
