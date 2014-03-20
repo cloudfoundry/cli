@@ -28,29 +28,27 @@ func NewCloudControllerCurlRepository(config configuration.Reader, gateway net.G
 	return
 }
 
-func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, apiErr error) {
+func (repo CloudControllerCurlRepository) Request(method, path, headerString, body string) (resHeaders, resBody string, err error) {
 	url := fmt.Sprintf("%s/%s", repo.config.ApiEndpoint(), strings.TrimLeft(path, "/"))
 
-	req, apiErr := repo.gateway.NewRequest(method, url, repo.config.AccessToken(), strings.NewReader(body))
-	if apiErr != nil {
-		return
-	}
-
-	err := mergeHeaders(req.HttpReq.Header, headerString)
+	req, err := repo.gateway.NewRequest(method, url, repo.config.AccessToken(), strings.NewReader(body))
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Error parsing headers", err)
 		return
 	}
 
-	res, apiErr := repo.gateway.PerformRequestForResponse(req)
+	err = mergeHeaders(req.HttpReq.Header, headerString)
+	if err != nil {
+		err = errors.NewErrorWithError("Error parsing headers", err)
+		return
+	}
 
-	if apiErr != nil {
-		if httpErr, ok := apiErr.(errors.HttpError); ok {
-			resHeaders = httpErr.Headers()
-			resBody = httpErr.Body()
-			apiErr = nil
-		}
+	res, err := repo.gateway.PerformRequestForResponse(req)
 
+	if _, ok := err.(errors.HttpError); ok {
+		err = nil
+	}
+
+	if err != nil {
 		return
 	}
 
@@ -59,7 +57,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 
 	bytes, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Error reading response", err)
+		err = errors.NewErrorWithError("Error reading response", err)
 	}
 	resBody = string(bytes)
 

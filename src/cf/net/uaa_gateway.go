@@ -3,8 +3,6 @@ package net
 import (
 	"cf/configuration"
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
 )
 
 type uaaErrorResponse struct {
@@ -12,21 +10,18 @@ type uaaErrorResponse struct {
 	Description string `json:"error_description"`
 }
 
-var uaaErrorHandler = func(response *http.Response) errorResponse {
-	invalidTokenCode := "invalid_token"
+var uaaInvalidTokenCode = "invalid_token"
 
-	jsonBytes, _ := ioutil.ReadAll(response.Body)
-	response.Body.Close()
-
+var uaaErrorHandler = func(body []byte) apiErrorInfo {
 	uaaResp := uaaErrorResponse{}
-	json.Unmarshal(jsonBytes, &uaaResp)
+	json.Unmarshal(body, &uaaResp)
 
 	code := uaaResp.Code
-	if code == invalidTokenCode {
+	if code == uaaInvalidTokenCode {
 		code = INVALID_TOKEN_CODE
 	}
 
-	return errorResponse{Code: code, Description: uaaResp.Description}
+	return apiErrorInfo{Code: code, Description: uaaResp.Description}
 }
 
 func NewUAAGateway(config configuration.Reader) Gateway {

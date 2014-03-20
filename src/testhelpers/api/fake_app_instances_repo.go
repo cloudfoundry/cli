@@ -25,7 +25,7 @@ func (repo *FakeAppInstancesRepo) GetInstances(appGuid string) (instances []mode
 		errorCode := repo.GetInstancesErrorCodes[0]
 		repo.GetInstancesErrorCodes = repo.GetInstancesErrorCodes[1:]
 		if errorCode != "" {
-			apiErr = errors.NewHttpError(400, "", "", errorCode, "Error staging app")
+			apiErr = errors.NewHttpError(400, errorCode, "Error staging app")
 		}
 	}
 

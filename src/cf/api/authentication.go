@@ -133,9 +133,9 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 		return errors.NewErrorWithError("auth request failed", err)
 	}
 
-	// TODO: get the actual status code and headers
+	// TODO: get the actual status code
 	if response.Error.Code != "" {
-		return errors.NewHttpError(0, "", "", response.Error.Code, response.Error.Description)
+		return errors.NewHttpError(0, response.Error.Code, response.Error.Description)
 	}
 
 	uaa.config.SetAccessToken(fmt.Sprintf("%s %s", response.TokenType, response.AccessToken))

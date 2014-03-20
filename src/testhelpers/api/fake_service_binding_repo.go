@@ -20,7 +20,7 @@ func (repo *FakeServiceBindingRepo) Create(instanceGuid, appGuid string) (apiErr
 	repo.CreateApplicationGuid = appGuid
 
 	if repo.CreateErrorCode != "" {
-		apiErr = errors.NewHttpError(400, "", "", repo.CreateErrorCode, "Error binding service")
+		apiErr = errors.NewHttpError(400, repo.CreateErrorCode, "Error binding service")
 	}
 
 	return

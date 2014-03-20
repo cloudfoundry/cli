@@ -1,6 +1,7 @@
 package net
 
 import (
+	"bytes"
 	"cf"
 	"cf/configuration"
 	"cf/errors"
@@ -40,14 +41,12 @@ type AsyncResponse struct {
 	Metadata AsyncMetadata
 }
 
-type errorResponse struct {
-	Code           string
-	Description    string
-	ResponseHeader string
-	ResponseBody   string
+type apiErrorInfo struct {
+	Code        string
+	Description string
 }
 
-type errorHandler func(*http.Response) errorResponse
+type apiErrorHandler func(body []byte) apiErrorInfo
 
 type tokenRefresher interface {
 	RefreshAuthToken() (string, error)
@@ -60,14 +59,14 @@ type Request struct {
 
 type Gateway struct {
 	authenticator   tokenRefresher
-	errHandler      errorHandler
+	errHandler      apiErrorHandler
 	PollingEnabled  bool
 	PollingThrottle time.Duration
 	trustedCerts    []tls.Certificate
 	config          configuration.Reader
 }
 
-func newGateway(errHandler errorHandler, config configuration.Reader) (gateway Gateway) {
+func newGateway(errHandler apiErrorHandler, config configuration.Reader) (gateway Gateway) {
 	gateway.errHandler = errHandler
 	gateway.config = config
 	gateway.PollingThrottle = DEFAULT_POLLING_THROTTLE
@@ -360,8 +359,12 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 	}
 
 	if rawResponse.StatusCode > 299 {
-		errorResponse := gateway.errHandler(rawResponse)
-		apiErr = errors.NewHttpError(rawResponse.StatusCode, errorResponse.ResponseHeader, errorResponse.ResponseBody, errorResponse.Code, errorResponse.Description)
+		jsonBytes, _ := ioutil.ReadAll(rawResponse.Body)
+		rawResponse.Body.Close()
+		rawResponse.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
+
+		apiErrorInfo := gateway.errHandler(jsonBytes)
+		apiErr = errors.NewHttpError(rawResponse.StatusCode, apiErrorInfo.Code, apiErrorInfo.Description)
 	}
 
 	return
