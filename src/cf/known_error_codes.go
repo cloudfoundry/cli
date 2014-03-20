@@ -1,6 +1,7 @@
 package cf
 
 const (
+	INVALID_RELATION            = "1002"
 	BAD_QUERY_PARAM             = "10005"
 	USER_EXISTS                 = "20002"
 	USER_NOT_FOUND              = "20003"

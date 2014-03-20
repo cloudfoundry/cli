@@ -71,7 +71,7 @@ type AppParams struct {
 	Memory             *uint64
 	Name               *string
 	NoRoute            bool
-	RandomHostname     bool
+	UseRandomHostname  bool
 	Path               *string
 	Services           *[]string
 	SpaceGuid          *string
@@ -134,7 +134,7 @@ func (app *AppParams) Merge(other *AppParams) {
 	}
 
 	app.NoRoute = app.NoRoute || other.NoRoute
-	app.RandomHostname = app.RandomHostname || other.RandomHostname
+	app.UseRandomHostname = app.UseRandomHostname || other.UseRandomHostname
 }
 
 func (app *AppParams) Equals(otherParams *AppParams) bool {

@@ -1,6 +1,7 @@
 package application_test
 
 import (
+	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/errors"
@@ -829,6 +830,39 @@ var _ = Describe("Push Command", func() {
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Uploading"},
 			{"FAILED"},
+		})
+	})
+
+	Describe("when binding the route fails", func() {
+		BeforeEach(func() {
+			routeRepo.FindByHostAndDomainRoute.Host = "existing-app"
+			routeRepo.FindByHostAndDomainRoute.Domain = models.DomainFields{Name: "foo.cf-app.com"}
+		})
+
+		It("suggests using 'random-route' if the default route is taken", func() {
+			routeRepo.BindErr = errors.NewHttpError(400, cf.INVALID_RELATION, "The URL not available")
+
+			callPush("existing-app")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"existing-app.foo.cf-app.com", "already in use"},
+				{"TIP", "random-route"},
+			})
+		})
+
+		It("does not suggest using 'random-route' for other failures", func() {
+			routeRepo.BindErr = errors.NewHttpError(500, "some-code", "exception happened")
+
+			callPush("existing-app")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+			})
+
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"TIP", "random-route"},
+			})
 		})
 	})
 
