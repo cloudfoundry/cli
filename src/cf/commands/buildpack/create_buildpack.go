@@ -44,7 +44,7 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 	buildpack, err := cmd.createBuildpack(buildpackName, c)
 
 	if err != nil {
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == cf.BUILDPACK_EXISTS {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
 			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" update-buildpack"))

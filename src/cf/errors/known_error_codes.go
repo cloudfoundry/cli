@@ -1,4 +1,4 @@
-package cf
+package errors
 
 const (
 	INVALID_RELATION            = "1002"

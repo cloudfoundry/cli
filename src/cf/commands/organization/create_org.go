@@ -45,7 +45,7 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 	)
 	err := cmd.orgRepo.Create(name)
 	if err != nil {
-		if apiErr, ok := err.(errors.HttpError); ok && apiErr.ErrorCode() == cf.ORG_EXISTS {
+		if apiErr, ok := err.(errors.HttpError); ok && apiErr.ErrorCode() == errors.ORG_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Org %s already exists", name)
 			return

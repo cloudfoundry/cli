@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/errors"
 	"cf/models"
 )
@@ -57,7 +56,7 @@ func (repo *FakeOrgRepository) FindByName(name string) (org models.Organization,
 
 func (repo *FakeOrgRepository) Create(name string) (apiErr error) {
 	if repo.CreateOrgExists {
-		apiErr = errors.NewHttpError(400, cf.ORG_EXISTS, "Space already exists")
+		apiErr = errors.NewHttpError(400, errors.ORG_EXISTS, "Space already exists")
 		return
 	}
 	repo.CreateName = name

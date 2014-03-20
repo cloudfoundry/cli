@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -199,7 +198,7 @@ func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error)
 
 	apiErr = repo.ccGateway.DeleteResource(path, repo.config.AccessToken())
 
-	if httpErr, ok := apiErr.(errors.HttpError); ok && httpErr.ErrorCode() != cf.USER_NOT_FOUND {
+	if httpErr, ok := apiErr.(errors.HttpError); ok && httpErr.ErrorCode() != errors.USER_NOT_FOUND {
 		return
 	}
 	uaaEndpoint, apiErr := repo.getAuthEndpoint()

@@ -1,7 +1,6 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
 	"cf/configuration"
 	"cf/errors"
@@ -840,7 +839,7 @@ var _ = Describe("Push Command", func() {
 		})
 
 		It("suggests using 'random-route' if the default route is taken", func() {
-			routeRepo.BindErr = errors.NewHttpError(400, cf.INVALID_RELATION, "The URL not available")
+			routeRepo.BindErr = errors.NewHttpError(400, errors.INVALID_RELATION, "The URL not available")
 
 			callPush("existing-app")
 

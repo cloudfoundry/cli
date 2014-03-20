@@ -1,8 +1,8 @@
 package application_test
 
 import (
-	"cf"
 	. "cf/commands/application"
+	"cf/errors"
 	"cf/formatters"
 	"cf/models"
 	. "github.com/onsi/gomega"
@@ -112,11 +112,11 @@ var _ = Describe("Show App Command", func() {
 	})
 
 	It("TestDisplayingStoppedAppSummary", func() {
-		testDisplayingAppSummaryWithErrorCode(cf.APP_STOPPED)
+		testDisplayingAppSummaryWithErrorCode(errors.APP_STOPPED)
 	})
 
 	It("TestDisplayingNotStagedAppSummary", func() {
-		testDisplayingAppSummaryWithErrorCode(cf.APP_NOT_STAGED)
+		testDisplayingAppSummaryWithErrorCode(errors.APP_NOT_STAGED)
 	})
 })
 
