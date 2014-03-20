@@ -13,14 +13,13 @@ type ccErrorResponse struct {
 }
 
 func cloudControllerErrorHandler(statusCode int, body []byte) error {
-	ccResp := ccErrorResponse{}
-	json.Unmarshal(body, &ccResp)
-	code := strconv.Itoa(ccResp.Code)
+	response := ccErrorResponse{}
+	json.Unmarshal(body, &response)
 
-	if code == "1000" {
-		return errors.NewInvalidTokenError(ccResp.Description)
+	if response.Code == 1000 {
+		return errors.NewInvalidTokenError(response.Description)
 	} else {
-		return errors.NewHttpError(statusCode, code, ccResp.Description)
+		return errors.NewHttpError(statusCode, strconv.Itoa(response.Code), response.Description)
 	}
 }
 

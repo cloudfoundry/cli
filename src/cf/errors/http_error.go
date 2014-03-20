@@ -9,9 +9,9 @@ type HttpError interface {
 }
 
 type httpError struct {
-	statusCode  int
-	code        string
-	description string
+	statusCode   int
+	apiErrorCode string
+	description  string
 }
 
 type HttpNotFoundError struct {
@@ -20,9 +20,9 @@ type HttpNotFoundError struct {
 
 func NewHttpError(statusCode int, code string, description string) HttpError {
 	err := httpError{
-		statusCode:  statusCode,
-		code:        code,
-		description: description,
+		statusCode:   statusCode,
+		apiErrorCode: code,
+		description:  description,
 	}
 	switch statusCode {
 	case 404:
@@ -40,11 +40,11 @@ func (err *httpError) Error() string {
 	return fmt.Sprintf(
 		"Server error, status code: %d, error code: %s, message: %s",
 		err.statusCode,
-		err.code,
+		err.apiErrorCode,
 		err.description,
 	)
 }
 
 func (err *httpError) ErrorCode() string {
-	return err.code
+	return err.apiErrorCode
 }

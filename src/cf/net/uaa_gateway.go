@@ -12,13 +12,13 @@ type uaaErrorResponse struct {
 }
 
 var uaaErrorHandler = func(statusCode int, body []byte) error {
-	uaaResp := uaaErrorResponse{}
-	json.Unmarshal(body, &uaaResp)
+	response := uaaErrorResponse{}
+	json.Unmarshal(body, &response)
 
-	if uaaResp.Code == "invalid_token" {
-		return errors.NewInvalidTokenError(uaaResp.Description)
+	if response.Code == "invalid_token" {
+		return errors.NewInvalidTokenError(response.Description)
 	} else {
-		return errors.NewHttpError(statusCode, uaaResp.Code, uaaResp.Description)
+		return errors.NewHttpError(statusCode, response.Code, response.Description)
 	}
 }
 
