@@ -207,7 +207,7 @@ var _ = Describe("Manifests", func() {
 		Expect(*apps[0].InstanceCount).To(Equal(1))
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(11))
 		Expect(apps[0].NoRoute).To(BeTrue())
-		Expect(apps[0].RandomHostname).To(BeTrue())
+		Expect(apps[0].UseRandomHostname).To(BeTrue())
 	})
 
 	Describe("old-style property syntax", func() {

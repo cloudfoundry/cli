@@ -18,6 +18,7 @@ type FakeRouteRepository struct {
 
 	CreatedHost       string
 	CreatedDomainGuid string
+	CreatedRoute      models.Route
 
 	CreateInSpaceHost         string
 	CreateInSpaceDomainGuid   string
@@ -25,6 +26,7 @@ type FakeRouteRepository struct {
 	CreateInSpaceCreatedRoute models.Route
 	CreateInSpaceErr          bool
 
+	BindErr        error
 	BoundRouteGuid string
 	BoundAppGuid   string
 
@@ -66,7 +68,7 @@ func (repo *FakeRouteRepository) FindByHostAndDomain(host, domain string) (route
 	repo.FindByHostAndDomainDomain = domain
 
 	if repo.FindByHostAndDomainErr {
-		apiErr = errors.New("Error finding Route")
+		apiErr = errors.NewModelNotFoundError("Route", host)
 	}
 
 	if repo.FindByHostAndDomainNotFound {
@@ -103,7 +105,7 @@ func (repo *FakeRouteRepository) CreateInSpace(host, domainGuid, spaceGuid strin
 func (repo *FakeRouteRepository) Bind(routeGuid, appGuid string) (apiErr error) {
 	repo.BoundRouteGuid = routeGuid
 	repo.BoundAppGuid = appGuid
-	return
+	return repo.BindErr
 }
 
 func (repo *FakeRouteRepository) Unbind(routeGuid, appGuid string) (apiErr error) {

@@ -1,6 +1,8 @@
 package application
 
 import (
+	//	"cf"
+	"cf"
 	"cf/api"
 	"cf/commands/service"
 	"cf/configuration"
@@ -156,8 +158,10 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 
 	route, apiErr := cmd.routeRepo.FindByHostAndDomain(hostname, domain.Name)
 
-	// FIXME: ensure this is a NotFound error
-	if apiErr != nil {
+	switch apiErr.(type) {
+	case nil:
+		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
+	case errors.ModelNotFoundError:
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)))
 
 		route, apiErr = cmd.routeRepo.Create(hostname, domain.Guid)
@@ -167,21 +171,26 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 
 		cmd.ui.Ok()
 		cmd.ui.Say("")
-	} else {
-		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
+	default:
+		cmd.ui.Failed(apiErr.Error())
 	}
 
 	if !app.HasRoute(route) {
 		cmd.ui.Say("Binding %s to %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)), terminal.EntityNameColor(app.Name))
 
 		apiErr = cmd.routeRepo.Bind(route.Guid, app.Guid)
-		if apiErr != nil {
-			cmd.ui.Failed(apiErr.Error())
+		switch apiErr := apiErr.(type) {
+		case nil:
+			cmd.ui.Ok()
+			cmd.ui.Say("")
+			return
+		case errors.HttpError:
+			if apiErr.ErrorCode() == cf.INVALID_RELATION {
+				cmd.ui.Failed("The route %s is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", route.URL())
+			}
 		}
+		cmd.ui.Failed(apiErr.Error())
 	}
-
-	cmd.ui.Ok()
-	cmd.ui.Say("")
 }
 
 func (cmd Push) hostnameForApp(appParams models.AppParams, c *cli.Context) string {
@@ -191,7 +200,7 @@ func (cmd Push) hostnameForApp(appParams models.AppParams, c *cli.Context) strin
 
 	if appParams.Host != nil {
 		return *appParams.Host
-	} else if appParams.RandomHostname {
+	} else if appParams.UseRandomHostname {
 		return hostNameForString(*appParams.Name) + "-" + cmd.wordGenerator.Babble()
 	} else {
 		return hostNameForString(*appParams.Name)
@@ -487,7 +496,7 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 	}
 
 	appParams.NoRoute = c.Bool("no-route")
-	appParams.RandomHostname = c.Bool("random-route")
+	appParams.UseRandomHostname = c.Bool("random-route")
 
 	if c.String("n") != "" {
 		hostname := c.String("n")
