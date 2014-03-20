@@ -2,6 +2,7 @@ package net
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"encoding/json"
 )
 
@@ -10,18 +11,15 @@ type uaaErrorResponse struct {
 	Description string `json:"error_description"`
 }
 
-var uaaInvalidTokenCode = "invalid_token"
-
-var uaaErrorHandler = func(body []byte) apiErrorInfo {
+var uaaErrorHandler = func(statusCode int, body []byte) error {
 	uaaResp := uaaErrorResponse{}
 	json.Unmarshal(body, &uaaResp)
 
-	code := uaaResp.Code
-	if code == uaaInvalidTokenCode {
-		code = INVALID_TOKEN_CODE
+	if uaaResp.Code == "invalid_token" {
+		return errors.NewInvalidTokenError(uaaResp.Description)
+	} else {
+		return errors.NewHttpError(statusCode, uaaResp.Code, uaaResp.Description)
 	}
-
-	return apiErrorInfo{Code: code, Description: uaaResp.Description}
 }
 
 func NewUAAGateway(config configuration.Reader) Gateway {

@@ -2,6 +2,7 @@ package net
 
 import (
 	"cf/configuration"
+	"cf/errors"
 	"encoding/json"
 	"strconv"
 )
@@ -11,20 +12,15 @@ type ccErrorResponse struct {
 	Description string
 }
 
-var cloudControllerInvalidTokenCode = "1000"
-
-func cloudControllerErrorHandler(body []byte) apiErrorInfo {
+func cloudControllerErrorHandler(statusCode int, body []byte) error {
 	ccResp := ccErrorResponse{}
 	json.Unmarshal(body, &ccResp)
-
 	code := strconv.Itoa(ccResp.Code)
-	if code == cloudControllerInvalidTokenCode {
-		code = INVALID_TOKEN_CODE
-	}
 
-	return apiErrorInfo{
-		Code:        code,
-		Description: ccResp.Description,
+	if code == "1000" {
+		return errors.NewInvalidTokenError(ccResp.Description)
+	} else {
+		return errors.NewHttpError(statusCode, code, ccResp.Description)
 	}
 }
 
