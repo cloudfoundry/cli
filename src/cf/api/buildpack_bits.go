@@ -21,7 +21,7 @@ import (
 )
 
 type BuildpackBitsRepository interface {
-	UploadBuildpack(buildpack models.Buildpack, dir string) (apiErr errors.Error)
+	UploadBuildpack(buildpack models.Buildpack, dir string) (apiErr error)
 }
 
 type CloudControllerBuildpackBitsRepository struct {
@@ -38,7 +38,7 @@ func NewCloudControllerBuildpackBitsRepository(config configuration.Reader, gate
 	return
 }
 
-func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiErr errors.Error) {
+func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack models.Buildpack, buildpackLocation string) (apiErr error) {
 	fileutils.TempFile("buildpack-upload", func(zipFileToUpload *os.File, err error) {
 		if err != nil {
 			apiErr = errors.NewErrorWithError("Couldn't create temp file for upload", err)
@@ -197,7 +197,7 @@ func (repo CloudControllerBuildpackBitsRepository) downloadBuildpack(url string,
 	})
 }
 
-func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) errors.Error {
+func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.Buildpack, body io.Reader, buildpackName string) error {
 	return repo.performMultiPartUpload(
 		fmt.Sprintf("%s/v2/buildpacks/%s/bits", repo.config.ApiEndpoint(), buildpack.Guid),
 		"buildpack",
@@ -205,10 +205,10 @@ func (repo CloudControllerBuildpackBitsRepository) uploadBits(buildpack models.B
 		body)
 }
 
-func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) (apiErr errors.Error) {
+func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url string, fieldName string, fileName string, body io.Reader) (apiErr error) {
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
-			apiErr = errors.NewErrorWithMessage(err.Error())
+			apiErr = err
 			return
 		}
 

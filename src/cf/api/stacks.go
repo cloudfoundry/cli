@@ -31,8 +31,8 @@ type StackEntity struct {
 }
 
 type StackRepository interface {
-	FindByName(name string) (stack models.Stack, apiErr errors.Error)
-	FindAll() (stacks []models.Stack, apiErr errors.Error)
+	FindByName(name string) (stack models.Stack, apiErr error)
+	FindAll() (stacks []models.Stack, apiErr error)
 }
 
 type CloudControllerStackRepository struct {
@@ -46,7 +46,7 @@ func NewCloudControllerStackRepository(config configuration.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiErr errors.Error) {
+func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiErr error) {
 	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
 	stacks, apiErr := repo.findAllWithPath(path)
 	if apiErr != nil {
@@ -54,7 +54,7 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack models
 	}
 
 	if len(stacks) == 0 {
-		apiErr = errors.NewErrorWithMessage("Stack '%s' not found", name)
+		apiErr = errors.NewWithFmt("Stack '%s' not found", name)
 		return
 	}
 
@@ -62,12 +62,12 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack models
 	return
 }
 
-func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiErr errors.Error) {
+func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiErr error) {
 	path := fmt.Sprintf("%s/v2/stacks", repo.config.ApiEndpoint())
 	return repo.findAllWithPath(path)
 }
 
-func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiErr errors.Error) {
+func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiErr error) {
 	resources := new(PaginatedStackResources)
 	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
 	if apiErr != nil {

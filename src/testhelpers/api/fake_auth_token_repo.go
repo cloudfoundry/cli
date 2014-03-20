@@ -1,9 +1,6 @@
 package api
 
-import (
-	"cf/errors"
-	"cf/models"
-)
+import "cf/models"
 
 type FakeAuthTokenRepo struct {
 	CreatedServiceAuthTokenFields models.ServiceAuthTokenFields
@@ -13,23 +10,23 @@ type FakeAuthTokenRepo struct {
 	FindByLabelAndProviderLabel                  string
 	FindByLabelAndProviderProvider               string
 	FindByLabelAndProviderServiceAuthTokenFields models.ServiceAuthTokenFields
-	FindByLabelAndProviderApiResponse            errors.Error
+	FindByLabelAndProviderApiResponse            error
 
 	UpdatedServiceAuthTokenFields models.ServiceAuthTokenFields
 
 	DeletedServiceAuthTokenFields models.ServiceAuthTokenFields
 }
 
-func (repo *FakeAuthTokenRepo) Create(authToken models.ServiceAuthTokenFields) (apiErr errors.Error) {
+func (repo *FakeAuthTokenRepo) Create(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	repo.CreatedServiceAuthTokenFields = authToken
 	return
 }
 
-func (repo *FakeAuthTokenRepo) FindAll() (authTokens []models.ServiceAuthTokenFields, apiErr errors.Error) {
+func (repo *FakeAuthTokenRepo) FindAll() (authTokens []models.ServiceAuthTokenFields, apiErr error) {
 	authTokens = repo.FindAllAuthTokens
 	return
 }
-func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (authToken models.ServiceAuthTokenFields, apiErr errors.Error) {
+func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (authToken models.ServiceAuthTokenFields, apiErr error) {
 	repo.FindByLabelAndProviderLabel = label
 	repo.FindByLabelAndProviderProvider = provider
 
@@ -38,12 +35,12 @@ func (repo *FakeAuthTokenRepo) FindByLabelAndProvider(label, provider string) (a
 	return
 }
 
-func (repo *FakeAuthTokenRepo) Delete(authToken models.ServiceAuthTokenFields) (apiErr errors.Error) {
+func (repo *FakeAuthTokenRepo) Delete(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	repo.DeletedServiceAuthTokenFields = authToken
 	return
 }
 
-func (repo *FakeAuthTokenRepo) Update(authToken models.ServiceAuthTokenFields) (apiErr errors.Error) {
+func (repo *FakeAuthTokenRepo) Update(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	repo.UpdatedServiceAuthTokenFields = authToken
 	return
 }

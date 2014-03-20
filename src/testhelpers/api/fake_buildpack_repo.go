@@ -12,26 +12,26 @@ type FakeBuildpackRepository struct {
 	FindByNameNotFound    bool
 	FindByNameName        string
 	FindByNameBuildpack   models.Buildpack
-	FindByNameApiResponse errors.Error
+	FindByNameApiResponse error
 
 	CreateBuildpackExists bool
 	CreateBuildpack       models.Buildpack
-	CreateApiResponse     errors.Error
+	CreateApiResponse     error
 
 	DeleteBuildpackGuid string
-	DeleteApiResponse   errors.Error
+	DeleteApiResponse   error
 
 	UpdateBuildpack models.Buildpack
 }
 
-func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) errors.Error {
+func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	for _, b := range repo.Buildpacks {
 		cb(b)
 	}
 	return nil
 }
 
-func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr errors.Error) {
+func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.Buildpack, apiErr error) {
 	repo.FindByNameName = name
 	buildpack = repo.FindByNameBuildpack
 
@@ -42,22 +42,22 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.B
 	return
 }
 
-func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr errors.Error) {
+func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	if repo.CreateBuildpackExists {
-		return repo.CreateBuildpack, errors.NewError("Buildpack already exists", cf.BUILDPACK_EXISTS)
+		return repo.CreateBuildpack, errors.NewHttpError(400, "", "", cf.BUILDPACK_EXISTS, "Buildpack already exists")
 	}
 
 	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	return repo.CreateBuildpack, repo.CreateApiResponse
 }
 
-func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiErr errors.Error) {
+func (repo *FakeBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
 	repo.DeleteBuildpackGuid = buildpackGuid
 	apiErr = repo.DeleteApiResponse
 	return
 }
 
-func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr errors.Error) {
+func (repo *FakeBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
 	repo.UpdateBuildpack = buildpack
 	return
 }

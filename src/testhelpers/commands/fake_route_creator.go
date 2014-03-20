@@ -1,9 +1,6 @@
 package commands
 
-import (
-	"cf/errors"
-	"cf/models"
-)
+import "cf/models"
 
 type FakeRouteCreator struct {
 	CreateRouteHostname     string
@@ -12,7 +9,7 @@ type FakeRouteCreator struct {
 	ReservedRoute           models.Route
 }
 
-func (cmd *FakeRouteCreator) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (reservedRoute models.Route, apiErr errors.Error) {
+func (cmd *FakeRouteCreator) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (reservedRoute models.Route, apiErr error) {
 	cmd.CreateRouteHostname = hostName
 	cmd.CreateRouteDomainFields = domain
 	cmd.CreateRouteSpaceFields = space

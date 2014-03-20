@@ -48,12 +48,12 @@ type SpaceEntity struct {
 }
 
 type SpaceRepository interface {
-	ListSpaces(func(models.Space) bool) errors.Error
-	FindByName(name string) (space models.Space, apiErr errors.Error)
-	FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr errors.Error)
-	Create(name string, orgGuid string) (space models.Space, apiErr errors.Error)
-	Rename(spaceGuid, newName string) (apiErr errors.Error)
-	Delete(spaceGuid string) (apiErr errors.Error)
+	ListSpaces(func(models.Space) bool) error
+	FindByName(name string) (space models.Space, apiErr error)
+	FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error)
+	Create(name string, orgGuid string) (space models.Space, apiErr error)
+	Rename(spaceGuid, newName string) (apiErr error)
+	Delete(spaceGuid string) (apiErr error)
 }
 
 type CloudControllerSpaceRepository struct {
@@ -67,7 +67,7 @@ func NewCloudControllerSpaceRepository(config configuration.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) errors.Error {
+func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
@@ -78,11 +78,11 @@ func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space
 		})
 }
 
-func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiErr errors.Error) {
+func (repo CloudControllerSpaceRepository) FindByName(name string) (space models.Space, apiErr error) {
 	return repo.FindByNameInOrg(name, repo.config.OrganizationFields().Guid)
 }
 
-func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr errors.Error) {
+func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string) (space models.Space, apiErr error) {
 	foundSpace := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
@@ -102,7 +102,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr errors.Error) {
+func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.ApiEndpoint())
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(SpaceResource)
@@ -114,13 +114,13 @@ func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (
 	return
 }
 
-func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiErr errors.Error) {
+func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.ApiEndpoint(), spaceGuid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
 	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
 }
 
-func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr errors.Error) {
+func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.ApiEndpoint(), spaceGuid)
 	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
 }

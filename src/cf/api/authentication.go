@@ -13,9 +13,9 @@ import (
 )
 
 type AuthenticationRepository interface {
-	Authenticate(credentials map[string]string) (apiErr errors.Error)
-	RefreshAuthToken() (updatedToken string, apiErr errors.Error)
-	GetLoginPromptsAndSaveUAAServerURL() (map[string]configuration.AuthPrompt, errors.Error)
+	Authenticate(credentials map[string]string) (apiErr error)
+	RefreshAuthToken() (updatedToken string, apiErr error)
+	GetLoginPromptsAndSaveUAAServerURL() (map[string]configuration.AuthPrompt, error)
 }
 
 type UAAAuthenticationRepository struct {
@@ -29,7 +29,7 @@ func NewUAAAuthenticationRepository(gateway net.Gateway, config configuration.Re
 	return
 }
 
-func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr errors.Error) {
+func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]string) (apiErr error) {
 	data := url.Values{
 		"grant_type": {"password"},
 		"scope":      {""},
@@ -42,7 +42,7 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	switch response := apiErr.(type) {
 	case errors.HttpError:
 		if response.StatusCode() == 401 {
-			apiErr = errors.NewErrorWithMessage("Password is incorrect, please try again.")
+			apiErr = errors.New("Password is incorrect, please try again.")
 		}
 	}
 
@@ -70,7 +70,7 @@ func (r *LoginResource) parsePrompts() (prompts map[string]configuration.AuthPro
 	return
 }
 
-func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr errors.Error) {
+func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthenticationEndpoint())
 	resource := &LoginResource{}
 	apiErr = uaa.gateway.GetResource(url, "", resource)
@@ -84,7 +84,7 @@ func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (pro
 	return
 }
 
-func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr errors.Error) {
+func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, apiErr error) {
 	data := url.Values{
 		"refresh_token": {uaa.config.RefreshToken()},
 		"grant_type":    {"refresh_token"},
@@ -102,7 +102,7 @@ func (uaa UAAAuthenticationRepository) RefreshAuthToken() (updatedToken string, 
 	return
 }
 
-func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) errors.Error {
+func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	type uaaErrorResponse struct {
 		Code        string `json:"error"`
 		Description string `json:"error_description"`
@@ -133,8 +133,9 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) errors.Erro
 		return errors.NewErrorWithError("auth request failed", err)
 	}
 
+	// TODO: get the actual status code and headers
 	if response.Error.Code != "" {
-		return errors.NewError("Authentication Server error: "+response.Error.Description, response.Error.Code)
+		return errors.NewHttpError(0, "", "", response.Error.Code, response.Error.Description)
 	}
 
 	uaa.config.SetAccessToken(fmt.Sprintf("%s %s", response.TokenType, response.AccessToken))

@@ -100,7 +100,7 @@ var _ = Describe("domains command", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: errors.NewErrorWithMessage("borked!"),
+			ListSharedDomainsApiResponse: errors.New("borked!"),
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
@@ -142,7 +142,7 @@ var _ = Describe("domains command", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListDomainsForOrgApiResponse: errors.NewErrorWithMessage("borked!"),
+			ListDomainsForOrgApiResponse: errors.New("borked!"),
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 

@@ -14,12 +14,12 @@ type FakeApplicationBitsRepository struct {
 	CallbackFileCount uint64
 }
 
-func (repo *FakeApplicationBitsRepository) UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr errors.Error) {
+func (repo *FakeApplicationBitsRepository) UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error) {
 	repo.UploadedDir = dir
 	repo.UploadedAppGuid = appGuid
 
 	if repo.UploadAppErr {
-		apiErr = errors.NewErrorWithMessage("Error uploading app")
+		apiErr = errors.New("Error uploading app")
 		return
 	}
 

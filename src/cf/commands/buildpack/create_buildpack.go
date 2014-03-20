@@ -41,14 +41,15 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	cmd.ui.Say("Creating buildpack %s...", terminal.EntityNameColor(buildpackName))
 
-	buildpack, apiErr := cmd.createBuildpack(buildpackName, c)
-	if apiErr != nil {
-		if apiErr.ErrorCode() == cf.BUILDPACK_EXISTS {
+	buildpack, err := cmd.createBuildpack(buildpackName, c)
+
+	if err != nil {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == cf.BUILDPACK_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Buildpack %s already exists", buildpackName)
 			cmd.ui.Say("TIP: use '%s' to update this buildpack", terminal.CommandColor(cf.Name()+" update-buildpack"))
 		} else {
-			cmd.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(err.Error())
 		}
 		return
 	}
@@ -59,26 +60,26 @@ func (cmd CreateBuildpack) Run(c *cli.Context) {
 
 	dir := c.Args()[1]
 
-	apiErr = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
+	err = cmd.buildpackBitsRepo.UploadBuildpack(buildpack, dir)
+	if err != nil {
+		cmd.ui.Failed(err.Error())
 		return
 	}
 
 	cmd.ui.Ok()
 }
 
-func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr errors.Error) {
+func (cmd CreateBuildpack) createBuildpack(buildpackName string, c *cli.Context) (buildpack models.Buildpack, apiErr error) {
 	position, err := strconv.Atoi(c.Args()[2])
 	if err != nil {
-		apiErr = errors.NewErrorWithMessage("Invalid position. %s", err.Error())
+		apiErr = errors.NewWithFmt("Invalid position. %s", err.Error())
 		return
 	}
 
 	enabled := c.Bool("enable")
 	disabled := c.Bool("disable")
 	if enabled && disabled {
-		apiErr = errors.NewErrorWithMessage("Cannot specify both enabled and disabled.")
+		apiErr = errors.New("Cannot specify both enabled and disabled.")
 		return
 	}
 

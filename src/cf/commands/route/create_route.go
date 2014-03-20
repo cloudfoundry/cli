@@ -3,16 +3,15 @@ package route
 import (
 	"cf/api"
 	"cf/configuration"
-	cferrors "cf/errors"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
 type RouteCreator interface {
-	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr cferrors.Error)
+	CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error)
 }
 
 type CreateRoute struct {
@@ -66,7 +65,7 @@ func (cmd *CreateRoute) Run(c *cli.Context) {
 	}
 }
 
-func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr cferrors.Error) {
+func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields, space models.SpaceFields) (route models.Route, apiErr error) {
 	cmd.ui.Say("Creating route %s for org %s / space %s as %s...",
 		terminal.EntityNameColor(domain.UrlForHost(hostName)),
 		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
@@ -76,7 +75,7 @@ func (cmd *CreateRoute) CreateRoute(hostName string, domain models.DomainFields,
 
 	route, apiErr = cmd.routeRepo.CreateInSpace(hostName, domain.Guid, space.Guid)
 	if apiErr != nil {
-		var findApiResponse cferrors.Error
+		var findApiResponse error
 		route, findApiResponse = cmd.routeRepo.FindByHostAndDomain(hostName, domain.Name)
 
 		if findApiResponse != nil ||

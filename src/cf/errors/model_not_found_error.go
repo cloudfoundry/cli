@@ -15,7 +15,3 @@ func NewModelNotFoundError(modelType, name string) ModelNotFoundError {
 func (err ModelNotFoundError) Error() string {
 	return err.ModelType + " " + err.ModelName + " not found"
 }
-
-func (err ModelNotFoundError) ErrorCode() string {
-	return "model-not-found"
-}

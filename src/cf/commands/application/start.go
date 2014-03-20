@@ -4,10 +4,10 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"github.com/codegangsta/cli"
@@ -173,18 +173,18 @@ func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
 
 func (cmd Start) waitForInstancesToStage(app models.Application) {
 	stagingStartTime := time.Now()
-	_, apiErr := cmd.appInstancesRepo.GetInstances(app.Guid)
+	_, err := cmd.appInstancesRepo.GetInstances(app.Guid)
 
-	for apiErr != nil && time.Since(stagingStartTime) < cmd.StagingTimeout {
-		if apiErr.ErrorCode() != cf.APP_NOT_STAGED {
+	for err != nil && time.Since(stagingStartTime) < cmd.StagingTimeout {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() != cf.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(fmt.Sprintf("%s\n\nTIP: use '%s' for more information",
-				apiErr.Error(),
+				err.Error(),
 				terminal.CommandColor(fmt.Sprintf("%s logs %s --recent", cf.Name(), app.Name))))
 			return
 		}
 		cmd.ui.Wait(cmd.PingerThrottle)
-		_, apiErr = cmd.appInstancesRepo.GetInstances(app.Guid)
+		_, err = cmd.appInstancesRepo.GetInstances(app.Guid)
 	}
 	return
 }

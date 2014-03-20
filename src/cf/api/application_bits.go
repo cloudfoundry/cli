@@ -26,7 +26,7 @@ type AppFileResource struct {
 }
 
 type ApplicationBitsRepository interface {
-	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr errors.Error)
+	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error)
 }
 
 type CloudControllerApplicationBitsRepository struct {
@@ -42,10 +42,10 @@ func NewCloudControllerApplicationBitsRepository(config configuration.Reader, ga
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, cb func(path string, zipSize, fileCount uint64)) (apiErr errors.Error) {
+func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, appDir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error) {
 	fileutils.TempDir("apps", func(uploadDir string, err error) {
 		if err != nil {
-			apiErr = errors.NewErrorWithMessage(err.Error())
+			apiErr = err
 			return
 		}
 
@@ -59,13 +59,13 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 		})
 
 		if err != nil {
-			apiErr = errors.NewErrorWithMessage("%s", err)
+			apiErr = err
 			return
 		}
 
 		fileutils.TempFile("uploads", func(zipFile *os.File, err error) {
 			if err != nil {
-				apiErr = errors.NewErrorWithMessage("%s", err.Error())
+				apiErr = err
 				return
 			}
 
@@ -91,7 +91,7 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiErr errors.Error) {
+func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, zipFile *os.File, presentResourcesJson []byte) (apiErr error) {
 	url := fmt.Sprintf("%s/v2/apps/%s/bits", repo.config.ApiEndpoint(), appGuid)
 	fileutils.TempFile("requests", func(requestFile *os.File, err error) {
 		if err != nil {
@@ -199,7 +199,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(appDir, destDir 
 	return
 }
 
-func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiErr errors.Error) {
+func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiErr error) {
 	appFilesRequest := []AppFileResource{}
 	for _, file := range allAppFiles {
 		appFilesRequest = append(appFilesRequest, AppFileResource{

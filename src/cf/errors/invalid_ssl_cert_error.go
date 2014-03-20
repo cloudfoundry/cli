@@ -19,7 +19,3 @@ func (err *InvalidSSLCert) Error() string {
 	}
 	return message
 }
-
-func (err *InvalidSSLCert) ErrorCode() string {
-	return "invalid-ssl-cert"
-}

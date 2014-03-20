@@ -97,7 +97,7 @@ var _ = Describe("delete-domain command", func() {
 	It("TestDeleteDomainFindError", func() {
 
 		domainRepo := &testapi.FakeDomainRepository{
-			FindByNameInOrgApiResponse: errors.NewErrorWithMessage("failed badly"),
+			FindByNameInOrgApiResponse: errors.New("failed badly"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 
@@ -119,7 +119,7 @@ var _ = Describe("delete-domain command", func() {
 		domain.Guid = "foo-guid"
 		domainRepo := &testapi.FakeDomainRepository{
 			FindByNameInOrgDomain: domain,
-			DeleteApiResponse:     errors.NewErrorWithMessage("failed badly"),
+			DeleteApiResponse:     errors.New("failed badly"),
 		}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true}
 

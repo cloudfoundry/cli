@@ -10,7 +10,7 @@ import (
 )
 
 type EndpointRepository interface {
-	UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr errors.Error)
+	UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr error)
 }
 
 type RemoteEndpointRepository struct {
@@ -30,7 +30,7 @@ func NewEndpointRepository(config configuration.ReadWriter, gateway net.Gateway)
 	return
 }
 
-func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr errors.Error) {
+func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpoint string, apiErr error) {
 	defer func() {
 		if apiErr != nil {
 			repo.config.SetApiEndpoint("")
@@ -59,7 +59,7 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 	}
 }
 
-func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) errors.Error {
+func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
 	request, err := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
 	if err != nil {
 		return err

@@ -76,19 +76,17 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 		orgGuid = org.Guid
 	}
 
-	space, apiErr := cmd.spaceRepo.Create(spaceName, orgGuid)
-	if apiErr != nil {
-		if apiErr.ErrorCode() == cf.SPACE_EXISTS {
+	space, err := cmd.spaceRepo.Create(spaceName, orgGuid)
+	if err != nil {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == cf.SPACE_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Space %s already exists", spaceName)
 			return
 		}
-		cmd.ui.Failed(apiErr.Error())
+		cmd.ui.Failed(err.Error())
 		return
 	}
 	cmd.ui.Ok()
-
-	var err error
 
 	err = cmd.spaceRoleSetter.SetSpaceRole(space, models.SPACE_MANAGER, cmd.config.UserGuid(), cmd.config.Username())
 	if err != nil {

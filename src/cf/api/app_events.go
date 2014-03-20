@@ -14,7 +14,7 @@ import (
 )
 
 type AppEventsRepository interface {
-	ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error
+	ListEvents(appGuid string, cb func(models.EventFields) bool) error
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -28,7 +28,7 @@ func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) errors.Error {
+func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) error {
 	apiErr := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),

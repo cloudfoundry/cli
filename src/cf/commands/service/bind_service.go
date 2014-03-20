@@ -23,7 +23,7 @@ type BindService struct {
 }
 
 type ServiceBinder interface {
-	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr cferrors.Error)
+	BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr error)
 }
 
 func NewBindService(ui terminal.UI, config configuration.Reader, serviceBindingRepo api.ServiceBindingRepository) (cmd *BindService) {
@@ -63,14 +63,14 @@ func (cmd *BindService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	apiErr := cmd.BindApplication(app, serviceInstance)
-	if apiErr != nil {
-		if apiErr.ErrorCode() == AppAlreadyBoundErrorCode {
+	err := cmd.BindApplication(app, serviceInstance)
+	if err != nil {
+		if err, ok := err.(cferrors.HttpError); ok && err.ErrorCode() == AppAlreadyBoundErrorCode {
 			cmd.ui.Ok()
 			cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
 			return
 		} else {
-			cmd.ui.Failed(apiErr.Error())
+			cmd.ui.Failed(err.Error())
 		}
 	}
 
@@ -78,7 +78,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 	cmd.ui.Say("TIP: Use '%s push' to ensure your env variable changes take effect", cf.Name())
 }
 
-func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr cferrors.Error) {
+func (cmd *BindService) BindApplication(app models.Application, serviceInstance models.ServiceInstance) (apiErr error) {
 	apiErr = cmd.serviceBindingRepo.Create(serviceInstance.Guid, app.Guid)
 	return
 }

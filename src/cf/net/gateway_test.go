@@ -102,7 +102,7 @@ var _ = Describe("Gateway", func() {
 		var (
 			err          error
 			request      *Request
-			apiErr       errors.Error
+			apiErr       error
 			apiServer    *httptest.Server
 			authServer   *httptest.Server
 			fileToUpload *os.File
@@ -220,7 +220,7 @@ var _ = Describe("Gateway", func() {
 			apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.ErrorCode()).To(Equal("333"))
+			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
 		})
 
 		It("returns a failure response when token refresh fails after a CC request", func() {
@@ -238,7 +238,7 @@ var _ = Describe("Gateway", func() {
 			apiErr = ccGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
-			Expect(apiErr.ErrorCode()).To(Equal("333"))
+			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
 		})
 	})
 

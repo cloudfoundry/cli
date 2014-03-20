@@ -4,9 +4,9 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -43,16 +43,15 @@ func (cmd CreateOrg) Run(c *cli.Context) {
 		terminal.EntityNameColor(name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
-	apiErr := cmd.orgRepo.Create(name)
-	if apiErr != nil {
-		if apiErr.ErrorCode() == cf.ORG_EXISTS {
+	err := cmd.orgRepo.Create(name)
+	if err != nil {
+		if apiErr, ok := err.(errors.HttpError); ok && apiErr.ErrorCode() == cf.ORG_EXISTS {
 			cmd.ui.Ok()
 			cmd.ui.Warn("Org %s already exists", name)
 			return
+		} else {
+			cmd.ui.Failed(err.Error())
 		}
-
-		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	cmd.ui.Ok()

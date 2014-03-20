@@ -75,7 +75,7 @@ var _ = Describe("Space Repository", func() {
 	Describe("finding spaces by name", func() {
 		It("returns the space", func() {
 			testSpacesFindByNameWithOrg("my-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
+				func(repo SpaceRepository, spaceName string) (models.Space, error) {
 					return repo.FindByName(spaceName)
 				},
 			)
@@ -83,7 +83,7 @@ var _ = Describe("Space Repository", func() {
 
 		It("can find spaces in a particular org", func() {
 			testSpacesFindByNameWithOrg("another-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
+				func(repo SpaceRepository, spaceName string) (models.Space, error) {
 					return repo.FindByNameInOrg(spaceName, "another-org-guid")
 				},
 			)
@@ -91,7 +91,7 @@ var _ = Describe("Space Repository", func() {
 
 		It("returns a 'not found' response when the space doesn't exist", func() {
 			testSpacesDidNotFindByNameWithOrg("my-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
+				func(repo SpaceRepository, spaceName string) (models.Space, error) {
 					return repo.FindByName(spaceName)
 				},
 			)
@@ -99,7 +99,7 @@ var _ = Describe("Space Repository", func() {
 
 		It("returns a 'not found' response when the space doesn't exist in the given org", func() {
 			testSpacesDidNotFindByNameWithOrg("another-org-guid",
-				func(repo SpaceRepository, spaceName string) (models.Space, errors.Error) {
+				func(repo SpaceRepository, spaceName string) (models.Space, error) {
 					return repo.FindByNameInOrg(spaceName, "another-org-guid")
 				},
 			)
@@ -163,7 +163,7 @@ var _ = Describe("Space Repository", func() {
 	})
 })
 
-func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, errors.Error)) {
+func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
 	findSpaceByNameResponse := testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
@@ -257,7 +257,7 @@ func testSpacesFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository
 	return
 }
 
-func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, errors.Error)) {
+func testSpacesDidNotFindByNameWithOrg(orgGuid string, findByName func(SpaceRepository, string) (models.Space, error)) {
 	request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 		Method: "GET",
 		Path:   fmt.Sprintf("/v2/organizations/%s/spaces?q=name%%3Aspace1&inline-relations-depth=1", orgGuid),

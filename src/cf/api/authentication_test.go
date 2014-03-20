@@ -3,7 +3,6 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
-	"cf/errors"
 	"cf/net"
 	"encoding/base64"
 	"fmt"
@@ -40,10 +39,10 @@ var _ = Describe("AuthenticationRepository", func() {
 	}
 
 	Describe("authenticating", func() {
-		var apiErr error
+		var err error
 
 		JustBeforeEach(func() {
-			apiErr = auth.Authenticate(map[string]string{
+			err = auth.Authenticate(map[string]string{
 				"username": "foo@example.com",
 				"password": "bar",
 			})
@@ -56,7 +55,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 			It("stores the access and refresh tokens in the config", func() {
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 				Expect(config.AuthenticationEndpoint()).To(Equal(testServer.URL))
 				Expect(config.AccessToken()).To(Equal("BEARER my_access_token"))
 				Expect(config.RefreshToken()).To(Equal("my_refresh_token"))
@@ -70,8 +69,8 @@ var _ = Describe("AuthenticationRepository", func() {
 
 			It("returns an error", func() {
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(BeNil())
-				Expect(apiErr.Error()).To(Equal("Password is incorrect, please try again."))
+				Expect(err).NotTo(BeNil())
+				Expect(err.Error()).To(Equal("Password is incorrect, please try again."))
 				Expect(config.AccessToken()).To(BeEmpty())
 				Expect(config.RefreshToken()).To(BeEmpty())
 			})
@@ -84,8 +83,8 @@ var _ = Describe("AuthenticationRepository", func() {
 
 			It("returns a failure response", func() {
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
-				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.Error()).To(Equal("Server error, status code: 500, error code: , message: "))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(Equal("Server error, status code: 500, error code: , message: "))
 				Expect(config.AccessToken()).To(BeEmpty())
 			})
 		})
@@ -97,8 +96,8 @@ var _ = Describe("AuthenticationRepository", func() {
 
 			It("returns an error", func() {
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
-				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.Error()).To(Equal("Authentication Server error: I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("I/O error: uaa.10.244.0.22.xip.io; nested exception is java.net.UnknownHostException: uaa.10.244.0.22.xip.io"))
 				Expect(config.AccessToken()).To(BeEmpty())
 			})
 		})
@@ -106,7 +105,7 @@ var _ = Describe("AuthenticationRepository", func() {
 
 	Describe("getting login info", func() {
 		var (
-			apiErr  errors.Error
+			apiErr  error
 			prompts map[string]configuration.AuthPrompt
 		)
 

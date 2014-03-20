@@ -73,7 +73,7 @@ func (cmd Target) setOrganization(orgName string) error {
 
 	org, apiErr := cmd.orgRepo.FindByName(orgName)
 	if apiErr != nil {
-		return errors.NewErrorWithMessage("Could not target org.\n%s", apiErr.Error())
+		return errors.NewWithFmt("Could not target org.\n%s", apiErr.Error())
 	}
 
 	cmd.config.SetOrganizationFields(org.OrganizationFields)
@@ -89,7 +89,7 @@ func (cmd Target) setSpace(spaceName string) error {
 
 	space, apiErr := cmd.spaceRepo.FindByName(spaceName)
 	if apiErr != nil {
-		return errors.NewErrorWithMessage("Unable to access space %s.\n%s", spaceName, apiErr.Error())
+		return errors.NewWithFmt("Unable to access space %s.\n%s", spaceName, apiErr.Error())
 	}
 
 	cmd.config.SetSpaceFields(space.SpaceFields)

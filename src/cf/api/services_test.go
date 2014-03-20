@@ -302,7 +302,7 @@ var _ = Describe("Services Repo", func() {
 
 		_, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
 		Expect(apiErr).To(HaveOccurred())
-		Expect(apiErr.ErrorCode()).To(Equal("10005"))
+		Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("10005"))
 	})
 
 	It("purges service offerings", func() {

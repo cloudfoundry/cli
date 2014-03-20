@@ -2,7 +2,6 @@ package requirements
 
 import (
 	"cf/api"
-	"cf/errors"
 	"cf/models"
 	"cf/terminal"
 )
@@ -28,7 +27,7 @@ func NewServiceInstanceRequirement(name string, ui terminal.UI, sR api.ServiceRe
 }
 
 func (req *serviceInstanceApiRequirement) Execute() (success bool) {
-	var apiErr errors.Error
+	var apiErr error
 	req.serviceInstance, apiErr = req.serviceRepo.FindInstanceByName(req.name)
 
 	if apiErr != nil {

@@ -2,7 +2,6 @@ package requirements
 
 import (
 	"cf/api"
-	"cf/errors"
 	"cf/models"
 	"cf/terminal"
 )
@@ -28,7 +27,7 @@ func NewUserRequirement(username string, ui terminal.UI, userRepo api.UserReposi
 }
 
 func (req *userApiRequirement) Execute() (success bool) {
-	var apiErr errors.Error
+	var apiErr error
 	req.user, apiErr = req.userRepo.FindByUsername(req.username)
 
 	if apiErr != nil {
