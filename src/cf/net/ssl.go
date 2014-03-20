@@ -36,7 +36,7 @@ func WrapSSLErrors(host string, err error) error {
 		return wrapSSLErrorInternal(host, websocketError.Err)
 	}
 
-	return errors.NewErrorWithError("Error performing request", err)
+	return errors.NewWithError("Error performing request", err)
 }
 
 func wrapSSLErrorInternal(host string, err error) error {
@@ -48,6 +48,6 @@ func wrapSSLErrorInternal(host string, err error) error {
 	case x509.CertificateInvalidError:
 		return errors.NewInvalidSSLCert(host, "")
 	default:
-		return errors.NewErrorWithError("Error performing request", err)
+		return errors.NewWithError("Error performing request", err)
 	}
 }

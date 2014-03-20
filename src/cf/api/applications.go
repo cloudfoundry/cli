@@ -147,7 +147,7 @@ func NewCloudControllerApplicationRepository(config configuration.Reader, gatewa
 func (repo CloudControllerApplicationRepository) Create(params models.AppParams) (createdApp models.Application, apiErr error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Failed to marshal JSON", err)
+		apiErr = errors.NewWithError("Failed to marshal JSON", err)
 		return
 	}
 
@@ -183,7 +183,7 @@ func (repo CloudControllerApplicationRepository) Read(name string) (app models.A
 func (repo CloudControllerApplicationRepository) Update(appGuid string, params models.AppParams) (updatedApp models.Application, apiErr error) {
 	data, err := repo.formatAppJSON(params)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Failed to marshal JSON", err)
+		apiErr = errors.NewWithError("Failed to marshal JSON", err)
 		return
 	}
 

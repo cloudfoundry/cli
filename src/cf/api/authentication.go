@@ -118,7 +118,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	path := fmt.Sprintf("%s/oauth/token", uaa.config.AuthenticationEndpoint())
 	request, err := uaa.gateway.NewRequest("POST", path, "Basic "+base64.StdEncoding.EncodeToString([]byte("cf:")), strings.NewReader(data.Encode()))
 	if err != nil {
-		return errors.NewErrorWithError("Failed to start oauth request", err)
+		return errors.NewWithError("Failed to start oauth request", err)
 	}
 	request.HttpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -130,7 +130,7 @@ func (uaa UAAAuthenticationRepository) getAuthToken(data url.Values) error {
 	case errors.HttpError:
 		return err
 	default:
-		return errors.NewErrorWithError("auth request failed", err)
+		return errors.NewWithError("auth request failed", err)
 	}
 
 	// TODO: get the actual status code

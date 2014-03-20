@@ -13,6 +13,6 @@ func NewWithFmt(message string, args ...interface{}) error {
 	return original.New(fmt.Sprintf(message, args...))
 }
 
-func NewErrorWithError(message string, err error) error {
+func NewWithError(message string, err error) error {
 	return NewWithFmt("%s: %s", message, err.Error())
 }

@@ -122,7 +122,7 @@ func (gateway Gateway) ListPaginatedResources(target string,
 
 		resources, err := pagination.Resources()
 		if err != nil {
-			return errors.NewErrorWithError("Error parsing JSON", err)
+			return errors.NewWithError("Error parsing JSON", err)
 		}
 
 		for _, resource := range resources {
@@ -163,7 +163,7 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 
 	request, err := http.NewRequest(method, path, body)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Error building request", err)
+		apiErr = errors.NewWithError("Error building request", err)
 		return
 	}
 
@@ -207,7 +207,7 @@ func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes [
 
 	bytes, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Error reading response", err)
+		apiErr = errors.NewWithError("Error reading response", err)
 	}
 
 	headers = rawResponse.Header
@@ -232,7 +232,7 @@ func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response 
 
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Invalid JSON response from server", err)
+		apiErr = errors.NewWithError("Invalid JSON response from server", err)
 	}
 	return
 }
@@ -253,7 +253,7 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 
 	err := json.Unmarshal(bytes, &response)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Invalid JSON response from server", err)
+		apiErr = errors.NewWithError("Invalid JSON response from server", err)
 		return
 	}
 
@@ -261,7 +261,7 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 
 	err = json.Unmarshal(bytes, &asyncResponse)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Invalid async response from server", err)
+		apiErr = errors.NewWithError("Invalid async response from server", err)
 		return
 	}
 

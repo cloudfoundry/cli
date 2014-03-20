@@ -45,7 +45,7 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("fails when an error occurs fetching the domain", func() {
-		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: errors.NewErrorWithError("", errors.New(""))}
+		domainRepo := &testapi.FakeDomainRepository{FindByNameInOrgApiResponse: errors.NewWithError("", errors.New(""))}
 		domainReq := NewDomainRequirement("example.com", ui, config, domainRepo)
 
 		testassert.AssertPanic(testterm.FailedWasCalled, func() {
