@@ -18,7 +18,6 @@ import (
 )
 
 const (
-	INVALID_TOKEN_CODE       = "GATEWAY INVALID TOKEN CODE"
 	JOB_FINISHED             = "finished"
 	JOB_FAILED               = "failed"
 	DEFAULT_POLLING_THROTTLE = 5 * time.Second
@@ -41,12 +40,7 @@ type AsyncResponse struct {
 	Metadata AsyncMetadata
 }
 
-type apiErrorInfo struct {
-	Code        string
-	Description string
-}
-
-type apiErrorHandler func(body []byte) apiErrorInfo
+type apiErrorHandler func(statusCode int, body []byte) error
 
 type tokenRefresher interface {
 	RefreshAuthToken() (string, error)
@@ -325,27 +319,24 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 		return
 	}
 
-	switch typedErr := apiErr.(type) {
-	case nil:
-	case errors.HttpError:
-		if typedErr.ErrorCode() == INVALID_TOKEN_CODE {
-			// refresh the auth token
-			var newToken string
-			newToken, apiErr = gateway.authenticator.RefreshAuthToken()
-			if apiErr != nil {
-				return
-			}
-
-			// reset the auth token and request body
-			httpReq.Header.Set("Authorization", newToken)
-			if request.SeekableBody != nil {
-				request.SeekableBody.Seek(0, 0)
-				httpReq.Body = ioutil.NopCloser(request.SeekableBody)
-			}
-
-			// make the request again
-			rawResponse, apiErr = gateway.doRequestAndHandlerError(request)
+	switch apiErr.(type) {
+	case errors.InvalidTokenError:
+		// refresh the auth token
+		var newToken string
+		newToken, apiErr = gateway.authenticator.RefreshAuthToken()
+		if apiErr != nil {
+			return
 		}
+
+		// reset the auth token and request body
+		httpReq.Header.Set("Authorization", newToken)
+		if request.SeekableBody != nil {
+			request.SeekableBody.Seek(0, 0)
+			httpReq.Body = ioutil.NopCloser(request.SeekableBody)
+		}
+
+		// make the request again
+		rawResponse, apiErr = gateway.doRequestAndHandlerError(request)
 	}
 
 	return
@@ -362,9 +353,7 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 		jsonBytes, _ := ioutil.ReadAll(rawResponse.Body)
 		rawResponse.Body.Close()
 		rawResponse.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
-
-		apiErrorInfo := gateway.errHandler(jsonBytes)
-		apiErr = errors.NewHttpError(rawResponse.StatusCode, apiErrorInfo.Code, apiErrorInfo.Description)
+		apiErr = gateway.errHandler(rawResponse.StatusCode, jsonBytes)
 	}
 
 	return
