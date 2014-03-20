@@ -83,7 +83,7 @@ func (repo *FakeSpaceRepository) GetSummary() (space models.Space, apiErr error)
 
 func (repo *FakeSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
 	if repo.CreateSpaceExists {
-		apiErr = errors.NewHttpError(400, "", "", cf.SPACE_EXISTS, "Space already exists")
+		apiErr = errors.NewHttpError(400, cf.SPACE_EXISTS, "Space already exists")
 		return
 	}
 	repo.CreateSpaceName = name

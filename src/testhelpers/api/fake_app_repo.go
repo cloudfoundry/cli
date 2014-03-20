@@ -32,7 +32,7 @@ func (repo *FakeApplicationRepository) Read(name string) (app models.Application
 		apiErr = errors.New("Error finding app by name.")
 	}
 	if repo.ReadAuthErr {
-		apiErr = errors.NewHttpError(401, "", "", "1000", "Authentication failed.")
+		apiErr = errors.NewHttpError(401, "1000", "Authentication failed.")
 	}
 	if repo.ReadNotFound {
 		apiErr = errors.NewModelNotFoundError("App", name)

@@ -102,7 +102,7 @@ var _ = Describe("Push Command", func() {
 			Guid:   "shared-domain-guid",
 		}
 
-		domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "", "", "", "")
+		domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "the-code", "something went wrong")
 		domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
 		routeRepo.FindByHostAndDomainErr = true
 		appRepo.ReadNotFound = true

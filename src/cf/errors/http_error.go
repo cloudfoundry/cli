@@ -6,14 +6,10 @@ type HttpError interface {
 	error
 	StatusCode() int   // actual HTTP status code
 	ErrorCode() string // error code returned in response body from CC or UAA
-	Headers() string   // see: known_error_codes.go
-	Body() string
 }
 
 type httpError struct {
 	statusCode  int
-	headers     string
-	body        string
 	code        string
 	description string
 }
@@ -22,11 +18,9 @@ type HttpNotFoundError struct {
 	*httpError
 }
 
-func NewHttpError(statusCode int, header string, body string, code string, description string) HttpError {
+func NewHttpError(statusCode int, code string, description string) HttpError {
 	err := httpError{
 		statusCode:  statusCode,
-		headers:     header,
-		body:        body,
 		code:        code,
 		description: description,
 	}
@@ -40,14 +34,6 @@ func NewHttpError(statusCode int, header string, body string, code string, descr
 
 func (err *httpError) StatusCode() int {
 	return err.statusCode
-}
-
-func (err *httpError) Headers() string {
-	return err.headers
-}
-
-func (err *httpError) Body() string {
-	return err.body
 }
 
 func (err *httpError) Error() string {

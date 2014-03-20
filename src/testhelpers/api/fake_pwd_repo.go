@@ -16,7 +16,7 @@ func (repo *FakePasswordRepo) UpdatePassword(old string, new string) (apiErr err
 	repo.UpdateNewPassword = new
 
 	if repo.UpdateUnauthorized {
-		apiErr = errors.NewHttpError(401, "", "", "unauthorized", "Authorization Failed")
+		apiErr = errors.NewHttpError(401, "unauthorized", "Authorization Failed")
 	}
 
 	return

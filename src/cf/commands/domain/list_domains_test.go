@@ -121,7 +121,7 @@ var _ = Describe("domains command", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: errors.NewHttpError(404, "", "", "", ""),
+			ListSharedDomainsApiResponse: errors.NewHttpError(404, "9003", "something bad happened"),
 			ListDomainsForOrgDomains: []models.DomainFields{
 				models.DomainFields{Name: "ze-domain"},
 			},
