@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -41,7 +40,7 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingsForSpaceByLabel
 	offerings, err = repo.getServiceOfferings(
 		fmt.Sprintf("/v2/spaces/%s/services?q=%s&inline-relations-depth=1", spaceGuid, url.QueryEscape("label:"+name)))
 
-	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == cf.BAD_QUERY_PARAM {
+	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.BAD_QUERY_PARAM {
 		offerings, err = repo.findServiceOfferingsByPaginating(spaceGuid, name)
 	}
 
@@ -132,7 +131,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 
 	err = repo.gateway.CreateResource(path, repo.config.AccessToken(), strings.NewReader(data))
 
-	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == cf.SERVICE_INSTANCE_NAME_TAKEN {
+	if httpErr, ok := err.(errors.HttpError); ok && httpErr.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
 		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
 
 		if findInstanceErr == nil && serviceInstance.ServicePlan.Guid == planGuid {

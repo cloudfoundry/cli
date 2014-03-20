@@ -57,7 +57,7 @@ func (cmd *RenameService) Run(c *cli.Context) {
 	err := cmd.serviceRepo.RenameService(serviceInstance, newName)
 
 	if err != nil {
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == cf.SERVICE_INSTANCE_NAME_TAKEN {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.SERVICE_INSTANCE_NAME_TAKEN {
 			cmd.ui.Failed("%s\nTIP: Use '%s services' to view all services in this org and space.", err.Error(), cf.Name())
 		} else {
 			cmd.ui.Failed(err.Error())

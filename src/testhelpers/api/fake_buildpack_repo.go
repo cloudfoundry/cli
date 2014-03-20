@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/errors"
 	"cf/models"
 )
@@ -44,7 +43,7 @@ func (repo *FakeBuildpackRepository) FindByName(name string) (buildpack models.B
 
 func (repo *FakeBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	if repo.CreateBuildpackExists {
-		return repo.CreateBuildpack, errors.NewHttpError(400, cf.BUILDPACK_EXISTS, "Buildpack already exists")
+		return repo.CreateBuildpack, errors.NewHttpError(400, errors.BUILDPACK_EXISTS, "Buildpack already exists")
 	}
 
 	repo.CreateBuildpack = models.Buildpack{Name: name, Position: position, Enabled: enabled, Locked: locked}

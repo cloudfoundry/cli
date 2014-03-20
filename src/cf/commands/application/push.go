@@ -1,8 +1,6 @@
 package application
 
 import (
-	//	"cf"
-	"cf"
 	"cf/api"
 	"cf/commands/service"
 	"cf/configuration"
@@ -185,7 +183,7 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 			cmd.ui.Say("")
 			return
 		case errors.HttpError:
-			if apiErr.ErrorCode() == cf.INVALID_RELATION {
+			if apiErr.ErrorCode() == errors.INVALID_RELATION {
 				cmd.ui.Failed("The route %s is already in use.\nTIP: Change the hostname with -n HOSTNAME or use --random-route to generate a new route and then push again.", route.URL())
 			}
 		}

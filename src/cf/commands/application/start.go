@@ -176,7 +176,7 @@ func (cmd Start) waitForInstancesToStage(app models.Application) {
 	_, err := cmd.appInstancesRepo.GetInstances(app.Guid)
 
 	for err != nil && time.Since(stagingStartTime) < cmd.StagingTimeout {
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() != cf.APP_NOT_STAGED {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() != errors.APP_NOT_STAGED {
 			cmd.ui.Say("")
 			cmd.ui.Failed(fmt.Sprintf("%s\n\nTIP: use '%s' for more information",
 				err.Error(),

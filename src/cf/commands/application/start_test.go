@@ -1,12 +1,11 @@
 package application_test
 
 import (
-	"cf"
 	"cf/api"
 	. "cf/commands/application"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
-	"errors"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -202,7 +201,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			[]models.AppInstanceFields{appInstance5, appInstance6},
 		}
 
-		errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, "", "", ""}
+		errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
 
 		ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
 
@@ -278,7 +277,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			[]models.AppInstanceFields{appInstance5, appInstance6},
 		}
 
-		errorCodes := []string{cf.APP_NOT_STAGED, cf.APP_NOT_STAGED, cf.APP_NOT_STAGED}
+		errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, errors.APP_NOT_STAGED}
 
 		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, 0)
 

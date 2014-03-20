@@ -1,7 +1,6 @@
 package api
 
 import (
-	"cf"
 	"cf/errors"
 	"cf/models"
 )
@@ -65,7 +64,7 @@ func (repo *FakeUserRepository) Create(username, password string) (apiErr error)
 	repo.CreateUserPassword = password
 
 	if repo.CreateUserExists {
-		apiErr = errors.NewHttpError(400, cf.USER_EXISTS, "User already exists")
+		apiErr = errors.NewHttpError(400, errors.USER_EXISTS, "User already exists")
 	}
 
 	return

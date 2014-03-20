@@ -1,7 +1,6 @@
 package application
 
 import (
-	"cf"
 	"cf/api"
 	"cf/configuration"
 	"cf/errors"
@@ -70,7 +69,7 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 
 	appIsStopped := (appSummary.State == "stopped")
 	if err, ok := apiErr.(errors.HttpError); ok {
-		if err.ErrorCode() == cf.APP_STOPPED || err.ErrorCode() == cf.APP_NOT_STAGED {
+		if err.ErrorCode() == errors.APP_STOPPED || err.ErrorCode() == errors.APP_NOT_STAGED {
 			appIsStopped = true
 		}
 	}
