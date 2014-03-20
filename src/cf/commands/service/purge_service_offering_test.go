@@ -117,7 +117,7 @@ var _ = Describe("Purging services", func() {
 	It("fails with an error message when the request fails", func() {
 		deps := setupDependencies()
 
-		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewErrorWithError("oh no!", errors.New("!"))
+		deps.serviceRepo.FindServiceOfferingByLabelAndProviderApiResponse = cferrors.NewWithError("oh no!", errors.New("!"))
 
 		testcmd.RunCommand(
 			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),

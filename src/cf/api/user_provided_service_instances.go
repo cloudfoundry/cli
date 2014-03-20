@@ -44,7 +44,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 	})
 
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Error parsing response", err)
+		apiErr = errors.NewWithError("Error parsing response", err)
 		return
 	}
 
@@ -62,7 +62,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 	reqBody := RequestBody{serviceInstanceFields.Params, serviceInstanceFields.SysLogDrainUrl}
 	jsonBytes, err := json.Marshal(reqBody)
 	if err != nil {
-		apiErr = errors.NewErrorWithError("Error parsing response", err)
+		apiErr = errors.NewWithError("Error parsing response", err)
 		return
 	}
 
