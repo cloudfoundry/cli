@@ -5,7 +5,7 @@
 
   function printStatus {
       if [ $? -eq 0 ]; then
-          echo -e "\nSUITE SUCCESS"
+          echo -e "\nSWEET SUITE SUCCESS"
       else
           echo -e "\nSUITE FAILURE"
       fi
