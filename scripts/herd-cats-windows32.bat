@@ -14,4 +14,4 @@ call %environment.bat
 
 cd %CATSPATH%
 SET CONFIG=%CATSPATH%\config.json
-ginkgo -r -v -slowSpecThreshold=300 -skip="admin buildpack"
+%GOPATH%\bin\ginkgo -r -v -slowSpecThreshold=300 -skip="admin buildpack"
