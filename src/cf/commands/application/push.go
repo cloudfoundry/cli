@@ -23,9 +23,9 @@ type Push struct {
 	ui            terminal.UI
 	config        configuration.Reader
 	manifestRepo  manifest.ManifestRepository
-	starter       ApplicationStarter
-	stopper       ApplicationStopper
-	binder        service.ServiceBinder
+	appStarter    ApplicationStarter
+	appStopper    ApplicationStopper
+	serviceBinder service.ServiceBinder
 	appRepo       api.ApplicationRepository
 	domainRepo    api.DomainRepository
 	routeRepo     api.RouteRepository
@@ -44,9 +44,9 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	cmd.ui = ui
 	cmd.config = config
 	cmd.manifestRepo = manifestRepo
-	cmd.starter = starter
-	cmd.stopper = stopper
-	cmd.binder = binder
+	cmd.appStarter = starter
+	cmd.appStopper = stopper
+	cmd.serviceBinder = binder
 	cmd.appRepo = appRepo
 	cmd.domainRepo = domainRepo
 	cmd.routeRepo = routeRepo
@@ -102,7 +102,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		}
 
 		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, cmd.config.Username())
-		err = cmd.binder.BindApplication(app, serviceInstance)
+		err = cmd.serviceBinder.BindApplication(app, serviceInstance)
 
 		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == service.AppAlreadyBoundErrorCode {
 			err = nil
@@ -217,7 +217,7 @@ func hostNameForString(name string) string {
 func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli.Context) {
 	if app.State != "stopped" {
 		cmd.ui.Say("")
-		app, _ = cmd.stopper.ApplicationStop(app)
+		app, _ = cmd.appStopper.ApplicationStop(app)
 	}
 
 	cmd.ui.Say("")
@@ -227,10 +227,10 @@ func (cmd *Push) restart(app models.Application, params models.AppParams, c *cli
 	}
 
 	if params.HealthCheckTimeout != nil {
-		cmd.starter.SetStartTimeoutSeconds(*params.HealthCheckTimeout)
+		cmd.appStarter.SetStartTimeoutSeconds(*params.HealthCheckTimeout)
 	}
 
-	cmd.starter.ApplicationStart(app)
+	cmd.appStarter.ApplicationStart(app)
 }
 
 func (cmd *Push) findDomain(appParams models.AppParams) (domain models.DomainFields) {
