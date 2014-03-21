@@ -17,7 +17,7 @@ type ServiceRepository interface {
 	GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error)
 	GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error)
 	FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error)
-	CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiErr error)
+	CreateServiceInstance(name, planGuid string) (apiErr error)
 	RenameService(instance models.ServiceInstance, newName string) (apiErr error)
 	DeleteService(instance models.ServiceInstance) (apiErr error)
 	FindServicePlanByDescription(planDescription ServicePlanDescription) (planGuid string, apiErr error)
@@ -122,7 +122,7 @@ func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (in
 	return
 }
 
-func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, err error) {
+func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGuid string) (err error) {
 	path := fmt.Sprintf("%s/v2/service_instances", repo.config.ApiEndpoint())
 	data := fmt.Sprintf(
 		`{"name":"%s","service_plan_guid":"%s","space_guid":"%s", "async": true}`,
@@ -135,8 +135,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
 
 		if findInstanceErr == nil && serviceInstance.ServicePlan.Guid == planGuid {
-			err = nil
-			identicalAlreadyExists = true
+			return errors.NewServiceInstanceAlreadyExistsError(name)
 		}
 	}
 
