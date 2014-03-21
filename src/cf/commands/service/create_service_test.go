@@ -27,8 +27,8 @@ func callCreateService(args []string, inputs []string, serviceRepo api.ServiceRe
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestCreateService", func() {
+var _ = Describe("create-service command", func() {
+	It("successfully creates a service", func() {
 		offering := models.ServiceOffering{}
 		offering.Label = "cleardb"
 		plan := models.ServicePlanFields{}
@@ -57,7 +57,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
 	})
 
-	It("TestCreateServiceWhenServiceAlreadyExists", func() {
+	It("warns the user when the service already exists with the same service plan", func() {
 		offering := models.ServiceOffering{}
 		offering.Label = "cleardb"
 		plan := models.ServicePlanFields{}

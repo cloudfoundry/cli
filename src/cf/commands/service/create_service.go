@@ -11,6 +11,10 @@ import (
 	"github.com/codegangsta/cli"
 )
 
+type ServiceCreator interface {
+	CreateService(serviceName string, planName string, serviceInstanceName string) (bool, error) // idempotent
+}
+
 type CreateService struct {
 	ui          terminal.UI
 	config      configuration.Reader
@@ -35,41 +39,49 @@ func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli
 }
 
 func (cmd CreateService) Run(c *cli.Context) {
-	offeringName := c.Args()[0]
+	serviceName := c.Args()[0]
 	planName := c.Args()[1]
-	name := c.Args()[2]
+	serviceInstanceName := c.Args()[2]
 
 	cmd.ui.Say("Creating service %s in org %s / space %s as %s...",
-		terminal.EntityNameColor(name),
+		terminal.EntityNameColor(serviceInstanceName),
 		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
 		terminal.EntityNameColor(cmd.config.SpaceFields().Name),
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	offerings, apiErr := cmd.serviceRepo.FindServiceOfferingsForSpaceByLabel(cmd.config.SpaceFields().Guid, offeringName)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
-	}
-
-	plan, err := findPlanFromOfferings(offerings, planName)
-	if err != nil {
+	alreadyExists, err := cmd.CreateService(serviceName, planName, serviceInstanceName)
+	if err != nil && !alreadyExists {
 		cmd.ui.Failed(err.Error())
-		return
-	}
-
-	var identicalAlreadyExists bool
-	identicalAlreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(name, plan.Guid)
-	if apiErr != nil {
-		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
 	cmd.ui.Ok()
-
-	if identicalAlreadyExists {
-		cmd.ui.Warn("Service %s already exists", name)
+	if alreadyExists {
+		cmd.ui.Warn("Service %s already exists", serviceInstanceName)
 	}
+}
+
+func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (alreadyExists bool, apiErr error) {
+	offerings, apiErr := cmd.serviceRepo.FindServiceOfferingsForSpaceByLabel(cmd.config.SpaceFields().Guid, serviceName)
+	if apiErr != nil {
+		return
+	}
+	plan, apiErr := findPlanFromOfferings(offerings, planName)
+	if apiErr != nil {
+		return
+	}
+
+	alreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
+	if apiErr != nil {
+		return
+	}
+
+	alreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
+	if alreadyExists {
+		return alreadyExists, nil
+	}
+
+	return alreadyExists, apiErr
 }
 
 func findOfferings(offerings []models.ServiceOffering, name string) (matchingOfferings models.ServiceOfferings, err error) {
