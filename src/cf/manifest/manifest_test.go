@@ -310,4 +310,42 @@ var _ = Describe("Manifests", func() {
 		Expect(errs).To(BeEmpty())
 		Expect(apps1).To(Equal(apps2))
 	})
+
+	Describe("parsing env vars", func() {
+		It("handles values that are not strings", func() {
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					generic.NewMap(map[interface{}]interface{}{
+						"env": map[interface{}]interface{}{
+							"string-key": "value",
+							"int-key":    1,
+							"float-key":  11.1,
+						},
+					}),
+				},
+			}))
+
+			app, errs := m.Applications()
+			Expect(errs).To(BeEmpty())
+
+			Expect((*app[0].EnvironmentVars)["string-key"]).To(Equal("value"))
+			Expect((*app[0].EnvironmentVars)["int-key"]).To(Equal("1"))
+			Expect((*app[0].EnvironmentVars)["float-key"]).To(ContainSubstring("11.1"))
+		})
+
+		It("handles values that cannot be converted to strings", func() {
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"applications": []interface{}{
+					generic.NewMap(map[interface{}]interface{}{
+						"env": map[interface{}]interface{}{
+							"bad-key": map[interface{}]interface{}{},
+						},
+					}),
+				},
+			}))
+
+			_, errs := m.Applications()
+			Expect(errs).ToNot(BeEmpty())
+		})
+	})
 })
