@@ -137,6 +137,6 @@ func (app *AppParams) Merge(other *AppParams) {
 	app.UseRandomHostname = app.UseRandomHostname || other.UseRandomHostname
 }
 
-func (app *AppParams) Equals(otherParams *AppParams) bool {
-	return reflect.DeepEqual(*app, *otherParams)
+func (app *AppParams) IsEmpty() bool {
+	return reflect.DeepEqual(*app, AppParams{})
 }

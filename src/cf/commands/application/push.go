@@ -356,29 +356,13 @@ func (cmd *Push) updateApp(app models.Application, appParams models.AppParams) (
 	return
 }
 
-func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) (appSet []models.AppParams) {
-	apps := cmd.instantiateManifest(c)
-
-	contextParams, err := newAppParamsFromContext(c)
-	if err != nil {
-		cmd.ui.Failed("Error: %s", err)
-		return
-	}
-
-	if contextParams.Name == nil && len(apps) > 1 && !contextParams.Equals(&models.AppParams{}) {
-		cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
-		return
-	}
-
-	appSet, err = cmd.createAppSetFromContextAndManifest(c, contextParams, apps)
-	if err != nil {
-		cmd.ui.Failed("Error: %s", err)
-	}
-
-	return
+func (cmd *Push) findAndValidateAppsToPush(c *cli.Context) []models.AppParams {
+	appsFromManifest := cmd.getAppParamsFromManifest(c)
+	appFromContext := cmd.getAppParamsFromContext(c)
+	return cmd.createAppSetFromContextAndManifest(appFromContext, appsFromManifest)
 }
 
-func (cmd *Push) instantiateManifest(c *cli.Context) []models.AppParams {
+func (cmd *Push) getAppParamsFromManifest(c *cli.Context) []models.AppParams {
 	if c.Bool("no-manifest") {
 		return []models.AppParams{}
 	}
@@ -406,44 +390,45 @@ func (cmd *Push) instantiateManifest(c *cli.Context) []models.AppParams {
 
 	apps, errs := m.Applications()
 	if !errs.Empty() {
-		if m.Path == "" && c.String("f") == "" {
-			return []models.AppParams{}
-		} else {
-			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
-		}
+		cmd.ui.Failed("Error reading manifest file:\n%s", errs)
 	}
 
 	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(m.Path))
 	return apps
 }
 
-func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParams models.AppParams, manifestApps []models.AppParams) (appSet []models.AppParams, err error) {
-	if len(manifestApps) > 1 {
-		if contextParams.Name != nil {
-			var app models.AppParams
-			app, err = findAppWithNameInManifest(*contextParams.Name, manifestApps)
+func (cmd *Push) createAppSetFromContextAndManifest(contextApp models.AppParams, manifestApps []models.AppParams) (apps []models.AppParams) {
+	var err error
 
-			if err != nil {
-				cmd.ui.Failed(fmt.Sprintf("Could not find app named '%s' in manifest", *contextParams.Name))
-				return
+	switch len(manifestApps) {
+	case 0:
+		err = addApp(&apps, contextApp)
+	case 1:
+		manifestApps[0].Merge(&contextApp)
+		err = addApp(&apps, manifestApps[0])
+	default:
+		selectedAppName := contextApp.Name
+		contextApp.Name = nil
+
+		if !contextApp.IsEmpty() {
+			cmd.ui.Failed("%s", "Incorrect Usage. Command line flags (except -f) cannot be applied when pushing multiple apps from a manifest file.")
+		}
+
+		if selectedAppName != nil {
+			var manifestApp models.AppParams
+			manifestApp, err = findAppWithNameInManifest(*selectedAppName, manifestApps)
+			if err == nil {
+				addApp(&apps, manifestApp)
 			}
-
-			manifestApps = []models.AppParams{app}
+		} else {
+			for _, manifestApp := range manifestApps {
+				addApp(&apps, manifestApp)
+			}
 		}
 	}
 
-	appSet = make([]models.AppParams, 0, len(manifestApps))
-	if len(manifestApps) == 0 {
-		if contextParams.Name == nil || *contextParams.Name == "" {
-			cmd.ui.FailWithUsage(c, "push")
-			return
-		}
-		err = addApp(&appSet, contextParams)
-	} else {
-		for _, manifestAppParams := range manifestApps {
-			manifestAppParams.Merge(&contextParams)
-			err = addApp(&appSet, manifestAppParams)
-		}
+	if err != nil {
+		cmd.ui.Failed("Error: %s", err)
 	}
 
 	return
@@ -451,7 +436,7 @@ func (cmd *Push) createAppSetFromContextAndManifest(c *cli.Context, contextParam
 
 func addApp(apps *[]models.AppParams, app models.AppParams) (err error) {
 	if app.Name == nil {
-		err = errors.New("app name is a required field")
+		err = errors.New("App name is a required field")
 	}
 	if app.Path == nil {
 		cwd, _ := os.Getwd()
@@ -469,11 +454,11 @@ func findAppWithNameInManifest(name string, manifestApps []models.AppParams) (ap
 		}
 	}
 
-	err = errors.New("Could not find named app in manifest")
+	err = errors.NewWithFmt("Could not find app named '%s' in manifest", name)
 	return
 }
 
-func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err error) {
+func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppParams) {
 	if len(c.Args()) > 0 {
 		appParams.Name = &c.Args()[0]
 	}
@@ -484,10 +469,9 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 	}
 
 	if c.String("m") != "" {
-		var memory uint64
-		memory, err = formatters.ToMegabytes(c.String("m"))
+		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
-			err = errors.New(fmt.Sprintf("Invalid memory param: %s\n%s", c.String("m"), err))
+			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid memory param: %s\n%s", c.String("m"), err))
 			return
 		}
 		appParams.Memory = &memory
@@ -517,11 +501,9 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 	}
 
 	if c.String("i") != "" {
-		var instances int
-		instances, err = strconv.Atoi(c.String("i"))
+		instances, err := strconv.Atoi(c.String("i"))
 		if err != nil {
-			err = errors.New(fmt.Sprintf("Invalid instances param: %s\n%s", c.String("i"), err))
-			return
+			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid instances param: %s\n%s", c.String("i"), err))
 		}
 		appParams.InstanceCount = &instances
 	}
@@ -532,11 +514,9 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 	}
 
 	if c.String("t") != "" {
-		var timeout int
-		timeout, err = strconv.Atoi(c.String("t"))
+		timeout, err := strconv.Atoi(c.String("t"))
 		if err != nil {
-			err = errors.New(fmt.Sprintf("Invalid timeout param: %s\n%s", c.String("t"), err))
-			return
+			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid timeout param: %s\n%s", c.String("t"), err))
 		}
 
 		appParams.HealthCheckTimeout = &timeout
@@ -546,5 +526,6 @@ func newAppParamsFromContext(c *cli.Context) (appParams models.AppParams, err er
 		path := c.String("p")
 		appParams.Path = &path
 	}
+
 	return
 }

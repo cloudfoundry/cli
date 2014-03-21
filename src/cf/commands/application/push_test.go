@@ -869,7 +869,8 @@ var _ = Describe("Push Command", func() {
 		manifestRepo.ReadManifestReturns.Errors = []error{errors.New("No such manifest")}
 		callPush()
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Incorrect Usage"},
+			{"FAILED"},
+			{"App name"},
 		})
 	})
 })
