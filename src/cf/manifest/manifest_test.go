@@ -35,6 +35,22 @@ var _ = Describe("Manifests", func() {
 		Expect(apps[0].NoRoute).To(BeTrue())
 	})
 
+	Describe("when there is no applications block", func() {
+		It("returns a single application with the global properties", func() {
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"instances": "3",
+				"memory":    "512M",
+			}))
+
+			apps, errs := m.Applications()
+			Expect(errs).To(BeEmpty())
+
+			Expect(len(apps)).To(Equal(1))
+			Expect(*apps[0].InstanceCount).To(Equal(3))
+			Expect(*apps[0].Memory).To(Equal(uint64(512)))
+		})
+	})
+
 	It("returns an error when the memory limit doesn't have a unit", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"instances": "3",

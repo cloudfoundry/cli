@@ -23,12 +23,32 @@ func NewEmptyManifest() (m *Manifest) {
 }
 
 func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) {
-	babbler := words.NewWordGenerator()
-	rawData, errs := expandProperties(m.Data, babbler)
-	data := generic.NewMap(rawData)
+	rawData, errs := expandProperties(m.Data, words.NewWordGenerator())
 	if !errs.Empty() {
 		return
 	}
+
+	data := generic.NewMap(rawData)
+	appMaps, errs := m.getAppMaps(data)
+	if !errs.Empty() {
+		return
+	}
+
+	for _, appMap := range appMaps {
+		app, appErrs := mapToAppParams(filepath.Dir(m.Path), appMap)
+		if !appErrs.Empty() {
+			errs = append(errs, appErrs)
+			continue
+		}
+
+		apps = append(apps, app)
+	}
+
+	return
+}
+
+func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error) {
+	globalProperties := data.Except([]interface{}{"applications"})
 
 	if data.Has("applications") {
 		appMaps, ok := data.Get("applications").([]interface{})
@@ -37,8 +57,6 @@ func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) 
 			return
 		}
 
-		globalProperties := data.Except([]interface{}{"applications"})
-
 		for _, appData := range appMaps {
 			if !generic.IsMappable(appData) {
 				errs = append(errs, errors.New("Expected application to be a dictionary"))
@@ -46,16 +64,10 @@ func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) 
 			}
 
 			appMap := generic.DeepMerge(globalProperties, generic.NewMap(appData))
-
-			basePath := filepath.Dir(m.Path)
-			appParams, appErrs := mapToAppParams(basePath, appMap)
-			if !appErrs.Empty() {
-				errs = append(errs, appErrs)
-				continue
-			}
-
-			apps = append(apps, appParams)
+			apps = append(apps, appMap)
 		}
+	} else {
+		apps = append(apps, globalProperties)
 	}
 
 	return

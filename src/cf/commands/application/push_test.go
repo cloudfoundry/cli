@@ -866,6 +866,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("fails when neither a manifest nor a name is given", func() {
+		manifestRepo.ReadManifestReturns.Errors = []error{errors.New("No such manifest")}
 		callPush()
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Incorrect Usage"},
