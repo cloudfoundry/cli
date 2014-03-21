@@ -16,7 +16,7 @@ end
 system "ssh #{BOSH_LITE_HOSTNAME} \"rm -rf $(find /opt/warden/disks/bind_mount_points -name '*cc-droplets*' 2> /dev/null)\""
 
 cf "api #{CC_HOSTNAME} --skip-ssl-validation"
-cf "auth #{CF_ADMIN_USER} #{CF_ADMIN_PASSWORD}"
+cf "login -u #{CF_ADMIN_USER} -p #{CF_ADMIN_PASSWORD}"
 
 %w(linux32 linux64 win32 win64 osx).each do |platform|
   user = "cats-user-#{platform}"
