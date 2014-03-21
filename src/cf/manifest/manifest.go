@@ -59,7 +59,7 @@ func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error
 
 		for _, appData := range appMaps {
 			if !generic.IsMappable(appData) {
-				errs = append(errs, errors.New("Expected application to be a dictionary"))
+				errs = append(errs, errors.New(fmt.Sprintf("Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'%s'", appData)))
 				continue
 			}
 
