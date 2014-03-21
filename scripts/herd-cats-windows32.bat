@@ -8,7 +8,7 @@ SET GOPATH=c:\Users\Administrator\go
 SET CATSPATH=%GOPATH%\src\github.com\cloudfoundry\cf-acceptance-tests
 copy %CLIPATH%\cf-windows-386.exe %CATSPATH%\gcf.exe /Y
 
-SET PATH=%PATH%;%CATSPATH%
+SET PATH=%PATH%;%CATSPATH%;C:\Program Files\cURL\bin
 
 call %environment.bat
 
