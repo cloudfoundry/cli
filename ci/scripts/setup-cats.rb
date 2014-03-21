@@ -21,7 +21,7 @@ cf "login -u #{CF_ADMIN_USER} -p #{CF_ADMIN_PASSWORD}"
 %w(linux32 linux64 win32 win64 osx).each do |platform|
   user = "cats-user-#{platform}"
   org = "cats-org-#{platform}"
-  cf "create-user #{user} cats-password"
+  cf "create-user #{user} cats-password" rescue puts "create-user failed, but still continuing"
   cf "delete-org -f #{org}"
   cf "create-org #{org}"
 
