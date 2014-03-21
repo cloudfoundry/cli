@@ -8,7 +8,7 @@ CF_ADMIN_USER = ENV['CF_ADMIN_USER']
 CF_ADMIN_PASSWORD = ENV['CF_ADMIN_PASSWORD']
 
 def cf(cmd)
-  out, err, status = Open3.capture3("cf #{cmd}")
+  out, err, status = Open3.capture3("out/cf #{cmd}")
   puts out
   raise "cf failed:\n#{err}" unless status == 0
 end
