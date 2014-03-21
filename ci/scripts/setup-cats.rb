@@ -12,12 +12,13 @@ def cf(cmd)
 end
 
 def run_or_die(cmd)
+  puts "Running #{cmd}"
   out, err, status = Open3.capture3(cmd)
   puts out
-  raise "cf failed:\n#{err}" unless status == 0
+  raise "Command failed:\n#{err}" unless status == 0
 end
 
-run_or_die("ssh #{BOSH_LITE_HOSTNAME} \"rm -rf $(find /opt/warden/disks/bind_mount_points -name '*cc-droplets*' 2> /dev/null)\"")
+run_or_die("ssh -o \"StrictHostKeyChecking no\" #{BOSH_LITE_HOSTNAME} \"rm -rf $(find /opt/warden/disks/bind_mount_points -name '*cc-droplets*' 2> /dev/null)\"")
 
 cf "api #{CC_HOSTNAME} --skip-ssl-validation"
 cf "login -u #{CF_ADMIN_USER} -p #{CF_ADMIN_PASSWORD}"
