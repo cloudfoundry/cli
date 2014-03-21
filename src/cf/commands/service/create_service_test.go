@@ -3,6 +3,7 @@ package service_test
 import (
 	"cf/api"
 	. "cf/commands/service"
+	"cf/errors"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -53,8 +54,8 @@ var _ = Describe("create-service command", func() {
 			{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
 			{"OK"},
 		})
-		Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
-		Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
+		Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
+		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 	})
 
 	It("warns the user when the service already exists with the same service plan", func() {
@@ -66,8 +67,11 @@ var _ = Describe("create-service command", func() {
 		offering.Plans = []models.ServicePlanFields{plan}
 		offering2 := models.ServiceOffering{}
 		offering2.Label = "postgres"
-		serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
+
+		serviceRepo := &testapi.FakeServiceRepo{}
+		serviceRepo.CreateServiceInstanceReturns.Error = errors.NewServiceInstanceAlreadyExistsError("my-cleardb-service")
 		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
+
 		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 			[]string{},
 			serviceRepo,
@@ -78,8 +82,8 @@ var _ = Describe("create-service command", func() {
 			{"OK"},
 			{"my-cleardb-service", "already exists"},
 		})
-		Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
-		Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
+		Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
+		Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 	})
 
 	Context("When there are multiple services with the same label", func() {
@@ -95,7 +99,8 @@ var _ = Describe("create-service command", func() {
 			plan.Guid = "cleardb-spark-guid"
 			offering2.Plans = []models.ServicePlanFields{plan}
 
-			serviceRepo := &testapi.FakeServiceRepo{CreateServiceAlreadyExists: true}
+			serviceRepo := &testapi.FakeServiceRepo{}
+			serviceRepo.CreateServiceInstanceReturns.Error = errors.NewServiceInstanceAlreadyExistsError("my-cleardb-service")
 			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
 			ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
 				[]string{},
@@ -106,8 +111,8 @@ var _ = Describe("create-service command", func() {
 				{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
 				{"OK"},
 			})
-			Expect(serviceRepo.CreateServiceInstanceName).To(Equal("my-cleardb-service"))
-			Expect(serviceRepo.CreateServiceInstancePlanGuid).To(Equal("cleardb-spark-guid"))
+			Expect(serviceRepo.CreateServiceInstanceArgs.Name).To(Equal("my-cleardb-service"))
+			Expect(serviceRepo.CreateServiceInstanceArgs.PlanGuid).To(Equal("cleardb-spark-guid"))
 		})
 	})
 })

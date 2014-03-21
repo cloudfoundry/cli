@@ -3,10 +3,10 @@ package service
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 )
@@ -50,18 +50,20 @@ func (cmd CreateService) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	alreadyExists, err := cmd.CreateService(serviceName, planName, serviceInstanceName)
-	if err != nil && !alreadyExists {
-		cmd.ui.Failed(err.Error())
-	}
+	err := cmd.CreateService(serviceName, planName, serviceInstanceName)
 
-	cmd.ui.Ok()
-	if alreadyExists {
-		cmd.ui.Warn("Service %s already exists", serviceInstanceName)
+	switch err.(type) {
+	case nil:
+		cmd.ui.Ok()
+	case *errors.ServiceInstanceAlreadyExistsError:
+		cmd.ui.Ok()
+		cmd.ui.Warn(err.Error())
+	default:
+		cmd.ui.Failed(err.Error())
 	}
 }
 
-func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (alreadyExists bool, apiErr error) {
+func (cmd CreateService) CreateService(serviceName string, planName string, serviceInstanceName string) (apiErr error) {
 	offerings, apiErr := cmd.serviceRepo.FindServiceOfferingsForSpaceByLabel(cmd.config.SpaceFields().Guid, serviceName)
 	if apiErr != nil {
 		return
@@ -71,17 +73,7 @@ func (cmd CreateService) CreateService(serviceName string, planName string, serv
 		return
 	}
 
-	alreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
-	if apiErr != nil {
-		return
-	}
-
-	alreadyExists, apiErr = cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
-	if alreadyExists {
-		return alreadyExists, nil
-	}
-
-	return alreadyExists, apiErr
+	return cmd.serviceRepo.CreateServiceInstance(serviceInstanceName, plan.Guid)
 }
 
 func findOfferings(offerings []models.ServiceOffering, name string) (matchingOfferings models.ServiceOfferings, err error) {

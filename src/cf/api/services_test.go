@@ -71,10 +71,9 @@ var _ = Describe("Services Repo", func() {
 			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
 			defer testServer.Close()
 
-			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("instance-name", "plan-guid")
+			apiErr := repo.CreateServiceInstance("instance-name", "plan-guid")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(identicalAlreadyExists).To(Equal(false))
 		})
 
 		It("returns a successful response when an identical service instance already exists", func() {
@@ -90,11 +89,12 @@ var _ = Describe("Services Repo", func() {
 			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
 			defer testServer.Close()
 
-			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("my-service", "plan-guid")
+			apiErr := repo.CreateServiceInstance("my-service", "plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(identicalAlreadyExists).To(Equal(true))
+
+			_, ok := apiErr.(*errors.ServiceInstanceAlreadyExistsError)
+			Expect(ok).To(BeTrue())
 		})
 
 		It("fails when a different service instance with the same name already exists", func() {
@@ -110,11 +110,11 @@ var _ = Describe("Services Repo", func() {
 			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
 			defer testServer.Close()
 
-			identicalAlreadyExists, apiErr := repo.CreateServiceInstance("my-service", "different-plan-guid")
+			apiErr := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(BeNil())
-			Expect(identicalAlreadyExists).To(Equal(false))
+			_, ok := apiErr.(*errors.ServiceInstanceAlreadyExistsError)
+			Expect(ok).To(BeFalse())
 		})
 	})
 

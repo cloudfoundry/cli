@@ -31,9 +31,13 @@ type FakeServiceRepo struct {
 		Error            error
 	}
 
-	CreateServiceInstanceName     string
-	CreateServiceInstancePlanGuid string
-	CreateServiceAlreadyExists    bool
+	CreateServiceInstanceArgs struct {
+		Name     string
+		PlanGuid string
+	}
+	CreateServiceInstanceReturns struct {
+		Error error
+	}
 
 	FindInstanceByNameName            string
 	FindInstanceByNameServiceInstance models.ServiceInstance
@@ -104,12 +108,11 @@ func (repo *FakeServiceRepo) FindServiceOfferingByLabelAndProvider(name, provide
 	return
 }
 
-func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (identicalAlreadyExists bool, apiErr error) {
-	repo.CreateServiceInstanceName = name
-	repo.CreateServiceInstancePlanGuid = planGuid
-	identicalAlreadyExists = repo.CreateServiceAlreadyExists
+func (repo *FakeServiceRepo) CreateServiceInstance(name, planGuid string) (apiErr error) {
+	repo.CreateServiceInstanceArgs.Name = name
+	repo.CreateServiceInstanceArgs.PlanGuid = planGuid
 
-	return
+	return repo.CreateServiceInstanceReturns.Error
 }
 
 func (repo *FakeServiceRepo) FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error) {
