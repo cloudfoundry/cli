@@ -20,20 +20,19 @@ import (
 )
 
 type Push struct {
-	ui             terminal.UI
-	config         configuration.Reader
-	manifestRepo   manifest.ManifestRepository
-	starter        ApplicationStarter
-	stopper        ApplicationStopper
-	binder         service.ServiceBinder
-	appRepo        api.ApplicationRepository
-	domainRepo     api.DomainRepository
-	routeRepo      api.RouteRepository
-	serviceRepo    api.ServiceRepository
-	stackRepo      api.StackRepository
-	appBitsRepo    api.ApplicationBitsRepository
-	globalServices []models.ServiceInstance
-	wordGenerator  words.WordGenerator
+	ui            terminal.UI
+	config        configuration.Reader
+	manifestRepo  manifest.ManifestRepository
+	starter       ApplicationStarter
+	stopper       ApplicationStopper
+	binder        service.ServiceBinder
+	appRepo       api.ApplicationRepository
+	domainRepo    api.DomainRepository
+	routeRepo     api.RouteRepository
+	serviceRepo   api.ServiceRepository
+	stackRepo     api.StackRepository
+	appBitsRepo   api.ApplicationBitsRepository
+	wordGenerator words.WordGenerator
 }
 
 func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.ManifestRepository,
