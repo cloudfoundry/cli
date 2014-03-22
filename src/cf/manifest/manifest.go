@@ -139,7 +139,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
 	appParams.UseRandomHostname = boolVal(yamlMap, "random-route", &errs)
-	appParams.ServicesToBind = sliceOrEmptyVal(yamlMap, "services", &errs)
+	appParams.ServicesToBind, appParams.ServicesToCreate = servicesOrEmptyVal(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 
 	if appParams.Path != nil {
@@ -251,19 +251,28 @@ func boolVal(yamlMap generic.Map, key string, errs *ManifestErrors) bool {
 	}
 }
 
-func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]string {
+func servicesOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) (*[]string, *[]map[string]string) {
 	if !yamlMap.Has(key) {
-		return new([]string)
+		return new([]string), new([]map[string]string)
 	}
 
 	var (
 		stringSlice []string
+		mapSlice    []map[string]string
 		err         error
 	)
 
 	errMsg := fmt.Sprintf("Expected %s to be a list of strings.", key)
 
 	switch input := yamlMap.Get(key).(type) {
+	case []map[interface{}]interface{}:
+		for _, mapValue := range input {
+			stringMap := map[string]string{}
+			for key, value := range mapValue {
+				stringMap[key.(string)] = value.(string)
+			}
+			mapSlice = append(mapSlice, stringMap)
+		}
 	case []interface{}:
 		for _, value := range input {
 			stringValue, ok := value.(string)
@@ -279,10 +288,10 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]s
 
 	if err != nil {
 		*errs = append(*errs, err)
-		return nil
+		return nil, nil
 	}
 
-	return &stringSlice
+	return &stringSlice, &mapSlice
 }
 
 func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]string {
