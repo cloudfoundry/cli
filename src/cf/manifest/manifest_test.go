@@ -348,4 +348,21 @@ var _ = Describe("Manifests", func() {
 			Expect(errs).ToNot(BeEmpty())
 		})
 	})
+
+	Describe("parsing services", func() {
+		It("can read a list of service instance names", func() {
+			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+				"services": []interface{}{"service-1", "service-2"},
+			}))
+
+			app, errs := m.Applications()
+			Expect(errs).To(BeEmpty())
+
+			Expect(*app[0].ServicesToBind).To(Equal([]string{"service-1", "service-2"}))
+		})
+
+		It("can read a list of service instance properties", func() {
+
+		})
+	})
 })

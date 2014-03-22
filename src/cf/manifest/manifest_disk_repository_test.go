@@ -115,7 +115,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 		applications, errs := m.Applications()
 		Expect(errs).To(BeEmpty())
 		Expect(*applications[0].Name).To(Equal("base-app"))
-		Expect(*applications[0].Services).To(Equal([]string{"base-service"}))
+		Expect(*applications[0].ServicesToBind).To(Equal([]string{"base-service"}))
 		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]string{
 			"foo":                "bar",
 			"will-be-overridden": "my-value",
@@ -127,7 +127,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 		Expect(env["will-be-overridden"]).To(Equal("my-value"))
 		Expect(env["foo"]).To(Equal("bar"))
 
-		services := *applications[1].Services
+		services := *applications[1].ServicesToBind
 		Expect(services).To(Equal([]string{"base-service", "foo-service"}))
 	})
 })

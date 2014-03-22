@@ -139,7 +139,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
 	appParams.NoRoute = boolVal(yamlMap, "no-route", &errs)
 	appParams.UseRandomHostname = boolVal(yamlMap, "random-route", &errs)
-	appParams.Services = sliceOrEmptyVal(yamlMap, "services", &errs)
+	appParams.ServicesToBind = sliceOrEmptyVal(yamlMap, "services", &errs)
 	appParams.EnvironmentVars = envVarOrEmptyMap(yamlMap, &errs)
 
 	if appParams.Path != nil {

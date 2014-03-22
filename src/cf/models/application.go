@@ -73,7 +73,7 @@ type AppParams struct {
 	NoRoute            bool
 	UseRandomHostname  bool
 	Path               *string
-	Services           *[]string
+	ServicesToBind     *[]string
 	SpaceGuid          *string
 	StackGuid          *string
 	StackName          *string
@@ -117,8 +117,8 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.Path != nil {
 		app.Path = other.Path
 	}
-	if other.Services != nil {
-		app.Services = other.Services
+	if other.ServicesToBind != nil {
+		app.ServicesToBind = other.ServicesToBind
 	}
 	if other.SpaceGuid != nil {
 		app.SpaceGuid = other.SpaceGuid

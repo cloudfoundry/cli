@@ -84,8 +84,8 @@ func (cmd *Push) Run(c *cli.Context) {
 		}
 		cmd.ui.Ok()
 
-		if appParams.Services != nil {
-			cmd.bindAppToServices(*appParams.Services, app)
+		if appParams.ServicesToBind != nil {
+			cmd.bindAppToServices(*appParams.ServicesToBind, app)
 		}
 
 		cmd.restart(app, appParams, c)
