@@ -15,7 +15,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 		repo = NewManifestDiskRepository()
 	})
 
-	Describe("given a directory containing a file called 'manifest.yml", func() {
+	Describe("given a directory containing a file called 'manifest.yml'", func() {
 		It("reads that file", func() {
 			m, errs := repo.ReadManifest("../../fixtures/manifests")
 
@@ -34,6 +34,33 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 			Expect(errs).NotTo(BeEmpty())
 			Expect(m.Path).To(BeEmpty())
+		})
+	})
+
+	Describe("given a directory that contains a file called 'manifest.yaml'", func() {
+		It("reads that file", func() {
+			m, errs := repo.ReadManifest("../../fixtures/manifests/only_yaml")
+
+			fmt.Printf("\n errors: %v", errs)
+			//Expect(errs).To(BeEmpty())
+			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/only_yaml/manifest.yaml")))
+
+			applications, errs := m.Applications()
+			//Expect(errs).To(BeEmpty())
+			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
+		})
+	})
+
+	Describe("given a directory contains files called 'manifest.yml' and 'manifest.yaml'", func() {
+		It("reads the file named 'manifest.yml'", func() {
+			m, errs := repo.ReadManifest("../../fixtures/manifests/both_yaml_yml")
+
+			Expect(errs).To(BeEmpty())
+			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/both_yaml_yml/manifest.yml")))
+
+			applications, errs := m.Applications()
+			Expect(errs).To(BeEmpty())
+			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
 		})
 	})
 
