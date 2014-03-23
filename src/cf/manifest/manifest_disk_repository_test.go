@@ -41,12 +41,11 @@ var _ = Describe("ManifestDiskRepository", func() {
 		It("reads that file", func() {
 			m, errs := repo.ReadManifest("../../fixtures/manifests/only_yaml")
 
-			fmt.Printf("\n errors: %v", errs)
-			//Expect(errs).To(BeEmpty())
+			Expect(errs).To(BeEmpty())
 			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/only_yaml/manifest.yaml")))
 
 			applications, errs := m.Applications()
-			//Expect(errs).To(BeEmpty())
+			Expect(errs).To(BeEmpty())
 			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
 		})
 	})
