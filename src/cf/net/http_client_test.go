@@ -1,10 +1,15 @@
 package net_test
 
 import (
+	"cf/errors"
 	. "cf/net"
+	"code.google.com/p/go.net/websocket"
+	"crypto/x509"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"net"
 	"net/http"
+	"net/url"
 )
 
 var _ = Describe("HTTP Client", func() {
@@ -207,6 +212,52 @@ Server: Apache-Coyote/1.1
 			err = PrepareRedirect(redirectReq, via)
 
 			Expect(err).To(HaveOccurred())
+		})
+	})
+
+	Describe("WrapSSLErrors", func() {
+		It("replaces http unknown authority errors with InvalidSSLCert errors", func() {
+			err, ok := WrapSSLErrors("example.com", &url.Error{Err: x509.UnknownAuthorityError{}}).(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("replaces http hostname errors with InvalidSSLCert errors", func() {
+			err, ok := WrapSSLErrors("example.com", &url.Error{Err: x509.HostnameError{}}).(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("replaces http certificate invalid errors with InvalidSSLCert errors", func() {
+			err, ok := WrapSSLErrors("example.com", &url.Error{Err: x509.CertificateInvalidError{}}).(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("replaces websocket unknown authority errors with InvalidSSLCert errors", func() {
+			err, ok := WrapSSLErrors("example.com", &websocket.DialError{Err: x509.UnknownAuthorityError{}}).(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("replaces websocket hostname with InvalidSSLCert errors", func() {
+			err, ok := WrapSSLErrors("example.com", &websocket.DialError{Err: x509.HostnameError{}}).(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("replaces http websocket certificate invalid errors with InvalidSSLCert errors", func() {
+			err, ok := WrapSSLErrors("example.com", &websocket.DialError{Err: x509.CertificateInvalidError{}}).(*errors.InvalidSSLCert)
+			Expect(ok).To(BeTrue())
+			Expect(err).To(HaveOccurred())
+		})
+
+		It("wraps other errors in a generic error type", func() {
+			err := WrapSSLErrors("example.com", errors.New("whatever"))
+			Expect(err).To(HaveOccurred())
+
+			_, ok := err.(*errors.InvalidSSLCert)
+			Expect(ok).To(BeFalse())
 		})
 	})
 })
