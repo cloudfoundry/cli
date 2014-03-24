@@ -92,7 +92,7 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
-		if !f.Mode().IsRegular() {
+		if !fileutils.IsRegular(f) {
 			return
 		}
 
