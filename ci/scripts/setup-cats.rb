@@ -30,7 +30,7 @@ cf "login -u #{CF_ADMIN_USER} -p #{CF_ADMIN_PASSWORD}"
   cf "delete-org -f #{org}"
   cf "create-org #{org}"
 
-  ["cats-space-#{platform}", "persistent-space-#{platform}"].each do |space|
+  ["cats-space-#{platform}", "persistent-space"].each do |space|
     cf "create-space #{space} -o #{org}"
 
     %w(SpaceManager SpaceDeveloper SpaceAuditor).each do |role|
