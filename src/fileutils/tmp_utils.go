@@ -1,8 +1,8 @@
 package fileutils
 
 import (
-	"os"
 	"io/ioutil"
+	"os"
 )
 
 func TempDir(namePrefix string, cb func(tmpDir string, err error)) {

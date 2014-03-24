@@ -1,13 +1,16 @@
 package net
 
 import (
+	"cf/errors"
 	"cf/terminal"
 	"cf/trace"
+	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
-	"errors"
+	"crypto/x509"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -80,5 +83,32 @@ func dumpResponse(res *http.Response) {
 		trace.Logger.Printf("Error dumping response\n%s\n", err)
 	} else {
 		trace.Logger.Printf("\n%s [%s]\n%s\n", terminal.HeaderColor("RESPONSE:"), time.Now().Format(time.RFC3339), Sanitize(string(dumpedResponse)))
+	}
+}
+
+func WrapSSLErrors(host string, err error) error {
+	urlError, ok := err.(*url.Error)
+	if ok {
+		return wrapSSLErrorInternal(host, urlError.Err)
+	}
+
+	websocketError, ok := err.(*websocket.DialError)
+	if ok {
+		return wrapSSLErrorInternal(host, websocketError.Err)
+	}
+
+	return errors.NewWithError("Error performing request", err)
+}
+
+func wrapSSLErrorInternal(host string, err error) error {
+	switch err.(type) {
+	case x509.UnknownAuthorityError:
+		return errors.NewInvalidSSLCert(host, "unknown authority")
+	case x509.HostnameError:
+		return errors.NewInvalidSSLCert(host, "not valid for the requested host")
+	case x509.CertificateInvalidError:
+		return errors.NewInvalidSSLCert(host, "")
+	default:
+		return errors.NewWithError("Error performing request", err)
 	}
 }
