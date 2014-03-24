@@ -104,8 +104,8 @@ USAGE:
    {{.Usage}}{{with .Flags}}
 
 OPTIONS:
-   {{range .}}{{.}}
-   {{end}}{{else}}
+{{range .}}   {{.}}
+{{end}}{{else}}
 {{end}}`
 
 }
