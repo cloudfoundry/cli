@@ -40,7 +40,7 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 
 	// FIXME: needs semantic API version
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		apiErr = repo.gateway.ListPaginatedResources(
 			repo.config.ApiEndpoint(),
 			repo.config.AccessToken(),

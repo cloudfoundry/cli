@@ -29,7 +29,7 @@ func (cmd PurgeServiceOffering) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Warn("Service offering does not exist\nTIP: If you are trying to purge a v1 service offering, you must set the -p flag.")
 		return
 	default:

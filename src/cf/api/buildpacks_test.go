@@ -116,7 +116,7 @@ var _ = Describe("Buildpacks repo", func() {
 
 		_, apiErr := repo.FindByName("Buildpack1")
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+		Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 	})
 
 	It("TestBuildpackCreateRejectsImproperNames", func() {

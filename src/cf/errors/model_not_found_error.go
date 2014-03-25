@@ -5,13 +5,13 @@ type ModelNotFoundError struct {
 	ModelName string
 }
 
-func NewModelNotFoundError(modelType, name string) ModelNotFoundError {
-	return ModelNotFoundError{
+func NewModelNotFoundError(modelType, name string) error {
+	return &ModelNotFoundError{
 		ModelType: modelType,
 		ModelName: name,
 	}
 }
 
-func (err ModelNotFoundError) Error() string {
+func (err *ModelNotFoundError) Error() string {
 	return err.ModelType + " " + err.ModelName + " not found"
 }

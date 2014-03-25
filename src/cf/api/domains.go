@@ -66,7 +66,7 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb
 
 	// FIXME: needs semantic versioning
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		apiErr = repo.listDomains("/v2/domains", cb)
 	}
 
@@ -100,7 +100,7 @@ func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid
 		name)
 
 	switch apiErr.(type) {
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		domain, apiErr = repo.FindByName(name)
 		if !domain.Shared {
 			apiErr = errors.NewModelNotFoundError("Domain", name)
@@ -133,7 +133,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		path := repo.config.ApiEndpoint() + "/v2/domains"
 		data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s", "wildcard": true}`, domainName, owningOrgGuid)
 		apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
@@ -151,7 +151,7 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 	apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
 
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		path := repo.config.ApiEndpoint() + "/v2/domains"
 		data := strings.NewReader(fmt.Sprintf(`{"name":"%s", "wildcard": true}`, domainName))
 		apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
@@ -164,7 +164,7 @@ func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiErr er
 	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
 		apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	}
@@ -176,7 +176,7 @@ func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string
 	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
 		apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
 	}

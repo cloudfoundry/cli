@@ -320,7 +320,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 	}
 
 	switch apiErr.(type) {
-	case errors.InvalidTokenError:
+	case *errors.InvalidTokenError:
 		// refresh the auth token
 		var newToken string
 		newToken, apiErr = gateway.authenticator.RefreshAuthToken()

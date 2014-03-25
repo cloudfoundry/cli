@@ -158,7 +158,7 @@ func (cmd *Push) bindAppToRoute(app models.Application, params models.AppParams,
 	switch apiErr.(type) {
 	case nil:
 		cmd.ui.Say("Using route %s", terminal.EntityNameColor(route.URL()))
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Say("Creating route %s...", terminal.EntityNameColor(domain.UrlForHost(hostname)))
 
 		route, apiErr = cmd.routeRepo.Create(hostname, domain.Guid)
@@ -267,7 +267,7 @@ func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
 
 	// FIXME: needs semantic API version
 	switch apiErr.(type) {
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 		apiErr = cmd.domainRepo.ListDomains(listDomainsCallback)
 	}
 
@@ -289,7 +289,7 @@ func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Appli
 	switch apiErr.(type) {
 	case nil:
 		app = cmd.updateApp(app, appParams)
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		app, apiErr = cmd.createApp(appParams)
 		if apiErr != nil {
 			cmd.ui.Failed(apiErr.Error())

@@ -65,7 +65,7 @@ func (cmd CreateSpace) Run(c *cli.Context) {
 		org, apiErr := cmd.orgRepo.FindByName(orgName)
 		switch apiErr.(type) {
 		case nil:
-		case errors.ModelNotFoundError:
+		case *errors.ModelNotFoundError:
 			cmd.ui.Failed("Org %s does not exist or is not accessible", orgName)
 			return
 		default:

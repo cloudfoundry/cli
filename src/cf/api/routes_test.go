@@ -120,7 +120,7 @@ var _ = Describe("route repository", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+		Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 	})
 
 	It("creates routes in a given space", func() {

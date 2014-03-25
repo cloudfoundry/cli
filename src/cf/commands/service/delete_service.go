@@ -62,7 +62,7 @@ func (cmd *DeleteService) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service %s does not exist.", serviceName)
 		return

@@ -55,7 +55,7 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil: //do nothing
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(apiErr.Error())
 		return

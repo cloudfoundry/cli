@@ -54,7 +54,7 @@ func (cmd *DeleteSharedDomain) Run(c *cli.Context) {
 	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(apiErr.Error())
 		return

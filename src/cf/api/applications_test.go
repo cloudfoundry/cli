@@ -43,7 +43,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 			_, apiErr := repo.Read("My App")
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		})
 	})
 

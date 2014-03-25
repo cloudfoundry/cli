@@ -55,7 +55,7 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil:
-	case errors.HttpNotFoundError:
+	case *errors.HttpNotFoundError:
 	default:
 		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiErr.Error())
 		return

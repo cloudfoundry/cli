@@ -57,7 +57,7 @@ func (cmd DeleteServiceBroker) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Broker %s does not exist.", brokerName)
 		return
