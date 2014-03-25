@@ -39,22 +39,22 @@ func NewPush(ui terminal.UI, config configuration.Reader, manifestRepo manifest.
 	starter ApplicationStarter, stopper ApplicationStopper, binder service.ServiceBinder,
 	appRepo api.ApplicationRepository, domainRepo api.DomainRepository, routeRepo api.RouteRepository,
 	stackRepo api.StackRepository, serviceRepo api.ServiceRepository, appBitsRepo api.ApplicationBitsRepository,
-	wordGenerator words.WordGenerator) (cmd *Push) {
-	cmd = &Push{}
-	cmd.ui = ui
-	cmd.config = config
-	cmd.manifestRepo = manifestRepo
-	cmd.appStarter = starter
-	cmd.appStopper = stopper
-	cmd.serviceBinder = binder
-	cmd.appRepo = appRepo
-	cmd.domainRepo = domainRepo
-	cmd.routeRepo = routeRepo
-	cmd.serviceRepo = serviceRepo
-	cmd.stackRepo = stackRepo
-	cmd.appBitsRepo = appBitsRepo
-	cmd.wordGenerator = wordGenerator
-	return
+	wordGenerator words.WordGenerator) *Push {
+	return &Push{
+		ui:            ui,
+		config:        config,
+		manifestRepo:  manifestRepo,
+		appStarter:    starter,
+		appStopper:    stopper,
+		serviceBinder: binder,
+		appRepo:       appRepo,
+		domainRepo:    domainRepo,
+		routeRepo:     routeRepo,
+		serviceRepo:   serviceRepo,
+		stackRepo:     stackRepo,
+		appBitsRepo:   appBitsRepo,
+		wordGenerator: wordGenerator,
+	}
 }
 
 func (cmd *Push) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
