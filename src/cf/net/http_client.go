@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"net"
 )
 
 const (
@@ -86,29 +87,28 @@ func dumpResponse(res *http.Response) {
 	}
 }
 
-func WrapSSLErrors(host string, err error) error {
-	urlError, ok := err.(*url.Error)
-	if ok {
-		return wrapSSLErrorInternal(host, urlError.Err)
+func WrapNetworkErrors(host string, err error) error {
+	var innerErr error
+	switch typedErr := err.(type) {
+	case *url.Error:
+		innerErr = typedErr.Err
+	case *websocket.DialError:
+		innerErr = typedErr.Err
 	}
 
-	websocketError, ok := err.(*websocket.DialError)
-	if ok {
-		return wrapSSLErrorInternal(host, websocketError.Err)
+	if innerErr != nil {
+		switch typedErr := innerErr.(type) {
+		case x509.UnknownAuthorityError:
+			return errors.NewInvalidSSLCert(host, "unknown authority")
+		case x509.HostnameError:
+			return errors.NewInvalidSSLCert(host, "not valid for the requested host")
+		case x509.CertificateInvalidError:
+			return errors.NewInvalidSSLCert(host, "")
+		case *net.OpError:
+			return typedErr.Err
+		}
 	}
 
 	return errors.NewWithError("Error performing request", err)
-}
 
-func wrapSSLErrorInternal(host string, err error) error {
-	switch err.(type) {
-	case x509.UnknownAuthorityError:
-		return errors.NewInvalidSSLCert(host, "unknown authority")
-	case x509.HostnameError:
-		return errors.NewInvalidSSLCert(host, "not valid for the requested host")
-	case x509.CertificateInvalidError:
-		return errors.NewInvalidSSLCert(host, "")
-	default:
-		return errors.NewWithError("Error performing request", err)
-	}
 }
