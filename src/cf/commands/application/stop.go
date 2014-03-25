@@ -46,7 +46,6 @@ func (cmd *Stop) GetRequirements(reqFactory requirements.Factory, c *cli.Context
 func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Application, err error) {
 	if app.State == "stopped" {
 		updatedApp = app
-		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already stopped"))
 		return
 	}
 
@@ -71,5 +70,9 @@ func (cmd *Stop) ApplicationStop(app models.Application) (updatedApp models.Appl
 
 func (cmd *Stop) Run(c *cli.Context) {
 	app := cmd.appReq.GetApplication()
-	cmd.ApplicationStop(app)
+	if app.State == "stopped" {
+		cmd.ui.Say(terminal.WarningColor("App " + app.Name + " is already stopped"))
+	} else {
+		cmd.ApplicationStop(app)
+	}
 }
