@@ -3,6 +3,7 @@ package app_files
 import (
 	"cf/models"
 	"crypto/sha1"
+	cffileutils "fileutils"
 	"fmt"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io/ioutil"
@@ -91,7 +92,7 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
-		if !fileutils.IsRegular(f) {
+		if !cffileutils.IsRegular(f) {
 			return
 		}
 
