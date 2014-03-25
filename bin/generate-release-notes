@@ -20,21 +20,21 @@ CF version $VERSION
 
 Installers
 ----------
-- [Debian 32 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-cli_i386.deb)
-- [Debian 64 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-cli_amd64.deb)
-- [Redhat 32 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-cli_i386.rpm)
-- [Redhat 64 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-cli_amd64.rpm)
-- [Mac OS X 64 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/installer-osx-amd64.pkg)
-- [Windows 32 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/installer-windows-386.zip)
-- [Windows 64 bit](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/installer-windows-amd64.zip)
+- [Debian 32 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-cli_i386.deb)
+- [Debian 64 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-cli_amd64.deb)
+- [Redhat 32 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-cli_i386.rpm)
+- [Redhat 64 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-cli_amd64.rpm)
+- [Mac OS X 64 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/installer-osx-amd64.pkg)
+- [Windows 32 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/installer-windows-386.zip)
+- [Windows 64 bit](https://s3.amazonaws.com/go-cli/releases/v$VERSION/installer-windows-amd64.zip)
 
 Binaries
 --------
-- [Linux 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-linux-386.tgz)
-- [Linux 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-linux-amd64.tgz)
-- [Mac OS X 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-darwin-amd64.tgz)
-- [Windows 32 bit binary](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-windows-386.zip)
-- [Windows 64 bit binary](https://github.com/cloudfoundry/cli/releases/download/v$VERSION/cf-windows-amd64.zip)
+- [Linux 32 bit binary]   (https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-linux-386.tgz)
+- [Linux 64 bit binary]   (https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-linux-amd64.tgz)
+- [Mac OS X 64 bit binary](https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-darwin-amd64.tgz)
+- [Windows 32 bit binary] (https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-windows-386.zip)
+- [Windows 64 bit binary] (https://s3.amazonaws.com/go-cli/releases/v$VERSION/cf-windows-amd64.zip)
 
 Change Log
 ----------
