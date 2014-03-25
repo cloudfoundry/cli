@@ -374,10 +374,7 @@ var _ = Describe("Push Command", func() {
 	It("fails when parsing the manifest has errors", func() {
 		appRepo.ReadNotFound = true
 		manifestRepo.ReadManifestReturns.Manifest = &manifest.Manifest{Path: "/some-path/"}
-		manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{
-			errors.New("buildpack should not be null"),
-			errors.New("disk_quota should not be null"),
-		}
+		manifestRepo.ReadManifestReturns.Error = errors.New("buildpack should not be null")
 
 		callPush()
 
@@ -385,7 +382,6 @@ var _ = Describe("Push Command", func() {
 			{"FAILED"},
 			{"Error", "reading", "manifest"},
 			{"buildpack should not be null"},
-			{"disk_quota should not be null"},
 		})
 	})
 
@@ -511,7 +507,7 @@ var _ = Describe("Push Command", func() {
 		appRepo.ReadNotFound = true
 
 		manifestRepo.ReadManifestReturns.Manifest = manifest.NewEmptyManifest()
-		manifestRepo.ReadManifestReturns.Errors = []error{errors.New("read manifest error")}
+		manifestRepo.ReadManifestReturns.Error = errors.New("read manifest error")
 
 		callPush("-f", "bad/manifest/path")
 
@@ -524,7 +520,7 @@ var _ = Describe("Push Command", func() {
 	It("does not fail when the current working directory does not contain a manifest", func() {
 		appRepo.ReadNotFound = true
 		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
-		manifestRepo.ReadManifestReturns.Errors = manifest.ManifestErrors{syscall.ENOENT}
+		manifestRepo.ReadManifestReturns.Error = syscall.ENOENT
 		manifestRepo.ReadManifestReturns.Manifest.Path = ""
 
 		callPush("--no-route", "app-name")
@@ -868,7 +864,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("fails when neither a manifest nor a name is given", func() {
-		manifestRepo.ReadManifestReturns.Errors = []error{errors.New("No such manifest")}
+		manifestRepo.ReadManifestReturns.Error = errors.New("No such manifest")
 		callPush()
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"FAILED"},

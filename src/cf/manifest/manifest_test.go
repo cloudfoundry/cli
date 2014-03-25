@@ -27,8 +27,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 
 		Expect(*apps[0].InstanceCount).To(Equal(3))
 		Expect(*apps[0].Memory).To(Equal(uint64(512)))
@@ -42,8 +42,8 @@ var _ = Describe("Manifests", func() {
 				"memory":    "512M",
 			}))
 
-			apps, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			apps, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(len(apps)).To(Equal(1))
 			Expect(*apps[0].InstanceCount).To(Equal(3))
@@ -62,9 +62,9 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		_, errs := m.Applications()
-		Expect(errs).NotTo(BeEmpty())
-		Expect(errs.Error()).To(ContainSubstring("memory"))
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("memory"))
 	})
 
 	It("sets applications' health check timeouts", func() {
@@ -77,8 +77,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].HealthCheckTimeout).To(Equal(360))
 	})
 
@@ -94,9 +94,9 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		_, errs := m.Applications()
-		Expect(errs).NotTo(BeEmpty())
-		Expect(errs.Error()).To(ContainSubstring("env var 'bar' should not be null"))
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("env var 'bar' should not be null"))
 	})
 
 	It("returns an empty map when no env was present in the manifest", func() {
@@ -106,8 +106,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].EnvironmentVars).NotTo(BeNil())
 	})
 
@@ -121,8 +121,8 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
-			apps, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			apps, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(*apps[0].Path).To(Equal(`C:\another\path`))
 		} else {
 			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
@@ -133,8 +133,8 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
-			apps, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			apps, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(*apps[0].Path).To(Equal("/another/path-segment"))
 		}
 	})
@@ -148,8 +148,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		if runtime.GOOS == "windows" {
 			Expect(*apps[0].Path).To(Equal("\\some\\another\\path-segment"))
 		} else {
@@ -179,9 +179,9 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		_, errs := m.Applications()
-		Expect(errs).NotTo(BeEmpty())
-		errorSlice := strings.Split(errs.Error(), "\n")
+		_, err := m.Applications()
+		Expect(err).To(HaveOccurred())
+		errorSlice := strings.Split(err.Error(), "\n")
 		manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
 			"memory", "instances", "timeout", "no-route", "services", "env", "random-route"}
 
@@ -209,8 +209,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(len(apps)).To(Equal(1))
 
 		Expect(*apps[0].BuildpackUrl).To(Equal("my-buildpack"))
@@ -238,9 +238,9 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
-			_, errs := m.Applications()
-			Expect(errs).NotTo(BeEmpty())
-			Expect(errs.Error()).To(ContainSubstring("'${some_property-name}'"))
+			_, err := m.Applications()
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("'${some_property-name}'"))
 		})
 
 		It("replaces the '${random-word} with a combination of 2 random words", func() {
@@ -255,8 +255,8 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
-			apps, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			apps, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect((*apps[0].EnvironmentVars)["bar"]).To(MatchRegexp(`prefix_\w+-\w+_suffix`))
 			Expect((*apps[0].EnvironmentVars)["foo"]).To(Equal("some-value"))
 
@@ -275,8 +275,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].Command).To(Equal(""))
 	})
 
@@ -287,8 +287,8 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(apps[0].Command).To(BeNil())
 	})
 
@@ -305,9 +305,11 @@ var _ = Describe("Manifests", func() {
 			},
 		}))
 
-		apps1, errs := m.Applications()
-		apps2, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		apps1, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
+
+		apps2, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(apps1).To(Equal(apps2))
 	})
 
@@ -325,8 +327,8 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
-			app, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			app, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect((*app[0].EnvironmentVars)["string-key"]).To(Equal("value"))
 			Expect((*app[0].EnvironmentVars)["int-key"]).To(Equal("1"))
@@ -344,8 +346,8 @@ var _ = Describe("Manifests", func() {
 				},
 			}))
 
-			_, errs := m.Applications()
-			Expect(errs).ToNot(BeEmpty())
+			_, err := m.Applications()
+			Expect(err).To(HaveOccurred())
 		})
 	})
 
@@ -355,14 +357,10 @@ var _ = Describe("Manifests", func() {
 				"services": []interface{}{"service-1", "service-2"},
 			}))
 
-			app, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			app, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 
 			Expect(*app[0].ServicesToBind).To(Equal([]string{"service-1", "service-2"}))
-		})
-
-		It("can read a list of service instance properties", func() {
-
 		})
 	})
 })

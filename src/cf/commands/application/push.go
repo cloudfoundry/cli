@@ -377,19 +377,19 @@ func (cmd *Push) getAppParamsFromManifest(c *cli.Context) []models.AppParams {
 		}
 	}
 
-	m, errs := cmd.manifestRepo.ReadManifest(path)
+	m, err := cmd.manifestRepo.ReadManifest(path)
 
-	if !errs.Empty() {
+	if err != nil {
 		if m.Path == "" && c.String("f") == "" {
 			return []models.AppParams{}
 		} else {
-			cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+			cmd.ui.Failed("Error reading manifest file:\n%s", err)
 		}
 	}
 
-	apps, errs := m.Applications()
-	if !errs.Empty() {
-		cmd.ui.Failed("Error reading manifest file:\n%s", errs)
+	apps, err := m.Applications()
+	if err != nil {
+		cmd.ui.Failed("Error reading manifest file:\n%s", err)
 	}
 
 	cmd.ui.Say("Using manifest file %s\n", terminal.EntityNameColor(m.Path))
