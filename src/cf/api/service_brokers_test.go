@@ -132,7 +132,7 @@ var _ = Describe("Service Brokers Repo", func() {
 		_, apiErr := repo.FindByName("my-broker")
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+		Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 		Expect(apiErr.Error()).To(Equal("Service Broker my-broker not found"))
 	})
 

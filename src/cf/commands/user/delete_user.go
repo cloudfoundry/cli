@@ -53,7 +53,7 @@ func (cmd DeleteUserFields) Run(c *cli.Context) {
 	user, apiErr := cmd.userRepo.FindByUsername(username)
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("User %s does not exist.", username)
 		return

@@ -126,7 +126,7 @@ var _ = Describe("Testing with ginkgo", func() {
 
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 
-		Expect(apiErr.(errors.ModelNotFoundError)).NotTo(BeNil())
+		Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
 	})
 	It("TestServiceAuthUpdate", func() {
 

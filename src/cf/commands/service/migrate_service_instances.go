@@ -52,7 +52,7 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 	v1Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v1)
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v1.String()))
 		return
 	default:
@@ -63,7 +63,7 @@ func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
 	v2Guid, apiErr := cmd.serviceRepo.FindServicePlanByDescription(v2)
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Failed("Plan %s cannot be found", terminal.EntityNameColor(v2.String()))
 		return
 	default:

@@ -54,7 +54,7 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil: //do nothing
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Buildpack %s does not exist.", buildpackName)
 		return

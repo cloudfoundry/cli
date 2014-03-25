@@ -56,6 +56,6 @@ var _ = Describe("Cloud Controller Gateway", func() {
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The token is invalid"))
-		Expect(apiErr.(errors.InvalidTokenError)).To(HaveOccurred())
+		Expect(apiErr.(*errors.InvalidTokenError)).To(HaveOccurred())
 	})
 })

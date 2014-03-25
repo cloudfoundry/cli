@@ -54,7 +54,7 @@ func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil:
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("Service Auth Token %s %s does not exist.", tokenLabel, tokenProvider)
 		return

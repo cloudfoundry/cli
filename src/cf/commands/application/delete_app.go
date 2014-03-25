@@ -60,7 +60,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 
 	switch apiErr.(type) {
 	case nil: // no error
-	case errors.ModelNotFoundError:
+	case *errors.ModelNotFoundError:
 		cmd.ui.Ok()
 		cmd.ui.Warn("App %s does not exist.", appName)
 		return
