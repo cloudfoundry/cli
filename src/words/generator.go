@@ -11,9 +11,9 @@ type WordGenerator interface {
 }
 
 type wordGenerator struct {
-	numberGenerator     *rand.Rand
-	adjectives []string
-	nouns      []string
+	numberGenerator *rand.Rand
+	adjectives      []string
+	nouns           []string
 }
 
 func (wg wordGenerator) Babble() (word string) {
@@ -30,8 +30,8 @@ func NewWordGenerator() WordGenerator {
 	source := rand.NewSource(time.Now().UnixNano())
 
 	return wordGenerator{
-		adjectives: strings.Split(string(adjectiveBytes), "\n"),
-		nouns:      strings.Split(string(nounBytes), "\n"),
-		numberGenerator:     rand.New(source),
+		adjectives:      strings.Split(string(adjectiveBytes), "\n"),
+		nouns:           strings.Split(string(nounBytes), "\n"),
+		numberGenerator: rand.New(source),
 	}
 }
