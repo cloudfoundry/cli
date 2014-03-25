@@ -72,4 +72,9 @@ var _ = Describe("Testing with ginkgo", func() {
 		_, err := ToMegabytes(" 5MB")
 		Expect(err).To(HaveOccurred())
 	})
+
+	It("Does not allow non-positive values", func() {
+		_, err := ToMegabytes("-5MB")
+		Expect(err).To(HaveOccurred())
+	})
 })
