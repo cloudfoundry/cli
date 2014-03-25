@@ -24,7 +24,8 @@ _testmain.go
 *.exe
 
 out/
-release/
+release/*
+!release/index.html
 
 *.iml
 *.zpi
@@ -32,11 +33,8 @@ release/
 
 *.go-e
 
-# Log files
 *.log
 
-# IDE
 .idea/
 
-# release
 tmp/
