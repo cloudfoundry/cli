@@ -98,15 +98,17 @@ func (repo ManifestDiskRepository) manifestPath(userSpecifiedPath string) (strin
 	}
 
 	if fileInfo.IsDir() {
-		manifestPaths := []string{filepath.Join(userSpecifiedPath, "manifest.yml"),
-			filepath.Join(userSpecifiedPath, "manifest.yaml")}
+		manifestPaths := []string{
+			filepath.Join(userSpecifiedPath, "manifest.yml"),
+			filepath.Join(userSpecifiedPath, "manifest.yaml"),
+		}
 		var err error
 		for _, manifestPath := range manifestPaths {
 			if _, err = os.Stat(manifestPath); err == nil {
 				return manifestPath, err
 			}
 		}
-		return manifestPaths[0], err
+		return "", err
 	} else {
 		return userSpecifiedPath, nil
 	}
