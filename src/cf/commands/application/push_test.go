@@ -245,6 +245,7 @@ var _ = Describe("Push Command", func() {
 			"-c", "unicorn -c config/unicorn.rb -D",
 			"-d", "bar.cf-app.com",
 			"-n", "my-hostname",
+			"-k", "4G",
 			"-i", "3",
 			"-m", "2G",
 			"-b", "https://github.com/heroku/heroku-buildpack-play.git",
@@ -271,6 +272,7 @@ var _ = Describe("Push Command", func() {
 		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
 		Expect(*appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
 		Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(3))
+		Expect(*appRepo.CreatedAppParams().DiskQuota).To(Equal(uint64(4096)))
 		Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(2048)))
 		Expect(*appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
 		Expect(*appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))

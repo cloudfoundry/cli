@@ -499,7 +499,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Push a new app or sync changes to an existing app",
 			Usage: "Push a single app (with or without a manifest):\n" +
 				fmt.Sprintf("   %s push APP [-b BUILDPACK_NAME] [-c COMMAND] [-d DOMAIN] [-f MANIFEST_PATH]\n", cf.Name()) +
-				"   [-i NUM_INSTANCES] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n" +
+				"   [-i NUM_INSTANCES] [-k DISK] [-m MEMORY] [-n HOST] [-p PATH] [-s STACK] [-t TIMEOUT]\n" +
 				"   [--no-hostname] [--no-manifest] [--no-route] [--no-start]" +
 				"\n\n   Push multiple apps with a manifest:\n" +
 				fmt.Sprintf("   %s push [-f MANIFEST_PATH]\n", cf.Name()),
@@ -509,6 +509,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("d", "Domain (e.g. example.com)"),
 				NewStringFlag("f", "Path to manifest"),
 				NewStringFlag("i", "Number of instances"),
+				NewStringFlag("k", "Disk quota (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("n", "Hostname (e.g. my-subdomain)"),
 				NewStringFlag("p", "Path of app directory or zip file"),
