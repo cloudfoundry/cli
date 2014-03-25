@@ -1,9 +1,9 @@
 package manifest
 
 import (
+	"cf/errors"
 	"cf/formatters"
 	"cf/models"
-	"errors"
 	"fmt"
 	"generic"
 	"path/filepath"
@@ -22,22 +22,24 @@ func NewEmptyManifest() (m *Manifest) {
 	return &Manifest{Data: generic.NewMap()}
 }
 
-func (m Manifest) Applications() (apps []models.AppParams, errs ManifestErrors) {
+func (m Manifest) Applications() (apps []models.AppParams, err error) {
 	rawData, errs := expandProperties(m.Data, words.NewWordGenerator())
-	if !errs.Empty() {
+	if len(errs) > 0 {
+		err = errors.NewWithSlice(errs)
 		return
 	}
 
 	data := generic.NewMap(rawData)
 	appMaps, errs := m.getAppMaps(data)
-	if !errs.Empty() {
+	if len(errs) > 0 {
+		err = errors.NewWithSlice(errs)
 		return
 	}
 
 	for _, appMap := range appMaps {
-		app, appErrs := mapToAppParams(filepath.Dir(m.Path), appMap)
-		if !appErrs.Empty() {
-			errs = append(errs, appErrs)
+		app, errs := mapToAppParams(filepath.Dir(m.Path), appMap)
+		if len(errs) > 0 {
+			err = errors.NewWithSlice(errs)
 			continue
 		}
 
@@ -59,7 +61,7 @@ func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error
 
 		for _, appData := range appMaps {
 			if !generic.IsMappable(appData) {
-				errs = append(errs, errors.New(fmt.Sprintf("Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'%s'", appData)))
+				errs = append(errs, errors.NewWithFmt("Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'%s'", appData))
 				continue
 			}
 
@@ -75,7 +77,7 @@ func (m Manifest) getAppMaps(data generic.Map) (apps []generic.Map, errs []error
 
 var propertyRegex = regexp.MustCompile(`\${[\w-]+}`)
 
-func expandProperties(input interface{}, babbler words.WordGenerator) (output interface{}, errs ManifestErrors) {
+func expandProperties(input interface{}, babbler words.WordGenerator) (output interface{}, errs []error) {
 	switch input := input.(type) {
 	case string:
 		match := propertyRegex.FindStringSubmatch(input)
@@ -83,7 +85,7 @@ func expandProperties(input interface{}, babbler words.WordGenerator) (output in
 			if match[0] == "${random-word}" {
 				output = strings.Replace(input, "${random-word}", strings.ToLower(babbler.Babble()), -1)
 			} else {
-				err := errors.New(fmt.Sprintf("Property '%s' found in manifest. This feature is no longer supported. Please remove it and try again.", match[0]))
+				err := errors.NewWithFmt("Property '%s' found in manifest. This feature is no longer supported. Please remove it and try again.", match[0])
 				errs = append(errs, err)
 			}
 		} else {
@@ -120,9 +122,9 @@ func expandProperties(input interface{}, babbler words.WordGenerator) (output in
 	return
 }
 
-func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppParams, errs ManifestErrors) {
+func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppParams, errs []error) {
 	errs = checkForNulls(yamlMap)
-	if !errs.Empty() {
+	if len(errs) > 0 {
 		return
 	}
 
@@ -155,33 +157,33 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 	return
 }
 
-func checkForNulls(yamlMap generic.Map) (errs ManifestErrors) {
+func checkForNulls(yamlMap generic.Map) (errs []error) {
 	generic.Each(yamlMap, func(key interface{}, value interface{}) {
 		if key == "command" {
 			return
 		}
 		if value == nil {
-			errs = append(errs, errors.New(fmt.Sprintf("%s should not be null", key)))
+			errs = append(errs, errors.NewWithFmt("%s should not be null", key))
 		}
 	})
 
 	return
 }
 
-func stringVal(yamlMap generic.Map, key string, errs *ManifestErrors) *string {
+func stringVal(yamlMap generic.Map, key string, errs *[]error) *string {
 	val := yamlMap.Get(key)
 	if val == nil {
 		return nil
 	}
 	result, ok := val.(string)
 	if !ok {
-		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string value", key)))
+		*errs = append(*errs, errors.NewWithFmt("%s must be a string value", key))
 		return nil
 	}
 	return &result
 }
 
-func stringOrNullVal(yamlMap generic.Map, key string, errs *ManifestErrors) *string {
+func stringOrNullVal(yamlMap generic.Map, key string, errs *[]error) *string {
 	if !yamlMap.Has(key) {
 		return nil
 	}
@@ -192,25 +194,25 @@ func stringOrNullVal(yamlMap generic.Map, key string, errs *ManifestErrors) *str
 		empty := ""
 		return &empty
 	default:
-		*errs = append(*errs, errors.New(fmt.Sprintf("%s must be a string or null value", key)))
+		*errs = append(*errs, errors.NewWithFmt("%s must be a string or null value", key))
 		return nil
 	}
 }
 
-func bytesVal(yamlMap generic.Map, key string, errs *ManifestErrors) *uint64 {
+func bytesVal(yamlMap generic.Map, key string, errs *[]error) *uint64 {
 	yamlVal := yamlMap.Get(key)
 	if yamlVal == nil {
 		return nil
 	}
 	value, err := formatters.ToMegabytes(yamlVal.(string))
 	if err != nil {
-		*errs = append(*errs, errors.New(fmt.Sprintf("Unexpected value for %s :\n%s", key, err.Error())))
+		*errs = append(*errs, errors.NewWithFmt("Unexpected value for %s :\n%s", key, err.Error()))
 		return nil
 	}
 	return &value
 }
 
-func intVal(yamlMap generic.Map, key string, errs *ManifestErrors) *int {
+func intVal(yamlMap generic.Map, key string, errs *[]error) *int {
 	var (
 		intVal int
 		err    error
@@ -226,7 +228,7 @@ func intVal(yamlMap generic.Map, key string, errs *ManifestErrors) *int {
 	case nil:
 		return nil
 	default:
-		err = errors.New(fmt.Sprintf("Expected %s to be a number, but it was a %T.", key, val))
+		err = errors.NewWithFmt("Expected %s to be a number, but it was a %T.", key, val)
 	}
 
 	if err != nil {
@@ -237,7 +239,7 @@ func intVal(yamlMap generic.Map, key string, errs *ManifestErrors) *int {
 	return &intVal
 }
 
-func boolVal(yamlMap generic.Map, key string, errs *ManifestErrors) bool {
+func boolVal(yamlMap generic.Map, key string, errs *[]error) bool {
 	switch val := yamlMap.Get(key).(type) {
 	case nil:
 		return false
@@ -246,12 +248,12 @@ func boolVal(yamlMap generic.Map, key string, errs *ManifestErrors) bool {
 	case string:
 		return val == "true"
 	default:
-		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a boolean.", key)))
+		*errs = append(*errs, errors.NewWithFmt("Expected %s to be a boolean.", key))
 		return false
 	}
 }
 
-func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]string {
+func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *[]error) *[]string {
 	if !yamlMap.Has(key) {
 		return new([]string)
 	}
@@ -261,20 +263,20 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]s
 		err         error
 	)
 
-	errMsg := fmt.Sprintf("Expected %s to be a list of strings.", key)
+	sliceErr := errors.NewWithFmt("Expected %s to be a list of strings.", key)
 
 	switch input := yamlMap.Get(key).(type) {
 	case []interface{}:
 		for _, value := range input {
 			stringValue, ok := value.(string)
 			if !ok {
-				err = errors.New(errMsg)
+				err = sliceErr
 				break
 			}
 			stringSlice = append(stringSlice, stringValue)
 		}
 	default:
-		err = errors.New(errMsg)
+		err = sliceErr
 	}
 
 	if err != nil {
@@ -285,7 +287,7 @@ func sliceOrEmptyVal(yamlMap generic.Map, key string, errs *ManifestErrors) *[]s
 	return &stringSlice
 }
 
-func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]string {
+func envVarOrEmptyMap(yamlMap generic.Map, errs *[]error) *map[string]string {
 	key := "env"
 	switch envVars := yamlMap.Get(key).(type) {
 	case nil:
@@ -300,7 +302,7 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]str
 	case generic.Map:
 		merrs := validateEnvVars(envVars)
 		if merrs != nil {
-			*errs = append(*errs, merrs)
+			*errs = append(*errs, merrs...)
 			return nil
 		}
 
@@ -315,18 +317,18 @@ func envVarOrEmptyMap(yamlMap generic.Map, errs *ManifestErrors) *map[string]str
 			case float32, float64:
 				result[key.(string)] = fmt.Sprintf("%f", value)
 			default:
-				*errs = append(*errs, errors.New(fmt.Sprintf("Expected environment variable %s to have a string value, but it was a %T.", key, value)))
+				*errs = append(*errs, errors.NewWithFmt("Expected environment variable %s to have a string value, but it was a %T.", key, value))
 			}
 
 		})
 		return &result
 	default:
-		*errs = append(*errs, errors.New(fmt.Sprintf("Expected %s to be a set of key => value, but it was a %T.", key, envVars)))
+		*errs = append(*errs, errors.NewWithFmt("Expected %s to be a set of key => value, but it was a %T.", key, envVars))
 		return nil
 	}
 }
 
-func validateEnvVars(input generic.Map) (errs ManifestErrors) {
+func validateEnvVars(input generic.Map) (errs []error) {
 	generic.Each(input, func(key, value interface{}) {
 		if value == nil {
 			errs = append(errs, errors.New(fmt.Sprintf("env var '%s' should not be null", key)))

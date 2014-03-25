@@ -2,7 +2,6 @@ package manifest_test
 
 import (
 	. "cf/manifest"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"path/filepath"
@@ -17,48 +16,48 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 	Describe("given a directory containing a file called 'manifest.yml'", func() {
 		It("reads that file", func() {
-			m, errs := repo.ReadManifest("../../fixtures/manifests")
+			m, err := repo.ReadManifest("../../fixtures/manifests")
 
-			Expect(errs).To(BeEmpty())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/manifest.yml")))
 
-			applications, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			applications, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
 		})
 	})
 
 	Describe("given a directory that doesn't contain a file called 'manifest.y{a}ml'", func() {
 		It("returns an error", func() {
-			m, errs := repo.ReadManifest("../../fixtures")
+			m, err := repo.ReadManifest("../../fixtures")
 
-			Expect(errs).NotTo(BeEmpty())
+			Expect(err).To(HaveOccurred())
 			Expect(m.Path).To(BeEmpty())
 		})
 	})
 
 	Describe("given a directory that contains a file called 'manifest.yaml'", func() {
 		It("reads that file", func() {
-			m, errs := repo.ReadManifest("../../fixtures/manifests/only_yaml")
+			m, err := repo.ReadManifest("../../fixtures/manifests/only_yaml")
 
-			Expect(errs).To(BeEmpty())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/only_yaml/manifest.yaml")))
 
-			applications, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			applications, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
 		})
 	})
 
 	Describe("given a directory contains files called 'manifest.yml' and 'manifest.yaml'", func() {
 		It("reads the file named 'manifest.yml'", func() {
-			m, errs := repo.ReadManifest("../../fixtures/manifests/both_yaml_yml")
+			m, err := repo.ReadManifest("../../fixtures/manifests/both_yaml_yml")
 
-			Expect(errs).To(BeEmpty())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(m.Path).To(Equal(filepath.Clean("../../fixtures/manifests/both_yaml_yml/manifest.yml")))
 
-			applications, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			applications, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(*applications[0].Name).To(Equal("yml-extension"))
 		})
 	})
@@ -67,26 +66,26 @@ var _ = Describe("ManifestDiskRepository", func() {
 		var (
 			inputPath string
 			m         *Manifest
-			errs      ManifestErrors
+			err       error
 		)
 
 		BeforeEach(func() {
 			inputPath = filepath.Clean("../../fixtures/manifests/different-manifest.yml")
-			m, errs = repo.ReadManifest(inputPath)
+			m, err = repo.ReadManifest(inputPath)
 		})
 
 		It("reads the file at that path", func() {
-			Expect(errs).To(BeEmpty())
+			Expect(err).NotTo(HaveOccurred())
 			Expect(m.Path).To(Equal(inputPath))
 
-			applications, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			applications, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(*applications[0].Name).To(Equal("from-different-manifest"))
 		})
 
 		It("passes the base directory to the manifest file", func() {
-			applications, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
+			applications, err := m.Applications()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(len(applications)).To(Equal(1))
 			Expect(*applications[0].Name).To(Equal("from-different-manifest"))
 
@@ -97,8 +96,8 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 	Describe("given a path to a file that doesn't exist", func() {
 		It("returns an error", func() {
-			_, errs := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
-			Expect(errs).NotTo(BeEmpty())
+			_, err := repo.ReadManifest("some/path/that/doesnt/exist/manifest.yml")
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns empty string for the manifest path", func() {
@@ -109,11 +108,8 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 	Describe("when the manifest is not valid", func() {
 		It("returns an error", func() {
-			_, errs := repo.ReadManifest("../../fixtures/manifests/empty-manifest.yml")
-
-			fmt.Printf("\n errors: %v", errs)
-
-			Expect(errs).NotTo(BeEmpty())
+			_, err := repo.ReadManifest("../../fixtures/manifests/empty-manifest.yml")
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("returns the path to the manifest", func() {
@@ -124,22 +120,22 @@ var _ = Describe("ManifestDiskRepository", func() {
 	})
 
 	It("converts nested maps to generic maps", func() {
-		m, errs := repo.ReadManifest("../../fixtures/manifests/different-manifest.yml")
-		Expect(errs).To(BeEmpty())
+		m, err := repo.ReadManifest("../../fixtures/manifests/different-manifest.yml")
+		Expect(err).NotTo(HaveOccurred())
 
-		applications, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		applications, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]string{
 			"LD_LIBRARY_PATH": "/usr/lib/somewhere",
 		}))
 	})
 
 	It("merges manifests with their 'inherited' manifests", func() {
-		m, errs := repo.ReadManifest("../../fixtures/manifests/inherited-manifest.yml")
-		Expect(errs).To(BeEmpty())
+		m, err := repo.ReadManifest("../../fixtures/manifests/inherited-manifest.yml")
+		Expect(err).NotTo(HaveOccurred())
 
-		applications, errs := m.Applications()
-		Expect(errs).To(BeEmpty())
+		applications, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
 		Expect(*applications[0].Name).To(Equal("base-app"))
 		Expect(*applications[0].ServicesToBind).To(Equal([]string{"base-service"}))
 		Expect(*applications[0].EnvironmentVars).To(Equal(map[string]string{

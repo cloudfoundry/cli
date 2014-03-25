@@ -1,7 +1,7 @@
 package manifest
 
 import (
-	"errors"
+	"cf/errors"
 	"generic"
 	"github.com/fraenkel/candiedyaml"
 	"io"
@@ -10,7 +10,7 @@ import (
 )
 
 type ManifestRepository interface {
-	ReadManifest(string) (manifest *Manifest, errors ManifestErrors)
+	ReadManifest(string) (*Manifest, error)
 }
 
 type ManifestDiskRepository struct{}
@@ -19,24 +19,24 @@ func NewManifestDiskRepository() (repo ManifestRepository) {
 	return ManifestDiskRepository{}
 }
 
-func (repo ManifestDiskRepository) ReadManifest(inputPath string) (m *Manifest, errs ManifestErrors) {
-	m = NewEmptyManifest()
-
+func (repo ManifestDiskRepository) ReadManifest(inputPath string) (*Manifest, error) {
+	m := NewEmptyManifest()
 	manifestPath, err := repo.manifestPath(inputPath)
+
 	if err != nil {
-		errs = append(errs, errors.New("Error finding manifest: "+err.Error()))
-		return
+		return m, errors.NewWithError("Error finding manifest", err)
 	}
+
 	m.Path = manifestPath
 
 	mapp, err := repo.readAllYAMLFiles(manifestPath)
 	if err != nil {
-		errs = append(errs, err)
-		return
+		return m, err
 	}
+
 	m.Data = mapp
 
-	return
+	return m, nil
 }
 
 func (repo ManifestDiskRepository) readAllYAMLFiles(path string) (mergedMap generic.Map, err error) {
