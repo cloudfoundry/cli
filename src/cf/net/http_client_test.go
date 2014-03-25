@@ -254,8 +254,9 @@ Server: Apache-Coyote/1.1
 		})
 
 		It("provides a nice message for connection errors", func() {
-			err := WrapNetworkErrors("example.com", &url.Error{Err: &net.OpError{Err: syscall.Errno(61)}})
-			Expect(err.Error()).To(Equal("connection refused"))
+			underlyingErr := syscall.Errno(61)
+			err := WrapNetworkErrors("example.com", &url.Error{Err: &net.OpError{Err: underlyingErr}})
+			Expect(err).To(Equal(underlyingErr))
 		})
 
 		It("wraps other errors in a generic error type", func() {
