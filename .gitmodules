@@ -19,3 +19,6 @@
 [submodule "src/github.com/jteeuwen/go-bindata"]
 	path = src/github.com/jteeuwen/go-bindata
 	url = https://github.com/jteeuwen/go-bindata.git
+[submodule "src/github.com/cloudfoundry/gofileutils"]
+	path = src/github.com/cloudfoundry/gofileutils
+	url = https://github.com/cloudfoundry/gofileutils
