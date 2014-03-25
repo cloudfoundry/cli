@@ -108,6 +108,9 @@ func (app *AppParams) Merge(other *AppParams) {
 	if other.InstanceCount != nil {
 		app.InstanceCount = other.InstanceCount
 	}
+	if other.DiskQuota != nil {
+		app.DiskQuota = other.DiskQuota
+	}
 	if other.Memory != nil {
 		app.Memory = other.Memory
 	}

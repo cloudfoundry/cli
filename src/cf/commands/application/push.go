@@ -498,6 +498,14 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		appParams.InstanceCount = &instances
 	}
 
+	if c.String("k") != "" {
+		diskQuota, err := formatters.ToMegabytes(c.String("k"))
+		if err != nil {
+			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid disk quota param: %s\n%s", c.String("k"), err))
+			return
+		}
+		appParams.DiskQuota = &diskQuota
+	}
 
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
