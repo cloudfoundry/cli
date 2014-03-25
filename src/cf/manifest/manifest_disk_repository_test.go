@@ -59,7 +59,7 @@ var _ = Describe("ManifestDiskRepository", func() {
 
 			applications, errs := m.Applications()
 			Expect(errs).To(BeEmpty())
-			Expect(*applications[0].Name).To(Equal("from-default-manifest"))
+			Expect(*applications[0].Name).To(Equal("yml-extension"))
 		})
 	})
 

@@ -1,4 +1,4 @@
 ---
 applications:
-- name: from-default-manifest
+- name: yaml-yaml-yaml
   memory: 256mb

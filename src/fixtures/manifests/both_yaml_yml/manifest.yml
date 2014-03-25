@@ -1,4 +1,4 @@
 ---
 applications:
-- name: from-default-manifest
+- name: yml-extension
   memory: 256mb
