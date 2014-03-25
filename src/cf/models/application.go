@@ -74,7 +74,6 @@ type AppParams struct {
 	UseRandomHostname  bool
 	Path               *string
 	ServicesToBind     *[]string
-	ServicesToCreate   *[]map[string]string
 	SpaceGuid          *string
 	StackGuid          *string
 	StackName          *string

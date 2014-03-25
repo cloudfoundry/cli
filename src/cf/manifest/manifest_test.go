@@ -362,25 +362,7 @@ var _ = Describe("Manifests", func() {
 		})
 
 		It("can read a list of service instance properties", func() {
-			m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
-				"services": []map[interface{}]interface{}{
-					map[interface{}]interface{}{
-						"name": "my-service-instance",
-						"type": "my-service-label",
-						"plan": "my-service-plan",
-					},
-				},
-			}))
 
-			app, errs := m.Applications()
-			Expect(errs).To(BeEmpty())
-
-			Expect(len(*app[0].ServicesToCreate)).To(Equal(1))
-
-			serviceMap := (*app[0].ServicesToCreate)[0]
-			Expect(serviceMap["name"]).To(Equal("my-service-instance"))
-			Expect(serviceMap["type"]).To(Equal("my-service-label"))
-			Expect(serviceMap["plan"]).To(Equal("my-service-plan"))
 		})
 	})
 })
