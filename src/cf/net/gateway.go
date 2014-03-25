@@ -345,7 +345,7 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiErr error) {
 	rawResponse, err := gateway.doRequest(request.HttpReq)
 	if err != nil {
-		apiErr = WrapSSLErrors(request.HttpReq.URL.Host, err)
+		apiErr = WrapNetworkErrors(request.HttpReq.URL.Host, err)
 		return
 	}
 

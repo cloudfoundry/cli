@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"syscall"
 )
 
 var _ = Describe("HTTP Client", func() {
@@ -215,45 +216,50 @@ Server: Apache-Coyote/1.1
 		})
 	})
 
-	Describe("WrapSSLErrors", func() {
+	Describe("WrapNetworkErrors", func() {
 		It("replaces http unknown authority errors with InvalidSSLCert errors", func() {
-			err, ok := WrapSSLErrors("example.com", &url.Error{Err: x509.UnknownAuthorityError{}}).(*errors.InvalidSSLCert)
+			err, ok := WrapNetworkErrors("example.com", &url.Error{Err: x509.UnknownAuthorityError{}}).(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("replaces http hostname errors with InvalidSSLCert errors", func() {
-			err, ok := WrapSSLErrors("example.com", &url.Error{Err: x509.HostnameError{}}).(*errors.InvalidSSLCert)
+			err, ok := WrapNetworkErrors("example.com", &url.Error{Err: x509.HostnameError{}}).(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("replaces http certificate invalid errors with InvalidSSLCert errors", func() {
-			err, ok := WrapSSLErrors("example.com", &url.Error{Err: x509.CertificateInvalidError{}}).(*errors.InvalidSSLCert)
+			err, ok := WrapNetworkErrors("example.com", &url.Error{Err: x509.CertificateInvalidError{}}).(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("replaces websocket unknown authority errors with InvalidSSLCert errors", func() {
-			err, ok := WrapSSLErrors("example.com", &websocket.DialError{Err: x509.UnknownAuthorityError{}}).(*errors.InvalidSSLCert)
+			err, ok := WrapNetworkErrors("example.com", &websocket.DialError{Err: x509.UnknownAuthorityError{}}).(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("replaces websocket hostname with InvalidSSLCert errors", func() {
-			err, ok := WrapSSLErrors("example.com", &websocket.DialError{Err: x509.HostnameError{}}).(*errors.InvalidSSLCert)
+			err, ok := WrapNetworkErrors("example.com", &websocket.DialError{Err: x509.HostnameError{}}).(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(err).To(HaveOccurred())
 		})
 
 		It("replaces http websocket certificate invalid errors with InvalidSSLCert errors", func() {
-			err, ok := WrapSSLErrors("example.com", &websocket.DialError{Err: x509.CertificateInvalidError{}}).(*errors.InvalidSSLCert)
+			err, ok := WrapNetworkErrors("example.com", &websocket.DialError{Err: x509.CertificateInvalidError{}}).(*errors.InvalidSSLCert)
 			Expect(ok).To(BeTrue())
 			Expect(err).To(HaveOccurred())
 		})
 
+		It("provides a nice message for connection errors", func() {
+			err := WrapNetworkErrors("example.com", &url.Error{Err: &net.OpError{Err: syscall.Errno(61)}})
+			Expect(err.Error()).To(Equal("connection refused"))
+		})
+
 		It("wraps other errors in a generic error type", func() {
-			err := WrapSSLErrors("example.com", errors.New("whatever"))
+			err := WrapNetworkErrors("example.com", errors.New("whatever"))
 			Expect(err).To(HaveOccurred())
 
 			_, ok := err.(*errors.InvalidSSLCert)
