@@ -9,8 +9,8 @@ import (
 	"cf/models"
 	"cf/net"
 	"encoding/json"
-	"fileutils"
 	"fmt"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"mime/multipart"
 	"net/textproto"
@@ -189,7 +189,7 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(appDir, destDir 
 				return
 			}
 
-			err = fileutils.SetExecutableBits(destFilePath, f.FileInfo())
+			err = os.Chmod(destFilePath, f.FileInfo().Mode())
 			if err != nil {
 				return
 			}

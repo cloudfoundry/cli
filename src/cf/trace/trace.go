@@ -1,7 +1,7 @@
 package trace
 
 import (
-	"fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	"io"
 	"log"
 	"os"
@@ -57,7 +57,7 @@ func newStdoutLogger() Printer {
 }
 
 func newFileLogger(path string) Printer {
-	file, err := fileutils.OpenFile(path)
+	file, err := fileutils.Open(path)
 	if err != nil {
 		logger := newStdoutLogger()
 		logger.Printf("CF_TRACE ERROR CREATING LOG FILE %s:\n%s", path, err)

@@ -2,7 +2,7 @@ package configuration_test
 
 import (
 	. "cf/configuration"
-	"fileutils"
+	"github.com/cloudfoundry/gofileutils/fileutils"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"
