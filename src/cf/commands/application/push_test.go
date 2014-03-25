@@ -229,93 +229,125 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("creates an app from the flags provided on the command line", func() {
-		domainRepo.FindByNameInOrgDomain = models.DomainFields{
-			Name: "bar.cf-app.com",
-			Guid: "bar-domain-guid",
-		}
-		routeRepo.FindByHostAndDomainErr = true
-		stackRepo.FindByNameStack = models.Stack{
-			Name: "customLinux",
-			Guid: "custom-linux-guid",
-		}
-		appRepo.ReadNotFound = true
+	Describe("creates an app from the flags provided on the command line", func() {
+		It("sets the app params from the flags", func() {
+			domainRepo.FindByNameInOrgDomain = models.DomainFields{
+				Name: "bar.cf-app.com",
+				Guid: "bar-domain-guid",
+			}
+			routeRepo.FindByHostAndDomainErr = true
+			stackRepo.FindByNameStack = models.Stack{
+				Name: "customLinux",
+				Guid: "custom-linux-guid",
+			}
+			appRepo.ReadNotFound = true
 
-		callPush(
-			"-c", "unicorn -c config/unicorn.rb -D",
-			"-d", "bar.cf-app.com",
-			"-n", "my-hostname",
-			"-k", "4G",
-			"-i", "3",
-			"-m", "2G",
-			"-b", "https://github.com/heroku/heroku-buildpack-play.git",
-			"-s", "customLinux",
-			"-t", "1",
-			"--no-start",
-			"my-new-app",
-		)
+			callPush(
+				"-c", "unicorn -c config/unicorn.rb -D",
+				"-d", "bar.cf-app.com",
+				"-n", "my-hostname",
+				"-k", "4G",
+				"-i", "3",
+				"-m", "2G",
+				"-b", "https://github.com/heroku/heroku-buildpack-play.git",
+				"-s", "customLinux",
+				"-t", "1",
+				"--no-start",
+				"my-new-app",
+			)
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Using", "customLinux"},
-			{"OK"},
-			{"Creating app", "my-new-app"},
-			{"OK"},
-			{"Creating Route", "my-hostname.bar.cf-app.com"},
-			{"OK"},
-			{"Binding", "my-hostname.bar.cf-app.com", "my-new-app"},
-			{"Uploading", "my-new-app"},
-			{"OK"},
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Using", "customLinux"},
+				{"OK"},
+				{"Creating app", "my-new-app"},
+				{"OK"},
+				{"Creating Route", "my-hostname.bar.cf-app.com"},
+				{"OK"},
+				{"Binding", "my-hostname.bar.cf-app.com", "my-new-app"},
+				{"Uploading", "my-new-app"},
+				{"OK"},
+			})
+
+			Expect(stackRepo.FindByNameName).To(Equal("customLinux"))
+
+			Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
+			Expect(*appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
+			Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(3))
+			Expect(*appRepo.CreatedAppParams().DiskQuota).To(Equal(uint64(4096)))
+			Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(2048)))
+			Expect(*appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
+			Expect(*appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))
+			Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
+
+			Expect(domainRepo.FindByNameInOrgName).To(Equal("bar.cf-app.com"))
+			Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
+
+			Expect(routeRepo.CreatedHost).To(Equal("my-hostname"))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal("bar-domain-guid"))
+			Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+			Expect(routeRepo.BoundRouteGuid).To(Equal("my-hostname-route-guid"))
+
+			Expect(appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
+
+			Expect(starter.AppToStart.Name).To(Equal(""))
 		})
 
-		Expect(stackRepo.FindByNameName).To(Equal("customLinux"))
+		Describe("checks for bad flags", func() {
 
-		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
-		Expect(*appRepo.CreatedAppParams().Command).To(Equal("unicorn -c config/unicorn.rb -D"))
-		Expect(*appRepo.CreatedAppParams().InstanceCount).To(Equal(3))
-		Expect(*appRepo.CreatedAppParams().DiskQuota).To(Equal(uint64(4096)))
-		Expect(*appRepo.CreatedAppParams().Memory).To(Equal(uint64(2048)))
-		Expect(*appRepo.CreatedAppParams().StackGuid).To(Equal("custom-linux-guid"))
-		Expect(*appRepo.CreatedAppParams().HealthCheckTimeout).To(Equal(1))
-		Expect(*appRepo.CreatedAppParams().BuildpackUrl).To(Equal("https://github.com/heroku/heroku-buildpack-play.git"))
+			It("fails when non-positive value is given for memory limit", func() {
+				callPush(
+					"-m", "0G",
+					"my-new-app",
+				)
 
-		Expect(domainRepo.FindByNameInOrgName).To(Equal("bar.cf-app.com"))
-		Expect(domainRepo.FindByNameInOrgGuid).To(Equal("my-org-guid"))
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"FAILED"},
+					{"memory"},
+					{"positive integer"},
+				})
+			})
 
-		Expect(routeRepo.CreatedHost).To(Equal("my-hostname"))
-		Expect(routeRepo.CreatedDomainGuid).To(Equal("bar-domain-guid"))
-		Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
-		Expect(routeRepo.BoundRouteGuid).To(Equal("my-hostname-route-guid"))
+			It("fails when non-positive value is given for disk quota", func() {
+				callPush(
+					"-k", "-1G",
+					"my-new-app",
+				)
 
-		Expect(appBitsRepo.UploadedAppGuid).To(Equal("my-new-app-guid"))
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"FAILED"},
+					{"disk quota"},
+					{"positive integer"},
+				})
+			})
 
-		Expect(starter.AppToStart.Name).To(Equal(""))
-	})
+			It("fails when a non-numeric start timeout is given", func() {
+				appRepo.ReadNotFound = true
 
-	It("fails when a non-numeric start timeout is given", func() {
-		appRepo.ReadNotFound = true
+				callPush(
+					"-t", "FooeyTimeout",
+					"my-new-app",
+				)
 
-		callPush(
-			"-t", "FooeyTimeout",
-			"my-new-app",
-		)
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"FAILED"},
+					{"invalid", "timeout"},
+				})
+			})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"FAILED"},
-			{"invalid", "timeout"},
+			It("resets the app's command when the -c flag is provided as 'null'", func() {
+				existingApp := models.Application{}
+				existingApp.Name = "existing-app"
+				existingApp.Guid = "existing-app-guid"
+				existingApp.Command = "unicorn -c config/unicorn.rb -D"
+
+				appRepo.ReadApp = existingApp
+
+				callPush("-c", "null", "existing-app")
+
+				Expect(*appRepo.UpdateParams.Command).To(Equal(""))
+			})
+
 		})
-	})
-
-	It("resets the app's command when the -c flag is provided as 'null'", func() {
-		existingApp := models.Application{}
-		existingApp.Name = "existing-app"
-		existingApp.Guid = "existing-app-guid"
-		existingApp.Command = "unicorn -c config/unicorn.rb -D"
-
-		appRepo.ReadApp = existingApp
-
-		callPush("-c", "null", "existing-app")
-
-		Expect(*appRepo.UpdateParams.Command).To(Equal(""))
 	})
 
 	It("merges env vars from the manifest with those from the server", func() {

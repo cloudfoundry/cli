@@ -42,7 +42,7 @@ func ByteSize(bytes uint64) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
-var bytesPattern *regexp.Regexp = regexp.MustCompile("(?i)^(\\d+)([KMGT])B?$")
+var bytesPattern *regexp.Regexp = regexp.MustCompile("(?i)^(-?\\d+)([KMGT])B?$")
 
 func ToMegabytes(s string) (megabytes uint64, err error) {
 	parts := bytesPattern.FindStringSubmatch(s)
@@ -52,9 +52,16 @@ func ToMegabytes(s string) (megabytes uint64, err error) {
 	}
 
 	var quantity uint64
-	quantity, err = strconv.ParseUint(parts[1], 10, 0)
+	value, err := strconv.ParseInt(parts[1], 10, 0)
 	if err != nil {
 		return
+	}
+
+	if value < 1 {
+		err = errors.New("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB")
+		return
+	} else {
+		quantity = uint64(value)
 	}
 
 	var bytes uint64
