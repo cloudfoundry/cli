@@ -1,10 +1,10 @@
 package words
 
 import (
-    "bytes"
-    "compress/gzip"
-    "fmt"
-    "io"
+	"bytes"
+	"compress/gzip"
+	"fmt"
+	"io"
 )
 
 func bindata_read(data []byte, name string) ([]byte, error) {
@@ -11580,7 +11580,7 @@ func src_words_dict_adjectives_txt() ([]byte, error) {
 		0xf7, 0x33, 0x36, 0x93, 0xf7, 0xcb, 0xad, 0xbf, 0x17, 0x85, 0x8c, 0x73,
 		0x60, 0xed, 0xe6, 0xa8, 0xb4, 0xf7, 0xcb, 0x7b, 0xee, 0xff, 0x03, 0x00,
 		0x00, 0xff, 0xff, 0x63, 0x93, 0x4c, 0xee, 0x82, 0xec, 0x06, 0x00,
-		},
+	},
 		"src/words/dict/adjectives.txt",
 	)
 }
@@ -28983,11 +28983,10 @@ func src_words_dict_nouns_txt() ([]byte, error) {
 		0x06, 0xbd, 0xf4, 0xf2, 0xd4, 0x06, 0xb8, 0xb2, 0x95, 0xc6, 0x21, 0x40,
 		0xb0, 0xf9, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xba, 0x00, 0xb9, 0xcd,
 		0x8d, 0xbe, 0x09, 0x00,
-		},
+	},
 		"src/words/dict/nouns.txt",
 	)
 }
-
 
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
@@ -29000,8 +28999,7 @@ func Asset(name string) ([]byte, error) {
 }
 
 // _bindata is a table, holding each asset generator, mapped to its name.
-var _bindata = map[string] func() ([]byte, error) {
+var _bindata = map[string]func() ([]byte, error){
 	"src/words/dict/adjectives.txt": src_words_dict_adjectives_txt,
-	"src/words/dict/nouns.txt": src_words_dict_nouns_txt,
-
+	"src/words/dict/nouns.txt":      src_words_dict_nouns_txt,
 }

@@ -8,13 +8,13 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
-	"net"
 )
 
 const (
