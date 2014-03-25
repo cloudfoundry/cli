@@ -38,7 +38,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		})
 
-		It("TestDeleteOrphanedRoutesWithConfirmation", func() {
+		It("passes when confirmation is provided", func() {
 			var ui *testterm.FakeUI
 			domain := models.DomainFields{Name: "example.com"}
 			domain2 := models.DomainFields{Name: "cookieclicker.co"}
@@ -70,7 +70,7 @@ var _ = Describe("delete-orphaned-routes command", func() {
 			Expect(routeRepo.DeleteRouteGuid).To(Equal("route2-guid"))
 		})
 
-		It("TestDeleteOrphanedRoutesWithForce", func() {
+		It("passes when the force flag is used", func() {
 			var ui *testterm.FakeUI
 			domain := models.DomainFields{Name: "example.com"}
 			domain2 := models.DomainFields{Name: "cookieclicker.co"}
