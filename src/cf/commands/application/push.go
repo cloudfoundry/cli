@@ -462,20 +462,6 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		appParams.Name = &c.Args()[0]
 	}
 
-	if c.String("b") != "" {
-		buildpack := c.String("b")
-		appParams.BuildpackUrl = &buildpack
-	}
-
-	if c.String("m") != "" {
-		memory, err := formatters.ToMegabytes(c.String("m"))
-		if err != nil {
-			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid memory param: %s\n%s", c.String("m"), err))
-			return
-		}
-		appParams.Memory = &memory
-	}
-
 	appParams.NoRoute = c.Bool("no-route")
 	appParams.UseRandomHostname = c.Bool("random-route")
 
@@ -484,9 +470,9 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		appParams.Host = &hostname
 	}
 
-	if c.String("d") != "" {
-		domain := c.String("d")
-		appParams.Domain = &domain
+	if c.String("b") != "" {
+		buildpack := c.String("b")
+		appParams.BuildpackUrl = &buildpack
 	}
 
 	if c.String("c") != "" {
@@ -499,12 +485,32 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		appParams.Command = &emptyStr
 	}
 
+	if c.String("d") != "" {
+		domain := c.String("d")
+		appParams.Domain = &domain
+	}
+
 	if c.String("i") != "" {
 		instances, err := strconv.Atoi(c.String("i"))
 		if err != nil {
 			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid instances param: %s\n%s", c.String("i"), err))
 		}
 		appParams.InstanceCount = &instances
+	}
+
+
+	if c.String("m") != "" {
+		memory, err := formatters.ToMegabytes(c.String("m"))
+		if err != nil {
+			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid memory param: %s\n%s", c.String("m"), err))
+			return
+		}
+		appParams.Memory = &memory
+	}
+
+	if c.String("p") != "" {
+		path := c.String("p")
+		appParams.Path = &path
 	}
 
 	if c.String("s") != "" {
@@ -519,11 +525,6 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		}
 
 		appParams.HealthCheckTimeout = &timeout
-	}
-
-	if c.String("p") != "" {
-		path := c.String("p")
-		appParams.Path = &path
 	}
 
 	return
