@@ -356,6 +356,45 @@ var _ = Describe("Login Command", func() {
 					{"Failed"},
 				})
 			})
+
+			It("prompts user for password again if password given on the cmd line fails", func() {
+				authRepo.AuthError = true
+
+				Flags = []string{"-p", "the-password-1"}
+
+				ui.Inputs = []string{"api.example.com", "the-account-number", "the-department-number",
+					"the-pin-1",
+					"the-pin-2", "the-password-2",
+					"the-pin-3", "the-password-3"}
+
+				l := NewLogin(ui, Config, authRepo, endpointRepo, orgRepo, spaceRepo)
+				testcmd.RunCommand(l, testcmd.NewContext("login", Flags), nil)
+
+				Expect(authRepo.AuthenticateArgs.Credentials).To(Equal([]map[string]string{
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin-1",
+						"password":          "the-password-1",
+					},
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin-2",
+						"password":          "the-password-2",
+					},
+					{
+						"account_number":    "the-account-number",
+						"department_number": "the-department-number",
+						"pin":               "the-pin-3",
+						"password":          "the-password-3",
+					},
+				}))
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Failed"},
+				})
+			})
 		})
 	})
 
