@@ -80,6 +80,9 @@ func (cmd Login) decideEndpoint(c *cli.Context) (string, bool) {
 }
 
 func (cmd Login) authenticate(c *cli.Context) {
+	usernameFlagValue := c.String("u")
+	passwordFlagValue := c.String("p")
+
 	prompts, err := cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 	if err != nil {
 		cmd.ui.Failed(err.Error())
@@ -89,8 +92,8 @@ func (cmd Login) authenticate(c *cli.Context) {
 	for key, prompt := range prompts {
 		if prompt.Type == configuration.AuthPromptTypePassword {
 			passwordKeys = append(passwordKeys, key)
-		} else if key == "username" && c.String("u") != "" {
-			credentials[key] = c.String("u")
+		} else if key == "username" && usernameFlagValue != "" {
+			credentials[key] = usernameFlagValue
 		} else {
 			credentials[key] = cmd.ui.Ask("%s%s", prompt.DisplayName, terminal.PromptColor(">"))
 		}
@@ -98,14 +101,12 @@ func (cmd Login) authenticate(c *cli.Context) {
 
 	for i := 0; i < maxLoginTries; i++ {
 		for _, key := range passwordKeys {
-			value := ""
-			if key == "password" && c.String("p") != "" {
-				value = c.String("p")
+			if key == "password" && passwordFlagValue != "" {
+				credentials[key] = passwordFlagValue
+				passwordFlagValue = ""
 			} else {
-				value = cmd.ui.AskForPassword("%s%s", prompts[key].DisplayName, terminal.PromptColor(">"))
+				credentials[key] = cmd.ui.AskForPassword("%s%s", prompts[key].DisplayName, terminal.PromptColor(">"))
 			}
-
-			credentials[key] = value
 		}
 
 		cmd.ui.Say("Authenticating...")
