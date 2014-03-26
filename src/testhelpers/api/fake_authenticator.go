@@ -10,7 +10,8 @@ type FakeAuthenticationRepository struct {
 	AuthenticateArgs struct {
 		Credentials []map[string]string
 	}
-	GetLoginPromptsReturns struct {
+	GetLoginPromptsWasCalled bool
+	GetLoginPromptsReturns   struct {
 		Error   error
 		Prompts map[string]configuration.AuthPrompt
 	}
@@ -43,6 +44,7 @@ func (auth *FakeAuthenticationRepository) RefreshAuthToken() (updatedToken strin
 }
 
 func (auth *FakeAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr error) {
+	auth.GetLoginPromptsWasCalled = true
 	prompts = auth.GetLoginPromptsReturns.Prompts
 	apiErr = auth.GetLoginPromptsReturns.Error
 	return

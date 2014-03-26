@@ -36,6 +36,7 @@ func (cmd Authenticate) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd Authenticate) Run(c *cli.Context) {
 	cmd.config.ClearSession()
+	cmd.authenticator.GetLoginPromptsAndSaveUAAServerURL()
 
 	cmd.ui.Say("API endpoint: %s", terminal.EntityNameColor(cmd.config.ApiEndpoint()))
 	cmd.ui.Say("Authenticating...")
