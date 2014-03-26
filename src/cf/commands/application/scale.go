@@ -3,11 +3,11 @@ package application
 import (
 	"cf/api"
 	"cf/configuration"
+	"cf/errors"
 	"cf/formatters"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
 
@@ -72,9 +72,7 @@ func (cmd *Scale) Run(c *cli.Context) {
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
-			cmd.ui.Say("Invalid value for memory")
-			cmd.ui.FailWithUsage(c, "scale")
-			return
+			cmd.ui.Failed("Invalid memory limit: %s\n%s", c.String("m"), err)
 		}
 		params.Memory = &memory
 		shouldRestart = true
@@ -83,17 +81,19 @@ func (cmd *Scale) Run(c *cli.Context) {
 	if c.String("k") != "" {
 		diskQuota, err := formatters.ToMegabytes(c.String("k"))
 		if err != nil {
-			cmd.ui.Say("Invalid value for disk")
-			cmd.ui.FailWithUsage(c, "scale")
-			return
+			cmd.ui.Failed("Invalid disk quota: %s\n%s", c.String("k"), err)
 		}
 		params.DiskQuota = &diskQuota
 		shouldRestart = true
 	}
 
-	instances := c.Int("i")
-	if instances != -1 {
-		params.InstanceCount = &instances
+	if c.IsSet("i") {
+		instances := c.Int("i")
+		if instances > 0 {
+			params.InstanceCount = &instances
+		} else {
+			cmd.ui.Failed("Invalid instance count: %d\nInstance count must be a positive integer", instances)
+		}
 	}
 
 	if shouldRestart && !cmd.confirmRestart(c, currentApp.Name) {
@@ -131,5 +131,5 @@ func (cmd *Scale) confirmRestart(context *cli.Context, appName string) bool {
 }
 
 func anyFlagsSet(context *cli.Context) bool {
-	return context.String("m") != "" || context.String("k") != "" || context.Int("i") != -1
+	return context.IsSet("m") || context.IsSet("k") || context.IsSet("i")
 }

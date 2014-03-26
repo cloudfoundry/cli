@@ -323,7 +323,8 @@ var _ = Describe("Push Command", func() {
 
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"FAILED"},
-					{"Instances", "positive integer"},
+					{"instance count"},
+					{"positive integer"},
 				})
 			})
 

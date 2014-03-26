@@ -497,13 +497,10 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		appParams.Domain = &domain
 	}
 
-	if c.String("i") != "" {
-		instances, err := strconv.Atoi(c.String("i"))
-		if err != nil {
-			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid instances param: %s\n%s", c.String("i"), err))
-		}
+	if c.IsSet("i") {
+		instances := c.Int("i")
 		if instances < 1 {
-			cmd.ui.Failed(fmt.Sprintf("Instances %d must be a positive integer", instances))
+			cmd.ui.Failed("Invalid instance count: %d\nInstance count must be a positive integer", instances)
 		}
 		appParams.InstanceCount = &instances
 	}
@@ -511,8 +508,7 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 	if c.String("k") != "" {
 		diskQuota, err := formatters.ToMegabytes(c.String("k"))
 		if err != nil {
-			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid disk quota param: %s\n%s", c.String("k"), err))
-			return
+			cmd.ui.Failed("Invalid disk quota: %s\n%s", c.String("k"), err)
 		}
 		appParams.DiskQuota = &diskQuota
 	}
@@ -520,8 +516,7 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 	if c.String("m") != "" {
 		memory, err := formatters.ToMegabytes(c.String("m"))
 		if err != nil {
-			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid memory param: %s\n%s", c.String("m"), err))
-			return
+			cmd.ui.Failed("Invalid memory limit: %s\n%s", c.String("m"), err)
 		}
 		appParams.Memory = &memory
 	}
