@@ -4,15 +4,12 @@ import (
 	"cf"
 	"cf/api"
 	"cf/configuration"
-	cferrors "cf/errors"
+	"cf/errors"
 	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
-	"errors"
 	"github.com/codegangsta/cli"
 )
-
-const AppAlreadyBoundErrorCode = "90003"
 
 type BindService struct {
 	ui                 terminal.UI
@@ -65,7 +62,7 @@ func (cmd *BindService) Run(c *cli.Context) {
 
 	err := cmd.BindApplication(app, serviceInstance)
 	if err != nil {
-		if err, ok := err.(cferrors.HttpError); ok && err.ErrorCode() == AppAlreadyBoundErrorCode {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.APP_ALREADY_BOUND {
 			cmd.ui.Ok()
 			cmd.ui.Warn("App %s is already bound to %s.", app.Name, serviceInstance.Name)
 			return
