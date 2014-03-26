@@ -88,6 +88,15 @@ var _ = Describe("Push Command", func() {
 			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
+
+		// yes, we're aware that the args here should probably be provided in a different order
+		// erg: app-name -p some/path some-extra-arg
+		// but the test infrastructure for parsing args and flags is sorely lacking
+		It("fails when provided too many args", func() {
+			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{"-p", "path", "too-much", "app-name"}), reqFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
 	})
 
 	It("successfully pushes an app when the CC API only supports the old domains endpoints", func() {
