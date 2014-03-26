@@ -67,6 +67,38 @@ var _ = Describe("scale command", func() {
 		})
 	})
 
+	Describe("checking for bad flags", func() {
+		It("fails when non-positive value is given for memory limit", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-m", "0M", "my-app"}), reqFactory)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"memory"},
+				{"positive integer"},
+			})
+		})
+
+		It("fails when non-positive value is given for instances", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-i", "-15", "my-app"}), reqFactory)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"Instance count"},
+				{"positive integer"},
+			})
+		})
+
+		It("fails when non-positive value is given for disk quota", func() {
+			testcmd.RunCommand(cmd, testcmd.NewContext("scale", []string{"-k", "-1G", "my-app"}), reqFactory)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"FAILED"},
+				{"disk quota"},
+				{"positive integer"},
+			})
+		})
+	})
+
 	Describe("scaling an app", func() {
 		BeforeEach(func() {
 			app := maker.NewApp(maker.Overrides{"name": "my-app", "guid": "my-app-guid"})

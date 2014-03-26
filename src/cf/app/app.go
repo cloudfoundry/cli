@@ -508,7 +508,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("c", "Startup command, set to null to reset to default start command"),
 				NewStringFlag("d", "Domain (e.g. example.com)"),
 				NewStringFlag("f", "Path to manifest"),
-				NewStringFlag("i", "Number of instances"),
+				NewIntFlag("i", "Number of instances"),
 				NewStringFlag("k", "Disk quota (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("n", "Hostname (e.g. my-subdomain)"),
@@ -596,7 +596,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Description: "Change or view the instance count, disk space limit, and memory limit for an app",
 			Usage:       fmt.Sprintf("%s scale APP [-i INSTANCES] [-k DISK] [-m MEMORY] [-f]", cf.Name()),
 			Flags: []cli.Flag{
-				NewIntFlagWithValue("i", "Number of instances", -1),
+				NewIntFlag("i", "Number of instances"),
 				NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 				cli.BoolFlag{Name: "f", Usage: "Force restart of app without prompt"},
