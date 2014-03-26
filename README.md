@@ -8,21 +8,21 @@ Stable Release
 
 Installers
 ----------
-- [Debian 32 bit](https://s3.amazonaws.com/go-cli/releases/latest/cf-cli_i386.deb)
-- [Debian 64 bit](https://s3.amazonaws.com/go-cli/releases/latest/cf-cli_amd64.deb)
-- [Redhat 32 bit](https://s3.amazonaws.com/go-cli/releases/latest/cf-cli_i386.rpm)
-- [Redhat 64 bit](https://s3.amazonaws.com/go-cli/releases/latest/cf-cli_amd64.rpm)
-- [Mac OS X 64 bit](https://s3.amazonaws.com/go-cli/releases/latest/installer-osx-amd64.pkg)
-- [Windows 32 bit](https://s3.amazonaws.com/go-cli/releases/latest/installer-windows-386.zip)
-- [Windows 64 bit](https://s3.amazonaws.com/go-cli/releases/latest/installer-windows-amd64.zip)
+- [Debian 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_i386.deb)
+- [Debian 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_amd64.deb)
+- [Redhat 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_i386.rpm)
+- [Redhat 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-cli_amd64.rpm)
+- [Mac OS X 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-osx-amd64.pkg)
+- [Windows 32 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-windows-386.zip)
+- [Windows 64 bit](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/installer-windows-amd64.zip)
 
 Binaries
 --------
-- [Linux 32 bit binary](https://s3.amazonaws.com/go-cli/releases/latest/cf-linux-386.tgz)
-- [Linux 64 bit binary](https://s3.amazonaws.com/go-cli/releases/latest/cf-linux-amd64.tgz)
-- [Mac OS X 64 bit binary](https://s3.amazonaws.com/go-cli/releases/latest/cf-darwin-amd64.tgz)
-- [Windows 32 bit binary](https://s3.amazonaws.com/go-cli/releases/latest/cf-windows-386.zip)
-- [Windows 64 bit binary](https://s3.amazonaws.com/go-cli/releases/latest/cf-windows-amd64.zip)
+- [Linux 32 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-linux-386.tgz)
+- [Linux 64 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-linux-amd64.tgz)
+- [Mac OS X 64 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-darwin-amd64.tgz)
+- [Windows 32 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-windows-386.zip)
+- [Windows 64 bit binary](http://go-cli.s3-website-us-east-1.amazonaws.com/releases/latest/cf-windows-amd64.zip)
 
 
 Edge Releases (master)
