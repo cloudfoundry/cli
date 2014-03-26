@@ -302,7 +302,6 @@ var _ = Describe("Push Command", func() {
 		})
 
 		Describe("checks for bad flags", func() {
-
 			It("fails when non-positive value is given for memory limit", func() {
 				callPush(
 					"-m", "0G",
@@ -313,6 +312,18 @@ var _ = Describe("Push Command", func() {
 					{"FAILED"},
 					{"memory"},
 					{"positive integer"},
+				})
+			})
+
+			It("fails when non-positive value is given for instances", func() {
+				callPush(
+					"-i", "0",
+					"my-new-app",
+				)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"FAILED"},
+					{"Instances", "positive integer"},
 				})
 			})
 

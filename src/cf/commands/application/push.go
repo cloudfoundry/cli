@@ -502,6 +502,9 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 		if err != nil {
 			cmd.ui.Failed("Error: %s", errors.NewWithFmt("Invalid instances param: %s\n%s", c.String("i"), err))
 		}
+		if instances < 1 {
+			cmd.ui.Failed(fmt.Sprintf("Instances %d must be a positive integer", instances))
+		}
 		appParams.InstanceCount = &instances
 	}
 
