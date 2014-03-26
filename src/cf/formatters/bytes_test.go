@@ -12,7 +12,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(ByteSize(uint64(100.5 * MEGABYTE))).To(Equal("100.5M"))
 	})
 
-	It("TestParsesByteAmounts", func() {
+	It("parses byte amounts with short units (e.g. M, G)", func() {
 		var (
 			megabytes uint64
 			err       error
@@ -35,7 +35,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("TestParsesByteAmountsWithLongUnits", func() {
+	It("parses byte amounts with long units (e.g MB, GB)", func() {
 		var (
 			megabytes uint64
 			err       error
@@ -58,23 +58,33 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("TestDoesNotParseAmountsWithoutUnits", func() {
+	It("returns an error when the unit is missing", func() {
 		_, err := ToMegabytes("5")
 		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unit of measurement"))
 	})
 
-	It("TestDoesNotParseAmountsWithUnknownSuffixes", func() {
+	It("returns an error when the unit is unrecognized", func() {
 		_, err := ToMegabytes("5MBB")
 		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unit of measurement"))
 	})
 
-	It("TestDoesNotParseAmountsWithUnknownPrefixes", func() {
-		_, err := ToMegabytes(" 5MB")
-		Expect(err).To(HaveOccurred())
+	It("allows whitespace before and after the value", func() {
+		megabytes, err := ToMegabytes("\t\n\r 5MB ")
+		Expect(megabytes).To(Equal(uint64(5)))
+		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("Does not allow non-positive values", func() {
+	It("returns an error for negative values", func() {
 		_, err := ToMegabytes("-5MB")
 		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unit of measurement"))
+	})
+
+	It("returns an error for zero values", func() {
+		_, err := ToMegabytes("0TB")
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("unit of measurement"))
 	})
 })
