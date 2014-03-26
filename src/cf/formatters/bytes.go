@@ -42,41 +42,33 @@ func ByteSize(bytes uint64) string {
 	return fmt.Sprintf("%s%s", stringValue, unit)
 }
 
-var bytesPattern *regexp.Regexp = regexp.MustCompile("(?i)^(-?\\d+)([KMGT])B?$")
-
-func ToMegabytes(s string) (megabytes uint64, err error) {
-	parts := bytesPattern.FindStringSubmatch(s)
+func ToMegabytes(s string) (uint64, error) {
+	parts := bytesPattern.FindStringSubmatch(strings.TrimSpace(s))
 	if len(parts) < 3 {
-		err = errors.New("Could not parse byte quantity '" + s + "'")
-		return
+		return 0, invalidByteQuantityError
 	}
 
-	var quantity uint64
-	value, err := strconv.ParseInt(parts[1], 10, 0)
-	if err != nil {
-		return
-	}
-
-	if value < 1 {
-		err = errors.New("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB")
-		return
-	} else {
-		quantity = uint64(value)
+	value, err := strconv.ParseUint(parts[1], 10, 0)
+	if err != nil || value < 1 {
+		return 0, invalidByteQuantityError
 	}
 
 	var bytes uint64
 	unit := strings.ToUpper(parts[2])
 	switch unit {
 	case "T":
-		bytes = quantity * TERABYTE
+		bytes = value * TERABYTE
 	case "G":
-		bytes = quantity * GIGABYTE
+		bytes = value * GIGABYTE
 	case "M":
-		bytes = quantity * MEGABYTE
+		bytes = value * MEGABYTE
 	case "K":
-		bytes = quantity * KILOBYTE
+		bytes = value * KILOBYTE
 	}
 
-	megabytes = bytes / MEGABYTE
-	return
+	return bytes / MEGABYTE, nil
 }
+
+var bytesPattern *regexp.Regexp = regexp.MustCompile(`(?i)^(-?\d+)([KMGT])B?$`)
+
+var invalidByteQuantityError = errors.New("Byte quantity must be a positive integer with a unit of measurement like M, MB, G, or GB")
