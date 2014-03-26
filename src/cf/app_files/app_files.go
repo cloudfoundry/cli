@@ -17,6 +17,7 @@ var DefaultIgnoreFiles = []string{
 	".git",
 	".svn",
 	"_darcs",
+	".DS_Store",
 }
 
 func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
