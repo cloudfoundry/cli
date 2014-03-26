@@ -110,7 +110,7 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 		cmd.ui.Say("Binding service %s to %s in org %s / space %s as %s", serviceName, app.Name, cmd.config.OrganizationFields().Name, cmd.config.SpaceFields().Name, cmd.config.Username())
 		err = cmd.serviceBinder.BindApplication(app, serviceInstance)
 
-		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == service.AppAlreadyBoundErrorCode {
+		if err, ok := err.(errors.HttpError); ok && err.ErrorCode() == errors.APP_ALREADY_BOUND {
 			err = nil
 		}
 

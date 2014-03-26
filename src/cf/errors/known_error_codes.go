@@ -11,4 +11,5 @@ const (
 	APP_NOT_STAGED              = "170002"
 	APP_STOPPED                 = "220001"
 	BUILDPACK_EXISTS            = "290001"
+	APP_ALREADY_BOUND           = "90003"
 )
