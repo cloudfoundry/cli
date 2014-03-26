@@ -76,6 +76,12 @@ var _ = Describe("auth command", func() {
 			}))
 		})
 
+		It("gets the UAA endpoint and saves it to the config file", func() {
+			reqFactory.ApiEndpointSuccess = true
+			testcmd.RunCommand(cmd, testcmd.NewContext("auth", []string{"foo@example.com", "password"}), reqFactory)
+			Expect(repo.GetLoginPromptsWasCalled).To(BeTrue())
+		})
+
 		Describe("when authentication fails", func() {
 			BeforeEach(func() {
 				repo.AuthError = true
