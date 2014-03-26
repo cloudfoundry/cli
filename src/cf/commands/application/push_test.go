@@ -356,6 +356,18 @@ var _ = Describe("Push Command", func() {
 				Expect(*appRepo.UpdateParams.Command).To(Equal(""))
 			})
 
+			It("resets the app's buildpack when the -b flag is provided as 'null'", func() {
+				existingApp := models.Application{}
+				existingApp.Name = "existing-app"
+				existingApp.Guid = "existing-app-guid"
+				existingApp.BuildpackUrl = "the-place.com/the-pack"
+
+				appRepo.ReadApp = existingApp
+
+				callPush("-b", "null", "existing-app")
+
+				Expect(*appRepo.UpdateParams.BuildpackUrl).To(Equal(""))
+			})
 		})
 	})
 

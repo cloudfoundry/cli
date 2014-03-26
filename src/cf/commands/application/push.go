@@ -478,17 +478,18 @@ func (cmd *Push) getAppParamsFromContext(c *cli.Context) (appParams models.AppPa
 
 	if c.String("b") != "" {
 		buildpack := c.String("b")
+		if buildpack == "null" {
+			buildpack = ""
+		}
 		appParams.BuildpackUrl = &buildpack
 	}
 
 	if c.String("c") != "" {
 		command := c.String("c")
+		if command == "null" {
+			command = ""
+		}
 		appParams.Command = &command
-	}
-
-	if c.String("c") == "null" {
-		emptyStr := ""
-		appParams.Command = &emptyStr
 	}
 
 	if c.String("d") != "" {

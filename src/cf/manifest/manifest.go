@@ -128,7 +128,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 		return
 	}
 
-	appParams.BuildpackUrl = stringVal(yamlMap, "buildpack", &errs)
+	appParams.BuildpackUrl = stringOrNullVal(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 	appParams.Domain = stringVal(yamlMap, "domain", &errs)
 	appParams.Host = stringVal(yamlMap, "host", &errs)
@@ -159,7 +159,7 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 
 func checkForNulls(yamlMap generic.Map) (errs []error) {
 	generic.Each(yamlMap, func(key interface{}, value interface{}) {
-		if key == "command" {
+		if key == "command" || key == "buildpack" {
 			return
 		}
 		if value == nil {

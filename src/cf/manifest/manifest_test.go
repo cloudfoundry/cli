@@ -161,7 +161,6 @@ var _ = Describe("Manifests", func() {
 		m := NewManifest("/some/path", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				map[interface{}]interface{}{
-					"buildpack":    nil,
 					"disk_quota":   nil,
 					"domain":       nil,
 					"host":         nil,
@@ -182,7 +181,7 @@ var _ = Describe("Manifests", func() {
 		_, err := m.Applications()
 		Expect(err).To(HaveOccurred())
 		errorSlice := strings.Split(err.Error(), "\n")
-		manifestKeys := []string{"buildpack", "disk_quota", "domain", "host", "name", "path", "stack",
+		manifestKeys := []string{"disk_quota", "domain", "host", "name", "path", "stack",
 			"memory", "instances", "timeout", "no-route", "services", "env", "random-route"}
 
 		for _, key := range manifestKeys {
@@ -278,6 +277,20 @@ var _ = Describe("Manifests", func() {
 		apps, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].Command).To(Equal(""))
+	})
+
+	It("sets the buildpack to blank when its value is null in the manifest", func() {
+		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
+			"applications": []interface{}{
+				generic.NewMap(map[interface{}]interface{}{
+					"buildpack": nil,
+				}),
+			},
+		}))
+
+		apps, err := m.Applications()
+		Expect(err).NotTo(HaveOccurred())
+		Expect(*apps[0].BuildpackUrl).To(Equal(""))
 	})
 
 	It("does not set the start command when the manifest doesn't have the 'command' key", func() {
