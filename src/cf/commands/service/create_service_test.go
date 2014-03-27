@@ -1,8 +1,8 @@
 package service_test
 
 import (
-	"cf/api"
 	. "cf/commands/service"
+	"cf/configuration"
 	"cf/errors"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
@@ -15,40 +15,64 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callCreateService(args []string, inputs []string, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{Inputs: inputs}
-	ctxt := testcmd.NewContext("create-service", args)
-
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewCreateService(fakeUI, config, serviceRepo)
-	reqFactory := &testreq.FakeReqFactory{}
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
 var _ = Describe("create-service command", func() {
-	It("successfully creates a service", func() {
-		offering := models.ServiceOffering{}
-		offering.Label = "cleardb"
-		plan := models.ServicePlanFields{}
-		plan.Name = "spark"
-		plan.Guid = "cleardb-spark-guid"
-		offering.Plans = []models.ServicePlanFields{plan}
-		offering2 := models.ServiceOffering{}
+	var (
+		ui          *testterm.FakeUI
+		config      configuration.Repository
+		reqFactory  *testreq.FakeReqFactory
+		cmd         CreateService
+		serviceRepo *testapi.FakeServiceRepo
+
+		offering1 models.ServiceOffering
+		offering2 models.ServiceOffering
+	)
+
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		config = testconfig.NewRepositoryWithDefaults()
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+		serviceRepo = &testapi.FakeServiceRepo{}
+		cmd = NewCreateService(ui, config, serviceRepo)
+
+		offering1 = models.ServiceOffering{}
+		offering1.Label = "cleardb"
+		offering1.Plans = []models.ServicePlanFields{{
+			Name: "spark",
+			Guid: "cleardb-spark-guid",
+		}}
+
+		offering2 = models.ServiceOffering{}
 		offering2.Label = "postgres"
 
-		serviceRepo := &testapi.FakeServiceRepo{}
-		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{
-			offering,
-			offering2,
-		}
+		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering1, offering2}
+	})
 
-		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
-			[]string{},
-			serviceRepo,
-		)
+	var callCreateService = func(args []string) {
+		ctxt := testcmd.NewContext("create-service", args)
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
+	}
+
+	Describe("requirements", func() {
+		It("passes when logged in and a space is targeted", func() {
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
+			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
+		})
+
+		It("fails when not logged in", func() {
+			reqFactory.LoginSuccess = false
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+
+		It("fails when a space is not targeted", func() {
+			reqFactory.TargetedSpaceSuccess = false
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+	})
+
+	It("successfully creates a service", func() {
+		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
@@ -59,23 +83,9 @@ var _ = Describe("create-service command", func() {
 	})
 
 	It("warns the user when the service already exists with the same service plan", func() {
-		offering := models.ServiceOffering{}
-		offering.Label = "cleardb"
-		plan := models.ServicePlanFields{}
-		plan.Name = "spark"
-		plan.Guid = "cleardb-spark-guid"
-		offering.Plans = []models.ServicePlanFields{plan}
-		offering2 := models.ServiceOffering{}
-		offering2.Label = "postgres"
-
-		serviceRepo := &testapi.FakeServiceRepo{}
 		serviceRepo.CreateServiceInstanceReturns.Error = errors.NewServiceInstanceAlreadyExistsError("my-cleardb-service")
-		serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
 
-		ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
-			[]string{},
-			serviceRepo,
-		)
+		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating service", "my-cleardb-service"},
@@ -88,24 +98,10 @@ var _ = Describe("create-service command", func() {
 
 	Context("When there are multiple services with the same label", func() {
 		It("finds the plan even if it has to search multiple services", func() {
-			offering := models.ServiceOffering{}
-			offering.Label = "cleardb"
-
-			offering2 := models.ServiceOffering{}
 			offering2.Label = "cleardb"
 
-			plan := models.ServicePlanFields{}
-			plan.Name = "spark"
-			plan.Guid = "cleardb-spark-guid"
-			offering2.Plans = []models.ServicePlanFields{plan}
-
-			serviceRepo := &testapi.FakeServiceRepo{}
 			serviceRepo.CreateServiceInstanceReturns.Error = errors.NewServiceInstanceAlreadyExistsError("my-cleardb-service")
-			serviceRepo.FindServiceOfferingsForSpaceByLabelReturns.ServiceOfferings = []models.ServiceOffering{offering, offering2}
-			ui := callCreateService([]string{"cleardb", "spark", "my-cleardb-service"},
-				[]string{},
-				serviceRepo,
-			)
+			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Creating service", "my-cleardb-service", "my-org", "my-space", "my-user"},
