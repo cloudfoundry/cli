@@ -19,15 +19,17 @@ import (
 	"time"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("start command", func() {
 	var (
 		defaultAppForStart        = models.Application{}
 		defaultInstanceReponses   = [][]models.AppInstanceFields{}
 		defaultInstanceErrorCodes = []string{"", ""}
-		defaultStartTimeout       = 50 * time.Millisecond
+		requirementsFactory       *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
+		requirementsFactory = &testreq.FakeReqFactory{}
+
 		defaultAppForStart.Name = "my-app"
 		defaultAppForStart.Guid = "my-app-guid"
 		defaultAppForStart.InstanceCount = 2
@@ -60,13 +62,20 @@ var _ = Describe("Testing with ginkgo", func() {
 		}
 	})
 
-	It("TestStartCommandDefaultTimeouts", func() {
+	It("has sane default timeout values", func() {
 		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
 		Expect(cmd.StagingTimeout).To(Equal(15 * time.Minute))
 		Expect(cmd.StartupTimeout).To(Equal(5 * time.Minute))
 	})
 
-	It("TestStartCommandSetsTimeoutsFromEnv", func() {
+	It("fails requirements when not logged in", func() {
+		requirementsFactory.LoginSuccess = false
+		cmd := NewStart(new(testterm.FakeUI), testconfig.NewRepository(), &testcmd.FakeAppDisplayer{}, &testapi.FakeApplicationRepository{}, &testapi.FakeAppInstancesRepo{}, &testapi.FakeLogsRepository{})
+		testcmd.RunCommand(cmd, testcmd.NewContext("start", []string{"some-app-name"}), requirementsFactory)
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	})
+
+	It("can read timeout values from environment variables", func() {
 		oldStaging := os.Getenv("CF_STAGING_TIMEOUT")
 		oldStart := os.Getenv("CF_STARTUP_TIMEOUT")
 		defer func() {
@@ -81,287 +90,264 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(cmd.StartupTimeout).To(Equal(3 * time.Minute))
 	})
 
-	It("TestStartCommandFailsWithUsage", func() {
-		config := testconfig.NewRepository()
-		displayApp := &testcmd.FakeAppDisplayer{}
-		appRepo := &testapi.FakeApplicationRepository{}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{
-			GetInstancesResponses: [][]models.AppInstanceFields{
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+		})
+
+		It("fails with usage when provided with no args", func() {
+			config := testconfig.NewRepository()
+			displayApp := &testcmd.FakeAppDisplayer{}
+			appRepo := &testapi.FakeApplicationRepository{}
+			appInstancesRepo := &testapi.FakeAppInstancesRepo{
+				GetInstancesResponses: [][]models.AppInstanceFields{
+					[]models.AppInstanceFields{},
+				},
+				GetInstancesErrorCodes: []string{""},
+			}
+			logRepo := &testapi.FakeLogsRepository{}
+
+			ui := callStart([]string{}, config, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
+
+		It("starts an app, when given the app's name", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			ui, appRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, requirementsFactory)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"my-app", "my-org", "my-space", "my-user"},
+				{"OK"},
+				{"0 of 2 instances running", "2 starting"},
+				{"Started"},
+			})
+
+			Expect(requirementsFactory.ApplicationName).To(Equal("my-app"))
+			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+			Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
+		})
+
+		It("only displays staging logs when an app is starting", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			requirementsFactory.Application = defaultAppForStart
+			appRepo := &testapi.FakeApplicationRepository{
+				ReadApp:         defaultAppForStart,
+				UpdateAppResult: defaultAppForStart,
+			}
+			appInstancesRepo := &testapi.FakeAppInstancesRepo{
+				GetInstancesResponses:  defaultInstanceReponses,
+				GetInstancesErrorCodes: defaultInstanceErrorCodes,
+			}
+
+			currentTime := time.Now()
+			wrongSourceName := "DEA"
+			correctSourceName := "STG"
+
+			logRepo := &testapi.FakeLogsRepository{
+				TailLogMessages: []*logmessage.Message{
+					NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
+					NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
+					NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
+					NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
+				},
+			}
+
+			ui := callStart([]string{"my-app"}, testconfig.NewRepository(), requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Log Line 2"},
+				{"Log Line 3"},
+			})
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"Log Line 1"},
+				{"Log Line 4"},
+			})
+		})
+
+		It("TestStartApplicationWhenAppIsStillStaging", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceDown
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceStarting
+			appInstance5 := models.AppInstanceFields{}
+			appInstance5.State = models.InstanceRunning
+			appInstance6 := models.AppInstanceFields{}
+			appInstance6.State = models.InstanceRunning
+			instances := [][]models.AppInstanceFields{
 				[]models.AppInstanceFields{},
-			},
-			GetInstancesErrorCodes: []string{""},
-		}
-		logRepo := &testapi.FakeLogsRepository{}
+				[]models.AppInstanceFields{},
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
+				[]models.AppInstanceFields{appInstance5, appInstance6},
+			}
 
-		reqFactory := &testreq.FakeReqFactory{}
+			errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
 
-		ui := callStart([]string{}, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
+			ui, _, appInstancesRepo := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-		ui = callStart([]string{"my-app"}, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
-	})
+			Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
 
-	It("TestStartApplication", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, defaultInstanceReponses, defaultInstanceErrorCodes, defaultStartTimeout)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"my-app", "my-org", "my-space", "my-user"},
-			{"OK"},
-			{"0 of 2 instances running", "2 starting"},
-			{"Started"},
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Log Line 1"},
+				{"Log Line 2"},
+				{"0 of 2 instances running", "2 starting"},
+			})
 		})
 
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-		Expect(displayApp.AppToDisplay).To(Equal(defaultAppForStart))
-	})
+		It("displays an error message when staging fails", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			instances := [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
+			errorCodes := []string{"170001"}
 
-	It("TestStartApplicationOnlyShowsCurrentStagingLogs", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
-		appRepo := &testapi.FakeApplicationRepository{
-			ReadApp:         defaultAppForStart,
-			UpdateAppResult: defaultAppForStart,
-		}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{
-			GetInstancesResponses:  defaultInstanceReponses,
-			GetInstancesErrorCodes: defaultInstanceErrorCodes,
-		}
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-		currentTime := time.Now()
-		wrongSourceName := "DEA"
-		correctSourceName := "STG"
-
-		logRepo := &testapi.FakeLogsRepository{
-			TailLogMessages: []*logmessage.Message{
-				NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
-				NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
-				NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
-				NewLogMessage("Log Line 4", defaultAppForStart.Guid, wrongSourceName, currentTime),
-			},
-		}
-
-		ui := callStart([]string{"my-app"}, testconfig.NewRepository(), reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Log Line 2"},
-			{"Log Line 3"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"Log Line 1"},
-			{"Log Line 4"},
-		})
-	})
-
-	It("TestStartApplicationWhenAppHasNoURL", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		app := defaultAppForStart
-		app.Routes = []models.RouteSummary{}
-		appInstance := models.AppInstanceFields{}
-		appInstance.State = models.InstanceRunning
-		instances := [][]models.AppInstanceFields{
-			[]models.AppInstanceFields{appInstance},
-			[]models.AppInstanceFields{appInstance},
-		}
-
-		errorCodes := []string{""}
-		ui, appRepo, _, reqFactory := startAppWithInstancesAndErrors(displayApp, app, instances, errorCodes, defaultStartTimeout)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"my-app"},
-			{"OK"},
-			{"Started"},
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"my-app"},
+				{"OK"},
+				{"FAILED"},
+				{"Error staging app"},
+			})
 		})
 
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-	})
+		It("TestStartApplicationWhenOneInstanceFlaps", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceStarting
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceFlapping
+			instances := [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
+			}
 
-	It("TestStartApplicationWhenAppIsStillStaging", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		appInstance := models.AppInstanceFields{}
-		appInstance.State = models.InstanceDown
-		appInstance2 := models.AppInstanceFields{}
-		appInstance2.State = models.InstanceStarting
-		appInstance3 := models.AppInstanceFields{}
-		appInstance3.State = models.InstanceStarting
-		appInstance4 := models.AppInstanceFields{}
-		appInstance4.State = models.InstanceStarting
-		appInstance5 := models.AppInstanceFields{}
-		appInstance5.State = models.InstanceRunning
-		appInstance6 := models.AppInstanceFields{}
-		appInstance6.State = models.InstanceRunning
-		instances := [][]models.AppInstanceFields{
-			[]models.AppInstanceFields{},
-			[]models.AppInstanceFields{},
-			[]models.AppInstanceFields{appInstance, appInstance2},
-			[]models.AppInstanceFields{appInstance3, appInstance4},
-			[]models.AppInstanceFields{appInstance5, appInstance6},
-		}
+			errorCodes := []string{"", ""}
 
-		errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, "", "", ""}
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-		ui, _, appInstancesRepo, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
-
-		Expect(appInstancesRepo.GetInstancesAppGuid).To(Equal("my-app-guid"))
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Log Line 1"},
-			{"Log Line 2"},
-			{"0 of 2 instances running", "2 starting"},
-		})
-	})
-
-	It("displays an error message when staging fails", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		instances := [][]models.AppInstanceFields{[]models.AppInstanceFields{}}
-		errorCodes := []string{"170001"}
-
-		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"my-app"},
-			{"OK"},
-			{"FAILED"},
-			{"Error staging app"},
-		})
-	})
-
-	It("TestStartApplicationWhenOneInstanceFlaps", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		appInstance := models.AppInstanceFields{}
-		appInstance.State = models.InstanceStarting
-		appInstance2 := models.AppInstanceFields{}
-		appInstance2.State = models.InstanceStarting
-		appInstance3 := models.AppInstanceFields{}
-		appInstance3.State = models.InstanceStarting
-		appInstance4 := models.AppInstanceFields{}
-		appInstance4.State = models.InstanceFlapping
-		instances := [][]models.AppInstanceFields{
-			[]models.AppInstanceFields{appInstance, appInstance2},
-			[]models.AppInstanceFields{appInstance3, appInstance4},
-		}
-
-		errorCodes := []string{"", ""}
-
-		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, defaultStartTimeout)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"my-app"},
-			{"OK"},
-			{"0 of 2 instances running", "1 starting", "1 failing"},
-			{"FAILED"},
-			{"Start unsuccessful"},
-		})
-	})
-
-	It("TestStartApplicationWhenStartTimesOut", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		appInstance := models.AppInstanceFields{}
-		appInstance.State = models.InstanceStarting
-		appInstance2 := models.AppInstanceFields{}
-		appInstance2.State = models.InstanceStarting
-		appInstance3 := models.AppInstanceFields{}
-		appInstance3.State = models.InstanceStarting
-		appInstance4 := models.AppInstanceFields{}
-		appInstance4.State = models.InstanceDown
-		appInstance5 := models.AppInstanceFields{}
-		appInstance5.State = models.InstanceDown
-		appInstance6 := models.AppInstanceFields{}
-		appInstance6.State = models.InstanceDown
-		instances := [][]models.AppInstanceFields{
-			[]models.AppInstanceFields{appInstance, appInstance2},
-			[]models.AppInstanceFields{appInstance3, appInstance4},
-			[]models.AppInstanceFields{appInstance5, appInstance6},
-		}
-
-		errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, errors.APP_NOT_STAGED}
-
-		ui, _, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, 0)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Starting", "my-app"},
-			{"OK"},
-			{"FAILED"},
-			{"Start app timeout"},
-		})
-		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
-			{"instances running"},
-		})
-	})
-
-	It("TestStartApplicationWhenStartFails", func() {
-		config := testconfig.NewRepository()
-		displayApp := &testcmd.FakeAppDisplayer{}
-		app := models.Application{}
-		app.Name = "my-app"
-		app.Guid = "my-app-guid"
-		appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-		logRepo := &testapi.FakeLogsRepository{}
-		args := []string{"my-app"}
-		reqFactory := &testreq.FakeReqFactory{Application: app}
-		ui := callStart(args, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"my-app"},
-			{"FAILED"},
-			{"Error updating app."},
-		})
-		Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
-	})
-
-	It("TestStartApplicationIsAlreadyStarted", func() {
-		displayApp := &testcmd.FakeAppDisplayer{}
-		config := testconfig.NewRepository()
-		app := models.Application{}
-		app.Name = "my-app"
-		app.Guid = "my-app-guid"
-		app.State = "started"
-		appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{}
-		logRepo := &testapi.FakeLogsRepository{}
-
-		reqFactory := &testreq.FakeReqFactory{Application: app}
-
-		args := []string{"my-app"}
-		ui := callStart(args, config, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"my-app", "is already started"},
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"my-app"},
+				{"OK"},
+				{"0 of 2 instances running", "1 starting", "1 failing"},
+				{"FAILED"},
+				{"Start unsuccessful"},
+			})
 		})
 
-		Expect(appRepo.UpdateAppGuid).To(Equal(""))
-	})
+		It("tells the user about the failure when waiting for the app to start times out", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			appInstance := models.AppInstanceFields{}
+			appInstance.State = models.InstanceStarting
+			appInstance2 := models.AppInstanceFields{}
+			appInstance2.State = models.InstanceStarting
+			appInstance3 := models.AppInstanceFields{}
+			appInstance3.State = models.InstanceStarting
+			appInstance4 := models.AppInstanceFields{}
+			appInstance4.State = models.InstanceDown
+			appInstance5 := models.AppInstanceFields{}
+			appInstance5.State = models.InstanceDown
+			appInstance6 := models.AppInstanceFields{}
+			appInstance6.State = models.InstanceDown
+			instances := [][]models.AppInstanceFields{
+				[]models.AppInstanceFields{appInstance, appInstance2},
+				[]models.AppInstanceFields{appInstance3, appInstance4},
+				[]models.AppInstanceFields{appInstance5, appInstance6},
+			}
 
-	It("TestStartApplicationWithLoggingFailure", func() {
-		configRepo := testconfig.NewRepositoryWithDefaults()
-		displayApp := &testcmd.FakeAppDisplayer{}
+			errorCodes := []string{errors.APP_NOT_STAGED, errors.APP_NOT_STAGED, errors.APP_NOT_STAGED}
 
-		appRepo := &testapi.FakeApplicationRepository{ReadApp: defaultAppForStart}
-		appInstancesRepo := &testapi.FakeAppInstancesRepo{
-			GetInstancesResponses:  defaultInstanceReponses,
-			GetInstancesErrorCodes: defaultInstanceErrorCodes,
-		}
+			ui, _, _ := startAppWithInstancesAndErrors(displayApp, defaultAppForStart, instances, errorCodes, requirementsFactory)
 
-		logRepo := &testapi.FakeLogsRepository{
-			TailLogErr: errors.New("Ooops"),
-		}
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Starting", "my-app"},
+				{"OK"},
+				{"FAILED"},
+				{"Start app timeout"},
+			})
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"instances running"},
+			})
+		})
 
-		reqFactory := &testreq.FakeReqFactory{Application: defaultAppForStart}
+		It("tells the user about the failure when starting the app fails", func() {
+			config := testconfig.NewRepository()
+			displayApp := &testcmd.FakeAppDisplayer{}
+			app := models.Application{}
+			app.Name = "my-app"
+			app.Guid = "my-app-guid"
+			appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
+			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
+			logRepo := &testapi.FakeLogsRepository{}
+			args := []string{"my-app"}
+			requirementsFactory.Application = app
+			ui := callStart(args, config, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 
-		ui := callStart([]string{"my-app"}, configRepo, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"my-app"},
+				{"FAILED"},
+				{"Error updating app."},
+			})
+			Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
+		})
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			testassert.Line{"error tailing logs"},
-			testassert.Line{"Ooops"},
+		It("warns the user when the app is already running", func() {
+			displayApp := &testcmd.FakeAppDisplayer{}
+			config := testconfig.NewRepository()
+			app := models.Application{}
+			app.Name = "my-app"
+			app.Guid = "my-app-guid"
+			app.State = "started"
+			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
+			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
+			logRepo := &testapi.FakeLogsRepository{}
+
+			requirementsFactory.Application = app
+
+			args := []string{"my-app"}
+			ui := callStart(args, config, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"my-app", "is already started"},
+			})
+
+			Expect(appRepo.UpdateAppGuid).To(Equal(""))
+		})
+
+		It("tells the user when connecting to the log server fails", func() {
+			configRepo := testconfig.NewRepositoryWithDefaults()
+			displayApp := &testcmd.FakeAppDisplayer{}
+
+			appRepo := &testapi.FakeApplicationRepository{ReadApp: defaultAppForStart}
+			appInstancesRepo := &testapi.FakeAppInstancesRepo{
+				GetInstancesResponses:  defaultInstanceReponses,
+				GetInstancesErrorCodes: defaultInstanceErrorCodes,
+			}
+
+			logRepo := &testapi.FakeLogsRepository{
+				TailLogErr: errors.New("Ooops"),
+			}
+
+			requirementsFactory.Application = defaultAppForStart
+
+			ui := callStart([]string{"my-app"}, configRepo, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				testassert.Line{"error tailing logs"},
+				testassert.Line{"Ooops"},
+			})
 		})
 	})
 })
 
-func callStart(args []string, config configuration.Reader, reqFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
+func callStart(args []string, config configuration.Reader, requirementsFactory *testreq.FakeReqFactory, displayApp ApplicationDisplayer, appRepo api.ApplicationRepository, appInstancesRepo api.AppInstancesRepository, logRepo api.LogsRepository) (ui *testterm.FakeUI) {
 	ui = new(testterm.FakeUI)
 	ctxt := testcmd.NewContext("start", args)
 
@@ -370,11 +356,11 @@ func callStart(args []string, config configuration.Reader, reqFactory *testreq.F
 	cmd.StartupTimeout = 50 * time.Millisecond
 	cmd.PingerThrottle = 50 * time.Millisecond
 
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
+	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
 	return
 }
 
-func startAppWithInstancesAndErrors(displayApp ApplicationDisplayer, app models.Application, instances [][]models.AppInstanceFields, errorCodes []string, startTimeout time.Duration) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo, reqFactory *testreq.FakeReqFactory) {
+func startAppWithInstancesAndErrors(displayApp ApplicationDisplayer, app models.Application, instances [][]models.AppInstanceFields, errorCodes []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo) {
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	appRepo = &testapi.FakeApplicationRepository{
 		ReadApp:         app,
@@ -393,7 +379,8 @@ func startAppWithInstancesAndErrors(displayApp ApplicationDisplayer, app models.
 	}
 
 	args := []string{"my-app"}
-	reqFactory = &testreq.FakeReqFactory{Application: app}
-	ui = callStart(args, configRepo, reqFactory, displayApp, appRepo, appInstancesRepo, logRepo)
+
+	requirementsFactory.Application = app
+	ui = callStart(args, configRepo, requirementsFactory, displayApp, appRepo, appInstancesRepo, logRepo)
 	return
 }
