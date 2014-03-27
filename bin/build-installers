@@ -71,8 +71,8 @@ echo "building amd64 RPM package"
     RPM_VERSION=$(echo $VERSION | sed 's/-/_/')
     echo "Version: ${RPM_VERSION}" > cf-cli.spec
     cat cf-cli.spec.template >> cf-cli.spec
-    rpmbuild --target amd64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
-    mv build/RPMS/amd64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
+    rpmbuild --target x86_64 --define "_topdir $(pwd)/build" -bb cf-cli.spec
+    mv build/RPMS/x86_64/cf-cli*.rpm ${RELEASE_DIR}/cf-cli_amd64.rpm
     rm -rf build cf cf-cli.spec
 )
 
