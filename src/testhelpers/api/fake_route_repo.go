@@ -6,10 +6,6 @@ import (
 )
 
 type FakeRouteRepository struct {
-	FindByHostHost  string
-	FindByHostErr   bool
-	FindByHostRoute models.Route
-
 	FindByHostAndDomainHost     string
 	FindByHostAndDomainDomain   string
 	FindByHostAndDomainRoute    models.Route
@@ -49,17 +45,6 @@ func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr 
 			break
 		}
 	}
-	return
-}
-
-func (repo *FakeRouteRepository) FindByHost(host string) (route models.Route, apiErr error) {
-	repo.FindByHostHost = host
-
-	if repo.FindByHostErr {
-		apiErr = errors.New("Route not found")
-	}
-
-	route = repo.FindByHostRoute
 	return
 }
 

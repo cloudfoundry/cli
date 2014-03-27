@@ -634,7 +634,7 @@ var _ = Describe("Push Command", func() {
 		domain.Guid = "bar-domain-guid"
 
 		domainRepo.FindByNameInOrgDomain = domain
-		routeRepo.FindByHostErr = true
+		routeRepo.FindByHostAndDomainErr = true
 		appRepo.ReadNotFound = true
 
 		callPush(
