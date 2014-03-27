@@ -262,6 +262,37 @@ var _ = Describe("Buildpacks repo", func() {
 		Expect(buildpack).To(Equal(updated))
 	})
 
+	It("TestRenameBuildpack", func() {
+		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			Method:  "PUT",
+			Path:    "/v2/buildpacks/my-cool-buildpack-guid",
+			Matcher: testnet.RequestBodyMatcher(`{"name":"my-new-buildpack"}`),
+			Response: testnet.TestResponse{
+				Status: http.StatusCreated,
+				Body: `{
+					"metadata": {
+						"guid": "my-cool-buildpack-guid"
+					},
+					"entity": {
+						"name": "my-cool-buildpack"
+					}
+				}`},
+		})
+
+		ts, handler, repo := createBuildpackRepo(req)
+		defer ts.Close()
+
+		buildpack := models.Buildpack{}
+		buildpack.Name = "my-cool-buildpack"
+		buildpack.Guid = "my-cool-buildpack-guid"
+		updated, apiErr := repo.Rename(buildpack, "my-new-buildpack")
+
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+
+		Expect(buildpack).To(Equal(updated))
+	})
+
 	It("TestLockBuildpack", func() {
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method:  "PUT",
