@@ -87,7 +87,7 @@ func (cmd *Start) GetRequirements(reqFactory requirements.Factory, c *cli.Contex
 
 	cmd.appReq = reqFactory.NewApplicationRequirement(c.Args()[0])
 
-	reqs = []requirements.Requirement{cmd.appReq}
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement(), cmd.appReq}
 	return
 }
 
