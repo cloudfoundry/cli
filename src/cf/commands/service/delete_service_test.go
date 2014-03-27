@@ -27,78 +27,89 @@ func callDeleteService(confirmation string, args []string, reqFactory *testreq.F
 	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestDeleteServiceCommandWithY", func() {
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "my-service"
-		serviceInstance.Guid = "my-service-guid"
-		reqFactory := &testreq.FakeReqFactory{}
-		serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-		ui := callDeleteService("Y", []string{"my-service"}, reqFactory, serviceRepo)
+var _ = Describe("delete-service command", func() {
+	var (
+		requirementsFactory *testreq.FakeReqFactory
+		serviceRepo         *testapi.FakeServiceRepo
+		serviceInstance     models.ServiceInstance
+	)
 
-		testassert.SliceContains(ui.Prompts, testassert.Lines{
-			{"Are you sure"},
-		})
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
-			{"OK"},
-		})
-
-		Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
+	BeforeEach(func() {
+		requirementsFactory = &testreq.FakeReqFactory{}
+		serviceRepo = &testapi.FakeServiceRepo{}
 	})
-	It("TestDeleteServiceCommandWithYes", func() {
 
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Name = "my-service"
-		serviceInstance.Guid = "my-service-guid"
-		reqFactory := &testreq.FakeReqFactory{}
-		serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
-		ui := callDeleteService("Yes", []string{"my-service"}, reqFactory, serviceRepo)
-
-		testassert.SliceContains(ui.Prompts, testassert.Lines{{"Are you sure"}})
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service", "my-service"},
-			{"OK"},
-		})
-
-		Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
-	})
-	It("TestDeleteServiceCommandOnNonExistentService", func() {
-
-		reqFactory := &testreq.FakeReqFactory{}
-		serviceRepo := &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
-		ui := callDeleteService("", []string{"-f", "my-service"}, reqFactory, serviceRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service", "my-service"},
-			{"OK"},
-			{"my-service", "does not exist"},
+	Context("when not logged in", func() {
+		It("does not pass requirements", func() {
+			cmd := NewDeleteService(&testterm.FakeUI{}, testconfig.NewRepository(), serviceRepo)
+			testcmd.RunCommand(cmd, testcmd.NewContext("delete-service", []string{"vestigal-service"}), requirementsFactory)
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
-	It("TestDeleteServiceCommandFailsWithUsage", func() {
 
-		reqFactory := &testreq.FakeReqFactory{}
-		serviceRepo := &testapi.FakeServiceRepo{}
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = true
+		})
 
-		ui := callDeleteService("", []string{"-f"}, reqFactory, serviceRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
+		It("fails with usage when no arguments are given", func() {
+			ui := callDeleteService("", []string{"-f"}, requirementsFactory, serviceRepo)
+			Expect(ui.FailedWithUsage).To(BeTrue())
+		})
 
-		ui = callDeleteService("", []string{"-f", "my-service"}, reqFactory, serviceRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
-	})
-	It("TestDeleteServiceForceFlagSkipsConfirmation", func() {
+		Context("when the service exists", func() {
+			BeforeEach(func() {
+				serviceInstance = models.ServiceInstance{}
+				serviceInstance.Name = "my-service"
+				serviceInstance.Guid = "my-service-guid"
+				serviceRepo = &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
+			})
 
-		reqFactory := &testreq.FakeReqFactory{}
-		serviceRepo := &testapi.FakeServiceRepo{}
+			Context("when the command is confirmed", func() {
+				It("deletes the service", func() {
+					ui := callDeleteService("Y", []string{"my-service"}, requirementsFactory, serviceRepo)
 
-		ui := callDeleteService("", []string{"-f", "foo.com"}, reqFactory, serviceRepo)
+					testassert.SliceContains(ui.Prompts, testassert.Lines{
+						{"Are you sure"},
+					})
 
-		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service", "foo.com"},
-			{"OK"},
+					testassert.SliceContains(ui.Outputs, testassert.Lines{
+						{"Deleting service", "my-service", "my-org", "my-space", "my-user"},
+						{"OK"},
+					})
+
+					Expect(serviceRepo.DeleteServiceServiceInstance).To(Equal(serviceInstance))
+				})
+			})
+
+			It("skips confirmation when the -f flag is given", func() {
+				ui := callDeleteService("", []string{"-f", "foo.com"}, requirementsFactory, serviceRepo)
+
+				Expect(ui.Prompts).To(BeEmpty())
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Deleting service", "foo.com"},
+					{"OK"},
+				})
+			})
+		})
+
+		Context("when the service does not exist", func() {
+			BeforeEach(func() {
+				serviceRepo = &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
+			})
+
+			It("warns the user the service does not exist", func() {
+				ui := callDeleteService("", []string{"-f", "my-service"}, requirementsFactory, serviceRepo)
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Deleting service", "my-service"},
+					{"OK"},
+				})
+
+				testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
+					{"my-service", "does not exist"},
+				})
+			})
 		})
 	})
 })
