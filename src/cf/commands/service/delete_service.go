@@ -37,6 +37,7 @@ func (cmd *DeleteService) GetRequirements(reqFactory requirements.Factory, c *cl
 		return
 	}
 
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
 	return
 }
 
