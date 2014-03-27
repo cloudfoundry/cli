@@ -585,7 +585,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "routes",
 			ShortName:   "r",
-			Description: "List all routes",
+			Description: "List all routes in the current space",
 			Usage:       fmt.Sprintf("%s routes", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("routes", c)

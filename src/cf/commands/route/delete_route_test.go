@@ -14,58 +14,67 @@ import (
 )
 
 var _ = Describe("delete-route command", func() {
-	var routeRepo *testapi.FakeRouteRepository
-	var reqFactory *testreq.FakeReqFactory
+	var (
+		routeRepo  *testapi.FakeRouteRepository
+		reqFactory *testreq.FakeReqFactory
+		ui         *testterm.FakeUI
+		cmd        *DeleteRoute
+	)
 
 	BeforeEach(func() {
+		configRepo := testconfig.NewRepositoryWithDefaults()
+		ui = &testterm.FakeUI{}
 		routeRepo = &testapi.FakeRouteRepository{}
 		reqFactory = &testreq.FakeReqFactory{}
+		cmd = NewDeleteRoute(ui, configRepo, routeRepo)
 	})
 
+	var callDeleteRoute = func(confirmation string, args []string) {
+		ui.Inputs = []string{confirmation}
+		testcmd.RunCommand(cmd, testcmd.NewContext("delete-route", args), reqFactory)
+	}
+
 	It("fails requirements when not logged in", func() {
-		callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
+		callDeleteRoute("y", []string{"-n", "my-host", "example.com"})
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
 	Context("when logged in successfully", func() {
-		var ui *testterm.FakeUI
-
 		BeforeEach(func() {
 			reqFactory.LoginSuccess = true
+			route := models.Route{}
+			route.Guid = "route-guid"
+			route.Host = "my-host"
+			route.Domain = models.DomainFields{
+				Guid: "domain-guid",
+				Name: "example.com",
+			}
+			routeRepo.FindByHostAndDomainRoute = route
+
 		})
 
 		It("passes requirements when logged in", func() {
-			callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
+			callDeleteRoute("y", []string{"-n", "my-host", "example.com"})
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		})
 
 		It("fails with usage when given zero args", func() {
-			ui = callDeleteRoute("y", []string{}, reqFactory, routeRepo)
+			callDeleteRoute("y", []string{})
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
 		It("does not fail with usage when provided with a domain", func() {
-			ui = callDeleteRoute("y", []string{"example.com"}, reqFactory, routeRepo)
+			callDeleteRoute("y", []string{"example.com"})
 			Expect(ui.FailedWithUsage).To(BeFalse())
 		})
 
 		It("does not fail with usage when provided a hostname", func() {
-			ui = callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
+			callDeleteRoute("y", []string{"-n", "my-host", "example.com"})
 			Expect(ui.FailedWithUsage).To(BeFalse())
 		})
 
-		It("TestDeleteRouteWithConfirmation", func() {
-			domain := models.DomainFields{}
-			domain.Guid = "domain-guid"
-			domain.Name = "example.com"
-
-			route := models.Route{}
-			route.Guid = "route-guid"
-			route.Host = "my-host"
-			route.Domain = domain
-			routeRepo.FindByHostAndDomainRoute = route
-
-			ui := callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
+		It("deletes routes when the user confirms", func() {
+			callDeleteRoute("y", []string{"-n", "my-host", "example.com"})
 
 			testassert.SliceContains(ui.Prompts, testassert.Lines{
 				{"Really delete", "my-host"},
@@ -78,18 +87,8 @@ var _ = Describe("delete-route command", func() {
 			Expect(routeRepo.DeleteRouteGuid).To(Equal("route-guid"))
 		})
 
-		It("TestDeleteRouteWithForce", func() {
-			domain := models.DomainFields{}
-			domain.Guid = "domain-guid"
-			domain.Name = "example.com"
-
-			route := models.Route{}
-			route.Guid = "route-guid"
-			route.Host = "my-host"
-			route.Domain = domain
-			routeRepo.FindByHostAndDomainRoute = route
-
-			ui := callDeleteRoute("", []string{"-f", "-n", "my-host", "example.com"}, reqFactory, routeRepo)
+		It("does not prompt the user to confirm when they pass the '-f' flag", func() {
+			callDeleteRoute("", []string{"-f", "-n", "my-host", "example.com"})
 
 			Expect(len(ui.Prompts)).To(Equal(0))
 
@@ -100,10 +99,10 @@ var _ = Describe("delete-route command", func() {
 			Expect(routeRepo.DeleteRouteGuid).To(Equal("route-guid"))
 		})
 
-		It("TestDeleteRouteWhenRouteDoesNotExist", func() {
+		It("succeeds with a warning when the route does not exist", func() {
 			routeRepo.FindByHostAndDomainNotFound = true
 
-			ui := callDeleteRoute("y", []string{"-n", "my-host", "example.com"}, reqFactory, routeRepo)
+			callDeleteRoute("y", []string{"-n", "my-host", "example.com"})
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Deleting", "my-host.example.com"},
@@ -113,14 +112,3 @@ var _ = Describe("delete-route command", func() {
 		})
 	})
 })
-
-func callDeleteRoute(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, routeRepo *testapi.FakeRouteRepository) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{Inputs: []string{confirmation}}
-	ctxt := testcmd.NewContext("delete-route", args)
-	configRepo := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewDeleteRoute(ui, configRepo, routeRepo)
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
