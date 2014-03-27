@@ -38,7 +38,11 @@ func (cmd *UnbindService) GetRequirements(reqFactory requirements.Factory, c *cl
 	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []requirements.Requirement{cmd.appReq, cmd.serviceInstanceReq}
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+		cmd.appReq,
+		cmd.serviceInstanceReq,
+	}
 	return
 }
 
