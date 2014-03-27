@@ -30,7 +30,6 @@ var _ = Describe("stop command", func() {
 		testcmd.RunCommand(cmd, testcmd.NewContext("stop", []string{"some-app-name"}), requirementsFactory)
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-
 	})
 
 	Context("when logged in", func() {

@@ -25,13 +25,14 @@ func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, sR api.Organi
 	return
 }
 
-func (cmd *DeleteOrg) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd *DeleteOrg) GetRequirements(requirementsFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Incorrect Usage")
 		cmd.ui.FailWithUsage(c, "delete-org")
 		return
-
 	}
+
+	reqs = []requirements.Requirement{requirementsFactory.NewLoginRequirement()}
 	return
 }
 
