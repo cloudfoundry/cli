@@ -16,10 +16,10 @@ import (
 
 var _ = Describe("unbind-service command", func() {
 	var (
-		app models.Application
-		serviceInstance models.ServiceInstance
+		app                 models.Application
+		serviceInstance     models.ServiceInstance
 		requirementsFactory *testreq.FakeReqFactory
-		serviceBindingRepo *testapi.FakeServiceBindingRepo
+		serviceBindingRepo  *testapi.FakeServiceBindingRepo
 	)
 
 	BeforeEach(func() {
@@ -46,7 +46,7 @@ var _ = Describe("unbind-service command", func() {
 
 	Context("when logged in", func() {
 		BeforeEach(func() {
-		    requirementsFactory.LoginSuccess = true
+			requirementsFactory.LoginSuccess = true
 		})
 
 		Context("when the service instance exists", func() {
