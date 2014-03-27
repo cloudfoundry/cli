@@ -27,6 +27,10 @@ var _ = Describe("route repository", func() {
 
 	BeforeEach(func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
+		configRepo.SetSpaceFields(models.SpaceFields{
+			Guid: "the-space-guid",
+			Name: "the-space-name",
+		})
 		gateway := net.NewCloudControllerGateway(configRepo)
 		domainRepo = &testapi.FakeDomainRepository{}
 		repo = NewCloudControllerRouteRepository(configRepo, gateway, domainRepo)
@@ -37,16 +41,16 @@ var _ = Describe("route repository", func() {
 	})
 
 	Describe("List routes", func() {
-		It("lists routes", func() {
+		It("lists routes in the current space", func() {
 			ts, handler = testnet.NewServer([]testnet.TestRequest{
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
-					Path:     "/v2/routes?inline-relations-depth=1",
+					Path:     "/v2/spaces/the-space-guid/routes?inline-relations-depth=1",
 					Response: firstPageRoutesResponse,
 				}),
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:   "GET",
-					Path:     "/v2/routes?inline-relations-depth=1&page=2",
+					Path:     "/v2/spaces/the-space-guid/routes?inline-relations-depth=1&page=2",
 					Response: secondPageRoutesResponse,
 				}),
 			})
@@ -63,40 +67,6 @@ var _ = Describe("route repository", func() {
 			Expect(routes[1].Guid).To(Equal("route-2-guid"))
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
 			Expect(apiErr).NotTo(HaveOccurred())
-		})
-
-		It("finds routes by host", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     "/v2/routes?q=host%3Amy-cool-app",
-					Response: findRouteByHostResponse,
-				}),
-			})
-			configRepo.SetApiEndpoint(ts.URL)
-
-			route, apiErr := repo.FindByHost("my-cool-app")
-
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(route.Host).To(Equal("my-cool-app"))
-			Expect(route.Guid).To(Equal("my-route-guid"))
-		})
-
-		It("returns an error when a route is not found with the given host", func() {
-			ts, handler = testnet.NewServer([]testnet.TestRequest{
-				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     "/v2/routes?q=host%3Amy-cool-app",
-					Response: testnet.TestResponse{Status: http.StatusCreated, Body: ` { "resources": [ ]}`},
-				}),
-			})
-			configRepo.SetApiEndpoint(ts.URL)
-
-			_, apiErr := repo.FindByHost("my-cool-app")
-
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(BeNil())
 		})
 
 		It("finds a route by host and domain", func() {
@@ -174,7 +144,7 @@ var _ = Describe("route repository", func() {
 				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method:  "POST",
 					Path:    "/v2/routes?inline-relations-depth=1",
-					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"my-space-guid"}`),
+					Matcher: testnet.RequestBodyMatcher(`{"host":"my-cool-app","domain_guid":"my-domain-guid","space_guid":"the-space-guid"}`),
 					Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "my-route-guid" },
@@ -248,7 +218,7 @@ var _ = Describe("route repository", func() {
 
 var firstPageRoutesResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
-  "next_url": "/v2/routes?inline-relations-depth=1&page=2",
+  "next_url": "/v2/spaces/the-space-guid/routes?inline-relations-depth=1&page=2",
   "resources": [
     {
       "metadata": {

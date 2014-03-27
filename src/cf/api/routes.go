@@ -39,7 +39,6 @@ type RouteEntity struct {
 
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
-	FindByHost(host string) (route models.Route, apiErr error)
 	FindByHostAndDomain(host, domain string) (route models.Route, apiErr error)
 	Create(host, domainGuid string) (createdRoute models.Route, apiErr error)
 	CreateInSpace(host, domainGuid, spaceGuid string) (createdRoute models.Route, apiErr error)
@@ -65,31 +64,11 @@ func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1"),
+		fmt.Sprintf("/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.SpaceFields().Guid),
 		RouteResource{},
 		func(resource interface{}) bool {
 			return cb(resource.(RouteResource).ToModel())
 		})
-}
-
-func (repo CloudControllerRouteRepository) FindByHost(host string) (route models.Route, apiErr error) {
-	found := false
-	apiErr = repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
-		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host)),
-		RouteResource{},
-		func(resource interface{}) bool {
-			route = resource.(RouteResource).ToModel()
-			found = true
-			return false
-		})
-
-	if apiErr == nil && !found {
-		apiErr = errors.NewModelNotFoundError("Route", host)
-	}
-
-	return
 }
 
 func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName string) (route models.Route, apiErr error) {
