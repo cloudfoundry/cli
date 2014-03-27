@@ -31,14 +31,14 @@ func (cmd *DeleteApp) GetRequirements(reqFactory requirements.Factory, c *cli.Co
 		return
 	}
 
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
 	return
 }
 
 func (cmd *DeleteApp) Run(c *cli.Context) {
 	appName := c.Args()[0]
-	force := c.Bool("f")
 
-	if !force {
+	if !c.Bool("f") {
 		response := cmd.ui.Confirm(
 			"Really delete %s?%s",
 			terminal.EntityNameColor(appName),
