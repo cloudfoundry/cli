@@ -30,35 +30,41 @@ func (zipper ApplicationZipper) IsZipFile(file string) (result bool) {
 	return err == nil
 }
 
-func writeZipFile(dir string, targetFile *os.File) (err error) {
+func writeZipFile(dir string, targetFile *os.File) error {
 	isEmpty, err := fileutils.IsDirEmpty(dir)
 	if err != nil {
-		return
+		return err
 	}
 	if isEmpty {
-		err = errors.New("Directory is empty")
-		return
+		return errors.New("Directory is empty")
 	}
 
 	writer := zip.NewWriter(targetFile)
 	defer writer.Close()
 
-	err = WalkAppFiles(dir, func(fileName string, fullPath string) (err error) {
+	return WalkAppFiles(dir, func(fileName string, fullPath string) error {
 		fileInfo, err := os.Stat(fullPath)
 		if err != nil {
 			return err
 		}
 
 		header, err := zip.FileInfoHeader(fileInfo)
-		header.Name = filepath.ToSlash(fileName)
 		if err != nil {
 			return err
 		}
 
-		zipFilePart, err := writer.CreateHeader(header)
-		err = fileutils.CopyPathToWriter(fullPath, zipFilePart)
-		return
-	})
+		header.Name = filepath.ToSlash(fileName)
 
-	return
+		if fileInfo.IsDir() {
+			header.Name += "/"
+		}
+
+		zipFilePart, err := writer.CreateHeader(header)
+
+		if fileInfo.IsDir() {
+			return nil
+		} else {
+			return fileutils.CopyPathToWriter(fullPath, zipFilePart)
+		}
+	})
 }

@@ -31,24 +31,24 @@ func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 		if err != nil {
 			return
 		}
-		size := fileInfo.Size()
 
-		h := sha1.New()
-
-		err = fileutils.CopyPathToWriter(fullPath, h)
-		if err != nil {
-			return
+		appFile := models.AppFileFields{
+			Path: filepath.ToSlash(fileName),
+			Size: fileInfo.Size(),
 		}
 
-		sha1Bytes := h.Sum(nil)
-		sha1 := fmt.Sprintf("%x", sha1Bytes)
+		if fileInfo.IsDir() {
+			appFile.Sha1 = "0"
+		} else {
+			hash := sha1.New()
+			err = fileutils.CopyPathToWriter(fullPath, hash)
+			if err != nil {
+				return
+			}
+			appFile.Sha1 = fmt.Sprintf("%x", hash.Sum(nil))
+		}
 
-		appFiles = append(appFiles, models.AppFileFields{
-			Path: filepath.ToSlash(fileName),
-			Sha1: sha1,
-			Size: size,
-		})
-
+		appFiles = append(appFiles, appFile)
 		return
 	})
 	return
@@ -79,9 +79,7 @@ func CountFiles(directory string) uint64 {
 	return count
 }
 
-type walkAppFileFunc func(fileName, fullPath string) (err error)
-
-func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
+func WalkAppFiles(dir string, onEachFile func(string, string) error) (err error) {
 	cfIgnore := loadIgnoreFile(dir)
 	walkFunc := func(fullPath string, f os.FileInfo, inErr error) (err error) {
 		err = inErr
@@ -89,11 +87,11 @@ func WalkAppFiles(dir string, onEachFile walkAppFileFunc) (err error) {
 			return
 		}
 
-		if f.IsDir() {
+		if fullPath == dir {
 			return
 		}
 
-		if !cffileutils.IsRegular(f) {
+		if !cffileutils.IsRegular(f) && !f.IsDir() {
 			return
 		}
 

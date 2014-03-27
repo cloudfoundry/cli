@@ -88,15 +88,15 @@ func (repo CloudControllerBuildpackBitsRepository) UploadBuildpack(buildpack mod
 	return
 }
 
-func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) (err error) {
+func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) error {
 	stats, err := inputFile.Stat()
 	if err != nil {
-		return
+		return err
 	}
 
 	reader, err := zip.NewReader(inputFile, stats.Size())
 	if err != nil {
-		return
+		return err
 	}
 
 	contents := reader.File
@@ -111,38 +111,40 @@ func normalizeBuildpackArchive(inputFile *os.File, outputFile *os.File) (err err
 
 	for _, file := range contents {
 		name := file.Name
-		if parentPath == "." || strings.HasPrefix(name, parentPath) {
-			var (
-				r      io.ReadCloser
-				w      io.Writer
-				header *zip.FileHeader
-			)
-
-			fileInfo := file.FileInfo()
-			header, err = zip.FileInfoHeader(fileInfo)
-			header.Name = strings.Replace(name, parentPath+"/", "", 1)
-
-			r, err = file.Open()
-			if err != nil {
-				return
+		if strings.HasPrefix(name, parentPath) {
+			relativeFilename := strings.TrimPrefix(name, parentPath+"/")
+			if relativeFilename == "" {
+				continue
 			}
 
-			w, err = writer.CreateHeader(header)
+			fileInfo := file.FileInfo()
+			header, err := zip.FileInfoHeader(fileInfo)
 			if err != nil {
-				return
+				return err
+			}
+			header.Name = relativeFilename
+
+			w, err := writer.CreateHeader(header)
+			if err != nil {
+				return err
+			}
+
+			r, err := file.Open()
+			if err != nil {
+				return err
 			}
 
 			io.Copy(w, r)
 			err = r.Close()
 			if err != nil {
-				return
+				return err
 			}
 		}
 	}
 
 	writer.Close()
 	outputFile.Seek(0, 0)
-	return
+	return nil
 }
 
 func findBuildpackPath(zipFiles []*zip.File) (parentPath string, foundBuildpack bool) {
@@ -152,6 +154,9 @@ func findBuildpackPath(zipFiles []*zip.File) (parentPath string, foundBuildpack 
 		if strings.HasSuffix(file.Name, needle) {
 			foundBuildpack = true
 			parentPath = path.Join(file.Name, "..", "..")
+			if parentPath == "." {
+				parentPath = ""
+			}
 			return
 		}
 	}
