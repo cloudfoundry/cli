@@ -35,6 +35,11 @@ func (cmd CreateService) GetRequirements(reqFactory requirements.Factory, c *cli
 		return
 	}
 
+	reqs = []requirements.Requirement{
+		reqFactory.NewLoginRequirement(),
+		reqFactory.NewTargetedSpaceRequirement(),
+	}
+
 	return
 }
 
