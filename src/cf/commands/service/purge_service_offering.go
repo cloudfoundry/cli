@@ -19,6 +19,8 @@ func (cmd PurgeServiceOffering) GetRequirements(reqFactory requirements.Factory,
 		err = errors.New("incorrect usage")
 		cmd.ui.FailWithUsage(c, "purge-service-offering")
 	}
+
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
 	return
 }
 

@@ -16,19 +16,36 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Purging services", func() {
-	It("does not run if the requirements are not met", func() {
-		deps := setupDependencies()
+var _ = Describe("purge-service command", func() {
+	Describe("requirements", func() {
+		It("fails when not logged in", func() {
+			deps := setupDependencies()
+			deps.reqFactory.LoginSuccess = false
 
-		testcmd.RunCommand(
-			NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
-			testcmd.NewContext("purge-service-offering", []string{}),
-			deps.reqFactory,
-		)
+			cmd := NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo)
+			testcmd.RunCommand(
+				cmd,
+				testcmd.NewContext("purge-service-offering", []string{"-f", "whatever"}),
+				deps.reqFactory,
+			)
 
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-		Expect(deps.ui.FailedWithUsage).To(BeTrue())
-		Expect(deps.ui.FailedWithUsageCommandName).To(Equal("purge-service-offering"))
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+		})
+
+		It("fails when called without exactly one arg", func() {
+			deps := setupDependencies()
+			deps.reqFactory.LoginSuccess = true
+
+			testcmd.RunCommand(
+				NewPurgeServiceOffering(deps.ui, deps.config, deps.serviceRepo),
+				testcmd.NewContext("purge-service-offering", []string{}),
+				deps.reqFactory,
+			)
+
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+			Expect(deps.ui.FailedWithUsage).To(BeTrue())
+			Expect(deps.ui.FailedWithUsageCommandName).To(Equal("purge-service-offering"))
+		})
 	})
 
 	It("works when given -p and a provider name", func() {
