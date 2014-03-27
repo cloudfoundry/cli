@@ -4,7 +4,6 @@ import (
 	. "cf/app_files"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"path"
 	"path/filepath"
 )
 
@@ -32,8 +31,15 @@ var _ = Describe("AppFiles", func() {
 			}
 
 			Expect(paths).To(Equal([]string{
-				path.Join("dir1", "child-dir", "file3.txt"),
-				path.Join("dir1", "file1.txt"),
+				"dir1",
+				"dir1/child-dir",
+				"dir1/child-dir/file3.txt",
+				"dir1/file1.txt",
+				"dir2",
+
+				// TODO: this should be excluded.
+				// .cfignore doesn't handle ** patterns right now
+				"dir2/child-dir2",
 			}))
 		})
 	})

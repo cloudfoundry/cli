@@ -33,10 +33,6 @@ var _ = Describe("Zipper", func() {
 			err = zipper.Zip(dir, zipFile)
 			Expect(err).NotTo(HaveOccurred())
 
-			offset, err := zipFile.Seek(0, os.SEEK_CUR)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(offset).To(Equal(int64(0)))
-
 			fileStat, err := zipFile.Stat()
 			Expect(err).NotTo(HaveOccurred())
 
@@ -54,20 +50,30 @@ var _ = Describe("Zipper", func() {
 				return file.Name, string(buf.Bytes())
 			}
 
-			Expect(len(reader.File)).To(Equal(3))
+			filenames := []string{}
+			for _, file := range reader.File {
+				filenames = append(filenames, file.Name)
+			}
+
+			Expect(filenames).To(Equal([]string{
+				"foo.txt",
+				"fooDir/",
+				"fooDir/bar/",
+				"lastDir/",
+				"subDir/",
+				"subDir/bar.txt",
+				"subDir/otherDir/",
+				"subDir/otherDir/file.txt",
+			}))
 
 			name, contents := readFileInZip(0)
 			Expect(name).To(Equal("foo.txt"))
 			Expect(contents).To(Equal("This is a simple text file."))
 
-			name, contents = readFileInZip(1)
+			name, contents = readFileInZip(5)
 			Expect(name).To(Equal("subDir/bar.txt"))
 			Expect(contents).To(Equal("I am in a subdirectory."))
-			Expect(reader.File[1].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
-
-			name, contents = readFileInZip(2)
-			Expect(name).To(Equal("subDir/otherDir/file.txt"))
-			Expect(contents).To(Equal("This file should be present."))
+			Expect(reader.File[5].FileInfo().Mode()).To(Equal(os.FileMode(0666)))
 		})
 	})
 

@@ -199,20 +199,24 @@ func uploadBuildpackRequest() testnet.TestRequest {
 			sort.Strings(actualFileNames)
 
 			Expect(actualFileNames).To(Equal([]string{
+				"bin/",
 				"bin/compile",
 				"bin/detect",
 				"bin/release",
+				"lib/",
 				"lib/helper",
 			}))
 			Expect(actualFileContents).To(Equal([]string{
+				"",
 				"the-compile-script\n",
 				"the-detect-script\n",
 				"the-release-script\n",
+				"",
 				"the-helper-script\n",
 			}))
 
 			if runtime.GOOS != "windows" {
-				for i := 0; i < 3; i++ {
+				for i := 1; i < 4; i++ {
 					Expect(zipReader.File[i].Mode()).To(Equal(os.FileMode(0755)))
 				}
 			}
