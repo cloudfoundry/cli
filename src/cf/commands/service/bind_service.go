@@ -44,7 +44,7 @@ func (cmd *BindService) GetRequirements(reqFactory requirements.Factory, c *cli.
 	cmd.appReq = reqFactory.NewApplicationRequirement(appName)
 	cmd.serviceInstanceReq = reqFactory.NewServiceInstanceRequirement(serviceName)
 
-	reqs = []requirements.Requirement{cmd.appReq, cmd.serviceInstanceReq}
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement(), cmd.appReq, cmd.serviceInstanceReq}
 	return
 }
 
