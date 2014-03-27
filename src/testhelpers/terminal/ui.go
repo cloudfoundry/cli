@@ -13,6 +13,7 @@ const FailedWasCalled = "FailedWasCalled"
 
 type FakeUI struct {
 	Outputs                    []string
+	WarnOutputs                []string
 	Prompts                    []string
 	PasswordPrompts            []string
 	Inputs                     []string
@@ -39,6 +40,8 @@ func (ui *FakeUI) Say(message string, args ...interface{}) {
 }
 
 func (ui *FakeUI) Warn(message string, args ...interface{}) {
+	message = fmt.Sprintf(message, args...)
+	ui.WarnOutputs = append(ui.WarnOutputs, strings.Split(message, "\n")...)
 	ui.Say(message, args...)
 	return
 }
