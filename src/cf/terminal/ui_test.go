@@ -51,6 +51,17 @@ var _ = Describe("UI", func() {
 			})
 		})
 
+		It("treats 'yes' as an affirmative confirmation", func() {
+			simulateStdin("yes\n", func(reader io.Reader) {
+				out := captureOutput(func() {
+					ui := NewUI(reader)
+					Expect(ui.Confirm("Hello %s", "World?")).To(BeTrue())
+				})
+
+				testassert.SliceContains(out, testassert.Lines{{"Hello World?"}})
+			})
+		})
+
 		It("treats other input as a negative confirmation", func() {
 			simulateStdin("wat\n", func(reader io.Reader) {
 				out := captureOutput(func() {
