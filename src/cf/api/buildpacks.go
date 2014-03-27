@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type BuildpackRepository interface {
@@ -17,6 +18,7 @@ type BuildpackRepository interface {
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error)
 	Delete(buildpackGuid string) (apiErr error)
 	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error)
+	Rename(buildpack models.Buildpack, newbuildpackName string) (renamedBuildpack models.Buildpack, apiErr error)
 }
 
 type CloudControllerBuildpackRepository struct {
@@ -98,6 +100,22 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 
 	resource := new(BuildpackResource)
 	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
+	if apiErr != nil {
+		return
+	}
+
+	updatedBuildpack = resource.ToFields()
+	return
+}
+
+func (repo CloudControllerBuildpackRepository) Rename(buildpack models.Buildpack, newbuildpackName string) (updatedBuildpack models.Buildpack, apiErr error) {
+	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
+
+	data := fmt.Sprintf(`{"name":"%s"}`, newbuildpackName)
+	fmt.Println(data)
+
+	resource := new(BuildpackResource)
+	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
