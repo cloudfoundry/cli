@@ -26,7 +26,7 @@ func main() {
 
 	refactorings := map[string]string{
 		"Application":            "app",
-		"AppSummary":             "appSummary",
+		"AppSummary":             "application",
 		"Domain":                 "domain",
 		"EventFields":            "event",
 		"Route":                  "route",

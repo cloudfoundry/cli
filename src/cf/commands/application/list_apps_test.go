@@ -39,25 +39,25 @@ var _ = Describe("list-apps command", func() {
 
 		app2Routes := []models.RouteSummary{route3}
 
-		app := models.AppSummary{}
+		app := models.Application{}
 		app.Name = "Application-1"
 		app.State = "started"
 		app.RunningInstances = 1
 		app.InstanceCount = 1
 		app.Memory = 512
 		app.DiskQuota = 1024
-		app.RouteSummaries = app1Routes
+		app.Routes = app1Routes
 
-		app2 := models.AppSummary{}
+		app2 := models.Application{}
 		app2.Name = "Application-2"
 		app2.State = "started"
 		app2.RunningInstances = 1
 		app2.InstanceCount = 2
 		app2.Memory = 256
 		app2.DiskQuota = 1024
-		app2.RouteSummaries = app2Routes
+		app2.Routes = app2Routes
 
-		apps := []models.AppSummary{app, app2}
+		apps := []models.Application{app, app2}
 
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{
 			GetSummariesInCurrentSpaceApps: apps,
@@ -79,7 +79,7 @@ var _ = Describe("list-apps command", func() {
 	It("TestAppsEmptyList", func() {
 
 		appSummaryRepo := &testapi.FakeAppSummaryRepo{
-			GetSummariesInCurrentSpaceApps: []models.AppSummary{},
+			GetSummariesInCurrentSpaceApps: []models.Application{},
 		}
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}

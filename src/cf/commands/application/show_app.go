@@ -65,9 +65,9 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	appSummary, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
+	application, apiErr := cmd.appSummaryRepo.GetSummary(app.Guid)
 
-	appIsStopped := (appSummary.State == "stopped")
+	appIsStopped := (application.State == "stopped")
 	if err, ok := apiErr.(errors.HttpError); ok {
 		if err.ErrorCode() == errors.APP_STOPPED || err.ErrorCode() == errors.APP_NOT_STAGED {
 			appIsStopped = true
@@ -87,12 +87,12 @@ func (cmd *ShowApp) ShowApp(app models.Application) {
 	}
 
 	cmd.ui.Ok()
-	cmd.ui.Say("\n%s %s", terminal.HeaderColor("requested state:"), coloredAppState(appSummary.ApplicationFields))
-	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstances(appSummary.ApplicationFields))
-	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(appSummary.Memory*formatters.MEGABYTE), appSummary.InstanceCount)
+	cmd.ui.Say("\n%s %s", terminal.HeaderColor("requested state:"), coloredAppState(application.ApplicationFields))
+	cmd.ui.Say("%s %s", terminal.HeaderColor("instances:"), coloredAppInstances(application.ApplicationFields))
+	cmd.ui.Say("%s %s x %d instances", terminal.HeaderColor("usage:"), formatters.ByteSize(application.Memory*formatters.MEGABYTE), application.InstanceCount)
 
 	var urls []string
-	for _, route := range appSummary.RouteSummaries {
+	for _, route := range application.Routes {
 		urls = append(urls, route.URL())
 	}
 

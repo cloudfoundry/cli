@@ -13,8 +13,8 @@ type ApplicationSummaries struct {
 }
 
 func (resource ApplicationSummaries) ToModels() (apps []models.ApplicationFields) {
-	for _, appSummary := range resource.Apps {
-		apps = append(apps, appSummary.ToFields())
+	for _, application := range resource.Apps {
+		apps = append(apps, application.ToFields())
 	}
 	return
 }
@@ -46,13 +46,13 @@ func (resource ApplicationFromSummary) ToFields() (app models.ApplicationFields)
 	return
 }
 
-func (resource ApplicationFromSummary) ToModel() (app models.AppSummary) {
+func (resource ApplicationFromSummary) ToModel() (app models.Application) {
 	app.ApplicationFields = resource.ToFields()
 	routes := []models.RouteSummary{}
 	for _, route := range resource.Routes {
 		routes = append(routes, route.ToModel())
 	}
-	app.RouteSummaries = routes
+	app.Routes = routes
 
 	return
 }
@@ -82,8 +82,8 @@ type DomainSummary struct {
 }
 
 type AppSummaryRepository interface {
-	GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr error)
-	GetSummary(appGuid string) (summary models.AppSummary, apiErr error)
+	GetSummariesInCurrentSpace() (apps []models.Application, apiErr error)
+	GetSummary(appGuid string) (summary models.Application, apiErr error)
 }
 
 type CloudControllerAppSummaryRepository struct {
@@ -97,7 +97,7 @@ func NewCloudControllerAppSummaryRepository(config configuration.Reader, gateway
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr error) {
+func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
 	resources := new(ApplicationSummaries)
 
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
@@ -112,7 +112,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 	return
 }
 
-func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.AppSummary, apiErr error) {
+func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.ApiEndpoint(), appGuid)
 	summaryResponse := new(ApplicationFromSummary)
 	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), summaryResponse)

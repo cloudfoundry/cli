@@ -6,19 +6,19 @@ import (
 )
 
 type FakeAppSummaryRepo struct {
-	GetSummariesInCurrentSpaceApps []models.AppSummary
+	GetSummariesInCurrentSpaceApps []models.Application
 
 	GetSummaryErrorCode string
 	GetSummaryAppGuid   string
-	GetSummarySummary   models.AppSummary
+	GetSummarySummary   models.Application
 }
 
-func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.AppSummary, apiErr error) {
+func (repo *FakeAppSummaryRepo) GetSummariesInCurrentSpace() (apps []models.Application, apiErr error) {
 	apps = repo.GetSummariesInCurrentSpaceApps
 	return
 }
 
-func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.AppSummary, apiErr error) {
+func (repo *FakeAppSummaryRepo) GetSummary(appGuid string) (summary models.Application, apiErr error) {
 	repo.GetSummaryAppGuid = appGuid
 	summary = repo.GetSummarySummary
 
