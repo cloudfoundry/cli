@@ -8,11 +8,13 @@ import (
 type FakeApplicationRepository struct {
 	FindAllApps []models.Application
 
-	ReadName     string
-	ReadApp      models.Application
-	ReadErr      bool
-	ReadAuthErr  bool
-	ReadNotFound bool
+	ReadArgs struct {
+		Name string
+	}
+	ReadReturns struct {
+		App   models.Application
+		Error error
+	}
 
 	CreateAppParams []models.AppParams
 
@@ -25,20 +27,8 @@ type FakeApplicationRepository struct {
 }
 
 func (repo *FakeApplicationRepository) Read(name string) (app models.Application, apiErr error) {
-	repo.ReadName = name
-	app = repo.ReadApp
-
-	if repo.ReadErr {
-		apiErr = errors.New("Error finding app by name.")
-	}
-	if repo.ReadAuthErr {
-		apiErr = errors.NewHttpError(401, "1000", "Authentication failed.")
-	}
-	if repo.ReadNotFound {
-		apiErr = errors.NewModelNotFoundError("App", name)
-	}
-
-	return
+	repo.ReadArgs.Name = name
+	return repo.ReadReturns.App, repo.ReadReturns.Error
 }
 
 func (repo *FakeApplicationRepository) CreatedAppParams() (params models.AppParams) {

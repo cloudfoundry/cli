@@ -59,16 +59,15 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 
 	It("TestUnsetEnvWhenUnsettingTheEnvFails", func() {
-
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		app.EnvironmentVars = map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
 		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
 		appRepo := &testapi.FakeApplicationRepository{
-			ReadApp:   app,
 			UpdateErr: true,
 		}
+		appRepo.ReadReturns.App = app
 
 		args := []string{"does-not-exist", "DATABASE_URL"}
 		ui := callUnsetEnv(args, reqFactory, appRepo)
@@ -97,13 +96,14 @@ var _ = Describe("Testing with ginkgo", func() {
 			{"DATABASE_URL", "was not set."},
 		})
 	})
-	It("TestUnsetEnvFailsWithUsage", func() {
 
+	It("TestUnsetEnvFailsWithUsage", func() {
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-		appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
+		appRepo := &testapi.FakeApplicationRepository{}
+		appRepo.ReadReturns.App = app
 
 		args := []string{"my-app", "DATABASE_URL"}
 		ui := callUnsetEnv(args, reqFactory, appRepo)

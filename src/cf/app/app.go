@@ -222,9 +222,10 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			Name:        "delete",
 			ShortName:   "d",
 			Description: "Delete an app",
-			Usage:       fmt.Sprintf("%s delete APP [-f]", cf.Name()),
+			Usage:       fmt.Sprintf("%s delete APP [-f -r]", cf.Name()),
 			Flags: []cli.Flag{
 				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+				cli.BoolFlag{Name: "r", Usage: "Also delete any mapped routes"},
 			},
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("delete", c)

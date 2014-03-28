@@ -131,9 +131,10 @@ var _ = Describe("start command", func() {
 			displayApp := &testcmd.FakeAppDisplayer{}
 			requirementsFactory.Application = defaultAppForStart
 			appRepo := &testapi.FakeApplicationRepository{
-				ReadApp:         defaultAppForStart,
 				UpdateAppResult: defaultAppForStart,
 			}
+			appRepo.ReadReturns.App = defaultAppForStart
+
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{
 				GetInstancesResponses:  defaultInstanceReponses,
 				GetInstancesErrorCodes: defaultInstanceErrorCodes,
@@ -283,7 +284,8 @@ var _ = Describe("start command", func() {
 			app := models.Application{}
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
-			appRepo := &testapi.FakeApplicationRepository{ReadApp: app, UpdateErr: true}
+			appRepo := &testapi.FakeApplicationRepository{UpdateErr: true}
+			appRepo.ReadReturns.App = app
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 			logRepo := &testapi.FakeLogsRepository{}
 			args := []string{"my-app"}
@@ -305,7 +307,8 @@ var _ = Describe("start command", func() {
 			app.Name = "my-app"
 			app.Guid = "my-app-guid"
 			app.State = "started"
-			appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
+			appRepo := &testapi.FakeApplicationRepository{}
+			appRepo.ReadReturns.App = app
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 			logRepo := &testapi.FakeLogsRepository{}
 
@@ -325,7 +328,8 @@ var _ = Describe("start command", func() {
 			configRepo := testconfig.NewRepositoryWithDefaults()
 			displayApp := &testcmd.FakeAppDisplayer{}
 
-			appRepo := &testapi.FakeApplicationRepository{ReadApp: defaultAppForStart}
+			appRepo := &testapi.FakeApplicationRepository{}
+			appRepo.ReadReturns.App = defaultAppForStart
 			appInstancesRepo := &testapi.FakeAppInstancesRepo{
 				GetInstancesResponses:  defaultInstanceReponses,
 				GetInstancesErrorCodes: defaultInstanceErrorCodes,
@@ -363,9 +367,9 @@ func callStart(args []string, config configuration.Reader, requirementsFactory *
 func startAppWithInstancesAndErrors(displayApp ApplicationDisplayer, app models.Application, instances [][]models.AppInstanceFields, errorCodes []string, requirementsFactory *testreq.FakeReqFactory) (ui *testterm.FakeUI, appRepo *testapi.FakeApplicationRepository, appInstancesRepo *testapi.FakeAppInstancesRepo) {
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	appRepo = &testapi.FakeApplicationRepository{
-		ReadApp:         app,
 		UpdateAppResult: app,
 	}
+	appRepo.ReadReturns.App = app
 	appInstancesRepo = &testapi.FakeAppInstancesRepo{
 		GetInstancesResponses:  instances,
 		GetInstancesErrorCodes: errorCodes,

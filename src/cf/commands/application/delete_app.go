@@ -10,17 +10,19 @@ import (
 )
 
 type DeleteApp struct {
-	ui      terminal.UI
-	config  configuration.Reader
-	appRepo api.ApplicationRepository
-	appReq  requirements.ApplicationRequirement
+	ui        terminal.UI
+	config    configuration.Reader
+	appRepo   api.ApplicationRepository
+	routeRepo api.RouteRepository
+	appReq    requirements.ApplicationRequirement
 }
 
-func NewDeleteApp(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository) (cmd *DeleteApp) {
+func NewDeleteApp(ui terminal.UI, config configuration.Reader, appRepo api.ApplicationRepository, routeRepo api.RouteRepository) (cmd *DeleteApp) {
 	cmd = new(DeleteApp)
 	cmd.ui = ui
 	cmd.config = config
 	cmd.appRepo = appRepo
+	cmd.routeRepo = routeRepo
 	return
 }
 
@@ -67,6 +69,16 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
+	}
+
+	if c.Bool("r") {
+		for _, route := range app.Routes {
+			apiErr = cmd.routeRepo.Delete(route.Guid)
+			if apiErr != nil {
+				cmd.ui.Failed(apiErr.Error())
+				return
+			}
+		}
 	}
 
 	apiErr = cmd.appRepo.Delete(app.Guid)

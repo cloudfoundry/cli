@@ -114,7 +114,7 @@ var _ = Describe("Push Command", func() {
 		domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "the-code", "something went wrong")
 		domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
 		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("-t", "111", "my-new-app")
 
@@ -140,7 +140,7 @@ var _ = Describe("Push Command", func() {
 		var manifestApp generic.Map
 
 		BeforeEach(func() {
-			appRepo.ReadNotFound = true
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 			manifest := singleAppManifest()
 			manifestApp = manifest.Data.Get("applications").([]interface{})[0].(generic.Map)
@@ -164,7 +164,7 @@ var _ = Describe("Push Command", func() {
 
 	It("creates an app when pushing for the first time", func() {
 		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("-t", "111", "my-new-app")
 		Expect(*appRepo.CreatedAppParams().Name).To(Equal("my-new-app"))
@@ -197,7 +197,7 @@ var _ = Describe("Push Command", func() {
 
 	It("strips special characters when creating a default route", func() {
 		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("-t", "111", "Tim's 1st-Crazy__app!")
 		Expect(*appRepo.CreatedAppParams().Name).To(Equal("Tim's 1st-Crazy__app!"))
@@ -221,7 +221,7 @@ var _ = Describe("Push Command", func() {
 		route.Domain = domainRepo.ListSharedDomainsDomains[0]
 
 		routeRepo.FindByHostAndDomainRoute = route
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("my-new-app")
 
@@ -249,7 +249,7 @@ var _ = Describe("Push Command", func() {
 				Name: "customLinux",
 				Guid: "custom-linux-guid",
 			}
-			appRepo.ReadNotFound = true
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 			callPush(
 				"-c", "unicorn -c config/unicorn.rb -D",
@@ -342,7 +342,7 @@ var _ = Describe("Push Command", func() {
 			})
 
 			It("fails when a non-numeric start timeout is given", func() {
-				appRepo.ReadNotFound = true
+				appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 				callPush(
 					"-t", "FooeyTimeout",
@@ -361,7 +361,7 @@ var _ = Describe("Push Command", func() {
 				existingApp.Guid = "existing-app-guid"
 				existingApp.Command = "unicorn -c config/unicorn.rb -D"
 
-				appRepo.ReadApp = existingApp
+				appRepo.ReadReturns.App = existingApp
 
 				callPush("-c", "null", "existing-app")
 
@@ -374,7 +374,7 @@ var _ = Describe("Push Command", func() {
 				existingApp.Guid = "existing-app-guid"
 				existingApp.BuildpackUrl = "the-place.com/the-pack"
 
-				appRepo.ReadApp = existingApp
+				appRepo.ReadReturns.App = existingApp
 
 				callPush("-b", "null", "existing-app")
 
@@ -390,7 +390,7 @@ var _ = Describe("Push Command", func() {
 			"FOO":   "NotYoBaz",
 			"foo":   "manchu",
 		}
-		appRepo.ReadApp = existingApp
+		appRepo.ReadReturns.App = existingApp
 
 		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
@@ -409,7 +409,7 @@ var _ = Describe("Push Command", func() {
 		domain.Guid = "bar-domain-guid"
 		domainRepo.FindByNameInOrgDomain = domain
 		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 
@@ -437,7 +437,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("fails when parsing the manifest has errors", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 		manifestRepo.ReadManifestReturns.Manifest = &manifest.Manifest{Path: "/some-path/"}
 		manifestRepo.ReadManifestReturns.Error = errors.New("buildpack should not be null")
 
@@ -452,7 +452,7 @@ var _ = Describe("Push Command", func() {
 
 	Context("when a manifest has many apps", func() {
 		BeforeEach(func() {
-			appRepo.ReadNotFound = true
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 			manifestRepo.ReadManifestReturns.Manifest = manifestWithServicesAndEnv()
 		})
 
@@ -500,7 +500,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("binds service instances to the app", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		serviceRepo.FindInstanceByNameMap = generic.NewMap(map[interface{}]interface{}{
 			"global-service": maker.NewServiceInstance("global-service"),
@@ -551,7 +551,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("uploads the application bits from the -p path", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("-p", "../some/path-to/an-app", "app-with-path")
 
@@ -559,7 +559,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("pushes the current working directory if a path is not given", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("app-with-default-path")
 
@@ -569,7 +569,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("fails when given a bad manifest path", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		manifestRepo.ReadManifestReturns.Manifest = manifest.NewEmptyManifest()
 		manifestRepo.ReadManifestReturns.Error = errors.New("read manifest error")
@@ -583,7 +583,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("does not fail when the current working directory does not contain a manifest", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 		manifestRepo.ReadManifestReturns.Error = syscall.ENOENT
 		manifestRepo.ReadManifestReturns.Manifest.Path = ""
@@ -601,7 +601,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("uses the manifest in the current directory by default", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 		manifestRepo.ReadManifestReturns.Manifest = singleAppManifest()
 		manifestRepo.ReadManifestReturns.Manifest.Path = "manifest.yml"
 
@@ -615,7 +615,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("does not use a manifest if the 'no-manifest' flag is passed", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("--no-route", "--no-manifest", "app-name")
 
@@ -635,7 +635,7 @@ var _ = Describe("Push Command", func() {
 
 		domainRepo.FindByNameInOrgDomain = domain
 		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush(
 			"--no-route",
@@ -655,7 +655,7 @@ var _ = Describe("Push Command", func() {
 
 		domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
 		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush(
 			"--no-hostname",
@@ -668,7 +668,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("Does not create a route when the no-route property is in the manifest", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		workerManifest := singleAppManifest()
 		workerManifest.Data.Get("applications").([]interface{})[0].(generic.Map).Set("no-route", true)
@@ -686,7 +686,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("fails when given an invalid memory limit", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
 		callPush("-m", "abcM", "my-new-app")
 
@@ -698,7 +698,7 @@ var _ = Describe("Push Command", func() {
 
 	It("stops the app, achieving a full-downtime deploy!", func() {
 		existingApp := maker.NewApp(maker.Overrides{"name": "existing-app"})
-		appRepo.ReadApp = existingApp
+		appRepo.ReadReturns.App = existingApp
 		appRepo.UpdateAppResult = existingApp
 
 		callPush("existing-app")
@@ -710,7 +710,7 @@ var _ = Describe("Push Command", func() {
 	It("does not stop the app when it is already stopped", func() {
 		stoppedApp := maker.NewApp(maker.Overrides{"state": "stopped", "name": "stopped-app"})
 
-		appRepo.ReadApp = stoppedApp
+		appRepo.ReadReturns.App = stoppedApp
 		appRepo.UpdateAppResult = stoppedApp
 
 		callPush("stopped-app")
@@ -727,7 +727,7 @@ var _ = Describe("Push Command", func() {
 		existingApp.Guid = "existing-app-guid"
 		existingApp.Routes = []models.RouteSummary{existingRoute}
 
-		appRepo.ReadApp = existingApp
+		appRepo.ReadReturns.App = existingApp
 
 		stack := models.Stack{}
 		stack.Name = "differentStack"
@@ -773,7 +773,7 @@ var _ = Describe("Push Command", func() {
 			existingApp.Guid = "existing-app-guid"
 			existingApp.Routes = []models.RouteSummary{existingRoute}
 
-			appRepo.ReadApp = existingApp
+			appRepo.ReadReturns.App = existingApp
 			appRepo.UpdateAppResult = existingApp
 		})
 
@@ -872,7 +872,7 @@ var _ = Describe("Push Command", func() {
 	})
 
 	It("displays information about the files being uploaded", func() {
-		appRepo.ReadNotFound = true
+		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 		appBitsRepo.CallbackPath = "path/to/app"
 		appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
 		appBitsRepo.CallbackFileCount = 11
