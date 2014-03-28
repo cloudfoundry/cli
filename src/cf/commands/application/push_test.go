@@ -51,7 +51,7 @@ var _ = Describe("Push Command", func() {
 
 		domainRepo = &testapi.FakeDomainRepository{}
 		sharedDomain := maker.NewSharedDomainFields(maker.Overrides{"name": "foo.cf-app.com", "guid": "foo-domain-guid"})
-		domainRepo.ListSharedDomainsDomains = []models.DomainFields{sharedDomain}
+		domainRepo.ListDomainsForOrgDomains = []models.DomainFields{sharedDomain}
 
 		routeRepo = &testapi.FakeRouteRepository{}
 		stackRepo = &testapi.FakeStackRepository{}
@@ -99,40 +99,74 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("successfully pushes an app when the CC API only supports the old domains endpoints", func() {
-		privateDomain := models.DomainFields{
-			Shared: false,
-			Name:   "private.cf-app.com",
-			Guid:   "private-domain-guid",
-		}
-		sharedDomain := models.DomainFields{
-			Name:   "shared.cf-app.com",
-			Shared: true,
-			Guid:   "shared-domain-guid",
-		}
+	Context("when there is a shared domain", func() {
+		It("creates a route with the shared domain and maps it to the app", func() {
+			privateDomain := models.DomainFields{
+				Shared: false,
+				Name:   "private.cf-app.com",
+				Guid:   "private-domain-guid",
+			}
+			sharedDomain := models.DomainFields{
+				Name:   "shared.cf-app.com",
+				Shared: true,
+				Guid:   "shared-domain-guid",
+			}
 
-		domainRepo.ListSharedDomainsApiResponse = errors.NewHttpError(404, "the-code", "something went wrong")
-		domainRepo.ListDomainsDomains = []models.DomainFields{privateDomain, sharedDomain}
-		routeRepo.FindByHostAndDomainErr = true
-		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
+			domainRepo.ListDomainsForOrgDomains = []models.DomainFields{privateDomain, sharedDomain}
+			routeRepo.FindByHostAndDomainErr = true
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
-		callPush("-t", "111", "my-new-app")
+			callPush("-t", "111", "my-new-app")
 
-		Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
-		Expect(routeRepo.CreatedHost).To(Equal("my-new-app"))
-		Expect(routeRepo.CreatedDomainGuid).To(Equal("shared-domain-guid"))
-		Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
-		Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
+			Expect(routeRepo.CreatedHost).To(Equal("my-new-app"))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal("shared-domain-guid"))
+			Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+			Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating app", "my-new-app", "my-org", "my-space"},
-			{"OK"},
-			{"Creating", "my-new-app.shared.cf-app.com"},
-			{"OK"},
-			{"Binding", "my-new-app.shared.cf-app.com"},
-			{"OK"},
-			{"Uploading my-new-app"},
-			{"OK"},
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating app", "my-new-app", "my-org", "my-space"},
+				{"OK"},
+				{"Creating", "my-new-app.shared.cf-app.com"},
+				{"OK"},
+				{"Binding", "my-new-app.shared.cf-app.com"},
+				{"OK"},
+				{"Uploading my-new-app"},
+				{"OK"},
+			})
+		})
+	})
+
+	Context("when there is no shared domain but there is a private domain in the targeted org", func() {
+		It("creates a route with the private domain and maps it to the app", func() {
+			privateDomain := models.DomainFields{
+				Shared: false,
+				Name:   "private.cf-app.com",
+				Guid:   "private-domain-guid",
+			}
+
+			domainRepo.ListDomainsForOrgDomains = []models.DomainFields{privateDomain}
+			routeRepo.FindByHostAndDomainErr = true
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
+
+			callPush("-t", "111", "my-new-app")
+
+			Expect(routeRepo.FindByHostAndDomainHost).To(Equal("my-new-app"))
+			Expect(routeRepo.CreatedHost).To(Equal("my-new-app"))
+			Expect(routeRepo.CreatedDomainGuid).To(Equal("private-domain-guid"))
+			Expect(routeRepo.BoundAppGuid).To(Equal("my-new-app-guid"))
+			Expect(routeRepo.BoundRouteGuid).To(Equal("my-new-app-route-guid"))
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Creating app", "my-new-app", "my-org", "my-space"},
+				{"OK"},
+				{"Creating", "my-new-app.private.cf-app.com"},
+				{"OK"},
+				{"Binding", "my-new-app.private.cf-app.com"},
+				{"OK"},
+				{"Uploading my-new-app"},
+				{"OK"},
+			})
 		})
 	})
 
@@ -218,7 +252,7 @@ var _ = Describe("Push Command", func() {
 		route := models.Route{}
 		route.Guid = "my-route-guid"
 		route.Host = "my-new-app"
-		route.Domain = domainRepo.ListSharedDomainsDomains[0]
+		route.Domain = domainRepo.ListDomainsForOrgDomains[0]
 
 		routeRepo.FindByHostAndDomainRoute = route
 		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
@@ -653,7 +687,7 @@ var _ = Describe("Push Command", func() {
 		domain.Guid = "bar-domain-guid"
 		domain.Shared = true
 
-		domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
+		domainRepo.ListDomainsForOrgDomains = []models.DomainFields{domain}
 		routeRepo.FindByHostAndDomainErr = true
 		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 
@@ -758,7 +792,7 @@ var _ = Describe("Push Command", func() {
 				Shared: true,
 			}
 
-			domainRepo.ListSharedDomainsDomains = []models.DomainFields{domain}
+			domainRepo.ListDomainsForOrgDomains = []models.DomainFields{domain}
 
 			existingRoute := models.RouteSummary{}
 			existingRoute.Host = "existing-app"

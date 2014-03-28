@@ -265,30 +265,18 @@ func (cmd *Push) findDomain(appParams models.AppParams) (domain models.DomainFie
 	return
 }
 
-func (cmd *Push) findDefaultDomain() (domain models.DomainFields, err error) {
-	foundIt := false
-	listDomainsCallback := func(aDomain models.DomainFields) bool {
-		if aDomain.Shared {
-			domain = aDomain
-			foundIt = true
-		}
-		return !foundIt
+func (cmd *Push) findDefaultDomain() (models.DomainFields, error) {
+	var foundDomain *models.DomainFields
+	cmd.domainRepo.ListDomainsForOrg(cmd.config.OrganizationFields().Guid, func(domain models.DomainFields) bool {
+		foundDomain = &domain
+		return !domain.Shared
+	})
+
+	if foundDomain == nil {
+		return models.DomainFields{}, errors.New("Could not find a default domain")
 	}
 
-	apiErr := cmd.domainRepo.ListSharedDomains(listDomainsCallback)
-
-	// FIXME: needs semantic API version
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		apiErr = cmd.domainRepo.ListDomains(listDomainsCallback)
-	}
-
-	if !foundIt {
-		err = errors.New("Could not find a default domain")
-		return
-	}
-
-	return
+	return *foundDomain, nil
 }
 
 func (cmd *Push) createOrUpdateApp(appParams models.AppParams) (app models.Application) {
