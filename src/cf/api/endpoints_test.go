@@ -79,7 +79,7 @@ var _ = Describe("Endpoints Repository", func() {
 	Describe("updating the endpoints", func() {
 		Context("when the API request is successful", func() {
 			var (
-				org models.OrganizationFields
+				org   models.OrganizationFields
 				space models.SpaceFields
 			)
 			BeforeEach(func() {
