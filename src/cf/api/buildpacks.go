@@ -112,7 +112,6 @@ func (repo CloudControllerBuildpackRepository) Rename(buildpack models.Buildpack
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
 
 	data := fmt.Sprintf(`{"name":"%s"}`, newbuildpackName)
-	fmt.Println(data)
 
 	resource := new(BuildpackResource)
 	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
