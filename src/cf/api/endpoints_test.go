@@ -78,20 +78,23 @@ var _ = Describe("Endpoints Repository", func() {
 
 	Describe("updating the endpoints", func() {
 		Context("when the API request is successful", func() {
-			It("stores the data from the /info api in the config", func() {
-				testServerFn = validApiInfoEndpoint
-
-				org := models.OrganizationFields{}
+			var (
+				org models.OrganizationFields
+				space models.SpaceFields
+			)
+			BeforeEach(func() {
 				org.Name = "my-org"
 				org.Guid = "my-org-guid"
 
-				space := models.SpaceFields{}
 				space.Name = "my-space"
 				space.Guid = "my-space-guid"
 
 				config.SetOrganizationFields(org)
 				config.SetSpaceFields(space)
+				testServerFn = validApiInfoEndpoint
+			})
 
+			It("stores the data from the /info api in the config", func() {
 				repo.UpdateEndpoint(testServer.URL)
 
 				Expect(config.AccessToken()).To(Equal(""))
@@ -103,29 +106,21 @@ var _ = Describe("Endpoints Repository", func() {
 				Expect(config.HasSpace()).To(BeFalse())
 			})
 
-			It("does not clear the session if the api endpoint does not change", func() {
-				testServerFn = validApiInfoEndpoint
+			Context("when the api endpoint does not change", func() {
+				BeforeEach(func() {
+					config.SetApiEndpoint(testServer.URL)
+					config.SetAccessToken("some access token")
+					config.SetRefreshToken("some refresh token")
+				})
 
-				org := models.OrganizationFields{}
-				org.Name = "my-org"
-				org.Guid = "my-org-guid"
+				It("does not clear the session if the api endpoint does not change", func() {
+					repo.UpdateEndpoint(testServer.URL)
 
-				space := models.SpaceFields{}
-				space.Name = "my-space"
-				space.Guid = "my-space-guid"
-
-				config.SetApiEndpoint(testServer.URL)
-				config.SetAccessToken("some access token")
-				config.SetRefreshToken("some refresh token")
-				config.SetOrganizationFields(org)
-				config.SetSpaceFields(space)
-
-				repo.UpdateEndpoint(testServer.URL)
-
-				Expect(config.OrganizationFields()).To(Equal(org))
-				Expect(config.SpaceFields()).To(Equal(space))
-				Expect(config.AccessToken()).To(Equal("some access token"))
-				Expect(config.RefreshToken()).To(Equal("some refresh token"))
+					Expect(config.OrganizationFields()).To(Equal(org))
+					Expect(config.SpaceFields()).To(Equal(space))
+					Expect(config.AccessToken()).To(Equal("some access token"))
+					Expect(config.RefreshToken()).To(Equal("some refresh token"))
+				})
 			})
 		})
 
