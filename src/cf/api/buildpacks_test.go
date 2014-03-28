@@ -274,7 +274,7 @@ var _ = Describe("Buildpacks repo", func() {
 						"guid": "my-cool-buildpack-guid"
 					},
 					"entity": {
-						"name": "my-cool-buildpack"
+						"name": "my-new-buildpack"
 					}
 				}`},
 		})
@@ -290,6 +290,7 @@ var _ = Describe("Buildpacks repo", func() {
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 
+		buildpack.Name = updated.Name
 		Expect(buildpack).To(Equal(updated))
 	})
 

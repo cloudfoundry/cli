@@ -53,7 +53,6 @@ func (cmd *RenameBuildpack) Run(c *cli.Context) {
 	default:
 		cmd.ui.Failed(apiErr.Error())
 		return
-
 	}
 
 	buildpack, apiErr = cmd.buildpackRepo.Rename(buildpack, newbuildpackName)
