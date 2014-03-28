@@ -14,24 +14,18 @@ import (
 	"time"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestEventsRequirements", func() {
-		reqFactory, eventsRepo := getEventsDependencies()
-
-		callEvents([]string{"my-app"}, reqFactory, eventsRepo)
-
-		Expect(reqFactory.ApplicationName).To(Equal("my-app"))
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-	})
-	It("TestEventsFailsWithUsage", func() {
-
+var _ = Describe("events command", func() {
+	It("fails with usage when called without an app name", func() {
 		reqFactory, eventsRepo := getEventsDependencies()
 		ui := callEvents([]string{}, reqFactory, eventsRepo)
 
 		Expect(ui.FailedWithUsage).To(BeTrue())
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
-	It("TestEventsSuccess", func() {
+
+	It("lists events given an app name", func() {
+		earlierTimestamp, err := time.Parse(TIMESTAMP_FORMAT, "1999-12-31T23:59:11.00-0000")
+		Expect(err).NotTo(HaveOccurred())
 
 		timestamp, err := time.Parse(TIMESTAMP_FORMAT, "2000-01-01T00:01:11.00-0000")
 		Expect(err).NotTo(HaveOccurred())
@@ -44,7 +38,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		event1 := models.EventFields{}
 		event1.Guid = "event-guid-1"
 		event1.Name = "app crashed"
-		event1.Timestamp = timestamp
+		event1.Timestamp = earlierTimestamp
 		event1.Description = "reason: app instance exited, exit_status: 78"
 
 		event2 := models.EventFields{}
@@ -63,12 +57,12 @@ var _ = Describe("Testing with ginkgo", func() {
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},
 			{"time", "event", "description"},
-			{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance exited", "78"},
+			{earlierTimestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance exited", "78"},
 			{timestamp.Local().Format(TIMESTAMP_FORMAT), "app crashed", "app instance was stopped", "77"},
 		})
 	})
-	It("TestEventsWhenNoEventsAvailable", func() {
 
+	It("tells the user when no events exist for that app", func() {
 		reqFactory, eventsRepo := getEventsDependencies()
 		app := models.Application{}
 		app.Name = "my-app"

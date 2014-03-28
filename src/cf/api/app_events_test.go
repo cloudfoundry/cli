@@ -16,98 +16,8 @@ import (
 	"time"
 )
 
-var firstPageOldV2EventsRequest = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/apps/my-app-guid/events",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `
-{
-  "total_results": 58,
-  "total_pages": 2,
-  "prev_url": null,
-  "next_url": "/v2/apps/my-app-guid/events?inline-relations-depth=1&page=2&results-per-page=50",
-  "resources": [
-    {
-      "entity": {
-        "instance_index": 1,
-        "exit_status": 1,
-        "exit_description": "app instance exited",
-        "timestamp": "2013-10-07T16:51:07+00:00"
-      }
-    }
-  ]
-}
-`},
-}
-
-var secondPageOldV2EventsRequest = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/apps/my-app-guid/events",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `
-{
-  "total_results": 58,
-  "total_pages": 2,
-  "prev_url": null,
-  "next_url": "",
-  "resources": [
-    {
-      "entity": {
-        "instance_index": 2,
-        "exit_status": 2,
-        "exit_description": "app instance was stopped",
-        "timestamp": "2013-10-07T17:51:07+00:00"
-      }
-    }
-  ]
-}
-`},
-}
-
-var oldV2NotFoundRequest = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/apps/my-app-guid/events",
-	Response: testnet.TestResponse{
-		Status: http.StatusNotFound,
-	},
-}
-
-var newV2NotFoundRequest = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/events?q=actee%3Amy-app-guid",
-	Response: testnet.TestResponse{
-		Status: http.StatusNotFound,
-	},
-}
-
-type eventTestDependencies struct {
-	server  *httptest.Server
-	handler *testnet.TestHandler
-	config  configuration.Reader
-	gateway net.Gateway
-}
-
-func setupEventTest(requests []testnet.TestRequest) (deps eventTestDependencies) {
-	deps.server, deps.handler = testnet.NewServer(requests)
-
-	configRepo := testconfig.NewRepository()
-	configRepo.SetApiEndpoint(deps.server.URL)
-	configRepo.SetAccessToken("BEARER my_access_token")
-
-	deps.config = configRepo
-	deps.gateway = net.NewCloudControllerGateway(configRepo)
-
-	return
-}
-
-func teardownEventTest(deps eventTestDependencies) {
-	deps.server.Close()
-}
-
 var _ = Describe("App Events Repo", func() {
-	It("TestListOldV2EventsWhenNewV2ApiNotFound", func() {
+	It("makes a backwards compatible request to the old events endpoint when the first request fails", func() {
 		deps := setupEventTest([]testnet.TestRequest{
 			newV2NotFoundRequest,
 			firstPageOldV2EventsRequest,
@@ -141,7 +51,7 @@ var _ = Describe("App Events Repo", func() {
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
 
-	It("TestListEventsUsingNewEndpoint", func() {
+	It("lists events from the /v2/events endpoint", func() {
 		pageOneNewV2Request := testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/events?q=actee%3Amy-app-guid",
@@ -254,7 +164,7 @@ var _ = Describe("App Events Repo", func() {
 		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
 	})
 
-	It("TestUnmarshalNewCrashEvent", func() {
+	It("unmarshals app crash events into a struct", func() {
 		resource := new(EventResourceNewV2)
 		err := json.Unmarshal([]byte(`
 			{
@@ -284,7 +194,7 @@ var _ = Describe("App Events Repo", func() {
 		Expect(eventFields.Description).To(Equal(`index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`))
 	})
 
-	It("TestUnmarshalUpdateAppEvent", func() {
+	It("unmarshals app update events into a strct", func() {
 		resource := new(EventResourceNewV2)
 		err := json.Unmarshal([]byte(`
 			{
@@ -341,7 +251,7 @@ var _ = Describe("App Events Repo", func() {
 		Expect(eventFields.Description).To(Equal(`state: STOPPED`))
 	})
 
-	It("TestUnmarshalDeleteAppEvent", func() {
+	It("unmarshals app delete events into a struct", func() {
 		resource := new(EventResourceNewV2)
 		err := json.Unmarshal([]byte(`
 			{
@@ -369,7 +279,7 @@ var _ = Describe("App Events Repo", func() {
 		Expect(eventFields.Description).To(Equal("recursive: true"))
 	})
 
-	It("TestUnmarshalNewV2CreateEvent", func() {
+	It("unmarshals the new v2 app create event into a struct", func() {
 		resource := new(EventResourceNewV2)
 		err := json.Unmarshal([]byte(`
 			{
@@ -403,3 +313,93 @@ var _ = Describe("App Events Repo", func() {
 		Expect(eventFields.Description).To(Equal("disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN"))
 	})
 })
+
+var firstPageOldV2EventsRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-app-guid/events",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+  "total_results": 58,
+  "total_pages": 2,
+  "prev_url": null,
+  "next_url": "/v2/apps/my-app-guid/events?inline-relations-depth=1&page=2&results-per-page=50",
+  "resources": [
+    {
+      "entity": {
+        "instance_index": 1,
+        "exit_status": 1,
+        "exit_description": "app instance exited",
+        "timestamp": "2013-10-07T16:51:07+00:00"
+      }
+    }
+  ]
+}
+`},
+}
+
+var secondPageOldV2EventsRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-app-guid/events",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `
+{
+  "total_results": 58,
+  "total_pages": 2,
+  "prev_url": null,
+  "next_url": "",
+  "resources": [
+    {
+      "entity": {
+        "instance_index": 2,
+        "exit_status": 2,
+        "exit_description": "app instance was stopped",
+        "timestamp": "2013-10-07T17:51:07+00:00"
+      }
+    }
+  ]
+}
+`},
+}
+
+var oldV2NotFoundRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/apps/my-app-guid/events",
+	Response: testnet.TestResponse{
+		Status: http.StatusNotFound,
+	},
+}
+
+var newV2NotFoundRequest = testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/events?q=actee%3Amy-app-guid",
+	Response: testnet.TestResponse{
+		Status: http.StatusNotFound,
+	},
+}
+
+type eventTestDependencies struct {
+	server  *httptest.Server
+	handler *testnet.TestHandler
+	config  configuration.Reader
+	gateway net.Gateway
+}
+
+func setupEventTest(requests []testnet.TestRequest) (deps eventTestDependencies) {
+	deps.server, deps.handler = testnet.NewServer(requests)
+
+	configRepo := testconfig.NewRepository()
+	configRepo.SetApiEndpoint(deps.server.URL)
+	configRepo.SetAccessToken("BEARER my_access_token")
+
+	deps.config = configRepo
+	deps.gateway = net.NewCloudControllerGateway(configRepo)
+
+	return
+}
+
+func teardownEventTest(deps eventTestDependencies) {
+	deps.server.Close()
+}
