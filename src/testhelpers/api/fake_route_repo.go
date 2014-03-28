@@ -32,7 +32,8 @@ type FakeRouteRepository struct {
 	ListErr bool
 	Routes  []models.Route
 
-	DeleteRouteGuid string
+	DeletedRouteGuids []string
+	DeleteErr         error
 }
 
 func (repo *FakeRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr error) {
@@ -100,6 +101,7 @@ func (repo *FakeRouteRepository) Unbind(routeGuid, appGuid string) (apiErr error
 }
 
 func (repo *FakeRouteRepository) Delete(routeGuid string) (apiErr error) {
-	repo.DeleteRouteGuid = routeGuid
+	repo.DeletedRouteGuids = append(repo.DeletedRouteGuids, routeGuid)
+	apiErr = repo.DeleteErr
 	return
 }

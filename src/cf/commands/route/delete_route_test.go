@@ -50,7 +50,6 @@ var _ = Describe("delete-route command", func() {
 				Name: "example.com",
 			}
 			routeRepo.FindByHostAndDomainRoute = route
-
 		})
 
 		It("passes requirements when logged in", func() {
@@ -84,7 +83,7 @@ var _ = Describe("delete-route command", func() {
 				{"Deleting route", "my-host.example.com"},
 				{"OK"},
 			})
-			Expect(routeRepo.DeleteRouteGuid).To(Equal("route-guid"))
+			Expect(routeRepo.DeletedRouteGuids).To(Equal([]string{"route-guid"}))
 		})
 
 		It("does not prompt the user to confirm when they pass the '-f' flag", func() {
@@ -96,7 +95,7 @@ var _ = Describe("delete-route command", func() {
 				{"Deleting", "my-host.example.com"},
 				{"OK"},
 			})
-			Expect(routeRepo.DeleteRouteGuid).To(Equal("route-guid"))
+			Expect(routeRepo.DeletedRouteGuids).To(Equal([]string{"route-guid"}))
 		})
 
 		It("succeeds with a warning when the route does not exist", func() {
