@@ -20,9 +20,9 @@ type FakeBuildpackRepository struct {
 	DeleteBuildpackGuid string
 	DeleteApiResponse   error
 
-	UpdateBuildpack models.Buildpack
-	RenameBuildpack models.Buildpack
-	RenameApiResponse   error
+	UpdateBuildpack   models.Buildpack
+	RenameBuildpack   models.Buildpack
+	RenameApiResponse error
 }
 
 func (repo *FakeBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {

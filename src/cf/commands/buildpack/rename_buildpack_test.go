@@ -2,8 +2,8 @@ package buildpack_test
 
 import (
 	. "cf/commands/buildpack"
-	"cf/models"
 	"cf/errors"
+	"cf/models"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	testapi "testhelpers/api"
@@ -80,7 +80,7 @@ var _ = Describe("rename-buildpack command", func() {
 			{"Buildpack my-buildpack1 does not exist"},
 		})
 	})
-	
+
 	It("TestRenameBuildpackToOneThatExist", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
 
@@ -97,5 +97,5 @@ var _ = Describe("rename-buildpack command", func() {
 			{"Renaming buildpack", "my-buildpack"},
 			{"failed, target build pack exists"},
 		})
-	})	
+	})
 })
