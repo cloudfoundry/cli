@@ -104,11 +104,14 @@ var _ = Describe("delete-route command", func() {
 
 			callDeleteRoute("y", []string{"-n", "my-host", "example.com"})
 
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting", "my-host.example.com"},
-				{"OK"},
+			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
 				{"my-host", "does not exist"},
 			})
+
+			testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+				{"OK"},
+			})
+
 		})
 	})
 })
