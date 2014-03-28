@@ -65,8 +65,7 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 	switch apiErr.(type) {
 	case nil:
 	case *errors.ModelNotFoundError:
-		cmd.ui.Ok()
-		cmd.ui.Warn("Route %s does not exist.", url)
+		cmd.ui.Warn("Unable to delete, route '%s' does not exist.", url)
 		return
 	default:
 		cmd.ui.Failed(apiErr.Error())
