@@ -7,7 +7,7 @@ import (
 
 type Application struct {
 	ApplicationFields
-	Stack  Stack
+	Stack  *Stack
 	Routes []RouteSummary
 }
 
@@ -31,17 +31,15 @@ func (model Application) ToParams() (params AppParams) {
 		InstanceCount:   &model.InstanceCount,
 		Memory:          &model.Memory,
 		State:           &state,
-		StackGuid:       &model.Stack.Guid,
 		SpaceGuid:       &model.SpaceGuid,
 		EnvironmentVars: &model.EnvironmentVars,
 	}
 
-	return
-}
+	if model.Stack != nil {
+		params.StackGuid = &model.Stack.Guid
+	}
 
-type AppSummary struct {
-	ApplicationFields
-	RouteSummaries []RouteSummary
+	return
 }
 
 type ApplicationFields struct {

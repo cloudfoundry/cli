@@ -32,8 +32,8 @@ var _ = Describe("AppSummaryRepository", func() {
 		app1 := apps[0]
 		Expect(app1.Name).To(Equal("app1"))
 		Expect(app1.Guid).To(Equal("app-1-guid"))
-		Expect(len(app1.RouteSummaries)).To(Equal(1))
-		Expect(app1.RouteSummaries[0].URL()).To(Equal("app1.cfapps.io"))
+		Expect(len(app1.Routes)).To(Equal(1))
+		Expect(app1.Routes[0].URL()).To(Equal("app1.cfapps.io"))
 
 		Expect(app1.State).To(Equal("started"))
 		Expect(app1.InstanceCount).To(Equal(1))
@@ -43,9 +43,9 @@ var _ = Describe("AppSummaryRepository", func() {
 		app2 := apps[1]
 		Expect(app2.Name).To(Equal("app2"))
 		Expect(app2.Guid).To(Equal("app-2-guid"))
-		Expect(len(app2.RouteSummaries)).To(Equal(2))
-		Expect(app2.RouteSummaries[0].URL()).To(Equal("app2.cfapps.io"))
-		Expect(app2.RouteSummaries[1].URL()).To(Equal("foo.cfapps.io"))
+		Expect(len(app2.Routes)).To(Equal(2))
+		Expect(app2.Routes[0].URL()).To(Equal("app2.cfapps.io"))
+		Expect(app2.Routes[1].URL()).To(Equal("foo.cfapps.io"))
 
 		Expect(app2.State).To(Equal("started"))
 		Expect(app2.InstanceCount).To(Equal(3))

@@ -65,12 +65,12 @@ var _ = Describe("Show App Command", func() {
 		domain2.Name = "example.com"
 		route2.Domain = domain2
 
-		appSummary := models.AppSummary{}
-		appSummary.State = "started"
-		appSummary.InstanceCount = 2
-		appSummary.RunningInstances = 2
-		appSummary.Memory = 256
-		appSummary.RouteSummaries = []models.RouteSummary{route1, route2}
+		application := models.Application{}
+		application.State = "started"
+		application.InstanceCount = 2
+		application.RunningInstances = 2
+		application.Memory = 256
+		application.Routes = []models.RouteSummary{route1, route2}
 
 		time1, err := time.Parse("Mon Jan 2 15:04:05 -0700 MST 2006", "Mon Jan 2 15:04:05 -0700 MST 2012")
 		Expect(err).NotTo(HaveOccurred())
@@ -93,7 +93,7 @@ var _ = Describe("Show App Command", func() {
 
 		instances := []models.AppInstanceFields{appInstance, appInstance2}
 
-		appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary}
+		appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: application}
 		appInstancesRepo := &testapi.FakeAppInstancesRepo{GetInstancesResponses: [][]models.AppInstanceFields{instances}}
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
 		ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
@@ -149,11 +149,11 @@ func testDisplayingAppSummaryWithErrorCode(errorCode string) {
 	app.RunningInstances = 0
 	app.Memory = 256
 
-	appSummary := models.AppSummary{}
-	appSummary.ApplicationFields = app
-	appSummary.RouteSummaries = routes
+	application := models.Application{}
+	application.ApplicationFields = app
+	application.Routes = routes
 
-	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: appSummary, GetSummaryErrorCode: errorCode}
+	appSummaryRepo := &testapi.FakeAppSummaryRepo{GetSummarySummary: application, GetSummaryErrorCode: errorCode}
 	appInstancesRepo := &testapi.FakeAppInstancesRepo{}
 	reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true, Application: reqApp}
 	ui := callApp([]string{"my-app"}, reqFactory, appSummaryRepo, appInstancesRepo)
