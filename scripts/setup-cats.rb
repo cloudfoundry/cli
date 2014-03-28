@@ -20,7 +20,7 @@ end
 
 cleanup_cmd = <<-BASH
 sudo rm -rfv $(sudo find /opt/warden/disks/bind_mount_points -name "*cc-droplets*") && \
-truncate -s 0 /opt/warden/disks/ephemeral_mount_point/*/sys/log/dea_logging_agent/*.log
+sudo truncate -s 0 /opt/warden/disks/ephemeral_mount_point/*/sys/log/dea_logging_agent/*.log
 BASH
 run_or_die(%(ssh -o "StrictHostKeyChecking no" #{BOSH_LITE_HOSTNAME} '#{cleanup_cmd}'))
 
