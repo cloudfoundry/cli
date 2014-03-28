@@ -40,7 +40,7 @@ var _ = Describe("domains command", func() {
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
-	It("TestListDomains", func() {
+	It("lists private domains", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
@@ -59,13 +59,13 @@ var _ = Describe("domains command", func() {
 		domain3.Name = "Domain3"
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsDomains: []models.DomainFields{domain1},
-			ListDomainsForOrgDomains: []models.DomainFields{domain2, domain3},
+			ListSharedDomainsDomains:        []models.DomainFields{domain1},
+			ListPrivateDomainsForOrgDomains: []models.DomainFields{domain2, domain3},
 		}
 
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		Expect(domainRepo.ListDomainsForOrgDomainsGuid).To(Equal("my-org-guid"))
+		Expect(domainRepo.ListPrivateDomainsForOrgGuid).To(Equal("my-org-guid"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
@@ -122,7 +122,7 @@ var _ = Describe("domains command", func() {
 
 		domainRepo := &testapi.FakeDomainRepository{
 			ListSharedDomainsApiResponse: errors.NewHttpError(404, "9003", "something bad happened"),
-			ListDomainsForOrgDomains: []models.DomainFields{
+			ListPrivateDomainsForOrgDomains: []models.DomainFields{
 				models.DomainFields{Name: "ze-domain"},
 			},
 		}
@@ -142,7 +142,7 @@ var _ = Describe("domains command", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListDomainsForOrgApiResponse: errors.New("borked!"),
+			ListPrivateDomainsForOrgApiResponse: errors.New("borked!"),
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 

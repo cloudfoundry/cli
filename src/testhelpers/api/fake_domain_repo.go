@@ -6,15 +6,16 @@ import (
 )
 
 type FakeDomainRepository struct {
-	ListDomainsForOrgDomainsGuid string
+	ListDomainsForOrgGuid        string
 	ListDomainsForOrgDomains     []models.DomainFields
 	ListDomainsForOrgApiResponse error
 
+	ListPrivateDomainsForOrgGuid        string
+	ListPrivateDomainsForOrgDomains     []models.DomainFields
+	ListPrivateDomainsForOrgApiResponse error
+
 	ListSharedDomainsDomains     []models.DomainFields
 	ListSharedDomainsApiResponse error
-
-	ListDomainsDomains     []models.DomainFields
-	ListDomainsApiResponse error
 
 	FindByNameInOrgName        string
 	FindByNameInOrgGuid        string
@@ -38,8 +39,16 @@ type FakeDomainRepository struct {
 	DeleteSharedApiResponse error
 }
 
+func (repo *FakeDomainRepository) ListPrivateDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
+	repo.ListPrivateDomainsForOrgGuid = orgGuid
+	for _, d := range repo.ListPrivateDomainsForOrgDomains {
+		cb(d)
+	}
+	return repo.ListPrivateDomainsForOrgApiResponse
+}
+
 func (repo *FakeDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
-	repo.ListDomainsForOrgDomainsGuid = orgGuid
+	repo.ListDomainsForOrgGuid = orgGuid
 	for _, d := range repo.ListDomainsForOrgDomains {
 		cb(d)
 	}
@@ -51,13 +60,6 @@ func (repo *FakeDomainRepository) ListSharedDomains(cb func(models.DomainFields)
 		cb(d)
 	}
 	return repo.ListSharedDomainsApiResponse
-}
-
-func (repo *FakeDomainRepository) ListDomains(cb func(models.DomainFields) bool) error {
-	for _, d := range repo.ListDomainsDomains {
-		cb(d)
-	}
-	return repo.ListDomainsApiResponse
 }
 
 func (repo *FakeDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr error) {

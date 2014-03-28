@@ -93,6 +93,45 @@ var _ = Describe("DomainRepository", func() {
 				})
 			})
 		})
+
+		Describe("listing the private domains for an organization", func() {
+			Context("when the organization-scoped domains endpoint is available", func() {
+				BeforeEach(func() {
+					setupTestServer(firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest)
+				})
+
+				It("uses that endpoint", func() {
+					receivedDomains := []models.DomainFields{}
+					apiErr := repo.ListPrivateDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+						receivedDomains = append(receivedDomains, d)
+						return true
+					})
+
+					Expect(apiErr).NotTo(HaveOccurred())
+					Expect(len(receivedDomains)).To(Equal(3))
+					Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
+					Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
+					Expect(handler).To(testnet.HaveAllRequestsCalled())
+				})
+			})
+
+			Context("when the organization-scoped endpoint returns a 404", func() {
+				It("uses the global domains endpoint", func() {
+					setupTestServer(notFoundPrivateDomainsRequest, oldEndpointDomainsRequest)
+
+					receivedDomains := []models.DomainFields{}
+					apiErr := repo.ListPrivateDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+						receivedDomains = append(receivedDomains, d)
+						return true
+					})
+
+					Expect(apiErr).NotTo(HaveOccurred())
+					Expect(len(receivedDomains)).To(Equal(1))
+					Expect(receivedDomains[0].Guid).To(Equal("domain-guid"))
+					Expect(handler).To(testnet.HaveAllRequestsCalled())
+				})
+			})
+		})
 	})
 
 	It("TestDomainFindByName", func() {
@@ -456,9 +495,16 @@ var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testn
 
 var notFoundDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method:   "GET",
+	Path:     "/v2/organizations/my-org-guid/domains",
+	Response: testnet.TestResponse{Status: http.StatusNotFound},
+})
+
+var notFoundPrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method:   "GET",
 	Path:     "/v2/organizations/my-org-guid/private_domains",
 	Response: testnet.TestResponse{Status: http.StatusNotFound},
 })
+
 var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/domains",
@@ -477,6 +523,54 @@ var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Te
 }`}})
 
 var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/organizations/my-org-guid/domains",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/organizations/my-org-guid/domains?page=2",
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain1-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		},
+		{
+		  "metadata": {
+			"guid": "domain2-guid"
+		  },
+		  "entity": {
+			"name": "some-example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`},
+})
+
+var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/organizations/my-org-guid/domains?page=2",
+	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"resources": [
+		{
+		  "metadata": {
+			"guid": "domain3-guid"
+		  },
+		  "entity": {
+			"name": "example.com",
+			"owning_organization_guid": "my-org-guid"
+		  }
+		}
+	]
+}`},
+})
+
+var firstPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/private_domains",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -505,7 +599,7 @@ var firstPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.Test
 }`},
 })
 
-var secondPageDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondPagePrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/organizations/my-org-guid/private_domains?page=2",
 	Response: testnet.TestResponse{Status: http.StatusOK, Body: `

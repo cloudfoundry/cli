@@ -61,7 +61,7 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		return
 	}
 
-	apiErr = cmd.domainRepo.ListDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
+	apiErr = cmd.domainRepo.ListPrivateDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
 	if apiErr != nil {
 		cmd.ui.Failed("Failed fetching private domains.\n%s", apiErr.Error())
 		return
