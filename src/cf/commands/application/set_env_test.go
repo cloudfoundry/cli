@@ -107,15 +107,12 @@ var _ = Describe("set-env command", func() {
 	})
 
 	It("TestRunWhenSettingTheEnvFails", func() {
-
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-		appRepo := &testapi.FakeApplicationRepository{
-			ReadApp:   app,
-			UpdateErr: true,
-		}
+		appRepo := &testapi.FakeApplicationRepository{UpdateErr: true}
+		appRepo.ReadReturns.App = app
 
 		args := []string{"does-not-exist", "DATABASE_URL", "mysql://example.com/my-db"}
 		ui := callSetEnv(args, reqFactory, appRepo)
@@ -128,12 +125,12 @@ var _ = Describe("set-env command", func() {
 	})
 
 	It("TestSetEnvFailsWithUsage", func() {
-
 		app := models.Application{}
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 		reqFactory := &testreq.FakeReqFactory{Application: app, LoginSuccess: true, TargetedSpaceSuccess: true}
-		appRepo := &testapi.FakeApplicationRepository{ReadApp: app}
+		appRepo := &testapi.FakeApplicationRepository{}
+		appRepo.ReadReturns.App = app
 
 		args := []string{"my-app", "DATABASE_URL", "..."}
 		ui := callSetEnv(args, reqFactory, appRepo)
