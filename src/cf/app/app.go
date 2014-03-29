@@ -276,6 +276,17 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "delete-orphaned-routes",
+			Description: "Delete all orphaned routes",
+			Usage:       fmt.Sprintf("%s delete-orphaned-routes [-f]", cf.Name()),
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "f", Usage: "Force deletion without confirmation"},
+			},
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("delete-orphaned-routes", c)
+			},
+		},
+		{
 			Name:        "delete-route",
 			Description: "Delete a route",
 			Usage:       fmt.Sprintf("%s delete-route DOMAIN [-n HOSTNAME] [-f]", cf.Name()),

@@ -48,6 +48,7 @@ func NewFactory(ui terminal.UI, config configuration.ReadWriter, manifestRepo ma
 	factory.cmdsByName["delete-domain"] = domain.NewDeleteDomain(ui, config, repoLocator.GetDomainRepository())
 	factory.cmdsByName["delete-shared-domain"] = domain.NewDeleteSharedDomain(ui, config, repoLocator.GetDomainRepository())
 	factory.cmdsByName["delete-org"] = organization.NewDeleteOrg(ui, config, repoLocator.GetOrganizationRepository())
+	factory.cmdsByName["delete-orphaned-routes"] = route.NewDeleteOrphanedRoutes(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["delete-route"] = route.NewDeleteRoute(ui, config, repoLocator.GetRouteRepository())
 	factory.cmdsByName["delete-service"] = service.NewDeleteService(ui, config, repoLocator.GetServiceRepository())
 	factory.cmdsByName["delete-service-auth-token"] = serviceauthtoken.NewDeleteServiceAuthToken(ui, config, repoLocator.GetServiceAuthTokenRepository())
