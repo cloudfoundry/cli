@@ -5,6 +5,8 @@ import (
 	"github.com/onsi/ginkgo"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"reflect"
 	"strings"
 )
 
@@ -33,6 +35,16 @@ func (h *TestHandler) AllRequestsCalled() bool {
 	return h.CallCount == len(h.Requests)
 }
 
+func urlQueryContains(container, containee url.Values) bool {
+	for key, value := range containee {
+		actualValue, ok := container[key]
+		if !ok || !reflect.DeepEqual(actualValue, value) {
+			return false
+		}
+	}
+	return true
+}
+
 func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(h.Requests) <= h.CallCount {
 		h.logError("Index out of range! Test server called too many times. Final Request:", r.Method, r.RequestURI)
@@ -54,7 +66,9 @@ func (h *TestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	// match query string
 	if len(paths) > 1 {
-		if !strings.Contains(r.URL.RawQuery, paths[1]) {
+		actualValues, _ := url.ParseQuery(r.URL.RawQuery)
+		expectedValues, _ := url.ParseQuery(paths[1])
+		if !urlQueryContains(actualValues, expectedValues) {
 			h.logError("Query string does not match.\nExpected: %s\nActual:   %s", paths[1], r.URL.RawQuery)
 		}
 	}
