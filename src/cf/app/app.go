@@ -510,7 +510,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("d", "Domain (e.g. example.com)"),
 				NewStringFlag("f", "Path to manifest"),
 				NewIntFlag("i", "Number of instances"),
-				NewStringFlag("k", "Disk quota (e.g. 256M, 1024M, 1G)"),
+				NewStringFlag("k", "Disk limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("n", "Hostname (e.g. my-subdomain)"),
 				NewStringFlag("p", "Path of app directory or zip file"),
