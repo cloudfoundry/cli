@@ -70,7 +70,7 @@ var _ = Describe("AuthenticationRepository", func() {
 			It("returns an error", func() {
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
 				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).To(Equal("Password is incorrect, please try again."))
+				Expect(err.Error()).To(Equal("Credentials were rejected, please try again."))
 				Expect(config.AccessToken()).To(BeEmpty())
 				Expect(config.RefreshToken()).To(BeEmpty())
 			})
