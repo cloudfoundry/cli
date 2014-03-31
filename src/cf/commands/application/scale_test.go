@@ -158,7 +158,7 @@ var _ = Describe("scale command", func() {
 				})
 
 				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"This will cause the app to restage", "Are you sure", "my-app"},
+					{"This will cause the app to restart", "Are you sure", "my-app"},
 				})
 				Expect(restarter.AppToRestart.Guid).To(Equal("my-app-guid"))
 				Expect(appRepo.UpdateAppGuid).To(Equal("my-app-guid"))
