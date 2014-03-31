@@ -39,22 +39,6 @@ var _ = Describe("DomainRepository", func() {
 	}
 
 	Describe("listing domains", func() {
-		It("lists shared domains", func() {
-			setupTestServer(firstPageSharedDomainsRequest, secondPageSharedDomainsRequest)
-
-			receivedDomains := []models.DomainFields{}
-			apiErr := repo.ListSharedDomains(func(d models.DomainFields) bool {
-				receivedDomains = append(receivedDomains, d)
-				return true
-			})
-
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(len(receivedDomains)).To(Equal(2))
-			Expect(receivedDomains[0].Guid).To(Equal("shared-domain1-guid"))
-			Expect(receivedDomains[1].Guid).To(Equal("shared-domain2-guid"))
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-		})
-
 		Describe("listing the domains for an organization", func() {
 			Context("when the organization-scoped domains endpoint is available", func() {
 				BeforeEach(func() {
@@ -93,48 +77,9 @@ var _ = Describe("DomainRepository", func() {
 				})
 			})
 		})
-
-		Describe("listing the private domains for an organization", func() {
-			Context("when the organization-scoped domains endpoint is available", func() {
-				BeforeEach(func() {
-					setupTestServer(firstPagePrivateDomainsRequest, secondPagePrivateDomainsRequest)
-				})
-
-				It("uses that endpoint", func() {
-					receivedDomains := []models.DomainFields{}
-					apiErr := repo.ListPrivateDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
-						receivedDomains = append(receivedDomains, d)
-						return true
-					})
-
-					Expect(apiErr).NotTo(HaveOccurred())
-					Expect(len(receivedDomains)).To(Equal(3))
-					Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
-					Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
-					Expect(handler).To(testnet.HaveAllRequestsCalled())
-				})
-			})
-
-			Context("when the organization-scoped endpoint returns a 404", func() {
-				It("uses the global domains endpoint", func() {
-					setupTestServer(notFoundPrivateDomainsRequest, oldEndpointDomainsRequest)
-
-					receivedDomains := []models.DomainFields{}
-					apiErr := repo.ListPrivateDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
-						receivedDomains = append(receivedDomains, d)
-						return true
-					})
-
-					Expect(apiErr).NotTo(HaveOccurred())
-					Expect(len(receivedDomains)).To(Equal(1))
-					Expect(receivedDomains[0].Guid).To(Equal("domain-guid"))
-					Expect(handler).To(testnet.HaveAllRequestsCalled())
-				})
-			})
-		})
 	})
 
-	It("TestDomainFindByName", func() {
+	It("finds a domain by name", func() {
 		setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 			Method: "GET",
 			Path:   "/v2/domains?inline-relations-depth=1&q=name%3Adomain2.cf-app.com",
