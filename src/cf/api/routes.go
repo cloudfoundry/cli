@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,33 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type RouteResource struct {
-	Resource
-	Entity RouteEntity
-}
-
-func (resource RouteResource) ToFields() (fields models.RouteFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.Host = resource.Entity.Host
-	return
-}
-func (resource RouteResource) ToModel() (route models.Route) {
-	route.RouteFields = resource.ToFields()
-	route.Domain = resource.Entity.Domain.ToFields()
-	route.Space = resource.Entity.Space.ToFields()
-	for _, appResource := range resource.Entity.Apps {
-		route.Apps = append(route.Apps, appResource.ToFields())
-	}
-	return
-}
-
-type RouteEntity struct {
-	Host   string
-	Domain DomainResource
-	Space  SpaceResource
-	Apps   []ApplicationResource
-}
 
 type RouteRepository interface {
 	ListRoutes(cb func(models.Route) bool) (apiErr error)
@@ -65,9 +39,9 @@ func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.SpaceFields().Guid),
-		RouteResource{},
+		resources.RouteResource{},
 		func(resource interface{}) bool {
-			return cb(resource.(RouteResource).ToModel())
+			return cb(resource.(resources.RouteResource).ToModel())
 		})
 }
 
@@ -82,9 +56,9 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid)),
-		RouteResource{},
+		resources.RouteResource{},
 		func(resource interface{}) bool {
-			route = resource.(RouteResource).ToModel()
+			route = resource.(resources.RouteResource).ToModel()
 			found = true
 			return false
 		})
@@ -104,7 +78,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, space
 	path := fmt.Sprintf("%s/v2/routes?inline-relations-depth=1", repo.config.ApiEndpoint())
 	data := fmt.Sprintf(`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`, host, domainGuid, spaceGuid)
 
-	resource := new(RouteResource)
+	resource := new(resources.RouteResource)
 	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
 	if apiErr != nil {
 		return

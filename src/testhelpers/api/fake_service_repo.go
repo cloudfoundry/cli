@@ -1,7 +1,7 @@
 package api
 
 import (
-	realApi "cf/api"
+	"cf/api/resources"
 	"cf/errors"
 	"cf/models"
 	"generic"
@@ -61,9 +61,9 @@ type FakeServiceRepo struct {
 	FindServiceOfferingByLabelAndProviderApiResponse     error
 	FindServiceOfferingByLabelAndProviderCalled          bool
 
-	V1ServicePlanDescription                realApi.ServicePlanDescription
-	V2ServicePlanDescription                realApi.ServicePlanDescription
-	FindServicePlanByDescriptionArguments   []realApi.ServicePlanDescription
+	V1ServicePlanDescription                resources.ServicePlanDescription
+	V2ServicePlanDescription                resources.ServicePlanDescription
+	FindServicePlanByDescriptionArguments   []resources.ServicePlanDescription
 	FindServicePlanByDescriptionResultGuids []string
 	FindServicePlanByDescriptionResponses   []error
 	findServicePlanByDescriptionCallCount   int
@@ -146,7 +146,7 @@ func (repo *FakeServiceRepo) RenameService(instance models.ServiceInstance, newN
 	return
 }
 
-func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription realApi.ServicePlanDescription) (planGuid string, apiErr error) {
+func (repo *FakeServiceRepo) FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error) {
 
 	repo.FindServicePlanByDescriptionArguments =
 		append(repo.FindServicePlanByDescriptionArguments, planDescription)

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,27 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type PaginatedQuotaResources struct {
-	Resources []QuotaResource
-}
-
-type QuotaResource struct {
-	Resource
-	Entity QuotaEntity
-}
-
-func (resource QuotaResource) ToFields() (quota models.QuotaFields) {
-	quota.Guid = resource.Metadata.Guid
-	quota.Name = resource.Entity.Name
-	quota.MemoryLimit = resource.Entity.MemoryLimit
-	return
-}
-
-type QuotaEntity struct {
-	Name        string
-	MemoryLimit uint64 `json:"memory_limit"`
-}
 
 type QuotaRepository interface {
 	FindAll() (quotas []models.QuotaFields, apiErr error)
@@ -49,14 +29,14 @@ func NewCloudControllerQuotaRepository(config configuration.Reader, gateway net.
 }
 
 func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiErr error) {
-	resources := new(PaginatedQuotaResources)
+	responseJSON := new(resources.PaginatedQuotaResources)
 
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
+	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), responseJSON)
 	if apiErr != nil {
 		return
 	}
 
-	for _, r := range resources.Resources {
+	for _, r := range responseJSON.Resources {
 		quotas = append(quotas, r.ToFields())
 	}
 

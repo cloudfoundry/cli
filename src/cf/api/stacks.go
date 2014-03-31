@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -8,28 +9,6 @@ import (
 	"fmt"
 	"net/url"
 )
-
-type PaginatedStackResources struct {
-	Resources []StackResource
-}
-
-type StackResource struct {
-	Resource
-	Entity StackEntity
-}
-
-func (resource StackResource) ToFields() *models.Stack {
-	return &models.Stack{
-		Guid:        resource.Metadata.Guid,
-		Name:        resource.Entity.Name,
-		Description: resource.Entity.Description,
-	}
-}
-
-type StackEntity struct {
-	Name        string
-	Description string
-}
 
 type StackRepository interface {
 	FindByName(name string) (stack models.Stack, apiErr error)
@@ -69,13 +48,13 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, api
 }
 
 func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiErr error) {
-	resources := new(PaginatedStackResources)
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
+	responseJSON := new(resources.PaginatedStackResources)
+	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), responseJSON)
 	if apiErr != nil {
 		return
 	}
 
-	for _, r := range resources.Resources {
+	for _, r := range responseJSON.Resources {
 		stacks = append(stacks, *r.ToFields())
 	}
 	return

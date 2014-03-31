@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,30 +10,6 @@ import (
 	neturl "net/url"
 	"strings"
 )
-
-type UserResource struct {
-	Resource
-	Entity UserEntity
-}
-
-type UAAUserResources struct {
-	Resources []struct {
-		Id       string
-		Username string
-	}
-}
-
-func (resource UserResource) ToFields() models.UserFields {
-	return models.UserFields{
-		Guid:    resource.Metadata.Guid,
-		IsAdmin: resource.Entity.Admin,
-	}
-}
-
-type UserEntity struct {
-	Entity
-	Admin bool
-}
 
 var orgRoleToPathMap = map[string]string{
 	models.ORG_USER:        "users",
@@ -106,9 +83,9 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		path,
-		UserResource{},
+		resources.UserResource{},
 		func(resource interface{}) bool {
-			user := resource.(UserResource).ToFields()
+			user := resource.(resources.UserResource).ToFields()
 			users = append(users, user)
 			guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, user.Guid))
 			return true
@@ -129,7 +106,7 @@ func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users 
 }
 
 func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers []models.UserFields, path string) (updatedUsers []models.UserFields, apiErr error) {
-	uaaResponse := new(UAAUserResources)
+	uaaResponse := new(resources.UAAUserResources)
 	apiErr = repo.uaaGateway.GetResource(path, repo.config.AccessToken(), uaaResponse)
 	if apiErr != nil {
 		return

@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -419,7 +420,7 @@ var _ = Describe("Services Repo", func() {
 				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
 				defer testServer.Close()
 
-				v1 := ServicePlanDescription{
+				v1 := resources.ServicePlanDescription{
 					ServiceLabel:    "v1-elephantsql",
 					ServicePlanName: "v1-panda",
 					ServiceProvider: "v1-elephantsql",
@@ -465,7 +466,7 @@ var _ = Describe("Services Repo", func() {
 				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
 				defer testServer.Close()
 
-				v2 := ServicePlanDescription{
+				v2 := resources.ServicePlanDescription{
 					ServiceLabel:    "v2-elephantsql",
 					ServicePlanName: "v2-panda",
 				}
@@ -488,7 +489,7 @@ var _ = Describe("Services Repo", func() {
 				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
 				defer testServer.Close()
 
-				v2 := ServicePlanDescription{
+				v2 := resources.ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
@@ -538,7 +539,7 @@ var _ = Describe("Services Repo", func() {
 				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
 				defer testServer.Close()
 
-				v2 := ServicePlanDescription{
+				v2 := resources.ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
@@ -563,7 +564,7 @@ var _ = Describe("Services Repo", func() {
 				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
 				defer testServer.Close()
 
-				v2 := ServicePlanDescription{
+				v2 := resources.ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}

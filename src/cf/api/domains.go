@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,26 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type DomainResource struct {
-	Resource
-	Entity DomainEntity
-}
-
-func (resource DomainResource) ToFields() models.DomainFields {
-	owningOrganizationGuid := resource.Entity.OwningOrganizationGuid
-	return models.DomainFields{
-		Name: resource.Entity.Name,
-		Guid: resource.Metadata.Guid,
-		OwningOrganizationGuid: owningOrganizationGuid,
-		Shared:                 owningOrganizationGuid == "",
-	}
-}
-
-type DomainEntity struct {
-	Name                   string
-	OwningOrganizationGuid string `json:"owning_organization_guid"`
-}
 
 type DomainRepository interface {
 	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error
@@ -68,9 +49,9 @@ func (repo CloudControllerDomainRepository) listDomains(path string, cb func(mod
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		path,
-		DomainResource{},
+		resources.DomainResource{},
 		func(resource interface{}) bool {
-			return cb(resource.(DomainResource).ToFields())
+			return cb(resource.(resources.DomainResource).ToFields())
 		})
 }
 
@@ -117,7 +98,7 @@ func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (
 
 func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error) {
 	data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid)
-	resource := new(DomainResource)
+	resource := new(resources.DomainResource)
 
 	path := repo.config.ApiEndpoint() + "/v2/private_domains"
 	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)

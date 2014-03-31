@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,20 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type PaginatedAuthTokenResources struct {
-	Resources []AuthTokenResource
-}
-
-type AuthTokenResource struct {
-	Resource
-	Entity AuthTokenEntity
-}
-
-type AuthTokenEntity struct {
-	Label    string
-	Provider string
-}
 
 type ServiceAuthTokenRepository interface {
 	FindAll() (authTokens []models.ServiceAuthTokenFields, apiErr error)
@@ -65,14 +52,14 @@ func (repo CloudControllerServiceAuthTokenRepository) FindByLabelAndProvider(lab
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path string) (authTokens []models.ServiceAuthTokenFields, apiErr error) {
-	resources := new(PaginatedAuthTokenResources)
+	responseJSON := new(resources.PaginatedAuthTokenResources)
 
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
+	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), responseJSON)
 	if apiErr != nil {
 		return
 	}
 
-	for _, resource := range resources.Resources {
+	for _, resource := range responseJSON.Resources {
 		authTokens = append(authTokens, models.ServiceAuthTokenFields{
 			Guid:     resource.Metadata.Guid,
 			Label:    resource.Entity.Label,

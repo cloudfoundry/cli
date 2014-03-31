@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,44 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type OrganizationEntity struct {
-	Name            string
-	QuotaDefinition QuotaResource `json:"quota_definition"`
-	Spaces          []SpaceResource
-	Domains         []DomainResource
-}
-
-type OrganizationResource struct {
-	Resource
-	Entity OrganizationEntity
-}
-
-func (resource OrganizationResource) ToFields() (fields models.OrganizationFields) {
-	fields.Name = resource.Entity.Name
-	fields.Guid = resource.Metadata.Guid
-
-	fields.QuotaDefinition = resource.Entity.QuotaDefinition.ToFields()
-	return
-}
-
-func (resource OrganizationResource) ToModel() (org models.Organization) {
-	org.OrganizationFields = resource.ToFields()
-
-	spaces := []models.SpaceFields{}
-	for _, s := range resource.Entity.Spaces {
-		spaces = append(spaces, s.ToFields())
-	}
-	org.Spaces = spaces
-
-	domains := []models.DomainFields{}
-	for _, d := range resource.Entity.Domains {
-		domains = append(domains, d.ToFields())
-	}
-	org.Domains = domains
-
-	return
-}
 
 type OrganizationRepository interface {
 	ListOrgs(func(models.Organization) bool) (apiErr error)
@@ -72,9 +35,9 @@ func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organi
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		"/v2/organizations",
-		OrganizationResource{},
+		resources.OrganizationResource{},
 		func(resource interface{}) bool {
-			return cb(resource.(OrganizationResource).ToModel())
+			return cb(resource.(resources.OrganizationResource).ToModel())
 		})
 }
 
@@ -84,9 +47,9 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name))),
-		OrganizationResource{},
+		resources.OrganizationResource{},
 		func(resource interface{}) bool {
-			org = resource.(OrganizationResource).ToModel()
+			org = resource.(resources.OrganizationResource).ToModel()
 			found = true
 			return false
 		})

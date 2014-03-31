@@ -2,6 +2,7 @@ package service
 
 import (
 	"cf/api"
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/requirements"
@@ -38,12 +39,12 @@ func (cmd *MigrateServiceInstances) GetRequirements(reqFactory requirements.Fact
 }
 
 func (cmd *MigrateServiceInstances) Run(c *cli.Context) {
-	v1 := api.ServicePlanDescription{
+	v1 := resources.ServicePlanDescription{
 		ServiceLabel:    c.Args()[0],
 		ServiceProvider: c.Args()[1],
 		ServicePlanName: c.Args()[2],
 	}
-	v2 := api.ServicePlanDescription{
+	v2 := resources.ServicePlanDescription{
 		ServiceLabel:    c.Args()[3],
 		ServicePlanName: c.Args()[4],
 	}

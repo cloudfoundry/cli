@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,43 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type SpaceResource struct {
-	Metadata Metadata
-	Entity   SpaceEntity
-}
-
-func (resource SpaceResource) ToFields() (fields models.SpaceFields) {
-	fields.Guid = resource.Metadata.Guid
-	fields.Name = resource.Entity.Name
-	return
-}
-
-func (resource SpaceResource) ToModel() (space models.Space) {
-	space.SpaceFields = resource.ToFields()
-	for _, app := range resource.Entity.Applications {
-		space.Applications = append(space.Applications, app.ToFields())
-	}
-
-	for _, domainResource := range resource.Entity.Domains {
-		space.Domains = append(space.Domains, domainResource.ToFields())
-	}
-
-	for _, serviceResource := range resource.Entity.ServiceInstances {
-		space.ServiceInstances = append(space.ServiceInstances, serviceResource.ToFields())
-	}
-
-	space.Organization = resource.Entity.Organization.ToFields()
-	return
-}
-
-type SpaceEntity struct {
-	Name             string
-	Organization     OrganizationResource
-	Applications     []ApplicationResource `json:"apps"`
-	Domains          []DomainResource
-	ServiceInstances []ServiceInstanceResource `json:"service_instances"`
-}
 
 type SpaceRepository interface {
 	ListSpaces(func(models.Space) bool) error
@@ -72,9 +36,9 @@ func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields().Guid),
-		SpaceResource{},
+		resources.SpaceResource{},
 		func(resource interface{}) bool {
-			return callback(resource.(SpaceResource).ToModel())
+			return callback(resource.(resources.SpaceResource).ToModel())
 		})
 }
 
@@ -88,9 +52,9 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name))),
-		SpaceResource{},
+		resources.SpaceResource{},
 		func(resource interface{}) bool {
-			space = resource.(SpaceResource).ToModel()
+			space = resource.(resources.SpaceResource).ToModel()
 			foundSpace = true
 			return false
 		})
@@ -105,7 +69,7 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (space models.Space, apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.ApiEndpoint())
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
-	resource := new(SpaceResource)
+	resource := new(resources.SpaceResource)
 	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(body), resource)
 	if apiErr != nil {
 		return

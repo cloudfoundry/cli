@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -9,28 +10,6 @@ import (
 	"net/url"
 	"strings"
 )
-
-type ServiceBrokerResource struct {
-	Resource
-	Entity ServiceBrokerEntity
-}
-
-func (resource ServiceBrokerResource) ToFields() (fields models.ServiceBroker) {
-	fields.Name = resource.Entity.Name
-	fields.Guid = resource.Metadata.Guid
-	fields.Url = resource.Entity.Url
-	fields.Username = resource.Entity.Username
-	fields.Password = resource.Entity.Password
-	return
-}
-
-type ServiceBrokerEntity struct {
-	Guid     string
-	Name     string
-	Password string `json:"auth_password"`
-	Username string `json:"auth_username"`
-	Url      string `json:"broker_url"`
-}
 
 type ServiceBrokerRepository interface {
 	ListServiceBrokers(callback func(models.ServiceBroker) bool) error
@@ -57,9 +36,9 @@ func (repo CloudControllerServiceBrokerRepository) ListServiceBrokers(callback f
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		"/v2/service_brokers",
-		ServiceBrokerResource{},
+		resources.ServiceBrokerResource{},
 		func(resource interface{}) bool {
-			callback(resource.(ServiceBrokerResource).ToFields())
+			callback(resource.(resources.ServiceBrokerResource).ToFields())
 			return true
 		})
 }
@@ -70,9 +49,9 @@ func (repo CloudControllerServiceBrokerRepository) FindByName(name string) (serv
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/service_brokers?q=%s", url.QueryEscape("name:"+name)),
-		ServiceBrokerResource{},
+		resources.ServiceBrokerResource{},
 		func(resource interface{}) bool {
-			serviceBroker = resource.(ServiceBrokerResource).ToFields()
+			serviceBroker = resource.(resources.ServiceBrokerResource).ToFields()
 			foundBroker = true
 			return false
 		})

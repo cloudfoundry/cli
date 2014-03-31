@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"cf/api/resources"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -35,9 +36,9 @@ func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Bui
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		buildpacks_path,
-		BuildpackResource{},
+		resources.BuildpackResource{},
 		func(resource interface{}) bool {
-			return cb(resource.(BuildpackResource).ToFields())
+			return cb(resource.(resources.BuildpackResource).ToFields())
 		})
 }
 
@@ -47,9 +48,9 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
 		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:"+name)),
-		BuildpackResource{},
+		resources.BuildpackResource{},
 		func(resource interface{}) bool {
-			buildpack = resource.(BuildpackResource).ToFields()
+			buildpack = resource.(resources.BuildpackResource).ToFields()
 			foundIt = true
 			return false
 		})
@@ -62,14 +63,14 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 
 func (repo CloudControllerBuildpackRepository) Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error) {
 	path := repo.config.ApiEndpoint() + buildpacks_path
-	entity := BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
+	entity := resources.BuildpackEntity{Name: name, Position: position, Enabled: enabled, Locked: locked}
 	body, err := json.Marshal(entity)
 	if err != nil {
 		apiErr = errors.NewWithError("Could not serialize information", err)
 		return
 	}
 
-	resource := new(BuildpackResource)
+	resource := new(resources.BuildpackResource)
 	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
@@ -88,7 +89,14 @@ func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (api
 func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpack.Guid)
 
-	entity := BuildpackEntity{buildpack.Name, buildpack.Position, buildpack.Enabled, "", "", buildpack.Locked}
+	entity := resources.BuildpackEntity{
+		Name:     buildpack.Name,
+		Position: buildpack.Position,
+		Enabled:  buildpack.Enabled,
+		Key:      "",
+		Filename: "",
+		Locked:   buildpack.Locked,
+	}
 
 	body, err := json.Marshal(entity)
 	if err != nil {
@@ -96,7 +104,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 		return
 	}
 
-	resource := new(BuildpackResource)
+	resource := new(resources.BuildpackResource)
 	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
@@ -107,29 +115,3 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 }
 
 const buildpacks_path = "/v2/buildpacks"
-
-func (resource BuildpackResource) ToFields() models.Buildpack {
-	return models.Buildpack{
-		Guid:     resource.Metadata.Guid,
-		Name:     resource.Entity.Name,
-		Position: resource.Entity.Position,
-		Enabled:  resource.Entity.Enabled,
-		Key:      resource.Entity.Key,
-		Filename: resource.Entity.Filename,
-		Locked:   resource.Entity.Locked,
-	}
-}
-
-type BuildpackResource struct {
-	Metadata Metadata
-	Entity   BuildpackEntity
-}
-
-type BuildpackEntity struct {
-	Name     string `json:"name"`
-	Position *int   `json:"position,omitempty"`
-	Enabled  *bool  `json:"enabled,omitempty"`
-	Key      string `json:"key,omitempty"`
-	Filename string `json:"filename,omitempty"`
-	Locked   *bool  `json:"locked,omitempty"`
-}
