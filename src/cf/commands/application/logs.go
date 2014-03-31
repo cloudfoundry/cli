@@ -104,7 +104,7 @@ func (cmd *Logs) displayLogMessages(logChan chan *logmessage.Message, errChan ch
 			switch err.(type) {
 			case nil:
 			case *errors.InvalidSSLCert:
-				cmd.ui.Failed(err.Error() + "\nTIP: use the --skip-ssl-validation to suppress this error")
+				cmd.ui.Failed(err.Error() + "\nTIP: use 'cf login -a API --skip-ssl-validation' or 'cf api API --skip-ssl-validation' to suppress this error")
 			default:
 				cmd.ui.Failed(err.Error())
 			}
