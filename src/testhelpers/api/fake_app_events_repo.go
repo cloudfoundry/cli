@@ -3,15 +3,19 @@ package api
 import "cf/models"
 
 type FakeAppEventsRepo struct {
-	AppGuid string
-	Events  []models.EventFields
-	Error   error
+	RecentEventsArgs struct {
+		AppGuid string
+		Limit   uint
+	}
+
+	RecentEventsReturns struct {
+		Events []models.EventFields
+		Error  error
+	}
 }
 
-func (repo FakeAppEventsRepo) ListEvents(appGuid string, cb func(models.EventFields) bool) error {
-	repo.AppGuid = appGuid
-	for _, e := range repo.Events {
-		cb(e)
-	}
-	return repo.Error
+func (repo *FakeAppEventsRepo) RecentEvents(appGuid string, limit uint) ([]models.EventFields, error) {
+	repo.RecentEventsArgs.AppGuid = appGuid
+	repo.RecentEventsArgs.Limit = limit
+	return repo.RecentEventsReturns.Events, repo.RecentEventsReturns.Error
 }

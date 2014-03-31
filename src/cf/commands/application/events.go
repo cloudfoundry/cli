@@ -3,7 +3,6 @@ package application
 import (
 	"cf/api"
 	"cf/configuration"
-	"cf/models"
 	"cf/requirements"
 	"cf/terminal"
 	"errors"
@@ -53,23 +52,22 @@ func (cmd *Events) Run(c *cli.Context) {
 	)
 
 	table := cmd.ui.Table([]string{"time", "event", "description"})
-	noEvents := true
 
-	apiErr := cmd.eventsRepo.ListEvents(app.Guid, func(event models.EventFields) bool {
+	events, apiErr := cmd.eventsRepo.RecentEvents(app.Guid, 50)
+	if apiErr != nil {
+		cmd.ui.Failed("Failed fetching events.\n%s", apiErr.Error())
+		return
+	}
+
+	for _, event := range events {
 		table.Print([][]string{{
 			event.Timestamp.Local().Format(TIMESTAMP_FORMAT),
 			event.Name,
 			event.Description,
 		}})
-		noEvents = false
-		return true
-	})
-
-	if apiErr != nil {
-		cmd.ui.Failed("Failed fetching events.\n%s", apiErr.Error())
-		return
 	}
-	if noEvents {
+
+	if len(events) == 0 {
 		cmd.ui.Say("No events for app %s", terminal.EntityNameColor(app.Name))
 		return
 	}
