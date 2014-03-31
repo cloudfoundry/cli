@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	"cf/api"
+	"cf/api/resources"
 	. "cf/commands/service"
 	"cf/errors"
 	"github.com/codegangsta/cli"
@@ -107,7 +107,7 @@ func init() {
 					It("finds the v1 service plan by its name, provider and service label", func() {
 						testcmd.RunCommand(cmd, context, requirementsFactory)
 
-						expectedV1 := api.ServicePlanDescription{
+						expectedV1 := resources.ServicePlanDescription{
 							ServicePlanName: "v1-plan-name",
 							ServiceProvider: "v1-provider-name",
 							ServiceLabel:    "v1-service-label",
@@ -118,7 +118,7 @@ func init() {
 					It("finds the v2 service plan by its name and service label", func() {
 						testcmd.RunCommand(cmd, context, requirementsFactory)
 
-						expectedV2 := api.ServicePlanDescription{
+						expectedV2 := resources.ServicePlanDescription{
 							ServicePlanName: "v2-plan-name",
 							ServiceLabel:    "v2-service-label",
 						}

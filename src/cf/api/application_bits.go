@@ -3,6 +3,7 @@ package api
 import (
 	"archive/zip"
 	"bytes"
+	"cf/api/resources"
 	"cf/app_files"
 	"cf/configuration"
 	"cf/errors"
@@ -18,12 +19,6 @@ import (
 	"path/filepath"
 	"time"
 )
-
-type AppFileResource struct {
-	Path string `json:"fn"`
-	Sha1 string `json:"sha1"`
-	Size int64  `json:"size"`
-}
 
 type ApplicationBitsRepository interface {
 	UploadApp(appGuid, dir string, cb func(path string, zipSize, fileCount uint64)) (apiErr error)
@@ -114,7 +109,7 @@ func (repo CloudControllerApplicationBitsRepository) uploadBits(appGuid string, 
 		contentType := fmt.Sprintf("multipart/form-data; boundary=%s", boundary)
 		request.HttpReq.Header.Set("Content-Type", contentType)
 
-		response := &Resource{}
+		response := &resources.Resource{}
 		_, apiErr = repo.gateway.PerformPollingRequestForJSONResponse(request, response, 5*time.Minute)
 		if apiErr != nil {
 			return
@@ -200,9 +195,9 @@ func (repo CloudControllerApplicationBitsRepository) extractZip(appDir, destDir 
 }
 
 func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFiles []models.AppFileFields) (appFilesToUpload []models.AppFileFields, presentResourcesJson []byte, apiErr error) {
-	appFilesRequest := []AppFileResource{}
+	appFilesRequest := []resources.AppFileResource{}
 	for _, file := range allAppFiles {
-		appFilesRequest = append(appFilesRequest, AppFileResource{
+		appFilesRequest = append(appFilesRequest, resources.AppFileResource{
 			Path: file.Path,
 			Sha1: file.Sha1,
 			Size: file.Size,
@@ -223,7 +218,7 @@ func (repo CloudControllerApplicationBitsRepository) getFilesToUpload(allAppFile
 
 	presentResourcesJson, _, _, apiErr = repo.gateway.PerformRequestForResponseBytes(req)
 
-	fileResource := []AppFileResource{}
+	fileResource := []resources.AppFileResource{}
 	err = json.Unmarshal(presentResourcesJson, &fileResource)
 
 	if err != nil {
