@@ -633,7 +633,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "services",
 			ShortName:   "s",
-			Description: "List all services in the target space",
+			Description: "List all service instances in the target space",
 			Usage:       fmt.Sprintf("%s services", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("services", c)
