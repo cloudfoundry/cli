@@ -737,7 +737,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "stacks",
-			Description: "List all stacks",
+			Description: "List all stacks (a stack is a pre-built file system, including an operating system, that can run apps)",
 			Usage:       fmt.Sprintf("%s stacks", cf.Name()),
 			Action: func(c *cli.Context) {
 				cmdRunner.RunCmdByName("stacks", c)
