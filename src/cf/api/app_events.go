@@ -14,7 +14,7 @@ import (
 )
 
 type AppEventsRepository interface {
-	ListEvents(appGuid string, cb func(models.EventFields) bool) error
+	RecentEvents(appGuid string, limit uint) ([]models.EventFields, error)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -28,11 +28,27 @@ func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb func(models.EventFields) bool) error {
+func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit uint) ([]models.EventFields, error) {
+	count := uint(0)
+	events := make([]models.EventFields, 0, limit)
+	apiErr := repo.listEvents(appGuid, url.Values{
+		"order-direction":  []string{"desc"},
+		"results-per-page": []string{strconv.FormatUint(uint64(limit), 10)},
+	}, func(eventField models.EventFields) bool {
+		count++
+		events = append(events, eventField)
+		return count < limit
+	})
+
+	return events, apiErr
+}
+
+func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, queryParams url.Values, cb func(models.EventFields) bool) error {
+	queryParams.Set("q", "actee:"+appGuid)
 	apiErr := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
-		fmt.Sprintf("/v2/events?q=%s", url.QueryEscape(fmt.Sprintf("actee:%s", appGuid))),
+		fmt.Sprintf("/v2/events?%s", queryParams.Encode()),
 		EventResourceNewV2{},
 		func(resource interface{}) bool {
 			return cb(resource.(EventResourceNewV2).ToFields())
@@ -53,8 +69,6 @@ func (repo CloudControllerAppEventsRepository) ListEvents(appGuid string, cb fun
 
 	return apiErr
 }
-
-const APP_EVENT_TIMESTAMP_FORMAT = "2006-01-02T15:04:05-07:00"
 
 // FIXME: needs semantic versioning
 type EventResourceOldV2 struct {

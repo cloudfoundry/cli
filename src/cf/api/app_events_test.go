@@ -13,160 +13,77 @@ import (
 	testconfig "testhelpers/configuration"
 	testnet "testhelpers/net"
 	testtime "testhelpers/time"
-	"time"
 )
 
 var _ = Describe("App Events Repo", func() {
-	It("makes a backwards compatible request to the old events endpoint when the first request fails", func() {
-		deps := setupEventTest([]testnet.TestRequest{
-			newV2NotFoundRequest,
-			firstPageOldV2EventsRequest,
-			secondPageOldV2EventsRequest,
-		})
-		defer teardownEventTest(deps)
+	var (
+		server  *httptest.Server
+		handler *testnet.TestHandler
+		config  configuration.ReadWriter
+		gateway net.Gateway
+		repo    AppEventsRepository
+	)
 
-		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
+	BeforeEach(func() {
+		config = testconfig.NewRepository()
+		config.SetAccessToken("BEARER my_access_token")
 
-		expectedEvents := []models.EventFields{
-			models.EventFields{
-				Name:        "app crashed",
-				Description: "instance: 1, reason: app instance exited, exit_status: 1",
-				Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00"),
-			},
-			models.EventFields{
-				Name:        "app crashed",
-				Description: "instance: 2, reason: app instance was stopped, exit_status: 2",
-				Timestamp:   testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T17:51:07+00:00"),
-			},
-		}
-
-		list := []models.EventFields{}
-		apiErr := repo.ListEvents("my-app-guid", func(event models.EventFields) bool {
-			list = append(list, event)
-			return true
-		})
-
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(list).To(Equal(expectedEvents))
-		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
+		gateway = net.NewCloudControllerGateway(config)
+		repo = NewCloudControllerAppEventsRepository(config, gateway)
 	})
 
-	It("lists events from the /v2/events endpoint", func() {
-		pageOneNewV2Request := testnet.TestRequest{
-			Method: "GET",
-			Path:   "/v2/events?q=actee%3Amy-app-guid",
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `{
-			  "total_results": 1,
-			  "total_pages": 1,
-			  "prev_url": null,
-			  "next_url": "/v2/events?q=actee%3Amy-app-guid&page=2",
-			  "resources": [
-    			{
-				  "metadata": {
-					"guid": "event-1-guid"
-				  },
-				  "entity": {
-					"type": "audit.app.update",
-					"timestamp": "2014-01-21T00:20:11+00:00",
-					"metadata": {
-					  "request": {
-						"command": "PRIVATE DATA HIDDEN",
-						"instances": 1,
-						"memory": 256,
-						"name": "dora",
-						"environment_json": "PRIVATE DATA HIDDEN"
-					  }
-					}
-				  }
-				}
-			  ]
-			}`}}
-
-		pageTwoNewV2Request := testnet.TestRequest{
-			Method: "GET",
-			Path:   "/v2/events?q=actee%3Amy-app-guid&page=2",
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `{
-			  "total_results": 1,
-			  "total_pages": 1,
-			  "prev_url": null,
-			  "next_url": "",
-			  "resources": [
-				{
-				  "metadata":{
-				    "guid":"event-2-guid"
-				  },
-				  "entity": {
-					"type": "app.crash",
-					"timestamp": "2013-10-07T17:51:07+00:00",
-					"metadata": {}
-				  }
-				}
-			  ]
-			}`}}
-
-		deps := setupEventTest([]testnet.TestRequest{
-			pageOneNewV2Request,
-			pageTwoNewV2Request,
-		})
-		defer teardownEventTest(deps)
-
-		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
-
-		events := []models.EventFields{}
-		apiErr := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
-			events = append(events, e)
-			return true
-		})
-
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
-
-		Expect(len(events)).To(Equal(2))
-		Expect(events[0].Guid).To(Equal("event-1-guid"))
-		Expect(events[0].Name).To(Equal("audit.app.update"))
-		Expect(events[1].Guid).To(Equal("event-2-guid"))
-		Expect(events[1].Name).To(Equal("app.crash"))
+	AfterEach(func() {
+		server.Close()
 	})
 
-	It("TestListOldV2EventsApiError", func() {
-		deps := setupEventTest([]testnet.TestRequest{
-			newV2NotFoundRequest,
-			firstPageOldV2EventsRequest,
-			oldV2NotFoundRequest,
-		})
-		defer teardownEventTest(deps)
+	setupTestServer := func(requests ...testnet.TestRequest) {
+		server, handler = testnet.NewServer(requests)
+		config.SetApiEndpoint(server.URL)
+	}
 
-		repo := NewCloudControllerAppEventsRepository(deps.config, deps.gateway)
-
-		list := []models.EventFields{}
-		apiErr := repo.ListEvents("my-app-guid", func(e models.EventFields) bool {
-			list = append(list, e)
-			return true
+	Describe("list recent events", func() {
+		var recentAPIRequest testnet.TestRequest
+		BeforeEach(func() {
+			recentAPIRequest = newAPIRequestPage1
+			recentAPIRequest.Path += "&order-direction=desc&results-per-page=2"
 		})
 
-		firstExpectedTime, err := time.Parse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")
-		Expect(err).NotTo(HaveOccurred())
+		It("makes a request to the /v2/events endpoint", func() {
+			setupTestServer(recentAPIRequest)
 
-		expectedEvents := []models.EventFields{
-			models.EventFields{
-				Name:        "app crashed",
-				Description: "instance: 1, reason: app instance exited, exit_status: 1",
-				Timestamp:   firstExpectedTime,
-			},
-		}
+			list, err := repo.RecentEvents("my-app-guid", 2)
+			Expect(err).ToNot(HaveOccurred())
 
-		Expect(list).To(Equal(expectedEvents))
-		Expect(apiErr).NotTo(BeNil())
-		Expect(deps.handler).To(testnet.HaveAllRequestsCalled())
+			Expect(list).To(Equal([]models.EventFields{
+				models.EventFields{
+					Guid:        "event-1-guid",
+					Name:        "audit.app.update",
+					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
+					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
+				},
+				models.EventFields{
+					Guid:        "event-2-guid",
+					Name:        "audit.app.update",
+					Timestamp:   testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00"),
+					Description: "instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN",
+				},
+			}))
+		})
+
+		It("makes a backwards compatible request to old events endpoint", func() {
+			setupTestServer(newV2NotFoundRequest, oldAPIRequestPage1)
+
+			_, err := repo.RecentEvents("my-app-guid", 2)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
+		})
 	})
 
-	It("unmarshals app crash events into a struct", func() {
-		resource := new(EventResourceNewV2)
-		err := json.Unmarshal([]byte(`
+	Describe("unmarshalling events", func() {
+		It("unmarshals app crash events", func() {
+			resource := new(EventResourceNewV2)
+			err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid":"event-1-guid"
@@ -182,21 +99,20 @@ var _ = Describe("App Events Repo", func() {
 				  "reason": "CRASHED"
 				}
 			  }
-			}
-			`), &resource)
+			}`), &resource)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		eventFields := resource.ToFields()
-		Expect(eventFields.Guid).To(Equal("event-1-guid"))
-		Expect(eventFields.Name).To(Equal("app.crash"))
-		Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2013-10-07T16:51:07+00:00")))
-		Expect(eventFields.Description).To(Equal(`index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`))
-	})
+			eventFields := resource.ToFields()
+			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.Name).To(Equal("app.crash"))
+			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2013-10-07T16:51:07+00:00")))
+			Expect(eventFields.Description).To(Equal(`index: 3, reason: CRASHED, exit_description: unknown, exit_status: -1`))
+		})
 
-	It("unmarshals app update events into a strct", func() {
-		resource := new(EventResourceNewV2)
-		err := json.Unmarshal([]byte(`
+		It("unmarshals app update events", func() {
+			resource := new(EventResourceNewV2)
+			err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-1-guid"
@@ -213,19 +129,18 @@ var _ = Describe("App Events Repo", func() {
 				  }
 				}
 			  }
-			}
-			`), &resource)
+			}`), &resource)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		eventFields := resource.ToFields()
-		Expect(eventFields.Guid).To(Equal("event-1-guid"))
-		Expect(eventFields.Name).To(Equal("audit.app.update"))
-		Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00")))
-		Expect(eventFields.Description).To(Equal("instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN"))
+			eventFields := resource.ToFields()
+			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.Name).To(Equal("audit.app.update"))
+			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00")))
+			Expect(eventFields.Description).To(Equal("instances: 1, memory: 256, command: PRIVATE DATA HIDDEN, environment_json: PRIVATE DATA HIDDEN"))
 
-		resource = new(EventResourceNewV2)
-		err = json.Unmarshal([]byte(`
+			resource = new(EventResourceNewV2)
+			err = json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-1-guid"
@@ -239,21 +154,20 @@ var _ = Describe("App Events Repo", func() {
 				  }
 				}
 			  }
-			}
-			`), &resource)
+			}`), &resource)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		eventFields = resource.ToFields()
-		Expect(eventFields.Guid).To(Equal("event-1-guid"))
-		Expect(eventFields.Name).To(Equal("audit.app.update"))
-		Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T00:20:11+00:00")))
-		Expect(eventFields.Description).To(Equal(`state: STOPPED`))
-	})
+			eventFields = resource.ToFields()
+			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.Name).To(Equal("audit.app.update"))
+			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-21T00:20:11+00:00")))
+			Expect(eventFields.Description).To(Equal(`state: STOPPED`))
+		})
 
-	It("unmarshals app delete events into a struct", func() {
-		resource := new(EventResourceNewV2)
-		err := json.Unmarshal([]byte(`
+		It("unmarshals app delete events", func() {
+			resource := new(EventResourceNewV2)
+			err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-2-guid"
@@ -267,21 +181,20 @@ var _ = Describe("App Events Repo", func() {
 				  }
 				}
 			  }
-			}
-			`), &resource)
+			}`), &resource)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		eventFields := resource.ToFields()
-		Expect(eventFields.Guid).To(Equal("event-2-guid"))
-		Expect(eventFields.Name).To(Equal("audit.app.delete-request"))
-		Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-21T18:39:09+00:00")))
-		Expect(eventFields.Description).To(Equal("recursive: true"))
-	})
+			eventFields := resource.ToFields()
+			Expect(eventFields.Guid).To(Equal("event-2-guid"))
+			Expect(eventFields.Name).To(Equal("audit.app.delete-request"))
+			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-21T18:39:09+00:00")))
+			Expect(eventFields.Description).To(Equal("recursive: true"))
+		})
 
-	It("unmarshals the new v2 app create event into a struct", func() {
-		resource := new(EventResourceNewV2)
-		err := json.Unmarshal([]byte(`
+		It("unmarshals the new v2 app create event", func() {
+			resource := new(EventResourceNewV2)
+			err := json.Unmarshal([]byte(`
 			{
 			  "metadata": {
 				"guid": "event-1-guid"
@@ -304,73 +217,99 @@ var _ = Describe("App Events Repo", func() {
 			  }
 			}`), &resource)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		eventFields := resource.ToFields()
-		Expect(eventFields.Guid).To(Equal("event-1-guid"))
-		Expect(eventFields.Name).To(Equal("audit.app.create"))
-		Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(APP_EVENT_TIMESTAMP_FORMAT, "2014-01-22T19:34:16+00:00")))
-		Expect(eventFields.Description).To(Equal("disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN"))
+			eventFields := resource.ToFields()
+			Expect(eventFields.Guid).To(Equal("event-1-guid"))
+			Expect(eventFields.Name).To(Equal("audit.app.create"))
+			Expect(eventFields.Timestamp).To(Equal(testtime.MustParse(eventTimestampFormat, "2014-01-22T19:34:16+00:00")))
+			Expect(eventFields.Description).To(Equal("disk_quota: 1024, instances: 1, state: STOPPED, environment_json: PRIVATE DATA HIDDEN"))
+		})
 	})
 })
 
-var firstPageOldV2EventsRequest = testnet.TestRequest{
+const eventTimestampFormat = "2006-01-02T15:04:05-07:00"
+
+var oldAPIRequestPage1 = testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/apps/my-app-guid/events",
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `
-{
-  "total_results": 58,
-  "total_pages": 2,
-  "prev_url": null,
-  "next_url": "/v2/apps/my-app-guid/events?inline-relations-depth=1&page=2&results-per-page=50",
-  "resources": [
-    {
-      "entity": {
-        "instance_index": 1,
-        "exit_status": 1,
-        "exit_description": "app instance exited",
-        "timestamp": "2013-10-07T16:51:07+00:00"
-      }
-    }
-  ]
-}
-`},
-}
+		{
+		  "total_results": 58,
+		  "total_pages": 2,
+		  "prev_url": null,
+		  "next_url": "/v2/apps/my-app-guid/events?inline-relations-depth=1&page=2&results-per-page=50",
+		  "resources": [
+			{
+			  "entity": {
+				"instance_index": 1,
+				"exit_status": 1,
+				"exit_description": "app instance exited",
+				"timestamp": "2013-10-07T16:51:07+00:00"
+			  }
+			},
+			{
+			  "entity": {
+				"instance_index": 2,
+				"exit_status": 2,
+				"exit_description": "app instance exited",
+				"timestamp": "2013-11-07T16:51:07+00:00"
+			  }
+			}
+		  ]
+		}`}}
 
-var secondPageOldV2EventsRequest = testnet.TestRequest{
+var newAPIRequestPage1 = testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/apps/my-app-guid/events",
+	Path:   "/v2/events?q=actee%3Amy-app-guid",
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
-		Body: `
-{
-  "total_results": 58,
-  "total_pages": 2,
-  "prev_url": null,
-  "next_url": "",
-  "resources": [
-    {
-      "entity": {
-        "instance_index": 2,
-        "exit_status": 2,
-        "exit_description": "app instance was stopped",
-        "timestamp": "2013-10-07T17:51:07+00:00"
-      }
-    }
-  ]
-}
-`},
-}
-
-var oldV2NotFoundRequest = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/apps/my-app-guid/events",
-	Response: testnet.TestResponse{
-		Status: http.StatusNotFound,
-	},
-}
+		Body: `{
+		  "total_results": 1,
+		  "total_pages": 1,
+		  "prev_url": null,
+		  "next_url": "/v2/events?q=actee%3Amy-app-guid&page=2",
+		  "resources": [
+			{
+			  "metadata": {
+				"guid": "event-1-guid"
+			  },
+			  "entity": {
+				"type": "audit.app.update",
+				"timestamp": "2014-01-21T00:20:11+00:00",
+				"metadata": {
+				  "request": {
+					"command": "PRIVATE DATA HIDDEN",
+					"instances": 1,
+					"memory": 256,
+					"name": "dora",
+					"environment_json": "PRIVATE DATA HIDDEN"
+				  }
+				}
+			  }
+			},
+			{
+			  "metadata": {
+				"guid": "event-2-guid"
+			  },
+			  "entity": {
+				"type": "audit.app.update",
+				"timestamp": "2014-01-21T00:20:11+00:00",
+				"metadata": {
+				  "request": {
+					"command": "PRIVATE DATA HIDDEN",
+					"instances": 1,
+					"memory": 256,
+					"name": "dora",
+					"environment_json": "PRIVATE DATA HIDDEN"
+				  }
+				}
+			  }
+			}
+		  ]
+		}`}}
 
 var newV2NotFoundRequest = testnet.TestRequest{
 	Method: "GET",
@@ -378,28 +317,4 @@ var newV2NotFoundRequest = testnet.TestRequest{
 	Response: testnet.TestResponse{
 		Status: http.StatusNotFound,
 	},
-}
-
-type eventTestDependencies struct {
-	server  *httptest.Server
-	handler *testnet.TestHandler
-	config  configuration.Reader
-	gateway net.Gateway
-}
-
-func setupEventTest(requests []testnet.TestRequest) (deps eventTestDependencies) {
-	deps.server, deps.handler = testnet.NewServer(requests)
-
-	configRepo := testconfig.NewRepository()
-	configRepo.SetApiEndpoint(deps.server.URL)
-	configRepo.SetAccessToken("BEARER my_access_token")
-
-	deps.config = configRepo
-	deps.gateway = net.NewCloudControllerGateway(configRepo)
-
-	return
-}
-
-func teardownEventTest(deps eventTestDependencies) {
-	deps.server.Close()
 }
