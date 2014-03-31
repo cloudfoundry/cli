@@ -514,7 +514,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 				NewStringFlag("m", "Memory limit (e.g. 256M, 1024M, 1G)"),
 				NewStringFlag("n", "Hostname (e.g. my-subdomain)"),
 				NewStringFlag("p", "Path of app directory or zip file"),
-				NewStringFlag("s", "Stack to use"),
+				NewStringFlag("s", "Stack to use (a stack is a pre-built file system, including an operating system, that can run apps)"),
 				NewStringFlag("t", "Start timeout in seconds"),
 				cli.BoolFlag{Name: "no-hostname", Usage: "Map the root domain to this app"},
 				cli.BoolFlag{Name: "no-manifest", Usage: "Ignore manifest file"},
