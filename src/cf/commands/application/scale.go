@@ -124,7 +124,7 @@ func (cmd *Scale) confirmRestart(context *cli.Context, appName string) bool {
 	if context.Bool("f") {
 		return true
 	} else {
-		result := cmd.ui.Confirm("This will cause the app to restage. Are you sure you want to scale %s?", terminal.EntityNameColor(appName))
+		result := cmd.ui.Confirm("This will cause the app to restart. Are you sure you want to scale %s?", terminal.EntityNameColor(appName))
 		cmd.ui.Say("")
 		return result
 	}
