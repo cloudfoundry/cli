@@ -185,7 +185,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "create-user-provided-service",
 			ShortName:   "cups",
-			Description: "Make a user-provided service available to cf apps",
+			Description: "Make a user-provided service instance available to cf apps",
 			Usage: fmt.Sprintf("%s create-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]\n", cf.Name()) +
 				"\n   Pass comma separated parameter names to enable interactive mode:\n" +
 				fmt.Sprintf("   %s create-user-provided-service SERVICE_INSTANCE -p \"comma, separated, parameter, names\"\n", cf.Name()) +
@@ -861,7 +861,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		{
 			Name:        "update-user-provided-service",
 			ShortName:   "uups",
-			Description: "Update user-provided service name value pairs",
+			Description: "Update user-provided service instance name value pairs",
 			Usage: fmt.Sprintf("%s update-user-provided-service SERVICE_INSTANCE [-p PARAMETERS] [-l SYSLOG-DRAIN-URL]'\n\n", cf.Name()) +
 				"EXAMPLE:\n" +
 				fmt.Sprintf("   %s update-user-provided-service oracle-db-mine -p '{\"username\":\"admin\",\"password\":\"pa55woRD\"}'\n", cf.Name()) +
