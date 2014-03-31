@@ -42,7 +42,7 @@ func (uaa UAAAuthenticationRepository) Authenticate(credentials map[string]strin
 	switch response := apiErr.(type) {
 	case errors.HttpError:
 		if response.StatusCode() == 401 {
-			apiErr = errors.New("Password is incorrect, please try again.")
+			apiErr = errors.New("Credentials were rejected, please try again.")
 		}
 	}
 
