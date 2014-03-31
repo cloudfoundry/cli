@@ -48,42 +48,37 @@ func (cmd *ListDomains) Run(c *cli.Context) {
 		terminal.EntityNameColor(cmd.config.Username()),
 	)
 
-	noDomains := true
-	table := cmd.ui.Table([]string{"name                              ", "status"})
+	domains := cmd.fetchAllDomains(org.Guid)
+	cmd.printDomainsTable(domains)
 
-	apiErr := cmd.domainRepo.ListSharedDomains(domainsCallback(table, &noDomains))
-
-	switch apiErr.(type) {
-	case nil:
-	case *errors.HttpNotFoundError:
-	default:
-		cmd.ui.Failed("Failed fetching shared domains.\n%s", apiErr.Error())
-		return
-	}
-
-	apiErr = cmd.domainRepo.ListPrivateDomainsForOrg(org.Guid, domainsCallback(table, &noDomains))
-	if apiErr != nil {
-		cmd.ui.Failed("Failed fetching private domains.\n%s", apiErr.Error())
-		return
-	}
-
-	if noDomains {
+	if len(domains) == 0 {
 		cmd.ui.Say("No domains found")
 	}
 }
 
-func domainsCallback(table terminal.Table, noDomains *bool) func(models.DomainFields) bool {
-	return func(domain models.DomainFields) bool {
-		table.Print([][]string{{domain.Name, domainStatusString(domain)}})
-		*noDomains = false
+func (cmd *ListDomains) fetchAllDomains(orgGuid string) (domains []models.DomainFields) {
+	apiErr := cmd.domainRepo.ListDomainsForOrg(orgGuid, func(domain models.DomainFields) bool {
+		domains = append(domains, domain)
 		return true
+	})
+	if apiErr != nil {
+		cmd.ui.Failed("Failed fetching domains.\n%s", apiErr.Error())
 	}
+	return
 }
 
-func domainStatusString(domain models.DomainFields) string {
-	if domain.Shared {
-		return "shared"
-	} else {
-		return "owned"
+func (cmd *ListDomains) printDomainsTable(domains []models.DomainFields) {
+	table := cmd.ui.Table([]string{"name                              ", "status"})
+
+	for _, domain := range domains {
+		if domain.Shared {
+			table.Print([][]string{{domain.Name, "shared"}})
+		}
+	}
+
+	for _, domain := range domains {
+		if !domain.Shared {
+			table.Print([][]string{{domain.Name, "owned"}})
+		}
 	}
 }

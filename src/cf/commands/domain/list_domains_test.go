@@ -40,43 +40,43 @@ var _ = Describe("domains command", func() {
 		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
-	It("lists private domains", func() {
+	It("lists domains", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
 
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-		domain1 := models.DomainFields{}
-		domain1.Shared = true
-		domain1.Name = "Domain1"
-
-		domain2 := models.DomainFields{}
-		domain2.Shared = false
-		domain2.Name = "Domain2"
-
-		domain3 := models.DomainFields{}
-		domain3.Shared = false
-		domain3.Name = "Domain3"
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsDomains:        []models.DomainFields{domain1},
-			ListPrivateDomainsForOrgDomains: []models.DomainFields{domain2, domain3},
+			ListDomainsForOrgDomains: []models.DomainFields{
+				models.DomainFields{
+					Shared: false,
+					Name:   "Private-domain1",
+				},
+				models.DomainFields{
+					Shared: true,
+					Name:   "The-shared-domain",
+				},
+				models.DomainFields{
+					Shared: false,
+					Name:   "Private-domain2",
+				}},
 		}
 
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
-		Expect(domainRepo.ListPrivateDomainsForOrgGuid).To(Equal("my-org-guid"))
+		Expect(domainRepo.ListDomainsForOrgGuid).To(Equal("my-org-guid"))
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"name", "status"},
-			{"Domain1", "shared"},
-			{"Domain2", "owned"},
-			{"Domain3", "owned"},
+			{"The-shared-domain", "shared"},
+			{"Private-domain1", "owned"},
+			{"Private-domain2", "owned"},
 		})
 	})
 
-	It("TestListDomainsWhenThereAreNone", func() {
+	It("displays a message when no domains are found", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
@@ -92,7 +92,7 @@ var _ = Describe("domains command", func() {
 		})
 	})
 
-	It("TestListDomainsSharedDomainsFails", func() {
+	It("fails when the domains API returns an error", func() {
 		orgFields := models.OrganizationFields{}
 		orgFields.Name = "my-org"
 		orgFields.Guid = "my-org-guid"
@@ -100,56 +100,14 @@ var _ = Describe("domains command", func() {
 		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
 
 		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: errors.New("borked!"),
+			ListDomainsForOrgApiResponse: errors.New("borked!"),
 		}
 		ui := callListDomains([]string{}, reqFactory, domainRepo)
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting domains in org", "my-org", "my-user"},
 			{"failed"},
-			{"shared domains"},
-			{"borked!"},
-		})
-	})
-
-	It("lists only the domains for the org if the new shared_domains endpoint returns a 404", func() {
-		orgFields := models.OrganizationFields{
-			Name: "my-org",
-			Guid: "my-org-guid",
-		}
-
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-
-		domainRepo := &testapi.FakeDomainRepository{
-			ListSharedDomainsApiResponse: errors.NewHttpError(404, "9003", "something bad happened"),
-			ListPrivateDomainsForOrgDomains: []models.DomainFields{
-				models.DomainFields{Name: "ze-domain"},
-			},
-		}
-		ui := callListDomains([]string{}, reqFactory, domainRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting domains in org", "my-org", "my-user"},
-			{"ze-domain"},
-		})
-	})
-
-	It("TestListDomainsOrgDomainsFails", func() {
-		orgFields := models.OrganizationFields{}
-		orgFields.Name = "my-org"
-		orgFields.Guid = "my-org-guid"
-
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedOrgSuccess: true, OrganizationFields: orgFields}
-
-		domainRepo := &testapi.FakeDomainRepository{
-			ListPrivateDomainsForOrgApiResponse: errors.New("borked!"),
-		}
-		ui := callListDomains([]string{}, reqFactory, domainRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting domains in org", "my-org", "my-user"},
-			{"failed"},
-			{"private domains"},
+			{"Failed fetching domains"},
 			{"borked!"},
 		})
 	})

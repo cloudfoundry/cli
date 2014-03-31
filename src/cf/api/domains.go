@@ -32,8 +32,6 @@ type DomainEntity struct {
 
 type DomainRepository interface {
 	ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error
-	ListPrivateDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error
-	ListSharedDomains(cb func(models.DomainFields) bool) error
 	FindByName(name string) (domain models.DomainFields, apiErr error)
 	FindByNameInOrg(name string, owningOrgGuid string) (domain models.DomainFields, apiErr error)
 	Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error)
@@ -53,24 +51,8 @@ func NewCloudControllerDomainRepository(config configuration.Reader, gateway net
 	return
 }
 
-func (repo CloudControllerDomainRepository) ListSharedDomains(cb func(models.DomainFields) bool) error {
-	return repo.listDomains("/v2/shared_domains", cb)
-}
-
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
 	apiErr := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/domains", orgGuid), cb)
-
-	// FIXME: needs semantic versioning
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		apiErr = repo.listDomains("/v2/domains", cb)
-	}
-
-	return apiErr
-}
-
-func (repo CloudControllerDomainRepository) ListPrivateDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
-	apiErr := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/private_domains", orgGuid), cb)
 
 	// FIXME: needs semantic versioning
 	switch apiErr.(type) {
