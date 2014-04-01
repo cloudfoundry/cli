@@ -11,14 +11,14 @@ func NewEndpointStrategy(versionString string) EndpointStrategy {
 		version = Version{0, 0, 0}
 	}
 
-	strategy := EndpointStrategy{}
+	strategy := EndpointStrategy{
+		EventsEndpointStrategy:  eventsEndpointStrategy{},
+		DomainsEndpointStrategy: domainsEndpointStrategy{},
+	}
 
 	if version.GreaterThanOrEqualTo(Version{2, 2, 0}) {
 		strategy.EventsEndpointStrategy = globalEventsEndpointStrategy{}
-		strategy.DomainsEndpointStrategy = orgScopedDomainsEndpointStrategy{}
-	} else {
-		strategy.EventsEndpointStrategy = appScopedEventsEndpointStrategy{}
-		strategy.DomainsEndpointStrategy = globalDomainsEndpointStrategy{}
+		strategy.DomainsEndpointStrategy = separatedDomainsEndpointStrategy{}
 	}
 
 	return strategy

@@ -8,8 +8,6 @@ import (
 	"cf/models"
 	"cf/net"
 	"encoding/json"
-	"fmt"
-	"net/url"
 	"strings"
 )
 
@@ -38,7 +36,7 @@ func NewCloudControllerDomainRepository(config configuration.Reader, gateway net
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
-	return repo.listDomains(repo.strategy.DomainsURL(orgGuid), cb)
+	return repo.listDomains(repo.strategy.OrgDomainsURL(orgGuid), cb)
 }
 
 func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr error) {
@@ -57,15 +55,11 @@ func (repo CloudControllerDomainRepository) isOrgDomain(orgGuid string, domain m
 }
 
 func (repo CloudControllerDomainRepository) FindByName(name string) (domain models.DomainFields, apiErr error) {
-	return repo.findOneWithPath(
-		fmt.Sprintf("/v2/domains?inline-relations-depth=1&q=%s", url.QueryEscape("name:"+name)),
-		name)
+	return repo.findOneWithPath(repo.strategy.DomainURL(name), name)
 }
 
 func (repo CloudControllerDomainRepository) FindByNameInOrg(name string, orgGuid string) (domain models.DomainFields, apiErr error) {
-	domain, apiErr = repo.findOneWithPath(
-		fmt.Sprintf("/v2/organizations/%s/domains?inline-relations-depth=1&q=%s", orgGuid, url.QueryEscape("name:"+name)),
-		name)
+	domain, apiErr = repo.findOneWithPath(repo.strategy.OrgDomainURL(orgGuid, name), name)
 
 	switch apiErr.(type) {
 	case *errors.ModelNotFoundError:
