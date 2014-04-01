@@ -22,7 +22,7 @@ var _ = Describe("EndpointStrategy", func() {
 			})
 		})
 
-		Context("when targeting a v2.0.0 cloud controller", func() {
+		Context("when targeting a pre-2.1.0 cloud controller", func() {
 			BeforeEach(func() {
 				strategy = NewEndpointStrategy("2.0.0")
 			})
@@ -36,9 +36,9 @@ var _ = Describe("EndpointStrategy", func() {
 			})
 		})
 
-		Context("when targeting a v2.2.0 cloud controller", func() {
+		Context("when targeting a 2.1.0 cloud controller", func() {
 			BeforeEach(func() {
-				strategy = NewEndpointStrategy("2.2.1")
+				strategy = NewEndpointStrategy("2.1.0")
 			})
 
 			It("returns an appropriate endpoint", func() {
@@ -52,9 +52,9 @@ var _ = Describe("EndpointStrategy", func() {
 	})
 
 	Describe("domains", func() {
-		Context("when targeting a pre-2.2.0 cloud controller", func() {
+		Context("when targeting a pre-2.1.0 cloud controller", func() {
 			BeforeEach(func() {
-				strategy = NewEndpointStrategy("2.1.9")
+				strategy = NewEndpointStrategy("2.0.0")
 			})
 
 			It("uses the general domains endpoint", func() {
@@ -62,9 +62,9 @@ var _ = Describe("EndpointStrategy", func() {
 			})
 		})
 
-		Context("when targeting a v2.2.x cloud controller", func() {
+		Context("when targeting a v2.1.0 cloud controller", func() {
 			BeforeEach(func() {
-				strategy = NewEndpointStrategy("2.2.1")
+				strategy = NewEndpointStrategy("2.1.0")
 			})
 
 			It("uses the private domains endpoint", func() {

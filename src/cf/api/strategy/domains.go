@@ -13,7 +13,7 @@ type DomainsEndpointStrategy interface {
 type domainsEndpointStrategy struct{}
 
 func (s domainsEndpointStrategy) DomainURL(name string) string {
-	return buildURL(v2("domains"), query{
+	return buildURL(v2("domains"), params{
 		inlineRelationsDepth: 1,
 		q:                    map[string]string{"name": name},
 	})
@@ -24,7 +24,7 @@ func (s domainsEndpointStrategy) OrgDomainsURL(orgGuid string) string {
 }
 
 func (s domainsEndpointStrategy) OrgDomainURL(orgGuid, name string) string {
-	return buildURL(s.OrgDomainsURL(orgGuid), query{
+	return buildURL(s.OrgDomainsURL(orgGuid), params{
 		inlineRelationsDepth: 1,
 		q:                    map[string]string{"name": name},
 	})
@@ -39,11 +39,11 @@ func (s domainsEndpointStrategy) SharedDomainsURL() string {
 }
 
 func (s domainsEndpointStrategy) DeleteDomainURL(guid string) string {
-	return buildURL(v2("domains", guid), query{recursive: true})
+	return buildURL(v2("domains", guid), params{recursive: true})
 }
 
 func (s domainsEndpointStrategy) DeleteSharedDomainURL(guid string) string {
-	return buildURL(v2("domains", guid), query{recursive: true})
+	return buildURL(v2("domains", guid), params{recursive: true})
 }
 
 type separatedDomainsEndpointStrategy struct {
@@ -59,9 +59,9 @@ func (s separatedDomainsEndpointStrategy) SharedDomainsURL() string {
 }
 
 func (s separatedDomainsEndpointStrategy) DeleteDomainURL(guid string) string {
-	return buildURL(v2("private_domains", guid), query{recursive: true})
+	return buildURL(v2("private_domains", guid), params{recursive: true})
 }
 
 func (s separatedDomainsEndpointStrategy) DeleteSharedDomainURL(guid string) string {
-	return buildURL(v2("shared_domains", guid), query{recursive: true})
+	return buildURL(v2("shared_domains", guid), params{recursive: true})
 }
