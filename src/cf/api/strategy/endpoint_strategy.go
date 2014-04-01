@@ -5,10 +5,10 @@ type EndpointStrategy struct {
 	DomainsEndpointStrategy
 }
 
-func NewEndpointStrategy(versionString string) (EndpointStrategy, error) {
+func NewEndpointStrategy(versionString string) EndpointStrategy {
 	version, err := ParseVersion(versionString)
 	if err != nil {
-		return EndpointStrategy{}, err
+		version = Version{0, 0, 0}
 	}
 
 	strategy := EndpointStrategy{}
@@ -21,5 +21,5 @@ func NewEndpointStrategy(versionString string) (EndpointStrategy, error) {
 		strategy.DomainsEndpointStrategy = globalDomainsEndpointStrategy{}
 	}
 
-	return strategy, nil
+	return strategy
 }

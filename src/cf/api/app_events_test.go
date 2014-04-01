@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/api/strategy"
 	"cf/configuration"
 	"cf/models"
 	"cf/net"
@@ -19,7 +20,6 @@ var _ = Describe("App Events Repo", func() {
 		server  *httptest.Server
 		handler *testnet.TestHandler
 		config  configuration.ReadWriter
-		gateway net.Gateway
 		repo    AppEventsRepository
 	)
 
@@ -27,9 +27,12 @@ var _ = Describe("App Events Repo", func() {
 		config = testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
 		config.SetApiVersion("2.2.0")
+	})
 
-		gateway = net.NewCloudControllerGateway(config)
-		repo = NewCloudControllerAppEventsRepository(config, gateway)
+	JustBeforeEach(func() {
+		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
+		gateway := net.NewCloudControllerGateway(config)
+		repo = NewCloudControllerAppEventsRepository(config, gateway, strategy)
 	})
 
 	AfterEach(func() {

@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/api/strategy"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -25,8 +26,12 @@ var _ = Describe("DomainRepository", func() {
 
 	BeforeEach(func() {
 		config = testconfig.NewRepositoryWithDefaults()
+	})
+
+	JustBeforeEach(func() {
 		gateway := net.NewCloudControllerGateway(config)
-		repo = NewCloudControllerDomainRepository(config, gateway)
+		strategy := strategy.NewEndpointStrategy(config.ApiVersion())
+		repo = NewCloudControllerDomainRepository(config, gateway, strategy)
 	})
 
 	AfterEach(func() {
@@ -62,7 +67,6 @@ var _ = Describe("DomainRepository", func() {
 
 		Context("when targeting an old cloud controller", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.0.0")
 				setupTestServer(oldEndpointDomainsRequest)
 			})
 
@@ -218,7 +222,6 @@ var _ = Describe("DomainRepository", func() {
 	Describe("creating domains", func() {
 		Context("when the private domains endpoint is not available", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.1.0")
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
@@ -243,8 +246,11 @@ var _ = Describe("DomainRepository", func() {
 		})
 
 		Context("when the private domains endpoint is available", func() {
-			It("uses that endpoint", func() {
+			BeforeEach(func() {
 				config.SetApiVersion("2.2.1")
+			})
+
+			It("uses that endpoint", func() {
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
@@ -268,8 +274,11 @@ var _ = Describe("DomainRepository", func() {
 
 	Describe("creating shared domains", func() {
 		Context("targeting a newer cloud controller", func() {
-			It("uses the shared domains endpoint", func() {
+			BeforeEach(func() {
 				config.SetApiVersion("2.2.0")
+			})
+
+			It("uses the shared domains endpoint", func() {
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
@@ -291,7 +300,6 @@ var _ = Describe("DomainRepository", func() {
 
 		Context("when targeting an older cloud controller", func() {
 			It("uses the general domains endpoint", func() {
-				config.SetApiVersion("2.1.0")
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
@@ -330,7 +338,6 @@ var _ = Describe("DomainRepository", func() {
 
 		Context("when the private domains endpoint is NOT available", func() {
 			BeforeEach(func() {
-				config.SetApiVersion("2.1.0")
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:   "DELETE",
@@ -373,10 +380,6 @@ var _ = Describe("DomainRepository", func() {
 		})
 
 		Context("when the shared domains endpoint is not available", func() {
-			BeforeEach(func() {
-				config.SetApiVersion("2.1.0")
-			})
-
 			It("uses the old domains endpoint", func() {
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{

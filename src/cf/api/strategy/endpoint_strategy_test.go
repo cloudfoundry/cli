@@ -8,16 +8,23 @@ import (
 )
 
 var _ = Describe("EndpointStrategy", func() {
-	var (
-		strategy EndpointStrategy
-		err      error
-	)
+	var strategy EndpointStrategy
 
 	Describe("events", func() {
+		Context("when the veresion string can't be parsed", func() {
+			BeforeEach(func() {
+				strategy = NewEndpointStrategy("")
+			})
+
+			It("uses the oldest possible strategy", func() {
+				Expect(strategy.EventsURL("the-guid", 20)).To(Equal("/v2/apps/the-guid/events?results-per-page=20"))
+				Expect(strategy.EventsResource()).To(BeAssignableToTypeOf(resources.EventResourceOldV2{}))
+			})
+		})
+
 		Context("when targeting a v2.0.0 cloud controller", func() {
 			BeforeEach(func() {
-				strategy, err = NewEndpointStrategy("2.0.0")
-				Expect(err).NotTo(HaveOccurred())
+				strategy = NewEndpointStrategy("2.0.0")
 			})
 
 			It("returns an appropriate endpoint", func() {
@@ -31,8 +38,7 @@ var _ = Describe("EndpointStrategy", func() {
 
 		Context("when targeting a v2.2.0 cloud controller", func() {
 			BeforeEach(func() {
-				strategy, err = NewEndpointStrategy("2.2.1")
-				Expect(err).NotTo(HaveOccurred())
+				strategy = NewEndpointStrategy("2.2.1")
 			})
 
 			It("returns an appropriate endpoint", func() {
@@ -48,8 +54,7 @@ var _ = Describe("EndpointStrategy", func() {
 	Describe("domains", func() {
 		Context("when targeting a pre-2.2.0 cloud controller", func() {
 			BeforeEach(func() {
-				strategy, err = NewEndpointStrategy("2.1.9")
-				Expect(err).NotTo(HaveOccurred())
+				strategy = NewEndpointStrategy("2.1.9")
 			})
 
 			It("returns an appropriate endpoint", func() {
@@ -59,8 +64,7 @@ var _ = Describe("EndpointStrategy", func() {
 
 		Context("when targeting a v2.2.x cloud controller", func() {
 			BeforeEach(func() {
-				strategy, err = NewEndpointStrategy("2.2.1")
-				Expect(err).NotTo(HaveOccurred())
+				strategy = NewEndpointStrategy("2.2.1")
 			})
 
 			It("returns an appropriate endpoint", func() {
