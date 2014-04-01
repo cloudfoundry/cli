@@ -1,6 +1,7 @@
 package api
 
 import (
+	"cf/api/strategy"
 	"cf/app_files"
 	"cf/configuration"
 	"cf/net"
@@ -36,6 +37,8 @@ type RepositoryLocator struct {
 }
 
 func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[string]net.Gateway) (loc RepositoryLocator) {
+	strategy := strategy.NewEndpointStrategy(config.ApiVersion())
+
 	authGateway := gatewaysByName["auth"]
 	cloudControllerGateway := gatewaysByName["cloud-controller"]
 	uaaGateway := gatewaysByName["uaa"]
@@ -46,14 +49,14 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
 	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
-	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway)
+	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
 	loc.appRepo = NewCloudControllerApplicationRepository(config, cloudControllerGateway)
 	loc.appSummaryRepo = NewCloudControllerAppSummaryRepository(config, cloudControllerGateway)
 	loc.appInstancesRepo = NewCloudControllerAppInstancesRepository(config, cloudControllerGateway)
 	loc.authTokenRepo = NewCloudControllerServiceAuthTokenRepository(config, cloudControllerGateway)
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
-	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway)
+	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
 	loc.logsRepo = NewLoggregatorLogsRepository(config)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)

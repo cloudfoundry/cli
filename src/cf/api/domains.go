@@ -24,23 +24,21 @@ type DomainRepository interface {
 }
 
 type CloudControllerDomainRepository struct {
-	config  configuration.Reader
-	gateway net.Gateway
+	config   configuration.Reader
+	gateway  net.Gateway
+	strategy strategy.EndpointStrategy
 }
 
-func NewCloudControllerDomainRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerDomainRepository) {
-	repo.config = config
-	repo.gateway = gateway
-	return
+func NewCloudControllerDomainRepository(config configuration.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerDomainRepository {
+	return CloudControllerDomainRepository{
+		config:   config,
+		gateway:  gateway,
+		strategy: strategy,
+	}
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
-	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
-	if err != nil {
-		return err
-	}
-
-	return repo.listDomains(strategy.DomainsURL(orgGuid), cb)
+	return repo.listDomains(repo.strategy.DomainsURL(orgGuid), cb)
 }
 
 func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr error) {
@@ -96,11 +94,6 @@ func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (
 }
 
 func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, err error) {
-	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
-	if err != nil {
-		return
-	}
-
 	data, err := json.Marshal(resources.DomainEntity{
 		Name: domainName,
 		OwningOrganizationGuid: owningOrgGuid,
@@ -113,10 +106,11 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 
 	resource := new(resources.DomainResource)
 	err = repo.gateway.CreateResourceForResponse(
-		repo.config.ApiEndpoint()+strategy.PrivateDomainsURL(),
+		repo.config.ApiEndpoint()+repo.strategy.PrivateDomainsURL(),
 		repo.config.AccessToken(),
 		strings.NewReader(string(data)),
 		resource)
+
 	if err != nil {
 		return
 	}
@@ -126,21 +120,17 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 }
 
 func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiErr error) {
-	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
-	if err != nil {
-		return
-	}
-
 	data, err := json.Marshal(resources.DomainEntity{
 		Name:     domainName,
 		Wildcard: true,
 	})
+
 	if err != nil {
 		return
 	}
 
 	apiErr = repo.gateway.CreateResource(
-		repo.config.ApiEndpoint()+strategy.SharedDomainsURL(),
+		repo.config.ApiEndpoint()+repo.strategy.SharedDomainsURL(),
 		repo.config.AccessToken(),
 		strings.NewReader(string(data)))
 
@@ -148,23 +138,13 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 }
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) error {
-	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
-	if err != nil {
-		return err
-	}
-
 	return repo.gateway.DeleteResource(
-		repo.config.ApiEndpoint()+strategy.DeleteDomainURL(domainGuid),
+		repo.config.ApiEndpoint()+repo.strategy.DeleteDomainURL(domainGuid),
 		repo.config.AccessToken())
 }
 
 func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) error {
-	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
-	if err != nil {
-		return err
-	}
-
 	return repo.gateway.DeleteResource(
-		repo.config.ApiEndpoint()+strategy.DeleteSharedDomainURL(domainGuid),
+		repo.config.ApiEndpoint()+repo.strategy.DeleteSharedDomainURL(domainGuid),
 		repo.config.AccessToken())
 }

@@ -13,14 +13,17 @@ type AppEventsRepository interface {
 }
 
 type CloudControllerAppEventsRepository struct {
-	config  configuration.Reader
-	gateway net.Gateway
+	config   configuration.Reader
+	gateway  net.Gateway
+	strategy strategy.EndpointStrategy
 }
 
-func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway net.Gateway) (repo CloudControllerAppEventsRepository) {
-	repo.config = config
-	repo.gateway = gateway
-	return
+func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway net.Gateway, strategy strategy.EndpointStrategy) CloudControllerAppEventsRepository {
+	return CloudControllerAppEventsRepository{
+		config:   config,
+		gateway:  gateway,
+		strategy: strategy,
+	}
 }
 
 func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit uint64) ([]models.EventFields, error) {
@@ -36,21 +39,12 @@ func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limi
 }
 
 func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, limit uint64, cb func(models.EventFields) bool) error {
-	endpointStrategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
-	if err != nil {
-		return err
-	}
-
-	url := endpointStrategy.EventsURL(appGuid, limit)
-	resource := endpointStrategy.EventsResource()
-
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		repo.config.AccessToken(),
-		url,
-		resource,
+		repo.strategy.EventsURL(appGuid, limit),
+		repo.strategy.EventsResource(),
 		func(resource interface{}) bool {
 			return cb(resource.(resources.EventResource).ToFields())
-		},
-	)
+		})
 }
