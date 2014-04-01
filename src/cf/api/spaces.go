@@ -34,7 +34,6 @@ func NewCloudControllerSpaceRepository(config configuration.Reader, gateway net.
 func (repo CloudControllerSpaceRepository) ListSpaces(callback func(models.Space) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations/%s/spaces", repo.config.OrganizationFields().Guid),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
@@ -50,7 +49,6 @@ func (repo CloudControllerSpaceRepository) FindByNameInOrg(name, orgGuid string)
 	foundSpace := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations/%s/spaces?q=%s&inline-relations-depth=1", orgGuid, url.QueryEscape("name:"+strings.ToLower(name))),
 		resources.SpaceResource{},
 		func(resource interface{}) bool {
@@ -70,7 +68,7 @@ func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (
 	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.ApiEndpoint())
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(resources.SpaceResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResourceForResponse(path, strings.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
@@ -81,10 +79,10 @@ func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (
 func (repo CloudControllerSpaceRepository) Rename(spaceGuid, newName string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s", repo.config.ApiEndpoint(), spaceGuid)
 	body := fmt.Sprintf(`{"name":"%s"}`, newName)
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
+	return repo.gateway.UpdateResource(path, strings.NewReader(body))
 }
 
 func (repo CloudControllerSpaceRepository) Delete(spaceGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s?recursive=true", repo.config.ApiEndpoint(), spaceGuid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	return repo.gateway.DeleteResource(path)
 }

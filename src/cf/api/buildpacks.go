@@ -34,7 +34,6 @@ func NewCloudControllerBuildpackRepository(config configuration.Reader, gateway 
 func (repo CloudControllerBuildpackRepository) ListBuildpacks(cb func(models.Buildpack) bool) error {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		buildpacks_path,
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
@@ -46,7 +45,6 @@ func (repo CloudControllerBuildpackRepository) FindByName(name string) (buildpac
 	foundIt := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		fmt.Sprintf("%s?q=%s", buildpacks_path, url.QueryEscape("name:"+name)),
 		resources.BuildpackResource{},
 		func(resource interface{}) bool {
@@ -71,7 +69,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResourceForResponse(path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
@@ -82,7 +80,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 
 func (repo CloudControllerBuildpackRepository) Delete(buildpackGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s%s/%s", repo.config.ApiEndpoint(), buildpacks_path, buildpackGuid)
-	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	apiErr = repo.gateway.DeleteResource(path)
 	return
 }
 
@@ -105,7 +103,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), bytes.NewReader(body), resource)
+	apiErr = repo.gateway.UpdateResourceForResponse(path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

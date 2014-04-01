@@ -37,7 +37,6 @@ func NewCloudControllerRouteRepository(config configuration.Reader, gateway net.
 func (repo CloudControllerRouteRepository) ListRoutes(cb func(models.Route) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/spaces/%s/routes?inline-relations-depth=1", repo.config.SpaceFields().Guid),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
@@ -54,7 +53,6 @@ func (repo CloudControllerRouteRepository) FindByHostAndDomain(host, domainName 
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/routes?inline-relations-depth=1&q=%s", url.QueryEscape("host:"+host+";domain_guid:"+domain.Guid)),
 		resources.RouteResource{},
 		func(resource interface{}) bool {
@@ -79,7 +77,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, space
 	data := fmt.Sprintf(`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`, host, domainGuid, spaceGuid)
 
 	resource := new(resources.RouteResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResourceForResponse(path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -90,15 +88,15 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, space
 
 func (repo CloudControllerRouteRepository) Bind(routeGuid, appGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.ApiEndpoint(), appGuid, routeGuid)
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), nil)
+	return repo.gateway.UpdateResource(path, nil)
 }
 
 func (repo CloudControllerRouteRepository) Unbind(routeGuid, appGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/routes/%s", repo.config.ApiEndpoint(), appGuid, routeGuid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	return repo.gateway.DeleteResource(path)
 }
 
 func (repo CloudControllerRouteRepository) Delete(routeGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/routes/%s", repo.config.ApiEndpoint(), routeGuid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	return repo.gateway.DeleteResource(path)
 }

@@ -49,7 +49,7 @@ func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, api
 
 func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiErr error) {
 	responseJSON := new(resources.PaginatedStackResources)
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), responseJSON)
+	apiErr = repo.gateway.GetResource(path, responseJSON)
 	if apiErr != nil {
 		return
 	}

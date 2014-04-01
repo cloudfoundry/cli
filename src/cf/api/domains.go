@@ -42,7 +42,6 @@ func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb
 func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		path,
 		resources.DomainResource{},
 		func(resource interface{}) bool {
@@ -101,7 +100,6 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	resource := new(resources.DomainResource)
 	err = repo.gateway.CreateResourceForResponse(
 		repo.config.ApiEndpoint()+repo.strategy.PrivateDomainsURL(),
-		repo.config.AccessToken(),
 		strings.NewReader(string(data)),
 		resource)
 
@@ -125,7 +123,6 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 
 	apiErr = repo.gateway.CreateResource(
 		repo.config.ApiEndpoint()+repo.strategy.SharedDomainsURL(),
-		repo.config.AccessToken(),
 		strings.NewReader(string(data)))
 
 	return
@@ -133,12 +130,10 @@ func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string
 
 func (repo CloudControllerDomainRepository) Delete(domainGuid string) error {
 	return repo.gateway.DeleteResource(
-		repo.config.ApiEndpoint()+repo.strategy.DeleteDomainURL(domainGuid),
-		repo.config.AccessToken())
+		repo.config.ApiEndpoint() + repo.strategy.DeleteDomainURL(domainGuid))
 }
 
 func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) error {
 	return repo.gateway.DeleteResource(
-		repo.config.ApiEndpoint()+repo.strategy.DeleteSharedDomainURL(domainGuid),
-		repo.config.AccessToken())
+		repo.config.ApiEndpoint() + repo.strategy.DeleteSharedDomainURL(domainGuid))
 }

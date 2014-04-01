@@ -48,7 +48,7 @@ func (repo CCUserProvidedServiceInstanceRepository) Create(name, drainUrl string
 		return
 	}
 
-	return repo.gateway.CreateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
+	return repo.gateway.CreateResource(path, bytes.NewReader(jsonBytes))
 }
 
 func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields models.ServiceInstanceFields) (apiErr error) {
@@ -66,5 +66,5 @@ func (repo CCUserProvidedServiceInstanceRepository) Update(serviceInstanceFields
 		return
 	}
 
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), bytes.NewReader(jsonBytes))
+	return repo.gateway.UpdateResource(path, bytes.NewReader(jsonBytes))
 }

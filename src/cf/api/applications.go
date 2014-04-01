@@ -39,7 +39,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 
 	path := fmt.Sprintf("%s/v2/apps", repo.config.ApiEndpoint())
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResourceForResponse(path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -51,7 +51,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 func (repo CloudControllerApplicationRepository) Read(name string) (app models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/spaces/%s/apps?q=%s&inline-relations-depth=1", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid, url.QueryEscape("name:"+name))
 	appResources := new(resources.PaginatedApplicationResources)
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), appResources)
+	apiErr = repo.gateway.GetResource(path, appResources)
 	if apiErr != nil {
 		return
 	}
@@ -75,7 +75,7 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params m
 
 	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.ApiEndpoint(), appGuid)
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.UpdateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
+	apiErr = repo.gateway.UpdateResourceForResponse(path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -93,5 +93,5 @@ func (repo CloudControllerApplicationRepository) formatAppJSON(input models.AppP
 
 func (repo CloudControllerApplicationRepository) Delete(appGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s?recursive=true", repo.config.ApiEndpoint(), appGuid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	return repo.gateway.DeleteResource(path)
 }

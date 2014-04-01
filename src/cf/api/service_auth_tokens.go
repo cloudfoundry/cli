@@ -54,7 +54,7 @@ func (repo CloudControllerServiceAuthTokenRepository) FindByLabelAndProvider(lab
 func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path string) (authTokens []models.ServiceAuthTokenFields, apiErr error) {
 	responseJSON := new(resources.PaginatedAuthTokenResources)
 
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), responseJSON)
+	apiErr = repo.gateway.GetResource(path, responseJSON)
 	if apiErr != nil {
 		return
 	}
@@ -72,16 +72,16 @@ func (repo CloudControllerServiceAuthTokenRepository) findAllWithPath(path strin
 func (repo CloudControllerServiceAuthTokenRepository) Create(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	body := fmt.Sprintf(`{"label":"%s","provider":"%s","token":"%s"}`, authToken.Label, authToken.Provider, authToken.Token)
 	path := fmt.Sprintf("%s/v2/service_auth_tokens", repo.config.ApiEndpoint())
-	return repo.gateway.CreateResource(path, repo.config.AccessToken(), strings.NewReader(body))
+	return repo.gateway.CreateResource(path, strings.NewReader(body))
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Delete(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.ApiEndpoint(), authToken.Guid)
-	return repo.gateway.DeleteResource(path, repo.config.AccessToken())
+	return repo.gateway.DeleteResource(path)
 }
 
 func (repo CloudControllerServiceAuthTokenRepository) Update(authToken models.ServiceAuthTokenFields) (apiErr error) {
 	body := fmt.Sprintf(`{"token":"%s"}`, authToken.Token)
 	path := fmt.Sprintf("%s/v2/service_auth_tokens/%s", repo.config.ApiEndpoint(), authToken.Guid)
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(body))
+	return repo.gateway.UpdateResource(path, strings.NewReader(body))
 }
