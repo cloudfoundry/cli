@@ -5,7 +5,7 @@ import "cf/models"
 type FakeAppEventsRepo struct {
 	RecentEventsArgs struct {
 		AppGuid string
-		Limit   uint
+		Limit   uint64
 	}
 
 	RecentEventsReturns struct {
@@ -14,7 +14,7 @@ type FakeAppEventsRepo struct {
 	}
 }
 
-func (repo *FakeAppEventsRepo) RecentEvents(appGuid string, limit uint) ([]models.EventFields, error) {
+func (repo *FakeAppEventsRepo) RecentEvents(appGuid string, limit uint64) ([]models.EventFields, error) {
 	repo.RecentEventsArgs.AppGuid = appGuid
 	repo.RecentEventsArgs.Limit = limit
 	return repo.RecentEventsReturns.Events, repo.RecentEventsReturns.Error

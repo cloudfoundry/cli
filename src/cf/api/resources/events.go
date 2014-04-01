@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type EventResource interface {
+	ToFields() models.EventFields
+}
+
 type EventResourceNewV2 struct {
 	Resource
 	Entity struct {
@@ -39,6 +43,15 @@ func (resource EventResourceNewV2) ToFields() models.EventFields {
 		Name:        resource.Entity.Type,
 		Timestamp:   resource.Entity.Timestamp,
 		Description: formatDescription(metadata, knownMetadataKeys),
+	}
+}
+
+func (resource EventResourceOldV2) ToFields() models.EventFields {
+	return models.EventFields{
+		Guid:        resource.Metadata.Guid,
+		Name:        "app crashed",
+		Timestamp:   resource.Entity.Timestamp,
+		Description: fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus)),
 	}
 }
 
@@ -81,14 +94,5 @@ func formatDescriptionPart(val interface{}) string {
 		}
 	default:
 		return fmt.Sprintf("%s", val)
-	}
-}
-
-func (resource EventResourceOldV2) ToFields() models.EventFields {
-	return models.EventFields{
-		Guid:        resource.Metadata.Guid,
-		Name:        "app crashed",
-		Timestamp:   resource.Entity.Timestamp,
-		Description: fmt.Sprintf("instance: %d, reason: %s, exit_status: %s", resource.Entity.InstanceIndex, resource.Entity.ExitDescription, strconv.Itoa(resource.Entity.ExitStatus)),
 	}
 }
