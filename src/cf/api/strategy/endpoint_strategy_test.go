@@ -57,8 +57,8 @@ var _ = Describe("EndpointStrategy", func() {
 				strategy = NewEndpointStrategy("2.1.9")
 			})
 
-			It("returns an appropriate endpoint", func() {
-				Expect(strategy.DomainsURL("guids-r-good")).To(Equal("/v2/domains"))
+			It("uses the general domains endpoint", func() {
+				Expect(strategy.PrivateDomainsURL()).To(Equal("/v2/domains"))
 			})
 		})
 
@@ -67,8 +67,8 @@ var _ = Describe("EndpointStrategy", func() {
 				strategy = NewEndpointStrategy("2.2.1")
 			})
 
-			It("returns an appropriate endpoint", func() {
-				Expect(strategy.DomainsURL("the-org-guid")).To(Equal("/v2/organizations/the-org-guid/domains"))
+			It("uses the private domains endpoint", func() {
+				Expect(strategy.PrivateDomainsURL()).To(Equal("/v2/private_domains"))
 			})
 		})
 	})

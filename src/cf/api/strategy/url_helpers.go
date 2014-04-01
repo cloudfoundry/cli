@@ -2,18 +2,29 @@ package strategy
 
 import (
 	"net/url"
+	"path"
 	"strconv"
 )
 
 type query struct {
-	resultsPerPage uint64
-	orderDirection string
-	q              map[string]string
-	recursive      bool
+	resultsPerPage       uint64
+	orderDirection       string
+	q                    map[string]string
+	recursive            bool
+	inlineRelationsDepth uint64
+}
+
+func v2(segments ...string) string {
+	segments = append([]string{"/v2"}, segments...)
+	return path.Join(segments...)
 }
 
 func buildURL(path string, query query) string {
 	values := url.Values{}
+
+	if query.inlineRelationsDepth != 0 {
+		values.Set("inline-relations-depth", strconv.FormatUint(query.inlineRelationsDepth, 10))
+	}
 
 	if query.resultsPerPage != 0 {
 		values.Set("results-per-page", strconv.FormatUint(query.resultsPerPage, 10))

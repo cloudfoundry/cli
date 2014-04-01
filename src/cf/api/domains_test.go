@@ -44,44 +44,23 @@ var _ = Describe("DomainRepository", func() {
 	}
 
 	Describe("listing domains", func() {
-		Context("when the organization-scoped domains endpoint is available", func() {
-			BeforeEach(func() {
-				config.SetApiVersion("2.2.0")
-				setupTestServer(firstPageDomainsRequest, secondPageDomainsRequest)
-			})
-
-			It("uses that endpoint", func() {
-				receivedDomains := []models.DomainFields{}
-				apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
-					receivedDomains = append(receivedDomains, d)
-					return true
-				})
-
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(len(receivedDomains)).To(Equal(3))
-				Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
-				Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
-				Expect(handler).To(testnet.HaveAllRequestsCalled())
-			})
+		BeforeEach(func() {
+			config.SetApiVersion("2.2.0")
+			setupTestServer(firstPageDomainsRequest, secondPageDomainsRequest)
 		})
 
-		Context("when targeting an old cloud controller", func() {
-			BeforeEach(func() {
-				setupTestServer(oldEndpointDomainsRequest)
+		It("uses the organization-scoped domains endpoint", func() {
+			receivedDomains := []models.DomainFields{}
+			apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
+				receivedDomains = append(receivedDomains, d)
+				return true
 			})
 
-			It("uses the global domains endpoint", func() {
-				receivedDomains := []models.DomainFields{}
-				apiErr := repo.ListDomainsForOrg("my-org-guid", func(d models.DomainFields) bool {
-					receivedDomains = append(receivedDomains, d)
-					return true
-				})
-
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(len(receivedDomains)).To(Equal(1))
-				Expect(receivedDomains[0].Guid).To(Equal("domain-guid"))
-				Expect(handler).To(testnet.HaveAllRequestsCalled())
-			})
+			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(len(receivedDomains)).To(Equal(3))
+			Expect(receivedDomains[0].Guid).To(Equal("domain1-guid"))
+			Expect(receivedDomains[1].Guid).To(Equal("domain2-guid"))
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
 		})
 	})
 
