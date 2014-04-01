@@ -79,7 +79,7 @@ func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (
 func (repo CloudControllerAppInstancesRepository) updateInstancesWithStats(guid string, instances []models.AppInstanceFields) (updatedInst []models.AppInstanceFields, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/stats", repo.config.ApiEndpoint(), guid)
 	statsResponse := StatsApiResponse{}
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), &statsResponse)
+	apiErr = repo.gateway.GetResource(path, &statsResponse)
 	if apiErr != nil {
 		return
 	}

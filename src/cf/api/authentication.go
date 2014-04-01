@@ -73,7 +73,7 @@ func (r *LoginResource) parsePrompts() (prompts map[string]configuration.AuthPro
 func (uaa UAAAuthenticationRepository) GetLoginPromptsAndSaveUAAServerURL() (prompts map[string]configuration.AuthPrompt, apiErr error) {
 	url := fmt.Sprintf("%s/login", uaa.config.AuthenticationEndpoint())
 	resource := &LoginResource{}
-	apiErr = uaa.gateway.GetResource(url, "", resource)
+	apiErr = uaa.gateway.GetResource(url, resource)
 
 	prompts = resource.parsePrompts()
 	if resource.Links["uaa"] == "" {

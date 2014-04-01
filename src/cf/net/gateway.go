@@ -71,45 +71,54 @@ func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
 	gateway.authenticator = auth
 }
 
-func (gateway Gateway) GetResource(url, accessToken string, resource interface{}) (apiErr error) {
-	request, apiErr := gateway.NewRequest("GET", url, accessToken, nil)
-	if apiErr != nil {
+func (gateway Gateway) GetResourceWithoutAccessToken(url string, resource interface{}) (err error) {
+	request, err := gateway.NewRequest("GET", url, "", nil)
+	if err != nil {
 		return
 	}
 
-	_, apiErr = gateway.PerformRequestForJSONResponse(request, resource)
+	_, err = gateway.PerformRequestForJSONResponse(request, resource)
 	return
 }
 
-func (gateway Gateway) CreateResource(url, accessToken string, body io.ReadSeeker) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body, nil)
+func (gateway Gateway) GetResource(url string, resource interface{}) (err error) {
+	request, err := gateway.NewRequest("GET", url, gateway.config.AccessToken(), nil)
+	if err != nil {
+		return
+	}
+
+	_, err = gateway.PerformRequestForJSONResponse(request, resource)
+	return
 }
 
-func (gateway Gateway) CreateResourceForResponse(url, accessToken string, body io.ReadSeeker, resource interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("POST", url, accessToken, body, resource)
+func (gateway Gateway) CreateResource(url string, body io.ReadSeeker) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("POST", url, body, nil)
 }
 
-func (gateway Gateway) UpdateResource(url, accessToken string, body io.ReadSeeker) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body, nil)
+func (gateway Gateway) CreateResourceForResponse(url string, body io.ReadSeeker, resource interface{}) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("POST", url, body, resource)
 }
 
-func (gateway Gateway) UpdateResourceForResponse(url, accessToken string, body io.ReadSeeker, resource interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, accessToken, body, resource)
+func (gateway Gateway) UpdateResource(url string, body io.ReadSeeker) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("PUT", url, body, nil)
 }
 
-func (gateway Gateway) DeleteResource(url, accessToken string) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("DELETE", url, accessToken, nil, &AsyncResponse{})
+func (gateway Gateway) UpdateResourceForResponse(url string, body io.ReadSeeker, resource interface{}) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("PUT", url, body, resource)
+}
+
+func (gateway Gateway) DeleteResource(url string) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("DELETE", url, nil, &AsyncResponse{})
 }
 
 func (gateway Gateway) ListPaginatedResources(target string,
-	accessToken string,
 	path string,
 	resource interface{},
 	cb func(interface{}) bool) (apiErr error) {
 
 	for path != "" {
 		pagination := NewPaginatedResources(resource)
-		apiErr = gateway.GetResource(fmt.Sprintf("%s%s", target, path), accessToken, &pagination)
+		apiErr = gateway.GetResource(fmt.Sprintf("%s%s", target, path), &pagination)
 		if apiErr != nil {
 			return
 		}
@@ -131,8 +140,8 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	return
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, url, accessToken string, body io.ReadSeeker, resource interface{}) (apiErr error) {
-	request, apiErr := gateway.NewRequest(verb, url, accessToken, body)
+func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.ReadSeeker, resource interface{}) (apiErr error) {
+	request, apiErr := gateway.NewRequest(verb, url, gateway.config.AccessToken(), body)
 	if apiErr != nil {
 		return
 	}

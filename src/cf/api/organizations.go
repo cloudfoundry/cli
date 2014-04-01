@@ -33,7 +33,6 @@ func NewCloudControllerOrganizationRepository(config configuration.Reader, gatew
 func (repo CloudControllerOrganizationRepository) ListOrgs(cb func(models.Organization) bool) (apiErr error) {
 	return repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		"/v2/organizations",
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
@@ -45,7 +44,6 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 	found := false
 	apiErr = repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
 		fmt.Sprintf("/v2/organizations?q=%s&inline-relations-depth=1", url.QueryEscape("name:"+strings.ToLower(name))),
 		resources.OrganizationResource{},
 		func(resource interface{}) bool {
@@ -64,16 +62,16 @@ func (repo CloudControllerOrganizationRepository) FindByName(name string) (org m
 func (repo CloudControllerOrganizationRepository) Create(name string) (apiErr error) {
 	url := repo.config.ApiEndpoint() + "/v2/organizations"
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.gateway.CreateResource(url, repo.config.AccessToken(), strings.NewReader(data))
+	return repo.gateway.CreateResource(url, strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Rename(orgGuid string, name string) (apiErr error) {
 	url := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"name":"%s"}`, name)
-	return repo.gateway.UpdateResource(url, repo.config.AccessToken(), strings.NewReader(data))
+	return repo.gateway.UpdateResource(url, strings.NewReader(data))
 }
 
 func (repo CloudControllerOrganizationRepository) Delete(orgGuid string) (apiErr error) {
 	url := fmt.Sprintf("%s/v2/organizations/%s?recursive=true", repo.config.ApiEndpoint(), orgGuid)
-	return repo.gateway.DeleteResource(url, repo.config.AccessToken())
+	return repo.gateway.DeleteResource(url)
 }

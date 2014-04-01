@@ -101,7 +101,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 	resources := new(ApplicationSummaries)
 
 	path := fmt.Sprintf("%s/v2/spaces/%s/summary", repo.config.ApiEndpoint(), repo.config.SpaceFields().Guid)
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), resources)
+	apiErr = repo.gateway.GetResource(path, resources)
 	if apiErr != nil {
 		return
 	}
@@ -115,7 +115,7 @@ func (repo CloudControllerAppSummaryRepository) GetSummariesInCurrentSpace() (ap
 func (repo CloudControllerAppSummaryRepository) GetSummary(appGuid string) (summary models.Application, apiErr error) {
 	path := fmt.Sprintf("%s/v2/apps/%s/summary", repo.config.ApiEndpoint(), appGuid)
 	summaryResponse := new(ApplicationFromSummary)
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), summaryResponse)
+	apiErr = repo.gateway.GetResource(path, summaryResponse)
 	if apiErr != nil {
 		return
 	}

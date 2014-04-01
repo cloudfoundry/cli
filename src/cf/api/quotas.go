@@ -31,7 +31,7 @@ func NewCloudControllerQuotaRepository(config configuration.Reader, gateway net.
 func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiErr error) {
 	responseJSON := new(resources.PaginatedQuotaResources)
 
-	apiErr = repo.gateway.GetResource(path, repo.config.AccessToken(), responseJSON)
+	apiErr = repo.gateway.GetResource(path, responseJSON)
 	if apiErr != nil {
 		return
 	}
@@ -67,5 +67,5 @@ func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models
 func (repo CloudControllerQuotaRepository) Update(orgGuid, quotaGuid string) (apiErr error) {
 	path := fmt.Sprintf("%s/v2/organizations/%s", repo.config.ApiEndpoint(), orgGuid)
 	data := fmt.Sprintf(`{"quota_definition_guid":"%s"}`, quotaGuid)
-	return repo.gateway.UpdateResource(path, repo.config.AccessToken(), strings.NewReader(data))
+	return repo.gateway.UpdateResource(path, strings.NewReader(data))
 }

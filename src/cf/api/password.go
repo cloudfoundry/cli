@@ -32,5 +32,5 @@ func (repo CloudControllerPasswordRepository) UpdatePassword(old string, new str
 	url := fmt.Sprintf("%s/Users/%s/password", uaaEndpoint, repo.config.UserGuid())
 	body := fmt.Sprintf(`{"password":"%s","oldPassword":"%s"}`, new, old)
 
-	return repo.gateway.UpdateResource(url, repo.config.AccessToken(), strings.NewReader(body))
+	return repo.gateway.UpdateResource(url, strings.NewReader(body))
 }
