@@ -267,13 +267,14 @@ var _ = Describe("DomainRepository", func() {
 	})
 
 	Describe("creating shared domains", func() {
-		Context("when the shared domains endpoint is available", func() {
-			It("uses that endpoint", func() {
+		Context("targeting a newer cloud controller", func() {
+			It("uses the shared domains endpoint", func() {
+				config.SetApiVersion("2.2.0")
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/shared_domains",
-						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com"}`),
+						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com", "wildcard": true}`),
 						Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "abc-123" },
@@ -288,15 +289,10 @@ var _ = Describe("DomainRepository", func() {
 			})
 		})
 
-		Context("when the shared domains endpoint is not available", func() {
+		Context("when targeting an older cloud controller", func() {
 			It("uses the general domains endpoint", func() {
+				config.SetApiVersion("2.1.0")
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-						Method:   "POST",
-						Path:     "/v2/shared_domains",
-						Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com"}`),
-						Response: testnet.TestResponse{Status: http.StatusNotFound},
-					}),
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/domains",
@@ -319,9 +315,12 @@ var _ = Describe("DomainRepository", func() {
 
 	Describe("deleting domains", func() {
 		Context("when the private domains endpoint is available", func() {
-			It("uses the private domains endpoint", func() {
+			BeforeEach(func() {
+				config.SetApiVersion("2.2.0")
 				setupTestServer(deleteDomainReq(http.StatusOK))
+			})
 
+			It("uses the private domains endpoint", func() {
 				apiErr := repo.Delete("my-domain-guid")
 
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -330,16 +329,17 @@ var _ = Describe("DomainRepository", func() {
 		})
 
 		Context("when the private domains endpoint is NOT available", func() {
-			It("uses the general domains endpoint", func() {
+			BeforeEach(func() {
+				config.SetApiVersion("2.1.0")
 				setupTestServer(
-					deleteDomainReq(http.StatusNotFound),
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:   "DELETE",
 						Path:     "/v2/domains/my-domain-guid?recursive=true",
 						Response: testnet.TestResponse{Status: http.StatusOK},
-					}),
-				)
+					}))
+			})
 
+			It("uses the general domains endpoint", func() {
 				apiErr := repo.Delete("my-domain-guid")
 
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
@@ -350,20 +350,35 @@ var _ = Describe("DomainRepository", func() {
 
 	Describe("deleting shared domains", func() {
 		Context("when the shared domains endpoint is available", func() {
-			It("uses the shared domains endpoint", func() {
+			BeforeEach(func() {
+				config.SetApiVersion("2.2.0")
 				setupTestServer(deleteSharedDomainReq(http.StatusOK))
+			})
 
+			It("uses the shared domains endpoint", func() {
 				apiErr := repo.DeleteSharedDomain("my-domain-guid")
 
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
+
+			It("returns an error when the delete fails", func() {
+				setupTestServer(deleteSharedDomainReq(http.StatusBadRequest))
+
+				apiErr := repo.DeleteSharedDomain("my-domain-guid")
+
+				Expect(handler).To(testnet.HaveAllRequestsCalled())
+				Expect(apiErr).NotTo(BeNil())
+			})
 		})
 
 		Context("when the shared domains endpoint is not available", func() {
+			BeforeEach(func() {
+				config.SetApiVersion("2.1.0")
+			})
+
 			It("uses the old domains endpoint", func() {
 				setupTestServer(
-					deleteSharedDomainReq(http.StatusNotFound),
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:   "DELETE",
 						Path:     "/v2/domains/my-domain-guid?recursive=true",
@@ -375,77 +390,9 @@ var _ = Describe("DomainRepository", func() {
 				Expect(handler).To(testnet.HaveAllRequestsCalled())
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
-
-			It("returns an error when the delete fails", func() {
-				setupTestServer(deleteDomainReq(http.StatusBadRequest))
-
-				apiErr := repo.Delete("my-domain-guid")
-
-				Expect(handler).To(testnet.HaveAllRequestsCalled())
-				Expect(apiErr).NotTo(BeNil())
-			})
 		})
 	})
 
-})
-
-var noDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/organizations/my-org-guid/private_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"next_url": "",
-	"resources": []
-}`},
-})
-
-var firstPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/shared_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"next_url": "/v2/shared_domains?page=2",
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "shared-domain1-guid"
-		  },
-		  "entity": {
-			"name": "shared-example1.com"
- 		  }
-		}
-	]
-}`},
-})
-
-var secondPageSharedDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/shared_domains",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-{
-	"resources": [
-		{
-		  "metadata": {
-			"guid": "shared-domain2-guid"
-		  },
-		  "entity": {
-			"name": "shared-example2.com"
- 		  }
-		}
-	]
-}`},
-})
-
-var notFoundDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:   "GET",
-	Path:     "/v2/organizations/my-org-guid/domains",
-	Response: testnet.TestResponse{Status: http.StatusNotFound},
-})
-
-var notFoundPrivateDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method:   "GET",
-	Path:     "/v2/organizations/my-org-guid/private_domains",
-	Response: testnet.TestResponse{Status: http.StatusNotFound},
 })
 
 var oldEndpointDomainsRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{

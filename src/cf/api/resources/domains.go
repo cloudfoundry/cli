@@ -9,7 +9,7 @@ type DomainResource struct {
 
 type DomainEntity struct {
 	Name                   string `json:"name"`
-	OwningOrganizationGuid string `json:"owning_organization_guid"`
+	OwningOrganizationGuid string `json:"owning_organization_guid,omitempty"`
 	Wildcard               bool   `json:"wildcard"`
 }
 

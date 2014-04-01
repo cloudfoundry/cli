@@ -12,8 +12,8 @@ type globalEventsEndpointStrategy struct{}
 func (strategy globalEventsEndpointStrategy) EventsURL(appGuid string, limit uint64) string {
 	return buildURL("/v2/events", query{
 		resultsPerPage: limit,
-		orderDirection:  "desc",
-		q: map[string]string{"actee": appGuid},
+		orderDirection: "desc",
+		q:              map[string]string{"actee": appGuid},
 	})
 }
 
