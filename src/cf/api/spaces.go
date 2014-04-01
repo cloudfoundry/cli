@@ -68,7 +68,7 @@ func (repo CloudControllerSpaceRepository) Create(name string, orgGuid string) (
 	path := fmt.Sprintf("%s/v2/spaces?inline-relations-depth=1", repo.config.ApiEndpoint())
 	body := fmt.Sprintf(`{"name":"%s","organization_guid":"%s"}`, name, orgGuid)
 	resource := new(resources.SpaceResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, strings.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(path, strings.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

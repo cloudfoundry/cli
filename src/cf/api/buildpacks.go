@@ -69,7 +69,7 @@ func (repo CloudControllerBuildpackRepository) Create(name string, position *int
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.CreateResource(path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}
@@ -103,7 +103,7 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	resource := new(resources.BuildpackResource)
-	apiErr = repo.gateway.UpdateResourceForResponse(path, bytes.NewReader(body), resource)
+	apiErr = repo.gateway.UpdateResource(path, bytes.NewReader(body), resource)
 	if apiErr != nil {
 		return
 	}

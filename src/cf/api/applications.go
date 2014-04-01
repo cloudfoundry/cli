@@ -39,7 +39,7 @@ func (repo CloudControllerApplicationRepository) Create(params models.AppParams)
 
 	path := fmt.Sprintf("%s/v2/apps", repo.config.ApiEndpoint())
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResource(path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}
@@ -75,7 +75,7 @@ func (repo CloudControllerApplicationRepository) Update(appGuid string, params m
 
 	path := fmt.Sprintf("%s/v2/apps/%s?inline-relations-depth=1", repo.config.ApiEndpoint(), appGuid)
 	resource := new(resources.ApplicationResource)
-	apiErr = repo.gateway.UpdateResourceForResponse(path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.UpdateResource(path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}

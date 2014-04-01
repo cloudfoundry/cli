@@ -145,7 +145,7 @@ var _ = Describe("Gateway", func() {
 
 		Describe("when the access token expires during the upload", func() {
 			It("successfully re-sends the file on the second request", func() {
-				apiErr = ccGateway.PerformRequest(request)
+				_, apiErr = ccGateway.PerformRequest(request)
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 		})
@@ -181,7 +181,7 @@ var _ = Describe("Gateway", func() {
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
 			request, apiErr := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-			apiErr = uaaGateway.PerformRequest(request)
+			_, apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
@@ -198,7 +198,7 @@ var _ = Describe("Gateway", func() {
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
 			request, apiErr := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-			apiErr = ccGateway.PerformRequest(request)
+			_, apiErr = ccGateway.PerformRequest(request)
 
 			Expect(apiErr).NotTo(HaveOccurred())
 			Expect(config.AccessToken()).To(Equal("bearer new-access-token"))
@@ -217,7 +217,7 @@ var _ = Describe("Gateway", func() {
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			uaaGateway.SetTokenRefresher(auth)
 			request, apiErr := uaaGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-			apiErr = uaaGateway.PerformRequest(request)
+			_, apiErr = uaaGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
 			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
@@ -235,7 +235,7 @@ var _ = Describe("Gateway", func() {
 			config, auth := createAuthenticationRepository(apiServer, authServer)
 			ccGateway.SetTokenRefresher(auth)
 			request, apiErr := ccGateway.NewRequest("POST", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), strings.NewReader("expected body"))
-			apiErr = ccGateway.PerformRequest(request)
+			_, apiErr = ccGateway.PerformRequest(request)
 
 			Expect(apiErr).To(HaveOccurred())
 			Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("333"))
@@ -263,7 +263,7 @@ var _ = Describe("Gateway", func() {
 			It("returns an invalid cert error if the server's CA is unknown (e.g. cert is self-signed)", func() {
 				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeSelfSignedTLSCert()}
 
-				apiErr := ccGateway.PerformRequest(request)
+				_, apiErr := ccGateway.PerformRequest(request)
 				certErr, ok := apiErr.(*errors.InvalidSSLCert)
 				Expect(ok).To(BeTrue())
 				Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
@@ -273,7 +273,7 @@ var _ = Describe("Gateway", func() {
 			It("returns an invalid cert error if the server's cert doesn't match its host", func() {
 				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeTLSCertWithInvalidHost()}
 
-				apiErr := ccGateway.PerformRequest(request)
+				_, apiErr := ccGateway.PerformRequest(request)
 				certErr, ok := apiErr.(*errors.InvalidSSLCert)
 				Expect(ok).To(BeTrue())
 				Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
@@ -285,7 +285,7 @@ var _ = Describe("Gateway", func() {
 			It("returns an invalid cert error if the server's cert has expired", func() {
 				apiServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
 
-				apiErr := ccGateway.PerformRequest(request)
+				_, apiErr := ccGateway.PerformRequest(request)
 				certErr, ok := apiErr.(*errors.InvalidSSLCert)
 				Expect(ok).To(BeTrue())
 				Expect(certErr.URL).To(Equal(getHost(apiServer.URL)))
@@ -302,7 +302,7 @@ var _ = Describe("Gateway", func() {
 			})
 
 			It("succeeds", func() {
-				apiErr := ccGateway.PerformRequest(request)
+				_, apiErr := ccGateway.PerformRequest(request)
 				Expect(apiErr).NotTo(HaveOccurred())
 			})
 		})
