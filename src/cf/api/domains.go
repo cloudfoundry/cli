@@ -113,7 +113,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 
 	resource := new(resources.DomainResource)
 	err = repo.gateway.CreateResourceForResponse(
-		repo.config.ApiEndpoint()+strategy.CreatePrivateDomainURL(),
+		repo.config.ApiEndpoint()+strategy.PrivateDomainsURL(),
 		repo.config.AccessToken(),
 		strings.NewReader(string(data)),
 		resource)
@@ -126,39 +126,45 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 }
 
 func (repo CloudControllerDomainRepository) CreateSharedDomain(domainName string) (apiErr error) {
-	path := repo.config.ApiEndpoint() + "/v2/shared_domains"
-	data := strings.NewReader(fmt.Sprintf(`{"name":"%s"}`, domainName))
-	apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
-
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		path := repo.config.ApiEndpoint() + "/v2/domains"
-		data := strings.NewReader(fmt.Sprintf(`{"name":"%s", "wildcard": true}`, domainName))
-		apiErr = repo.gateway.CreateResource(path, repo.config.AccessToken(), data)
+	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
+	if err != nil {
+		return
 	}
+
+	data, err := json.Marshal(resources.DomainEntity{
+		Name:     domainName,
+		Wildcard: true,
+	})
+	if err != nil {
+		return
+	}
+
+	apiErr = repo.gateway.CreateResource(
+		repo.config.ApiEndpoint()+strategy.SharedDomainsURL(),
+		repo.config.AccessToken(),
+		strings.NewReader(string(data)))
+
 	return
 }
 
-func (repo CloudControllerDomainRepository) Delete(domainGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/private_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
-
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-		apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+func (repo CloudControllerDomainRepository) Delete(domainGuid string) error {
+	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
+	if err != nil {
+		return err
 	}
-	return
+
+	return repo.gateway.DeleteResource(
+		repo.config.ApiEndpoint()+strategy.DeleteDomainURL(domainGuid),
+		repo.config.AccessToken())
 }
 
-func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) (apiErr error) {
-	path := fmt.Sprintf("%s/v2/shared_domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-	apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
-
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		path := fmt.Sprintf("%s/v2/domains/%s?recursive=true", repo.config.ApiEndpoint(), domainGuid)
-		apiErr = repo.gateway.DeleteResource(path, repo.config.AccessToken())
+func (repo CloudControllerDomainRepository) DeleteSharedDomain(domainGuid string) error {
+	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
+	if err != nil {
+		return err
 	}
-	return
+
+	return repo.gateway.DeleteResource(
+		repo.config.ApiEndpoint()+strategy.DeleteSharedDomainURL(domainGuid),
+		repo.config.AccessToken())
 }
