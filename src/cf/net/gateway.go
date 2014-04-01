@@ -71,16 +71,6 @@ func (gateway *Gateway) SetTokenRefresher(auth tokenRefresher) {
 	gateway.authenticator = auth
 }
 
-func (gateway Gateway) GetResourceWithoutAccessToken(url string, resource interface{}) (err error) {
-	request, err := gateway.NewRequest("GET", url, "", nil)
-	if err != nil {
-		return
-	}
-
-	_, err = gateway.PerformRequestForJSONResponse(request, resource)
-	return
-}
-
 func (gateway Gateway) GetResource(url string, resource interface{}) (err error) {
 	request, err := gateway.NewRequest("GET", url, gateway.config.AccessToken(), nil)
 	if err != nil {
