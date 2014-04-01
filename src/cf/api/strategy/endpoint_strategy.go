@@ -16,7 +16,7 @@ func NewEndpointStrategy(versionString string) EndpointStrategy {
 		DomainsEndpointStrategy: domainsEndpointStrategy{},
 	}
 
-	if version.GreaterThanOrEqualTo(Version{2, 2, 0}) {
+	if version.GreaterThanOrEqualTo(Version{2, 1, 0}) {
 		strategy.EventsEndpointStrategy = globalEventsEndpointStrategy{}
 		strategy.DomainsEndpointStrategy = separatedDomainsEndpointStrategy{}
 	}

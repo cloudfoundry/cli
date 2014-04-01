@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type query struct {
+type params struct {
 	resultsPerPage       uint64
 	orderDirection       string
 	q                    map[string]string
@@ -19,32 +19,32 @@ func v2(segments ...string) string {
 	return path.Join(segments...)
 }
 
-func buildURL(path string, query query) string {
-	values := url.Values{}
+func buildURL(path string, params params) string {
+	query := url.Values{}
 
-	if query.inlineRelationsDepth != 0 {
-		values.Set("inline-relations-depth", strconv.FormatUint(query.inlineRelationsDepth, 10))
+	if params.inlineRelationsDepth != 0 {
+		query.Set("inline-relations-depth", strconv.FormatUint(params.inlineRelationsDepth, 10))
 	}
 
-	if query.resultsPerPage != 0 {
-		values.Set("results-per-page", strconv.FormatUint(query.resultsPerPage, 10))
+	if params.resultsPerPage != 0 {
+		query.Set("results-per-page", strconv.FormatUint(params.resultsPerPage, 10))
 	}
 
-	if query.orderDirection != "" {
-		values.Set("order-direction", query.orderDirection)
+	if params.orderDirection != "" {
+		query.Set("order-direction", params.orderDirection)
 	}
 
-	if query.q != nil {
+	if params.q != nil {
 		q := ""
-		for key, value := range query.q {
+		for key, value := range params.q {
 			q += key + ":" + value
 		}
-		values.Set("q", q)
+		query.Set("q", q)
 	}
 
-	if query.recursive {
-		values.Set("recursive", "true")
+	if params.recursive {
+		query.Set("recursive", "true")
 	}
 
-	return path + "?" + values.Encode()
+	return path + "?" + query.Encode()
 }
