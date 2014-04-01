@@ -2,17 +2,14 @@ package api
 
 import (
 	"cf/api/resources"
+	"cf/api/strategy"
 	"cf/configuration"
-	"cf/errors"
 	"cf/models"
 	"cf/net"
-	"fmt"
-	"net/url"
-	"strconv"
 )
 
 type AppEventsRepository interface {
-	RecentEvents(appGuid string, limit uint) ([]models.EventFields, error)
+	RecentEvents(appGuid string, limit uint64) ([]models.EventFields, error)
 }
 
 type CloudControllerAppEventsRepository struct {
@@ -26,13 +23,10 @@ func NewCloudControllerAppEventsRepository(config configuration.Reader, gateway 
 	return
 }
 
-func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit uint) ([]models.EventFields, error) {
-	count := uint(0)
+func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limit uint64) ([]models.EventFields, error) {
+	count := uint64(0)
 	events := make([]models.EventFields, 0, limit)
-	apiErr := repo.listEvents(appGuid, url.Values{
-		"order-direction":  []string{"desc"},
-		"results-per-page": []string{strconv.FormatUint(uint64(limit), 10)},
-	}, func(eventField models.EventFields) bool {
+	apiErr := repo.listEvents(appGuid, limit, func(eventField models.EventFields) bool {
 		count++
 		events = append(events, eventField)
 		return count < limit
@@ -41,29 +35,22 @@ func (repo CloudControllerAppEventsRepository) RecentEvents(appGuid string, limi
 	return events, apiErr
 }
 
-func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, queryParams url.Values, cb func(models.EventFields) bool) error {
-	queryParams.Set("q", "actee:"+appGuid)
-	apiErr := repo.gateway.ListPaginatedResources(
-		repo.config.ApiEndpoint(),
-		repo.config.AccessToken(),
-		fmt.Sprintf("/v2/events?%s", queryParams.Encode()),
-		resources.EventResourceNewV2{},
-		func(resource interface{}) bool {
-			return cb(resource.(resources.EventResourceNewV2).ToFields())
-		})
-
-	// FIXME: needs semantic API version
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		apiErr = repo.gateway.ListPaginatedResources(
-			repo.config.ApiEndpoint(),
-			repo.config.AccessToken(),
-			fmt.Sprintf("/v2/apps/%s/events", appGuid),
-			resources.EventResourceOldV2{},
-			func(resource interface{}) bool {
-				return cb(resource.(resources.EventResourceOldV2).ToFields())
-			})
+func (repo CloudControllerAppEventsRepository) listEvents(appGuid string, limit uint64, cb func(models.EventFields) bool) error {
+	endpointStrategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
+	if err != nil {
+		return err
 	}
 
-	return apiErr
+	url := endpointStrategy.EventsURL(appGuid, limit)
+	resource := endpointStrategy.EventsResource()
+
+	return repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		repo.config.AccessToken(),
+		url,
+		resource,
+		func(resource interface{}) bool {
+			return cb(resource.(resources.EventResource).ToFields())
+		},
+	)
 }

@@ -69,7 +69,7 @@ var _ = Describe("events command", func() {
 
 		runCommand("my-app")
 
-		Expect(eventsRepo.RecentEventsArgs.Limit).To(Equal(uint(50)))
+		Expect(eventsRepo.RecentEventsArgs.Limit).To(Equal(uint64(50)))
 		Expect(eventsRepo.RecentEventsArgs.AppGuid).To(Equal("my-app-guid"))
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting events for app", "my-app", "my-org", "my-space", "my-user"},

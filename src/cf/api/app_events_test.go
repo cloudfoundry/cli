@@ -26,6 +26,7 @@ var _ = Describe("App Events Repo", func() {
 	BeforeEach(func() {
 		config = testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
+		config.SetApiVersion("2.2.0")
 
 		gateway = net.NewCloudControllerGateway(config)
 		repo = NewCloudControllerAppEventsRepository(config, gateway)
@@ -41,14 +42,8 @@ var _ = Describe("App Events Repo", func() {
 	}
 
 	Describe("list recent events", func() {
-		var recentAPIRequest testnet.TestRequest
-		BeforeEach(func() {
-			recentAPIRequest = newAPIRequestPage1
-			recentAPIRequest.Path += "&order-direction=desc&results-per-page=2"
-		})
-
-		It("makes a request to the /v2/events endpoint", func() {
-			setupTestServer(recentAPIRequest)
+		It("returns the most recent events", func() {
+			setupTestServer(eventsRequest)
 
 			list, err := repo.RecentEvents("my-app-guid", 2)
 			Expect(err).ToNot(HaveOccurred())
@@ -68,54 +63,14 @@ var _ = Describe("App Events Repo", func() {
 				},
 			}))
 		})
-
-		It("makes a backwards compatible request to old events endpoint", func() {
-			setupTestServer(newV2NotFoundRequest, oldAPIRequestPage1)
-
-			_, err := repo.RecentEvents("my-app-guid", 2)
-			Expect(err).ToNot(HaveOccurred())
-
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-		})
 	})
 })
 
 const eventTimestampFormat = "2006-01-02T15:04:05-07:00"
 
-var oldAPIRequestPage1 = testnet.TestRequest{
+var eventsRequest = testnet.TestRequest{
 	Method: "GET",
-	Path:   "/v2/apps/my-app-guid/events",
-	Response: testnet.TestResponse{
-		Status: http.StatusOK,
-		Body: `
-		{
-		  "total_results": 58,
-		  "total_pages": 2,
-		  "prev_url": null,
-		  "next_url": "/v2/apps/my-app-guid/events?inline-relations-depth=1&page=2&results-per-page=50",
-		  "resources": [
-			{
-			  "entity": {
-				"instance_index": 1,
-				"exit_status": 1,
-				"exit_description": "app instance exited",
-				"timestamp": "2013-10-07T16:51:07+00:00"
-			  }
-			},
-			{
-			  "entity": {
-				"instance_index": 2,
-				"exit_status": 2,
-				"exit_description": "app instance exited",
-				"timestamp": "2013-11-07T16:51:07+00:00"
-			  }
-			}
-		  ]
-		}`}}
-
-var newAPIRequestPage1 = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/events?q=actee%3Amy-app-guid",
+	Path:   "/v2/events?q=actee%3Amy-app-guid&order-direction=desc&results-per-page=2",
 	Response: testnet.TestResponse{
 		Status: http.StatusOK,
 		Body: `{
@@ -162,11 +117,3 @@ var newAPIRequestPage1 = testnet.TestRequest{
 			}
 		  ]
 		}`}}
-
-var newV2NotFoundRequest = testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/events?q=actee%3Amy-app-guid",
-	Response: testnet.TestResponse{
-		Status: http.StatusNotFound,
-	},
-}
