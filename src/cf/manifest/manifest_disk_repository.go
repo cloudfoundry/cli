@@ -3,7 +3,7 @@ package manifest
 import (
 	"cf/errors"
 	"generic"
-	"github.com/fraenkel/candiedyaml"
+	"github.com/cloudfoundry-incubator/candiedyaml"
 	"io"
 	"os"
 	"path/filepath"
