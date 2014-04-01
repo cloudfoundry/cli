@@ -241,7 +241,7 @@ func (repo CloudControllerBuildpackBitsRepository) performMultiPartUpload(url st
 			return
 		}
 
-		apiErr = repo.gateway.PerformRequest(request)
+		_, apiErr = repo.gateway.PerformRequest(request)
 	})
 
 	return

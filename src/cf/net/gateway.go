@@ -81,20 +81,12 @@ func (gateway Gateway) GetResource(url string, resource interface{}) (err error)
 	return
 }
 
-func (gateway Gateway) CreateResource(url string, body io.ReadSeeker) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("POST", url, body, nil)
+func (gateway Gateway) CreateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("POST", url, body, resource...)
 }
 
-func (gateway Gateway) CreateResourceForResponse(url string, body io.ReadSeeker, resource interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("POST", url, body, resource)
-}
-
-func (gateway Gateway) UpdateResource(url string, body io.ReadSeeker) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, body, nil)
-}
-
-func (gateway Gateway) UpdateResourceForResponse(url string, body io.ReadSeeker, resource interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, body, resource)
+func (gateway Gateway) UpdateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("PUT", url, body, resource...)
 }
 
 func (gateway Gateway) DeleteResource(url string) (apiErr error) {
@@ -130,14 +122,20 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	return
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.ReadSeeker, resource interface{}) (apiErr error) {
+func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.ReadSeeker, optionalResource ...interface{}) (apiErr error) {
+	var resource interface{}
+	if len(optionalResource) > 0 {
+		resource = optionalResource[0]
+	}
+
 	request, apiErr := gateway.NewRequest(verb, url, gateway.config.AccessToken(), body)
 	if apiErr != nil {
 		return
 	}
 
 	if resource == nil {
-		return gateway.PerformRequest(request)
+		_, apiErr = gateway.PerformRequest(request)
+		return
 	}
 
 	if gateway.PollingEnabled {
@@ -183,12 +181,7 @@ func (gateway Gateway) NewRequest(method, path, accessToken string, body io.Read
 	return
 }
 
-func (gateway Gateway) PerformRequest(request *Request) (apiErr error) {
-	_, apiErr = gateway.doRequestHandlingAuth(request)
-	return
-}
-
-func (gateway Gateway) PerformRequestForResponse(request *Request) (rawResponse *http.Response, apiErr error) {
+func (gateway Gateway) PerformRequest(request *Request) (rawResponse *http.Response, apiErr error) {
 	return gateway.doRequestHandlingAuth(request)
 }
 
@@ -273,20 +266,20 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 	return
 }
 
-func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (apiErr error) {
+func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Duration) (err error) {
 	startTime := time.Now()
 	for true {
 		if time.Since(startTime) > timeout {
-			apiErr = errors.NewWithFmt("Error: timed out waiting for async job '%s' to finish", jobUrl)
+			err = errors.NewWithFmt("Error: timed out waiting for async job '%s' to finish", jobUrl)
 			return
 		}
 
 		var request *Request
-		request, apiErr = gateway.NewRequest("GET", jobUrl, accessToken, nil)
+		request, err = gateway.NewRequest("GET", jobUrl, accessToken, nil)
 		response := &JobResponse{}
 
-		_, apiErr = gateway.PerformRequestForJSONResponse(request, response)
-		if apiErr != nil {
+		_, err = gateway.PerformRequestForJSONResponse(request, response)
+		if err != nil {
 			return
 		}
 
@@ -294,7 +287,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 		case JOB_FINISHED:
 			return
 		case JOB_FAILED:
-			apiErr = errors.New("Job failed")
+			err = errors.New("Job failed")
 			return
 		}
 
@@ -305,7 +298,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 	return
 }
 
-func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, apiErr error) {
+func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *http.Response, err error) {
 	httpReq := request.HttpReq
 
 	if request.SeekableBody != nil {
@@ -313,17 +306,17 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 	}
 
 	// perform request
-	rawResponse, apiErr = gateway.doRequestAndHandlerError(request)
-	if apiErr == nil || gateway.authenticator == nil {
+	rawResponse, err = gateway.doRequestAndHandlerError(request)
+	if err == nil || gateway.authenticator == nil {
 		return
 	}
 
-	switch apiErr.(type) {
+	switch err.(type) {
 	case *errors.InvalidTokenError:
 		// refresh the auth token
 		var newToken string
-		newToken, apiErr = gateway.authenticator.RefreshAuthToken()
-		if apiErr != nil {
+		newToken, err = gateway.authenticator.RefreshAuthToken()
+		if err != nil {
 			return
 		}
 
@@ -335,16 +328,16 @@ func (gateway Gateway) doRequestHandlingAuth(request *Request) (rawResponse *htt
 		}
 
 		// make the request again
-		rawResponse, apiErr = gateway.doRequestAndHandlerError(request)
+		rawResponse, err = gateway.doRequestAndHandlerError(request)
 	}
 
 	return
 }
 
-func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, apiErr error) {
-	rawResponse, err := gateway.doRequest(request.HttpReq)
+func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *http.Response, err error) {
+	rawResponse, err = gateway.doRequest(request.HttpReq)
 	if err != nil {
-		apiErr = WrapNetworkErrors(request.HttpReq.URL.Host, err)
+		err = WrapNetworkErrors(request.HttpReq.URL.Host, err)
 		return
 	}
 
@@ -352,7 +345,7 @@ func (gateway Gateway) doRequestAndHandlerError(request *Request) (rawResponse *
 		jsonBytes, _ := ioutil.ReadAll(rawResponse.Body)
 		rawResponse.Body.Close()
 		rawResponse.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
-		apiErr = gateway.errHandler(rawResponse.StatusCode, jsonBytes)
+		err = gateway.errHandler(rawResponse.StatusCode, jsonBytes)
 	}
 
 	return

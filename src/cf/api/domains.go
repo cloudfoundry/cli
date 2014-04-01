@@ -98,7 +98,7 @@ func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgG
 	}
 
 	resource := new(resources.DomainResource)
-	err = repo.gateway.CreateResourceForResponse(
+	err = repo.gateway.CreateResource(
 		repo.config.ApiEndpoint()+repo.strategy.PrivateDomainsURL(),
 		strings.NewReader(string(data)),
 		resource)

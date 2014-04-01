@@ -211,7 +211,7 @@ func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1Plan
 	body := strings.NewReader(fmt.Sprintf(`{"service_plan_guid":"%s"}`, v2PlanGuid))
 	response := new(resources.ServiceMigrateV1ToV2Response)
 
-	apiErr = repo.gateway.UpdateResourceForResponse(path, body, response)
+	apiErr = repo.gateway.UpdateResource(path, body, response)
 	if apiErr != nil {
 		return
 	}

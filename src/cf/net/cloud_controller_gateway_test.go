@@ -39,7 +39,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
 		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		apiErr = gateway.PerformRequest(request)
+		_, apiErr = gateway.PerformRequest(request)
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The host is taken: test1"))
@@ -52,7 +52,7 @@ var _ = Describe("Cloud Controller Gateway", func() {
 		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
 		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		apiErr = gateway.PerformRequest(request)
+		_, apiErr = gateway.PerformRequest(request)
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The token is invalid"))

@@ -77,7 +77,7 @@ func (repo CloudControllerRouteRepository) CreateInSpace(host, domainGuid, space
 	data := fmt.Sprintf(`{"host":"%s","domain_guid":"%s","space_guid":"%s"}`, host, domainGuid, spaceGuid)
 
 	resource := new(resources.RouteResource)
-	apiErr = repo.gateway.CreateResourceForResponse(path, strings.NewReader(data), resource)
+	apiErr = repo.gateway.CreateResource(path, strings.NewReader(data), resource)
 	if apiErr != nil {
 		return
 	}

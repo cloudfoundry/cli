@@ -33,7 +33,7 @@ var _ = Describe("UAA Gateway", func() {
 		gateway.SetTrustedCerts(ts.TLS.Certificates)
 
 		request, apiErr := gateway.NewRequest("GET", ts.URL, "TOKEN", nil)
-		apiErr = gateway.PerformRequest(request)
+		_, apiErr = gateway.PerformRequest(request)
 
 		Expect(apiErr).NotTo(BeNil())
 		Expect(apiErr.Error()).To(ContainSubstring("The foo is wrong"))

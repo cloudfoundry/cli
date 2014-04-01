@@ -213,7 +213,7 @@ func (repo CloudControllerUserRepository) setOrUnsetOrgRole(verb, userGuid, orgG
 		return
 	}
 
-	apiErr = repo.ccGateway.PerformRequest(request)
+	_, apiErr = repo.ccGateway.PerformRequest(request)
 	if apiErr != nil {
 		return
 	}

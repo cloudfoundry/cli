@@ -42,7 +42,7 @@ func (repo CloudControllerCurlRepository) Request(method, path, headerString, bo
 		return
 	}
 
-	res, err := repo.gateway.PerformRequestForResponse(req)
+	res, err := repo.gateway.PerformRequest(req)
 
 	if _, ok := err.(errors.HttpError); ok {
 		err = nil
