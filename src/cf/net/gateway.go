@@ -82,15 +82,19 @@ func (gateway Gateway) GetResource(url string, resource interface{}) (err error)
 }
 
 func (gateway Gateway) CreateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("POST", url, body, resource...)
+	return gateway.createUpdateOrDeleteResource("POST", url, body, false, resource...)
 }
 
 func (gateway Gateway) UpdateResource(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("PUT", url, body, resource...)
+	return gateway.createUpdateOrDeleteResource("PUT", url, body, false, resource...)
+}
+
+func (gateway Gateway) UpdateResourceSync(url string, body io.ReadSeeker, resource ...interface{}) (apiErr error) {
+	return gateway.createUpdateOrDeleteResource("PUT", url, body, true, resource...)
 }
 
 func (gateway Gateway) DeleteResource(url string) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("DELETE", url, nil, &AsyncResponse{})
+	return gateway.createUpdateOrDeleteResource("DELETE", url, nil, false, &AsyncResponse{})
 }
 
 func (gateway Gateway) ListPaginatedResources(target string,
@@ -122,7 +126,7 @@ func (gateway Gateway) ListPaginatedResources(target string,
 	return
 }
 
-func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.ReadSeeker, optionalResource ...interface{}) (apiErr error) {
+func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.ReadSeeker, sync bool, optionalResource ...interface{}) (apiErr error) {
 	var resource interface{}
 	if len(optionalResource) > 0 {
 		resource = optionalResource[0]
@@ -138,7 +142,7 @@ func (gateway Gateway) createUpdateOrDeleteResource(verb, url string, body io.Re
 		return
 	}
 
-	if gateway.PollingEnabled {
+	if gateway.PollingEnabled && !sync {
 		_, apiErr = gateway.PerformPollingRequestForJSONResponse(request, resource, ASYNC_REQUEST_TIMEOUT)
 		return
 	} else {
@@ -185,7 +189,7 @@ func (gateway Gateway) PerformRequest(request *Request) (rawResponse *http.Respo
 	return gateway.doRequestHandlingAuth(request)
 }
 
-func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, rawResponse *http.Response, apiErr error) {
+func (gateway Gateway) performRequestForResponseBytes(request *Request) (bytes []byte, headers http.Header, rawResponse *http.Response, apiErr error) {
 	rawResponse, apiErr = gateway.doRequestHandlingAuth(request)
 	if apiErr != nil {
 		return
@@ -201,13 +205,13 @@ func (gateway Gateway) PerformRequestForResponseBytes(request *Request) (bytes [
 }
 
 func (gateway Gateway) PerformRequestForTextResponse(request *Request) (response string, headers http.Header, apiErr error) {
-	bytes, headers, _, apiErr := gateway.PerformRequestForResponseBytes(request)
+	bytes, headers, _, apiErr := gateway.performRequestForResponseBytes(request)
 	response = string(bytes)
 	return
 }
 
 func (gateway Gateway) PerformRequestForJSONResponse(request *Request, response interface{}) (headers http.Header, apiErr error) {
-	bytes, headers, rawResponse, apiErr := gateway.PerformRequestForResponseBytes(request)
+	bytes, headers, rawResponse, apiErr := gateway.performRequestForResponseBytes(request)
 	if apiErr != nil {
 		return
 	}
@@ -228,7 +232,7 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 	query.Add("async", "true")
 	request.HttpReq.URL.RawQuery = query.Encode()
 
-	bytes, headers, rawResponse, apiErr := gateway.PerformRequestForResponseBytes(request)
+	bytes, headers, rawResponse, apiErr := gateway.performRequestForResponseBytes(request)
 	if apiErr != nil {
 		return
 	}
