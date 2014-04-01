@@ -218,13 +218,8 @@ var _ = Describe("DomainRepository", func() {
 	Describe("creating domains", func() {
 		Context("when the private domains endpoint is not available", func() {
 			BeforeEach(func() {
+				config.SetApiVersion("2.1.0")
 				setupTestServer(
-					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-						Method:   "POST",
-						Path:     "/v2/private_domains",
-						Matcher:  testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
-						Response: testnet.TestResponse{Status: http.StatusNotFound},
-					}),
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/domains",
@@ -249,11 +244,12 @@ var _ = Describe("DomainRepository", func() {
 
 		Context("when the private domains endpoint is available", func() {
 			It("uses that endpoint", func() {
+				config.SetApiVersion("2.2.1")
 				setupTestServer(
 					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 						Method:  "POST",
 						Path:    "/v2/private_domains",
-						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid"}`),
+						Matcher: testnet.RequestBodyMatcher(`{"name":"example.com","owning_organization_guid":"org-guid", "wildcard": true}`),
 						Response: testnet.TestResponse{Status: http.StatusCreated, Body: `
 						{
 							"metadata": { "guid": "abc-123" },

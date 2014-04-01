@@ -7,6 +7,7 @@ import (
 	"cf/errors"
 	"cf/models"
 	"cf/net"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -94,23 +95,33 @@ func (repo CloudControllerDomainRepository) findOneWithPath(path, name string) (
 	return
 }
 
-func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, apiErr error) {
-	data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s"}`, domainName, owningOrgGuid)
+func (repo CloudControllerDomainRepository) Create(domainName string, owningOrgGuid string) (createdDomain models.DomainFields, err error) {
+	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
+	if err != nil {
+		return
+	}
+
+	data, err := json.Marshal(resources.DomainEntity{
+		Name: domainName,
+		OwningOrganizationGuid: owningOrgGuid,
+		Wildcard:               true,
+	})
+
+	if err != nil {
+		return
+	}
+
 	resource := new(resources.DomainResource)
-
-	path := repo.config.ApiEndpoint() + "/v2/private_domains"
-	apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
-
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		path := repo.config.ApiEndpoint() + "/v2/domains"
-		data := fmt.Sprintf(`{"name":"%s","owning_organization_guid":"%s", "wildcard": true}`, domainName, owningOrgGuid)
-		apiErr = repo.gateway.CreateResourceForResponse(path, repo.config.AccessToken(), strings.NewReader(data), resource)
+	err = repo.gateway.CreateResourceForResponse(
+		repo.config.ApiEndpoint()+strategy.CreatePrivateDomainURL(),
+		repo.config.AccessToken(),
+		strings.NewReader(string(data)),
+		resource)
+	if err != nil {
+		return
 	}
 
-	if apiErr == nil {
-		createdDomain = resource.ToFields()
-	}
+	createdDomain = resource.ToFields()
 	return
 }
 

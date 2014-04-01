@@ -8,8 +8,9 @@ type DomainResource struct {
 }
 
 type DomainEntity struct {
-	Name                   string
+	Name                   string `json:"name"`
 	OwningOrganizationGuid string `json:"owning_organization_guid"`
+	Wildcard               bool   `json:"wildcard"`
 }
 
 func (resource DomainResource) ToFields() models.DomainFields {
