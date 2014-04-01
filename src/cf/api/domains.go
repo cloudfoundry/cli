@@ -2,6 +2,7 @@ package api
 
 import (
 	"cf/api/resources"
+	"cf/api/strategy"
 	"cf/configuration"
 	"cf/errors"
 	"cf/models"
@@ -33,15 +34,12 @@ func NewCloudControllerDomainRepository(config configuration.Reader, gateway net
 }
 
 func (repo CloudControllerDomainRepository) ListDomainsForOrg(orgGuid string, cb func(models.DomainFields) bool) error {
-	apiErr := repo.listDomains(fmt.Sprintf("/v2/organizations/%s/domains", orgGuid), cb)
-
-	// FIXME: needs semantic versioning
-	switch apiErr.(type) {
-	case *errors.HttpNotFoundError:
-		apiErr = repo.listDomains("/v2/domains", cb)
+	strategy, err := strategy.NewEndpointStrategy(repo.config.ApiVersion())
+	if err != nil {
+		return err
 	}
 
-	return apiErr
+	return repo.listDomains(strategy.DomainsURL(orgGuid), cb)
 }
 
 func (repo CloudControllerDomainRepository) listDomains(path string, cb func(models.DomainFields) bool) (apiErr error) {

@@ -14,7 +14,7 @@ var _ = Describe("EndpointStrategy", func() {
 	)
 
 	Describe("events", func() {
-		Context("when targeting a v2.0.0 cloud foundry", func() {
+		Context("when targeting a v2.0.0 cloud controller", func() {
 			BeforeEach(func() {
 				strategy, err = NewEndpointStrategy("2.0.0")
 				Expect(err).NotTo(HaveOccurred())
@@ -29,7 +29,7 @@ var _ = Describe("EndpointStrategy", func() {
 			})
 		})
 
-		Context("when targeting a v2.2.0 cloud foundry", func() {
+		Context("when targeting a v2.2.0 cloud controller", func() {
 			BeforeEach(func() {
 				strategy, err = NewEndpointStrategy("2.2.1")
 				Expect(err).NotTo(HaveOccurred())
@@ -41,6 +41,30 @@ var _ = Describe("EndpointStrategy", func() {
 
 			It("returns a new EventResource", func() {
 				Expect(strategy.EventsResource()).To(BeAssignableToTypeOf(resources.EventResourceNewV2{}))
+			})
+		})
+	})
+
+	Describe("domains", func() {
+		Context("when targeting a pre-2.2.0 cloud controller", func() {
+			BeforeEach(func() {
+				strategy, err = NewEndpointStrategy("2.1.9")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns an appropriate endpoint", func() {
+				Expect(strategy.DomainsURL("guids-r-good")).To(Equal("/v2/domains"))
+			})
+		})
+
+		Context("when targeting a v2.2.x cloud controller", func() {
+			BeforeEach(func() {
+				strategy, err = NewEndpointStrategy("2.2.1")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns an appropriate endpoint", func() {
+				Expect(strategy.DomainsURL("the-org-guid")).To(Equal("/v2/organizations/the-org-guid/domains"))
 			})
 		})
 	})
