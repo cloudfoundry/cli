@@ -7,41 +7,62 @@ import (
 	"strconv"
 )
 
-type EndpointStrategy interface {
-	EventsURL(appGuid string, limit uint64) string
-	EventsResource() resources.EventResource
-}
-
-type endpointStrategy struct {
-	version Version
+type EndpointStrategy struct {
+	EventsURL      func(appGuid string, limit uint64) string
+	EventsResource func() resources.EventResource
+	DomainsURL     func(orgGuid string) string
 }
 
 func NewEndpointStrategy(versionString string) (EndpointStrategy, error) {
 	version, err := ParseVersion(versionString)
-	return endpointStrategy{version: version}, err
+	if err != nil {
+		return EndpointStrategy{}, err
+	}
+
+	strategy := EndpointStrategy{}
+	setupEvents(&strategy, version)
+	setupDomains(&strategy, version)
+
+	return strategy, nil
 }
 
-func (strategy endpointStrategy) EventsURL(appGuid string, limit uint64) string {
-	if strategy.version.GreaterThanOrEqualTo(Version{2, 2, 0}) {
-		queryParams := url.Values{
-			"results-per-page": []string{strconv.FormatUint(limit, 10)},
-			"order-direction":  []string{"desc"},
-			"q":                []string{"actee:" + appGuid},
+func setupEvents(strategy *EndpointStrategy, version Version) {
+	if version.GreaterThanOrEqualTo(Version{2, 2, 0}) {
+		strategy.EventsResource = func() resources.EventResource {
+			return resources.EventResourceNewV2{}
 		}
 
-		return fmt.Sprintf("/v2/events?%s", queryParams.Encode())
-	} else {
-		queryParams := url.Values{
-			"results-per-page": []string{strconv.FormatUint(limit, 10)},
+		strategy.EventsURL = func(appGuid string, limit uint64) string {
+			queryParams := url.Values{
+				"results-per-page": []string{strconv.FormatUint(limit, 10)},
+				"order-direction":  []string{"desc"},
+				"q":                []string{"actee:" + appGuid},
+			}
+
+			return fmt.Sprintf("/v2/events?%s", queryParams.Encode())
 		}
-		return fmt.Sprintf("/v2/apps/%s/events?%s", appGuid, queryParams.Encode())
+	} else {
+		strategy.EventsResource = func() resources.EventResource {
+			return resources.EventResourceOldV2{}
+		}
+
+		strategy.EventsURL = func(appGuid string, limit uint64) string {
+			queryParams := url.Values{
+				"results-per-page": []string{strconv.FormatUint(limit, 10)},
+			}
+			return fmt.Sprintf("/v2/apps/%s/events?%s", appGuid, queryParams.Encode())
+		}
 	}
 }
 
-func (strategy endpointStrategy) EventsResource() resources.EventResource {
-	if strategy.version.GreaterThanOrEqualTo(Version{2, 2, 0}) {
-		return resources.EventResourceNewV2{}
+func setupDomains(strategy *EndpointStrategy, version Version) {
+	if version.GreaterThanOrEqualTo(Version{2, 2, 0}) {
+		strategy.DomainsURL = func(orgGuid string) string {
+			return fmt.Sprintf("/v2/organizations/%s/domains", orgGuid)
+		}
 	} else {
-		return resources.EventResourceOldV2{}
+		strategy.DomainsURL = func(_ string) string {
+			return "/v2/domains"
+		}
 	}
 }
