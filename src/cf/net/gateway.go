@@ -24,20 +24,16 @@ const (
 	ASYNC_REQUEST_TIMEOUT    = 20 * time.Second
 )
 
-type JobEntity struct {
-	Status string
+type JobResource struct {
+	Entity struct {
+		Status string
+	}
 }
 
-type JobResponse struct {
-	Entity JobEntity
-}
-
-type AsyncMetadata struct {
-	Url string
-}
-
-type AsyncResponse struct {
-	Metadata AsyncMetadata
+type AsyncResource struct {
+	Metadata struct {
+		URL string
+	}
 }
 
 type apiErrorHandler func(statusCode int, body []byte) error
@@ -94,7 +90,7 @@ func (gateway Gateway) UpdateResourceSync(url string, body io.ReadSeeker, resour
 }
 
 func (gateway Gateway) DeleteResource(url string) (apiErr error) {
-	return gateway.createUpdateOrDeleteResource("DELETE", url, nil, false, &AsyncResponse{})
+	return gateway.createUpdateOrDeleteResource("DELETE", url, nil, false, &AsyncResource{})
 }
 
 func (gateway Gateway) ListPaginatedResources(target string,
@@ -247,15 +243,14 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 		return
 	}
 
-	asyncResponse := &AsyncResponse{}
-
-	err = json.Unmarshal(bytes, &asyncResponse)
+	asyncResource := &AsyncResource{}
+	err = json.Unmarshal(bytes, &asyncResource)
 	if err != nil {
 		apiErr = errors.NewWithError("Invalid async response from server", err)
 		return
 	}
 
-	jobUrl := asyncResponse.Metadata.Url
+	jobUrl := asyncResource.Metadata.URL
 	if jobUrl == "" {
 		return
 	}
@@ -264,7 +259,7 @@ func (gateway Gateway) PerformPollingRequestForJSONResponse(request *Request, re
 		return
 	}
 
-	jobUrl = fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResponse.Metadata.Url)
+	jobUrl = fmt.Sprintf("%s://%s%s", request.HttpReq.URL.Scheme, request.HttpReq.URL.Host, asyncResource.Metadata.URL)
 	apiErr = gateway.waitForJob(jobUrl, request.HttpReq.Header.Get("Authorization"), timeout)
 
 	return
@@ -280,7 +275,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 
 		var request *Request
 		request, err = gateway.NewRequest("GET", jobUrl, accessToken, nil)
-		response := &JobResponse{}
+		response := &JobResource{}
 
 		_, err = gateway.PerformRequestForJSONResponse(request, response)
 		if err != nil {
