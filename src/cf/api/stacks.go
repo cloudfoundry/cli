@@ -27,7 +27,7 @@ func NewCloudControllerStackRepository(config configuration.Reader, gateway net.
 }
 
 func (repo CloudControllerStackRepository) FindByName(name string) (stack models.Stack, apiErr error) {
-	path := fmt.Sprintf("%s/v2/stacks?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("/v2/stacks?q=%s", url.QueryEscape("name:"+name))
 	stacks, apiErr := repo.findAllWithPath(path)
 	if apiErr != nil {
 		return
@@ -43,19 +43,20 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack models
 }
 
 func (repo CloudControllerStackRepository) FindAll() (stacks []models.Stack, apiErr error) {
-	path := fmt.Sprintf("%s/v2/stacks", repo.config.ApiEndpoint())
-	return repo.findAllWithPath(path)
+	return repo.findAllWithPath("/v2/stacks")
 }
 
-func (repo CloudControllerStackRepository) findAllWithPath(path string) (stacks []models.Stack, apiErr error) {
-	responseJSON := new(resources.PaginatedStackResources)
-	apiErr = repo.gateway.GetResource(path, responseJSON)
-	if apiErr != nil {
-		return
-	}
-
-	for _, r := range responseJSON.Resources {
-		stacks = append(stacks, *r.ToFields())
-	}
-	return
+func (repo CloudControllerStackRepository) findAllWithPath(path string) ([]models.Stack, error) {
+	var stacks []models.Stack
+	apiErr := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.StackResource{},
+		func(resource interface{}) bool {
+			if sr, ok := resource.(resources.StackResource); ok {
+				stacks = append(stacks, *sr.ToFields())
+			}
+			return true
+		})
+	return stacks, apiErr
 }

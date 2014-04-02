@@ -28,28 +28,27 @@ func NewCloudControllerQuotaRepository(config configuration.Reader, gateway net.
 	return
 }
 
-func (repo CloudControllerQuotaRepository) findAllWithPath(path string) (quotas []models.QuotaFields, apiErr error) {
-	responseJSON := new(resources.PaginatedQuotaResources)
-
-	apiErr = repo.gateway.GetResource(path, responseJSON)
-	if apiErr != nil {
-		return
-	}
-
-	for _, r := range responseJSON.Resources {
-		quotas = append(quotas, r.ToFields())
-	}
-
-	return
+func (repo CloudControllerQuotaRepository) findAllWithPath(path string) ([]models.QuotaFields, error) {
+	var quotas []models.QuotaFields
+	apiErr := repo.gateway.ListPaginatedResources(
+		repo.config.ApiEndpoint(),
+		path,
+		resources.QuotaResource{},
+		func(resource interface{}) bool {
+			if qr, ok := resource.(resources.QuotaResource); ok {
+				quotas = append(quotas, qr.ToFields())
+			}
+			return true
+		})
+	return quotas, apiErr
 }
 
 func (repo CloudControllerQuotaRepository) FindAll() (quotas []models.QuotaFields, apiErr error) {
-	path := fmt.Sprintf("%s/v2/quota_definitions", repo.config.ApiEndpoint())
-	return repo.findAllWithPath(path)
+	return repo.findAllWithPath("/v2/quota_definitions")
 }
 
 func (repo CloudControllerQuotaRepository) FindByName(name string) (quota models.QuotaFields, apiErr error) {
-	path := fmt.Sprintf("%s/v2/quota_definitions?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("name:"+name))
+	path := fmt.Sprintf("/v2/quota_definitions?q=%s", url.QueryEscape("name:"+name))
 	quotas, apiErr := repo.findAllWithPath(path)
 	if apiErr != nil {
 		return

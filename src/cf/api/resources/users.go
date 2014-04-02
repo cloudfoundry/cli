@@ -12,11 +12,9 @@ type UserEntity struct {
 	Admin bool
 }
 
-type UAAUserResources struct {
-	Resources []struct {
-		Id       string
-		Username string
-	}
+type UAAUserResource struct {
+	Id       string
+	UserName string
 }
 
 func (resource UserResource) ToFields() models.UserFields {
@@ -56,4 +54,11 @@ func NewUAAUserResource(username, password string) UAAUserResource {
 
 type UAAUserFields struct {
 	Id string
+}
+
+func (resource UAAUserResource) ToFields() models.UserFields {
+	return models.UserFields{
+		Guid:     resource.Id,
+		Username: resource.UserName,
+	}
 }
