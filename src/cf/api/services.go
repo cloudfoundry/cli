@@ -68,17 +68,18 @@ func (repo CloudControllerServiceRepository) findServiceOfferingsByPaginating(sp
 	return matchingOffering, nil
 }
 
-func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (offerings models.ServiceOfferings, apiErr error) {
+func (repo CloudControllerServiceRepository) GetServiceOfferingsForSpace(spaceGuid string) (models.ServiceOfferings, error) {
 	return repo.getServiceOfferings(
 		fmt.Sprintf("/v2/spaces/%s/services?inline-relations-depth=1", spaceGuid))
 }
 
-func (repo CloudControllerServiceRepository) GetAllServiceOfferings() (offerings models.ServiceOfferings, apiErr error) {
+func (repo CloudControllerServiceRepository) GetAllServiceOfferings() (models.ServiceOfferings, error) {
 	return repo.getServiceOfferings("/v2/services?inline-relations-depth=1")
 }
 
-func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (offerings models.ServiceOfferings, apiErr error) {
-	apiErr = repo.gateway.ListPaginatedResources(
+func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (models.ServiceOfferings, error) {
+	var offerings models.ServiceOfferings
+	apiErr := repo.gateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		path,
 		resources.ServiceOfferingResource{},
@@ -88,11 +89,8 @@ func (repo CloudControllerServiceRepository) getServiceOfferings(path string) (o
 			}
 			return true
 		})
-	if apiErr != nil {
-		return
-	}
 
-	return
+	return offerings, apiErr
 }
 
 func (repo CloudControllerServiceRepository) FindInstanceByName(name string) (instance models.ServiceInstance, apiErr error) {
@@ -165,45 +163,39 @@ func (repo CloudControllerServiceRepository) PurgeServiceOffering(offering model
 	return repo.gateway.DeleteResource(url)
 }
 
-func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvider(label, provider string) (offering models.ServiceOffering, apiErr error) {
-	path := fmt.Sprintf("%s/v2/services?q=%s", repo.config.ApiEndpoint(), url.QueryEscape("label:"+label+";provider:"+provider))
+func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvider(label, provider string) (models.ServiceOffering, error) {
+	path := fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:"+label+";provider:"+provider))
+	offerings, apiErr := repo.getServiceOfferings(path)
 
-	resources := new(resources.PaginatedServiceOfferingResources)
-	apiErr = repo.gateway.GetResource(path, resources)
-
-	if apiErr != nil {
-		return
-	} else if len(resources.Resources) == 0 {
+	if len(offerings) == 0 {
 		apiErr = errors.NewModelNotFoundError("Service offering", label+" "+provider)
-	} else {
-		offering = resources.Resources[0].ToModel()
 	}
-	return
+
+	return offerings[0], apiErr
 }
 
-func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (planGuid string, apiErr error) {
-	path := fmt.Sprintf("%s/v2/services?inline-relations-depth=1&q=%s",
-		repo.config.ApiEndpoint(),
+func (repo CloudControllerServiceRepository) FindServicePlanByDescription(planDescription resources.ServicePlanDescription) (string, error) {
+	path := fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s",
 		url.QueryEscape("label:"+planDescription.ServiceLabel+";provider:"+planDescription.ServiceProvider))
 
-	response := new(resources.PaginatedServiceOfferingResources)
-	apiErr = repo.gateway.GetResource(path, response)
+	var planGuid string
+	offerings, apiErr := repo.getServiceOfferings(path)
 	if apiErr != nil {
-		return
+		return planGuid, apiErr
 	}
 
-	for _, serviceOfferingResource := range response.Resources {
-		for _, servicePlanResource := range serviceOfferingResource.Entity.ServicePlans {
-			if servicePlanResource.Entity.Name == planDescription.ServicePlanName {
-				planGuid = servicePlanResource.Metadata.Guid
-				return
+	for _, serviceOfferingResource := range offerings {
+		for _, servicePlanResource := range serviceOfferingResource.Plans {
+			if servicePlanResource.Name == planDescription.ServicePlanName {
+				planGuid := servicePlanResource.Guid
+				return planGuid, apiErr
 			}
 		}
 	}
 
 	apiErr = errors.NewModelNotFoundError("Plan", planDescription.String())
 
-	return
+	return planGuid, apiErr
 }
 
 func (repo CloudControllerServiceRepository) MigrateServicePlanFromV1ToV2(v1PlanGuid, v2PlanGuid string) (changedCount int, apiErr error) {
