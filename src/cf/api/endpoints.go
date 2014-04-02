@@ -60,13 +60,8 @@ func (repo RemoteEndpointRepository) UpdateEndpoint(endpoint string) (finalEndpo
 }
 
 func (repo RemoteEndpointRepository) attemptUpdate(endpoint string) error {
-	request, err := repo.gateway.NewRequest("GET", endpoint+"/v2/info", "", nil)
-	if err != nil {
-		return err
-	}
-
 	serverResponse := new(endpointResource)
-	_, err = repo.gateway.PerformRequestForJSONResponse(request, &serverResponse)
+	err := repo.gateway.GetResource(endpoint+"/v2/info", &serverResponse)
 	if err != nil {
 		return err
 	}

@@ -130,9 +130,9 @@ func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers [
 	return
 }
 
-func (repo CloudControllerUserRepository) Create(username, password string) (apiErr error) {
-	uaaEndpoint, apiErr := repo.getAuthEndpoint()
-	if apiErr != nil {
+func (repo CloudControllerUserRepository) Create(username, password string) (err error) {
+	uaaEndpoint, err := repo.getAuthEndpoint()
+	if err != nil {
 		return
 	}
 
@@ -149,18 +149,14 @@ func (repo CloudControllerUserRepository) Create(username, password string) (api
 		username,
 		username,
 	)
-	request, apiErr := repo.uaaGateway.NewRequest("POST", path, repo.config.AccessToken(), strings.NewReader(body))
-	if apiErr != nil {
-		return
-	}
 
 	type uaaUserFields struct {
 		Id string
 	}
 	createUserResponse := &uaaUserFields{}
 
-	_, apiErr = repo.uaaGateway.PerformRequestForJSONResponse(request, createUserResponse)
-	if apiErr != nil {
+	err = repo.uaaGateway.CreateResource(path, strings.NewReader(body), createUserResponse)
+	if err != nil {
 		return
 	}
 

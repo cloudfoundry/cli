@@ -46,17 +46,12 @@ func NewCloudControllerAppInstancesRepository(config configuration.Reader, gatew
 	return
 }
 
-func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, apiErr error) {
-	path := fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid)
-	request, apiErr := repo.gateway.NewRequest("GET", path, repo.config.AccessToken(), nil)
-	if apiErr != nil {
-		return
-	}
-
+func (repo CloudControllerAppInstancesRepository) GetInstances(appGuid string) (instances []models.AppInstanceFields, err error) {
 	instancesResponse := InstancesApiResponse{}
-
-	_, apiErr = repo.gateway.PerformRequestForJSONResponse(request, &instancesResponse)
-	if apiErr != nil {
+	err = repo.gateway.GetResource(
+		fmt.Sprintf("%s/v2/apps/%s/instances", repo.config.ApiEndpoint(), appGuid),
+		&instancesResponse)
+	if err != nil {
 		return
 	}
 
