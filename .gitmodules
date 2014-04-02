@@ -13,12 +13,12 @@
 [submodule "src/github.com/onsi/gomega"]
 	path = src/github.com/onsi/gomega
 	url = https://github.com/onsi/gomega
-[submodule "src/github.com/fraenkel/candiedyaml"]
-	path = src/github.com/fraenkel/candiedyaml
-	url = https://github.com/fraenkel/candiedyaml.git
 [submodule "src/github.com/jteeuwen/go-bindata"]
 	path = src/github.com/jteeuwen/go-bindata
 	url = https://github.com/jteeuwen/go-bindata.git
 [submodule "src/github.com/cloudfoundry/gofileutils"]
 	path = src/github.com/cloudfoundry/gofileutils
 	url = https://github.com/cloudfoundry/gofileutils
+[submodule "src/github.com/cloudfoundry-incubator/candiedyaml"]
+	path = src/github.com/cloudfoundry-incubator/candiedyaml
+	url = https://github.com/cloudfoundry-incubator/candiedyaml.git
