@@ -210,6 +210,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 					newCmdPresenter(app, maxNameLen, "buildpacks"),
 					newCmdPresenter(app, maxNameLen, "create-buildpack"),
 					newCmdPresenter(app, maxNameLen, "update-buildpack"),
+					newCmdPresenter(app, maxNameLen, "rename-buildpack"),
 					newCmdPresenter(app, maxNameLen, "delete-buildpack"),
 				},
 			},

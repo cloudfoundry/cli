@@ -543,6 +543,14 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 			},
 		},
 		{
+			Name:        "rename-buildpack",
+			Description: "Rename a buildpack",
+			Usage:       fmt.Sprintf("%s rename-buildpack BUILDPACK NEWBUILDPACK", cf.Name()),
+			Action: func(c *cli.Context) {
+				cmdRunner.RunCmdByName("rename-buildpack", c)
+			},
+		},
+		{
 			Name:        "rename-org",
 			Description: "Rename an org",
 			Usage:       fmt.Sprintf("%s rename-org ORG NEW_ORG", cf.Name()),
