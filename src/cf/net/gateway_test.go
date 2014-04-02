@@ -58,7 +58,15 @@ var _ = Describe("Gateway", func() {
 				case "/v2/foo":
 					fmt.Fprintln(writer, `{ "metadata": { "url": "/v2/jobs/the-job-guid" } }`)
 				case "/v2/jobs/the-job-guid":
-					fmt.Fprintf(writer, `{ "entity": { "status": "%s" } }`, jobStatus)
+					fmt.Fprintf(writer, `
+					{
+						"entity": {
+							"status": "%s",
+							"error_details": {
+								"description": "he's dead, Jim"
+							}
+						}
+					}`, jobStatus)
 				default:
 					writer.WriteHeader(http.StatusInternalServerError)
 					fmt.Fprintf(writer, `"Unexpected request path '%s'"`, request.URL.Path)
@@ -88,6 +96,17 @@ var _ = Describe("Gateway", func() {
 			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
 			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 500*time.Millisecond)
 			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("returns an error with the right message when the job fails", func() {
+			go func() {
+				time.Sleep(25 * time.Millisecond)
+				jobStatus = "failed"
+			}()
+
+			request, _ := ccGateway.NewRequest("GET", config.ApiEndpoint()+"/v2/foo", config.AccessToken(), nil)
+			_, apiErr := ccGateway.PerformPollingRequestForJSONResponse(request, new(struct{}), 500*time.Millisecond)
+			Expect(apiErr.Error()).To(ContainSubstring("he's dead, Jim"))
 		})
 
 		It("returns an error if jobs takes longer than the timeout", func() {
