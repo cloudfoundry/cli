@@ -18,7 +18,6 @@ type BuildpackRepository interface {
 	Create(name string, position *int, enabled *bool, locked *bool) (createdBuildpack models.Buildpack, apiErr error)
 	Delete(buildpackGuid string) (apiErr error)
 	Update(buildpack models.Buildpack) (updatedBuildpack models.Buildpack, apiErr error)
-	Rename(buildpack models.Buildpack, newbuildpackName string) (renamedBuildpack models.Buildpack, apiErr error)
 }
 
 type CloudControllerBuildpackRepository struct {
@@ -110,12 +109,6 @@ func (repo CloudControllerBuildpackRepository) Update(buildpack models.Buildpack
 	}
 
 	updatedBuildpack = resource.ToFields()
-	return
-}
-
-func (repo CloudControllerBuildpackRepository) Rename(buildpack models.Buildpack, newbuildpackName string) (updatedBuildpack models.Buildpack, apiErr error) {
-	buildpack.Name = newbuildpackName
-	updatedBuildpack, apiErr = repo.Update(buildpack)
 	return
 }
 

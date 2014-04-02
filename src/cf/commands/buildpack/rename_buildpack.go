@@ -27,35 +27,24 @@ func (cmd *RenameBuildpack) GetRequirements(reqFactory requirements.Factory, c *
 		return
 	}
 
-	loginReq := reqFactory.NewLoginRequirement()
-
-	reqs = []requirements.Requirement{
-		loginReq,
-	}
-
+	reqs = []requirements.Requirement{reqFactory.NewLoginRequirement()}
 	return
 }
 
 func (cmd *RenameBuildpack) Run(c *cli.Context) {
 	buildpackName := c.Args()[0]
-	newbuildpackName := c.Args()[1]
+	newBuildpackName := c.Args()[1]
 
-	cmd.ui.Say("Renaming buildpack %s to %s...", terminal.EntityNameColor(buildpackName), terminal.EntityNameColor(newbuildpackName))
+	cmd.ui.Say("Renaming buildpack %s to %s...", terminal.EntityNameColor(buildpackName), terminal.EntityNameColor(newBuildpackName))
 
 	buildpack, apiErr := cmd.buildpackRepo.FindByName(buildpackName)
 
-	switch apiErr.(type) {
-	case nil: //do nothing
-	case *errors.ModelNotFoundError:
-		cmd.ui.Ok()
-		cmd.ui.Warn("Buildpack %s does not exist.", buildpackName)
-		return
-	default:
+	if apiErr != nil {
 		cmd.ui.Failed(apiErr.Error())
-		return
 	}
 
-	buildpack, apiErr = cmd.buildpackRepo.Rename(buildpack, newbuildpackName)
+	buildpack.Name = newBuildpackName
+	buildpack, apiErr = cmd.buildpackRepo.Update(buildpack)
 	if apiErr != nil {
 		cmd.ui.Failed("Error renaming buildpack %s\n%s", terminal.EntityNameColor(buildpackName), apiErr.Error())
 		return

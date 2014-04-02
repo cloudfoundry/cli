@@ -13,89 +13,73 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callRenameBuildpack(args []string, reqFactory *testreq.FakeReqFactory, fakeRepo *testapi.FakeBuildpackRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("rename-buildpack", args)
-	cmd := NewRenameBuildpack(ui, fakeRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
 var _ = Describe("rename-buildpack command", func() {
-	It("TestRenameBuildpackRequirements", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-		repo := &testapi.FakeBuildpackRepository{}
+	var (
+		cmd        *RenameBuildpack
+		fakeRepo   *testapi.FakeBuildpackRepository
+		ui         *testterm.FakeUI
+		reqFactory *testreq.FakeReqFactory
+	)
 
-		ui := callRenameBuildpack([]string{}, reqFactory, repo)
+	BeforeEach(func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+		ui = new(testterm.FakeUI)
+		fakeRepo = &testapi.FakeBuildpackRepository{}
+		cmd = NewRenameBuildpack(ui, fakeRepo)
+	})
+
+	var runCommand = func(args ...string) {
+		ctxt := testcmd.NewContext("rename-buildpack", args)
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
+	}
+
+	It("fails requirements when called without the current name and the new name to use", func() {
+		runCommand("my-buildpack-name")
 		Expect(ui.FailedWithUsage).To(BeTrue())
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Failed"},
-		})
-
-		ui = callRenameBuildpack([]string{"my-buildpack"}, reqFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Failed"},
-		})
-
-		ui = callRenameBuildpack([]string{"my-buildpack", "renamed-buildpack"}, reqFactory, repo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Ok"},
-		})
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 
-	It("TestRenameBuildpack", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
-
-		buildpack := models.Buildpack{}
-		buildpack.Name = "my-buildpack"
-		buildpack.Guid = "my-buildpack-guid"
-		repo := &testapi.FakeBuildpackRepository{
-			FindByNameBuildpack: buildpack,
-		}
-
-		ui := callRenameBuildpack([]string{"my-buildpack", "new-buildpack"}, reqFactory, repo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming buildpack", "my-buildpack"},
-			{"OK"},
+	Context("when logged in", func() {
+		BeforeEach(func() {
+			reqFactory.LoginSuccess = true
 		})
-	})
 
-	It("TestRenameBuildpackThatDoesNotExist", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+		It("renames a buildpack", func() {
+			fakeRepo.FindByNameBuildpack = models.Buildpack{
+				Name: "my-buildpack",
+				Guid: "my-buildpack-guid",
+			}
 
-		buildpack := models.Buildpack{}
-		buildpack.Name = "my-buildpack"
-		buildpack.Guid = "my-buildpack-guid"
-		repo := &testapi.FakeBuildpackRepository{
-			FindByNameNotFound:  true,
-			FindByNameBuildpack: buildpack,
-		}
-
-		ui := callRenameBuildpack([]string{"my-buildpack1", "new-buildpack"}, reqFactory, repo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming buildpack", "my-buildpack"},
-			{"OK"},
-			{"Buildpack my-buildpack1 does not exist"},
+			runCommand("my-buildpack", "new-buildpack")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Renaming buildpack", "my-buildpack"},
+				{"OK"},
+			})
 		})
-	})
 
-	It("TestRenameBuildpackToOneThatExist", func() {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, BuildpackSuccess: true}
+		It("fails when the buildpack does not exist", func() {
+			fakeRepo.FindByNameNotFound = true
 
-		buildpack := models.Buildpack{}
-		buildpack.Name = "my-buildpack"
-		buildpack.Guid = "my-buildpack-guid"
-		repo := &testapi.FakeBuildpackRepository{
-			FindByNameBuildpack: buildpack,
-			RenameApiResponse:   errors.New("failed, target build pack exists"),
-		}
+			runCommand("my-buildpack1", "new-buildpack")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Renaming buildpack", "my-buildpack"},
+				{"FAILED"},
+				{"Buildpack my-buildpack1 not found"},
+			})
+		})
 
-		ui := callRenameBuildpack([]string{"my-buildpack1", "new-buildpack"}, reqFactory, repo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Renaming buildpack", "my-buildpack"},
-			{"failed, target build pack exists"},
+		It("fails when there is an error updating the buildpack", func() {
+			fakeRepo.FindByNameBuildpack = models.Buildpack{
+				Name: "my-buildpack",
+				Guid: "my-buildpack-guid",
+			}
+			fakeRepo.UpdateBuildpackReturns.Error = errors.New("SAD TROMBONE")
+
+			runCommand("my-buildpack1", "new-buildpack")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Renaming buildpack", "my-buildpack"},
+				{"SAD TROMBONE"},
+			})
 		})
 	})
 })
