@@ -26,7 +26,10 @@ const (
 
 type JobResource struct {
 	Entity struct {
-		Status string
+		Status       string
+		ErrorDetails struct {
+			Description string
+		} `json:"error_details"`
 	}
 }
 
@@ -286,7 +289,7 @@ func (gateway Gateway) waitForJob(jobUrl, accessToken string, timeout time.Durat
 		case JOB_FINISHED:
 			return
 		case JOB_FAILED:
-			err = errors.New("Job failed")
+			err = errors.New(response.Entity.ErrorDetails.Description)
 			return
 		}
 
