@@ -39,7 +39,7 @@ done
 # this tries to avoid uploading a release to the "latest" bucket if we're
 # actually building an older tag, which would result in us overwriting the
 # edge build with an older version.
-git merge-base --is-ancestor $latest_release_tag head
+git merge-base --is-ancestor $latest_release_tag HEAD
 if [ $? -eq 0 ]
 then
   echo "Uploading master artifacts"
