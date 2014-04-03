@@ -18,8 +18,9 @@ s3_config_file=$root_dir/ci/s3cfg
 function upload_artifacts {
   s3_path_prefix=$1
 
-  for file in $(ls)
+  for file in $(ls release)
   do
+    echo s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
     s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
   done
 }
