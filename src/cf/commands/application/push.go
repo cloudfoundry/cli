@@ -88,7 +88,6 @@ func (cmd *Push) Run(c *cli.Context) {
 			cmd.ui.Failed(fmt.Sprintf("Error uploading application.\n%s", apiErr.Error()))
 			return
 		}
-		cmd.ui.Ok()
 
 		if appParams.ServicesToBind != nil {
 			cmd.bindAppToServices(*appParams.ServicesToBind, app)
@@ -129,8 +128,13 @@ func (cmd *Push) bindAppToServices(services []string, app models.Application) {
 }
 
 func (cmd *Push) describeUploadOperation(path string, zipFileBytes, fileCount uint64) {
-	humanReadableBytes := formatters.ByteSize(zipFileBytes)
-	cmd.ui.Say("Uploading from: %s\n%s, %d files", path, humanReadableBytes, fileCount)
+	if fileCount > 0 {
+		cmd.ui.Say("Uploading app files from: %s", path)
+		cmd.ui.Say("Uploading %s, %d files", formatters.ByteSize(zipFileBytes), fileCount)
+		cmd.ui.Ok()
+	} else {
+		cmd.ui.Warn("None of your application files have changed. Nothing will be uploaded.")
+	}
 }
 
 func (cmd *Push) fetchStackGuid(appParams *models.AppParams) {

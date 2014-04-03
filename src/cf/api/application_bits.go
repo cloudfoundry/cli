@@ -64,18 +64,28 @@ func (repo CloudControllerApplicationBitsRepository) UploadApp(appGuid string, a
 				return
 			}
 
+			zipFileSize := uint64(0)
+			zipFileCount := uint64(0)
+
 			err = repo.zipper.Zip(uploadDir, zipFile)
-			if err != nil {
+			switch err := err.(type) {
+			case nil:
+				stat, err := zipFile.Stat()
+				if err != nil {
+					apiErr = errors.NewWithError("Error zipping application", err)
+					return
+				}
+
+				zipFileSize = uint64(stat.Size())
+				zipFileCount = app_files.CountFiles(uploadDir)
+			case *errors.EmptyDirError:
+				zipFile = nil
+			default:
 				apiErr = errors.NewWithError("Error zipping application", err)
 				return
 			}
 
-			stat, err := zipFile.Stat()
-			if err != nil {
-				apiErr = errors.NewWithError("Error zipping application", err)
-				return
-			}
-			cb(appDir, uint64(stat.Size()), app_files.CountFiles(uploadDir))
+			cb(appDir, zipFileSize, zipFileCount)
 
 			apiErr = repo.uploadBits(appGuid, zipFile, presentFiles)
 			if apiErr != nil {
@@ -265,24 +275,27 @@ func (repo CloudControllerApplicationBitsRepository) writeUploadBody(zipFile *os
 		return
 	}
 
-	zipStats, err := zipFile.Stat()
-	if err != nil {
-		return
+	if zipFile != nil {
+		zipStats, zipErr := zipFile.Stat()
+		if zipErr != nil {
+			return
+		}
+
+		if zipStats.Size() == 0 {
+			return
+		}
+
+		part, zipErr = createZipPartWriter(zipStats, writer)
+		if zipErr != nil {
+			return
+		}
+
+		_, zipErr = io.Copy(part, zipFile)
+		if zipErr != nil {
+			return
+		}
 	}
 
-	if zipStats.Size() == 0 {
-		return
-	}
-
-	part, err = createZipPartWriter(zipStats, writer)
-	if err != nil {
-		return
-	}
-
-	_, err = io.Copy(part, zipFile)
-	if err != nil {
-		return
-	}
 	return
 }
 

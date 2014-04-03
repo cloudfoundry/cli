@@ -55,7 +55,7 @@ var _ = Describe("Push Command", func() {
 
 		routeRepo = &testapi.FakeRouteRepository{}
 		stackRepo = &testapi.FakeStackRepository{}
-		appBitsRepo = &testapi.FakeApplicationBitsRepository{}
+		appBitsRepo = &testapi.FakeApplicationBitsRepository{CallbackZipSize: 1, CallbackFileCount: 1}
 		serviceRepo = &testapi.FakeServiceRepo{}
 		wordGenerator = testwords.NewFakeWordGenerator("laughing-cow")
 
@@ -905,16 +905,29 @@ var _ = Describe("Push Command", func() {
 		})
 	})
 
-	It("displays information about the files being uploaded", func() {
-		appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
-		appBitsRepo.CallbackPath = "path/to/app"
-		appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
-		appBitsRepo.CallbackFileCount = 11
+	Describe("displaying information about files being uploaded", func() {
+		It("displays information about the files being uploaded", func() {
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
+			appBitsRepo.CallbackPath = "path/to/app"
+			appBitsRepo.CallbackZipSize = 61 * 1024 * 1024
+			appBitsRepo.CallbackFileCount = 11
 
-		callPush("appName")
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Uploading", "path/to/app"},
-			{"61M", "11 files"},
+			callPush("appName")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Uploading", "path/to/app"},
+				{"61M", "11 files"},
+			})
+		})
+
+		It("omits the size when there are no files being uploaded", func() {
+			appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
+			appBitsRepo.CallbackPath = "path/to/app"
+			appBitsRepo.CallbackFileCount = 0
+
+			callPush("appName")
+			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
+				{"None of your application files have changed", "nothing will be uploaded"},
+			})
 		})
 	})
 
