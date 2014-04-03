@@ -18,13 +18,10 @@ s3_config_file=$root_dir/ci/s3cfg
 function upload_artifacts {
   s3_path_prefix=$1
 
-  (
-    cd release
-    for file in $(ls)
-    do
-      s3cmd --config=$s3_config_file put $file s3://go-cli/$s3_path_prefix/$file
-    done
-  )
+  for file in $(ls)
+  do
+    s3cmd --config=$s3_config_file put release/$file s3://go-cli/$s3_path_prefix/$file
+  done
 }
 
 if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/master)" ]
