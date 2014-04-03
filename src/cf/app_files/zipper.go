@@ -2,7 +2,7 @@ package app_files
 
 import (
 	"archive/zip"
-	"errors"
+	"cf/errors"
 	"github.com/cloudfoundry/gofileutils/fileutils"
 	"os"
 	"path/filepath"
@@ -35,8 +35,9 @@ func writeZipFile(dir string, targetFile *os.File) error {
 	if err != nil {
 		return err
 	}
+
 	if isEmpty {
-		return errors.New("Directory is empty")
+		return errors.NewEmptyDirError(dir)
 	}
 
 	writer := zip.NewWriter(targetFile)

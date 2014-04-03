@@ -108,7 +108,7 @@ var _ = Describe("Zipper", func() {
 				zipper := ApplicationZipper{}
 				err = zipper.Zip(emptyDir, zipFile)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("Directory is empty"))
+				Expect(err.Error()).To(ContainSubstring("is empty"))
 			})
 		})
 	})
