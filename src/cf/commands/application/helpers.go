@@ -37,8 +37,8 @@ func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
 	return
 }
 
-func LogMessageOutput(msg *logmessage.LogMessage) string {
-	logHeader, coloredLogHeader := extractLogHeader(msg)
+func LogMessageOutput(msg *logmessage.LogMessage, loc *time.Location) string {
+	logHeader, coloredLogHeader := extractLogHeader(msg, loc)
 	logContent := extractLogContent(msg, logHeader)
 
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
@@ -51,13 +51,13 @@ func max(a, b int) int {
 	return b
 }
 
-func extractLogHeader(msg *logmessage.LogMessage) (logHeader, coloredLogHeader string) {
+func extractLogHeader(msg *logmessage.LogMessage, loc *time.Location) (logHeader, coloredLogHeader string) {
 	logMsg := msg
 	sourceName := logMsg.GetSourceName()
 	sourceID := logMsg.GetSourceId()
 	t := time.Unix(0, logMsg.GetTimestamp())
 	timeFormat := TIMESTAMP_FORMAT
-	timeString := t.Format(timeFormat)
+	timeString := t.In(loc).Format(timeFormat)
 
 	logHeader = fmt.Sprintf("%s [%s]", timeString, sourceName)
 	coloredLogHeader = terminal.LogSysHeaderColor(logHeader)

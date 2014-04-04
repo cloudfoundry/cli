@@ -68,7 +68,7 @@ func (cmd *Logs) recentLogsFor(app models.Application) {
 	}
 
 	for _, msg := range messages {
-		cmd.ui.Say("%s", LogMessageOutput(msg))
+		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
 	}
 }
 
@@ -83,7 +83,7 @@ func (cmd *Logs) tailLogsFor(app models.Application) {
 	}
 
 	err := cmd.logsRepo.TailLogsFor(app.Guid, 5*time.Second, onConnect, func(msg *logmessage.LogMessage) {
-		cmd.ui.Say("%s", LogMessageOutput(msg))
+		cmd.ui.Say("%s", LogMessageOutput(msg, time.Local))
 	})
 
 	if err != nil {
