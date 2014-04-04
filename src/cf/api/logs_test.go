@@ -21,7 +21,7 @@ var _ = Describe("loggregator logs repository", func() {
 	)
 
 	BeforeEach(func() {
-		fakeConsumer = &testapi.FakeLoggregatorConsumer{}
+		fakeConsumer = testapi.NewFakeLoggregatorConsumer()
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
 		configRepo.SetAccessToken("the-access-token")
@@ -107,24 +107,12 @@ var _ = Describe("loggregator logs repository", func() {
 			It("sorts the messages before yielding them", func(done Done) {
 				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
 					logChan := make(chan *logmessage.LogMessage)
-					messages := []*logmessage.LogMessage{
-						makeLogMessage("hello3", 300),
-						makeLogMessage("hello2", 200),
-						makeLogMessage("hello1", 100),
-					}
-
 					go func() {
-						for _, msg := range messages {
-							logChan <- msg
-						}
-
-						for {
-							time.Sleep(1 * time.Millisecond)
-							if fakeConsumer.IsClosed {
-								close(logChan)
-								return
-							}
-						}
+						logChan <- makeLogMessage("hello3", 300)
+						logChan <- makeLogMessage("hello2", 200)
+						logChan <- makeLogMessage("hello1", 100)
+						fakeConsumer.WaitForClose()
+						close(logChan)
 					}()
 
 					return logChan, nil
