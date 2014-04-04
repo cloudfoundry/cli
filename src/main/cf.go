@@ -25,10 +25,6 @@ type cliDependencies struct {
 }
 
 func setupDependencies() (deps *cliDependencies) {
-	if os.Getenv("CF_COLOR") == "" {
-		os.Setenv("CF_COLOR", "true")
-	}
-
 	deps = new(cliDependencies)
 
 	deps.termUI = terminal.NewUI(os.Stdin)
