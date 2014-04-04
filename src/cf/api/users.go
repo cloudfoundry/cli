@@ -7,6 +7,7 @@ import (
 	"cf/models"
 	"cf/net"
 	"fmt"
+	"net/http"
 	neturl "net/url"
 	"strings"
 )
@@ -156,7 +157,14 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 	createUserResponse := &uaaUserFields{}
 
 	err = repo.uaaGateway.CreateResource(path, strings.NewReader(body), createUserResponse)
-	if err != nil {
+	switch httpErr := err.(type) {
+	case nil:
+	case errors.HttpError:
+		if httpErr.StatusCode() == http.StatusConflict {
+			err = errors.NewModelAlreadyExistsError("user", username)
+			return
+		}
+	default:
 		return
 	}
 

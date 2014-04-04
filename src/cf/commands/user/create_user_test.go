@@ -38,73 +38,67 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestCreateUserFailsWithUsage", func() {
-		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
+var _ = Describe("Create user command", func() {
+	var (
+		reqFactory *testreq.FakeReqFactory
+		ui         *testterm.FakeUI
+		userRepo   *testapi.FakeUserRepository
+		configRepo configuration.ReadWriter
+	)
 
-		ui := callCreateUser([]string{}, defaultReqs, defaultUserRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callCreateUser(defaultArgs, defaultReqs, defaultUserRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
+	BeforeEach(func() {
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+		ui = new(testterm.FakeUI)
+		userRepo = &testapi.FakeUserRepository{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		accessToken, _ := testconfig.EncodeAccessToken(configuration.TokenInfo{
+			Username: "current-user",
+		})
+		configRepo.SetAccessToken(accessToken)
 	})
 
-	It("TestCreateUserRequirements", func() {
-		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
+	var runCommand = func(args ...string) {
+		ctxt := testcmd.NewContext("create-user", args)
+		cmd := NewCreateUser(ui, configRepo, userRepo)
+		testcmd.RunCommand(cmd, ctxt, reqFactory)
+		return
+	}
 
-		callCreateUser(defaultArgs, defaultReqs, defaultUserRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		notLoggedInReq := &testreq.FakeReqFactory{LoginSuccess: false}
-		callCreateUser(defaultArgs, notLoggedInReq, defaultUserRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-	})
-
-	It("TestCreateUser", func() {
-		defaultArgs, defaultReqs, defaultUserRepo := getCreateUserDefaults()
-		ui := callCreateUser(defaultArgs, defaultReqs, defaultUserRepo)
+	It("creates a user", func() {
+		runCommand("my-user", "my-password")
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Creating user", "my-user", "current-user"},
 			{"OK"},
 			{"TIP"},
 		})
-		Expect(defaultUserRepo.CreateUserUsername).To(Equal("my-user"))
+
+		Expect(userRepo.CreateUserUsername).To(Equal("my-user"))
 	})
 
-	It("TestCreateUserWhenItAlreadyExists", func() {
-		defaultArgs, defaultReqs, userAlreadyExistsRepo := getCreateUserDefaults()
-		userAlreadyExistsRepo.CreateUserExists = true
+	It("prints a warning when the given user already exists", func() {
+		userRepo.CreateUserExists = true
 
-		ui := callCreateUser(defaultArgs, defaultReqs, userAlreadyExistsRepo)
+		runCommand("my-user", "my-password")
 
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Creating user"},
-			{"FAILED"},
-			{"my-user"},
+		testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
 			{"already exists"},
 		})
+
+		testassert.SliceDoesNotContain(ui.Outputs, testassert.Lines{
+			{"Failed"},
+		})
+	})
+
+	It("fails when no arguments are passed", func() {
+		runCommand()
+		Expect(ui.FailedWithUsage).To(BeTrue())
+	})
+
+	It("fails when the user is not logged in", func() {
+		reqFactory.LoginSuccess = false
+
+		runCommand("my-user", "my-password")
+		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 	})
 })
-
-func getCreateUserDefaults() (defaultArgs []string, defaultReqs *testreq.FakeReqFactory, defaultUserRepo *testapi.FakeUserRepository) {
-	defaultArgs = []string{"my-user", "my-password"}
-	defaultReqs = &testreq.FakeReqFactory{LoginSuccess: true}
-	defaultUserRepo = &testapi.FakeUserRepository{}
-	return
-}
-
-func callCreateUser(args []string, reqFactory *testreq.FakeReqFactory, userRepo *testapi.FakeUserRepository) (ui *testterm.FakeUI) {
-	ui = new(testterm.FakeUI)
-	ctxt := testcmd.NewContext("create-user", args)
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	accessToken, err := testconfig.EncodeAccessToken(configuration.TokenInfo{
-		Username: "current-user",
-	})
-	Expect(err).NotTo(HaveOccurred())
-	configRepo.SetAccessToken(accessToken)
-
-	cmd := NewCreateUser(ui, configRepo, userRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
