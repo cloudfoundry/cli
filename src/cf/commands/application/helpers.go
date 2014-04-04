@@ -78,12 +78,11 @@ func extractLogHeader(msg *logmessage.LogMessage) (logHeader, coloredLogHeader s
 	return
 }
 
+var newLinesPattern = regexp.MustCompile("[\n\r]+$")
+
 func extractLogContent(logMsg *logmessage.LogMessage, logHeader string) (logContent string) {
 	msgText := string(logMsg.GetMessage())
-	reg, err := regexp.Compile("[\n\r]+$")
-	if err == nil {
-		msgText = reg.ReplaceAllString(msgText, "")
-	}
+	msgText = newLinesPattern.ReplaceAllString(msgText, "")
 
 	msgLines := strings.Split(msgText, "\n")
 	padding := strings.Repeat(" ", len(logHeader))

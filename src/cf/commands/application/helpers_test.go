@@ -2,80 +2,47 @@ package application_test
 
 import (
 	. "cf/commands/application"
-	"cf/terminal"
 	"code.google.com/p/gogoprotobuf/proto"
-	"fmt"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"time"
 )
 
-func createMessage(sourceId string, sourceName *string, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.LogMessage) {
-	timestamp := time.Now().UnixNano()
-	msg = &logmessage.LogMessage{
+func createMessage(sourceId string, sourceName string, msgType logmessage.LogMessage_MessageType, date time.Time) *logmessage.LogMessage {
+	timestamp := date.UnixNano()
+	return &logmessage.LogMessage{
 		Message:     []byte("Hello World!\n\r\n\r"),
 		AppId:       proto.String("my-app-guid"),
-		MessageType: msgType,
+		MessageType: &msgType,
 		SourceId:    &sourceId,
 		Timestamp:   &timestamp,
-		SourceName:  sourceName,
+		SourceName:  &sourceName,
 	}
-
-	return
 }
 
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestTimestampFormat", func() {
-		Expect(TIMESTAMP_FORMAT).To(Equal("2006-01-02T15:04:05.00-0700"))
+var _ = Describe("Helpers", func() {
+	Context("when the message comes from an app", func() {
+	    It("includes the instance index", func() {
+			date := time.Date(2014, 4, 4, 11, 39, 20, 5, time.UTC)
+			msg := createMessage("4", "App", logmessage.LogMessage_OUT, date)
+			Expect(LogMessageOutput(msg)).To(Equal("2014-04-04T04:39:20.00-0700 [App/4]   OUT Hello World!"))
+		})
 	})
 
-	It("TestLogMessageOutput", func() {
-		cloud_controller := "API"
-		router := "RTR"
-		uaa := "UAA"
-		dea := "DEA"
-		wardenContainer := "App"
+	Context("when the message comes from a cloudfoundry component", func() {
+	    It("doesn't include the instance index", func() {
+			date := time.Date(2014, 4, 4, 11, 39, 20, 5, time.UTC)
+			msg := createMessage("4", "DEA", logmessage.LogMessage_OUT, date)
+			Expect(LogMessageOutput(msg)).To(Equal("2014-04-04T04:39:20.00-0700 [DEA]     OUT Hello World!"))
+	    })
+	})
 
-		stdout := logmessage.LogMessage_OUT
-		stderr := logmessage.LogMessage_ERR
-
-		date := time.Now()
-		msg := createMessage("0", &cloud_controller, &stdout)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-
-		msg = createMessage("0", &cloud_controller, &stderr)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
-
-		msg = createMessage("1", &router, &stdout)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-
-		msg = createMessage("1", &router, &stderr)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
-
-		msg = createMessage("2", &uaa, &stdout)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage("2", &uaa, &stderr)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
-
-		msg = createMessage("3", &dea, &stdout)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage("3", &dea, &stderr)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
-
-		msg = createMessage("4", &wardenContainer, &stdout)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage("4", &wardenContainer, &stderr)
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT))))
-		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
+	Context("when the message was written to stderr", func() {
+	    It("shows the log type as 'ERR'", func() {
+			date := time.Date(2014, 4, 4, 11, 39, 20, 5, time.UTC)
+			msg := createMessage("4", "DEA", logmessage.LogMessage_ERR, date)
+			Expect(LogMessageOutput(msg)).To(Equal("2014-04-04T04:39:20.00-0700 [DEA]     ERR Hello World!"))
+		})
 	})
 })
