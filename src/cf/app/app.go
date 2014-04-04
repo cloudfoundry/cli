@@ -7,6 +7,7 @@ import (
 	"cf/trace"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"time"
 )
 
 func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
@@ -33,6 +34,16 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 	app.Usage = cf.Usage
 	app.Version = cf.Version
 	app.Action = helpCommand.Action
+
+	compiledAtTime, err := time.Parse("Jan 2, 2006 3:04PM", cf.BuiltOnDate)
+
+	if err == nil {
+		app.Compiled = compiledAtTime
+	} else {
+		err = nil
+		app.Compiled = time.Now()
+	}
+
 	app.Commands = []cli.Command{
 		helpCommand,
 		{

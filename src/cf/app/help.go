@@ -17,6 +17,9 @@ var appHelpTemplate = `{{.Title "NAME:"}}
 
 {{.Title "VERSION:"}}
    {{.Version}}
+
+{{.Title "BUILD TIME:"}}
+   {{.Compiled}}
    {{range .Commands}}
 {{.SubTitle .Name}}{{range .CommandSubGroups}}
 {{range .}}   {{.Name}} {{.Description}}
@@ -55,7 +58,6 @@ func newCmdPresenter(app *cli.App, maxNameLen int, cmdName string) (presenter cm
 	presenter.Name = presentCmdName(*cmd)
 	padding := strings.Repeat(" ", maxNameLen-len(presenter.Name))
 	presenter.Name = presenter.Name + padding
-
 	presenter.Description = cmd.Description
 
 	return
@@ -96,6 +98,7 @@ func newAppPresenter(app *cli.App) (presenter appPresenter) {
 	presenter.Version = app.Version
 	presenter.Name = app.Name
 	presenter.Flags = app.Flags
+	presenter.Compiled = app.Compiled
 
 	presenter.Commands = []groupedCommands{
 		{
