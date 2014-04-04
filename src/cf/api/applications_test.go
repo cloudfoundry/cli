@@ -14,7 +14,7 @@ import (
 	testnet "testhelpers/net"
 )
 
-var _ = Describe("Testing with ginkgo", func() {
+var _ = Describe("ApplicationsRepository", func() {
 	Describe("finding apps by name", func() {
 		It("returns the app when it is found", func() {
 			ts, handler, repo := createAppRepo([]testnet.TestRequest{findAppRequest})
@@ -102,6 +102,7 @@ var _ = Describe("Testing with ginkgo", func() {
 			app.SpaceGuid = "some-space-guid"
 			app.State = "started"
 			app.DiskQuota = 512
+			Expect(app.EnvironmentVars).To(BeNil())
 
 			updatedApp, apiErr := repo.Update(app.Guid, app.ToParams())
 
@@ -123,6 +124,26 @@ var _ = Describe("Testing with ginkgo", func() {
 			defer ts.Close()
 
 			envParams := map[string]string{"DATABASE_URL": "mysql://example.com/my-db"}
+			params := models.AppParams{EnvironmentVars: &envParams}
+
+			_, apiErr := repo.Update("app1-guid", params)
+
+			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(apiErr).NotTo(HaveOccurred())
+		})
+
+		It("can remove environment variables", func() {
+			request := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "PUT",
+				Path:     "/v2/apps/app1-guid",
+				Matcher:  testnet.RequestBodyMatcher(`{"environment_json":{}}`),
+				Response: testnet.TestResponse{Status: http.StatusCreated},
+			})
+
+			ts, handler, repo := createAppRepo([]testnet.TestRequest{request})
+			defer ts.Close()
+
+			envParams := map[string]string{}
 			params := models.AppParams{EnvironmentVars: &envParams}
 
 			_, apiErr := repo.Update("app1-guid", params)
@@ -218,14 +239,14 @@ var createApplicationRequest = testapi.NewCloudControllerTestRequest(testnet.Tes
 	Method: "POST",
 	Path:   "/v2/apps",
 	Matcher: testnet.RequestBodyMatcher(`{
-	"name":"my-cool-app",
-	"instances":3,
-	"buildpack":"buildpack-url",
-	"memory":2048,
-	"disk_quota": 512,
-	"space_guid":"some-space-guid",
-	"stack_guid":"some-stack-guid",
-	"command":"some-command"
+		"name":"my-cool-app",
+		"instances":3,
+		"buildpack":"buildpack-url",
+		"memory":2048,
+		"disk_quota": 512,
+		"space_guid":"some-space-guid",
+		"stack_guid":"some-stack-guid",
+		"command":"some-command"
 	}`),
 	Response: testnet.TestResponse{
 		Status: http.StatusCreated,
