@@ -11,15 +11,16 @@ import (
 	"time"
 )
 
-func createMessage(protoMsg *logmessage.LogMessage, sourceName *string, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.Message) {
-	protoMsg.SourceName = sourceName
-	protoMsg.MessageType = msgType
-
-	data, err := proto.Marshal(protoMsg)
-	Expect(err).NotTo(HaveOccurred())
-
-	msg, err = logmessage.ParseMessage(data)
-	Expect(err).NotTo(HaveOccurred())
+func createMessage(sourceId string, sourceName *string, msgType *logmessage.LogMessage_MessageType) (msg *logmessage.LogMessage) {
+	timestamp := time.Now().UnixNano()
+	msg = &logmessage.LogMessage{
+		Message:     []byte("Hello World!\n\r\n\r"),
+		AppId:       proto.String("my-app-guid"),
+		MessageType: msgType,
+		SourceId:    &sourceId,
+		Timestamp:   &timestamp,
+		SourceName:  sourceName,
+	}
 
 	return
 }
@@ -40,55 +41,40 @@ var _ = Describe("Testing with ginkgo", func() {
 		stderr := logmessage.LogMessage_ERR
 
 		date := time.Now()
-		timestamp := date.UnixNano()
-
-		sourceId := "0"
-
-		protoMessage := &logmessage.LogMessage{
-			Message:     []byte("Hello World!\n\r\n\r"),
-			AppId:       proto.String("my-app-guid"),
-			MessageType: &stdout,
-			SourceId:    &sourceId,
-			Timestamp:   &timestamp,
-		}
-
-		msg := createMessage(protoMessage, &cloud_controller, &stdout)
+		msg := createMessage("0", &cloud_controller, &stdout)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
 
-		msg = createMessage(protoMessage, &cloud_controller, &stderr)
+		msg = createMessage("0", &cloud_controller, &stderr)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [API]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
-		sourceId = "1"
-		msg = createMessage(protoMessage, &router, &stdout)
+		msg = createMessage("1", &router, &stdout)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(protoMessage, &router, &stderr)
+
+		msg = createMessage("1", &router, &stderr)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [RTR]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
-		sourceId = "2"
-		msg = createMessage(protoMessage, &uaa, &stdout)
+		msg = createMessage("2", &uaa, &stdout)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(protoMessage, &uaa, &stderr)
+		msg = createMessage("2", &uaa, &stderr)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [UAA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
-		sourceId = "3"
-		msg = createMessage(protoMessage, &dea, &stdout)
+		msg = createMessage("3", &dea, &stdout)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(protoMessage, &dea, &stderr)
+		msg = createMessage("3", &dea, &stderr)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [DEA]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 
-		sourceId = "4"
-		msg = createMessage(protoMessage, &wardenContainer, &stdout)
+		msg = createMessage("4", &wardenContainer, &stdout)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStdoutColor("OUT Hello World!")))
-		msg = createMessage(protoMessage, &wardenContainer, &stderr)
+		msg = createMessage("4", &wardenContainer, &stderr)
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(fmt.Sprintf("%s [App/4]", date.Format(TIMESTAMP_FORMAT))))
 		Expect(LogMessageOutput(msg)).To(ContainSubstring(terminal.LogStderrColor("ERR Hello World!")))
 	})

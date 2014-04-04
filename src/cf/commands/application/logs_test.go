@@ -39,7 +39,7 @@ var _ = Describe("logs command", func() {
 
 		currentTime := time.Now()
 
-		recentLogs := []*logmessage.Message{
+		recentLogs := []*logmessage.LogMessage{
 			NewLogMessage("Log Line 1", app.Guid, "DEA", currentTime),
 			NewLogMessage("Log Line 2", app.Guid, "DEA", currentTime),
 		}
@@ -64,7 +64,7 @@ var _ = Describe("logs command", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 
-		recentLogs := []*logmessage.Message{
+		recentLogs := []*logmessage.LogMessage{
 			NewLogMessage("hello%2Bworld%v", app.Guid, "DEA", time.Now()),
 		}
 
@@ -84,7 +84,7 @@ var _ = Describe("logs command", func() {
 		app.Name = "my-app"
 		app.Guid = "my-app-guid"
 
-		logs := []*logmessage.Message{
+		logs := []*logmessage.LogMessage{
 			NewLogMessage("Log Line 1", app.Guid, "DEA", time.Now()),
 		}
 

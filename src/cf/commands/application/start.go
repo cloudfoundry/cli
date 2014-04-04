@@ -102,9 +102,7 @@ func (cmd *Start) ApplicationStart(app models.Application) (updatedApp models.Ap
 	}
 
 	stopLoggingChan := make(chan bool, 1)
-	defer close(stopLoggingChan)
 	loggingStartedChan := make(chan bool)
-	defer close(loggingStartedChan)
 
 	go cmd.tailStagingLogs(app, loggingStartedChan, stopLoggingChan)
 
@@ -143,31 +141,25 @@ func (cmd *Start) SetStartTimeoutSeconds(timeout int) {
 }
 
 func (cmd Start) tailStagingLogs(app models.Application, startChan chan bool, stopChan chan bool) {
-	logChan := make(chan *logmessage.Message, 1000)
-	go func() {
-		defer close(logChan)
+	onConnect := func() {
+		startChan <- true
+	}
 
-		onConnect := func() {
-			startChan <- true
+	err := cmd.logRepo.TailLogsFor(app.Guid, 5*time.Second, onConnect, func(msg *logmessage.LogMessage) {
+		select {
+		case <-stopChan:
+			cmd.logRepo.Close()
+		default:
+			if msg.GetSourceName() == LogMessageTypeStaging {
+				cmd.ui.Say(simpleLogMessageOutput(msg))
+			}
 		}
+	})
 
-		err := cmd.logRepo.TailLogsFor(app.Guid, onConnect, logChan, stopChan, 1)
-		if err != nil {
-			cmd.ui.Warn("Warning: error tailing logs")
-			cmd.ui.Say("%s", err)
-			startChan <- true
-		}
-	}()
-
-	cmd.displayLogMessages(logChan)
-}
-
-func (cmd Start) displayLogMessages(logChan chan *logmessage.Message) {
-	for msg := range logChan {
-		if msg.GetLogMessage().GetSourceName() != LogMessageTypeStaging {
-			continue
-		}
-		cmd.ui.Say(simpleLogMessageOutput(msg))
+	if err != nil {
+		cmd.ui.Warn("Warning: error tailing logs")
+		cmd.ui.Say("%s", err)
+		startChan <- true
 	}
 }
 

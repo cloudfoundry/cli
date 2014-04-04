@@ -3,166 +3,164 @@ package api_test
 import (
 	. "cf/api"
 	"cf/configuration"
-	"code.google.com/p/go.net/websocket"
+	"cf/errors"
 	"code.google.com/p/gogoprotobuf/proto"
-	"crypto/tls"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http/httptest"
-	"strings"
+	testapi "testhelpers/api"
 	testconfig "testhelpers/configuration"
-	testnet "testhelpers/net"
 	"time"
 )
 
 var _ = Describe("loggregator logs repository", func() {
 	var (
-		logChan        chan *logmessage.Message
-		testServer     *httptest.Server
-		requestHandler *requestHandlerWithExpectedPath
-		logsRepo       *LoggregatorLogsRepository
-		configRepo     configuration.ReadWriter
-		messagesToSend [][]byte
+		fakeConsumer *testapi.FakeLoggregatorConsumer
+		logsRepo     *LoggregatorLogsRepository
+		configRepo   configuration.ReadWriter
 	)
 
 	BeforeEach(func() {
-		startTime := time.Now()
-		messagesToSend = [][]byte{
-			marshalledLogMessageWithTime("My message 1", startTime.UnixNano()),
-			marshalledLogMessageWithTime("My message 2", startTime.UnixNano()),
-			marshalledLogMessageWithTime("My message 3", startTime.UnixNano()),
-		}
-		logChan = make(chan *logmessage.Message, 1000)
-
-		requestHandler = new(requestHandlerWithExpectedPath)
-		requestHandler.handlerFunc = func(conn *websocket.Conn) {
-			request := conn.Request()
-			requestHandler.lastPath = request.URL.Path
-			Expect(request.URL.RawQuery).To(Equal("app=my-app-guid"))
-			Expect(request.Method).To(Equal("GET"))
-			Expect(request.Header.Get("Authorization")).To(ContainSubstring("BEARER my_access_token"))
-
-			for _, msg := range messagesToSend {
-				conn.Write(msg)
-			}
-			time.Sleep(time.Duration(50) * time.Millisecond)
-			conn.Close()
-		}
-
-		testServer = httptest.NewTLSServer(websocket.Handler(requestHandler.handlerFunc))
-
+		fakeConsumer = &testapi.FakeLoggregatorConsumer{}
 		configRepo = testconfig.NewRepositoryWithDefaults()
-		configRepo.SetApiEndpoint("https://localhost")
-		configRepo.SetLoggregatorEndpoint(strings.Replace(testServer.URL, "https", "wss", 1))
-
-		repo := NewLoggregatorLogsRepository(configRepo)
+		configRepo.SetLoggregatorEndpoint("loggregator-server.test.com")
+		configRepo.SetAccessToken("the-access-token")
+		repo := NewLoggregatorLogsRepository(configRepo, fakeConsumer)
 		logsRepo = &repo
-		logsRepo.AddTrustedCerts(testServer.TLS.Certificates)
-	})
-
-	AfterEach(func() {
-		testServer.Close()
 	})
 
 	Describe("RecentLogsFor", func() {
-		BeforeEach(func() {
-			err := logsRepo.RecentLogsFor("my-app-guid", func() {}, logChan)
-			Expect(err).NotTo(HaveOccurred())
-			close(logChan)
+		Context("when an error occurs", func() {
+			BeforeEach(func() {
+				fakeConsumer.RecentReturns.Err = errors.New("oops")
+			})
+
+			It("returns the error", func() {
+				_, err := logsRepo.RecentLogsFor("app-guid")
+				Expect(err).To(Equal(errors.New("oops")))
+			})
 		})
 
-		It("connects to the dump endpoint", func() {
-			Expect(requestHandler.lastPath).To(Equal("/dump/"))
-		})
+		Context("when an error does not occur", func() {
+			BeforeEach(func() {
+				fakeConsumer.RecentReturns.Messages = []*logmessage.LogMessage{
+					makeLogMessage("My message 2", int64(2000)),
+					makeLogMessage("My message 1", int64(1000)),
+				}
+			})
 
-		It("writes log messages onto the provided channel", func() {
-			dumpedMessages := []*logmessage.Message{}
-			for msg := range logChan {
-				dumpedMessages = append(dumpedMessages, msg)
-			}
+			It("gets the logs for the requested app", func() {
+				logsRepo.RecentLogsFor("app-guid")
+				Expect(fakeConsumer.RecentCalledWith.AppGuid).To(Equal("app-guid"))
+			})
 
-			Expect(len(dumpedMessages)).To(Equal(3))
-			Expect(dumpedMessages[0]).To(Equal(parseMessage(messagesToSend[0])))
-			Expect(dumpedMessages[1]).To(Equal(parseMessage(messagesToSend[1])))
-			Expect(dumpedMessages[2]).To(Equal(parseMessage(messagesToSend[2])))
+			It("writes the sorted log messages onto the provided channel", func() {
+				messages, err := logsRepo.RecentLogsFor("app-guid")
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(string(messages[0].Message)).To(Equal("My message 1"))
+				Expect(string(messages[1].Message)).To(Equal("My message 2"))
+			})
 		})
 	})
 
-	Describe("TailLogsFor", func() {
-		Context("when the SSL certificate is valid", func() {
-			It("connects to the tailing endpoint", func() {
-				err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
-				Expect(err).NotTo(HaveOccurred())
-				close(logChan)
-
-				Expect(requestHandler.lastPath).To(Equal("/tail/"))
+	Describe("tailing logs", func() {
+		Context("when an error occurs", func() {
+			BeforeEach(func() {
+				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					return nil, errors.New("oops")
+				}
 			})
 
-			It("writes log messages on the channel in the correct order", func() {
-				err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
-				Expect(err).NotTo(HaveOccurred())
-				close(logChan)
+			It("returns an error", func() {
+				err := logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(*logmessage.LogMessage) {
 
-				var messages []string
-				for msg := range logChan {
-					messages = append(messages, string(msg.GetLogMessage().Message))
-				}
-
-				Expect(messages).To(Equal([]string{"My message 1", "My message 2", "My message 3"}))
+				})
+				Expect(err).To(Equal(errors.New("oops")))
 			})
 		})
 
-		Context("when the SSL certificate is invalid", func() {
-			BeforeEach(func() {
-				testServer.TLS.Certificates = []tls.Certificate{testnet.MakeExpiredTLSCert()}
+		Context("when no error occurs", func() {
+			It("asks for the logs for the given app", func(done Done) {
+				fakeConsumer.TailFunc = func(appGuid, token string) (<-chan *logmessage.LogMessage, error) {
+					Expect(appGuid).To(Equal("app-guid"))
+					Expect(token).To(Equal("the-access-token"))
+					close(done)
+					return nil, nil
+				}
+
+				logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() {}, func(msg *logmessage.LogMessage) {})
 			})
 
-			Context("when skip-validation-errors flag is set", func() {
-				BeforeEach(func() {
-					configRepo.SetSSLDisabled(true)
-				})
+			It("sets the on connect callback", func(done Done) {
+				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					close(done)
+					return nil, nil
+				}
 
-				It("ignores SSL validation errors", func() {
-					err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
-					Expect(err).NotTo(HaveOccurred())
-				})
+				called := false
+				logsRepo.TailLogsFor("app-guid", 1*time.Millisecond, func() { called = true }, func(msg *logmessage.LogMessage) {})
+				fakeConsumer.OnConnectCallback()
+				Expect(called).To(BeTrue())
 			})
 
-			Context("when skip-validation-errors is not set", func() {
-				It("fails when the server's SSL cert cannot be verified", func() {
-					err := logsRepo.TailLogsFor("my-app-guid", func() {}, logChan, make(chan bool), time.Duration(1*time.Second))
-					Expect(err).To(HaveOccurred())
+			It("sorts the messages before yielding them", func(done Done) {
+				fakeConsumer.TailFunc = func(_, _ string) (<-chan *logmessage.LogMessage, error) {
+					logChan := make(chan *logmessage.LogMessage)
+					messages := []*logmessage.LogMessage{
+						makeLogMessage("hello3", 300),
+						makeLogMessage("hello2", 200),
+						makeLogMessage("hello1", 100),
+					}
+
+					go func() {
+						for _, msg := range messages {
+							logChan <- msg
+						}
+
+						for {
+							time.Sleep(1 * time.Millisecond)
+							if fakeConsumer.IsClosed {
+								close(logChan)
+								return
+							}
+						}
+					}()
+
+					return logChan, nil
+				}
+
+				receivedMessages := []*logmessage.LogMessage{}
+				err := logsRepo.TailLogsFor("app-guid", 10*time.Millisecond, func() {}, func(msg *logmessage.LogMessage) {
+					receivedMessages = append(receivedMessages, msg)
+					if len(receivedMessages) >= 3 {
+						logsRepo.Close()
+					}
 				})
+
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(receivedMessages).To(Equal([]*logmessage.LogMessage{
+					makeLogMessage("hello1", 100),
+					makeLogMessage("hello2", 200),
+					makeLogMessage("hello3", 300),
+				}))
+
+				close(done)
 			})
 		})
 	})
 })
 
-func parseMessage(msgBytes []byte) (msg *logmessage.Message) {
-	msg, err := logmessage.ParseMessage(msgBytes)
-	Expect(err).ToNot(HaveOccurred())
-	return
-}
-
-type requestHandlerWithExpectedPath struct {
-	handlerFunc func(conn *websocket.Conn)
-	lastPath    string
-}
-
-func marshalledLogMessageWithTime(messageString string, timestamp int64) []byte {
+func makeLogMessage(message string, timestamp int64) *logmessage.LogMessage {
 	messageType := logmessage.LogMessage_OUT
 	sourceName := "DEA"
-	protoMessage := &logmessage.LogMessage{
-		Message:     []byte(messageString),
+	return &logmessage.LogMessage{
+		Message:     []byte(message),
 		AppId:       proto.String("my-app-guid"),
 		MessageType: &messageType,
 		SourceName:  &sourceName,
 		Timestamp:   proto.Int64(timestamp),
 	}
 
-	message, err := proto.Marshal(protoMessage)
-	Expect(err).ToNot(HaveOccurred())
-
-	return message
 }

@@ -5,6 +5,8 @@ import (
 	"cf/app_files"
 	"cf/configuration"
 	"cf/net"
+	"crypto/tls"
+	consumer "github.com/cloudfoundry/loggregator_consumer"
 )
 
 type RepositoryLocator struct {
@@ -48,6 +50,9 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	cloudControllerGateway.SetTokenRefresher(loc.authRepo)
 	uaaGateway.SetTokenRefresher(loc.authRepo)
 
+	tlsConfig := net.NewTLSConfig([]tls.Certificate{}, config.IsSSLDisabled())
+	loggregatorConsumer := consumer.New(config.LoggregatorEndpoint(), tlsConfig, nil)
+
 	loc.appBitsRepo = NewCloudControllerApplicationBitsRepository(config, cloudControllerGateway, app_files.ApplicationZipper{})
 	loc.appEventsRepo = NewCloudControllerAppEventsRepository(config, cloudControllerGateway, strategy)
 	loc.appFilesRepo = NewCloudControllerAppFilesRepository(config, cloudControllerGateway)
@@ -58,7 +63,7 @@ func NewRepositoryLocator(config configuration.ReadWriter, gatewaysByName map[st
 	loc.curlRepo = NewCloudControllerCurlRepository(config, cloudControllerGateway)
 	loc.domainRepo = NewCloudControllerDomainRepository(config, cloudControllerGateway, strategy)
 	loc.endpointRepo = NewEndpointRepository(config, cloudControllerGateway)
-	loc.logsRepo = NewLoggregatorLogsRepository(config)
+	loc.logsRepo = NewLoggregatorLogsRepository(config, loggregatorConsumer)
 	loc.organizationRepo = NewCloudControllerOrganizationRepository(config, cloudControllerGateway)
 	loc.passwordRepo = NewCloudControllerPasswordRepository(config, uaaGateway)
 	loc.quotaRepo = NewCloudControllerQuotaRepository(config, cloudControllerGateway)

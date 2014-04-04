@@ -22,3 +22,6 @@
 [submodule "src/github.com/cloudfoundry-incubator/candiedyaml"]
 	path = src/github.com/cloudfoundry-incubator/candiedyaml
 	url = https://github.com/cloudfoundry-incubator/candiedyaml.git
+[submodule "src/github.com/cloudfoundry/loggregator_consumer"]
+	path = src/github.com/cloudfoundry/loggregator_consumer
+	url = https://github.com/cloudfoundry/loggregator_consumer
