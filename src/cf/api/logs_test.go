@@ -119,7 +119,7 @@ var _ = Describe("loggregator logs repository", func() {
 				}
 
 				receivedMessages := []*logmessage.LogMessage{}
-				err := logsRepo.TailLogsFor("app-guid", 250 * time.Millisecond, func() {}, func(msg *logmessage.LogMessage) {
+				err := logsRepo.TailLogsFor("app-guid", 250*time.Millisecond, func() {}, func(msg *logmessage.LogMessage) {
 					receivedMessages = append(receivedMessages, msg)
 					if len(receivedMessages) >= 3 {
 						logsRepo.Close()

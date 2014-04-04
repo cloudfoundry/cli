@@ -51,7 +51,6 @@ func (c *FakeLoggregatorConsumer) Tail(appGuid string, authToken string) (<-chan
 	return c.TailFunc(appGuid, authToken)
 }
 
-
 func (c *FakeLoggregatorConsumer) WaitForClose() {
 	<-c.closeChan
 }
