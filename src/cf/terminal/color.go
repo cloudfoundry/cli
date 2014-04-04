@@ -5,6 +5,8 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+
+	"github.com/kless/term"
 )
 
 type Color uint
@@ -21,7 +23,7 @@ const (
 )
 
 func Colorize(message string, color Color, bold bool) string {
-	if runtime.GOOS == "windows" || os.Getenv("CF_COLOR") != "true" {
+	if !OsSupportsColours || os.Getenv("CF_COLOR") == "false" || (!TerminalSupportsColours && os.Getenv("CF_COLOR") != "true") {
 		return message
 	}
 
@@ -100,3 +102,7 @@ func LogAppHeaderColor(message string) string {
 func LogSysHeaderColor(message string) string {
 	return Colorize(message, cyan, true)
 }
+
+var OsSupportsColours = runtime.GOOS != "windows"
+
+var TerminalSupportsColours = term.IsTerminal(1)
