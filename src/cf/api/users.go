@@ -53,8 +53,13 @@ func NewCloudControllerUserRepository(config configuration.Reader, uaaGateway ne
 }
 
 func (repo CloudControllerUserRepository) FindByUsername(username string) (user models.UserFields, apiErr error) {
+	uaaEndpoint, apiErr := repo.getAuthEndpoint()
+	if apiErr != nil {
+		return
+	}
+
 	usernameFilter := neturl.QueryEscape(fmt.Sprintf(`userName Eq "%s"`, username))
-	path := fmt.Sprintf("/Users?attributes=id,userName&filter=%s", usernameFilter)
+	path := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, usernameFilter)
 
 	users, apiErr := repo.updateOrFindUsersWithUAAPath([]models.UserFields{}, path)
 	if len(users) == 0 {
@@ -74,68 +79,58 @@ func (repo CloudControllerUserRepository) ListUsersInSpaceForRole(spaceGuid stri
 	return repo.listUsersWithPath(fmt.Sprintf("/v2/spaces/%s/%s", spaceGuid, spaceRoleToPathMap[roleName]))
 }
 
-func (repo CloudControllerUserRepository) listUsersWithPath(path string) ([]models.UserFields, error) {
-	var users []models.UserFields
+func (repo CloudControllerUserRepository) listUsersWithPath(path string) (users []models.UserFields, apiErr error) {
 	guidFilters := []string{}
 
-	apiErr := repo.ccGateway.ListPaginatedResources(
+	apiErr = repo.ccGateway.ListPaginatedResources(
 		repo.config.ApiEndpoint(),
 		path,
 		resources.UserResource{},
 		func(resource interface{}) bool {
-			if user, ok := resource.(resources.UserResource); ok {
-				users = append(users, user.ToFields())
-				guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, user.ToFields().Guid))
-			}
+			user := resource.(resources.UserResource).ToFields()
+			users = append(users, user)
+			guidFilters = append(guidFilters, fmt.Sprintf(`Id eq "%s"`, user.Guid))
 			return true
 		})
 	if apiErr != nil {
-		return []models.UserFields{}, apiErr
+		return
+	}
+
+	uaaEndpoint, apiErr := repo.getAuthEndpoint()
+	if apiErr != nil {
+		return
 	}
 
 	filter := strings.Join(guidFilters, " or ")
-	usersURL := fmt.Sprintf("/Users?attributes=id,userName&filter=%s", neturl.QueryEscape(filter))
-	return repo.updateOrFindUsersWithUAAPath(users, usersURL)
+	usersURL := fmt.Sprintf("%s/Users?attributes=id,userName&filter=%s", uaaEndpoint, neturl.QueryEscape(filter))
+	users, apiErr = repo.updateOrFindUsersWithUAAPath(users, usersURL)
+	return
 }
 
-func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers []models.UserFields, path string) ([]models.UserFields, error) {
-	var users, updatedUsers []models.UserFields
-	uaaEndpoint, apiErr := repo.getAuthEndpoint()
+func (repo CloudControllerUserRepository) updateOrFindUsersWithUAAPath(ccUsers []models.UserFields, path string) (updatedUsers []models.UserFields, apiErr error) {
+	uaaResponse := new(resources.UAAUserResources)
+	apiErr = repo.uaaGateway.GetResource(path, uaaResponse)
 	if apiErr != nil {
-		return updatedUsers, apiErr
+		return
 	}
 
-	apiErr = repo.ccGateway.ListPaginatedResources(
-		uaaEndpoint,
-		path,
-		resources.UAAUserResource{},
-		func(resource interface{}) bool {
-			if user, ok := resource.(resources.UAAUserResource); ok {
-				users = append(users, user.ToFields())
-			}
-			return true
-		})
-	if apiErr != nil {
-		return []models.UserFields{}, apiErr
-	}
-
-	for _, user := range users {
+	for _, uaaResource := range uaaResponse.Resources {
 		var ccUserFields models.UserFields
 
 		for _, u := range ccUsers {
-			if u.Guid == user.Guid {
+			if u.Guid == uaaResource.Id {
 				ccUserFields = u
 				break
 			}
 		}
 
 		updatedUsers = append(updatedUsers, models.UserFields{
-			Guid:     user.Guid,
-			Username: user.Username,
+			Guid:     uaaResource.Id,
+			Username: uaaResource.Username,
 			IsAdmin:  ccUserFields.IsAdmin,
 		})
 	}
-	return updatedUsers, apiErr
+	return
 }
 
 func (repo CloudControllerUserRepository) Create(username, password string) (err error) {

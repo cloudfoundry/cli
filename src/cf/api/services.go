@@ -167,8 +167,11 @@ func (repo CloudControllerServiceRepository) FindServiceOfferingByLabelAndProvid
 	path := fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:"+label+";provider:"+provider))
 	offerings, apiErr := repo.getServiceOfferings(path)
 
-	if len(offerings) == 0 {
+	if apiErr != nil {
+		return models.ServiceOffering{}, apiErr
+	} else if len(offerings) == 0 {
 		apiErr = errors.NewModelNotFoundError("Service offering", label+" "+provider)
+		return models.ServiceOffering{}, apiErr
 	}
 
 	return offerings[0], apiErr
