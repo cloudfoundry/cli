@@ -145,7 +145,7 @@ var _ = Describe("start command", func() {
 			correctSourceName := "STG"
 
 			logRepo := &testapi.FakeLogsRepository{
-				TailLogMessages: []*logmessage.Message{
+				TailLogMessages: []*logmessage.LogMessage{
 					NewLogMessage("Log Line 1", defaultAppForStart.Guid, wrongSourceName, currentTime),
 					NewLogMessage("Log Line 2", defaultAppForStart.Guid, correctSourceName, currentTime),
 					NewLogMessage("Log Line 3", defaultAppForStart.Guid, correctSourceName, currentTime),
@@ -376,7 +376,7 @@ func startAppWithInstancesAndErrors(displayApp ApplicationDisplayer, app models.
 	}
 
 	logRepo := &testapi.FakeLogsRepository{
-		TailLogMessages: []*logmessage.Message{
+		TailLogMessages: []*logmessage.LogMessage{
 			NewLogMessage("Log Line 1", app.Guid, LogMessageTypeStaging, time.Now()),
 			NewLogMessage("Log Line 2", app.Guid, LogMessageTypeStaging, time.Now()),
 		},

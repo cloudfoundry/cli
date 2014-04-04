@@ -15,24 +15,19 @@ const (
 	TIMESTAMP_FORMAT = "2006-01-02T15:04:05.00-0700"
 )
 
-func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) (msg *logmessage.Message) {
+func NewLogMessage(msgText, appGuid, sourceName string, timestamp time.Time) *logmessage.LogMessage {
 	messageType := logmessage.LogMessage_ERR
 
-	logMsg := logmessage.LogMessage{
+	return &logmessage.LogMessage{
 		Message:     []byte(msgText),
 		AppId:       proto.String(appGuid),
 		MessageType: &messageType,
 		SourceName:  proto.String(sourceName),
 		Timestamp:   proto.Int64(timestamp.UnixNano()),
 	}
-	data, _ := proto.Marshal(&logMsg)
-	msg, _ = logmessage.ParseMessage(data)
-
-	return
 }
 
-func simpleLogMessageOutput(msg *logmessage.Message) (msgText string) {
-	logMsg := msg.GetLogMessage()
+func simpleLogMessageOutput(logMsg *logmessage.LogMessage) (msgText string) {
 	msgText = string(logMsg.GetMessage())
 	reg, err := regexp.Compile("[\n\r]+$")
 	if err != nil {
@@ -42,10 +37,9 @@ func simpleLogMessageOutput(msg *logmessage.Message) (msgText string) {
 	return
 }
 
-func LogMessageOutput(msg *logmessage.Message) string {
+func LogMessageOutput(msg *logmessage.LogMessage) string {
 	logHeader, coloredLogHeader := extractLogHeader(msg)
-	logMsg := msg.GetLogMessage()
-	logContent := extractLogContent(logMsg, logHeader)
+	logContent := extractLogContent(msg, logHeader)
 
 	return fmt.Sprintf("%s%s", coloredLogHeader, logContent)
 }
@@ -57,8 +51,8 @@ func max(a, b int) int {
 	return b
 }
 
-func extractLogHeader(msg *logmessage.Message) (logHeader, coloredLogHeader string) {
-	logMsg := msg.GetLogMessage()
+func extractLogHeader(msg *logmessage.LogMessage) (logHeader, coloredLogHeader string) {
+	logMsg := msg
 	sourceName := logMsg.GetSourceName()
 	sourceID := logMsg.GetSourceId()
 	t := time.Unix(0, logMsg.GetTimestamp())

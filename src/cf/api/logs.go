@@ -2,152 +2,78 @@ package api
 
 import (
 	"cf/configuration"
-	"cf/net"
-	"cf/terminal"
-	"cf/trace"
-	"code.google.com/p/go.net/websocket"
 	"crypto/tls"
 	"errors"
-	"fmt"
+	consumer "github.com/cloudfoundry/loggregator_consumer"
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
 	"time"
 )
 
-const LogBufferSize = 1024
-
 type LogsRepository interface {
-	RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error)
-	TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printInterval time.Duration) (err error)
+	RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error)
+	TailLogsFor(appGuid string, bufferTime time.Duration, onConnect func(), onMessage func(*logmessage.LogMessage)) error
+	Close()
 }
 
 type LoggregatorLogsRepository struct {
+	consumer     consumer.LoggregatorConsumer
 	config       configuration.Reader
 	TrustedCerts []tls.Certificate
 }
 
-func NewLoggregatorLogsRepository(config configuration.Reader) LoggregatorLogsRepository {
-	return LoggregatorLogsRepository{config: config}
+func NewLoggregatorLogsRepository(config configuration.Reader, consumer consumer.LoggregatorConsumer) LoggregatorLogsRepository {
+	return LoggregatorLogsRepository{config: config, consumer: consumer}
 }
 
-func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
-	host := repo.config.LoggregatorEndpoint()
-	if host == "" {
+func (repo LoggregatorLogsRepository) Close() {
+	repo.consumer.Close()
+}
+
+func (repo LoggregatorLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
+	messages, err := repo.consumer.Recent(appGuid, repo.config.AccessToken())
+	consumer.SortRecent(messages)
+	return messages, err
+}
+
+func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, bufferTime time.Duration, onConnect func(), onMessage func(*logmessage.LogMessage)) error {
+	endpoint := repo.config.LoggregatorEndpoint()
+	if endpoint == "" {
 		return errors.New("Loggregator endpoint missing from config file")
 	}
 
-	location := fmt.Sprintf("%s/dump/?app=%s", host, appGuid)
-	stopLoggingChan := make(chan bool)
-	defer close(stopLoggingChan)
-
-	return repo.connectToWebsocket(location, onConnect, logChan, stopLoggingChan, 0*time.Nanosecond)
-}
-
-func (repo LoggregatorLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) error {
-	host := repo.config.LoggregatorEndpoint()
-	if host == "" {
-		return errors.New("Loggregator endpoint missing from config file")
-	}
-
-	location := host + fmt.Sprintf("/tail/?app=%s", appGuid)
-	return repo.connectToWebsocket(location, onConnect, logChan, stopLoggingChan, printTimeBuffer)
-}
-
-func (repo LoggregatorLogsRepository) connectToWebsocket(location string, onConnect func(), outputChan chan *logmessage.Message, stopLoggingChan chan bool, printTimeBuffer time.Duration) (err error) {
-	trace.Logger.Printf("\n%s %s\n", terminal.HeaderColor("CONNECTING TO WEBSOCKET:"), location)
-
-	inputChan := make(chan *logmessage.Message, LogBufferSize)
-	messageQueue := NewSortedMessageQueue(printTimeBuffer, time.Now)
-
-	wsConfig, err := websocket.NewConfig(location, "http://localhost")
+	repo.consumer.SetOnConnectCallback(onConnect)
+	logChan, err := repo.consumer.Tail(appGuid, repo.config.AccessToken())
 	if err != nil {
-		return
+		return err
 	}
 
-	wsConfig.Header.Add("Authorization", repo.config.AccessToken())
-	wsConfig.TlsConfig = net.NewTLSConfig(repo.TrustedCerts, repo.config.IsSSLDisabled())
-
-	ws, err := websocket.DialConfig(wsConfig)
-	if err != nil {
-		err = net.WrapNetworkErrors(location, err)
-		return
-	}
-
-	defer func() {
-		ws.Close()
-		repo.drainRemainingMessages(messageQueue, inputChan, outputChan)
-	}()
-
-	onConnect()
-
-	go repo.sendKeepAlive(ws)
-
-	go func() {
-		defer close(inputChan)
-		repo.listenForMessages(ws, inputChan)
-	}()
-
-	repo.processMessages(messageQueue, inputChan, outputChan, stopLoggingChan)
-
-	return
+	bufferMessages(logChan, onMessage, bufferTime)
+	return nil
 }
 
-func (repo LoggregatorLogsRepository) processMessages(messageQueue *SortedMessageQueue, inputChan <-chan *logmessage.Message, outputChan chan *logmessage.Message, stopLoggingChan <-chan bool) {
+func bufferMessages(logChan <-chan *logmessage.LogMessage, onMessage func(*logmessage.LogMessage), bufferTime time.Duration) {
+	messageQueue := NewSortedMessageQueue(bufferTime, func() time.Time {
+		return time.Now()
+	})
+
 	for {
+		sendMessages(messageQueue, onMessage)
+
 		select {
-		case msg, ok := <-inputChan:
-			if ok {
-				messageQueue.PushMessage(msg)
-			} else {
+		case msg, ok := <-logChan:
+			if !ok {
 				return
 			}
-		case <-stopLoggingChan:
-			return
-		case <-time.After(10 * time.Millisecond):
-			for messageQueue.NextTimestamp() < time.Now().UnixNano() {
-				msg := messageQueue.PopMessage()
-				outputChan <- msg
-			}
+			messageQueue.PushMessage(msg)
+		default:
+			time.Sleep(1 * time.Millisecond)
 		}
 	}
 }
 
-func (repo LoggregatorLogsRepository) drainRemainingMessages(messageQueue *SortedMessageQueue, inputChan <-chan *logmessage.Message, outputChan chan *logmessage.Message) {
-	for msg := range inputChan {
-		messageQueue.PushMessage(msg)
+func sendMessages(queue *SortedMessageQueue, onMessage func(*logmessage.LogMessage)) {
+	for queue.NextTimestamp() < time.Now().UnixNano() {
+		msg := queue.PopMessage()
+		onMessage(msg)
 	}
-
-	for {
-		msg := messageQueue.PopMessage()
-		if msg == nil {
-			break
-		}
-		outputChan <- msg
-	}
-}
-
-func (repo LoggregatorLogsRepository) sendKeepAlive(ws *websocket.Conn) {
-	for {
-		websocket.Message.Send(ws, "I'm alive!")
-		time.Sleep(25 * time.Second)
-	}
-}
-
-func (repo LoggregatorLogsRepository) listenForMessages(ws *websocket.Conn, msgChan chan<- *logmessage.Message) {
-	for {
-		var data []byte
-		err := websocket.Message.Receive(ws, &data)
-		if err != nil {
-			break
-		}
-
-		msg, msgErr := logmessage.ParseMessage(data)
-		if msgErr != nil {
-			continue
-		}
-		msgChan <- msg
-	}
-}
-
-func (repo *LoggregatorLogsRepository) AddTrustedCerts(certificates []tls.Certificate) {
-	repo.TrustedCerts = append(repo.TrustedCerts, certificates...)
 }

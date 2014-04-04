@@ -2,21 +2,21 @@ package api
 
 import (
 	"github.com/cloudfoundry/loggregatorlib/logmessage"
+	"sort"
 	"time"
 )
 
 const MAX_INT64 int64 = 1<<63 - 1
 
-type Item struct {
-	message                  *logmessage.Message
+type item struct {
+	message                  *logmessage.LogMessage
 	timestampWhenOutputtable int64
-	index                    int
 }
 
 type SortedMessageQueue struct {
 	clock           func() time.Time
 	printTimeBuffer time.Duration
-	items           []*Item
+	items           []*item
 }
 
 func NewSortedMessageQueue(printTimeBuffer time.Duration, clock func() time.Time) *SortedMessageQueue {
@@ -26,18 +26,18 @@ func NewSortedMessageQueue(printTimeBuffer time.Duration, clock func() time.Time
 	}
 }
 
-func (pq *SortedMessageQueue) PushMessage(message *logmessage.Message) {
-	item := &Item{message: message, timestampWhenOutputtable: pq.clock().Add(pq.printTimeBuffer).UnixNano()}
+func (pq *SortedMessageQueue) PushMessage(message *logmessage.LogMessage) {
+	item := &item{message: message, timestampWhenOutputtable: pq.clock().Add(pq.printTimeBuffer).UnixNano()}
 	pq.items = append(pq.items, item)
-	pq.insertionSort()
+	sort.Stable(pq)
 }
 
-func (pq *SortedMessageQueue) PopMessage() *logmessage.Message {
+func (pq *SortedMessageQueue) PopMessage() *logmessage.LogMessage {
 	if len(pq.items) == 0 {
 		return nil
 	}
 
-	var item *Item
+	var item *item
 	item = pq.items[0]
 	pq.items = pq.items[1:len(pq.items)]
 
@@ -54,20 +54,14 @@ func (pq *SortedMessageQueue) NextTimestamp() int64 {
 	return item.timestampWhenOutputtable
 }
 
-func (pq SortedMessageQueue) less(i, j int) bool {
-	return *pq.items[i].message.GetLogMessage().Timestamp < *pq.items[j].message.GetLogMessage().Timestamp
+func (pq SortedMessageQueue) Less(i, j int) bool {
+	return *pq.items[i].message.Timestamp < *pq.items[j].message.Timestamp
 }
 
-func (pq SortedMessageQueue) swap(i, j int) {
+func (pq SortedMessageQueue) Swap(i, j int) {
 	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
-	pq.items[i].index = i
-	pq.items[j].index = j
 }
 
-func (pq SortedMessageQueue) insertionSort() {
-	for i := 0 + 1; i < len(pq.items); i++ {
-		for j := i; j > 0 && pq.less(j, j-1); j-- {
-			pq.swap(j, j-1)
-		}
-	}
+func (pq SortedMessageQueue) Len() int {
+	return len(pq.items)
 }

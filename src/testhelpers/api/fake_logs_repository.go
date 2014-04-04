@@ -7,39 +7,42 @@ import (
 
 type FakeLogsRepository struct {
 	AppLoggedGuid string
-	RecentLogs    []*logmessage.Message
+	RecentLogs    []*logmessage.LogMessage
 	RecentLogErr  error
 
-	TailLogMessages   []*logmessage.Message
+	TailLogMessages []*logmessage.LogMessage
+	TailLogErr      error
+
 	TailLogStopCalled bool
-	TailLogErr        error
 }
 
-func (l *FakeLogsRepository) RecentLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message) (err error) {
-	err = l.RecentLogErr
-
-	if err != nil {
-		return
-	}
-
-	stopLoggingChan := make(chan bool)
-	defer close(stopLoggingChan)
-	l.logsFor(appGuid, l.RecentLogs, onConnect, logChan, stopLoggingChan)
-	return
+func (l *FakeLogsRepository) RecentLogsFor(appGuid string) ([]*logmessage.LogMessage, error) {
+	l.AppLoggedGuid = appGuid
+	return l.RecentLogs, l.RecentLogErr
 }
 
-func (l *FakeLogsRepository) TailLogsFor(appGuid string, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool, printInterval time.Duration) (err error) {
+func (l *FakeLogsRepository) TailLogsFor(appGuid string, bufferTime time.Duration, onConnect func(), onMessage func(*logmessage.LogMessage)) (err error) {
+	l.AppLoggedGuid = appGuid
+
 	err = l.TailLogErr
-
 	if err != nil {
 		return
 	}
 
-	l.logsFor(appGuid, l.TailLogMessages, onConnect, logChan, stopLoggingChan)
+	onConnect()
+
+	for _, msg := range l.TailLogMessages {
+		onMessage(msg)
+	}
+
 	return
 }
 
-func (l *FakeLogsRepository) logsFor(appGuid string, logMessages []*logmessage.Message, onConnect func(), logChan chan *logmessage.Message, stopLoggingChan chan bool) {
+func (l *FakeLogsRepository) Close() {
+	l.TailLogStopCalled = true
+}
+
+func (l *FakeLogsRepository) logsFor(appGuid string, logMessages []*logmessage.LogMessage, onConnect func(), logChan chan *logmessage.LogMessage, stopLoggingChan chan bool) {
 	l.AppLoggedGuid = appGuid
 	onConnect()
 
