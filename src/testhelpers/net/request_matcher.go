@@ -36,6 +36,7 @@ func bytesToInterface(jsonBytes []byte) (interface{}, error) {
 
 func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 	return func(request *http.Request) {
+		defer GinkgoRecover()
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			Fail(fmt.Sprintf("Error reading request body: %s", err))
@@ -58,6 +59,7 @@ func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 
 func RequestBodyMatcherWithContentType(expectedBody, expectedContentType string) RequestMatcher {
 	return func(request *http.Request) {
+		defer GinkgoRecover()
 		bodyBytes, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			Fail(fmt.Sprintf("Error reading request body: %s", err))
