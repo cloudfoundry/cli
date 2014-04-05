@@ -135,7 +135,7 @@ func (repo CloudControllerServiceRepository) CreateServiceInstance(name, planGui
 		serviceInstance, findInstanceErr := repo.FindInstanceByName(name)
 
 		if findInstanceErr == nil && serviceInstance.ServicePlan.Guid == planGuid {
-			return errors.NewServiceInstanceAlreadyExistsError(name)
+			return errors.NewModelAlreadyExistsError("Service", name)
 		}
 	}
 

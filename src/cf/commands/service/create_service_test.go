@@ -83,7 +83,7 @@ var _ = Describe("create-service command", func() {
 	})
 
 	It("warns the user when the service already exists with the same service plan", func() {
-		serviceRepo.CreateServiceInstanceReturns.Error = errors.NewServiceInstanceAlreadyExistsError("my-cleardb-service")
+		serviceRepo.CreateServiceInstanceReturns.Error = errors.NewModelAlreadyExistsError("Service", "my-cleardb-service")
 
 		callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
@@ -100,7 +100,7 @@ var _ = Describe("create-service command", func() {
 		It("finds the plan even if it has to search multiple services", func() {
 			offering2.Label = "cleardb"
 
-			serviceRepo.CreateServiceInstanceReturns.Error = errors.NewServiceInstanceAlreadyExistsError("my-cleardb-service")
+			serviceRepo.CreateServiceInstanceReturns.Error = errors.NewModelAlreadyExistsError("Service", "my-cleardb-service")
 			callCreateService([]string{"cleardb", "spark", "my-cleardb-service"})
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
