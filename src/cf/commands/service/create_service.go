@@ -60,7 +60,7 @@ func (cmd CreateService) Run(c *cli.Context) {
 	switch err.(type) {
 	case nil:
 		cmd.ui.Ok()
-	case *errors.ServiceInstanceAlreadyExistsError:
+	case *errors.ModelAlreadyExistsError:
 		cmd.ui.Ok()
 		cmd.ui.Warn(err.Error())
 	default:

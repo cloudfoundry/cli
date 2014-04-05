@@ -115,12 +115,10 @@ var _ = Describe("Services Repo", func() {
 			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
 			defer testServer.Close()
 
-			apiErr := repo.CreateServiceInstance("my-service", "plan-guid")
+			err := repo.CreateServiceInstance("my-service", "plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-
-			_, ok := apiErr.(*errors.ServiceInstanceAlreadyExistsError)
-			Expect(ok).To(BeTrue())
+			Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 		})
 
 		It("fails when a different service instance with the same name already exists", func() {
@@ -136,11 +134,11 @@ var _ = Describe("Services Repo", func() {
 			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
 			defer testServer.Close()
 
-			apiErr := repo.CreateServiceInstance("my-service", "different-plan-guid")
+			err := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
 			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			_, ok := apiErr.(*errors.ServiceInstanceAlreadyExistsError)
-			Expect(ok).To(BeFalse())
+			Expect(err).To(HaveOccurred())
+			Expect(err).NotTo(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
 		})
 	})
 
