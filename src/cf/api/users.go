@@ -10,6 +10,8 @@ import (
 	"net/http"
 	neturl "net/url"
 	"strings"
+	"encoding/json"
+	"bytes"
 )
 
 var orgRoleToPathMap = map[string]string{
@@ -138,25 +140,14 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 	}
 
 	path := fmt.Sprintf("%s/Users", uaaEndpoint)
-	body := fmt.Sprintf(`{
-  "userName": "%s",
-  "emails": [{"value":"%s"}],
-  "password": "%s",
-  "name": {"givenName":"%s", "familyName":"%s"}
-}`,
-		username,
-		username,
-		password,
-		username,
-		username,
-	)
+	body, err := json.Marshal(resources.NewUAAUserResource(username, password))
 
-	type uaaUserFields struct {
-		Id string
+	if err != nil {
+		return
 	}
-	createUserResponse := &uaaUserFields{}
 
-	err = repo.uaaGateway.CreateResource(path, strings.NewReader(body), createUserResponse)
+	createUserResponse := &resources.UAAUserFields{}
+	err = repo.uaaGateway.CreateResource(path, bytes.NewReader(body), createUserResponse)
 	switch httpErr := err.(type) {
 	case nil:
 	case errors.HttpError:
@@ -169,8 +160,15 @@ func (repo CloudControllerUserRepository) Create(username, password string) (err
 	}
 
 	path = fmt.Sprintf("%s/v2/users", repo.config.ApiEndpoint())
-	body = fmt.Sprintf(`{"guid":"%s"}`, createUserResponse.Id)
-	return repo.ccGateway.CreateResource(path, strings.NewReader(body))
+	body, err = json.Marshal(resources.Metadata{
+		Guid: createUserResponse.Id,
+	})
+
+	if err != nil {
+		return
+	}
+
+	return repo.ccGateway.CreateResource(path, bytes.NewReader(body))
 }
 
 func (repo CloudControllerUserRepository) Delete(userGuid string) (apiErr error) {
