@@ -15,6 +15,7 @@ var DefaultIgnoreFiles = []string{
 	".cfignore",
 	".gitignore",
 	".git",
+	".hg",
 	".svn",
 	"_darcs",
 	".DS_Store",
