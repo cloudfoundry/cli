@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package api_test
 
 import (
@@ -45,176 +20,171 @@ import (
 )
 
 var _ = Describe("Services Repo", func() {
-	It("gets all public service offerings", func() {
-		config := testconfig.NewRepository()
-		config.SetAccessToken("BEARER my_access_token")
+	var (
+		testServer  *httptest.Server
+		testHandler *testnet.TestHandler
+		configRepo  configuration.ReadWriter
+		repo        ServiceRepository
+	)
 
-		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/services?inline-relations-depth=1",
-				Response: multipleOfferingsResponse,
-			}),
-		}, config)
-		defer testServer.Close()
+	setupTestServer := func(reqs ...testnet.TestRequest) {
+		testServer, testHandler = testnet.NewServer(reqs)
+		configRepo.SetApiEndpoint(testServer.URL)
+	}
 
-		offerings, apiErr := repo.GetAllServiceOfferings()
+	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		configRepo.SetAccessToken("BEARER my_access_token")
 
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
-		expectMultipleServiceOfferings(offerings)
+		gateway := net.NewCloudControllerGateway(configRepo)
+		repo = NewCloudControllerServiceRepository(configRepo, gateway)
 	})
 
-	It("gets all public service offerings multipage", func() {
-		config := testconfig.NewRepository()
-		config.SetAccessToken("BEARER my_access_token")
-
-		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/services?inline-relations-depth=1",
-				Response: firstOfferingsResponse,
-			}),
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/services?inline-relations-depth=1",
-				Response: multipleOfferingsResponse,
-			}),
-		}, config)
-		defer testServer.Close()
-
-		offerings, apiErr := repo.GetAllServiceOfferings()
-
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(len(offerings)).To(Equal(3))
-
-		firstOffering := offerings[0]
-		Expect(firstOffering.Label).To(Equal("first-Offering 1"))
-		Expect(firstOffering.Version).To(Equal("1.0"))
-		Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
-		Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
-		Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+	AfterEach(func() {
+		testServer.Close()
 	})
 
-	It("gets all service offerings in a given space", func() {
-		config := testconfig.NewRepository()
-		config.SetAccessToken("BEARER my_access_token")
+	Describe("GetAllServiceOfferings", func() {
+		BeforeEach(func() {
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/services?inline-relations-depth=1",
+					Response: firstOfferingsResponse,
+				}),
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/services?inline-relations-depth=1",
+					Response: multipleOfferingsResponse,
+				}),
+			)
+		})
 
-		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-				Response: multipleOfferingsResponse,
-			}),
-		}, config)
-		defer testServer.Close()
+		It("gets all public service offerings", func() {
+			offerings, err := repo.GetAllServiceOfferings()
 
-		offerings, apiErr := repo.GetServiceOfferingsForSpace("my-space-guid")
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(len(offerings)).To(Equal(3))
 
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
-		expectMultipleServiceOfferings(offerings)
+			firstOffering := offerings[0]
+			Expect(firstOffering.Label).To(Equal("first-Offering 1"))
+			Expect(firstOffering.Version).To(Equal("1.0"))
+			Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
+			Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
+			Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+		})
 	})
 
-	It("gets all service offerings in a given space multipage", func() {
-		config := testconfig.NewRepository()
-		config.SetAccessToken("BEARER my_access_token")
+	Describe("GetServiceOfferingsForSpace", func() {
+		It("gets all service offerings in a given space", func() {
+			setupTestServer(
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+					Response: firstOfferingsForSpaceResponse,
+				}),
+				testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+					Response: multipleOfferingsResponse,
+				}))
 
-		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-				Response: firstOfferingsForSpaceResponse,
-			}),
-			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:   "GET",
-				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
-				Response: multipleOfferingsResponse,
-			}),
-		}, config)
-		defer testServer.Close()
+			offerings, err := repo.GetServiceOfferingsForSpace("my-space-guid")
 
-		offerings, apiErr := repo.GetServiceOfferingsForSpace("my-space-guid")
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
 
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(len(offerings)).To(Equal(3))
+			Expect(len(offerings)).To(Equal(3))
 
-		firstOffering := offerings[0]
-		Expect(firstOffering.Label).To(Equal("first-Offering 1"))
-		Expect(firstOffering.Version).To(Equal("1.0"))
-		Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
-		Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
-		Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+			firstOffering := offerings[0]
+			Expect(firstOffering.Label).To(Equal("first-Offering 1"))
+			Expect(firstOffering.Version).To(Equal("1.0"))
+			Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
+			Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
+			Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+			Expect(len(firstOffering.Plans)).To(Equal(2))
+
+			secondOffering := offerings[1]
+			Expect(secondOffering.Label).To(Equal("Offering 1"))
+			Expect(secondOffering.Version).To(Equal("1.0"))
+			Expect(secondOffering.Description).To(Equal("Offering 1 description"))
+			Expect(secondOffering.Provider).To(Equal("Offering 1 provider"))
+			Expect(secondOffering.Guid).To(Equal("offering-1-guid"))
+			Expect(len(secondOffering.Plans)).To(Equal(2))
+		})
 	})
 
 	Describe("creating a service instance", func() {
 		It("makes the right request", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "POST",
 				Path:     "/v2/service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"name":"instance-name","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
 				Response: testnet.TestResponse{Status: http.StatusCreated},
+			}))
+
+			err := repo.CreateServiceInstance("instance-name", "plan-guid")
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		Context("when the name is taken but an identical service exists", func() {
+			BeforeEach(func() {
+				setupTestServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:  "POST",
+						Path:    "/v2/service_instances",
+						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
+						Response: testnet.TestResponse{
+							Status: http.StatusBadRequest,
+							Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+						}}),
+					findServiceInstanceReq,
+					serviceOfferingReq)
 			})
 
-			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer testServer.Close()
-
-			apiErr := repo.CreateServiceInstance("instance-name", "plan-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			It("returns a ModelAlreadyExistsError if the plan is the same", func() {
+				err := repo.CreateServiceInstance("my-service", "plan-guid")
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
+			})
 		})
 
-		It("returns a successful response when an identical service instance already exists", func() {
-			errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:  "POST",
-				Path:    "/v2/service_instances",
-				Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"plan-guid","space_guid":"my-space-guid","async":true}`),
-				Response: testnet.TestResponse{
-					Status: http.StatusBadRequest,
-					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-				}})
+		Context("when the name is taken and no identical service instance exists", func() {
+			BeforeEach(func() {
+				setupTestServer(
+					testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+						Method:  "POST",
+						Path:    "/v2/service_instances",
+						Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
+						Response: testnet.TestResponse{
+							Status: http.StatusBadRequest,
+							Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
+						}}),
+					findServiceInstanceReq,
+					serviceOfferingReq)
+			})
 
-			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
-			defer testServer.Close()
+			It("fails if the plan is different", func() {
+				err := repo.CreateServiceInstance("my-service", "different-plan-guid")
 
-			err := repo.CreateServiceInstance("my-service", "plan-guid")
-
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(err).To(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
-		})
-
-		It("fails when a different service instance with the same name already exists", func() {
-			errorReq := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method:  "POST",
-				Path:    "/v2/service_instances",
-				Matcher: testnet.RequestBodyMatcher(`{"name":"my-service","service_plan_guid":"different-plan-guid","space_guid":"my-space-guid","async":true}`),
-				Response: testnet.TestResponse{
-					Status: http.StatusBadRequest,
-					Body:   `{"code":60002,"description":"The service instance name is taken: my-service"}`,
-				}})
-
-			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{errorReq, findServiceInstanceReq, serviceOfferingReq})
-			defer testServer.Close()
-
-			err := repo.CreateServiceInstance("my-service", "different-plan-guid")
-
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(err).To(HaveOccurred())
-			Expect(err).NotTo(BeAssignableToTypeOf(&errors.ModelAlreadyExistsError{}))
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(400, "", "")))
+			})
 		})
 	})
 
 	Describe("finding service instances by name", func() {
 		It("returns the service instance", func() {
-			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{findServiceInstanceReq, serviceOfferingReq})
-			defer testServer.Close()
+			setupTestServer(findServiceInstanceReq, serviceOfferingReq)
 
-			instance, apiErr := repo.FindInstanceByName("my-service")
+			instance, err := repo.FindInstanceByName("my-service")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal("mysql"))
@@ -230,13 +200,49 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("returns user provided services", func() {
-			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{findUserProvidedServiceInstanceReq})
-			defer testServer.Close()
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method: "GET",
+				Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
+				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
+				{
+					"resources": [
+						{
+						  "metadata": {
+							"guid": "my-service-instance-guid"
+						  },
+						  "entity": {
+							"name": "my-service",
+							"service_bindings": [
+							  {
+								"metadata": {
+								  "guid": "service-binding-1-guid",
+								  "url": "/v2/service_bindings/service-binding-1-guid"
+								},
+								"entity": {
+								  "app_guid": "app-1-guid"
+								}
+							  },
+							  {
+								"metadata": {
+								  "guid": "service-binding-2-guid",
+								  "url": "/v2/service_bindings/service-binding-2-guid"
+								},
+								"entity": {
+								  "app_guid": "app-2-guid"
+								}
+							  }
+							],
+							"service_plan_guid": null
+						  }
+						}
+					]
+				}`}}))
 
-			instance, apiErr := repo.FindInstanceByName("my-service")
+			instance, err := repo.FindInstanceByName("my-service")
 
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(instance.Name).To(Equal("my-service"))
 			Expect(instance.Guid).To(Equal("my-service-instance-guid"))
 			Expect(instance.ServiceOffering.Label).To(Equal(""))
@@ -250,172 +256,201 @@ var _ = Describe("Services Repo", func() {
 		})
 
 		It("it returns a failure response when the instance doesn't exist", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+			}))
+
+			_, err := repo.FindInstanceByName("my-service")
+
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+		})
+	})
+
+	Describe("DeleteService", func() {
+		It("it deletes the service when no apps are bound", func() {
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "DELETE",
+				Path:     "/v2/service_instances/my-service-instance-guid",
+				Response: testnet.TestResponse{Status: http.StatusOK},
+			}))
+
+			serviceInstance := models.ServiceInstance{}
+			serviceInstance.Guid = "my-service-instance-guid"
+
+			err := repo.DeleteService(serviceInstance)
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("doesn't delete the service when apps are bound", func() {
+			setupTestServer()
+
+			serviceInstance := models.ServiceInstance{}
+			serviceInstance.Guid = "my-service-instance-guid"
+			serviceInstance.ServiceBindings = []models.ServiceBindingFields{
+				{
+					Url:     "/v2/service_bindings/service-binding-1-guid",
+					AppGuid: "app-1-guid",
+				},
+				{
+					Url:     "/v2/service_bindings/service-binding-2-guid",
+					AppGuid: "app-2-guid",
+				},
+			}
+
+			err := repo.DeleteService(serviceInstance)
+			Expect(err.Error()).To(Equal("Cannot delete service instance, apps are still bound to it"))
+		})
+	})
+
+	Describe("RenameService", func() {
+		Context("when the service is not user provided", func() {
+
+			BeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/service_instances/my-service-instance-guid",
+					Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
+					Response: testnet.TestResponse{Status: http.StatusCreated},
+				}))
 			})
 
-			testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer testServer.Close()
+			It("renames the service", func() {
+				serviceInstance := models.ServiceInstance{}
+				serviceInstance.Guid = "my-service-instance-guid"
+				serviceInstance.ServicePlan = models.ServicePlanFields{
+					Guid: "some-plan-guid",
+				}
 
-			_, apiErr := repo.FindInstanceByName("my-service")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+				err := repo.RenameService(serviceInstance, "new-name")
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
 
-			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+		Context("when the service is user provided", func() {
+			BeforeEach(func() {
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "PUT",
+					Path:     "/v2/user_provided_service_instances/my-service-instance-guid",
+					Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
+					Response: testnet.TestResponse{Status: http.StatusCreated},
+				}))
+			})
+
+			It("renames the service", func() {
+				serviceInstance := models.ServiceInstance{}
+				serviceInstance.Guid = "my-service-instance-guid"
+
+				err := repo.RenameService(serviceInstance, "new-name")
+				Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
 	})
 
-	It("TestDeleteServiceWithoutServiceBindings", func() {
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method:   "DELETE",
-			Path:     "/v2/service_instances/my-service-instance-guid",
-			Response: testnet.TestResponse{Status: http.StatusOK},
+	Describe("FindServiceOfferingByLabelAndProvider", func() {
+		Context("when the service offering can be found", func() {
+			BeforeEach(func() {
+				setupTestServer(testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `
+						{
+							"next_url": null,
+							"resources": [
+								{
+								  "metadata": {
+									"guid": "offering-1-guid"
+								  },
+								  "entity": {
+									"label": "offering-1",
+									"provider": "provider-1",
+									"description": "offering 1 description",
+									"version" : "1.0",
+									"service_plans": []
+								  }
+								}
+							]
+						}`}})
+			})
+
+			It("finds service offerings by label and provider", func() {
+				offering, err := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+				Expect(offering.Guid).To(Equal("offering-1-guid"))
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
-		testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-		defer testServer.Close()
 
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "my-service-instance-guid"
-		apiErr := repo.DeleteService(serviceInstance)
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
-		Expect(apiErr).NotTo(HaveOccurred())
+		Context("when the service offering cannot be found", func() {
+			BeforeEach(func() {
+				setupTestServer(testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `
+						{
+							"next_url": null,
+							"resources": []
+						}`,
+					},
+				})
+			})
+			It("returns a ModelNotFoundError", func() {
+				offering, err := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+				Expect(offering.Guid).To(Equal(""))
+			})
+		})
+
+		It("handles api errors when finding service offerings", func() {
+			setupTestServer(testnet.TestRequest{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
+				Response: testnet.TestResponse{
+					Status: 400,
+					Body: `
+					{
+            			"code": 10005,
+            			"description": "The query parameter is invalid"
+					}`}})
+
+			_, err := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
+			Expect(err).To(HaveOccurred())
+			Expect(err.(errors.HttpError).ErrorCode()).To(Equal("10005"))
+		})
 	})
 
-	It("TestDeleteServiceWithServiceBindings", func() {
-		testServer, _, repo := createServiceRepo([]testnet.TestRequest{})
-		defer testServer.Close()
+	Describe("PurgeServiceOffering", func() {
+		It("purges service offerings", func() {
+			setupTestServer(testnet.TestRequest{
+				Method: "DELETE",
+				Path:   "/v2/services/the-service-guid?purge=true",
+				Response: testnet.TestResponse{
+					Status: 204,
+				}})
 
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "my-service-instance-guid"
+			offering := maker.NewServiceOffering("the-offering")
+			offering.Guid = "the-service-guid"
 
-		binding := models.ServiceBindingFields{}
-		binding.Url = "/v2/service_bindings/service-binding-1-guid"
-		binding.AppGuid = "app-1-guid"
-
-		binding2 := models.ServiceBindingFields{}
-		binding2.Url = "/v2/service_bindings/service-binding-2-guid"
-		binding2.AppGuid = "app-2-guid"
-
-		serviceInstance.ServiceBindings = []models.ServiceBindingFields{binding, binding2}
-
-		apiErr := repo.DeleteService(serviceInstance)
-		Expect(apiErr).NotTo(BeNil())
-		Expect(apiErr.Error()).To(Equal("Cannot delete service instance, apps are still bound to it"))
-	})
-
-	It("TestRenameService", func() {
-		path := "/v2/service_instances/my-service-instance-guid"
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "my-service-instance-guid"
-
-		plan := models.ServicePlanFields{}
-		plan.Guid = "some-plan-guid"
-		serviceInstance.ServicePlan = plan
-
-		testRenameService(path, serviceInstance)
-	})
-
-	It("TestRenameServiceWhenServiceIsUserProvided", func() {
-		path := "/v2/user_provided_service_instances/my-service-instance-guid"
-		serviceInstance := models.ServiceInstance{}
-		serviceInstance.Guid = "my-service-instance-guid"
-		testRenameService(path, serviceInstance)
-	})
-
-	It("finds service offerings by label and provider", func() {
-		testServer, _, repo := createServiceRepo([]testnet.TestRequest{{
-			Method: "GET",
-			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
-			Response: testnet.TestResponse{
-				Status: 200,
-				Body: `{
-            "next_url": null,
-            "resources": [
-                {
-                  "metadata": {
-                    "guid": "offering-1-guid"
-                  },
-                  "entity": {
-                    "label": "offering-1",
-                    "provider": "provider-1",
-                    "description": "offering 1 description",
-                    "version" : "1.0",
-                    "service_plans": []
-                  }
-                }
-            ]
-        }`,
-			},
-		}})
-		defer testServer.Close()
-
-		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(offering.Guid).To(Equal("offering-1-guid"))
-		Expect(apiErr).NotTo(HaveOccurred())
-	})
-
-	It("returns an error if the offering cannot be found", func() {
-		testServer, _, repo := createServiceRepo([]testnet.TestRequest{{
-			Method: "GET",
-			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
-			Response: testnet.TestResponse{
-				Status: 200,
-				Body: `{
-            "next_url": null,
-            "resources": []
-        }`,
-			},
-		}})
-		defer testServer.Close()
-
-		offering, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
-		Expect(offering.Guid).To(Equal(""))
-	})
-
-	It("handles api errors when finding service offerings", func() {
-		testServer, _, repo := createServiceRepo([]testnet.TestRequest{{
-			Method: "GET",
-			Path:   fmt.Sprintf("/v2/services?q=%s", url.QueryEscape("label:offering-1;provider:provider-1")),
-			Response: testnet.TestResponse{
-				Status: 400,
-				Body: `{
-            "code": 10005,
-            "description": "The query parameter is invalid"
-        }`,
-			},
-		}})
-		defer testServer.Close()
-
-		_, apiErr := repo.FindServiceOfferingByLabelAndProvider("offering-1", "provider-1")
-		Expect(apiErr).To(HaveOccurred())
-		Expect(apiErr.(errors.HttpError).ErrorCode()).To(Equal("10005"))
-	})
-
-	It("purges service offerings", func() {
-		testServer, handler, repo := createServiceRepo([]testnet.TestRequest{{
-			Method: "DELETE",
-			Path:   "/v2/services/the-service-guid?purge=true",
-			Response: testnet.TestResponse{
-				Status: 204,
-			},
-		}})
-		defer testServer.Close()
-
-		offering := maker.NewServiceOffering("the-offering")
-		offering.Guid = "the-service-guid"
-
-		apiErr := repo.PurgeServiceOffering(offering)
-		Expect(apiErr).NotTo(HaveOccurred())
-		Expect(handler).To(testnet.HaveAllRequestsCalled())
+			err := repo.PurgeServiceOffering(offering)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+		})
 	})
 
 	Describe("getting the count of service instances for a service plan", func() {
 		var planGuid = "abc123"
 
 		It("returns the number of service instances", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method: "GET",
 				Path:   fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -447,34 +482,37 @@ var _ = Describe("Services Repo", func() {
                       ]
                     }
                 `},
-			})
-			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer testServer.Close()
+			}))
 
-			count, apiErr := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			count, err := repo.GetServiceInstanceCountForServicePlan(planGuid)
 			Expect(count).To(Equal(9))
-			Expect(apiErr).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("returns the API error when one occurs", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "GET",
 				Path:     fmt.Sprintf("/v2/service_plans/%s/service_instances?results-per-page=1", planGuid),
 				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
-			})
-			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer testServer.Close()
+			}))
 
-			_, apiErr := repo.GetServiceInstanceCountForServicePlan(planGuid)
-
-			Expect(apiErr).To(HaveOccurred())
+			_, err := repo.GetServiceInstanceCountForServicePlan(planGuid)
+			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe("finding a service plan", func() {
-		Context("when we find a matching plan", func() {
-			It("returns the plan guid for a v1 plan", func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+		var planDescription resources.ServicePlanDescription
+
+		Context("when the service is a v1 service", func() {
+			BeforeEach(func() {
+				planDescription = resources.ServicePlanDescription{
+					ServiceLabel:    "v1-elephantsql",
+					ServicePlanName: "v1-panda",
+					ServiceProvider: "v1-elephantsql",
+				}
+
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v1-elephantsql;provider:v1-elephantsql")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -502,25 +540,25 @@ var _ = Describe("Services Repo", func() {
                               }
                             }
                           ]
-                        }`}})
-
-				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer testServer.Close()
-
-				v1 := resources.ServicePlanDescription{
-					ServiceLabel:    "v1-elephantsql",
-					ServicePlanName: "v1-panda",
-					ServiceProvider: "v1-elephantsql",
-				}
-
-				v1Guid, apiErr := repo.FindServicePlanByDescription(v1)
-
-				Expect(v1Guid).To(Equal("offering-1-plan-2-guid"))
-				Expect(apiErr).NotTo(HaveOccurred())
+                        }`}}))
 			})
 
-			It("returns the plan guid for a v2 plan", func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			It("returns the plan guid for a v1 plan", func() {
+				guid, err := repo.FindServicePlanByDescription(planDescription)
+
+				Expect(guid).To(Equal("offering-1-plan-2-guid"))
+				Expect(err).NotTo(HaveOccurred())
+			})
+		})
+
+		Context("when the service is a v2 service", func() {
+			BeforeEach(func() {
+				planDescription = resources.ServicePlanDescription{
+					ServiceLabel:    "v2-elephantsql",
+					ServicePlanName: "v2-panda",
+				}
+
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-elephantsql;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -548,52 +586,46 @@ var _ = Describe("Services Repo", func() {
                               }
                             }
                           ]
-                        }`}})
+                        }`}}))
+			})
 
-				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer testServer.Close()
-
-				v2 := resources.ServicePlanDescription{
-					ServiceLabel:    "v2-elephantsql",
-					ServicePlanName: "v2-panda",
-				}
-
-				v2Guid, apiErr := repo.FindServicePlanByDescription(v2)
-
-				Expect(apiErr).NotTo(HaveOccurred())
-				Expect(v2Guid).To(Equal("offering-1-plan-2-guid"))
+			It("returns the plan guid for a v2 plan", func() {
+				guid, err := repo.FindServicePlanByDescription(planDescription)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(guid).To(Equal("offering-1-plan-2-guid"))
 			})
 		})
 
 		Context("when no service matches the description", func() {
-			It("returns an apiErr error", func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
-					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
-				})
-
-				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer testServer.Close()
-
-				v2 := resources.ServicePlanDescription{
+			BeforeEach(func() {
+				planDescription = resources.ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
 
-				_, apiErr := repo.FindServicePlanByDescription(v2)
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method:   "GET",
+					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
+					Response: testnet.TestResponse{Status: http.StatusOK, Body: `{ "resources": [] }`},
+				}))
+			})
 
-				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
-				Expect(apiErr.Error()).To(ContainSubstring("Plan"))
-				Expect(apiErr.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiErr.Error()).To(ContainSubstring("not found"))
+			It("returns an error", func() {
+				_, err := repo.FindServicePlanByDescription(planDescription)
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+				Expect(err.Error()).To(ContainSubstring("Plan"))
+				Expect(err.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
 			})
 		})
 
 		Context("when the described service has no matching plan", func() {
-			It("returns apiErr error", func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			BeforeEach(func() {
+				planDescription = resources.ServicePlanDescription{
+					ServiceLabel:    "v2-service-label",
+					ServicePlanName: "v2-plan-name",
+				}
+
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
 					Response: testnet.TestResponse{Status: http.StatusOK, Body: `
@@ -621,203 +653,158 @@ var _ = Describe("Services Repo", func() {
                               }
                             }
                           ]
-                        }`}})
+                        }`}}))
+			})
 
-				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer testServer.Close()
+			It("returns a ModelNotFoundError", func() {
+				_, err := repo.FindServicePlanByDescription(planDescription)
 
-				v2 := resources.ServicePlanDescription{
-					ServiceLabel:    "v2-service-label",
-					ServicePlanName: "v2-plan-name",
-				}
-
-				_, apiErr := repo.FindServicePlanByDescription(v2)
-
-				Expect(apiErr).To(HaveOccurred())
-				Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
-				Expect(apiErr.Error()).To(ContainSubstring("Plan"))
-				Expect(apiErr.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
-				Expect(apiErr.Error()).To(ContainSubstring("not found"))
+				Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
+				Expect(err.Error()).To(ContainSubstring("Plan"))
+				Expect(err.Error()).To(ContainSubstring("v2-service-label v2-plan-name"))
 			})
 		})
 
 		Context("when we get an HTTP error", func() {
-			It("returns that apiErr error", func() {
-				req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-					Method:   "GET",
-					Path:     fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
-					Response: testnet.TestResponse{Status: http.StatusInternalServerError}})
-
-				testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-				defer testServer.Close()
-
-				v2 := resources.ServicePlanDescription{
+			BeforeEach(func() {
+				planDescription = resources.ServicePlanDescription{
 					ServiceLabel:    "v2-service-label",
 					ServicePlanName: "v2-plan-name",
 				}
 
-				_, apiErr := repo.FindServicePlanByDescription(v2)
+				setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/services?inline-relations-depth=1&q=%s", url.QueryEscape("label:v2-service-label;provider:")),
+					Response: testnet.TestResponse{
+						Status: http.StatusInternalServerError,
+					}}))
+			})
 
-				Expect(apiErr).To(HaveOccurred())
-				_, ok := apiErr.(errors.HttpError)
-				Expect(ok).To(BeTrue())
+			It("returns an error", func() {
+				_, err := repo.FindServicePlanByDescription(planDescription)
+
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(500, "", "")))
 			})
 		})
 	})
 
 	Describe("migrating service plans", func() {
 		It("makes a request to CC to migrate the instances from v1 to v2", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_plans/v1-guid/service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"v2-guid"}`),
 				Response: testnet.TestResponse{Status: http.StatusOK, Body: `{"changed_count":3}`},
 			})
 
-			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer testServer.Close()
-
-			changedCount, apiErr := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
-			Expect(apiErr).NotTo(HaveOccurred())
+			changedCount, err := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			Expect(err).NotTo(HaveOccurred())
 			Expect(changedCount).To(Equal(3))
 		})
 
 		It("returns an error when migrating fails", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+			setupTestServer(testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 				Method:   "PUT",
 				Path:     "/v2/service_plans/v1-guid/service_instances",
 				Matcher:  testnet.RequestBodyMatcher(`{"service_plan_guid":"v2-guid"}`),
 				Response: testnet.TestResponse{Status: http.StatusInternalServerError},
-			})
+			}))
 
-			testServer, _, repo := createServiceRepo([]testnet.TestRequest{req})
-			defer testServer.Close()
-
-			_, apiErr := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
-			Expect(apiErr).To(HaveOccurred())
+			_, err := repo.MigrateServicePlanFromV1ToV2("v1-guid", "v2-guid")
+			Expect(err).To(HaveOccurred())
 		})
 	})
 
 	Describe("FindServiceOfferingsForSpaceByLabel", func() {
 		It("finds service offerings within a space by label", func() {
-			_, _, repo := createServiceRepo([]testnet.TestRequest{{
-				Method: "GET",
-				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
-				Response: testnet.TestResponse{
-					Status: 200,
-					Body: `{
-            "next_url": null,
-            "resources": [
-                {
-                  "metadata": {
-                    "guid": "offering-1-guid"
-                  },
-                  "entity": {
-                    "label": "offering-1",
-                    "provider": "provider-1",
-                    "description": "offering 1 description",
-                    "version" : "1.0",
-                    "service_plans": []
-                  }
-                }
-            ]
-        }`,
-				},
-			}})
-
-			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr).ToNot(HaveOccurred())
-			Expect(offerings).To(HaveLen(1))
-			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
-		})
-
-		It("finds service offerings within a space by label multipage", func() {
-			_, _, repo := createServiceRepo([]testnet.TestRequest{{
-				Method: "GET",
-				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
-				Response: testnet.TestResponse{
-					Status: 200,
-					Body: `{
-		            "next_url": "/v2/spaces/my-space-guid/services?q=label%3Aoffering-1&inline-relations-depth=1&page=2",
-		            "resources": [
-		                {
-		                	"metadata": {
-		                    	"guid": "offering-1-guid"
-		                  	},
-		                  	"entity": {
-		                    	"label": "offering-1",
-			                    "provider": "provider-1",
-			                    "description": "offering 1 description",
-			                    "version" : "1.0",
-			                    "service_plans": []
-			                  }
-		                }
-		            ]}`,
-				},
-			},
-				{
+			setupTestServer(
+				testnet.TestRequest{
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
 					Response: testnet.TestResponse{
 						Status: 200,
-						Body: `{
-		            "next_url": null,
-		            "resources": [
-		                {
-		                	"metadata": {
-		                    	"guid": "offering-2-guid"
-		                  	},
-		                  	"entity": {
-			                    "label": "offering-2",
-			                    "provider": "provider-2",
-			                    "description": "offering 2 description",
-			                    "version" : "1.0",
-			                    "service_plans": []
-		                  	}
-		                }
-		            ]}`,
-					},
-				}})
+						Body: `
+						{
+							"next_url": "/v2/spaces/my-space-guid/services?q=label%3Aoffering-1&inline-relations-depth=1&page=2",
+							"resources": [
+								{
+									"metadata": {
+										"guid": "offering-1-guid"
+									},
+									"entity": {
+										"label": "offering-1",
+										"provider": "provider-1",
+										"description": "offering 1 description",
+										"version" : "1.0",
+										"service_plans": []
+									  }
+								}
+							]
+						}`}},
+				testnet.TestRequest{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `
+						{
+							"next_url": null,
+							"resources": [
+								{
+									"metadata": {
+										"guid": "offering-2-guid"
+									},
+									"entity": {
+										"label": "offering-2",
+										"provider": "provider-2",
+										"description": "offering 2 description",
+										"version" : "1.0",
+										"service_plans": []
+									}
+								}
+							]
+						}`}})
 
-			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr).ToNot(HaveOccurred())
+			offerings, err := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(offerings).To(HaveLen(2))
 			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
 		})
 
 		It("returns an error if the offering cannot be found", func() {
-			_, _, repo := createServiceRepo([]testnet.TestRequest{{
+			setupTestServer(testnet.TestRequest{
 				Method: "GET",
 				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
 				Response: testnet.TestResponse{
-					Status: 200,
+					Status: http.StatusOK,
 					Body: `{
 						"next_url": null,
 						"resources": []
 					}`,
 				},
-			}})
+			})
 
-			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr.(*errors.ModelNotFoundError)).NotTo(BeNil())
+			offerings, err := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(err).To(BeAssignableToTypeOf(&errors.ModelNotFoundError{}))
 			Expect(offerings).To(HaveLen(0))
 		})
 
 		It("handles api errors when finding service offerings", func() {
-			_, _, repo := createServiceRepo([]testnet.TestRequest{{
+			setupTestServer(testnet.TestRequest{
 				Method: "GET",
 				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
 				Response: testnet.TestResponse{
-					Status: 400,
+					Status: http.StatusBadRequest,
 					Body: `{
 						"code": 9001,
 						"description": "Something Happened"
 					}`,
 				},
-			}})
+			})
 
-			_, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
-			Expect(apiErr.(errors.HttpError)).NotTo(BeNil())
+			_, err := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(err).To(BeAssignableToTypeOf(errors.NewHttpError(400, "", "")))
 		})
 
 		Describe("when api returns query by label is invalid", func() {
@@ -826,7 +813,7 @@ var _ = Describe("Services Repo", func() {
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:my-service-offering")),
 					Response: testnet.TestResponse{
-						Status: 400,
+						Status: http.StatusBadRequest,
 						Body:   `{"code": 10005,"description": "The query parameter is invalid"}`,
 					},
 				}
@@ -835,7 +822,7 @@ var _ = Describe("Services Repo", func() {
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?inline-relations-depth=1"),
 					Response: testnet.TestResponse{
-						Status: 200,
+						Status: http.StatusOK,
 						Body: `{
 							"next_url": "/v2/spaces/my-space-guid/services?page=2&inline-relations-depth=1",
 							"resources": [
@@ -860,7 +847,7 @@ var _ = Describe("Services Repo", func() {
 					Method: "GET",
 					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?inline-relations-depth=1"),
 					Response: testnet.TestResponse{
-						Status: 200,
+						Status: http.StatusOK,
 						Body: `{"next_url": null,
 									"resources": [
 										{
@@ -879,11 +866,10 @@ var _ = Describe("Services Repo", func() {
 					},
 				}
 
-				testServer, _, repo := createServiceRepo([]testnet.TestRequest{failedRequestByQueryLabel, firstPaginatedRequest, secondPaginatedRequest})
-				defer testServer.Close()
+				setupTestServer(failedRequestByQueryLabel, firstPaginatedRequest, secondPaginatedRequest)
 
-				serviceOfferings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "my-service-offering")
-				Expect(apiErr).NotTo(HaveOccurred())
+				serviceOfferings, err := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "my-service-offering")
+				Expect(err).NotTo(HaveOccurred())
 				Expect(len(serviceOfferings)).To(Equal(2))
 			})
 		})
@@ -989,27 +975,6 @@ var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body
 	]}`,
 }
 
-func expectMultipleServiceOfferings(offerings []models.ServiceOffering) {
-	Expect(len(offerings)).To(Equal(2))
-
-	firstOffering := offerings[0]
-	Expect(firstOffering.Label).To(Equal("Offering 1"))
-	Expect(firstOffering.Version).To(Equal("1.0"))
-	Expect(firstOffering.Description).To(Equal("Offering 1 description"))
-	Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
-	Expect(firstOffering.Guid).To(Equal("offering-1-guid"))
-	Expect(len(firstOffering.Plans)).To(Equal(2))
-
-	plan := firstOffering.Plans[0]
-	Expect(plan.Name).To(Equal("Offering 1 Plan 1"))
-	Expect(plan.Guid).To(Equal("offering-1-plan-1-guid"))
-
-	secondOffering := offerings[1]
-	Expect(secondOffering.Label).To(Equal("Offering 2"))
-	Expect(secondOffering.Guid).To(Equal("offering-2-guid"))
-	Expect(len(secondOffering.Plans)).To(Equal(1))
-}
-
 var serviceOfferingReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/services/the-service-guid",
@@ -1070,71 +1035,3 @@ var findServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestR
           }
         }
     ]}`}})
-
-var findUserProvidedServiceInstanceReq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-	Method: "GET",
-	Path:   "/v2/spaces/my-space-guid/service_instances?return_user_provided_service_instances=true&q=name%3Amy-service",
-	Response: testnet.TestResponse{Status: http.StatusOK, Body: `
-	{"resources": [
-        {
-          "metadata": {
-            "guid": "my-service-instance-guid"
-          },
-          "entity": {
-            "name": "my-service",
-            "service_bindings": [
-              {
-                "metadata": {
-                  "guid": "service-binding-1-guid",
-                  "url": "/v2/service_bindings/service-binding-1-guid"
-                },
-                "entity": {
-                  "app_guid": "app-1-guid"
-                }
-              },
-              {
-                "metadata": {
-                  "guid": "service-binding-2-guid",
-                  "url": "/v2/service_bindings/service-binding-2-guid"
-                },
-                "entity": {
-                  "app_guid": "app-2-guid"
-                }
-              }
-            ],
-            "service_plan_guid": null
-          }
-        }
-    ]}`}})
-
-func testRenameService(endpointPath string, serviceInstance models.ServiceInstance) {
-	req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-		Method:   "PUT",
-		Path:     endpointPath,
-		Matcher:  testnet.RequestBodyMatcher(`{"name":"new-name"}`),
-		Response: testnet.TestResponse{Status: http.StatusCreated},
-	})
-
-	testServer, handler, repo := createServiceRepo([]testnet.TestRequest{req})
-	defer testServer.Close()
-
-	apiErr := repo.RenameService(serviceInstance, "new-name")
-	Expect(handler).To(testnet.HaveAllRequestsCalled())
-	Expect(apiErr).NotTo(HaveOccurred())
-}
-
-func createServiceRepo(reqs []testnet.TestRequest) (testServer *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	config := testconfig.NewRepository()
-	config.SetAccessToken("BEARER my_access_token")
-	config.SetSpaceFields(models.SpaceFields{Guid: "my-space-guid"})
-	return createServiceRepoWithConfig(reqs, config)
-}
-
-func createServiceRepoWithConfig(reqs []testnet.TestRequest, config configuration.ReadWriter) (testServer *httptest.Server, handler *testnet.TestHandler, repo ServiceRepository) {
-	testServer, handler = testnet.NewServer(reqs)
-	config.SetApiEndpoint(testServer.URL)
-
-	gateway := net.NewCloudControllerGateway(config)
-	repo = NewCloudControllerServiceRepository(config, gateway)
-	return
-}
