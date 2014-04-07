@@ -65,6 +65,38 @@ var _ = Describe("Services Repo", func() {
 		expectMultipleServiceOfferings(offerings)
 	})
 
+	It("gets all public service offerings multipage", func() {
+		config := testconfig.NewRepository()
+		config.SetAccessToken("BEARER my_access_token")
+
+		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/services?inline-relations-depth=1",
+				Response: firstOfferingsResponse,
+			}),
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/services?inline-relations-depth=1",
+				Response: multipleOfferingsResponse,
+			}),
+		}, config)
+		defer testServer.Close()
+
+		offerings, apiErr := repo.GetAllServiceOfferings()
+
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+		Expect(len(offerings)).To(Equal(3))
+
+		firstOffering := offerings[0]
+		Expect(firstOffering.Label).To(Equal("first-Offering 1"))
+		Expect(firstOffering.Version).To(Equal("1.0"))
+		Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
+		Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
+		Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
+	})
+
 	It("gets all service offerings in a given space", func() {
 		config := testconfig.NewRepository()
 		config.SetAccessToken("BEARER my_access_token")
@@ -83,6 +115,38 @@ var _ = Describe("Services Repo", func() {
 		Expect(handler).To(testnet.HaveAllRequestsCalled())
 		Expect(apiErr).NotTo(HaveOccurred())
 		expectMultipleServiceOfferings(offerings)
+	})
+
+	It("gets all service offerings in a given space multipage", func() {
+		config := testconfig.NewRepository()
+		config.SetAccessToken("BEARER my_access_token")
+
+		testServer, handler, repo := createServiceRepoWithConfig([]testnet.TestRequest{
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+				Response: firstOfferingsForSpaceResponse,
+			}),
+			testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+				Method:   "GET",
+				Path:     "/v2/spaces/my-space-guid/services?inline-relations-depth=1",
+				Response: multipleOfferingsResponse,
+			}),
+		}, config)
+		defer testServer.Close()
+
+		offerings, apiErr := repo.GetServiceOfferingsForSpace("my-space-guid")
+
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+		Expect(len(offerings)).To(Equal(3))
+
+		firstOffering := offerings[0]
+		Expect(firstOffering.Label).To(Equal("first-Offering 1"))
+		Expect(firstOffering.Version).To(Equal("1.0"))
+		Expect(firstOffering.Description).To(Equal("first Offering 1 description"))
+		Expect(firstOffering.Provider).To(Equal("Offering 1 provider"))
+		Expect(firstOffering.Guid).To(Equal("first-offering-1-guid"))
 	})
 
 	Describe("creating a service instance", func() {
@@ -667,6 +731,60 @@ var _ = Describe("Services Repo", func() {
 			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
 		})
 
+		It("finds service offerings within a space by label multipage", func() {
+			_, _, repo := createServiceRepo([]testnet.TestRequest{{
+				Method: "GET",
+				Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
+				Response: testnet.TestResponse{
+					Status: 200,
+					Body: `{
+		            "next_url": "/v2/spaces/my-space-guid/services?q=label%3Aoffering-1&inline-relations-depth=1&page=2",
+		            "resources": [
+		                {
+		                	"metadata": {
+		                    	"guid": "offering-1-guid"
+		                  	},
+		                  	"entity": {
+		                    	"label": "offering-1",
+			                    "provider": "provider-1",
+			                    "description": "offering 1 description",
+			                    "version" : "1.0",
+			                    "service_plans": []
+			                  }
+		                }
+		            ]}`,
+				},
+			},
+				{
+					Method: "GET",
+					Path:   fmt.Sprintf("/v2/spaces/my-space-guid/services?q=%s&inline-relations-depth=1", url.QueryEscape("label:offering-1")),
+					Response: testnet.TestResponse{
+						Status: 200,
+						Body: `{
+		            "next_url": null,
+		            "resources": [
+		                {
+		                	"metadata": {
+		                    	"guid": "offering-2-guid"
+		                  	},
+		                  	"entity": {
+			                    "label": "offering-2",
+			                    "provider": "provider-2",
+			                    "description": "offering 2 description",
+			                    "version" : "1.0",
+			                    "service_plans": []
+		                  	}
+		                }
+		            ]}`,
+					},
+				}})
+
+			offerings, apiErr := repo.FindServiceOfferingsForSpaceByLabel("my-space-guid", "offering-1")
+			Expect(apiErr).ToNot(HaveOccurred())
+			Expect(offerings).To(HaveLen(2))
+			Expect(offerings[0].Guid).To(Equal("offering-1-guid"))
+		})
+
 		It("returns an error if the offering cannot be found", func() {
 			_, _, repo := createServiceRepo([]testnet.TestRequest{{
 				Method: "GET",
@@ -772,49 +890,104 @@ var _ = Describe("Services Repo", func() {
 	})
 })
 
+var firstOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/services?inline-relations-depth=1&page=2",
+	"resources": [
+	{
+		"metadata": {
+			"guid": "first-offering-1-guid"
+		},
+		"entity": {
+			"label": "first-Offering 1",
+			"provider": "Offering 1 provider",
+			"description": "first Offering 1 description",
+			"version" : "1.0",
+			"service_plans": [
+				{
+					"metadata": {"guid": "first-offering-1-plan-1-guid"},
+					"entity": {"name": "first Offering 1 Plan 1"}
+				},
+				{
+					"metadata": {"guid": "first-offering-1-plan-2-guid"},
+					"entity": {"name": "first Offering 1 Plan 2"}
+				}
+	        ]
+    	}
+	}
+  ]}`,
+}
+
+var firstOfferingsForSpaceResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
+{
+	"next_url": "/v2/spaces/my-space-guid/services?inline-relations-depth=1&page=2",
+	"resources": [
+		{
+			"metadata": {
+				"guid": "first-offering-1-guid"
+			},
+			"entity": {
+				"label": "first-Offering 1",
+				"provider": "Offering 1 provider",
+				"description": "first Offering 1 description",
+				"version" : "1.0",
+				"service_plans": [
+				{
+					"metadata": {"guid": "first-offering-1-plan-1-guid"},
+					"entity": {"name": "first Offering 1 Plan 1"}
+				},
+				{
+					"metadata": {"guid": "first-offering-1-plan-2-guid"},
+					"entity": {"name": "first Offering 1 Plan 2"}
+				}]
+			}
+	    }
+    ]}`,
+}
+
 var multipleOfferingsResponse = testnet.TestResponse{Status: http.StatusOK, Body: `
 {
-  "resources": [
-    {
-      "metadata": {
-        "guid": "offering-1-guid"
-      },
-      "entity": {
-        "label": "Offering 1",
-        "provider": "Offering 1 provider",
-        "description": "Offering 1 description",
-        "version" : "1.0",
-        "service_plans": [
-            {
-                "metadata": {"guid": "offering-1-plan-1-guid"},
-                "entity": {"name": "Offering 1 Plan 1"}
-            },
-            {
-                "metadata": {"guid": "offering-1-plan-2-guid"},
-                "entity": {"name": "Offering 1 Plan 2"}
-            }
-        ]
-      }
-    },
-    {
-      "metadata": {
-        "guid": "offering-2-guid"
-      },
-      "entity": {
-        "label": "Offering 2",
-        "provider": "Offering 2 provider",
-        "description": "Offering 2 description",
-        "version" : "1.5",
-        "service_plans": [
-            {
-                "metadata": {"guid": "offering-2-plan-1-guid"},
-                "entity": {"name": "Offering 2 Plan 1"}
-            }
-        ]
-      }
-    }
-  ]
-}`}
+	"resources": [
+		{
+	    	"metadata": {
+	        	"guid": "offering-1-guid"
+			},
+      		"entity": {
+		        "label": "Offering 1",
+		        "provider": "Offering 1 provider",
+		        "description": "Offering 1 description",
+		        "version" : "1.0",
+		        "service_plans": [
+		            {
+		                "metadata": {"guid": "offering-1-plan-1-guid"},
+		                "entity": {"name": "Offering 1 Plan 1"}
+		            },
+		            {
+		                "metadata": {"guid": "offering-1-plan-2-guid"},
+		                "entity": {"name": "Offering 1 Plan 2"}
+		            }
+		        ]
+			}
+	    },
+    	{
+      		"metadata": {
+        		"guid": "offering-2-guid"
+	      	},
+	      	"entity": {
+		        "label": "Offering 2",
+		        "provider": "Offering 2 provider",
+		        "description": "Offering 2 description",
+		        "version" : "1.5",
+		        "service_plans": [
+		            {
+		                "metadata": {"guid": "offering-2-plan-1-guid"},
+		                "entity": {"name": "Offering 2 Plan 1"}
+		            }
+	        	]
+	        }
+    	}
+	]}`,
+}
 
 func expectMultipleServiceOfferings(offerings []models.ServiceOffering) {
 	Expect(len(offerings)).To(Equal(2))
