@@ -22,17 +22,34 @@ const (
 	white   = 38
 )
 
-func Colorize(message string, color Color, bold bool) string {
-	if !OsSupportsColours || os.Getenv("CF_COLOR") == "false" || (!TerminalSupportsColours && os.Getenv("CF_COLOR") != "true") {
-		return message
-	}
+var (
+	colorize               func(message string, color Color, bold int) string
+	OsSupportsColors       = runtime.GOOS != "windows"
+	TerminalSupportsColors = terminal.IsTerminal(1)
+)
 
-	attr := 0
-	if bold {
-		attr = 1
-	}
+func init() {
+	ResetColorSupport()
+}
 
-	return fmt.Sprintf("\033[%d;%dm%s\033[0m", attr, color, message)
+func ResetColorSupport() {
+	if !OsSupportsColors || os.Getenv("CF_COLOR") == "false" || (!TerminalSupportsColors && os.Getenv("CF_COLOR") != "true") {
+		colorize = func(message string, _ Color, _ int) string {
+			return message
+		}
+	} else {
+		colorize = func(message string, color Color, bold int) string {
+			return fmt.Sprintf("\033[%d;%dm%s\033[0m", bold, color, message)
+		}
+	}
+}
+
+func Colorize(message string, color Color) string {
+	return colorize(message, color, 0)
+}
+
+func ColorizeBold(message string, color Color) string {
+	return colorize(message, color, 1)
 }
 
 func decolorize(message string) string {
@@ -44,65 +61,61 @@ func decolorize(message string) string {
 }
 
 func HeaderColor(message string) string {
-	return Colorize(message, white, true)
+	return ColorizeBold(message, white)
 }
 
 func CommandColor(message string) string {
-	return Colorize(message, yellow, true)
+	return ColorizeBold(message, yellow)
 }
 
 func StoppedColor(message string) string {
-	return Colorize(message, grey, true)
+	return ColorizeBold(message, grey)
 }
 
 func AdvisoryColor(message string) string {
-	return Colorize(message, yellow, true)
+	return ColorizeBold(message, yellow)
 }
 
 func CrashedColor(message string) string {
-	return Colorize(message, red, true)
+	return ColorizeBold(message, red)
 }
 
 func FailureColor(message string) string {
-	return Colorize(message, red, true)
+	return ColorizeBold(message, red)
 }
 
 func SuccessColor(message string) string {
-	return Colorize(message, green, true)
+	return ColorizeBold(message, green)
 }
 
 func EntityNameColor(message string) string {
-	return Colorize(message, cyan, true)
+	return ColorizeBold(message, cyan)
 }
 
 func PromptColor(message string) string {
-	return Colorize(message, cyan, true)
+	return ColorizeBold(message, cyan)
 }
 
 func TableContentHeaderColor(message string) string {
-	return Colorize(message, cyan, true)
+	return ColorizeBold(message, cyan)
 }
 
 func WarningColor(message string) string {
-	return Colorize(message, magenta, true)
+	return ColorizeBold(message, magenta)
 }
 
 func LogStdoutColor(message string) string {
-	return Colorize(message, white, false)
+	return Colorize(message, white)
 }
 
 func LogStderrColor(message string) string {
-	return Colorize(message, red, false)
+	return Colorize(message, red)
 }
 
 func LogAppHeaderColor(message string) string {
-	return Colorize(message, yellow, true)
+	return ColorizeBold(message, yellow)
 }
 
 func LogSysHeaderColor(message string) string {
-	return Colorize(message, cyan, true)
+	return ColorizeBold(message, cyan)
 }
-
-var OsSupportsColours = runtime.GOOS != "windows"
-
-var TerminalSupportsColours = terminal.IsTerminal(1)
