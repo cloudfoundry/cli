@@ -34,7 +34,7 @@ func (repo CloudControllerStackRepository) FindByName(name string) (stack models
 	}
 
 	if len(stacks) == 0 {
-		apiErr = errors.NewWithFmt("Stack '%s' not found", name)
+		apiErr = errors.NewModelNotFoundError("Stack", name)
 		return
 	}
 

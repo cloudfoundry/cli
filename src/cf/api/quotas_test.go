@@ -2,6 +2,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/configuration"
 	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
@@ -14,60 +15,56 @@ import (
 )
 
 var _ = Describe("CloudControllerQuotaRepository", func() {
-	Describe("FindByName", func() {
-		It("finds a Quota given a particular name", func() {
-			req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-				Method: "GET",
-				Path:   "/v2/quota_definitions?q=name%3Amy-quota",
-				Response: testnet.TestResponse{
-					Status: http.StatusOK,
-					Body: `{
-					"resources": [
-						{
-						  "metadata": { "guid": "my-quota-guid" },
-						  "entity": { "name": "my-remote-quota", "memory_limit": 1024 }
-						}
-					]}`,
-				},
-			})
+	var (
+		testServer  *httptest.Server
+		testHandler *testnet.TestHandler
+		configRepo  configuration.ReadWriter
+		repo        CloudControllerQuotaRepository
+	)
 
-			ts, handler, repo := createQuotaRepo(req)
-			defer ts.Close()
-
-			quota, apiErr := repo.FindByName("my-quota")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
-			expectedQuota := models.QuotaFields{}
-			expectedQuota.Guid = "my-quota-guid"
-			expectedQuota.Name = "my-remote-quota"
-			expectedQuota.MemoryLimit = 1024
-			Expect(quota).To(Equal(expectedQuota))
-		})
-
+	BeforeEach(func() {
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		gateway := net.NewCloudControllerGateway(configRepo)
+		repo = NewCloudControllerQuotaRepository(configRepo, gateway)
 	})
 
-	Describe("Find Quotas multipage", func() {
+	AfterEach(func() {
+		testServer.Close()
+	})
 
-		It("FindByName Quota definition", func() {
-			ts, handler, repo := createQuotaRepo2([]testnet.TestRequest{firstQuotaResponse, secondQuotaResponse})
-			defer ts.Close()
-			quota, apiErr := repo.FindByName("my-remote-quota")
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			expectedQuota := models.QuotaFields{}
-			expectedQuota.Guid = "my-quota-guid"
-			expectedQuota.Name = "my-remote-quota"
-			expectedQuota.MemoryLimit = 1024
-			Expect(quota).To(Equal(expectedQuota))
+	setupTestServer := func(reqs ...testnet.TestRequest) {
+		testServer, testHandler = testnet.NewServer(reqs)
+		configRepo.SetApiEndpoint(testServer.URL)
+	}
+
+	Describe("FindByName", func() {
+		BeforeEach(func() {
+			setupTestServer(firstQuotaRequest, secondQuotaRequest)
 		})
 
-		It("FindAll Quota definitions", func() {
-			ts, handler, repo := createQuotaRepo2([]testnet.TestRequest{firstQuotaResponse, secondQuotaResponse})
-			defer ts.Close()
+		It("Finds Quota definitions by name", func() {
+			quota, err := repo.FindByName("my-remote-quota")
 
-			quotas, apiErr := repo.FindAll()
-			Expect(apiErr).NotTo(HaveOccurred())
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(quota).To(Equal(models.QuotaFields{
+				Guid:        "my-quota-guid",
+				Name:        "my-remote-quota",
+				MemoryLimit: 1024,
+			}))
+		})
+	})
+
+	Describe("FindAll", func() {
+		BeforeEach(func() {
+			setupTestServer(firstQuotaRequest, secondQuotaRequest)
+		})
+
+		It("finds all Quota definitions", func() {
+			quotas, err := repo.FindAll()
+
+			Expect(err).NotTo(HaveOccurred())
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
 			Expect(len(quotas)).To(Equal(3))
 			Expect(quotas[0].Guid).To(Equal("my-quota-guid"))
 			Expect(quotas[1].Guid).To(Equal("my-quota-guid2"))
@@ -84,18 +81,17 @@ var _ = Describe("CloudControllerQuotaRepository", func() {
 				Response: testnet.TestResponse{Status: http.StatusCreated},
 			})
 
-			ts, handler, repo := createQuotaRepo(req)
-			defer ts.Close()
+			setupTestServer(req)
 
-			apiErr := repo.Update("my-org-guid", "my-quota-guid")
-			Expect(handler).To(testnet.HaveAllRequestsCalled())
-			Expect(apiErr).NotTo(HaveOccurred())
+			err := repo.Update("my-org-guid", "my-quota-guid")
+			Expect(testHandler).To(testnet.HaveAllRequestsCalled())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 	})
 })
 
-var firstQuotaResponse = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var firstQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/quota_definitions",
 	Response: testnet.TestResponse{
@@ -111,7 +107,7 @@ var firstQuotaResponse = testapi.NewCloudControllerTestRequest(testnet.TestReque
 	},
 })
 
-var secondQuotaResponse = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+var secondQuotaRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
 	Method: "GET",
 	Path:   "/v2/quota_definitions?page=2",
 	Response: testnet.TestResponse{
@@ -129,17 +125,3 @@ var secondQuotaResponse = testapi.NewCloudControllerTestRequest(testnet.TestRequ
 		]}`,
 	},
 })
-
-func createQuotaRepo(req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo QuotaRepository) {
-	return createQuotaRepo2([]testnet.TestRequest{req})
-}
-
-func createQuotaRepo2(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo QuotaRepository) {
-	ts, handler = testnet.NewServer(reqs)
-
-	configRepo := testconfig.NewRepositoryWithDefaults()
-	configRepo.SetApiEndpoint(ts.URL)
-	gateway := net.NewCloudControllerGateway(configRepo)
-	repo = NewCloudControllerQuotaRepository(configRepo, gateway)
-	return
-}
