@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 )
 
-
 func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 	dir, err = filepath.Abs(dir)
 	if err != nil {

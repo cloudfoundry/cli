@@ -1,2 +1,2 @@
 *.yml
-!manifest.yml
+ignore-me

@@ -62,7 +62,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 		Expect(apiErr).NotTo(HaveOccurred())
 		Expect(reportedFilePath).To(Equal(appPath))
 		Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
-		Expect(reportedUploadSize).To(Equal(uint64(759)))
+		Expect(reportedUploadSize).To(Equal(uint64(532)))
 	})
 
 	It("returns an error when the directory to upload does not exist", func() {
@@ -98,7 +98,7 @@ var _ = Describe("CloudControllerApplicationBitsRepository", func() {
 
 			Expect(reportedFilePath).To(Equal(appPath))
 			Expect(reportedFileCount).To(Equal(uint64(len(expectedApplicationContent))))
-			Expect(reportedUploadSize).To(Equal(uint64(759)))
+			Expect(reportedUploadSize).To(Equal(uint64(532)))
 		})
 
 		It("returns a failure when uploading bits fails", func() {
@@ -228,11 +228,6 @@ var matchResourceRequest = testnet.TestRequest{
         "fn": "config.ru",
         "sha1": "f097424ce1fa66c6cb9f5e8a18c317376ec12e05",
         "size": 70
-    },
-    {
-        "fn": "manifest.yml",
-        "sha1": "19b5b4225dc64da3213b1ffaa1e1920ee5faf36c",
-        "size": 111
     }
 ]`)),
 	Response: testnet.TestResponse{
@@ -248,7 +243,7 @@ var defaultRequests = []testnet.TestRequest{
 	createProgressEndpoint("finished"),
 }
 
-var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock", "manifest.yml"}
+var expectedApplicationContent = []string{"Gemfile", "Gemfile.lock"}
 
 const maxMultipartResponseSizeInBytes = 4096
 
@@ -296,7 +291,7 @@ var uploadBodyMatcher = func(request *http.Request) {
 		return
 	}
 
-	Expect(len(zipReader.File)).To(Equal(3), "Wrong number of files in zip")
+	Expect(len(zipReader.File)).To(Equal(2), "Wrong number of files in zip")
 
 	var expectedPermissionBits os.FileMode
 	if runtime.GOOS == "windows" {

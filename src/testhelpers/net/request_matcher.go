@@ -52,8 +52,8 @@ func RequestBodyMatcher(expectedBodyString string) RequestMatcher {
 			Fail(fmt.Sprintf("Error unmarshalling expected json", err.Error()))
 		}
 
-		Expect(expectedBody).To(Equal(actualBody), "\nEXPECTED: %s\nACTUAL: %s", expectedBody, actualBody)
-		Expect(request.Header.Get("content-type")).To(Equal("application/json"), "Content Type was not application/json.")
+		Expect(actualBody).To(Equal(expectedBody))
+		Expect(request.Header.Get("content-type")).To(Equal("application/json"))
 	}
 }
 
