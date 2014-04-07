@@ -1,5 +1,7 @@
 package resources
 
+import "cf/models"
+
 type PaginatedAuthTokenResources struct {
 	Resources []AuthTokenResource
 }
@@ -12,4 +14,11 @@ type AuthTokenResource struct {
 type AuthTokenEntity struct {
 	Label    string
 	Provider string
+}
+
+func (resource AuthTokenResource) ToFields() (authToken models.ServiceAuthTokenFields) {
+	authToken.Guid = resource.Metadata.Guid
+	authToken.Label = resource.Entity.Label
+	authToken.Provider = resource.Entity.Provider
+	return
 }
