@@ -27,6 +27,7 @@ package api_test
 
 import (
 	. "cf/api"
+	"cf/models"
 	"cf/net"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -124,10 +125,74 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(stacks[0].Name).To(Equal("lucid64"))
 		Expect(stacks[0].Guid).To(Equal("50688ae5-9bfc-4bf6-a4bf-caadb21a32c6"))
 	})
+
+	It("TestStacksFindAll multipage", func() {
+		ts, handler, repo := createStackRepo2([]testnet.TestRequest{firstreq, secondreq})
+		defer ts.Close()
+		var stacks []models.Stack
+		stacks, apiErr := repo.FindAll()
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+		Expect(len(stacks)).To(Equal(2))
+		Expect(stacks[1].Name).To(Equal("lucid64custom"))
+		Expect(stacks[1].Guid).To(Equal("e8cda251-7ce8-44b9-becb-ba5f5913d8ba"))
+	})
+
+})
+
+var firstreq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/stacks",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+		"next_url": "/v2/stacks?page=2",
+		"resources": [
+			{
+				"metadata": {
+					"guid": "50688ae5-9bfc-4bf6-a4bf-caadb21a32c6",
+					"url": "/v2/stacks/50688ae5-9bfc-4bf6-a4bf-caadb21a32c6",
+					"created_at": "2013-08-31 01:32:40 +0000",
+					"updated_at": "2013-08-31 01:32:40 +0000"
+				},
+				"entity": {
+					"name": "lucid64",
+					"description": "Ubuntu 10.04"
+				}
+			}
+		]}`,
+	},
+})
+
+var secondreq = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/stacks",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+		"resources": [
+			{
+				"metadata": {
+					"guid": "e8cda251-7ce8-44b9-becb-ba5f5913d8ba",
+					"url": "/v2/stacks/e8cda251-7ce8-44b9-becb-ba5f5913d8ba",
+					"created_at": "2013-08-31 01:32:40 +0000",
+					"updated_at": "2013-08-31 01:32:40 +0000"
+			  	},
+				"entity": {
+					"name": "lucid64custom",
+					"description": "Fake Ubuntu 10.04"
+			  	}
+			}
+		]}`,
+	},
 })
 
 func createStackRepo(req testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo StackRepository) {
-	ts, handler = testnet.NewServer([]testnet.TestRequest{req})
+	return createStackRepo2([]testnet.TestRequest{req})
+}
+
+func createStackRepo2(reqs []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo StackRepository) {
+	ts, handler = testnet.NewServer(reqs)
 
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)

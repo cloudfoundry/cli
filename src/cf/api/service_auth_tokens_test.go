@@ -60,35 +60,7 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(apiErr).NotTo(HaveOccurred())
 	})
 	It("TestServiceAuthFindAll", func() {
-
-		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
-			Method: "GET",
-			Path:   "/v2/service_auth_tokens",
-			Response: testnet.TestResponse{
-				Status: http.StatusOK,
-				Body: `{ "resources": [
-			{
-			  "metadata": {
-				"guid": "mysql-core-guid"
-			  },
-			  "entity": {
-				"label": "mysql",
-				"provider": "mysql-core"
-			  }
-			},
-			{
-			  "metadata": {
-				"guid": "postgres-core-guid"
-			  },
-			  "entity": {
-				"label": "postgres",
-				"provider": "postgres-core"
-			  }
-			}
-		]}`},
-		})
-
-		ts, handler, repo := createServiceAuthTokenRepo(req)
+		ts, handler, repo := createServiceAuthTokenRepo(serviceAuthRequest)
 		defer ts.Close()
 
 		authTokens, apiErr := repo.FindAll()
@@ -105,6 +77,27 @@ var _ = Describe("Testing with ginkgo", func() {
 		Expect(authTokens[1].Provider).To(Equal("postgres-core"))
 		Expect(authTokens[1].Guid).To(Equal("postgres-core-guid"))
 	})
+
+	It("TestServiceAuthFindAll multipage", func() {
+		ts, handler, repo := createServiceAuthTokenRepo2([]testnet.TestRequest{firstServiceAuthRequest, serviceAuthRequest})
+		defer ts.Close()
+
+		authTokens, apiErr := repo.FindAll()
+
+		Expect(handler).To(testnet.HaveAllRequestsCalled())
+		Expect(apiErr).NotTo(HaveOccurred())
+
+		Expect(len(authTokens)).To(Equal(3))
+
+		Expect(authTokens[0].Label).To(Equal("mongodb"))
+		Expect(authTokens[0].Provider).To(Equal("mongodb-core"))
+		Expect(authTokens[0].Guid).To(Equal("mongodb-core-guid"))
+
+		Expect(authTokens[1].Label).To(Equal("mysql"))
+		Expect(authTokens[1].Provider).To(Equal("mysql-core"))
+		Expect(authTokens[1].Guid).To(Equal("mysql-core-guid"))
+	})
+
 	It("TestServiceAuthFindByLabelAndProvider", func() {
 
 		req := testapi.NewCloudControllerTestRequest(testnet.TestRequest{
@@ -112,13 +105,15 @@ var _ = Describe("Testing with ginkgo", func() {
 			Path:   "/v2/service_auth_tokens?q=label%3Aa-label%3Bprovider%3Aa-provider",
 			Response: testnet.TestResponse{
 				Status: http.StatusOK,
-				Body: `{"resources": [{
-		"metadata": { "guid": "mysql-core-guid" },
-		"entity": {
-			"label": "mysql",
-			"provider": "mysql-core"
-		}
-	}]}`},
+				Body: `{
+				"resources": [{
+					"metadata": { "guid": "mysql-core-guid" },
+					"entity": {
+						"label": "mysql",
+						"provider": "mysql-core"
+					}
+				}]}`,
+			},
 		})
 
 		ts, handler, repo := createServiceAuthTokenRepo(req)
@@ -191,8 +186,62 @@ var _ = Describe("Testing with ginkgo", func() {
 	})
 })
 
+var serviceAuthRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/service_auth_tokens",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+		"resources": [
+			{
+				"metadata": {
+					"guid": "mysql-core-guid"
+			  	},
+			  	"entity": {
+					"label": "mysql",
+					"provider": "mysql-core"
+			  	}
+			},
+			{
+				"metadata": {
+					"guid": "postgres-core-guid"
+			  	},
+			  	"entity": {
+					"label": "postgres",
+					"provider": "postgres-core"
+			  	}
+			}
+		]}`,
+	},
+})
+
+var firstServiceAuthRequest = testapi.NewCloudControllerTestRequest(testnet.TestRequest{
+	Method: "GET",
+	Path:   "/v2/service_auth_tokens",
+	Response: testnet.TestResponse{
+		Status: http.StatusOK,
+		Body: `{
+		"next_url": "/v2/service_auth_tokens?page=2",		    
+		"resources": [
+			{
+				"metadata": {
+					"guid": "mongodb-core-guid"
+			  	},
+			  	"entity": {
+					"label": "mongodb",
+					"provider": "mongodb-core"
+			  	}
+			}
+		]}`,
+	},
+})
+
 func createServiceAuthTokenRepo(request testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceAuthTokenRepository) {
-	ts, handler = testnet.NewServer([]testnet.TestRequest{request})
+	return createServiceAuthTokenRepo2([]testnet.TestRequest{request})
+}
+
+func createServiceAuthTokenRepo2(requests []testnet.TestRequest) (ts *httptest.Server, handler *testnet.TestHandler, repo ServiceAuthTokenRepository) {
+	ts, handler = testnet.NewServer(requests)
 	configRepo := testconfig.NewRepositoryWithDefaults()
 	configRepo.SetApiEndpoint(ts.URL)
 	gateway := net.NewCloudControllerGateway(configRepo)
