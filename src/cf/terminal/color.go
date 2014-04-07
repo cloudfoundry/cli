@@ -5,8 +5,6 @@ import (
 	"os"
 	"regexp"
 	"runtime"
-
-	"code.google.com/p/go.crypto/ssh/terminal"
 )
 
 type Color uint
@@ -25,7 +23,7 @@ const (
 var (
 	colorize               func(message string, color Color, bold int) string
 	OsSupportsColors       = runtime.GOOS != "windows"
-	TerminalSupportsColors = terminal.IsTerminal(1)
+	TerminalSupportsColors = isTerminal()
 )
 
 func init() {
