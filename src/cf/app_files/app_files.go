@@ -11,15 +11,6 @@ import (
 	"path/filepath"
 )
 
-var DefaultIgnoreFiles = []string{
-	".cfignore",
-	".gitignore",
-	".git",
-	".hg",
-	".svn",
-	"_darcs",
-	".DS_Store",
-}
 
 func AppFilesInDir(dir string) (appFiles []models.AppFileFields, err error) {
 	dir, err = filepath.Abs(dir)

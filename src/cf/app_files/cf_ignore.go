@@ -13,7 +13,7 @@ type CfIgnore interface {
 func NewCfIgnore(text string) CfIgnore {
 	patterns := []ignorePattern{}
 	lines := strings.Split(text, "\n")
-	lines = append(DefaultIgnoreFiles, lines...)
+	lines = append(defaultIgnoreLines, lines...)
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -27,8 +27,7 @@ func NewCfIgnore(text string) CfIgnore {
 			ignore = false
 		}
 
-		line = path.Clean(line)
-		for _, p := range globsForPattern(line) {
+		for _, p := range globsForPattern(path.Clean(line)) {
 			patterns = append(patterns, ignorePattern{ignore, p})
 		}
 	}
@@ -72,3 +71,14 @@ type ignorePattern struct {
 }
 
 type cfIgnore []ignorePattern
+
+var defaultIgnoreLines = []string{
+	".cfignore",
+	"manifest.yml",
+	".gitignore",
+	".git",
+	".hg",
+	".svn",
+	"_darcs",
+	".DS_Store",
+}
