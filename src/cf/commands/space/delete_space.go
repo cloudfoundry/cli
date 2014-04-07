@@ -46,14 +46,6 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
 	force := c.Bool("f")
 
-	cmd.ui.Say("Deleting space %s in org %s as %s...",
-		terminal.EntityNameColor(spaceName),
-		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
-		terminal.EntityNameColor(cmd.config.Username()),
-	)
-
-	space := cmd.spaceReq.GetSpace()
-
 	if !force {
 		response := cmd.ui.Confirm(
 			"Really delete space %s and everything associated with it?%s",
@@ -64,6 +56,14 @@ func (cmd *DeleteSpace) Run(c *cli.Context) {
 			return
 		}
 	}
+
+	cmd.ui.Say("Deleting space %s in org %s as %s...",
+		terminal.EntityNameColor(spaceName),
+		terminal.EntityNameColor(cmd.config.OrganizationFields().Name),
+		terminal.EntityNameColor(cmd.config.Username()),
+	)
+
+	space := cmd.spaceReq.GetSpace()
 
 	apiErr := cmd.spaceRepo.Delete(space.Guid)
 	if apiErr != nil {
