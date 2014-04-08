@@ -45,15 +45,8 @@ func (cmd *DeleteRoute) Run(c *cli.Context) {
 	if host != "" {
 		url = host + "." + domainName
 	}
-	force := c.Bool("f")
-	if !force {
-		response := cmd.ui.Confirm(
-			"Really delete route %s?%s",
-			terminal.EntityNameColor(url),
-			terminal.PromptColor(">"),
-		)
-
-		if !response {
+	if !c.Bool("f") {
+		if !cmd.ui.ConfirmDelete("route", url) {
 			return
 		}
 	}
