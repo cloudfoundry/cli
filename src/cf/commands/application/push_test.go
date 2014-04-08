@@ -40,6 +40,7 @@ var _ = Describe("Push Command", func() {
 		appBitsRepo   *testapi.FakeApplicationBitsRepository
 		serviceRepo   *testapi.FakeServiceRepo
 		wordGenerator words.WordGenerator
+		reqFactory *testreq.FakeReqFactory
 	)
 
 	BeforeEach(func() {
@@ -62,30 +63,30 @@ var _ = Describe("Push Command", func() {
 		ui = new(testterm.FakeUI)
 		configRepo = testconfig.NewRepositoryWithDefaults()
 
+		reqFactory = &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
+
 		cmd = NewPush(ui, configRepo, manifestRepo, starter, stopper, binder, appRepo, domainRepo, routeRepo, stackRepo, serviceRepo, appBitsRepo, wordGenerator)
 	})
 
 	callPush := func(args ...string) {
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
 		testcmd.RunCommand(cmd, testcmd.NewContext("push", args), reqFactory)
 	}
 
 	Describe("requirements", func() {
 		It("passes when logged in and a space is targeted", func() {
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
+			callPush()
 			Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
 		})
 
 		It("fails when not logged in", func() {
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: false, TargetedSpaceSuccess: true}
-			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
+			reqFactory.LoginSuccess = false
+			callPush()
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
 		It("fails when a space is not targeted", func() {
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: false}
-			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{}), reqFactory)
+			reqFactory.TargetedSpaceSuccess = false
+			callPush()
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 
@@ -93,8 +94,7 @@ var _ = Describe("Push Command", func() {
 		// erg: app-name -p some/path some-extra-arg
 		// but the test infrastructure for parsing args and flags is sorely lacking
 		It("fails when provided too many args", func() {
-			reqFactory := &testreq.FakeReqFactory{LoginSuccess: true, TargetedSpaceSuccess: true}
-			testcmd.RunCommand(cmd, testcmd.NewContext("push", []string{"-p", "path", "too-much", "app-name"}), reqFactory)
+			callPush("-p", "path", "too-much", "app-name")
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -515,7 +515,6 @@ var _ = Describe("Push Command", func() {
 			appRepo.ReadReturns.App = existingApp
 		})
 
-		// HERE
 
 		It("resets the app's buildpack when the -b flag is provided as 'null'", func() {
 			callPush("-b", "null", "existing-app")
