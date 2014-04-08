@@ -1,7 +1,6 @@
 package service_test
 
 import (
-	"cf/api"
 	. "cf/commands/service"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
@@ -14,35 +13,38 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callDeleteService(confirmation string, args []string, reqFactory *testreq.FakeReqFactory, serviceRepo api.ServiceRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{
-		Inputs: []string{confirmation},
-	}
-	ctxt := testcmd.NewContext("delete-service", args)
-
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewDeleteService(fakeUI, config, serviceRepo)
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
 var _ = Describe("delete-service command", func() {
 	var (
+		ui *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceInstance     models.ServiceInstance
 	)
 
 	BeforeEach(func() {
-		requirementsFactory = &testreq.FakeReqFactory{}
+		ui = &testterm.FakeUI{
+			Inputs: []string{"yes"},
+		}
+
 		serviceRepo = &testapi.FakeServiceRepo{}
+		requirementsFactory = &testreq.FakeReqFactory{
+			LoginSuccess:       true,
+		}
 	})
 
+	runCommand := func(args ...string) {
+		configRepo := testconfig.NewRepositoryWithDefaults()
+		cmd := NewDeleteService(ui, configRepo, serviceRepo)
+		testcmd.RunCommand(cmd, testcmd.NewContext("delete-service", args), requirementsFactory)
+	}
+
 	Context("when not logged in", func() {
+		BeforeEach(func() {
+			requirementsFactory.LoginSuccess = false
+		})
+
 		It("does not pass requirements", func() {
-			cmd := NewDeleteService(&testterm.FakeUI{}, testconfig.NewRepository(), serviceRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-service", []string{"vestigal-service"}), requirementsFactory)
+			runCommand("vestigial-service")
 			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
@@ -52,8 +54,8 @@ var _ = Describe("delete-service command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		It("fails with usage when no arguments are given", func() {
-			ui := callDeleteService("", []string{"-f"}, requirementsFactory, serviceRepo)
+		It("fails with usage when no service name is given", func() {
+			runCommand()
 			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
@@ -62,15 +64,15 @@ var _ = Describe("delete-service command", func() {
 				serviceInstance = models.ServiceInstance{}
 				serviceInstance.Name = "my-service"
 				serviceInstance.Guid = "my-service-guid"
-				serviceRepo = &testapi.FakeServiceRepo{FindInstanceByNameServiceInstance: serviceInstance}
+				serviceRepo.FindInstanceByNameServiceInstance = serviceInstance
 			})
 
 			Context("when the command is confirmed", func() {
 				It("deletes the service", func() {
-					ui := callDeleteService("Y", []string{"my-service"}, requirementsFactory, serviceRepo)
+					runCommand("my-service")
 
 					testassert.SliceContains(ui.Prompts, testassert.Lines{
-						{"Are you sure"},
+						{"Really delete the service my-service"},
 					})
 
 					testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -83,7 +85,7 @@ var _ = Describe("delete-service command", func() {
 			})
 
 			It("skips confirmation when the -f flag is given", func() {
-				ui := callDeleteService("", []string{"-f", "foo.com"}, requirementsFactory, serviceRepo)
+				runCommand("-f", "foo.com")
 
 				Expect(ui.Prompts).To(BeEmpty())
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
@@ -95,11 +97,11 @@ var _ = Describe("delete-service command", func() {
 
 		Context("when the service does not exist", func() {
 			BeforeEach(func() {
-				serviceRepo = &testapi.FakeServiceRepo{FindInstanceByNameNotFound: true}
+				serviceRepo.FindInstanceByNameNotFound = true
 			})
 
 			It("warns the user the service does not exist", func() {
-				ui := callDeleteService("", []string{"-f", "my-service"}, requirementsFactory, serviceRepo)
+				runCommand("-f", "my-service")
 
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Deleting service", "my-service"},
