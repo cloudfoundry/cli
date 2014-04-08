@@ -82,7 +82,7 @@ var _ = Describe("delete-org command", func() {
 				runCommand("org-to-delete")
 
 				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"Really delete"},
+					{"Really delete the org org-to-delete"},
 				})
 
 				testassert.SliceContains(ui.Outputs, testassert.Lines{

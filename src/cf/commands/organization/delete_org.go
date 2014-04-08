@@ -39,16 +39,8 @@ func (cmd *DeleteOrg) GetRequirements(requirementsFactory requirements.Factory, 
 func (cmd *DeleteOrg) Run(c *cli.Context) {
 	orgName := c.Args()[0]
 
-	force := c.Bool("f")
-
-	if !force {
-		response := cmd.ui.Confirm(
-			"Really delete org %s and everything associated with it?%s",
-			terminal.EntityNameColor(orgName),
-			terminal.PromptColor(">"),
-		)
-
-		if !response {
+	if !c.Bool("f") {
+		if !cmd.ui.ConfirmDeleteWithAssociations("org", orgName) {
 			return
 		}
 	}
