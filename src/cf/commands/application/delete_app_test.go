@@ -36,8 +36,6 @@ var _ = Describe("delete app command", func() {
 		routeRepo = &testapi.FakeRouteRepository{}
 		requirementsFactory = &testreq.FakeReqFactory{}
 
-		ui = &testterm.FakeUI{}
-
 		configRepo = testconfig.NewRepositoryWithDefaults()
 		cmd = NewDeleteApp(ui, configRepo, appRepo, routeRepo)
 	})

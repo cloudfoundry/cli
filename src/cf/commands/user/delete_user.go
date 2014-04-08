@@ -9,20 +9,20 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-type DeleteUserFields struct {
+type DeleteUser struct {
 	ui       terminal.UI
 	config   configuration.Reader
 	userRepo api.UserRepository
 }
 
-func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd DeleteUserFields) {
+func NewDeleteUser(ui terminal.UI, config configuration.Reader, userRepo api.UserRepository) (cmd DeleteUser) {
 	cmd.ui = ui
 	cmd.config = config
 	cmd.userRepo = userRepo
 	return
 }
 
-func (cmd DeleteUserFields) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
+func (cmd DeleteUser) GetRequirements(reqFactory requirements.Factory, c *cli.Context) (reqs []requirements.Requirement, err error) {
 	if len(c.Args()) != 1 {
 		err = errors.New("Invalid usage")
 		cmd.ui.FailWithUsage(c, "delete-user")
@@ -34,14 +34,11 @@ func (cmd DeleteUserFields) GetRequirements(reqFactory requirements.Factory, c *
 	return
 }
 
-func (cmd DeleteUserFields) Run(c *cli.Context) {
+func (cmd DeleteUser) Run(c *cli.Context) {
 	username := c.Args()[0]
 	force := c.Bool("f")
 
-	if !force && !cmd.ui.Confirm("Really delete user %s?%s",
-		terminal.EntityNameColor(username),
-		terminal.PromptColor(">"),
-	) {
+	if !force && !cmd.ui.ConfirmDelete("user", username) {
 		return
 	}
 
