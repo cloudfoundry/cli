@@ -17,11 +17,11 @@ type DeleteOrg struct {
 	orgReq  requirements.OrganizationRequirement
 }
 
-func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, sR api.OrganizationRepository) (cmd *DeleteOrg) {
+func NewDeleteOrg(ui terminal.UI, config configuration.ReadWriter, orgRepo api.OrganizationRepository) (cmd *DeleteOrg) {
 	cmd = new(DeleteOrg)
 	cmd.ui = ui
 	cmd.config = config
-	cmd.orgRepo = sR
+	cmd.orgRepo = orgRepo
 	return
 }
 
