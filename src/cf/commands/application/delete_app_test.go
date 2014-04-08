@@ -76,8 +76,9 @@ var _ = Describe("delete app command", func() {
 				Expect(appRepo.DeletedAppGuid).To(Equal("app-to-delete-guid"))
 
 				testassert.SliceContains(ui.Prompts, testassert.Lines{
-					{"Really delete"},
+					{"Really delete the app app-to-delete"},
 				})
+
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Deleting", "app-to-delete", "my-org", "my-space", "my-user"},
 					{"OK"},
@@ -152,7 +153,7 @@ var _ = Describe("delete app command", func() {
 				appRepo.ReadReturns.Error = errors.NewModelNotFoundError("App", "the-app")
 			})
 
-			It("tells the user when the provided app does not exist", func() {
+			It("warns the user when the provided app does not exist", func() {
 				runCommand("-f", "app-to-delete")
 
 				Expect(appRepo.ReadArgs.Name).To(Equal("app-to-delete"))
@@ -161,6 +162,9 @@ var _ = Describe("delete app command", func() {
 				testassert.SliceContains(ui.Outputs, testassert.Lines{
 					{"Deleting", "app-to-delete"},
 					{"OK"},
+				})
+
+				testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
 					{"app-to-delete", "does not exist"},
 				})
 			})
