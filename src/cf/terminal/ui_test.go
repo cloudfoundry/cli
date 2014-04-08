@@ -74,6 +74,41 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("Confirming deletion", func() {
+		It("treats 'y' as an affirmative confirmation", func() {
+			simulateStdin("y\n", func(reader io.Reader) {
+				out := captureOutput(func() {
+					ui := NewUI(reader)
+					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
+				})
+
+				testassert.SliceContains(out, testassert.Lines{{"modelType modelName"}})
+			})
+		})
+
+		It("treats 'yes' as an affirmative confirmation", func() {
+			simulateStdin("yes\n", func(reader io.Reader) {
+				out := captureOutput(func() {
+					ui := NewUI(reader)
+					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeTrue())
+				})
+
+				testassert.SliceContains(out, testassert.Lines{{"modelType modelName"}})
+			})
+		})
+
+		It("treats other input as a negative confirmation and warns the user", func() {
+			simulateStdin("wat\n", func(reader io.Reader) {
+				out := captureOutput(func() {
+					ui := NewUI(reader)
+					Expect(ui.ConfirmDelete("modelType", "modelName")).To(BeFalse())
+				})
+
+				testassert.SliceContains(out, testassert.Lines{{"Delete cancelled"}})
+			})
+		})
+	})
+
 	Context("when user is not logged in", func() {
 		var config configuration.Reader
 

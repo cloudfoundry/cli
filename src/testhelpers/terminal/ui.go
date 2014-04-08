@@ -57,6 +57,14 @@ func (ui *FakeUI) Ask(prompt string, args ...interface{}) (answer string) {
 	return
 }
 
+func (ui *FakeUI) ConfirmDelete(modelType, modelName string) bool {
+	return ui.Confirm(
+		"Really delete the %s %s?%s",
+		modelType,
+		term.EntityNameColor(modelName),
+		term.PromptColor(">"))
+}
+
 func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 	response := ui.Ask(prompt, args...)
 	switch strings.ToLower(response) {
