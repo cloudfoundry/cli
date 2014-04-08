@@ -32,7 +32,7 @@ var _ = Describe("Create user command", func() {
 		configRepo.SetAccessToken(accessToken)
 	})
 
-	var runCommand = func(args ...string) {
+	runCommand := func(args ...string) {
 		ctxt := testcmd.NewContext("create-user", args)
 		cmd := NewCreateUser(ui, configRepo, userRepo)
 		testcmd.RunCommand(cmd, ctxt, reqFactory)

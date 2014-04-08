@@ -37,7 +37,7 @@ var _ = Describe("delete-domain command", func() {
 		configRepo = testconfig.NewRepositoryWithDefaults()
 	})
 
-	var runCommand = func(args ...string) {
+	runCommand := func(args ...string) {
 		cmd = NewDeleteDomain(ui, configRepo, domainRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-domain", args), requirementsFactory)
 	}
