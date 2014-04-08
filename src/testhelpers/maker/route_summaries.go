@@ -12,12 +12,12 @@ func NewRouteSummary(overrides Overrides) (routeSummary models.RouteSummary) {
 	routeSummary.Guid = routeSummaryGuid()
 	routeSummary.Host = "route-host"
 
-	if overrides.Has("guid") {
-		routeSummary.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		routeSummary.Guid = overrides.Get("Guid").(string)
 	}
 
-	if overrides.Has("host") {
-		routeSummary.Host = overrides.Get("host").(string)
+	if overrides.Has("Host") {
+		routeSummary.Host = overrides.Get("Host").(string)
 	}
 
 	return

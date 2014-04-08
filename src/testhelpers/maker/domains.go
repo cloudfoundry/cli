@@ -9,11 +9,11 @@ func NewSharedDomainFields(overrides Overrides) (domain models.DomainFields) {
 	domain.Guid = domainGuid()
 	domain.Shared = true
 
-	if overrides.Has("name") {
-		domain.Name = overrides.Get("name").(string)
+	if overrides.Has("Name") {
+		domain.Name = overrides.Get("Name").(string)
 	}
-	if overrides.Has("guid") {
-		domain.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		domain.Guid = overrides.Get("Guid").(string)
 	}
 	return
 }
@@ -23,11 +23,11 @@ func NewPrivateDomainFields(overrides Overrides) (domain models.DomainFields) {
 	domain.Guid = domainGuid()
 	domain.Shared = false
 
-	if overrides.Has("name") {
-		domain.Name = overrides.Get("name").(string)
+	if overrides.Has("Name") {
+		domain.Name = overrides.Get("Name").(string)
 	}
-	if overrides.Has("guid") {
-		domain.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		domain.Guid = overrides.Get("Guid").(string)
 	}
 	return
 }

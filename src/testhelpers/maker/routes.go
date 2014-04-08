@@ -12,12 +12,12 @@ func NewRouteFields(overrides Overrides) (route models.RouteFields) {
 	route.Guid = routeGuid()
 	route.Host = "route-host"
 
-	if overrides.Has("guid") {
-		route.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		route.Guid = overrides.Get("Guid").(string)
 	}
 
-	if overrides.Has("host") {
-		route.Host = overrides.Get("host").(string)
+	if overrides.Has("Host") {
+		route.Host = overrides.Get("Host").(string)
 	}
 
 	return

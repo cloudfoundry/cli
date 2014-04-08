@@ -12,12 +12,12 @@ func NewSpaceFields(overrides Overrides) (space models.SpaceFields) {
 	space.Name = "new-space"
 	space.Guid = spaceGuid()
 
-	if overrides.Has("guid") {
-		space.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		space.Guid = overrides.Get("Guid").(string)
 	}
 
-	if overrides.Has("name") {
-		space.Name = overrides.Get("name").(string)
+	if overrides.Has("Name") {
+		space.Name = overrides.Get("Name").(string)
 	}
 
 	return
