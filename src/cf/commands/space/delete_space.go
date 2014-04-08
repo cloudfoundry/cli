@@ -44,15 +44,9 @@ func (cmd *DeleteSpace) GetRequirements(reqFactory requirements.Factory, c *cli.
 
 func (cmd *DeleteSpace) Run(c *cli.Context) {
 	spaceName := c.Args()[0]
-	force := c.Bool("f")
 
-	if !force {
-		response := cmd.ui.Confirm(
-			"Really delete space %s and everything associated with it?%s",
-			terminal.EntityNameColor(spaceName),
-			terminal.PromptColor(">"),
-		)
-		if !response {
+	if !c.Bool("f") {
+		if !cmd.ui.ConfirmDelete("space", spaceName) {
 			return
 		}
 	}
