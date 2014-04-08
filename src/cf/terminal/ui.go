@@ -25,6 +25,7 @@ type UI interface {
 	Ask(prompt string, args ...interface{}) (answer string)
 	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Confirm(message string, args ...interface{}) bool
+	ConfirmDelete(modelType, modelName string) bool
 	Ok()
 	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
@@ -64,6 +65,21 @@ func (c terminalUI) Warn(message string, args ...interface{}) {
 	message = fmt.Sprintf(message, args...)
 	c.Say(WarningColor(message))
 	return
+}
+
+func (c terminalUI) ConfirmDelete(modelType, modelName string) bool {
+	result := c.Confirm(
+		"Really delete the %s %s?%s",
+		modelType,
+		EntityNameColor(modelName),
+		PromptColor(">"),
+	)
+
+	if !result {
+		c.Warn("Delete cancelled")
+	}
+
+	return result
 }
 
 func (c terminalUI) Confirm(message string, args ...interface{}) bool {
