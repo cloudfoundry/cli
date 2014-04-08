@@ -41,11 +41,7 @@ func (cmd *DeleteApp) Run(c *cli.Context) {
 	appName := c.Args()[0]
 
 	if !c.Bool("f") {
-		response := cmd.ui.Confirm(
-			"Really delete %s?%s",
-			terminal.EntityNameColor(appName),
-			terminal.PromptColor(">"),
-		)
+		response := cmd.ui.ConfirmDelete("app", appName)
 		if !response {
 			return
 		}
