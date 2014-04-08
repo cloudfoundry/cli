@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package organization_test
 
 import (
@@ -48,19 +23,11 @@ var _ = Describe("delete-org command", func() {
 	)
 
 	BeforeEach(func() {
-		ui = &testterm.FakeUI{}
+		ui = &testterm.FakeUI{
+			Inputs: []string{"y"},
+		}
+		config = testconfig.NewRepositoryWithDefaults()
 		requirementsFactory = &testreq.FakeReqFactory{}
-
-		spaceFields := models.SpaceFields{}
-		spaceFields.Name = "my-space"
-
-		orgFields := models.OrganizationFields{}
-		orgFields.Name = "my-org"
-
-		token := configuration.TokenInfo{Username: "my-user"}
-		config = testconfig.NewRepositoryWithAccessToken(token)
-		config.SetSpaceFields(spaceFields)
-		config.SetOrganizationFields(orgFields)
 
 		org := models.Organization{}
 		org.Name = "org-to-delete"
@@ -68,11 +35,20 @@ var _ = Describe("delete-org command", func() {
 		orgRepo = &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
 	})
 
-	It("fails requirements when not logged in", func() {
+	var runCommand = func(args ...string) {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
-		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"some-org-name"}), requirementsFactory)
+		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", args), requirementsFactory)
+	}
+
+	It("fails requirements when not logged in", func() {
+		runCommand("some-org-name")
 
 		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	})
+
+	It("fails with usage if no arguments are given", func() {
+		runCommand()
+		Expect(ui.FailedWithUsage).To(BeTrue())
 	})
 
 	Context("when logged in", func() {
@@ -80,14 +56,54 @@ var _ = Describe("delete-org command", func() {
 			requirementsFactory.LoginSuccess = true
 		})
 
-		It("TestDeleteOrgConfirmingWithY", func() {
-			ui.Inputs = []string{"y"}
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), requirementsFactory)
+		Context("when deleting the currently targeted org", func() {
+			It("untargets the deleted org", func() {
+				config.SetOrganizationFields(orgRepo.Organizations[0].OrganizationFields)
+				runCommand("org-to-delete")
 
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete"},
+				Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
+				Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
 			})
+		})
+
+		Context("when deleting an org that is not targeted", func() {
+			BeforeEach(func() {
+				otherOrgFields := models.OrganizationFields{}
+				otherOrgFields.Guid = "some-other-org-guid"
+				otherOrgFields.Name = "some-other-org"
+				config.SetOrganizationFields(otherOrgFields)
+
+				spaceFields := models.SpaceFields{}
+				spaceFields.Name = "some-other-space"
+				config.SetSpaceFields(spaceFields)
+			})
+
+			It("deletes the org with the given name", func() {
+				runCommand("org-to-delete")
+
+				testassert.SliceContains(ui.Prompts, testassert.Lines{
+					{"Really delete"},
+				})
+
+				testassert.SliceContains(ui.Outputs, testassert.Lines{
+					{"Deleting", "org-to-delete"},
+					{"OK"},
+				})
+				Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
+				Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
+			})
+
+			It("does not untarget the org and space", func() {
+				runCommand("org-to-delete")
+
+				Expect(config.OrganizationFields().Name).To(Equal("some-other-org"))
+				Expect(config.SpaceFields().Name).To(Equal("some-other-space"))
+			})
+		})
+
+		It("does not prompt when the -f flag is given", func() {
+			ui.Inputs = []string{}
+			runCommand("-f", "org-to-delete")
 
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Deleting", "org-to-delete"},
@@ -97,95 +113,20 @@ var _ = Describe("delete-org command", func() {
 			Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
 		})
 
-		It("TestDeleteOrgConfirmingWithYes", func() {
-			ui.Inputs = []string{"Yes"}
-
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), requirementsFactory)
-
-			testassert.SliceContains(ui.Prompts, testassert.Lines{
-				{"Really delete", "org-to-delete"},
-			})
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting org", "org-to-delete", "my-user"},
-				{"OK"},
-			})
-
-			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
-			Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
-		})
-
-		It("TestDeleteTargetedOrganizationClearsConfig", func() {
-			config.SetOrganizationFields(orgRepo.Organizations[0].OrganizationFields)
-
-			spaceFields := models.SpaceFields{}
-			spaceFields.Name = "space-to-delete"
-			config.SetSpaceFields(spaceFields)
-
-			ui.Inputs = []string{"Yes"}
-
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), requirementsFactory)
-
-			Expect(config.OrganizationFields()).To(Equal(models.OrganizationFields{}))
-			Expect(config.SpaceFields()).To(Equal(models.SpaceFields{}))
-		})
-
-		It("TestDeleteUntargetedOrganizationDoesNotClearConfig", func() {
-			otherOrgFields := models.OrganizationFields{}
-			otherOrgFields.Guid = "some-other-org-guid"
-			otherOrgFields.Name = "some-other-org"
-			config.SetOrganizationFields(otherOrgFields)
-
-			spaceFields := models.SpaceFields{}
-			spaceFields.Name = "some-other-space"
-			config.SetSpaceFields(spaceFields)
-
-			ui.Inputs = []string{"Yes"}
-
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), requirementsFactory)
-
-			Expect(config.OrganizationFields().Name).To(Equal("some-other-org"))
-			Expect(config.SpaceFields().Name).To(Equal("some-other-space"))
-		})
-
-		It("TestDeleteOrgWithForceOption", func() {
-			ui.Inputs = []string{"Yes"}
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"-f", "org-to-delete"}), requirementsFactory)
-
-			Expect(len(ui.Prompts)).To(Equal(0))
-			testassert.SliceContains(ui.Outputs, testassert.Lines{
-				{"Deleting", "org-to-delete"},
-				{"OK"},
-			})
-			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
-			Expect(orgRepo.DeletedOrganizationGuid).To(Equal("org-to-delete-guid"))
-		})
-
-		It("FailsWithUsage when 1st argument is omitted", func() {
-			ui.Inputs = []string{"Yes"}
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{}), requirementsFactory)
-			Expect(ui.FailedWithUsage).To(BeTrue())
-		})
-
-		It("TestDeleteOrgWhenOrgDoesNotExist", func() {
+		It("warns the user when the org does not exist", func() {
 			orgRepo.FindByNameNotFound = true
 
-			ui.Inputs = []string{"y"}
-			cmd := NewDeleteOrg(ui, config, orgRepo)
-			testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", []string{"org-to-delete"}), requirementsFactory)
+			runCommand("org-to-delete")
 
-			Expect(len(ui.Outputs)).To(Equal(3))
+			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
+
 			testassert.SliceContains(ui.Outputs, testassert.Lines{
 				{"Deleting", "org-to-delete"},
 				{"OK"},
+			})
+			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
 				{"org-to-delete", "does not exist."},
 			})
-
-			Expect(orgRepo.FindByNameName).To(Equal("org-to-delete"))
 		})
 	})
 })
