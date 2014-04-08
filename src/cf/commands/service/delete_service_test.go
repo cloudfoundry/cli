@@ -15,7 +15,7 @@ import (
 
 var _ = Describe("delete-service command", func() {
 	var (
-		ui *testterm.FakeUI
+		ui                  *testterm.FakeUI
 		requirementsFactory *testreq.FakeReqFactory
 		serviceRepo         *testapi.FakeServiceRepo
 		serviceInstance     models.ServiceInstance
@@ -28,7 +28,7 @@ var _ = Describe("delete-service command", func() {
 
 		serviceRepo = &testapi.FakeServiceRepo{}
 		requirementsFactory = &testreq.FakeReqFactory{
-			LoginSuccess:       true,
+			LoginSuccess: true,
 		}
 	})
 
