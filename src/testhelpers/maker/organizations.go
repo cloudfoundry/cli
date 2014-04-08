@@ -12,12 +12,12 @@ func NewOrgFields(overrides Overrides) (org models.OrganizationFields) {
 	org.Name = "new-org"
 	org.Guid = orgGuid()
 
-	if overrides.Has("guid") {
-		org.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		org.Guid = overrides.Get("Guid").(string)
 	}
 
-	if overrides.Has("name") {
-		org.Name = overrides.Get("name").(string)
+	if overrides.Has("Name") {
+		org.Name = overrides.Get("Name").(string)
 	}
 
 	return

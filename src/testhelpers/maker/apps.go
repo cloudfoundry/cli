@@ -13,16 +13,16 @@ func NewAppFields(overrides Overrides) (app models.ApplicationFields) {
 	app.Guid = appGuid()
 	app.State = "started"
 
-	if overrides.Has("guid") {
-		app.Guid = overrides.Get("guid").(string)
+	if overrides.Has("Guid") {
+		app.Guid = overrides.Get("Guid").(string)
 	}
 
-	if overrides.Has("name") {
-		app.Name = overrides.Get("name").(string)
+	if overrides.Has("Name") {
+		app.Name = overrides.Get("Name").(string)
 	}
 
-	if overrides.Has("state") {
-		app.State = overrides.Get("state").(string)
+	if overrides.Has("State") {
+		app.State = overrides.Get("State").(string)
 	}
 
 	return
