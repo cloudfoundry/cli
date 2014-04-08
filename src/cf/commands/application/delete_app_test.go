@@ -40,7 +40,7 @@ var _ = Describe("delete app command", func() {
 		cmd = NewDeleteApp(ui, configRepo, appRepo, routeRepo)
 	})
 
-	var runCommand = func(args ...string) {
+	runCommand := func(args ...string) {
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete", args), requirementsFactory)
 	}
 

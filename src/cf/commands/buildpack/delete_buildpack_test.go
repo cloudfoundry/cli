@@ -26,7 +26,7 @@ var _ = Describe("delete-buildpack command", func() {
 		requirementsFactory = &testreq.FakeReqFactory{}
 	})
 
-	var runCommand = func(args ...string) {
+	runCommand := func(args ...string) {
 		cmd := NewDeleteBuildpack(ui, buildpackRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-buildpack", args), requirementsFactory)
 	}

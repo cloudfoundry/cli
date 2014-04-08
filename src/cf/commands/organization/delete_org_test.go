@@ -35,7 +35,7 @@ var _ = Describe("delete-org command", func() {
 		orgRepo = &testapi.FakeOrgRepository{Organizations: []models.Organization{org}}
 	})
 
-	var runCommand = func(args ...string) {
+	runCommand := func(args ...string) {
 		cmd := NewDeleteOrg(ui, config, orgRepo)
 		testcmd.RunCommand(cmd, testcmd.NewContext("delete-org", args), requirementsFactory)
 	}

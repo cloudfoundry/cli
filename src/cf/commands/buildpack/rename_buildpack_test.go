@@ -28,7 +28,7 @@ var _ = Describe("rename-buildpack command", func() {
 		cmd = NewRenameBuildpack(ui, fakeRepo)
 	})
 
-	var runCommand = func(args ...string) {
+	runCommand := func(args ...string) {
 		ctxt := testcmd.NewContext("rename-buildpack", args)
 		testcmd.RunCommand(cmd, ctxt, reqFactory)
 	}
