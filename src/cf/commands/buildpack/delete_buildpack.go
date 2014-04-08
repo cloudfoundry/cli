@@ -42,7 +42,7 @@ func (cmd *DeleteBuildpack) Run(c *cli.Context) {
 	force := c.Bool("f")
 
 	if !force {
-		answer := cmd.ui.Confirm("Are you sure you want to delete the buildpack %s ?", terminal.EntityNameColor(buildpackName))
+		answer := cmd.ui.ConfirmDelete("buildpack", buildpackName)
 		if !answer {
 			return
 		}
