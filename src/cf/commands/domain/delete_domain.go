@@ -44,8 +44,6 @@ func (cmd *DeleteDomain) GetRequirements(reqFactory requirements.Factory, c *cli
 
 func (cmd *DeleteDomain) Run(c *cli.Context) {
 	domainName := c.Args()[0]
-	force := c.Bool("f")
-
 	domain, apiErr := cmd.domainRepo.FindByNameInOrg(domainName, cmd.orgReq.GetOrganizationFields().Guid)
 
 	switch apiErr.(type) {
@@ -59,10 +57,8 @@ func (cmd *DeleteDomain) Run(c *cli.Context) {
 		return
 	}
 
-	if !force {
-		answer := cmd.ui.Confirm("Are you sure you want to delete the domain %s and all of its associations?", domainName)
-
-		if !answer {
+	if !c.Bool("f") {
+		if !cmd.ui.ConfirmDelete("domain", domainName) {
 			return
 		}
 	}
