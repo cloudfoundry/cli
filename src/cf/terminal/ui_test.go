@@ -109,6 +109,19 @@ var _ = Describe("UI", func() {
 		})
 	})
 
+	Describe("Confirming deletion with associations", func() {
+		It("warns the user that associated objects will also be deleted", func() {
+			simulateStdin("wat\n", func(reader io.Reader) {
+				out := captureOutput(func() {
+					ui := NewUI(reader)
+					Expect(ui.ConfirmDeleteWithAssociations("modelType", "modelName")).To(BeFalse())
+				})
+
+				testassert.SliceContains(out, testassert.Lines{{"Delete cancelled"}})
+			})
+		})
+	})
+
 	Context("when user is not logged in", func() {
 		var config configuration.Reader
 

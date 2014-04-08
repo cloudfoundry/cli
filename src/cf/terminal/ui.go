@@ -26,6 +26,7 @@ type UI interface {
 	AskForPassword(prompt string, args ...interface{}) (answer string)
 	Confirm(message string, args ...interface{}) bool
 	ConfirmDelete(modelType, modelName string) bool
+	ConfirmDeleteWithAssociations(modelType, modelName string) bool
 	Ok()
 	Failed(message string, args ...interface{})
 	FailWithUsage(ctxt *cli.Context, cmdName string)
@@ -67,9 +68,17 @@ func (c terminalUI) Warn(message string, args ...interface{}) {
 	return
 }
 
+func (c terminalUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
+	return c.confirmDelete("Really delete the %s %s and everything associated with it?%s", modelType, modelName)
+}
+
 func (c terminalUI) ConfirmDelete(modelType, modelName string) bool {
+	return c.confirmDelete("Really delete the %s %s?%s", modelType, modelName)
+}
+
+func (c terminalUI) confirmDelete(message, modelType, modelName string) bool {
 	result := c.Confirm(
-		"Really delete the %s %s?%s",
+		message,
 		modelType,
 		EntityNameColor(modelName),
 		PromptColor(">"),

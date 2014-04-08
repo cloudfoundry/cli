@@ -65,6 +65,10 @@ func (ui *FakeUI) ConfirmDelete(modelType, modelName string) bool {
 		term.PromptColor(">"))
 }
 
+func (ui *FakeUI) ConfirmDeleteWithAssociations(modelType, modelName string) bool {
+	return ui.ConfirmDelete(modelType, modelName)
+}
+
 func (ui *FakeUI) Confirm(prompt string, args ...interface{}) bool {
 	response := ui.Ask(prompt, args...)
 	switch strings.ToLower(response) {
