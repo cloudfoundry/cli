@@ -16,7 +16,7 @@ import (
 var _ = Describe("delete-buildpack command", func() {
 	var (
 		ui                  *testterm.FakeUI
-		buildpackRepo             *testapi.FakeBuildpackRepository
+		buildpackRepo       *testapi.FakeBuildpackRepository
 		requirementsFactory *testreq.FakeReqFactory
 	)
 
@@ -90,10 +90,10 @@ var _ = Describe("delete-buildpack command", func() {
 		Context("when the buildpack provided is not found", func() {
 			BeforeEach(func() {
 				ui = &testterm.FakeUI{Inputs: []string{"y"}}
-			    buildpackRepo.FindByNameNotFound = true
+				buildpackRepo.FindByNameNotFound = true
 			})
 
-		    It("warns the user", func() {
+			It("warns the user", func() {
 				runCommand("my-buildpack")
 
 				Expect(buildpackRepo.FindByNameName).To(Equal("my-buildpack"))
@@ -107,19 +107,19 @@ var _ = Describe("delete-buildpack command", func() {
 				testassert.SliceContains(ui.WarnOutputs, testassert.Lines{
 					{"my-buildpack", "does not exist"},
 				})
-		    })
+			})
 		})
 
 		Context("when an error occurs", func() {
-		    BeforeEach(func() {
+			BeforeEach(func() {
 				ui = &testterm.FakeUI{Inputs: []string{"y"}}
 
 				buildpackRepo.FindByNameBuildpack = models.Buildpack{
 					Name: "my-buildpack",
 					Guid: "my-buildpack-guid",
 				}
-		    	buildpackRepo.DeleteApiResponse = errors.New("failed badly")
-		    })
+				buildpackRepo.DeleteApiResponse = errors.New("failed badly")
+			})
 
 			It("fails with the error", func() {
 				runCommand("my-buildpack")
