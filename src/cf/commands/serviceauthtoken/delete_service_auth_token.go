@@ -39,12 +39,7 @@ func (cmd DeleteServiceAuthTokenFields) Run(c *cli.Context) {
 	tokenProvider := c.Args()[1]
 
 	if c.Bool("f") == false {
-		response := cmd.ui.Confirm(
-			"Are you sure you want to delete %s?%s",
-			terminal.EntityNameColor(fmt.Sprintf("%s %s", tokenLabel, tokenProvider)),
-			terminal.PromptColor(">"),
-		)
-		if response == false {
+		if !cmd.ui.ConfirmDelete("service auth token", fmt.Sprintf("%s %s", tokenLabel, tokenProvider)) {
 			return
 		}
 	}

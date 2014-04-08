@@ -1,32 +1,8 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package serviceauthtoken_test
 
 import (
 	. "cf/commands/serviceauthtoken"
+	"cf/configuration"
 	"cf/errors"
 	"cf/models"
 	. "github.com/onsi/ginkgo"
@@ -39,157 +15,114 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callDeleteServiceAuthToken(args []string, inputs []string, reqFactory *testreq.FakeReqFactory, authTokenRepo *testapi.FakeAuthTokenRepo) (ui *testterm.FakeUI) {
-	ui = &testterm.FakeUI{
-		Inputs: inputs,
+var _ = Describe("delete-service-auth-token command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		configRepo          configuration.ReadWriter
+		authTokenRepo       *testapi.FakeAuthTokenRepo
+		requirementsFactory *testreq.FakeReqFactory
+	)
+
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{Inputs: []string{"y"}}
+		authTokenRepo = &testapi.FakeAuthTokenRepo{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
+	})
+
+	runCommand := func(args ...string) {
+		cmd := NewDeleteServiceAuthToken(ui, configRepo, authTokenRepo)
+		testcmd.RunCommand(cmd, testcmd.NewContext("delete-service-auth-token", args), requirementsFactory)
 	}
 
-	config := testconfig.NewRepositoryWithDefaults()
-
-	cmd := NewDeleteServiceAuthToken(ui, config, authTokenRepo)
-	ctxt := testcmd.NewContext("delete-service-auth-token", args)
-
-	testcmd.RunCommand(cmd, ctxt, reqFactory)
-	return
-}
-
-var _ = Describe("Testing with ginkgo", func() {
-	It("TestDeleteServiceAuthTokenFailsWithUsage", func() {
-		authTokenRepo := &testapi.FakeAuthTokenRepo{}
-		reqFactory := &testreq.FakeReqFactory{}
-
-		ui := callDeleteServiceAuthToken([]string{}, []string{"Y"}, reqFactory, authTokenRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callDeleteServiceAuthToken([]string{"arg1"}, []string{"Y"}, reqFactory, authTokenRepo)
-		Expect(ui.FailedWithUsage).To(BeTrue())
-
-		ui = callDeleteServiceAuthToken([]string{"arg1", "arg2"}, []string{"Y"}, reqFactory, authTokenRepo)
-		Expect(ui.FailedWithUsage).To(BeFalse())
-	})
-	It("TestDeleteServiceAuthTokenRequirements", func() {
-
-		authTokenRepo := &testapi.FakeAuthTokenRepo{}
-		reqFactory := &testreq.FakeReqFactory{}
-		args := []string{"arg1", "arg2"}
-
-		reqFactory.LoginSuccess = true
-		callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		reqFactory.LoginSuccess = false
-		callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
-	})
-	It("TestDeleteServiceAuthToken", func() {
-
-		expectedToken := models.ServiceAuthTokenFields{}
-		expectedToken.Label = "a label"
-		expectedToken.Provider = "a provider"
-
-		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderServiceAuthTokenFields: expectedToken,
-		}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		args := []string{"a label", "a provider"}
-
-		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service auth token as", "my-user"},
-			{"OK"},
+	Describe("requirements", func() {
+		It("fails with usage when fewer than two arguments are given", func() {
+			runCommand("yurp")
+			Expect(ui.FailedWithUsage).To(BeTrue())
 		})
 
-		Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
-		Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
-		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(expectedToken))
-	})
-	It("TestDeleteServiceAuthTokenWithN", func() {
-
-		authTokenRepo := &testapi.FakeAuthTokenRepo{}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		args := []string{"a label", "a provider"}
-
-		ui := callDeleteServiceAuthToken(args, []string{"N"}, reqFactory, authTokenRepo)
-
-		testassert.SliceContains(ui.Prompts, testassert.Lines{
-			{"Are you sure you want to delete", "a label", "a provider"},
-		})
-		Expect(len(ui.Outputs)).To(Equal(0))
-		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(models.ServiceAuthTokenFields{}))
-	})
-	It("TestDeleteServiceAuthTokenWithY", func() {
-
-		expectedToken := models.ServiceAuthTokenFields{}
-		expectedToken.Label = "a label"
-		expectedToken.Provider = "a provider"
-
-		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderServiceAuthTokenFields: expectedToken,
-		}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		args := []string{"a label", "a provider"}
-
-		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-
-		testassert.SliceContains(ui.Prompts, testassert.Lines{
-			{"Are you sure you want to delete", "a label", "a provider"},
-		})
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting"},
-			{"OK"},
-		})
-
-		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(expectedToken))
-	})
-	It("TestDeleteServiceAuthTokenWithForce", func() {
-
-		expectedToken := models.ServiceAuthTokenFields{}
-		expectedToken.Label = "a label"
-		expectedToken.Provider = "a provider"
-
-		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderServiceAuthTokenFields: expectedToken,
-		}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		args := []string{"-f", "a label", "a provider"}
-		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-
-		Expect(len(ui.Prompts)).To(Equal(0))
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting"},
-			{"OK"},
-		})
-
-		Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(expectedToken))
-	})
-	It("TestDeleteServiceAuthTokenWhenTokenDoesNotExist", func() {
-
-		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderApiResponse: errors.NewModelNotFoundError("Service Auth Token", ""),
-		}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		args := []string{"a label", "a provider"}
-
-		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service auth token as", "my-user"},
-			{"OK"},
-			{"does not exist"},
+		It("fails when not logged in", func() {
+			requirementsFactory.LoginSuccess = false
+			runCommand()
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
-	It("TestDeleteServiceAuthTokenFailsWithError", func() {
 
-		authTokenRepo := &testapi.FakeAuthTokenRepo{
-			FindByLabelAndProviderApiResponse: errors.New("OH NOES"),
-		}
-		reqFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		args := []string{"a label", "a provider"}
+	Context("when the service auth token exists", func() {
+		BeforeEach(func() {
+			authTokenRepo.FindByLabelAndProviderServiceAuthTokenFields = models.ServiceAuthTokenFields{
+				Guid:     "the-guid",
+				Label:    "a label",
+				Provider: "a provider",
+			}
+		})
 
-		ui := callDeleteServiceAuthToken(args, []string{"Y"}, reqFactory, authTokenRepo)
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Deleting service auth token as", "my-user"},
-			{"FAILED"},
-			{"OH NOES"},
+		It("deletes the service auth token", func() {
+			runCommand("a label", "a provider")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Deleting service auth token as", "my-user"},
+				{"OK"},
+			})
+
+			Expect(authTokenRepo.FindByLabelAndProviderLabel).To(Equal("a label"))
+			Expect(authTokenRepo.FindByLabelAndProviderProvider).To(Equal("a provider"))
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
+		})
+
+		It("does nothing when the user does not confirm", func() {
+			ui.Inputs = []string{"nope"}
+			runCommand("a label", "a provider")
+
+			testassert.SliceContains(ui.Prompts, testassert.Lines{
+				{"Really delete", "service auth token", "a label", "a provider"},
+			})
+			Expect(ui.Outputs).To(BeEmpty())
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields).To(Equal(models.ServiceAuthTokenFields{}))
+		})
+
+		It("does not prompt the user when the -f flag is given", func() {
+			ui.Inputs = []string{}
+			runCommand("-f", "a label", "a provider")
+
+			Expect(ui.Prompts).To(BeEmpty())
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Deleting"},
+				{"OK"},
+			})
+
+			Expect(authTokenRepo.DeletedServiceAuthTokenFields.Guid).To(Equal("the-guid"))
+		})
+	})
+
+	Context("when the service auth token does not exist", func() {
+		BeforeEach(func() {
+			authTokenRepo.FindByLabelAndProviderApiResponse = errors.NewModelNotFoundError("Service Auth Token", "")
+		})
+
+		It("warns the user when the specified service auth token does not exist", func() {
+			runCommand("a label", "a provider")
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Deleting service auth token as", "my-user"},
+				{"OK"},
+			})
+
+			testassert.SliceContains(ui.WarnOutputs, testassert.Lines{{"does not exist"}})
+		})
+	})
+
+	Context("when there is an error deleting the service auth token", func() {
+		BeforeEach(func() {
+			authTokenRepo.FindByLabelAndProviderApiResponse = errors.New("OH NOES")
+		})
+
+		It("TestDeleteServiceAuthTokenFailsWithError", func() {
+			runCommand("a label", "a provider")
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Deleting service auth token as", "my-user"},
+				{"FAILED"},
+				{"OH NOES"},
+			})
 		})
 	})
 })
