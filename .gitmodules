@@ -25,3 +25,6 @@
 [submodule "src/github.com/cloudfoundry/loggregator_consumer"]
 	path = src/github.com/cloudfoundry/loggregator_consumer
 	url = https://github.com/cloudfoundry/loggregator_consumer
+[submodule "src/github.com/gorilla/websocket"]
+	path = src/github.com/gorilla/websocket
+	url = https://github.com/gorilla/websocket
