@@ -702,7 +702,7 @@ func NewApp(cmdRunner commands.Runner) (app *cli.App, err error) {
 		},
 		{
 			Name:        "set-quota",
-			Description: "Define the quota for an org",
+			Description: "Assign a quota to an org",
 			Usage: fmt.Sprintf("%s set-quota ORG QUOTA\n\n", cf.Name()) +
 				"TIP:\n" +
 				fmt.Sprintf("   View allowable quotas with '%s quotas'", cf.Name()),
