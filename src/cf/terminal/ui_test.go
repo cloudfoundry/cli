@@ -37,6 +37,15 @@ var _ = Describe("UI", func() {
 				Expect("Hello World!").To(Equal(strings.Join(output, "")))
 			})
 		})
+
+		It("does not format strings when provided no args", func() {
+			output := captureOutput(func() {
+				ui := NewUI(os.Stdin)
+				ui.Say("Hello %s World!") // whoops
+			})
+
+			Expect(strings.Join(output, "")).To(Equal("Hello %s World!"))
+		})
 	})
 
 	Describe("Confirming user input", func() {
