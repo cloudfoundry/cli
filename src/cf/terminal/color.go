@@ -50,12 +50,10 @@ func ColorizeBold(message string, color Color) string {
 	return colorize(message, color, 1)
 }
 
+var decolorizerRegex = regexp.MustCompile(`\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`)
+
 func decolorize(message string) string {
-	reg, err := regexp.Compile(`\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]`)
-	if err != nil {
-		panic(err)
-	}
-	return string(reg.ReplaceAll([]byte(message), []byte("")))
+	return string(decolorizerRegex.ReplaceAll([]byte(message), []byte("")))
 }
 
 func HeaderColor(message string) string {

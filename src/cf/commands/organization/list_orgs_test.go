@@ -1,28 +1,3 @@
-/*
-                       WARNING WARNING WARNING
-
-                Attention all potential contributors
-
-   This testfile is not in the best state. We've been slowly transitioning
-   from the built in "testing" package to using Ginkgo. As you can see, we've
-   changed the format, but a lot of the setup, test body, descriptions, etc
-   are either hardcoded, completely lacking, or misleading.
-
-   For example:
-
-   Describe("Testing with ginkgo"...)      // This is not a great description
-   It("TestDoesSoemthing"...)              // This is a horrible description
-
-   Describe("create-user command"...       // Describe the actual object under test
-   It("creates a user when provided ..."   // this is more descriptive
-
-   For good examples of writing Ginkgo tests for the cli, refer to
-
-   src/cf/commands/application/delete_app_test.go
-   src/cf/terminal/ui_test.go
-   src/github.com/cloudfoundry/loggregator_consumer/consumer_test.go
-*/
-
 package organization_test
 
 import (
@@ -39,68 +14,62 @@ import (
 	testterm "testhelpers/terminal"
 )
 
-func callListOrgs(config configuration.Reader, requirementsFactory *testreq.FakeReqFactory, orgRepo *testapi.FakeOrgRepository) (fakeUI *testterm.FakeUI) {
-	fakeUI = &testterm.FakeUI{}
-	ctxt := testcmd.NewContext("orgs", []string{})
-	cmd := organization.NewListOrgs(fakeUI, config, orgRepo)
-	testcmd.RunCommand(cmd, ctxt, requirementsFactory)
-	return
-}
+var _ = Describe("org command", func() {
+	var (
+		ui                  *testterm.FakeUI
+		orgRepo             *testapi.FakeOrgRepository
+		configRepo          configuration.ReadWriter
+		requirementsFactory *testreq.FakeReqFactory
+	)
 
-var _ = Describe("Testing with ginkgo", func() {
+	runCommand := func() {
+		cmd := organization.NewListOrgs(ui, configRepo, orgRepo)
+		testcmd.RunCommand(cmd, testcmd.NewContext("orgs", []string{}), requirementsFactory)
+	}
 
-	It("TestListOrgsRequirements", func() {
-		orgRepo := &testapi.FakeOrgRepository{}
-		config := testconfig.NewRepository()
-
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		callListOrgs(config, requirementsFactory, orgRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeTrue())
-
-		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: false}
-		callListOrgs(config, requirementsFactory, orgRepo)
-		Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
+	BeforeEach(func() {
+		ui = &testterm.FakeUI{}
+		configRepo = testconfig.NewRepositoryWithDefaults()
+		orgRepo = &testapi.FakeOrgRepository{}
+		requirementsFactory = &testreq.FakeReqFactory{LoginSuccess: true}
 	})
 
-	It("TestListAllPagesOfOrgs", func() {
-		org1 := models.Organization{}
-		org1.Name = "Organization-1"
-
-		org2 := models.Organization{}
-		org2.Name = "Organization-2"
-
-		org3 := models.Organization{}
-		org3.Name = "Organization-3"
-
-		orgRepo := &testapi.FakeOrgRepository{
-			Organizations: []models.Organization{org1, org2, org3},
-		}
-
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		tokenInfo := configuration.TokenInfo{Username: "my-user"}
-		config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
-
-		ui := callListOrgs(config, requirementsFactory, orgRepo)
-
-		testassert.SliceContains(ui.Outputs, testassert.Lines{
-			{"Getting orgs as my-user"},
-			{"Organization-1"},
-			{"Organization-2"},
-			{"Organization-3"},
+	Describe("requirements", func() {
+		It("fails when not logged in", func() {
+			requirementsFactory.LoginSuccess = false
+			runCommand()
+			Expect(testcmd.CommandDidPassRequirements).To(BeFalse())
 		})
 	})
 
-	It("TestListNoOrgs", func() {
-		orgs := []models.Organization{}
-		orgRepo := &testapi.FakeOrgRepository{
-			Organizations: orgs,
-		}
+	Context("when there are orgs to be listed", func() {
+		BeforeEach(func() {
+			org1 := models.Organization{}
+			org1.Name = "Organization-1"
 
-		requirementsFactory := &testreq.FakeReqFactory{LoginSuccess: true}
-		tokenInfo := configuration.TokenInfo{Username: "my-user"}
-		config := testconfig.NewRepositoryWithAccessToken(tokenInfo)
+			org2 := models.Organization{}
+			org2.Name = "Organization-2"
 
-		ui := callListOrgs(config, requirementsFactory, orgRepo)
+			org3 := models.Organization{}
+			org3.Name = "Organization-3"
+
+			orgRepo.Organizations = []models.Organization{org1, org2, org3}
+		})
+
+		It("lists orgs", func() {
+			runCommand()
+
+			testassert.SliceContains(ui.Outputs, testassert.Lines{
+				{"Getting orgs as my-user"},
+				{"Organization-1"},
+				{"Organization-2"},
+				{"Organization-3"},
+			})
+		})
+	})
+
+	It("tells the user when no orgs were found", func() {
+		runCommand()
 
 		testassert.SliceContains(ui.Outputs, testassert.Lines{
 			{"Getting orgs as my-user"},
