@@ -128,14 +128,14 @@ func mapToAppParams(basePath string, yamlMap generic.Map) (appParams models.AppP
 		return
 	}
 
-	appParams.BuildpackUrl = stringOrNullVal(yamlMap, "buildpack", &errs)
+	appParams.BuildpackUrl = stringValOrDefault(yamlMap, "buildpack", &errs)
 	appParams.DiskQuota = bytesVal(yamlMap, "disk_quota", &errs)
 	appParams.Domain = stringVal(yamlMap, "domain", &errs)
 	appParams.Host = stringVal(yamlMap, "host", &errs)
 	appParams.Name = stringVal(yamlMap, "name", &errs)
 	appParams.Path = stringVal(yamlMap, "path", &errs)
 	appParams.StackName = stringVal(yamlMap, "stack", &errs)
-	appParams.Command = stringOrNullVal(yamlMap, "command", &errs)
+	appParams.Command = stringValOrDefault(yamlMap, "command", &errs)
 	appParams.Memory = bytesVal(yamlMap, "memory", &errs)
 	appParams.InstanceCount = intVal(yamlMap, "instances", &errs)
 	appParams.HealthCheckTimeout = intVal(yamlMap, "timeout", &errs)
@@ -183,15 +183,19 @@ func stringVal(yamlMap generic.Map, key string, errs *[]error) *string {
 	return &result
 }
 
-func stringOrNullVal(yamlMap generic.Map, key string, errs *[]error) *string {
+func stringValOrDefault(yamlMap generic.Map, key string, errs *[]error) *string {
 	if !yamlMap.Has(key) {
 		return nil
 	}
+	empty := ""
 	switch val := yamlMap.Get(key).(type) {
 	case string:
-		return &val
+		if val == "default" {
+			return &empty
+		} else {
+			return &val
+		}
 	case nil:
-		empty := ""
 		return &empty
 	default:
 		*errs = append(*errs, errors.NewWithFmt("%s must be a string or null value", key))

@@ -265,11 +265,12 @@ var _ = Describe("Manifests", func() {
 		})
 	})
 
-	It("sets the command to blank when its value is null in the manifest", func() {
+	It("sets the command and buildpack to blank when their values are null in the manifest", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				generic.NewMap(map[interface{}]interface{}{
-					"command": nil,
+					"buildpack": nil,
+					"command":   nil,
 				}),
 			},
 		}))
@@ -277,19 +278,22 @@ var _ = Describe("Manifests", func() {
 		apps, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
 		Expect(*apps[0].Command).To(Equal(""))
+		Expect(*apps[0].BuildpackUrl).To(Equal(""))
 	})
 
-	It("sets the buildpack to blank when its value is null in the manifest", func() {
+	It("sets the command and buildpack to blank when their values are 'default' in the manifest", func() {
 		m := NewManifest("/some/path/manifest.yml", generic.NewMap(map[interface{}]interface{}{
 			"applications": []interface{}{
 				generic.NewMap(map[interface{}]interface{}{
-					"buildpack": nil,
+					"command":   "default",
+					"buildpack": "default",
 				}),
 			},
 		}))
 
 		apps, err := m.Applications()
 		Expect(err).NotTo(HaveOccurred())
+		Expect(*apps[0].Command).To(Equal(""))
 		Expect(*apps[0].BuildpackUrl).To(Equal(""))
 	})
 
