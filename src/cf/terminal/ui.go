@@ -58,7 +58,12 @@ func (c terminalUI) PrintPaginator(rows []string, err error) {
 }
 
 func (c terminalUI) Say(message string, args ...interface{}) {
-	fmt.Printf(message+"\n", args...)
+	if len(args) == 0 {
+		fmt.Printf("%s\n", message)
+	} else {
+		fmt.Printf(message+"\n", args...)
+	}
+
 	return
 }
 
